@@ -16,9 +16,9 @@
 package annis.provider;
 
 import annis.utils.GraphMLConverter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
+import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -75,14 +75,14 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
 
     // collect document graphs from the salt project
     List<SDocument> docs = new LinkedList<>();
-    List<SCorpusGraph> corpusGraphs = t.getSCorpusGraphs();
+    List<SCorpusGraph> corpusGraphs = t.getCorpusGraphs();
     if(corpusGraphs != null)
     {
       for(SCorpusGraph c : corpusGraphs)
       {
-        if(c.getSDocuments() != null)
+        if(c.getDocuments() != null)
         {
-          docs.addAll(c.getSDocuments());
+          docs.addAll(c.getDocuments());
         }
       }
     }

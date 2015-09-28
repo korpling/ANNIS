@@ -15,17 +15,19 @@
  */
 package annis.libgui.media;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+
+import de.hu_berlin.u.saltnpepper.graph.Relation;
+import de.hu_berlin.u.saltnpepper.salt.common.SSpan;
+import de.hu_berlin.u.saltnpepper.salt.common.SSpanningRelation;
+import de.hu_berlin.u.saltnpepper.salt.common.SToken;
+import de.hu_berlin.u.saltnpepper.salt.core.SAnnotation;
+import de.hu_berlin.u.saltnpepper.salt.core.SGraph;
+import de.hu_berlin.u.saltnpepper.salt.core.SNode;
+import de.hu_berlin.u.saltnpepper.salt.core.SRelation;
+import de.hu_berlin.u.saltnpepper.salt.util.SaltUtil;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,44 +51,44 @@ public class TimeHelper
    */
   public static double[] getOverlappedTime(SNode node)
   {
-    SGraph graph = node.getSGraph();
+    SGraph graph = node.getGraph();
 
-    final List<Double> startTimes = new LinkedList<Double>();
-    final List<Double> endTimes = new  LinkedList<Double>();
+    final List<Double> startTimes = new LinkedList<>();
+    final List<Double> endTimes = new  LinkedList<>();
     
-    List<SToken> token = new LinkedList<SToken>();
+    List<SToken> token = new LinkedList<>();
     if(node instanceof SToken)
     {
       token.add((SToken) node);
     }
     else
     {
-      EList<Edge> outEdges = graph.getOutEdges(node.getSId());
-      if (outEdges != null)
+      List<SRelation<SNode,SNode>> outRelations = graph.getOutRelations(node.getId());
+      if (outRelations != null)
       {
-        for (Edge e : outEdges)
+        for (Relation e : outRelations)
         {
           if (e instanceof SSpanningRelation)
           {
-            SToken tok = ((SSpanningRelation) e).getSToken();
+            SToken tok = ((SSpanningRelation) e).getTarget();
             token.add(tok);
           }
         }
-      } // end for each out edges
+      } // end for each out relations
     }
 
     for (SToken tok : token)
     {
 
-      SAnnotation anno = tok.getSAnnotation("annis::time");
+      SAnnotation anno = tok.getAnnotation(SaltUtil.createQName("annis", "time"));
       if (anno != null
-        && anno.getSValueSTEXT() != null
-        && !anno.getSValueSTEXT().isEmpty() 
-        && !anno.getSValueSTEXT().matches("\\-[0-9]*(\\.[0-9]*)?"))
+        && anno.getValue_STEXT() != null
+        && !anno.getValue_STEXT().isEmpty() 
+        && !anno.getValue_STEXT().matches("\\-[0-9]*(\\.[0-9]*)?"))
       {
         try
         {
-          String[] split = anno.getSValueSTEXT().split("-");
+          String[] split = anno.getValue_STEXT().split("-");
           if (split.length == 1)
           {
             startTimes.add(Double.parseDouble(split[0]));

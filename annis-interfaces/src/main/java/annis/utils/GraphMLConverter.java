@@ -15,20 +15,20 @@
  */
 package annis.utils;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.IdentifiableElement;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.LabelableElement;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import de.hu_berlin.u.saltnpepper.graph.IdentifiableElement;
+import de.hu_berlin.u.saltnpepper.graph.Label;
+import de.hu_berlin.u.saltnpepper.graph.LabelableElement;
+import de.hu_berlin.u.saltnpepper.graph.Node;
+import de.hu_berlin.u.saltnpepper.graph.Relation;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
+import de.hu_berlin.u.saltnpepper.salt.core.SNode;
+import de.hu_berlin.u.saltnpepper.salt.core.SRelation;
+import de.hu_berlin.u.saltnpepper.salt.util.SALT_TYPE;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +38,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.eclipse.emf.ecore.EObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,21 +88,21 @@ public class GraphMLConverter
         // first get all possible label names and write them as "key"
         for(SDocument doc : docs)
         {
-          SDocumentGraph g = doc.getSDocumentGraph();
+          SDocumentGraph g = doc.getDocumentGraph();
           if(g != null)
           {
             writeKeys(w, g.getNodes(), existingKeys);
-            writeKeys(w, g.getEdges(), existingKeys);
-            if(g.getSDocument() != null)
+            writeKeys(w, g.getRelations(), existingKeys);
+            if(g.getDocument() != null)
             {
-              writeKeys(w, g.getSDocument().getLabels(), existingKeys);
+              writeKeys(w, g.getDocument().getLabels(), existingKeys);
             }
           }
         }
         // write the actual graphs
         for(SDocument d : docs)
         {
-          writeSDocumentGraph(w, d.getSDocumentGraph(), ids, existingKeys, true);
+          writeSDocumentGraph(w, d.getDocumentGraph(), ids, existingKeys, true);
         }
       }
       w.writeEndDocument();
@@ -118,14 +117,14 @@ public class GraphMLConverter
     
   }
   
-  private static void writeKeys(XMLStreamWriter w, List<? extends LabelableElement> elements, Set<String> existing)
+  private static void writeKeys(XMLStreamWriter w, Collection<? extends LabelableElement> elements, Set<String> existing)
     throws XMLStreamException
   {
     if (elements != null && !elements.isEmpty())
     {
       for (LabelableElement e : elements)
       {
-        List<Label> labels = e.getLabels();
+        Collection<Label> labels = e.getLabels();
         if (labels != null && !labels.isEmpty())
         {
           for (Label l : labels)
@@ -176,7 +175,7 @@ public class GraphMLConverter
     }
   }
 
-  private static void writeLabels(XMLStreamWriter w, List<Label> labels,
+  private static void writeLabels(XMLStreamWriter w, Collection<Label> labels,
     Set<String> existingKeys) 
     throws XMLStreamException
   {
@@ -202,15 +201,15 @@ public class GraphMLConverter
    * @param o
    * @throws XMLStreamException 
    */
-  private static void writeType(XMLStreamWriter w, EObject o)
+  private static void writeType(XMLStreamWriter w, Object o)
     throws XMLStreamException
   {
-    HashSet<STYPE_NAME> types = SaltFactory.eINSTANCE.convertClazzToSTypeName(o.getClass());
+    Set<SALT_TYPE> types = SALT_TYPE.class2SaltType(o.getClass());
     if(!types.isEmpty())
     {
       w.writeStartElement(NS, "data");
       w.writeAttribute(NS, "key", "salt::type");
-      w.writeCharacters(types.iterator().next().getName());
+      w.writeCharacters(types.iterator().next().name());
       w.writeEndElement();
     }
   }
@@ -227,10 +226,10 @@ public class GraphMLConverter
     w.writeEndElement();
   }
   
-  private static void writeEdge(XMLStreamWriter w, Edge e, 
+  private static void writeRelation(XMLStreamWriter w, Relation e, 
     IDManager ids, Set<String> existingKeys) throws XMLStreamException
   {
-    w.writeStartElement(NS, "edge");
+    w.writeStartElement(NS, "relation");
     w.writeAttribute(NS, "id", ids.getID(e));
     w.writeAttribute(NS, "source", ids.getID(e.getSource()));
     w.writeAttribute(NS, "target", ids.getID(e.getTarget()));
@@ -251,18 +250,18 @@ public class GraphMLConverter
       return;
       
     }
-    List<SNode> nodes = g.getSNodes();
-    List<SRelation> relations = g.getSRelations();
+    List<SNode> nodes = g.getNodes();
+    List<SRelation<SNode, SNode>> relations = g.getRelations();
     // graphs without nodes are not allowed
     if(nodes != null && !nodes.isEmpty())
     {
       w.writeStartElement(NS, "graph");
       w.writeAttribute(NS, "id", ids.getID(g));
-      w.writeAttribute(NS, "edgedefault", "directed");
+      w.writeAttribute(NS, "relationdefault", "directed");
       
-      if(includeDocLabels && g.getSDocument() != null)
+      if(includeDocLabels && g.getDocument() != null)
       {
-        writeLabels(w, g.getSDocument().getLabels(), existingKeys);
+        writeLabels(w, g.getDocument().getLabels(), existingKeys);
       }
       
       for(SNode n : nodes)
@@ -274,7 +273,7 @@ public class GraphMLConverter
       {
         for(SRelation e : relations)
         {
-          writeEdge(w, e, ids, existingKeys);
+          writeRelation(w, e, ids, existingKeys);
         }
       }
 

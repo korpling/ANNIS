@@ -22,32 +22,32 @@ import java.util.TreeSet;
 public abstract class Join extends DataObject {
 
 	protected QueryNode target;
-  private Set<QueryAnnotation> edgeAnnotations;
+  private Set<QueryAnnotation> relationAnnotations;
   
   private ParsedEntityLocation parseLocation;
 
 	public Join(QueryNode target) {
 		this.target = target;
-    this.edgeAnnotations = new TreeSet<>();
+    this.relationAnnotations = new TreeSet<>();
 	}
 
 	public QueryNode getTarget() {
 		return target;
 	}
   
-  public boolean addEdgeAnnotation(QueryAnnotation anno)
+  public boolean addRelationAnnotation(QueryAnnotation anno)
   {
-    return edgeAnnotations.add(anno);
+    return relationAnnotations.add(anno);
   }
 
-  public Set<QueryAnnotation> getEdgeAnnotations()
+  public Set<QueryAnnotation> getRelationAnnotations()
   {
-    return edgeAnnotations;
+    return relationAnnotations;
   }
 
-  public void setEdgeAnnotations(Set<QueryAnnotation> edgeAnnotations)
+  public void setRelationAnnotations(Set<QueryAnnotation> relationAnnotations)
   {
-    this.edgeAnnotations = edgeAnnotations;
+    this.relationAnnotations = relationAnnotations;
   }
   
   public String toAQLFragment(QueryNode source)

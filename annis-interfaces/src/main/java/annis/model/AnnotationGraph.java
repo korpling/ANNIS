@@ -41,7 +41,7 @@ public class AnnotationGraph implements Serializable
 
 	// graph is defined by list of nodes and tokens
 	private List<AnnisNode> nodes;
-	private List<Edge> edges;
+	private List<Edge> relations;
 
 	// annotation graph for nodes with these ids
 	private Set<Long> matchedNodeIds;
@@ -54,10 +54,10 @@ public class AnnotationGraph implements Serializable
 		this(new ArrayList<AnnisNode>(), new ArrayList<Edge>());
 	}
 
-	public AnnotationGraph(List<AnnisNode> nodes, List<Edge> edges)
+	public AnnotationGraph(List<AnnisNode> nodes, List<Edge> relations)
 	{
 		this.nodes = nodes;
-		this.edges = edges;
+		this.relations = relations;
 		this.matchedNodeIds = new HashSet<Long>();
 		this.tokenByIndex = new HashMap<Long, AnnisNode>();
 	}
@@ -68,19 +68,19 @@ public class AnnotationGraph implements Serializable
 		List<Long> ids = new ArrayList<Long>();
 		for (AnnisNode node : nodes)
 			ids.add(node.getId());
-		List<String> _edges = new ArrayList<String>();
-		for (Edge edge : edges)
+		List<String> _relations = new ArrayList<String>();
+		for (Edge relation : relations)
 		{
-			Long src = edge.getSource() != null ? edge.getSource().getId()
+			Long src = relation.getSource() != null ? relation.getSource().getId()
 					: null;
-			long dst = edge.getDestination().getId();
-			String edgeType = edge.getEdgeType() != null ? edge.getEdgeType()
+			long dst = relation.getDestination().getId();
+			String relationType = relation.getRelationType() != null ? relation.getRelationType()
 					.toString() : null;
-			String name = edge.getQualifiedName();
-			_edges.add(src + "->" + dst + " " + name + " " + edgeType);
+			String name = relation.getQualifiedName();
+			_relations.add(src + "->" + dst + " " + name + " " + relationType);
 		}
 		return "match: " + StringUtils.join(matchedNodeIds, "-") + "; nodes: "
-				+ ids + "; edges: " + _edges;
+				+ ids + "; relations: " + _relations;
 	}
 
 	public void addMatchedNodeId(Long id)
@@ -101,9 +101,9 @@ public class AnnotationGraph implements Serializable
 		return nodes.add(node);
 	}
 
-	public boolean addEdge(Edge edge)
+	public boolean addRelation(Edge relation)
 	{
-		return edges.add(edge);
+		return relations.add(relation);
 	}
 
 	public AnnisNode getToken(long tokenIndex)
@@ -132,14 +132,14 @@ public class AnnotationGraph implements Serializable
 		AnnotationGraph other = (AnnotationGraph) obj;
 
 		return new EqualsBuilder().append(this.nodes, other.nodes)
-				.append(this.edges, other.edges)
+				.append(this.relations, other.relations)
 				.append(this.matchedNodeIds, other.matchedNodeIds).isEquals();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new HashCodeBuilder().append(nodes).append(edges)
+		return new HashCodeBuilder().append(nodes).append(relations)
 				.append(matchedNodeIds).toHashCode();
 	}
 
@@ -150,9 +150,9 @@ public class AnnotationGraph implements Serializable
 		return nodes;
 	}
 
-	public List<Edge> getEdges()
+	public List<Edge> getRelations()
 	{
-		return edges;
+		return relations;
 	}
 
 	public Set<Long> getMatchedNodeIds()

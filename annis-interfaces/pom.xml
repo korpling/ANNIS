@@ -57,19 +57,9 @@
     
     <dependency>
       <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
-      <artifactId>salt-saltCommon</artifactId>
-      <version>2.0.0</version>
+      <artifactId>salt-core</artifactId>
+      <version>3.0.0-SNAPSHOT</version>
       <type>bundle</type>
-      <exclusions>
-        <exclusion>  
-          <groupId>org.apache.felix</groupId>  
-          <artifactId>javax.servlet</artifactId>
-        </exclusion>
-        <exclusion>  
-          <groupId>log4j</groupId>  
-          <artifactId>log4j</artifactId>
-        </exclusion>
-      </exclusions> 
       <scope>compile</scope>
     </dependency>
 
@@ -79,7 +69,7 @@
       <version>1.1.1</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
+      <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>1.3.2</version>
       <scope>compile</scope>

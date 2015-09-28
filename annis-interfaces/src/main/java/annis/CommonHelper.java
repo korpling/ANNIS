@@ -17,40 +17,34 @@ package annis;
 
 import annis.model.AnnisConstants;
 import annis.service.objects.Match;
-import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import de.hu_berlin.u.saltnpepper.graph.Label;
+import de.hu_berlin.u.saltnpepper.graph.Relation;
+import de.hu_berlin.u.saltnpepper.salt.common.SCorpus;
+import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
+import de.hu_berlin.u.saltnpepper.salt.common.SOrderRelation;
+import de.hu_berlin.u.saltnpepper.salt.common.STextualDS;
+import de.hu_berlin.u.saltnpepper.salt.common.STextualRelation;
+import de.hu_berlin.u.saltnpepper.salt.common.SToken;
+import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
+import de.hu_berlin.u.saltnpepper.salt.core.GraphTraverseHandler;
+import de.hu_berlin.u.saltnpepper.salt.core.SAnnotation;
+import de.hu_berlin.u.saltnpepper.salt.core.SFeature;
+import de.hu_berlin.u.saltnpepper.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import de.hu_berlin.u.saltnpepper.salt.core.SLayer;
+import de.hu_berlin.u.saltnpepper.salt.core.SNode;
+import de.hu_berlin.u.saltnpepper.salt.core.SRelation;
+import de.hu_berlin.u.saltnpepper.salt.util.DataSourceSequence;
+import de.hu_berlin.u.saltnpepper.salt.util.SALT_TYPE;
+import de.hu_berlin.u.saltnpepper.salt.util.SaltUtil;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -62,11 +56,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,19 +131,19 @@ public class CommonHelper
     if (segName == null)
     {
       // if no segmentation is given just return the sorted token list
-      token.addAll(graph.getSortedSTokenByText());
+      token.addAll(graph.getSortedTokenByText());
     }
     else
     {
       // get the very first node of the order relation chain
       Set<SNode> startNodes = new LinkedHashSet<SNode>();
 
-      for (SNode n : graph.getSNodes())
+      for (SNode n : graph.getNodes())
       {
         SFeature feat
-          = n.getSFeature(AnnisConstants.ANNIS_NS,
-            AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
-        if (feat != null && segName.equalsIgnoreCase(feat.getSValueSTEXT()))
+          = n.getFeature(SaltUtil.createQName(AnnisConstants.ANNIS_NS,
+              AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN));
+        if (feat != null && segName.equalsIgnoreCase(feat.getValue_STEXT()))
         {
           startNodes.add(n);
         }
@@ -169,23 +158,24 @@ public class CommonHelper
         while (current != null)
         {
           token.add(current);
-          EList<Edge> out = graph.getOutEdges(current.getSId());
+          List<SRelation<SNode, SNode>> out = graph.getOutRelations(current.
+            getId());
           current = null;
           if (out != null)
           {
-            for (Edge e : out)
+            for (Relation e : out)
             {
               if (e instanceof SOrderRelation)
               {
-                current = ((SOrderRelation) e).getSTarget();
-                if (alreadyAdded.contains(current.getSId()))
+                current = ((SOrderRelation) e).getTarget();
+                if (alreadyAdded.contains(current.getId()))
                 {
                   // abort if cycle detected
                   current = null;
                 }
                 else
                 {
-                  alreadyAdded.add(current.getSId());
+                  alreadyAdded.add(current.getId());
                 }
                 break;
               }
@@ -204,9 +194,9 @@ public class CommonHelper
 
     if (graph != null)
     {
-      for (SToken n : graph.getSTokens())
+      for (SToken n : graph.getTokens())
       {
-        for (SAnnotation anno : n.getSAnnotations())
+        for (SAnnotation anno : n.getAnnotations())
         {
           result.add(anno.getQName());
         }
@@ -220,11 +210,11 @@ public class CommonHelper
   {
     Set<String> result = new TreeSet<String>();
 
-    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    for (SCorpusGraph corpusGraphs : p.getCorpusGraphs())
     {
-      for (SDocument doc : corpusGraphs.getSDocuments())
+      for (SDocument doc : corpusGraphs.getDocuments())
       {
-        SDocumentGraph g = doc.getSDocumentGraph();
+        SDocumentGraph g = doc.getDocumentGraph();
         result.addAll(getTokenAnnotationLevelSet(g));
       }
     }
@@ -234,7 +224,7 @@ public class CommonHelper
 
   /**
    * Gets the spannend/covered text for a token. This will get all
-   * {@link STextualRelation} edges for a {@link SToken} from the
+   * {@link STextualRelation} relations for a {@link SToken} from the
    * {@link SDocumentGraph} and calculates the appropiate substring from the
    * {@link STextualDS}.
    *
@@ -244,16 +234,16 @@ public class CommonHelper
    */
   public static String getSpannedText(SToken tok)
   {
-    SDocumentGraph graph = tok.getSDocumentGraph();
+    SDocumentGraph graph = tok.getGraph();
 
-    EList<Edge> edges = graph.getOutEdges(tok.getSId());
-    for (Edge e : edges)
+    List<SRelation<SNode, SNode>> relations = graph.getOutRelations(tok.getId());
+    for (SRelation e : relations)
     {
       if (e instanceof STextualRelation)
       {
         STextualRelation textRel = (STextualRelation) e;
-        return textRel.getSTextualDS().getSText().substring(textRel.getSStart(),
-          textRel.getSEnd());
+        return textRel.getTarget().getText().substring(textRel.getStart(),
+          textRel.getEnd());
       }
     }
     return "";
@@ -275,12 +265,12 @@ public class CommonHelper
       return false;
     }
 
-    EList<SLayer> sLayers = node.getSLayers();
+    Set<SLayer> sLayers = node.getLayers();
     if (sLayers != null)
     {
       for (SLayer l : sLayers)
       {
-        EList<Label> labels = l.getLabels();
+        Collection<Label> labels = l.getLabels();
         if (labels != null)
         {
           for (Label label : labels)
@@ -300,34 +290,34 @@ public class CommonHelper
   public static List<String> getCorpusPath(SCorpusGraph corpusGraph,
     SDocument doc)
   {
-    final List<String> result = new LinkedList<String>();
+    final List<String> result = new LinkedList<>();
 
-    result.add(doc.getSName());
-    SCorpus c = corpusGraph.getSCorpus(doc);
-    BasicEList<SCorpus> cAsList = new BasicEList<SCorpus>();
+    result.add(doc.getName());
+    SCorpus c = corpusGraph.getCorpus(doc);
+    ArrayList<SNode> cAsList = new ArrayList<>();
     cAsList.add(c);
     corpusGraph.traverse(cAsList, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST,
       "getRootCorpora",
-      new SGraphTraverseHandler()
+      new GraphTraverseHandler()
       {
         @Override
         public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId, SNode currNode, SRelation edge, SNode fromNode,
+          String traversalId, SNode currNode, SRelation relation, SNode fromNode,
           long order)
         {
-          result.add(currNode.getSName());
+          result.add(currNode.getName());
         }
 
         @Override
         public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
           String traversalId,
-          SNode currNode, SRelation edge, SNode fromNode, long order)
+          SNode currNode, SRelation relation, SNode fromNode, long order)
         {
         }
 
         @Override
         public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId, SRelation edge, SNode currNode, long order)
+          String traversalId, SRelation relation, SNode currNode, long order)
         {
           return true;
         }
@@ -373,19 +363,20 @@ public class CommonHelper
     if (node != null)
     {
       STextualDS tokenText = null;
-      EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
-      types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+      List<SALT_TYPE> types = new ArrayList<>();
+      types.add(SALT_TYPE.STEXT_OVERLAPPING_RELATION);
 
-      EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(
-        node,
-        types);
+      List<DataSourceSequence> dataSources = graph.
+        getOverlappedDataSourceSequence(
+          node,
+          types);
       if (dataSources != null)
       {
-        for (SDataSourceSequence seq : dataSources)
+        for (DataSourceSequence seq : dataSources)
         {
-          if (seq.getSSequentialDS() instanceof STextualDS)
+          if (seq.getDataSource() instanceof STextualDS)
           {
-            return (STextualDS) seq.getSSequentialDS();
+            return (STextualDS) seq.getDataSource();
           }
         }
       }
@@ -422,67 +413,21 @@ public class CommonHelper
   {
     Set<String> names = new HashSet<String>();
 
-    if (p != null && p.getSCorpusGraphs() != null)
+    if (p != null && p.getCorpusGraphs() != null)
     {
-      for (SCorpusGraph g : p.getSCorpusGraphs())
+      for (SCorpusGraph g : p.getCorpusGraphs())
       {
-        if (g.getSRootCorpus() != null)
+        if (g.getRoots() != null)
         {
-          for (SCorpus c : g.getSRootCorpus())
+          for (SNode c : g.getRoots())
           {
-            names.add(c.getSName());
+            names.add(c.getName());
           }
         }
       }
     }
 
     return names;
-  }
-
-  public static void writeSDocument(SDocument doc, ObjectOutputStream out)
-    throws IOException
-  {
-    XMIResourceImpl res = new XMIResourceImpl();
-    res.getContents().add(doc);
-
-    // also add the SDocumentGraph of the document
-    res.getContents().add(doc.getSDocumentGraph());
-
-    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-
-    res.save(byteOut, res.getDefaultSaveOptions());
-
-    out.writeUTF(byteOut.toString("UTF-8"));
-  }
-
-  public static SDocument readSDocument(ObjectInputStream in)
-    throws IOException
-  {
-    XMIResourceImpl res = new XMIResourceImpl();
-
-    try
-    {
-      byte[] asBytes = in.readUTF().getBytes(Charsets.UTF_8);
-      ByteArrayInputStream byteIn = new ByteArrayInputStream(asBytes);
-
-      res.load(byteIn, res.getDefaultLoadOptions());
-
-      TreeIterator<EObject> itContents = res.getAllContents();
-      while (itContents.hasNext())
-      {
-        EObject o = itContents.next();
-        if (o instanceof SDocument)
-        {
-          return (SDocument) o;
-        }
-      }
-    }
-    catch(EOFException ex)
-    {
-      log.warn("Empty document string");
-    }
-
-    return SaltCommonFactory.eINSTANCE.createSDocument();
   }
 
   /**
@@ -503,7 +448,7 @@ public class CommonHelper
     {
       for (Map.Entry<String, V> e : map.entrySet())
       {
-        SNode n = graph.getSNode(e.getKey());
+        SNode n = graph.getNode(e.getKey());
         if (n != null)
         {
           result.put(n, e.getValue());
@@ -513,32 +458,34 @@ public class CommonHelper
 
     return result;
   }
-  
+
   public static Match extractMatch(SDocument doc) throws URISyntaxException
   {
     Splitter idSplit = Splitter.on(',').trimResults();
     Match m = null;
 
     // get the matched node IDs
-    SFeature featIDs = doc.getSFeature(AnnisConstants.ANNIS_NS,
-      AnnisConstants.FEAT_MATCHEDIDS);
-    
+    SFeature featIDs = doc.getFeature(SaltUtil.createQName(
+      AnnisConstants.ANNIS_NS,
+      AnnisConstants.FEAT_MATCHEDIDS));
+
     if (featIDs != null)
     {
       LinkedList<URI> idList = new LinkedList<>();
-      for(String rawID : idSplit.split(featIDs.getSValueSTEXT()))
+      for (String rawID : idSplit.split(featIDs.getValue_STEXT()))
       {
         idList.add(new URI(rawID));
       }
-      SFeature featAnnos = doc.getSFeature(AnnisConstants.ANNIS_NS,
-      AnnisConstants.FEAT_MATCHEDANNOS);
-      if(featAnnos == null)
+      SFeature featAnnos = doc.getFeature(SaltUtil.createQName(
+        AnnisConstants.ANNIS_NS,
+        AnnisConstants.FEAT_MATCHEDANNOS));
+      if (featAnnos == null)
       {
         m = new Match(idList);
       }
       else
       {
-        m = new Match(idList, idSplit.splitToList(featAnnos.getSValueSTEXT()));
+        m = new Match(idList, idSplit.splitToList(featAnnos.getValue_STEXT()));
       }
     }
 
@@ -562,7 +509,7 @@ public class CommonHelper
 //      for(URI u : m.getSaltIDs())
 //      {
 //        // get the specific node
-//        SNode node = doc.getSDocumentGraph().getSNode(u.toASCIIString());
+//        SNode node = doc.getDocumentGraph().getNode(u.toASCIIString());
 //        if (node != null)
 //        {
 //          result[i] = node;

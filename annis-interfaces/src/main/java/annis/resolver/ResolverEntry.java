@@ -31,7 +31,7 @@ public class ResolverEntry implements Serializable
   public enum ElementType
   {
 
-    node, edge
+    node, relation
   }
   private long id;
   private String corpus;

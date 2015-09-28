@@ -43,15 +43,15 @@ public class AnnisNode implements Serializable
   // annotation graph
   private AnnotationGraph graph;
   // node position in annotation graph
-  private Set<Edge> incomingEdges;
-  private Set<Edge> outgoingEdges;
+  private Set<Edge> incomingRelations;
+  private Set<Edge> outgoingRelations;
   private String name;
   private String namespace;
   // node constraints
-  private boolean partOfEdge;
+  private boolean partOfRelation;
   private boolean root;
   private boolean token;
-  private Set<Annotation> edgeAnnotations;
+  private Set<Annotation> relationAnnotations;
   private Long matchedNodeInQuery;
 
 
@@ -99,10 +99,10 @@ public class AnnisNode implements Serializable
 
   public AnnisNode()
   {
-    nodeAnnotations = new TreeSet<Annotation>();
-    edgeAnnotations = new TreeSet<Annotation>();
-    incomingEdges = new HashSet<Edge>();
-    outgoingEdges = new HashSet<Edge>();
+    nodeAnnotations = new TreeSet<>();
+    relationAnnotations = new TreeSet<>();
+    incomingRelations = new HashSet<>();
+    outgoingRelations = new HashSet<>();
   }
 
   public AnnisNode(long id)
@@ -191,28 +191,28 @@ public class AnnisNode implements Serializable
       sb.append(nodeAnnotations);
     }
 
-    if (!edgeAnnotations.isEmpty())
+    if (!relationAnnotations.isEmpty())
     {
-      sb.append("; edge labes: ");
-      sb.append(edgeAnnotations);
+      sb.append("; relation labes: ");
+      sb.append(relationAnnotations);
     }
     
     return sb.toString();
   }
 
-  public boolean addIncomingEdge(Edge edge)
+  public boolean addIncomingRelation(Edge relation)
   {
-    return incomingEdges.add(edge);
+    return incomingRelations.add(relation);
   }
 
-  public boolean addOutgoingEdge(Edge edge)
+  public boolean addOutgoingRelation(Edge relation)
   {
-    return outgoingEdges.add(edge);
+    return outgoingRelations.add(relation);
   }
 
-  public boolean addEdgeAnnotation(Annotation annotation)
+  public boolean addRelationAnnotation(Annotation annotation)
   {
-    return edgeAnnotations.add(annotation);
+    return relationAnnotations.add(annotation);
   }
 
   public boolean addNodeAnnotation(Annotation annotation)
@@ -284,7 +284,7 @@ public class AnnisNode implements Serializable
     {
       return false;
     }
-    if (this.partOfEdge != other.partOfEdge)
+    if (this.partOfRelation != other.partOfRelation)
     {
       return false;
     }
@@ -297,9 +297,9 @@ public class AnnisNode implements Serializable
       return false;
     }
     
-    if (this.edgeAnnotations != other.edgeAnnotations
-      && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(
-      other.edgeAnnotations)))
+    if (this.relationAnnotations != other.relationAnnotations
+      && (this.relationAnnotations == null || !this.relationAnnotations.equals(
+      other.relationAnnotations)))
     {
       return false;
     }
@@ -315,14 +315,14 @@ public class AnnisNode implements Serializable
   }
 
   // /// Getter / Setter
-  public Set<Annotation> getEdgeAnnotations()
+  public Set<Annotation> getRelationAnnotations()
   {
-    return edgeAnnotations;
+    return relationAnnotations;
   }
 
-  public void setEdgeAnnotations(Set<Annotation> edgeAnnotations)
+  public void setRelationAnnotations(Set<Annotation> relationAnnotations)
   {
-    this.edgeAnnotations = edgeAnnotations;
+    this.relationAnnotations = relationAnnotations;
   }
 
   public boolean isRoot()
@@ -385,14 +385,14 @@ public class AnnisNode implements Serializable
     this.token = token;
   }
 
-  public boolean isPartOfEdge()
+  public boolean isPartOfRelation()
   {
-    return partOfEdge;
+    return partOfRelation;
   }
 
-  public void setPartOfEdge(boolean partOfEdge)
+  public void setPartOfRelation(boolean partOfRelation)
   {
-    this.partOfEdge = partOfEdge;
+    this.partOfRelation = partOfRelation;
   }
 
   public long getCorpus()
@@ -467,24 +467,24 @@ public class AnnisNode implements Serializable
     this.rightToken = rightToken;
   }
 
-  public Set<Edge> getIncomingEdges()
+  public Set<Edge> getIncomingRelations()
   {
-    return incomingEdges;
+    return incomingRelations;
   }
 
-  public void setIncomingEdges(Set<Edge> incomingEdges)
+  public void setIncomingRelations(Set<Edge> incomingRelations)
   {
-    this.incomingEdges = incomingEdges;
+    this.incomingRelations = incomingRelations;
   }
 
-  public Set<Edge> getOutgoingEdges()
+  public Set<Edge> getOutgoingRelations()
   {
-    return outgoingEdges;
+    return outgoingRelations;
   }
 
-  public void setOutgoingEdges(Set<Edge> outgoingEdges)
+  public void setOutgoingRelations(Set<Edge> outgoingRelations)
   {
-    this.outgoingEdges = outgoingEdges;
+    this.outgoingRelations = outgoingRelations;
   }
 
   public AnnotationGraph getGraph()

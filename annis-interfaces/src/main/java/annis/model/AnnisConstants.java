@@ -15,10 +15,6 @@
  */
 package annis.model;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-
 /**
  *
  * @author thomas
@@ -55,9 +51,9 @@ public class AnnisConstants
   public static final String FEAT_RELANNIS_NODE = "relannis_node";
   
   /**
-   * A number of relANNIS specific edge values encoded as {@link RelannisEdgeFeature}.   * 
+   * A number of relANNIS specific relation values encoded as {@link RelannisRelationFeature}.   * 
    */
-  public static final String FEAT_RELANNIS_EDGE = "relannis_edge";
+  public static final String FEAT_RELANNIS_EDGE = "relannis_relation";
   
   /**
    * A marker feature for the first node of a segmentation chain. The value is the name of the segmentation. 
