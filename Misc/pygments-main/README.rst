@@ -1,22 +1,27 @@
-README for Pygments
-===================
+README for Pygments (ANNIS Edition)
+====================================
 
-This is the source of Pygments.  It is a generic syntax highlighter that
-supports over 300 languages and text formats, for use in code hosting, forums,
-wikis or other applications that need to prettify source code.
+This is a stripped down version of Pygments 2.0.2 (http://pygments.org/)
 
-Installing
-----------
+It has support for AQL syntax an can be used to for
+syntax highlighting of AQL in publications and presentations.
+All other lexers except for the custom AQL one have been removed to
+save space.
+The original license (see LICENSE file) still applies.
 
-... works as usual, use ``python setup.py install``.
+
+Example
+-------
+
+Run the following (needs Python)
+```
+./pygmentize -f svg -o outfile.svg example.aql
+```
 
 Documentation
 -------------
 
-... can be found online at http://pygments.org/ or created by ::
-
-   cd doc
-   make html
+... can be found online at http://pygments.org/
 
 Development
 -----------
