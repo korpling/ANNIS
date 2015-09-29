@@ -286,9 +286,9 @@ public class AnnotateSqlGenerator<T>
     fields.add("(splitanno(node_qannotext))[2] as node_annotation_name");
     fields.add("(splitanno(node_qannotext))[3] as node_annotation_value");
     
-    fields.add("(splitanno(edge_qannotext))[1] as edge_annotation_namespace");
-    fields.add("(splitanno(edge_qannotext))[2] as edge_annotation_name");
-    fields.add("(splitanno(edge_qannotext))[3] as edge_annotation_value");
+    fields.add("(splitanno(relation_qannotext))[1] as relation_annotation_namespace");
+    fields.add("(splitanno(relation_qannotext))[2] as relation_annotation_name");
+    fields.add("(splitanno(relation_qannotext))[3] as relation_annotation_value");
 
     
     return fields;

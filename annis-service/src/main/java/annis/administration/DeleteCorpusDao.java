@@ -96,7 +96,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
 
       log.debug("dropping facts table for corpus " + l);
       getJdbcTemplate().execute("DROP TABLE IF EXISTS facts_" + l);
-      getJdbcTemplate().execute("DROP TABLE IF EXISTS facts_edge_" + l);
+      getJdbcTemplate().execute("DROP TABLE IF EXISTS facts_relation_" + l);
       getJdbcTemplate().execute("DROP TABLE IF EXISTS facts_node_" + l);
       log.debug("dropping annotation_pool table for corpus " + l);
       getJdbcTemplate().execute("DROP TABLE IF EXISTS annotation_pool_" + l);

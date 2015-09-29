@@ -16,17 +16,16 @@
 package annis.dao.autogenqueries;
 
 import annis.CommonHelper;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
+import de.hu_berlin.u.saltnpepper.salt.common.SToken;
+import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
+import de.hu_berlin.u.saltnpepper.salt.core.SNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.EList;
 
 /**
  * Generates a simple regex query.
@@ -60,14 +59,14 @@ public class AutoSimpleRegexQuery extends AbstractAutoQuery
   {
 
     List<String> tokens = new ArrayList<>();
-    for (SCorpusGraph g : saltProject.getSCorpusGraphs())
+    for (SCorpusGraph g : saltProject.getCorpusGraphs())
     {
       if (g != null)
       {
-        for (SDocument doc : g.getSDocuments())
+        for (SDocument doc : g.getDocuments())
         {
-          SDocumentGraph docGraph = doc.getSDocumentGraph();
-          EList<SNode> sNodes = docGraph.getSNodes();
+          SDocumentGraph docGraph = doc.getDocumentGraph();
+          List<SNode> sNodes = docGraph.getNodes();
 
           if (sNodes != null)
           {

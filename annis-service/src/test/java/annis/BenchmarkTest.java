@@ -17,7 +17,7 @@ package annis;
 
 import annis.dao.AnnisDao;
 import annis.dao.SpringAnnisDao;
-import annis.provider.SaltProjectProvider;
+import annis.provider.SDocumentGraphProvider;
 import annis.test.TestHelper;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
@@ -27,7 +27,8 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 import com.google.common.io.ByteStreams;
 import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
+import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
@@ -82,7 +83,7 @@ public class BenchmarkTest
 
   private List<Long> ridgesCorpusID;
 
-  private final SaltProjectProvider provider = new SaltProjectProvider();
+  private final SDocumentGraphProvider provider = new SDocumentGraphProvider();
 
   private final OutputStream nullStream = ByteStreams.nullOutputStream();
   private final MediaType typeXMI = new MediaType("application", "xmi+xml");
@@ -132,7 +133,7 @@ public class BenchmarkTest
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282", null);
 
-    assertEquals(1, p.getSCorpusGraphs().size());
+    assertEquals(1, p.getCorpusGraphs().size());
   }
 
   @Test
@@ -142,22 +143,11 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282", null);
-    provider.writeTo(p, SaltProject.class, null, null,
+    provider.writeTo(p.getCorpusGraphs().get(0).getDocuments().get(0).getDocumentGraph(), SaltProject.class, null, null,
       typeXMI, new StringKeyIgnoreCaseMultivaluedMap<>(),
       nullStream);
   }
 
-  @Test
-  public void mapSaltAndSaveBinary_Pcc4282() throws IOException
-  {
-    assumeTrue(ridgesCorpusID.size() > 0);
-
-    SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282", null);
-    provider.writeTo(p, SaltProject.class, null, null,
-      typeBinary, null,
-      nullStream);
-  }
 
   @Test
   public void mapSalt_SonderbaresKraeuterBuch()
@@ -167,7 +157,7 @@ public class BenchmarkTest
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21", null);
 
-    assertEquals(1, p.getSCorpusGraphs().size());
+    assertEquals(1, p.getCorpusGraphs().size());
   }
 
   @Test
@@ -177,20 +167,9 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21", null);
-    provider.writeTo(p, SaltProject.class, null, null,
+    provider.writeTo(p.getCorpusGraphs().get(0).getDocuments().get(0).getDocumentGraph(), 
+      SaltProject.class, null, null,
       typeXMI, null,
-      nullStream);
-  }
-
-  @Test
-  public void mapSaltAndSaveBinary_SonderbaresKraeuterBuch() throws IOException
-  {
-    assumeTrue(ridgesCorpusID.size() > 0);
-
-    SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21", null);
-    provider.writeTo(p, SaltProject.class, null, null,
-      new MediaType("application", "xmi+binary"), null,
       nullStream);
   }
 }

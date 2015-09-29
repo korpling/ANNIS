@@ -49,7 +49,7 @@ import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.mimeparse.MIMEParse;
 import com.sun.jersey.api.core.ResourceConfig;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

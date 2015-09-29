@@ -198,7 +198,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     "corpus", "corpus_annotation",
     "text", "node", "node_annotation",
-    "component", "rank", "edge_annotation",
+    "component", "rank", "relation_annotation",
     FILE_RESOLVER_VIS_MAP, EXAMPLE_QUERIES_TAB
   };
 
@@ -1308,8 +1308,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.info("indexing the new facts table (general indexes)");
     executeSqlFromScript("indexes.sql", args);
 
-    log.info("indexing the new facts table (edge related indexes)");
-    executeSqlFromScript("indexes_edge.sql", args);
+    log.info("indexing the new facts table (relation related indexes)");
+    executeSqlFromScript("indexes_relation.sql", args);
 
   }
 

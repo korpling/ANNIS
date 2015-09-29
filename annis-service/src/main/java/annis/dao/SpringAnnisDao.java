@@ -60,16 +60,18 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.impl.SaltFactoryImpl;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.exceptions.SaltResourceException;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import de.hu_berlin.u.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.u.saltnpepper.salt.common.SCorpus;
+import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
+import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
+import de.hu_berlin.u.saltnpepper.salt.core.SNode;
+import de.hu_berlin.u.saltnpepper.salt.core.SRelation;
+import de.hu_berlin.u.saltnpepper.salt.exceptions.SaltResourceException;
+import de.hu_berlin.u.saltnpepper.salt.impl.SaltFactoryImpl;
+import de.hu_berlin.u.saltnpepper.salt.util.SaltUtil;
+import de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Writer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -1025,8 +1027,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     // check if the corpus really exists
     mapCorpusNameToId(toplevelCorpus);
     
-    SaltProject corpusProject = SaltFactory.eINSTANCE.createSaltProject();
-    SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
+    SaltProject corpusProject = SaltFactory.createSaltProject();
+    SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
     corpusGraph.setSaltProject(corpusProject);
     
     SCorpus rootCorpus = corpusGraph.createSCorpus(null, toplevelCorpus);
@@ -1034,7 +1036,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     // add all root metadata
     for(Annotation metaAnno : listCorpusAnnotations(toplevelCorpus))
     {
-      rootCorpus.createSMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
+      rootCorpus.createMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
         metaAnno.getValue());
     }
     
@@ -1050,9 +1052,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       }
     }
     
-    File projectFile = new File(outputDirectory, "saltProject"+"."+ SaltFactory.FILE_ENDING_SALT);
-    URI saltProjectFileURI = URI.createFileURI(projectFile.getAbsolutePath());
-    Resource resource= SaltFactoryImpl.getResourceSet().createResource(saltProjectFileURI);
     
     List<Annotation> docs = listDocuments(toplevelCorpus);
     int i=1;
@@ -1060,49 +1059,49 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       log.info("Loading document {} from database ({}/{})", docAnno.getName(), i, docs.size());
       SaltProject docProject = retrieveAnnotationGraph(toplevelCorpus, docAnno.getName(), null);
-      if(docProject != null && docProject.getSCorpusGraphs() != null
-        && !docProject.getSCorpusGraphs().isEmpty())
+      if(docProject != null && docProject.getCorpusGraphs() != null
+        && !docProject.getCorpusGraphs().isEmpty())
       {
         List<Annotation> docMetaData = listCorpusAnnotations(toplevelCorpus,
           docAnno.getName(), true);
         
-        SCorpusGraph docCorpusGraph = docProject.getSCorpusGraphs().get(0);
+        SCorpusGraph docCorpusGraph = docProject.getCorpusGraphs().get(0);
         // TODO: we could re-use the actual corpus structure instead of just adding a flat list of documents
-        if(docCorpusGraph.getSDocuments() != null)
+        if(docCorpusGraph.getDocuments() != null)
         {
-          for(SDocument doc : docCorpusGraph.getSDocuments())
+          for(SDocument doc : docCorpusGraph.getDocuments())
           {
             log.info("Removing SFeatures from {} ({}/{})", docAnno.getName(), i, docs.size());
             // remove all ANNIS specific features that require a special Java class
-            SDocumentGraph graph = doc.getSDocumentGraph();
+            SDocumentGraph graph = doc.getDocumentGraph();
             if(graph != null)
             {
-              if(graph.getSNodes() != null)
+              if(graph.getNodes() != null)
               {
-                for(SNode n : graph.getSNodes())
+                for(SNode n : graph.getNodes())
                 {
                   n.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE);
                 }
               }
-              if(graph.getSRelations() != null)
+              if(graph.getRelations() != null)
               {
-                for(SRelation e : graph.getSRelations())
+                for(SRelation e : graph.getRelations())
                 {
                   e.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_EDGE);
                 }
               }
             }
             
-            log.info("Saving document {} ({}/{})", doc.getSName(), i, docs.size());
-            doc.saveSDocumentGraph(URI.createFileURI(
-              new File(documentRootDir, doc.getSName() + "." 
-                + SaltFactory.FILE_ENDING_SALT).getAbsolutePath()));
+            log.info("Saving document {} ({}/{})", doc.getName(), i, docs.size());
+            SaltUtil.saveDocumentGraph(graph, URI.createFileURI(
+              new File(documentRootDir, doc.getName() + "." 
+                + SaltUtil.FILE_ENDING_SALT_XML).getAbsolutePath()));
             
-            SDocument docCopy = corpusGraph.createSDocument(rootCorpus, doc.getSName());
-            log.info("Adding metadata to document {} ({}/{})", doc.getSName(), i, docs.size());
+            SDocument docCopy = corpusGraph.createSDocument(rootCorpus, doc.getName());
+            log.info("Adding metadata to document {} ({}/{})", doc.getName(), i, docs.size());
             for(Annotation metaAnno : docMetaData)
             {
-              docCopy.createSMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
+              docCopy.createMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
                 metaAnno.getValue());
             }
           }
@@ -1113,18 +1112,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     
     // save the actual SaltProject
     log.info("Saving corpus structure");
-    try 
-		{//must be done after all, because it doesn't work, if not all SDocumentGraph objects 
-			XMLResource xmlProjectResource= (XMLResource) resource;
-			xmlProjectResource.getContents().add(corpusProject);
-			xmlProjectResource.setEncoding("UTF-8");
-			xmlProjectResource.save(null);
-		}//must be done after all, because it doesn't work, if not all SDocumentGraph objects  
-		catch (IOException e) 
-		{
-			throw new SaltResourceException("Cannot save salt project to given uri \"" 
-        + outputDirectory.getAbsolutePath() + "\"", e);
-		}
+
+    File projectFile = new File(outputDirectory, SaltUtil.FILE_SALT_PROJECT);
+    SaltXML10Writer writer = new SaltXML10Writer(projectFile);
+		writer.writeSaltProject(corpusProject);
+      
+		
   }
   
   

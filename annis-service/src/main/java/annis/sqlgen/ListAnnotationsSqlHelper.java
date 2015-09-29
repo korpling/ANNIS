@@ -38,19 +38,19 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
   public String createSqlQuery(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValue)
   {
-    String sqlAnnos = "select namespace, name, value, \"type\", subtype, edge_namespace, edge_name from\n"
+    String sqlAnnos = "select namespace, name, value, \"type\", subtype, relation_namespace, relation_name from\n"
       + "(\n"
-      + "  select *, row_number() OVER (PARTITION BY namespace, name, edge_namespace, edge_name) as row_num\n"
+      + "  select *, row_number() OVER (PARTITION BY namespace, name, relation_namespace, relation_name) as row_num\n"
       + "  FROM\n"
       + "  (\n"
       + "    select\n"
-      + "    namespace, name, \"type\", subtype, edge_name, edge_namespace, "
+      + "    namespace, name, \"type\", subtype, relation_name, relation_namespace, "
       + "    occurences, :value AS value\n"
       + "    FROM annotations\n"
       + "    WHERE\n"
       + "    (value IS NULL OR value <> '--')\n"
       + (corpusList.isEmpty() ? "\n" : "    AND toplevel_corpus IN (:corpora)\n")
-      + "    ORDER by namespace, name, edge_namespace, edge_name, occurences desc\n"
+      + "    ORDER by namespace, name, relation_namespace, relation_name, occurences desc\n"
       + "  ) as tableAll\n"
       + ") as tableFreq\n";
     if ((listValues && onlyMostFrequentValue) || !listValues)
@@ -60,10 +60,10 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
 
     // fetch corpus annotations
     String sqlMeta =  
-      "SELECT namespace, name, value, \"type\", subtype, edge_namespace, edge_name\n"
+      "SELECT namespace, name, value, \"type\", subtype, relation_namespace, relation_name\n"
       + "FROM\n" + "(\n" + "	SELECT\n"
       + "	m.namespace AS namespace, m.name AS \"name\", :value AS value, 'meta'::varchar as \"type\", 'm'::char(1) as subtype, \n"
-      + "	''::varchar as edge_namespace, ''::varchar as edge_name, row_number() OVER (PARTITION BY m.namespace, m.name) as row_num\n"
+      + "	''::varchar as relation_namespace, ''::varchar as relation_name, row_number() OVER (PARTITION BY m.namespace, m.name) as row_num\n"
       + "	FROM corpus_annotation as m, corpus c, corpus p\n"
       + "	 WHERE p.id IN (:corpora)\n" + "	AND c.pre > p.pre\n"
       + "	AND c.post < p.post\n" + "	AND m.corpus_ref = c.id\n"
@@ -74,7 +74,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
     }
     
 
-    String sql = sqlAnnos + "\nUNION\n" + sqlMeta +  "\nORDER BY name, edge_namespace, edge_name";
+    String sql = sqlAnnos + "\nUNION\n" + sqlMeta +  "\nORDER BY name, relation_namespace, relation_name";
     
     sql = sql.replaceAll(":corpora", StringUtils.join(corpusList, ", "));
     sql = sql.replaceAll(":value", listValues ? "value" : "NULL::varchar");
@@ -95,14 +95,14 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       String name = resultSet.getString("name");
       String qName = AnnisNode.qName(namespace, name);
 
-      String edgeNamespace = resultSet.getString("edge_namespace");
-      String edgeName = resultSet.getString("edge_name");
-      String qEdgeName = AnnisNode.qName(edgeNamespace, edgeName);
+      String relationNamespace = resultSet.getString("relation_namespace");
+      String relationName = resultSet.getString("relation_name");
+      String qRelationName = AnnisNode.qName(relationNamespace, relationName);
 
       String key = qName;
-      if (qEdgeName != null)
+      if (qRelationName != null)
       {
-        key += "_" + qEdgeName;
+        key += "_" + qRelationName;
       }
 
       if (!attributesByName.containsKey(key))
@@ -112,7 +112,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
 
       AnnisAttribute attribute = attributesByName.get(key);
       attribute.setName(qName);
-      attribute.setEdgeName(qEdgeName);
+      attribute.setEdgeName(qRelationName);
       AnnisAttribute.Type t = AnnisAttribute.Type.unknown;
 
       try

@@ -19,7 +19,7 @@ import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SolutionKey;
 import annis.sqlgen.TestAnnotateSqlGenerator;
 import annis.test.CsvResultSetProvider;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;

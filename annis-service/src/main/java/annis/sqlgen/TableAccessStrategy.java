@@ -286,14 +286,14 @@ public class TableAccessStrategy {
 	}
   
   public static boolean usesComponentTable(QueryNode node) {
-		return node == null || node.isPartOfEdge() || usesEdgeAnnotationTable(node);
+		return node == null || node.isPartOfEdge() || useEdgeAnnotationTable(node);
 	}
 	
 	public boolean usesEdgeAnnotationTable() {
 		return node == null || ! node.getEdgeAnnotations().isEmpty();
 	}
   
-  public static boolean usesEdgeAnnotationTable(QueryNode node) {
+  public static boolean useEdgeAnnotationTable(QueryNode node) {
 		return node == null || ! node.getEdgeAnnotations().isEmpty();
 	}
 	

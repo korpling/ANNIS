@@ -32,7 +32,7 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;

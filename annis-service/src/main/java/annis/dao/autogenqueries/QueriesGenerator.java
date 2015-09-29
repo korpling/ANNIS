@@ -24,7 +24,7 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
