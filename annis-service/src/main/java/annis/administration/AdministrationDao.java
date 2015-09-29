@@ -198,7 +198,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     "corpus", "corpus_annotation",
     "text", "node", "node_annotation",
-    "component", "rank", "relation_annotation",
+    "component", "rank", "edge_annotation",
     FILE_RESOLVER_VIS_MAP, EXAMPLE_QUERIES_TAB
   };
 

@@ -789,8 +789,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     {
       for (Relation e : existingRelations)
       {
-        // only select the relation that has the same type ("relation_name" and
-        // the same layer ("relation_namespace")
+        // only select the relation that has the same type ("edge_name" and
+        // the same layer "edge_namespace")
         if (e instanceof SRelation)
         {
           SRelation existingRel = (SRelation) e;
