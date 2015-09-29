@@ -16,7 +16,8 @@ Example
 Run the following (needs Python)
 
 .. code:: sh
-./pygmentize -f svg -o outfile.svg example.aql
+
+   ./pygmentize -f svg -o outfile.svg example.aql
 
 
 Documentation
