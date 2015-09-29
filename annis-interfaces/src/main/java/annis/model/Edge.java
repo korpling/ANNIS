@@ -24,7 +24,7 @@ public class Edge implements Serializable
 {
 
   // this class is sent to the front end
-  public enum RelationType
+  public enum EdgeType
   {
 
     COVERAGE("c", "Coverage"),
@@ -34,7 +34,7 @@ public class Edge implements Serializable
     private String type;
     private String name;
 
-    private RelationType(String type, String name)
+    private EdgeType(String type, String name)
     {
       this.type = type;
       this.name = name;
@@ -52,7 +52,7 @@ public class Edge implements Serializable
     }
 
     // FIXME: test parseRelationType()
-    public static RelationType parseRelationType(String type)
+    public static EdgeType parseEdgeType(String type)
     {
       if ("c".equals(type))
       {
@@ -77,7 +77,7 @@ public class Edge implements Serializable
   private AnnisNode destination;
   private long pre;
   private long componentID;
-  private RelationType relationType;
+  private EdgeType edgeType;
   private String namespace;
   private String name;
   private Set<Annotation> annotations;
@@ -85,7 +85,7 @@ public class Edge implements Serializable
   public Edge()
   {
     annotations = new HashSet<Annotation>();
-    relationType = RelationType.UNKNOWN;
+    edgeType = EdgeType.UNKNOWN;
   }
 
   public boolean addAnnotation(Annotation o)
@@ -98,7 +98,7 @@ public class Edge implements Serializable
   {
     String src = source != null ? "" + source.getId() : "(no source)";
     String dst = destination != null ? "" + destination.getId() : "(no destination)";
-    String type = relationType != null ? relationType.toString() : "(no type)";
+    String type = edgeType != null ? edgeType.toString() : "(no type)";
     String qname = getQualifiedName() != null ? getQualifiedName() : "(no name)";
     
     String strcomponent = "component-id " + componentID;
@@ -144,7 +144,7 @@ public class Edge implements Serializable
     {
       return false;
     }
-    if (this.relationType != other.relationType)
+    if (this.edgeType != other.edgeType)
     {
       return false;
     }
@@ -170,7 +170,7 @@ public class Edge implements Serializable
       17 * hash + (this.destination != null ? this.destination.hashCode() : 0);
     hash = 17 * hash + (int) (this.pre ^ (this.pre >>> 32));
     hash = 17 * hash + (int) (this.componentID ^ (this.componentID >>> 32));
-    hash = 17 * hash + (this.relationType != null ? this.relationType.hashCode() : 0);
+    hash = 17 * hash + (this.edgeType != null ? this.edgeType.hashCode() : 0);
     hash = 17 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
     hash = 17 * hash + (this.name != null ? this.name.hashCode() : 0);
     return hash;
@@ -199,14 +199,14 @@ public class Edge implements Serializable
   }
   
   
-  public RelationType getRelationType()
+  public EdgeType getEdgeType()
   {
-    return relationType;
+    return edgeType;
   }
 
-  public void setRelationType(RelationType relationType)
+  public void setEdgeType(EdgeType edgeType)
   {
-    this.relationType = relationType;
+    this.edgeType = edgeType;
   }
 
   public String getNamespace()

@@ -43,12 +43,12 @@ public class AnnisNode implements Serializable
   // annotation graph
   private AnnotationGraph graph;
   // node position in annotation graph
-  private Set<Edge> incomingRelations;
-  private Set<Edge> outgoingRelations;
+  private Set<Edge> incomingEdges;
+  private Set<Edge> outgoingEdges;
   private String name;
   private String namespace;
   // node constraints
-  private boolean partOfRelation;
+  private boolean partOfEdge;
   private boolean root;
   private boolean token;
   private Set<Annotation> relationAnnotations;
@@ -101,8 +101,8 @@ public class AnnisNode implements Serializable
   {
     nodeAnnotations = new TreeSet<>();
     relationAnnotations = new TreeSet<>();
-    incomingRelations = new HashSet<>();
-    outgoingRelations = new HashSet<>();
+    incomingEdges = new HashSet<>();
+    outgoingEdges = new HashSet<>();
   }
 
   public AnnisNode(long id)
@@ -200,14 +200,14 @@ public class AnnisNode implements Serializable
     return sb.toString();
   }
 
-  public boolean addIncomingRelation(Edge relation)
+  public boolean addIncomingEdge(Edge relation)
   {
-    return incomingRelations.add(relation);
+    return incomingEdges.add(relation);
   }
 
-  public boolean addOutgoingRelation(Edge relation)
+  public boolean addOutgoingEdge(Edge relation)
   {
-    return outgoingRelations.add(relation);
+    return outgoingEdges.add(relation);
   }
 
   public boolean addRelationAnnotation(Annotation annotation)
@@ -284,7 +284,7 @@ public class AnnisNode implements Serializable
     {
       return false;
     }
-    if (this.partOfRelation != other.partOfRelation)
+    if (this.partOfEdge != other.partOfEdge)
     {
       return false;
     }
@@ -385,14 +385,14 @@ public class AnnisNode implements Serializable
     this.token = token;
   }
 
-  public boolean isPartOfRelation()
+  public boolean isPartOfEdge()
   {
-    return partOfRelation;
+    return partOfEdge;
   }
 
-  public void setPartOfRelation(boolean partOfRelation)
+  public void setPartOfEdge(boolean partOfEdge)
   {
-    this.partOfRelation = partOfRelation;
+    this.partOfEdge = partOfEdge;
   }
 
   public long getCorpus()
@@ -467,24 +467,24 @@ public class AnnisNode implements Serializable
     this.rightToken = rightToken;
   }
 
-  public Set<Edge> getIncomingRelations()
+  public Set<Edge> getIncomingEdges()
   {
-    return incomingRelations;
+    return incomingEdges;
   }
 
-  public void setIncomingRelations(Set<Edge> incomingRelations)
+  public void setIncomingEdges(Set<Edge> incomingEdges)
   {
-    this.incomingRelations = incomingRelations;
+    this.incomingEdges = incomingEdges;
   }
 
-  public Set<Edge> getOutgoingRelations()
+  public Set<Edge> getOutgoingEdges()
   {
-    return outgoingRelations;
+    return outgoingEdges;
   }
 
-  public void setOutgoingRelations(Set<Edge> outgoingRelations)
+  public void setOutgoingEdges(Set<Edge> outgoingEdges)
   {
-    this.outgoingRelations = outgoingRelations;
+    this.outgoingEdges = outgoingEdges;
   }
 
   public AnnotationGraph getGraph()

@@ -23,7 +23,7 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
-import annis.model.Edge.RelationType;
+import annis.model.Edge.EdgeType;
 import annis.model.RelannisEdgeFeature;
 import annis.model.RelannisNodeFeature;
 import annis.service.ifaces.AnnisResultSet;
@@ -31,7 +31,6 @@ import annis.service.objects.AnnisResultImpl;
 import annis.service.objects.AnnisResultSetImpl;
 import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
-import de.hu_berlin.u.saltnpepper.graph.Relation;
 import de.hu_berlin.u.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
 import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
@@ -57,6 +56,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.management.relation.RelationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -287,7 +287,7 @@ public class LegacyGraphConverter
     aRelation.setSource(allNodes.get(rel.getSource()));
     aRelation.setDestination(allNodes.get(rel.getTarget()));
 
-    aRelation.setRelationType(RelationType.UNKNOWN);
+    aRelation.setEdgeType(EdgeType.UNKNOWN);
     aRelation.setPre(pre);
     aRelation.setComponentID(componentID);
 
@@ -300,15 +300,15 @@ public class LegacyGraphConverter
    
     if (rel instanceof SDominanceRelation)
     {
-      aRelation.setRelationType(RelationType.DOMINANCE);
+      aRelation.setEdgeType(EdgeType.DOMINANCE);
     }
     else if (rel instanceof SPointingRelation)
     {
-      aRelation.setRelationType(RelationType.POINTING_RELATION);
+      aRelation.setEdgeType(EdgeType.POINTING_RELATION);
     }
     else if (rel instanceof SSpanningRelation)
     {
-      aRelation.setRelationType(RelationType.COVERAGE);
+      aRelation.setEdgeType(EdgeType.COVERAGE);
     }
 
     for (SAnnotation sAnno : rel.getAnnotations())
@@ -317,11 +317,11 @@ public class LegacyGraphConverter
         sAnno.getValue_STEXT()));
     }
 
-    annoGraph.addRelation(aRelation);
-    aRelation.getDestination().addIncomingRelation(aRelation);
+    annoGraph.addEdge(aRelation);
+    aRelation.getDestination().addIncomingEdge(aRelation);
     if(aRelation.getSource() != null)
     {
-      aRelation.getSource().addOutgoingRelation(aRelation);
+      aRelation.getSource().addOutgoingEdge(aRelation);
     }
   }
   
