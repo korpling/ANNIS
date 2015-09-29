@@ -15,22 +15,15 @@
  */
 package annis.provider;
 
-import com.sun.xml.internal.ws.api.streaming.XMLStreamWriterFactory;
 import de.hu_berlin.u.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
-import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
 import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
 import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
 import de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Writer;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,15 +33,7 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.impl.BinaryResourceImpl;
-import org.eclipse.emf.ecore.xmi.XMIResource;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
-import org.json.XML;
 import org.slf4j.LoggerFactory;
-import static sun.awt.FontConfiguration.loadBinary;
 
 /**
  *
