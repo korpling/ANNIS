@@ -153,7 +153,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           corpusGraph = SaltFactory.createSCorpusGraph();
           corpusGraph.setName("match_" + (match_index + matchstart));
 
-          project.getCorpusGraphs().add(corpusGraph);
+          project.addCorpusGraph(corpusGraph);
 
           graph = SaltFactory.createSDocumentGraph();
           document = SaltFactory.createSDocument();
