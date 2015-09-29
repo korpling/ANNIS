@@ -51,9 +51,9 @@ public class AnnisConstants
   public static final String FEAT_RELANNIS_NODE = "relannis_node";
   
   /**
-   * A number of relANNIS specific relation values encoded as {@link RelannisRelationFeature}.   * 
+   * A number of relANNIS specific edge values encoded as {@link RelannisEdgeFeature}.   * 
    */
-  public static final String FEAT_RELANNIS_EDGE = "relannis_relation";
+  public static final String FEAT_RELANNIS_EDGE = "relannis_edge";
   
   /**
    * A marker feature for the first node of a segmentation chain. The value is the name of the segmentation. 

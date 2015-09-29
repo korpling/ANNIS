@@ -54,10 +54,10 @@ public class AnnotationGraph implements Serializable
 		this(new ArrayList<AnnisNode>(), new ArrayList<Edge>());
 	}
 
-	public AnnotationGraph(List<AnnisNode> nodes, List<Edge> relations)
+	public AnnotationGraph(List<AnnisNode> nodes, List<Edge> edges)
 	{
 		this.nodes = nodes;
-		this.edges = relations;
+		this.edges = edges;
 		this.matchedNodeIds = new HashSet<Long>();
 		this.tokenByIndex = new HashMap<Long, AnnisNode>();
 	}
@@ -68,19 +68,19 @@ public class AnnotationGraph implements Serializable
 		List<Long> ids = new ArrayList<Long>();
 		for (AnnisNode node : nodes)
 			ids.add(node.getId());
-		List<String> _relations = new ArrayList<String>();
-		for (Edge relation : edges)
+		List<String> _edges = new ArrayList<String>();
+		for (Edge edge : edges)
 		{
-			Long src = relation.getSource() != null ? relation.getSource().getId()
+			Long src = edge.getSource() != null ? edge.getSource().getId()
 					: null;
-			long dst = relation.getDestination().getId();
-			String relationType = relation.getEdgeType() != null ? relation.getEdgeType()
+			long dst = edge.getDestination().getId();
+			String edgeType = edge.getEdgeType() != null ? edge.getEdgeType()
 					.toString() : null;
-			String name = relation.getQualifiedName();
-			_relations.add(src + "->" + dst + " " + name + " " + relationType);
+			String name = edge.getQualifiedName();
+			_edges.add(src + "->" + dst + " " + name + " " + edgeType);
 		}
 		return "match: " + StringUtils.join(matchedNodeIds, "-") + "; nodes: "
-				+ ids + "; relations: " + _relations;
+				+ ids + "; edges: " + _edges;
 	}
 
 	public void addMatchedNodeId(Long id)

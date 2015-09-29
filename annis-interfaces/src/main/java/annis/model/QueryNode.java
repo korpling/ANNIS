@@ -52,7 +52,7 @@ public class QueryNode implements Serializable
   private String name;
   private String namespace;
   // node constraints
-  private boolean partOfRelation;
+  private boolean partOfEdge;
   private boolean root;
   private boolean token;
   private TextMatching spanTextMatching;
@@ -219,7 +219,7 @@ public class QueryNode implements Serializable
     this.name = other.name;
     this.namespace = other.namespace;
     this.nodeAnnotations = new TreeSet<>(other.nodeAnnotations);
-    this.partOfRelation = other.partOfRelation;
+    this.partOfEdge = other.partOfEdge;
     this.right = other.right;
     this.rightToken = other.rightToken;
     this.root = other.root;
@@ -343,11 +343,11 @@ public class QueryNode implements Serializable
       sb.append(nodeAnnotations);
     }
 
-    Set<QueryAnnotation> relationAnnotations = getRelationAnnotations();
-    if (!relationAnnotations.isEmpty())
+    Set<QueryAnnotation> edgeAnnotations = getEdgeAnnotations();
+    if (!edgeAnnotations.isEmpty())
     {
-      sb.append("; relation labes: ");
-      sb.append(relationAnnotations);
+      sb.append("; edge labes: ");
+      sb.append(edgeAnnotations);
     }
 
     for (Join join : outgoingJoins)
@@ -427,7 +427,7 @@ public class QueryNode implements Serializable
     return sb.toString();
   }
   
-  public String toAQLRelationFragment()
+  public String toAQLEdgeFragment()
   {
     List<String> frags = new LinkedList<String>();
     for (Join join : outgoingJoins)
@@ -463,12 +463,12 @@ public class QueryNode implements Serializable
     
     if (join instanceof RankTableJoin)
     {
-      this.setPartOfRelation(true);
+      this.setPartOfEdge(true);
 
       QueryNode target = join.getTarget();
       if(target != null)
       {
-        target.setPartOfRelation(true);
+        target.setPartOfEdge(true);
       }
     }
 
@@ -546,7 +546,7 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    if (this.partOfRelation != other.partOfRelation)
+    if (this.partOfEdge != other.partOfEdge)
     {
       return false;
     }
@@ -572,11 +572,11 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    Set<QueryAnnotation> relationAnnotations = getRelationAnnotations();
-    Set<QueryAnnotation> otherRelationAnnotations = other.getRelationAnnotations();
-    if (relationAnnotations != otherRelationAnnotations
-      && (relationAnnotations == null || !relationAnnotations.equals(
-      otherRelationAnnotations)))
+    Set<QueryAnnotation> edgeAnnotations = getEdgeAnnotations();
+    Set<QueryAnnotation> otherEdgeAnnotations = other.getEdgeAnnotations();
+    if (edgeAnnotations != otherEdgeAnnotations
+      && (edgeAnnotations == null || !edgeAnnotations.equals(
+      otherEdgeAnnotations)))
     {
       return false;
     }
@@ -612,7 +612,7 @@ public class QueryNode implements Serializable
   // .append(this.nodeAnnotations, other.nodeAnnotations)
   // .append(this.name, other.name)
   // .append(this.namespace, other.namespace)
-  // .append(this.partOfRelation, other.partOfRelation)
+  // .append(this.partOfEdge, other.partOfEdge)
   // .append(this.root, other.root)
   // .append(this.token, other.token)
   // .append(this.spanTextMatching, other.spanTextMatching)
@@ -640,16 +640,16 @@ public class QueryNode implements Serializable
 
   // /// Getter / Setter
   @XmlTransient
-  public Set<QueryAnnotation> getRelationAnnotations()
+  public Set<QueryAnnotation> getEdgeAnnotations()
   {
-    Set<QueryAnnotation> relationAnnotations = new TreeSet<QueryAnnotation>();
+    Set<QueryAnnotation> edgeAnnotations = new TreeSet<>();
     
     for(Join j : ingoingJoins)
     {
-      relationAnnotations.addAll(j.getRelationAnnotations());
+      edgeAnnotations.addAll(j.getEdgeAnnotations());
     }
     
-    return Collections.unmodifiableSet(relationAnnotations);
+    return Collections.unmodifiableSet(edgeAnnotations);
   }
 
   public boolean isRoot()
@@ -744,14 +744,14 @@ public class QueryNode implements Serializable
     this.token = token;
   }
 
-  public boolean isPartOfRelation()
+  public boolean isPartOfEdge()
   {
-    return partOfRelation;
+    return partOfEdge;
   }
 
-  public void setPartOfRelation(boolean partOfRelation)
+  public void setPartOfEdge(boolean partOfEdge)
   {
-    this.partOfRelation = partOfRelation;
+    this.partOfEdge = partOfEdge;
   }
 
   public long getCorpus()

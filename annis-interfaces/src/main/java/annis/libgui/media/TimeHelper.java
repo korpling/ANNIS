@@ -16,7 +16,6 @@
 package annis.libgui.media;
 
 
-import de.hu_berlin.u.saltnpepper.graph.Relation;
 import de.hu_berlin.u.saltnpepper.salt.common.SSpan;
 import de.hu_berlin.u.saltnpepper.salt.common.SSpanningRelation;
 import de.hu_berlin.u.saltnpepper.salt.common.SToken;
@@ -66,7 +65,7 @@ public class TimeHelper
       List<SRelation<SNode,SNode>> outRelations = graph.getOutRelations(node.getId());
       if (outRelations != null)
       {
-        for (Relation e : outRelations)
+        for (SRelation<? extends SNode, ? extends SNode> e : outRelations)
         {
           if (e instanceof SSpanningRelation)
           {

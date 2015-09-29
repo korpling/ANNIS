@@ -19,7 +19,6 @@ import annis.model.AnnisConstants;
 import annis.service.objects.Match;
 import com.google.common.base.Splitter;
 import de.hu_berlin.u.saltnpepper.graph.Label;
-import de.hu_berlin.u.saltnpepper.graph.Relation;
 import de.hu_berlin.u.saltnpepper.salt.common.SCorpus;
 import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
 import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
@@ -163,7 +162,7 @@ public class CommonHelper
           current = null;
           if (out != null)
           {
-            for (Relation e : out)
+            for (SRelation<? extends SNode,? extends SNode> e : out)
             {
               if (e instanceof SOrderRelation)
               {

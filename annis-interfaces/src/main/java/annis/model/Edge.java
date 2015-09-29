@@ -51,7 +51,7 @@ public class Edge implements Serializable
       return type;
     }
 
-    // FIXME: test parseRelationType()
+    // FIXME: test parseEdgeType()
     public static EdgeType parseEdgeType(String type)
     {
       if ("c".equals(type))

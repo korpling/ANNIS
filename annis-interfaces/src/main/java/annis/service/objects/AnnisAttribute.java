@@ -31,7 +31,7 @@ public class AnnisAttribute implements Serializable
   public enum Type
   {
     node,
-    relation,
+    edge,
     segmentation,
     meta,
     unknown
@@ -49,7 +49,7 @@ public class AnnisAttribute implements Serializable
 
 
   private String name = "";
-  private String relationName = null;
+  private String edgeName = null;
   private LinkedHashSet<String> distinctValues = new LinkedHashSet<String>();
   private Type type;
   private SubType subtype;
@@ -77,14 +77,14 @@ public class AnnisAttribute implements Serializable
     this.name = name;
   }
 
-  public String getRelationName()
+  public String getEdgeName()
   {
-    return relationName;
+    return edgeName;
   }
 
-  public void setRelationName(String relationName)
+  public void setEdgeName(String edgeName)
   {
-    this.relationName = relationName;
+    this.edgeName = edgeName;
   }
 
 

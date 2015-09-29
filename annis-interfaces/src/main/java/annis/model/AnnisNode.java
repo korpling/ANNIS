@@ -51,7 +51,7 @@ public class AnnisNode implements Serializable
   private boolean partOfEdge;
   private boolean root;
   private boolean token;
-  private Set<Annotation> relationAnnotations;
+  private Set<Annotation> edgeAnnotations;
   private Long matchedNodeInQuery;
 
 
@@ -100,7 +100,7 @@ public class AnnisNode implements Serializable
   public AnnisNode()
   {
     nodeAnnotations = new TreeSet<>();
-    relationAnnotations = new TreeSet<>();
+    edgeAnnotations = new TreeSet<>();
     incomingEdges = new HashSet<>();
     outgoingEdges = new HashSet<>();
   }
@@ -191,28 +191,28 @@ public class AnnisNode implements Serializable
       sb.append(nodeAnnotations);
     }
 
-    if (!relationAnnotations.isEmpty())
+    if (!edgeAnnotations.isEmpty())
     {
-      sb.append("; relation labes: ");
-      sb.append(relationAnnotations);
+      sb.append("; edge labes: ");
+      sb.append(edgeAnnotations);
     }
     
     return sb.toString();
   }
 
-  public boolean addIncomingEdge(Edge relation)
+  public boolean addIncomingEdge(Edge edge)
   {
-    return incomingEdges.add(relation);
+    return incomingEdges.add(edge);
   }
 
-  public boolean addOutgoingEdge(Edge relation)
+  public boolean addOutgoingEdge(Edge edge)
   {
-    return outgoingEdges.add(relation);
+    return outgoingEdges.add(edge);
   }
 
-  public boolean addRelationAnnotation(Annotation annotation)
+  public boolean addEdgeAnnotation(Annotation annotation)
   {
-    return relationAnnotations.add(annotation);
+    return edgeAnnotations.add(annotation);
   }
 
   public boolean addNodeAnnotation(Annotation annotation)
@@ -297,9 +297,8 @@ public class AnnisNode implements Serializable
       return false;
     }
     
-    if (this.relationAnnotations != other.relationAnnotations
-      && (this.relationAnnotations == null || !this.relationAnnotations.equals(
-      other.relationAnnotations)))
+    if (this.edgeAnnotations != other.edgeAnnotations
+      && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(other.edgeAnnotations)))
     {
       return false;
     }
@@ -315,14 +314,14 @@ public class AnnisNode implements Serializable
   }
 
   // /// Getter / Setter
-  public Set<Annotation> getRelationAnnotations()
+  public Set<Annotation> getEdgeAnnotations()
   {
-    return relationAnnotations;
+    return edgeAnnotations;
   }
 
-  public void setRelationAnnotations(Set<Annotation> relationAnnotations)
+  public void setEdgeAnnotations(Set<Annotation> edgeAnnotations)
   {
-    this.relationAnnotations = relationAnnotations;
+    this.edgeAnnotations = edgeAnnotations;
   }
 
   public boolean isRoot()

@@ -56,7 +56,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.management.relation.RelationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,10 +253,10 @@ public class LegacyGraphConverter
     // add relations with empty relation name for every dominance relation
     for(SDominanceRelation rel : docGraph.getDominanceRelations())
     {
-      RelannisEdgeFeature featRelation = RelannisEdgeFeature.extract(rel);
-      if(featRelation != null 
-        && featRelation.getArtificialDominanceComponent() != null 
-        && featRelation.getArtificialDominancePre() != null)
+      RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
+      if(featEdge != null 
+        && featEdge.getArtificialDominanceComponent() != null 
+        && featEdge.getArtificialDominancePre() != null)
       {
         SDominanceRelation newRel = SaltFactory.createSDominanceRelation();
         newRel.setSource(rel.getSource());
@@ -271,7 +270,7 @@ public class LegacyGraphConverter
           newRel.addAnnotation(anno);
         }
         
-        addRelation(newRel, featRelation.getArtificialDominancePre(), featRelation.getArtificialDominanceComponent(), allNodes, annoGraph);
+        addRelation(newRel, featEdge.getArtificialDominancePre(), featEdge.getArtificialDominanceComponent(), allNodes, annoGraph);
 
       }
     }
@@ -282,46 +281,46 @@ public class LegacyGraphConverter
   private static void addRelation(SRelation<? extends SNode, ? extends SNode> rel, long pre, long componentID, 
     Map<SNode, AnnisNode> allNodes, AnnotationGraph annoGraph)
   {
-    Edge aRelation = new Edge();
+    Edge aEdge = new Edge();
     
-    aRelation.setSource(allNodes.get(rel.getSource()));
-    aRelation.setDestination(allNodes.get(rel.getTarget()));
+    aEdge.setSource(allNodes.get(rel.getSource()));
+    aEdge.setDestination(allNodes.get(rel.getTarget()));
 
-    aRelation.setEdgeType(EdgeType.UNKNOWN);
-    aRelation.setPre(pre);
-    aRelation.setComponentID(componentID);
+    aEdge.setEdgeType(EdgeType.UNKNOWN);
+    aEdge.setPre(pre);
+    aEdge.setComponentID(componentID);
 
     Set<SLayer> relLayers = rel.getLayers();
     if(!relLayers.isEmpty())
     {
-       aRelation.setNamespace(relLayers.iterator().next().getName());
+       aEdge.setNamespace(relLayers.iterator().next().getName());
     }
-    aRelation.setName(rel.getType());
+    aEdge.setName(rel.getType());
    
     if (rel instanceof SDominanceRelation)
     {
-      aRelation.setEdgeType(EdgeType.DOMINANCE);
+      aEdge.setEdgeType(EdgeType.DOMINANCE);
     }
     else if (rel instanceof SPointingRelation)
     {
-      aRelation.setEdgeType(EdgeType.POINTING_RELATION);
+      aEdge.setEdgeType(EdgeType.POINTING_RELATION);
     }
     else if (rel instanceof SSpanningRelation)
     {
-      aRelation.setEdgeType(EdgeType.COVERAGE);
+      aEdge.setEdgeType(EdgeType.COVERAGE);
     }
 
     for (SAnnotation sAnno : rel.getAnnotations())
     {
-      aRelation.addAnnotation(new Annotation(sAnno.getNamespace(), sAnno.getName(),
+      aEdge.addAnnotation(new Annotation(sAnno.getNamespace(), sAnno.getName(),
         sAnno.getValue_STEXT()));
     }
 
-    annoGraph.addEdge(aRelation);
-    aRelation.getDestination().addIncomingEdge(aRelation);
-    if(aRelation.getSource() != null)
+    annoGraph.addEdge(aEdge);
+    aEdge.getDestination().addIncomingEdge(aEdge);
+    if(aEdge.getSource() != null)
     {
-      aRelation.getSource().addOutgoingEdge(aRelation);
+      aEdge.getSource().addOutgoingEdge(aEdge);
     }
   }
   
