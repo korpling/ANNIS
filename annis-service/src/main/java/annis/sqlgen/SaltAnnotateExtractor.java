@@ -24,8 +24,8 @@ import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.io.Files;
 import de.hu_berlin.u.saltnpepper.graph.Relation;
-import de.hu_berlin.u.saltnpepper.salt.SDATATYPE;
 import de.hu_berlin.u.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.u.saltnpepper.salt.common.SCorpus;
 import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
@@ -64,6 +64,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.LoggerFactory;
@@ -154,10 +155,13 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           corpusGraph.setName("match_" + (match_index + matchstart));
 
           project.addCorpusGraph(corpusGraph);
-
+          
           graph = SaltFactory.createSDocumentGraph();
           document = SaltFactory.createSDocument();
-
+          
+          document.setDocumentGraphLocation(org.eclipse.emf.common.util.URI.
+            createFileURI(Files.createTempDir().getAbsolutePath()));
+          
           List<String> path = corpusPathExtractor.extractCorpusPath(resultSet,
             "path");
 
@@ -594,7 +598,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       layer.setName(namespace);
       graph.addLayer(layer);
     }
-    node.getLayers().add(layer);
+    node.addLayer(layer);
   }
 
   private void addLongSFeature(SNode node, String name,
@@ -680,9 +684,9 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     to.setName(from.getName());
     for (SLayer l : from.getLayers())
     {
-      to.getLayers().add(l);
+      to.addLayer(l);
+      from.removeLayer(l);
     }
-    from.getLayers().clear();
 
     Multimap<SRelation, SLayer> layerOfRelation = ArrayListMultimap.create();
 
