@@ -119,7 +119,6 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
   
     String visConfigName = vi.getMappings().getProperty("config");
-    //Properties a = vi.getMappings();
     String hitMarkConfig = vi.getMappings().getProperty("hitmark","on");
     hitMark = ("on".equals(hitMarkConfig));
     mc = vi.getMarkedAndCovered();
@@ -372,7 +371,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       for (SSpan span : spans)
       {
         tokenColor="";  
-        if (mc.containsKey(span)){
+        if (mc.containsKey(span) && hitMark){
           tokenColor = MatchedNodeColors
                   .getHTMLColorByMatch(mc.get(span));
         }  
