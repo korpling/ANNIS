@@ -60,4 +60,9 @@ public class AnnisConstants
    */
   public static final String FEAT_FIRST_NODE_SEGMENTATION_CHAIN = "first_node_segmentation_chain";
   
+  /**
+   * A "/" seperated string with the name of each (sub-) corpus and the document in which a document graph is contained.
+   */
+  public static final String FEAT_CORPUS_STRUCTURE = "corpusstructure";
+  
 }

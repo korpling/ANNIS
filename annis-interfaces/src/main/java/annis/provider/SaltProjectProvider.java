@@ -16,6 +16,8 @@
 package annis.provider;
 
 import annis.model.AnnisConstants;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,6 +25,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.WebApplicationException;
@@ -38,11 +41,15 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.SaltUtil;
 import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.ATT_XMI_VERSION;
 import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SALTCORE;
 import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SDOCUMENTSTRUCTURE;
@@ -138,6 +145,28 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
             }
           }
           
+          // add the corpus graph structure as feature 
+          // (this could be generatedd by the ID, but we can't be sure how it is generated)
+          List<String> path = new ArrayList<>();
+          path.add(doc.getName());
+          SNode c = corpusGraph.getCorpus(doc);
+          while(c != null)
+          {
+            path.add(0, c.getName());
+            List<SRelation<SNode, SNode>> inRels = corpusGraph.getInRelations(c.getId());
+            if(inRels != null && !inRels.isEmpty())
+            {
+              c = inRels.get(0).getSource();
+            }
+            else
+            {
+              c = null;
+            }
+          }
+          docGraph.createFeature(AnnisConstants.ANNIS_NS, 
+            AnnisConstants.FEAT_CORPUS_STRUCTURE, Joiner.on('/').join(path));
+          
+          
           writer.writeDocumentGraph(xml, docGraph);
         }
       }
@@ -189,26 +218,33 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       for(SDocumentGraph g : handler.getDocGraphs())
       {
         // create a separate corpus graph for each document
+        SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
+        SFeature featCorpusStructure = g.getFeature(SaltUtil.createQName(AnnisConstants.ANNIS_NS,
+          AnnisConstants.FEAT_CORPUS_STRUCTURE));
         
-      }
-      
-      if(handler.getProject() != null)
-      {
-        result = handler.getProject();
-        
-        Map<String, SDocument> docsByID = new HashMap<>();
-        for(SCorpusGraph cg : result.getCorpusGraphs())
+        SCorpus parentCorpus = null;
+        SDocument doc = null;
+        Iterator<String> it = Splitter.on('/').omitEmptyStrings().trimResults()
+          .split(featCorpusStructure.getValue_STEXT()).iterator();
+        while(it.hasNext())
         {
-          for(SDocument doc : cg.getDocuments())
+          String name = it.next();
+          if(it.hasNext())
           {
-            docsByID.put(doc.getId(), doc);
+            // this is a sub-corpus
+            parentCorpus = corpusGraph.createCorpus(parentCorpus, name);
+          }
+          else
+          {
+            // no more path elements left, must be a document
+            doc = corpusGraph.createDocument(parentCorpus, name);
+            break;
           }
         }
-        
-        // append all document graphs to the actual project
-        for(SDocumentGraph g : handler.getDocGraphs())
+        if(doc != null)
         {
-//          String id = g.getDocument()
+          result.addCorpusGraph(corpusGraph);
+          doc.setDocumentGraph(g);
         }
       }
       
