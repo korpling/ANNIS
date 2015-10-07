@@ -41,7 +41,6 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import elemental.json.JsonValue;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -61,6 +60,8 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.util.SaltUtil;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -834,13 +835,13 @@ public class Helper
   {
     if(anno != null)
     {
-      if(anno.getSNS() == null || anno.getSNS().isEmpty())
+      if(anno.getNamespace()== null || anno.getNamespace().isEmpty())
       {
-        return anno.getSName();
+        return anno.getName();
       }
       else
       {
-        return anno.getSNS() + ":" + anno.getSName();
+        return anno.getNamespace()+ ":" + anno.getNamespace();
       }
     }
     return "";
