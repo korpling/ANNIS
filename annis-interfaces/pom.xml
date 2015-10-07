@@ -57,7 +57,7 @@
     
     <dependency>
       <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
-      <artifactId>salt-core</artifactId>
+      <artifactId>salt-api</artifactId>
       <version>3.0.0-SNAPSHOT</version>
       <type>bundle</type>
       <scope>compile</scope>

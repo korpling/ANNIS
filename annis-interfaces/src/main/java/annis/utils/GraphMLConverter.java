@@ -15,16 +15,7 @@
  */
 package annis.utils;
 
-import de.hu_berlin.u.saltnpepper.graph.IdentifiableElement;
-import de.hu_berlin.u.saltnpepper.graph.Label;
-import de.hu_berlin.u.saltnpepper.graph.LabelableElement;
-import de.hu_berlin.u.saltnpepper.graph.Node;
-import de.hu_berlin.u.saltnpepper.graph.Relation;
-import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
-import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
-import de.hu_berlin.u.saltnpepper.salt.core.SNode;
-import de.hu_berlin.u.saltnpepper.salt.core.SRelation;
-import de.hu_berlin.u.saltnpepper.salt.util.SALT_TYPE;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -38,6 +29,16 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.graph.IdentifiableElement;
+import org.corpus_tools.salt.graph.Label;
+import org.corpus_tools.salt.graph.LabelableElement;
+import org.corpus_tools.salt.graph.Node;
+import org.corpus_tools.salt.graph.Relation;
+import org.corpus_tools.salt.util.SALT_TYPE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

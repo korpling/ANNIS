@@ -15,30 +15,11 @@
  */
 package annis.provider;
 
-import de.hu_berlin.u.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
-import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
-import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
-import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
-import de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.ATT_XMI_VERSION;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_SALTCORE;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_SALTCOMMON;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_SDOCUMENTSTRUCTURE;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SALTCORE;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SDOCUMENTSTRUCTURE;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XMI;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XSI;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_XMI;
-import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_XSI;
-import de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Writer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.LinkedList;
-import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -48,6 +29,21 @@ import javax.ws.rs.ext.Provider;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.ATT_XMI_VERSION;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SALTCORE;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SDOCUMENTSTRUCTURE;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SALTCORE;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SDOCUMENTSTRUCTURE;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XMI;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XSI;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_XMI;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_XSI;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.slf4j.LoggerFactory;
 
 /**

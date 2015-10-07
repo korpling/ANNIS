@@ -15,19 +15,19 @@
  */
 package annis;
 
-import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
-import de.hu_berlin.u.saltnpepper.salt.common.SDominanceRelation;
-import de.hu_berlin.u.saltnpepper.salt.common.SSpanningRelation;
-import de.hu_berlin.u.saltnpepper.salt.common.STextualDS;
-import de.hu_berlin.u.saltnpepper.salt.common.STextualRelation;
-import de.hu_berlin.u.saltnpepper.salt.core.GraphTraverseHandler;
-import de.hu_berlin.u.saltnpepper.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.u.saltnpepper.salt.core.SNode;
-import de.hu_berlin.u.saltnpepper.salt.core.SRelation;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.STextualRelation;
+import org.corpus_tools.salt.core.GraphTraverseHandler;
+import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
 
 /**
  * Traverses the Salt graph and gets the covered {@link STextualDS} for a list

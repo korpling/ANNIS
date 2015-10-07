@@ -60,18 +60,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import de.hu_berlin.u.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.u.saltnpepper.salt.common.SCorpus;
-import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
-import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
-import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
-import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
-import de.hu_berlin.u.saltnpepper.salt.core.SNode;
-import de.hu_berlin.u.saltnpepper.salt.core.SRelation;
-import de.hu_berlin.u.saltnpepper.salt.exceptions.SaltResourceException;
-import de.hu_berlin.u.saltnpepper.salt.impl.SaltFactoryImpl;
-import de.hu_berlin.u.saltnpepper.salt.util.SaltUtil;
-import de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Writer;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -104,9 +92,17 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpus;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.SaltUtil;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -1031,7 +1027,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
     corpusGraph.setSaltProject(corpusProject);
     
-    SCorpus rootCorpus = corpusGraph.createSCorpus(null, toplevelCorpus);
+    SCorpus rootCorpus = corpusGraph.createCorpus(null, toplevelCorpus);
     
     // add all root metadata
     for(Annotation metaAnno : listCorpusAnnotations(toplevelCorpus))
@@ -1097,7 +1093,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
               new File(documentRootDir, doc.getName() + "." 
                 + SaltUtil.FILE_ENDING_SALT_XML).getAbsolutePath()));
             
-            SDocument docCopy = corpusGraph.createSDocument(rootCorpus, doc.getName());
+            SDocument docCopy = corpusGraph.createDocument(rootCorpus, doc.getName());
             log.info("Adding metadata to document {} ({}/{})", doc.getName(), i, docs.size());
             for(Annotation metaAnno : docMetaData)
             {

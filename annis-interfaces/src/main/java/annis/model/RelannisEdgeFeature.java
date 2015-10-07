@@ -17,9 +17,9 @@ package annis.model;
 
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_EDGE;
-import de.hu_berlin.u.saltnpepper.salt.core.SFeature;
-import de.hu_berlin.u.saltnpepper.salt.core.SRelation;
 import java.io.Serializable;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SRelation;
 
 /**
  * Common Features included in the Salt graph that are available
