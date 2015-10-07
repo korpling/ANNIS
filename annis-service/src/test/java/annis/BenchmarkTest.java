@@ -17,7 +17,7 @@ package annis;
 
 import annis.dao.AnnisDao;
 import annis.dao.SpringAnnisDao;
-import annis.provider.SDocumentGraphProvider;
+import annis.provider.SaltProjectProvider;
 import annis.test.TestHelper;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
@@ -82,7 +82,7 @@ public class BenchmarkTest
 
   private List<Long> ridgesCorpusID;
 
-  private final SDocumentGraphProvider provider = new SDocumentGraphProvider();
+  private final SaltProjectProvider provider = new SaltProjectProvider();
 
   private final OutputStream nullStream = ByteStreams.nullOutputStream();
   private final MediaType typeXMI = new MediaType("application", "xmi+xml");
@@ -142,7 +142,7 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282", null);
-    provider.writeTo(p.getCorpusGraphs().get(0).getDocuments().get(0).getDocumentGraph(), SaltProject.class, null, null,
+    provider.writeTo(p, SaltProject.class, null, null,
       typeXMI, new StringKeyIgnoreCaseMultivaluedMap<>(),
       nullStream);
   }
@@ -166,7 +166,7 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21", null);
-    provider.writeTo(p.getCorpusGraphs().get(0).getDocuments().get(0).getDocumentGraph(), 
+    provider.writeTo(p, 
       SaltProject.class, null, null,
       typeXMI, null,
       nullStream);
