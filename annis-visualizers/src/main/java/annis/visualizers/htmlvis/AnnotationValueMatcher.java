@@ -15,12 +15,12 @@
  */
 package annis.visualizers.htmlvis;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SNode;
 
 /**
  *
@@ -41,9 +41,9 @@ public class AnnotationValueMatcher implements SpanMatcher
   {
     if(node instanceof SSpan || node instanceof SToken)
     {
-      for(SAnnotation anno : node.getSAnnotations())
+      for(SAnnotation anno : node.getAnnotations())
       {
-        if(annotationValue.equals(anno.getSValueSTEXT()))
+        if(annotationValue.equals(anno.getValue_STEXT()))
         {
           return anno.getQName();
         }

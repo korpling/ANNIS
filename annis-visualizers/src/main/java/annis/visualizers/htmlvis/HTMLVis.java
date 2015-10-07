@@ -32,9 +32,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -51,6 +48,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.io.IOUtils;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SToken;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +97,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     lblResult.setSizeUndefined();
 
     List<String> corpusPath = CommonHelper.getCorpusPath(vi.getDocument().
-      getSCorpusGraph(), vi.getDocument());
+      getGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     corpusName = urlPathEscape.escape(corpusName);
     
@@ -116,7 +116,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
 
         
-      lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(),
+      lblResult.setValue(createHTML(vi.getSResult().getDocumentGraph(),
         definitions));
 
       String labelClass = vi.getMappings().getProperty("class", "htmlvis");
@@ -284,7 +284,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       = new TreeMap<Long, SortedSet<OutputItem>>();
     StringBuilder sb = new StringBuilder();
 
-    EList<SToken> token = graph.getSortedSTokenByText();
+    List<SToken> token = graph.getSortedTokenByText();
 
     //Get metadata for visualizer if stylesheet requires it
     //First check the stylesheet
@@ -319,8 +319,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         //Get corpus and document name
         String strDocName = "";
         String strCorpName = "";    
-        strDocName = graph.getSDocument().getSName();
-        List<String> corpusPath = CommonHelper.getCorpusPath(graph.getSDocument().getSCorpusGraph(), graph.getSDocument());
+        strDocName = graph.getDocument().getName();
+        List<String> corpusPath = CommonHelper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
         strCorpName = corpusPath.get(corpusPath.size() - 1);
         
         //Get metadata and put in hashmap
@@ -344,7 +344,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
     }
 
-    List<SSpan> spans = graph.getSSpans();
+    List<SSpan> spans = graph.getSpans();
     for (VisualizationDefinition vis : definitions)
     {
       for (SSpan span : spans)
