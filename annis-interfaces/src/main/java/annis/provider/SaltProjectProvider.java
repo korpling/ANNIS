@@ -16,14 +16,29 @@
 package annis.provider;
 
 import de.hu_berlin.u.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.u.saltnpepper.salt.common.SCorpusGraph;
+import de.hu_berlin.u.saltnpepper.salt.common.SDocument;
 import de.hu_berlin.u.saltnpepper.salt.common.SDocumentGraph;
 import de.hu_berlin.u.saltnpepper.salt.common.SaltProject;
+import de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.ATT_XMI_VERSION;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_SALTCORE;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_SALTCOMMON;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_SDOCUMENTSTRUCTURE;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SALTCORE;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SDOCUMENTSTRUCTURE;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XMI;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XSI;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_XMI;
+import static de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Dictionary.NS_XSI;
 import de.hu_berlin.u.saltnpepper.salt.util.internal.persistence.SaltXML10Writer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.LinkedList;
+import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -40,12 +55,11 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 @Provider
-public class SDocumentGraphProvider implements MessageBodyWriter<SDocumentGraph>,
-  MessageBodyReader<SDocumentGraph>
+public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
+  MessageBodyReader<SaltProject>
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    SDocumentGraphProvider.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltProjectProvider.class);
 
   private static final XMLOutputFactory factory = XMLOutputFactory.newFactory();
 
@@ -60,11 +74,11 @@ public class SDocumentGraphProvider implements MessageBodyWriter<SDocumentGraph>
     return (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)
       || MediaType.TEXT_XML_TYPE.isCompatible(mediaType)
       || APPLICATION_XMI_XML.isCompatible(mediaType))
-      && SDocumentGraph.class.isAssignableFrom(type);
+      && SaltProject.class.isAssignableFrom(type);
   }
 
   @Override
-  public long getSize(SDocumentGraph t,
+  public long getSize(SaltProject t,
     Class<?> type, Type genericType, Annotation[] annotations,
     MediaType mediaType)
   {
@@ -72,7 +86,7 @@ public class SDocumentGraphProvider implements MessageBodyWriter<SDocumentGraph>
   }
 
   @Override
-  public void writeTo(SDocumentGraph graph,
+  public void writeTo(SaltProject project,
     Class<?> type, Type genericType, Annotation[] annotations,
     MediaType mediaType,
     MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
@@ -88,7 +102,25 @@ public class SDocumentGraphProvider implements MessageBodyWriter<SDocumentGraph>
       xml.writeStartDocument("1.0");
       xml.writeCharacters("\n");
       long startTime = System.currentTimeMillis();
-      writer.writeDocumentGraph(xml, graph);
+      
+      // output XMI root element
+      xml.writeStartElement(NS_XMI, "XMI", NS_VALUE_XMI);
+			xml.writeNamespace(NS_SDOCUMENTSTRUCTURE, NS_VALUE_SDOCUMENTSTRUCTURE);
+			xml.writeNamespace(NS_XMI, NS_VALUE_XMI);
+			xml.writeNamespace(NS_XSI, NS_VALUE_XSI);
+			xml.writeNamespace(NS_SALTCORE, NS_VALUE_SALTCORE);
+			xml.writeAttribute(NS_VALUE_XMI, ATT_XMI_VERSION, "2.0");
+      
+      writer.writeSaltProject(xml, project);
+      
+      for(SCorpusGraph corpusGraph : project.getCorpusGraphs())
+      {
+        for(SDocument doc : corpusGraph.getDocuments())
+        {
+          writer.writeDocumentGraph(xml, doc.getDocumentGraph());
+        }
+      }
+      xml.writeEndDocument();
       long endTime = System.currentTimeMillis();
       log.debug("Saving XMI (" + mediaType.toString() + ") needed {} ms",
         endTime - startTime);
@@ -98,6 +130,11 @@ public class SDocumentGraphProvider implements MessageBodyWriter<SDocumentGraph>
     {
       log.error("exception when serializing SDocumentGraph", ex);
     }
+  }
+  
+  private void writeHead( XMLStreamWriter xml)
+  {
+    
   }
 
   @Override
@@ -111,13 +148,13 @@ public class SDocumentGraphProvider implements MessageBodyWriter<SDocumentGraph>
   }
 
   @Override
-  public SDocumentGraph readFrom(Class<SDocumentGraph> type, Type genericType,
+  public SaltProject readFrom(Class<SaltProject> type, Type genericType,
     Annotation[] annotations, MediaType mediaType,
     MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws
     IOException,
     WebApplicationException
   {
-    SDocumentGraph result = SaltFactory.createSDocumentGraph();
+    SaltProject result = SaltFactory.createSaltProject();
 
     return result;
   }
