@@ -15,13 +15,16 @@
  */
 package annis.provider;
 
+import annis.model.AnnisConstants;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -39,6 +42,7 @@ import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
 import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.ATT_XMI_VERSION;
 import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SALTCORE;
 import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SDOCUMENTSTRUCTURE;
@@ -51,7 +55,6 @@ import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionar
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Handler;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -67,7 +70,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltProjectProvider.class);
 
-  private static final XMLOutputFactory factory = XMLOutputFactory.newFactory();
+  private static final XMLOutputFactory outFactory = XMLOutputFactory.newFactory();
 
   public static final MediaType APPLICATION_XMI_XML = new MediaType(
     "application",
@@ -103,7 +106,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
 
     try
     {
-      XMLStreamWriter xml = factory.createXMLStreamWriter(entityStream, "UTF-8");
+      XMLStreamWriter xml = outFactory.createXMLStreamWriter(entityStream, "UTF-8");
 
       xml.writeStartDocument("1.0");
       xml.writeCharacters("\n");
@@ -117,13 +120,25 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
 			xml.writeNamespace(NS_SALTCORE, NS_VALUE_SALTCORE);
 			xml.writeAttribute(NS_VALUE_XMI, ATT_XMI_VERSION, "2.0");
       
-      writer.writeSaltProject(xml, project);
+      //writer.writeSaltProject(xml, project);
       
       for(SCorpusGraph corpusGraph : project.getCorpusGraphs())
       {
         for(SDocument doc : corpusGraph.getDocuments())
         {
-          writer.writeDocumentGraph(xml, doc.getDocumentGraph());
+          // make sure that any ANNIS feature on the document is copied to the document graph
+          SDocumentGraph docGraph = doc.getDocumentGraph();
+          for(SFeature feat : doc.getFeatures())
+          {
+            if(AnnisConstants.ANNIS_NS.equals(feat.getNamespace()))
+            {
+              SFeature newFeat = SaltFactory.createSFeature();
+              feat.copy(newFeat);
+              docGraph.addFeature(newFeat);
+            }
+          }
+          
+          writer.writeDocumentGraph(xml, docGraph);
         }
       }
       xml.writeEndDocument();
@@ -171,13 +186,29 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       source.setEncoding("UTF-8");
       xmlReader.parse(source);
       
+      for(SDocumentGraph g : handler.getDocGraphs())
+      {
+        // create a separate corpus graph for each document
+        
+      }
+      
       if(handler.getProject() != null)
       {
         result = handler.getProject();
+        
+        Map<String, SDocument> docsByID = new HashMap<>();
+        for(SCorpusGraph cg : result.getCorpusGraphs())
+        {
+          for(SDocument doc : cg.getDocuments())
+          {
+            docsByID.put(doc.getId(), doc);
+          }
+        }
+        
         // append all document graphs to the actual project
         for(SDocumentGraph g : handler.getDocGraphs())
         {
-          
+//          String id = g.getDocument()
         }
       }
       
