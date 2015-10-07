@@ -43,12 +43,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -64,6 +58,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -350,9 +350,9 @@ public class ResultViewPanel extends VerticalLayout implements
     List<SingleResultPanel> result = new LinkedList<>();
 
     int i = 0;
-    for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
+    for (SCorpusGraph corpusGraph : p.getCorpusGraphs())
     {
-      SDocument doc = corpusGraph.getSDocuments().get(0);
+      SDocument doc = corpusGraph.getDocuments().get(0);
       Match m = new Match();
       try
       {
@@ -421,22 +421,22 @@ public class ResultViewPanel extends VerticalLayout implements
   {
     Set<String> result = new TreeSet<>();
 
-    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    for (SCorpusGraph corpusGraphs : p.getCorpusGraphs())
     {
-      for (SDocument doc : corpusGraphs.getSDocuments())
+      for (SDocument doc : corpusGraphs.getDocuments())
       {
-        SDocumentGraph g = doc.getSDocumentGraph();
+        SDocumentGraph g = doc.getDocumentGraph();
         if (g != null)
         {
           // collect the start nodes of a segmentation chain of length 1
-          for (SNode n : g.getSNodes())
+          for (SNode n : g.getNodes())
           {
             SFeature feat
-              = n.getSFeature(AnnisConstants.ANNIS_NS,
+              = n.getFeature(AnnisConstants.ANNIS_NS,
                 AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
-            if (feat != null && feat.getSValueSTEXT() != null)
+            if (feat != null && feat.getValue_STEXT() != null)
             {
-              result.add(feat.getSValueSTEXT());
+              result.add(feat.getValue_STEXT());
             }
           }
         } // end if graph not null

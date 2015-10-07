@@ -46,20 +46,6 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -73,8 +59,18 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.GraphTraverseHandler;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
 import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -92,7 +88,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
-  private transient SDocument result;
+  private SDocument result;
 
   private Map<String, String> markedCoveredMap;
 
@@ -181,12 +177,12 @@ public class SingleResultPanel extends CssLayout implements
      * Extract the top level corpus name and the document name of this single
      * result.
      */
-    path = CommonHelper.getCorpusPath(result.getSCorpusGraph(), result);
+    path = CommonHelper.getCorpusPath(result.getGraph(), result);
     Collections.reverse(path);
     corpusName = path.get(0);
     documentName = path.get(path.size() - 1);
 
-    MinMax minMax = getIds(result.getSDocumentGraph());
+    MinMax minMax = getIds(result.getDocumentGraph());
 
     // build label
     StringBuilder sb = new StringBuilder("Path: ");
@@ -287,19 +283,6 @@ public class SingleResultPanel extends CssLayout implements
     initVisualizer();
   }
   
-  private void writeObject(ObjectOutputStream out) throws IOException
-  {
-    out.defaultWriteObject();
-    
-    CommonHelper.writeSDocument(result, out);
-  }
-  
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
-    
-   this.result = CommonHelper.readSDocument(in);
-  }
 
   public void setSegmentationLayer(String segmentationName)
   {
@@ -309,7 +292,7 @@ public class SingleResultPanel extends CssLayout implements
     {
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
-        result.getSDocumentGraph());
+        result.getDocumentGraph());
       Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       for (VisualizerPanel p : visualizers)
       {
@@ -333,15 +316,14 @@ public class SingleResultPanel extends CssLayout implements
 
     if (result != null)
     {
-      SDocumentGraph g = result.getSDocumentGraph();
+      SDocumentGraph g = result.getDocumentGraph();
       if (g != null)
       {
-        for (SNode n : result.getSDocumentGraph().getSNodes())
+        for (SNode n : result.getDocumentGraph().getNodes())
         {
-
-          SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          SFeature featMatched = n.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
           Long matchNum = featMatched == null ? null : featMatched.
-            getSValueSNUMERIC();
+            getValue_SNUMERIC();
 
           if (matchNum != null)
           {
@@ -370,7 +352,7 @@ public class SingleResultPanel extends CssLayout implements
           longValue()
           - 1,
           MatchedNodeColors.values().length - 1));
-        SNode n = result.getSDocumentGraph().getSNode(markedEntry.getKey());
+        SNode n = result.getDocumentGraph().getNode(markedEntry.getKey());
         RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
 
         if (feat != null)
@@ -388,22 +370,21 @@ public class SingleResultPanel extends CssLayout implements
     Map<String, Long> initialCovered = new HashMap<>();
 
     // add all covered nodes
-    for (SNode n : doc.getSDocumentGraph().getSNodes())
+    for (SNode n : doc.getDocumentGraph().getNodes())
     {
-      SFeature featMatched = n.getSFeature(ANNIS_NS,
+      SFeature featMatched = n.getFeature(ANNIS_NS,
         FEAT_MATCHEDNODE);
-      Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
+      Long match = featMatched == null ? null : featMatched.getValue_SNUMERIC();
 
       if (match != null)
       {
-        initialCovered.put(n.getSId(), match);
+        initialCovered.put(n.getId(), match);
       }
     }
 
     // calculate covered nodes
     SingleResultPanel.CoveredMatchesCalculator cmc = new SingleResultPanel.CoveredMatchesCalculator(
-      doc.
-      getSDocumentGraph(), initialCovered);
+      doc.getDocumentGraph(), initialCovered);
     Map<String, Long> covered = cmc.getMatchedAndCovered();
 
     if (segmentationName != null)
@@ -412,7 +393,7 @@ public class SingleResultPanel extends CssLayout implements
       Map<SToken, Long> coveredToken = new HashMap<>();
       for (Map.Entry<String, Long> e : covered.entrySet())
       {
-        SNode n = doc.getSDocumentGraph().getSNode(e.getKey());
+        SNode n = doc.getDocumentGraph().getNode(e.getKey());
         if (n instanceof SToken)
         {
           coveredToken.put((SToken) n, e.getValue());
@@ -422,9 +403,9 @@ public class SingleResultPanel extends CssLayout implements
       for (SNode segNode : segNodes)
       {
         RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.
-          getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+          getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-        if (!covered.containsKey(segNode.getSId()))
+        if (!covered.containsKey(segNode.getId()))
         {
           long leftTok = featSegNode.getLeftToken();
           long rightTok = featSegNode.getRightToken();
@@ -433,12 +414,12 @@ public class SingleResultPanel extends CssLayout implements
           for (Map.Entry<SToken, Long> e : coveredToken.entrySet())
           {
             RelannisNodeFeature featTok = (RelannisNodeFeature) e.getKey().
-              getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+              getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
             long entryTokenIndex = featTok.getTokenIndex();
             if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
             {
               // add this segmentation node to the covered set
-              covered.put(segNode.getSId(), e.getValue());
+              covered.put(segNode.getId(), e.getValue());
               break;
             }
           } // end for each covered token
@@ -454,7 +435,7 @@ public class SingleResultPanel extends CssLayout implements
   {
     if (event.getButton() == btInfo && result != null)
     {
-      Window infoWindow = new Window("Info for " + result.getSId());
+      Window infoWindow = new Window("Info for " + result.getId());
 
       infoWindow.setModal(false);
       MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size()
@@ -495,7 +476,7 @@ public class SingleResultPanel extends CssLayout implements
 
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
-        result.getSDocumentGraph());
+        result.getDocumentGraph());
 
       Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       calulcateColorsForMarkedAndCovered(markedAndCovered);
@@ -667,7 +648,7 @@ public class SingleResultPanel extends CssLayout implements
    * should always work.
    *
    */
-  public static class CoveredMatchesCalculator implements SGraphTraverseHandler
+  public static class CoveredMatchesCalculator implements GraphTraverseHandler
   {
 
     private Map<String, Long> matchedAndCovered;
@@ -685,9 +666,9 @@ public class SingleResultPanel extends CssLayout implements
           @Override
           public int compare(SNode o1, SNode o2)
           {
-            RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getSFeature(
+            RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getFeature(
               ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-            RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getSFeature(
+            RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getFeature(
               ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
             long leftTokIdxO1 = feat1.getLeftToken();
@@ -719,7 +700,7 @@ public class SingleResultPanel extends CssLayout implements
 
       for (Map.Entry<String, Long> entry : initialMatches.entrySet())
       {
-        SNode n = graph.getSNode(entry.getKey());
+        SNode n = graph.getNode(entry.getKey());
         sortedByOverlappedTokenIntervall.put(n, entry.getValue());
       }
 
@@ -729,7 +710,7 @@ public class SingleResultPanel extends CssLayout implements
         graph.traverse(new BasicEList<>(sortedByOverlappedTokenIntervall.
           keySet()),
           GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
-          (SGraphTraverseHandler) this, true);
+          (GraphTraverseHandler) this, true);
       }
     }
 
@@ -739,12 +720,12 @@ public class SingleResultPanel extends CssLayout implements
       long order)
     {
       if (fromNode != null
-        && matchedAndCovered.containsKey(fromNode.getSId()) 
+        && matchedAndCovered.containsKey(fromNode.getId()) 
         && currNode != null
-        && !matchedAndCovered.containsKey(currNode.getSId()))
+        && !matchedAndCovered.containsKey(currNode.getId()))
       {
-        currentMatchPos = matchedAndCovered.get(fromNode.getSId());
-        matchedAndCovered.put(currNode.getSId(), currentMatchPos);
+        currentMatchPos = matchedAndCovered.get(fromNode.getId());
+        matchedAndCovered.put(currNode.getId(), currentMatchPos);
       }
 
     }
@@ -789,7 +770,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private MinMax getIds(SDocumentGraph graph)
   {
-    EList<SToken> sTokens = graph.getSTokens();
+    List<SToken> sTokens = graph.getTokens();
 
     MinMax minMax = new MinMax();
     minMax.min = Long.MAX_VALUE;
@@ -803,7 +784,7 @@ public class SingleResultPanel extends CssLayout implements
       {
         for (SToken t : sTokens)
         {
-          SFeature feature = t.getSFeature(ANNIS_NS,
+          SFeature feature = t.getFeature(ANNIS_NS,
             FEAT_RELANNIS_NODE);
           if(feature != null && feature.getValue() instanceof RelannisNodeFeature)
           {
@@ -856,13 +837,13 @@ public class SingleResultPanel extends CssLayout implements
   {
     this.query = query;
     if (p != null
-      && p.getSCorpusGraphs() != null
-      && !p.getSCorpusGraphs().isEmpty()
-      && p.getSCorpusGraphs().get(0) != null
-      && p.getSCorpusGraphs().get(0).getSDocuments() != null
-      && !p.getSCorpusGraphs().get(0).getSDocuments().isEmpty())
+      && p.getCorpusGraphs() != null
+      && !p.getCorpusGraphs().isEmpty()
+      && p.getCorpusGraphs().get(0) != null
+      && p.getCorpusGraphs().get(0).getDocuments() != null
+      && !p.getCorpusGraphs().get(0).getDocuments().isEmpty())
     {
-      this.result = p.getSCorpusGraphs().get(0).getSDocuments().get(0);
+      this.result = p.getCorpusGraphs().get(0).getDocuments().get(0);
     }
 
     removeComponent(reloadVisualizer);

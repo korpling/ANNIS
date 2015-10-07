@@ -17,8 +17,8 @@ package annis.gui.resultview;
 
 import annis.gui.objects.PagedResultQuery;
 import annis.libgui.ResolverProvider;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.Serializable;
+import org.corpus_tools.salt.common.SaltProject;
 
 /**
  * Defines a facade for changing the context of all visualizer for a single

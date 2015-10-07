@@ -16,15 +16,15 @@
 
 package annis.gui.resultview;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.samples.SampleGenerator;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.samples.SampleGenerator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -67,7 +67,7 @@ public class VisualizerPanelTest
   public void testSerializationOfSDocument() throws IOException, ClassNotFoundException
   {
     SaltProject project = SampleGenerator.createSaltProject();
-    SDocument doc = project.getSCorpusGraphs().get(0).getSDocuments().get(0);
+    SDocument doc = project.getCorpusGraphs().get(0).getDocuments().get(0);
     
     VisualizerPanel o = new VisualizerPanel(null, doc, null, null, null, null,
       null, null, null, null, null, null, null, null);

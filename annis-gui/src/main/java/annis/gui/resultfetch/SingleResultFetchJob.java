@@ -22,9 +22,9 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
 import com.sun.jersey.api.client.WebResource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
 import java.util.List;
+import org.corpus_tools.salt.common.SaltProject;
 
 /**
  * Fetches a result which contains only one subgraph. This single query always
