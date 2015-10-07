@@ -20,12 +20,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -43,8 +48,13 @@ import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionar
 import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XSI;
 import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_XMI;
 import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_XSI;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Handler;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  *
@@ -128,11 +138,6 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     }
   }
   
-  private void writeHead( XMLStreamWriter xml)
-  {
-    
-  }
-
   @Override
   public boolean isReadable(Class<?> type, Type genericType,
     Annotation[] annotations, MediaType mediaType)
@@ -151,8 +156,72 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     WebApplicationException
   {
     SaltProject result = SaltFactory.createSaltProject();
-
+    
+    SAXParser parser;
+		XMLReader xmlReader;
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    MixedContentHandler handler = new MixedContentHandler();
+    
+    try
+    {
+      parser = factory.newSAXParser();
+      xmlReader = parser.getXMLReader();
+      xmlReader.setContentHandler(handler);
+      InputSource source = new InputSource(entityStream);
+      source.setEncoding("UTF-8");
+      xmlReader.parse(source);
+      
+      if(handler.getProject() != null)
+      {
+        result = handler.getProject();
+        // append all document graphs to the actual project
+        for(SDocumentGraph g : handler.getDocGraphs())
+        {
+          
+        }
+      }
+      
+    }
+    catch(ParserConfigurationException | SAXException ex)
+    {
+      log.error("Error when parsing XMI", ex);
+    }
     return result;
+  }
+  
+  public static class MixedContentHandler extends SaltXML10Handler
+  {
+    
+    private SaltProject project;
+    private final List<SDocumentGraph> docGraphs = new ArrayList<>();
+
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException
+    {
+      if(TAG_SALT_PROJECT.equals(localName) && getSaltObject() instanceof SaltProject)
+      {
+        this.project = (SaltProject) getSaltObject();
+      }
+      else if(TAG_SDOCUMENT_GRAPH.equals(localName) && getSaltObject() instanceof SDocumentGraph)
+      {
+        this.docGraphs.add((SDocumentGraph) getSaltObject());
+      }
+      
+      super.endElement(uri, localName, qName);
+    }
+
+    public SaltProject getProject()
+    {
+      return project;
+    }
+
+    public List<SDocumentGraph> getDocGraphs()
+    {
+      return docGraphs;
+    }
+    
+    
+    
   }
 
   /**
