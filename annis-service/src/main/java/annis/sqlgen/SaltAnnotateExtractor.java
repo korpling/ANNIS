@@ -911,7 +911,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           {
             rel.setTarget(targetNode);
             graph.addRelation(rel);
-            rel.getLayers().add(layer);
+            layer.addRelation(rel);
           }
 
         }

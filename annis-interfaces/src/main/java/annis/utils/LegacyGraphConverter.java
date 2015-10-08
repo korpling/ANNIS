@@ -264,7 +264,7 @@ public class LegacyGraphConverter
         newRel.setTarget(rel.getTarget());
         for(SLayer layer : rel.getLayers())
         {
-          newRel.getLayers().add(layer);
+          layer.addRelation(newRel);
         }
         for(SAnnotation anno : rel.getAnnotations())
         {
