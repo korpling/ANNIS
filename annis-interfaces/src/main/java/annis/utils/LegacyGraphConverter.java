@@ -103,14 +103,15 @@ public class LegacyGraphConverter
 
   public static AnnotationGraph convertToAnnotationGraph(SDocument document)
   {
-    SFeature featMatchedIDs = document.getFeature(SaltUtil.createQName(ANNIS_NS,
+    
+    SDocumentGraph docGraph = document.getDocumentGraph();
+    SFeature featMatchedIDs = docGraph.getFeature(SaltUtil.createQName(ANNIS_NS,
       FEAT_MATCHEDIDS));
     Match match = new Match();
     if (featMatchedIDs != null && featMatchedIDs.getValue_STEXT() != null)
     {    
        match = Match.parseFromString(featMatchedIDs.getValue_STEXT(), ',');
     }
-    SDocumentGraph docGraph = document.getDocumentGraph();
     
     // get matched node names by using the IDs
     List<Long> matchedNodeIDs = new ArrayList<>();

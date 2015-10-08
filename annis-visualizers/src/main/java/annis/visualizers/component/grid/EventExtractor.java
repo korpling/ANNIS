@@ -262,7 +262,7 @@ public class EventExtractor {
   {
 
     List<String> matchedAnnos = new ArrayList<>();
-    SFeature featMatchedAnnos = graph.getDocument().getFeature(ANNIS_NS, FEAT_MATCHEDANNOS);
+    SFeature featMatchedAnnos = graph.getFeature(ANNIS_NS, FEAT_MATCHEDANNOS);
     if(featMatchedAnnos != null)
     {
       matchedAnnos = Splitter.on(',').trimResults()

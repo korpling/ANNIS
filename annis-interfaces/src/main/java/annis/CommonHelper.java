@@ -464,7 +464,7 @@ public class CommonHelper
     Match m = null;
 
     // get the matched node IDs
-    SFeature featIDs = doc.getFeature(SaltUtil.createQName(
+    SFeature featIDs = doc.getDocumentGraph().getFeature(SaltUtil.createQName(
       AnnisConstants.ANNIS_NS,
       AnnisConstants.FEAT_MATCHEDIDS));
 
@@ -475,7 +475,7 @@ public class CommonHelper
       {
         idList.add(new URI(rawID));
       }
-      SFeature featAnnos = doc.getFeature(SaltUtil.createQName(
+      SFeature featAnnos = doc.getDocumentGraph().getFeature(SaltUtil.createQName(
         AnnisConstants.ANNIS_NS,
         AnnisConstants.FEAT_MATCHEDANNOS));
       if (featAnnos == null)
