@@ -189,7 +189,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     return (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)
       || MediaType.TEXT_XML_TYPE.isCompatible(mediaType)
       || APPLICATION_XMI_XML.isCompatible(mediaType))
-      && SDocumentGraph.class.isAssignableFrom(type);
+      && SaltProject.class.isAssignableFrom(type);
   }
 
   @Override
@@ -265,11 +265,11 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException
     {
-      if(TAG_SALT_PROJECT.equals(localName) && getSaltObject() instanceof SaltProject)
+      if(TAG_SALT_PROJECT.equals(qName) && getSaltObject() instanceof SaltProject)
       {
         this.project = (SaltProject) getSaltObject();
       }
-      else if(TAG_SDOCUMENT_GRAPH.equals(localName) && getSaltObject() instanceof SDocumentGraph)
+      else if(TAG_SDOCUMENT_GRAPH.equals(qName) && getSaltObject() instanceof SDocumentGraph)
       {
         this.docGraphs.add((SDocumentGraph) getSaltObject());
       }
