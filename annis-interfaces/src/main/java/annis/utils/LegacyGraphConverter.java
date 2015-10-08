@@ -35,6 +35,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -105,8 +106,7 @@ public class LegacyGraphConverter
   {
     
     SDocumentGraph docGraph = document.getDocumentGraph();
-    SFeature featMatchedIDs = docGraph.getFeature(SaltUtil.createQName(ANNIS_NS,
-      FEAT_MATCHEDIDS));
+    SFeature featMatchedIDs = docGraph.getFeature(ANNIS_NS, FEAT_MATCHEDIDS);
     Match match = new Match();
     if (featMatchedIDs != null && featMatchedIDs.getValue_STEXT() != null)
     {    
@@ -252,7 +252,8 @@ public class LegacyGraphConverter
     }
     
     // add relations with empty relation name for every dominance relation
-    for(SDominanceRelation rel : docGraph.getDominanceRelations())
+    List<SDominanceRelation> dominanceRelations = new LinkedList<>(docGraph.getDominanceRelations());
+    for(SDominanceRelation rel : dominanceRelations)
     {
       RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
       if(featEdge != null 
@@ -271,7 +272,8 @@ public class LegacyGraphConverter
           newRel.addAnnotation(anno);
         }
         
-        addRelation(newRel, featEdge.getArtificialDominancePre(), featEdge.getArtificialDominanceComponent(), allNodes, annoGraph);
+        addRelation(newRel, featEdge.getArtificialDominancePre(), 
+          featEdge.getArtificialDominanceComponent(), allNodes, annoGraph);
 
       }
     }

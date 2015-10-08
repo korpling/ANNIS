@@ -442,7 +442,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     long tokenIndex = longValue(resultSet, NODE_TABLE, "token_index");
     boolean isToken = !resultSet.wasNull();
 
-    org.eclipse.emf.common.util.URI nodeURI = graph.getDocument().getDocumentGraphLocation();
+    org.eclipse.emf.common.util.URI nodeURI =  graph.getDocument().getPath();
 
     nodeURI = nodeURI.appendSegment("");
     nodeURI = nodeURI.appendFragment(saltID);
