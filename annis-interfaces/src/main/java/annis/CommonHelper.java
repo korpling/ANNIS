@@ -130,7 +130,11 @@ public class CommonHelper
     if (segName == null)
     {
       // if no segmentation is given just return the sorted token list
-      token.addAll(graph.getSortedTokenByText());
+      List<SToken> unsortedToken = graph.getSortedTokenByText();
+      if(unsortedToken != null)
+      {
+        token.addAll(unsortedToken);
+      }
     }
     else
     {

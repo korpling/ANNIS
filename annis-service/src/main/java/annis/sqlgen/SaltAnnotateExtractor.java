@@ -341,7 +341,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     } // end for each span
   }
 
-  private static void setMatchedIDs(SDocument document, Match match)
+  private static void setMatchedIDs(SDocumentGraph docGraph, Match match)
   {
     List<String> allUrisAsString = new LinkedList<>();
     for (URI u : match.getSaltIDs())
@@ -353,13 +353,13 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     featIDs.setNamespace(ANNIS_NS);
     featIDs.setName(FEAT_MATCHEDIDS);
     featIDs.setValue(Joiner.on(",").join(allUrisAsString));
-    document.addFeature(featIDs);
+    docGraph.addFeature(featIDs);
 
     SFeature featAnnos = SaltFactory.createSFeature();
     featAnnos.setNamespace(ANNIS_NS);
     featAnnos.setName(FEAT_MATCHEDANNOS);
     featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
-    document.addFeature(featAnnos);
+    docGraph.addFeature(featAnnos);
 
   }
 
@@ -1131,7 +1131,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       SCorpusGraph corpusGraph = p.getCorpusGraphs().get(matchIndex);
       SDocument doc = corpusGraph.getDocuments().get(0);
 
-      setMatchedIDs(doc, m);
+      setMatchedIDs(doc.getDocumentGraph(), m);
 
       matchIndex++;
     }
