@@ -30,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -444,7 +445,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
     org.eclipse.emf.common.util.URI nodeURI =  graph.getDocument().getPath();
 
-    nodeURI = nodeURI.appendSegment("");
     nodeURI = nodeURI.appendFragment(saltID);
     SStructuredNode node = (SStructuredNode) graph.getNode(nodeURI.toString());
     if (node == null)
@@ -672,59 +672,85 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
   }
 
-  private void moveNodeProperties(SStructuredNode from, SStructuredNode to,
+  private void moveNodeProperties(SStructuredNode oldNode, SStructuredNode newNode,
     SGraph graph)
   {
-    Validate.notNull(from);
-    Validate.notNull(to);
+    Validate.notNull(oldNode);
+    Validate.notNull(newNode);
 
-    String oldID = from.getId();
-
-    to.setName(from.getName());
-    for (SLayer l : from.getLayers())
-    {
-      to.addLayer(l);
-      from.removeLayer(l);
-    }
-
+    // step 1: collect every information that is need in a separate variable
+    String id = oldNode.getId();
+    String name = oldNode.getName();
+    Set<SAnnotation> annotations = new LinkedHashSet<>(oldNode.getAnnotations());
+    Set<SFeature> features = new LinkedHashSet<>(oldNode.getFeatures());
+    Set<SProcessingAnnotation> processingAnnotations = new LinkedHashSet<>(oldNode.getProcessingAnnotations());
+    Set<SMetaAnnotation> metaAnnotations = new LinkedHashSet<>(oldNode.getMetaAnnotations());
+    Set<SLayer> nodeLayers = new LinkedHashSet<>(oldNode.getLayers());
     Multimap<SRelation, SLayer> layerOfRelation = ArrayListMultimap.create();
-
-    List<SRelation<SNode,SNode>> inRelations = new LinkedList<>(graph.getInRelations(from.
+    List<SRelation<SNode,SNode>> inRelations = new LinkedList<>(graph.getInRelations(oldNode.
       getId()));
-    for (SRelation<SNode,SNode> e : inRelations)
+    List<SRelation<SNode,SNode>> outRelations = new LinkedList<>(graph.getOutRelations(oldNode.
+      getId()));
+    
+    // step 2: remove the old node from everything it is connected to
+    graph.removeNode(oldNode);
+    for(SLayer l : nodeLayers) 
     {
-      if (e instanceof SRelation)
-      {
-        SRelation rel = (SRelation) e;
-        if (rel.getLayers() != null)
-        {
-          layerOfRelation.putAll(rel, rel.getLayers());
-        }
-        graph.removeRelation(e);
-      }
+      l.removeNode(oldNode);
     }
-    List<SRelation<SNode,SNode>> outRelations = new LinkedList<>(graph.getOutRelations(from.
-      getId()));
-    for (SRelation<SNode,SNode> e : outRelations)
+    for (SRelation<SNode,SNode> rel : inRelations)
     {
-
-      SRelation<SNode,SNode> rel = (SRelation) e;
       if (rel.getLayers() != null)
       {
         layerOfRelation.putAll(rel, rel.getLayers());
       }
-      graph.removeRelation(e);
-
+      graph.removeRelation(rel);
     }
-
-    graph.removeNode(from);
-    to.setId(oldID);
-    graph.addNode(to);
-
-    // fix old relations
+        
+    for (SRelation<SNode,SNode> rel : outRelations)
+    {
+      if (rel.getLayers() != null)
+      {
+        layerOfRelation.putAll(rel, rel.getLayers());
+      }
+      graph.removeRelation(rel);
+    }
+    
+    // step 3: add the new node to everything it should be connected to
+    newNode.setName(name);
+    newNode.setId(id);
+    graph.addNode(newNode);
+    
+    for (SAnnotation anno : annotations)
+    {
+      newNode.addAnnotation(anno);
+    }
+    for (SFeature feat : features)
+    {
+      // filter the features, do not include salt::SNAME 
+      if (!(SaltUtil.SALT_NAMESPACE.equals(feat.getNamespace())
+        && SaltUtil.FEAT_NAME.equals(
+          feat.getName())))
+      {
+        newNode.addFeature(feat);
+      }
+    }
+    for (SProcessingAnnotation proc : processingAnnotations)
+    {
+      newNode.addProcessingAnnotation(proc);
+    }
+    for (SMetaAnnotation meta : metaAnnotations)
+    {
+      newNode.addMetaAnnotation(meta);
+    }
+    
+    for(SLayer l : nodeLayers)
+    {
+      l.addNode(newNode);
+    }
     for (SRelation rel : inRelations)
     {
-      rel.setTarget(to);
+      rel.setTarget(newNode);
       graph.addRelation(rel);
       if (layerOfRelation.containsKey(rel))
       {
@@ -734,10 +760,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         }
       }      
     }
-
+    
     for (SRelation rel : outRelations)
     {
-      rel.setSource(to);
+      rel.setSource(newNode);
       graph.addRelation(rel);
       if (layerOfRelation.containsKey(rel))
       {
@@ -747,30 +773,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         }
       }
     }
-
-    for (SAnnotation anno : from.getAnnotations())
-    {
-      to.addAnnotation(anno);
-    }
-    for (SFeature feat : from.getFeatures())
-    {
-      // filter the features, do not include salt::SNAME 
-      if (!(SaltUtil.SALT_NAMESPACE.equals(feat.getNamespace())
-        && SaltUtil.FEAT_NAME.equals(
-          feat.getName())))
-      {
-        to.addFeature(feat);
-      }
-    }
-    for (SProcessingAnnotation proc : from.getProcessingAnnotations())
-    {
-      to.addProcessingAnnotation(proc);
-    }
-    for (SMetaAnnotation meta : from.getMetaAnnotations())
-    {
-      to.addMetaAnnotation(meta);
-    }
-
   }
 
   private SRelation findExistingRelation(SDocumentGraph graph,
