@@ -722,36 +722,28 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     graph.addNode(to);
 
     // fix old relations
-    for (Relation e : inRelations)
+    for (SRelation rel : inRelations)
     {
-      if (e instanceof SRelation)
+      rel.setTarget(to);
+      graph.addRelation(rel);
+      if (layerOfRelation.containsKey(rel))
       {
-        SRelation rel = (SRelation) e;
-        rel.setTarget(to);
-        graph.addRelation(rel);
-        if (layerOfRelation.containsKey(rel))
+        for (SLayer l : layerOfRelation.get(rel))
         {
-          for (SLayer l : layerOfRelation.get(rel))
-          {
-            rel.getLayers().add(l);
-          }
+          l.addRelation(rel);
         }
-      }
+      }      
     }
 
-    for (Relation e : outRelations)
+    for (SRelation rel : outRelations)
     {
-      if (e instanceof SRelation)
+      rel.setSource(to);
+      graph.addRelation(rel);
+      if (layerOfRelation.containsKey(rel))
       {
-        SRelation rel = (SRelation) e;
-        rel.setSource(to);
-        graph.addRelation(rel);
-        if (layerOfRelation.containsKey(rel))
+        for (SLayer l : layerOfRelation.get(rel))
         {
-          for (SLayer l : layerOfRelation.get(rel))
-          {
-            rel.getLayers().add(l);
-          }
+          l.addRelation(rel);
         }
       }
     }
