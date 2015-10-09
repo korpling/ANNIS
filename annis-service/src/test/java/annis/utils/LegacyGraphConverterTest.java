@@ -104,7 +104,7 @@ public class LegacyGraphConverterTest
     TestAnnotateSqlGenerator.setupOuterQueryFactsTableColumnAliases(saltExtractor);
     
     List<Match> matches = new ArrayList<>();
-    matches.add(Match.parseFromString("salt:/pcc2/4282/#tok_155 tiger::pos::salt:/pcc2/4282/#tok_156"));
+    matches.add(Match.parseFromString("salt:/pcc2/4282/#tok_155 tiger::pos::salt:/pcc2/4282#tok_156"));
     MatchGroup matchGroup = new MatchGroup(matches);
     
     SaltProject p =
