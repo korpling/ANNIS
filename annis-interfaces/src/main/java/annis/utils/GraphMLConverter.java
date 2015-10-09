@@ -38,7 +38,7 @@ import org.corpus_tools.salt.graph.Label;
 import org.corpus_tools.salt.graph.LabelableElement;
 import org.corpus_tools.salt.graph.Node;
 import org.corpus_tools.salt.graph.Relation;
-import org.corpus_tools.salt.util.SALT_TYPE;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
