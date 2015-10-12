@@ -21,7 +21,7 @@
     annotations is also required.
   </description>
 
-  <url>http://annis-tools.org/</url>
+  <url>http://corpus-tools.org/annis/</url>
   
    <developers>
     <developer>
@@ -69,7 +69,7 @@
   
   <properties>
     <servlet.version>3.0.1</servlet.version>
-    <vaadin.version>7.5.6</vaadin.version>
+    <vaadin.version>7.5.7</vaadin.version>
   </properties>
 
   <build>

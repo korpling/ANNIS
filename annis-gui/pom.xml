@@ -131,6 +131,10 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <optimizationLevel>9</optimizationLevel>
+          <style>OBF</style>
+        </configuration>
       </plugin>
       
     </plugins>
