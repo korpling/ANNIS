@@ -32,14 +32,11 @@ import com.google.common.eventbus.Subscribe;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.DeploymentConfiguration;
-import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.Alignment;
-import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.JavaScript;
@@ -362,6 +359,11 @@ public class MainToolbar extends HorizontalLayout
 
   public void setNavigationTarget(NavigationTarget target)
   {
+    if(target == this.navigationTarget)
+    {
+      // nothing changed, return
+    }
+    
     this.navigationTarget = target;
     btNavigate.setVisible(false);
 
