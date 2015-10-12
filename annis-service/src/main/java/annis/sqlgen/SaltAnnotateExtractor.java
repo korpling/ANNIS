@@ -693,11 +693,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       getId()));
     
     // step 2: remove the old node from everything it is connected to
-    graph.removeNode(oldNode);
-    for(SLayer l : nodeLayers) 
-    {
-      l.removeNode(oldNode);
-    }
     for (SRelation<SNode,SNode> rel : inRelations)
     {
       if (rel.getLayers() != null)
@@ -715,6 +710,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       }
       graph.removeRelation(rel);
     }
+    graph.removeNode(oldNode);
+
     
     // step 3: add the new node to everything it should be connected to
     newNode.setName(name);
