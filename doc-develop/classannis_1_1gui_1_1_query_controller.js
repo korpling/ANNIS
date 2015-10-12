@@ -3,7 +3,7 @@ var classannis_1_1gui_1_1_query_controller =
     [ "QueryController", "classannis_1_1gui_1_1_query_controller.html#ababb9d14b99b61b5e3292753e5d547d3", null ],
     [ "addHistoryEntry", "classannis_1_1gui_1_1_query_controller.html#ad9075e3d078966717c64bf80219d0831", null ],
     [ "cancelExport", "classannis_1_1gui_1_1_query_controller.html#a60e7fbdc4c20f2950c46801041dd1215", null ],
-    [ "changeContext", "classannis_1_1gui_1_1_query_controller.html#a99c03eeca207ad1479d5aa992eb87789", null ],
+    [ "changeContext", "classannis_1_1gui_1_1_query_controller.html#aa973ec53a1cf1fa00a91556c629e87e7", null ],
     [ "corpusSelectionChangedInBackground", "classannis_1_1gui_1_1_query_controller.html#a1d53eaf97978d8bb32b28bdfac5f21ae", null ],
     [ "executeExport", "classannis_1_1gui_1_1_query_controller.html#a4113d12ad3615a0c7ce6fc52d25d337e", null ],
     [ "executeFrequency", "classannis_1_1gui_1_1_query_controller.html#a98db8584eb646219cad1972c82d9c9cf", null ],

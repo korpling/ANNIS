@@ -233,11 +233,11 @@ var hierarchy =
     [ "annis.gui.admin.view.GroupListView.Listener", "interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view_1_1_listener.html", [
       [ "annis.gui.admin.controller.GroupController", "classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html", null ]
     ] ],
-    [ "annis.gui.admin.view.UserListView.Listener", "interfaceannis_1_1gui_1_1admin_1_1view_1_1_user_list_view_1_1_listener.html", [
-      [ "annis.gui.admin.controller.UserController", "classannis_1_1gui_1_1admin_1_1controller_1_1_user_controller.html", null ]
-    ] ],
     [ "annis.gui.admin.view.CorpusListView.Listener", "interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view_1_1_listener.html", [
       [ "annis.gui.admin.controller.CorpusController", "classannis_1_1gui_1_1admin_1_1controller_1_1_corpus_controller.html", null ]
+    ] ],
+    [ "annis.gui.admin.view.UserListView.Listener", "interfaceannis_1_1gui_1_1admin_1_1view_1_1_user_list_view_1_1_listener.html", [
+      [ "annis.gui.admin.controller.UserController", "classannis_1_1gui_1_1admin_1_1controller_1_1_user_controller.html", null ]
     ] ],
     [ "annis.visualizers.LoadableVisualizer", "interfaceannis_1_1visualizers_1_1_loadable_visualizer.html", [
       [ "annis.gui.components.medialement.MediaElementPlayer", "classannis_1_1gui_1_1components_1_1medialement_1_1_media_element_player.html", null ]
@@ -308,8 +308,7 @@ var hierarchy =
     [ "annis.sqlgen.ResultSetTypedIterator< annis.dao.objects.AnnotatedSpan >", "classannis_1_1sqlgen_1_1_result_set_typed_iterator.html", null ],
     [ "Runnable", null, [
       [ "annis.gui.controller.CountCallback", "classannis_1_1gui_1_1controller_1_1_count_callback.html", null ],
-      [ "annis.gui.resultfetch.ResultFetchJob", "classannis_1_1gui_1_1resultfetch_1_1_result_fetch_job.html", null ],
-      [ "annis.gui.resultfetch.SingleResultFetchJob", "classannis_1_1gui_1_1resultfetch_1_1_single_result_fetch_job.html", null ]
+      [ "annis.gui.resultfetch.ResultFetchJob", "classannis_1_1gui_1_1resultfetch_1_1_result_fetch_job.html", null ]
     ] ],
     [ "RuntimeException", null, [
       [ "annis.AnnisRunnerException", "classannis_1_1_annis_runner_exception.html", [
@@ -448,9 +447,9 @@ var hierarchy =
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
     ] ],
-    [ "annis.model.QueryNode.Type", "classannis_1_1model_1_1_query_node.html#enumannis_1_1model_1_1_query_node_1_1_type", null ],
-    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
     [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
+    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
+    [ "annis.model.QueryNode.Type", "classannis_1_1model_1_1_query_node.html#enumannis_1_1model_1_1_query_node_1_1_type", null ],
     [ "UriFragmentChangedListener", null, [
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
     ] ],
@@ -544,6 +543,7 @@ var hierarchy =
     [ "Callable", null, [
       [ "annis.gui.controller.ExportBackgroundJob", "classannis_1_1gui_1_1controller_1_1_export_background_job.html", null ],
       [ "annis.gui.controller.FrequencyBackgroundJob", "classannis_1_1gui_1_1controller_1_1_frequency_background_job.html", null ],
+      [ "annis.gui.resultfetch.SingleResultFetchJob", "classannis_1_1gui_1_1resultfetch_1_1_single_result_fetch_job.html", null ],
       [ "annis.gui.resultview.VisualizerPanel.LoadComponentTask", "classannis_1_1gui_1_1resultview_1_1_visualizer_panel_1_1_load_component_task.html", null ]
     ] ],
     [ "ComboBox", null, [
@@ -644,6 +644,12 @@ var hierarchy =
     [ "HttpServlet", null, [
       [ "annis.gui.servlets.CitationRedirectionServlet", "classannis_1_1gui_1_1servlets_1_1_citation_redirection_servlet.html", null ],
       [ "annis.gui.servlets.ResourceServlet", "classannis_1_1gui_1_1servlets_1_1_resource_servlet.html", null ]
+    ] ],
+    [ "Initializable", null, [
+      [ "annis.security.MultipleIniWebEnvironment", "classannis_1_1security_1_1_multiple_ini_web_environment.html", null ]
+    ] ],
+    [ "IniWebEnvironment", null, [
+      [ "annis.security.MultipleIniWebEnvironment", "classannis_1_1security_1_1_multiple_ini_web_environment.html", null ]
     ] ],
     [ "ItemClickListener", null, [
       [ "annis.gui.HistoryPanel", "classannis_1_1gui_1_1_history_panel.html", null ]

@@ -24,5 +24,6 @@ var searchData=
   ['metadataservice',['MetadataService',['../interfaceannis_1_1service_1_1_metadata_service.html',1,'annis::service']]],
   ['metadataserviceimpl',['MetadataServiceImpl',['../classannis_1_1service_1_1internal_1_1_metadata_service_impl.html',1,'annis::service::internal']]],
   ['mimeparse',['MIMEParse',['../classcom_1_1google_1_1mimeparse_1_1_m_i_m_e_parse.html',1,'com::google::mimeparse']]],
-  ['mimetypeerrorlistener',['MimeTypeErrorListener',['../interfaceannis_1_1libgui_1_1media_1_1_mime_type_error_listener.html',1,'annis::libgui::media']]]
+  ['mimetypeerrorlistener',['MimeTypeErrorListener',['../interfaceannis_1_1libgui_1_1media_1_1_mime_type_error_listener.html',1,'annis::libgui::media']]],
+  ['multipleiniwebenvironment',['MultipleIniWebEnvironment',['../classannis_1_1security_1_1_multiple_ini_web_environment.html',1,'annis::security']]]
 ];

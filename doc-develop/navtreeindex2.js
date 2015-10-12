@@ -209,7 +209,7 @@ var NAVTREEINDEX2 =
 "classannis_1_1gui_1_1_query_controller.html#a873eb5d57df335ac2d2d5aed9bb55b88":[3,0,0,6,41,12],
 "classannis_1_1gui_1_1_query_controller.html#a92a4b369186c478beaa97ceb4eb1094a":[3,0,0,6,41,7],
 "classannis_1_1gui_1_1_query_controller.html#a98db8584eb646219cad1972c82d9c9cf":[3,0,0,6,41,6],
-"classannis_1_1gui_1_1_query_controller.html#a99c03eeca207ad1479d5aa992eb87789":[3,0,0,6,41,3],
+"classannis_1_1gui_1_1_query_controller.html#aa973ec53a1cf1fa00a91556c629e87e7":[3,0,0,6,41,3],
 "classannis_1_1gui_1_1_query_controller.html#ababb9d14b99b61b5e3292753e5d547d3":[3,0,0,6,41,0],
 "classannis_1_1gui_1_1_query_controller.html#ad9075e3d078966717c64bf80219d0831":[3,0,0,6,41,1],
 "classannis_1_1gui_1_1_query_controller.html#adf355dbbae1bc7201d4bfb61b17ab746":[3,0,0,6,41,11],

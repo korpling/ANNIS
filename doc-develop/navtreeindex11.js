@@ -1,5 +1,7 @@
 var NAVTREEINDEX11 =
 {
+"classannis_1_1sqlgen_1_1_default_where_clause_generator.html#af387a2a48b3326dd282b3f5de3c57cb0":[3,0,0,15,22,32],
+"classannis_1_1sqlgen_1_1_default_where_clause_generator.html#af9286bceecdce497afa8f03dcef44d71":[3,0,0,15,22,7],
 "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#aff8db487db31be978624bb66a3bd3c2d":[3,0,0,15,22,16],
 "classannis_1_1sqlgen_1_1_find_sql_generator.html":[3,0,0,15,23],
 "classannis_1_1sqlgen_1_1_find_sql_generator.html#a06cd109b65b0528edb0a05d2e5b763c1":[3,0,0,15,23,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX11 =
 "classannis_1_1sqlgen_1_1model_1_1_pointing_relation.html#a62cea910b7b49ab628b5c096bb00d3e4":[3,0,0,15,1,13,0],
 "classannis_1_1sqlgen_1_1model_1_1_pointing_relation.html#a88cc9212f55c579e5806e34e57b9353e":[3,0,0,15,1,13,1],
 "classannis_1_1sqlgen_1_1model_1_1_pointing_relation.html#a9bda7f147a7ecb9d48125d266f87f1d9":[3,0,0,15,1,13,3],
-"classannis_1_1sqlgen_1_1model_1_1_precedence.html":[3,0,0,15,1,14],
-"classannis_1_1sqlgen_1_1model_1_1_precedence.html#a122f8c4803dd14da98249951eda6a6a9":[3,0,0,15,1,14,11],
-"classannis_1_1sqlgen_1_1model_1_1_precedence.html#a151e192ec4dfc204ecd0b34352515309":[3,0,0,15,1,14,7]
+"classannis_1_1sqlgen_1_1model_1_1_precedence.html":[3,0,0,15,1,14]
 };

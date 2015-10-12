@@ -16,7 +16,7 @@ var classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter =
     [ "getStyle", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#a2b1ee5525aa6344a1491d5f2f0a7f297", null ],
     [ "getType", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#a473af8d786353c983eca3811ea6a76b8", null ],
     [ "outputAny", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#a09a18fe17ceeed0da8978779c7a997eb", null ],
-    [ "outputHTML", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#aa8609dae1efa5cb1aa4fc0048ff4952a", null ],
+    [ "outputHTML", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#af19da06a52e16ed795a6c1f163e2ce27", null ],
     [ "setAttribute", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#abcf2e2fa5a1d9b4c6e2066cd31c10a35", null ],
     [ "setConstant", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#adf5cd5a6723304277d6919ab46470e56", null ],
     [ "setElement", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#ab93ef6e3699647a684371d2033e4cfdb", null ],
