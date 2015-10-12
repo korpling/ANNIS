@@ -168,10 +168,12 @@ print("Copying the config files.")
 # make a backup in case there are new configs and the user want's to compare the old configuration
 # to the new default one
 shutil.copy2(os.path.join(newconf, "annis-service.properties"), os.path.join(newconf, "annis-service.properties.bak"))
+shutil.copy2(os.path.join(newconf, "shiro.ini"), os.path.join(newconf, "shiro.ini.bak"))
 
 # do the actual copy of the two files a user should change (other files should be untouched)
 shutil.copy2(os.path.join(origconf, "database.properties"), os.path.join(newconf, "database.properties"))
 shutil.copy2(os.path.join(origconf, "annis-service.properties"), os.path.join(newconf, "annis-service.properties"))
+shutil.copy2(os.path.join(origconf, "shiro.ini"), os.path.join(newconf, "shiro.ini"))
 
 # check if we can update without any database migration
 copiedCorpora=False
