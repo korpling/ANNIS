@@ -29,6 +29,7 @@ import annis.libgui.Helper;
 import annis.libgui.LoginDataLostException;
 import annis.security.User;
 import com.google.common.eventbus.Subscribe;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ExternalResource;
@@ -724,6 +725,10 @@ public class MainToolbar extends HorizontalLayout
         user = Helper.getAnnisWebResource().path("admin/users").path(
           userName)
           .get(User.class);
+      }
+      catch(UniformInterfaceException ex)
+      {
+        // ignore
       }
       finally
       {

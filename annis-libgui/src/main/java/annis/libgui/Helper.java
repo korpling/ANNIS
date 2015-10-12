@@ -622,13 +622,7 @@ public class Helper
         .path("corpora").path(urlPathEscape.escape(corpus))
         .path("config").get(CorpusConfig.class);
     }
-    catch (UniformInterfaceException ex)
-    {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
-    }
-    catch (ClientHandlerException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
       new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
         ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
