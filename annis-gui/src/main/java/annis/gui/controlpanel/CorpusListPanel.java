@@ -586,7 +586,10 @@ public class CorpusListPanel extends VerticalLayout implements
         String firstCorpusName = corpora.iterator().next();
         int idx = ui.getQueryState().getAvailableCorpora().indexOfId(
           firstCorpusName);
-        tblCorpora.setCurrentPageFirstItemIndex(idx);
+        if(idx >= 0)
+        {
+          tblCorpora.setCurrentPageFirstItemIndex(idx);
+        }
       }
     }
   }

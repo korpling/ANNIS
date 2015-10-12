@@ -1,3 +1,17 @@
+Version 3.4.0-preview4
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview4+is%3Aclosed
+
+[Bugs]
+ #450 Extending a context for single match sometimes fails
+ #449 Error message "Corpus Properties does not exists" when logging in after following a corpus link
+
+[Enhancements]
+ #448 service update script does not copy the shiro.ini file
+ #105 Hit marking in HTML visualizations
+
 Version 3.4.0-preview3
 =====================
 

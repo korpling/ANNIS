@@ -20,6 +20,7 @@ import annis.AnnisRunnerException;
 import annis.AnnisXmlContextHelper;
 import annis.dao.AnnisDao;
 import annis.exceptions.AnnisException;
+import annis.security.MultipleIniWebEnvironment;
 import annis.utils.Utils;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -31,6 +32,7 @@ import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
 import javax.servlet.DispatcherType;
+import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.server.Server;
@@ -224,16 +226,18 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
       ServletHolder holder = new ServletHolder(jerseyContainer);
       context.addServlet(holder, "/*");
+      context.setInitParameter(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM, MultipleIniWebEnvironment.class.getName());
 
 
       if (useAuthentification)
       {
-        context.setInitParameter("shiroConfigLocations",
-          "file:" + System.getProperty("annis.home") + "/conf/shiro.ini");
+        context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
+          "file:" + System.getProperty("annis.home") + "/conf/shiro.ini,"
+          + "file:" + System.getProperty("annis.home") + "/conf/develop_shiro.ini");
       }
       else
       {
-        context.setInitParameter("shiroConfigLocations",
+        context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
           "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
       }
 

@@ -1,0 +1,6 @@
+node & pos="VVFIN" & cat="S" & node &
+#3 >[tiger:func="OA"] #1 &
+#3 >[tiger:func="SB"] #4 &
+#3 > #2 &
+#1 .* #2 &
+#2 .* #4

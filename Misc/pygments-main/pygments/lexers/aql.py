@@ -12,6 +12,7 @@ class AqlLexer(RegexLexer):
         'root': [
             (r'"', String, 'string'),
             (r'/', String.Regex, 'regex'),
+            (r'/\*', String.Comment, 'comment'),
             (r'&', Operator),
             (r'([a-zA-Z_%]([a-zA-Z0-9_\-%])*:)?([a-zA-Z_\%]([a-zA-Z0-9_\-%])*)', Name.Variable),
             (r'(==)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(_ol_)|(_or_)', Operator),
@@ -29,5 +30,9 @@ class AqlLexer(RegexLexer):
         'regex': [
 			(r'/', String.Regex, 'root'),
 			(r'.', String.Regex)
+        ],
+        'comment': [
+			(r'\*/', String.Comment, 'root'),
+			(r'.', String.Comment)
         ]
     }

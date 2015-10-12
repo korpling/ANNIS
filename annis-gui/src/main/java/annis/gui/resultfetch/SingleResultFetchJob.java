@@ -25,6 +25,7 @@ import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
 import java.util.List;
 import org.corpus_tools.salt.common.SaltProject;
+import java.util.concurrent.Callable;
 
 /**
  * Fetches a result which contains only one subgraph. This single query always
@@ -38,37 +39,28 @@ import org.corpus_tools.salt.common.SaltProject;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class SingleResultFetchJob extends AbstractResultFetchJob implements
-  Runnable
+  Callable<SaltProject>
 {
-
-  private final VisualizerContextChanger visContextChanger;
 
   private final Match match;
 
   private final PagedResultQuery query;
 
-  public SingleResultFetchJob(Match match, PagedResultQuery query,
-    VisualizerContextChanger visContextChanger)
+  public SingleResultFetchJob(Match match, PagedResultQuery query)
   {
     this.match = match;
     this.query = query;
-    this.visContextChanger = visContextChanger;
   }
 
   @Override
-  public void run()
+  public SaltProject call() throws Exception
   {
     WebResource subgraphRes
       = Helper.getAnnisWebResource().path("query/search/subgraph");
 
     if (Thread.interrupted())
     {
-      return;
-    }
-
-    if (Thread.interrupted())
-    {
-      return;
+      return null;
     }
 
     List<Match> subList = new LinkedList<>();
@@ -78,11 +70,8 @@ public class SingleResultFetchJob extends AbstractResultFetchJob implements
       query.getLeftContext(), query.getRightContext(),
       query.getSegmentation(), SubgraphFilter.all);
 
-    visContextChanger.updateResult(p, query);
-
-    if (Thread.interrupted())
-    {
-      return;
-    }
+    return p;
+    
   }
+  
 }

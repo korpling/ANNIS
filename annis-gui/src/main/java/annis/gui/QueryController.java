@@ -48,6 +48,7 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import com.google.common.base.Joiner;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -64,12 +65,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -586,10 +587,10 @@ public class QueryController implements Serializable
   public void changeContext(PagedResultQuery originalQuery,
     Match match,
     int offset, int newContext,
-    VisualizerContextChanger visCtxChange, boolean left)
+    final VisualizerContextChanger visCtxChange, boolean left)
   {
 
-    PagedResultQuery newQuery = originalQuery.clone();
+    final PagedResultQuery newQuery = originalQuery.clone();
     if (left)
     {
       newQuery.setLeftContext(newContext);
@@ -600,9 +601,24 @@ public class QueryController implements Serializable
     }
 
     newQuery.setOffset(offset);
+    
 
-    Background.run(new SingleResultFetchJob(match, newQuery,
-      visCtxChange));
+    Background.runWithCallback(new SingleResultFetchJob(match, newQuery), 
+      new FutureCallback<SaltProject>()
+      {
+
+      @Override
+      public void onSuccess(SaltProject result)
+      {
+        visCtxChange.updateResult(result, newQuery);
+      }
+
+      @Override
+      public void onFailure(Throwable t)
+      {
+        ExceptionDialog.show(t, "Could not extend context.");
+      }
+    });
 
   }
 
