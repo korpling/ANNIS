@@ -64,6 +64,7 @@ import org.slf4j.LoggerFactory;
  * <strong>Mappings:</strong><br />
  * <ul>
  * <li>config - path of the visualization configuration file</li>
+ * <li>hitmark - if "true" (which is the default) hit are marked in their corresponding colors</li>
  * </ul>
  * </p>
  *
@@ -83,7 +84,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   
   private String tokenColor = "";  
   
-  private Boolean hitMark = true;    
+  private boolean hitMark = true;    
   
   
 
@@ -119,8 +120,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
   
     String visConfigName = vi.getMappings().getProperty("config");
-    String hitMarkConfig = vi.getMappings().getProperty("hitmark","on");
-    hitMark = ("on".equals(hitMarkConfig));
+    String hitMarkConfig = vi.getMappings().getProperty("hitmark","true");
+    hitMark = Boolean.parseBoolean(hitMarkConfig);
     mc = vi.getMarkedAndCovered();
     
     
