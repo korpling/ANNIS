@@ -24,22 +24,21 @@ import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
-import com.vaadin.server.VaadinService;
-import com.vaadin.ui.Accordion;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 
 /**
@@ -50,10 +49,11 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
 {
   private final HorizontalLayout layout;
   private final ListSelect visSelector;
-  private final Accordion generatorSelector;
+  private final VerticalLayout generatedLinks;
   
-  private final TextArea txtURL;
-  private final Property<String> urlProperty;
+  private final Property<String> directURL;
+  private final Property<String> iframeCode;
+  private final BrowserFrame preview;
   
   private final BeanItemContainer<ResolverEntry> visContainer;
   
@@ -73,17 +73,33 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
     this.segmentation = segmentation;
     this.ps = ps;
     
-    urlProperty = new ObjectProperty<>("");
+    directURL = new ObjectProperty<>("");
+    iframeCode = new ObjectProperty<>("");
     
     visContainer = new BeanItemContainer<>(ResolverEntry.class);
     visContainer.addAll(visualizers);
     
-    txtURL = new TextArea(urlProperty);
-    txtURL.setSizeFull();
-    txtURL.addStyleName(ValoTheme.TEXTFIELD_LARGE);
-    txtURL.addStyleName("citation");
-    txtURL.setWordwrap(true);
-    txtURL.setReadOnly(true);
+    TextArea txtDirectURL = new TextArea(directURL);
+    txtDirectURL.setCaption("Link for publications");
+    txtDirectURL.setWidth("100%");
+    txtDirectURL.setHeight("-1px");
+    txtDirectURL.addStyleName(ValoTheme.TEXTFIELD_LARGE);
+    txtDirectURL.addStyleName("citation");
+    txtDirectURL.setWordwrap(true);
+    txtDirectURL.setReadOnly(true);
+    
+    TextArea txtIFrameCode = new TextArea(iframeCode);
+    txtIFrameCode.setCaption("Code for embedding visualization into web page");
+    txtIFrameCode.setWidth("100%");
+    txtIFrameCode.setHeight("-1px");
+    txtIFrameCode.addStyleName(ValoTheme.TEXTFIELD_LARGE);
+    txtIFrameCode.addStyleName("citation");
+    txtIFrameCode.setWordwrap(true);
+    txtIFrameCode.setReadOnly(true);
+    
+    preview = new BrowserFrame();
+    preview.setCaption("Preview");
+    preview.setSizeFull();
     
     visSelector = new ListSelect("Select visualization");
     visSelector.setHeight("100%");
@@ -91,18 +107,19 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
     visSelector.setItemCaptionPropertyId("displayName");
     visSelector.setNullSelectionAllowed(false);
     visSelector.addValueChangeListener(this);
+    visSelector.setValue(visContainer.getIdByIndex(0));
     
-    generatorSelector = new Accordion();
-    generatorSelector.addTab(txtURL, "Link");
-    generatorSelector.addTab(new Label("Test"), "Webpage");
-    generatorSelector.addTab(new Label("Test"), "Preview");
+    generatedLinks = new VerticalLayout(txtDirectURL, txtIFrameCode, preview);
+    generatedLinks.setComponentAlignment(txtDirectURL, Alignment.TOP_LEFT);
+    generatedLinks.setComponentAlignment(txtIFrameCode, Alignment.TOP_LEFT);
+    generatedLinks.setExpandRatio(preview, 1.0f);
     
-    generatorSelector.setSizeFull();
+    generatedLinks.setSizeFull();
     
-    layout = new HorizontalLayout(visSelector, generatorSelector);
+    layout = new HorizontalLayout(visSelector, generatedLinks);
     layout.setSizeFull();
     layout.setSpacing(true);
-    layout.setExpandRatio(generatorSelector, 1.0f);
+    layout.setExpandRatio(generatedLinks, 1.0f);
     
     setContent(layout);
     setSizeFull();
@@ -194,6 +211,8 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
   public void valueChange(Property.ValueChangeEvent event)
   {
     String url = generatorURLForVisualizer((ResolverEntry) event.getProperty().getValue());
-    urlProperty.setValue(url);
+    directURL.setValue(url);
+    iframeCode.setValue("<iframe width=\"100%\" height=\"300px\" src=\"" + url + "\"></iframe>");
+    preview.setSource(new ExternalResource(url));
   }
 }
