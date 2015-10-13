@@ -16,6 +16,7 @@
 package annis.gui;
 
 import annis.gui.docbrowser.DocBrowserController;
+import annis.gui.util.ANNISFontIcon;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
 import annis.libgui.LoginDataLostException;
@@ -192,7 +193,7 @@ public class EmbeddedVisUI extends CommonUI
       
       Link link = new Link();
       link.setCaption("Show in search interface");
-      link.setIcon(FontAwesome.LINK);
+      link.setIcon(ANNISFontIcon.LOGO);
       link.setVisible(false);
       if(args.containsKey(KEY_SEARCH_INTERFACE))
       {
