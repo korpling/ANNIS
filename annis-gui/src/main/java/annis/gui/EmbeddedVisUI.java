@@ -16,18 +16,32 @@
 package annis.gui;
 
 import annis.gui.docbrowser.DocBrowserController;
+import annis.libgui.AnnisUser;
+import annis.libgui.Helper;
+import annis.libgui.LoginDataLostException;
 import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.Visualizer;
 import annis.visualizers.htmlvis.HTMLVis;
 import com.google.common.base.Splitter;
+import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
+@Theme("annis")
 public class EmbeddedVisUI extends CommonUI
 {
   private static final Logger log = LoggerFactory.getLogger(EmbeddedVisUI.class);
@@ -56,15 +71,29 @@ public class EmbeddedVisUI extends CommonUI
         3).splitToList(rawPath);
     }
     
-    if(splittedPath.size() >= 3)
+    if(splittedPath.size() == 1)
     {
+      // a visualizer definition which get the results from a remote salt file
+      String saltUrl = request.getParameter("salt");
+      if(saltUrl == null)
+      {
+        displayGeneralHelp();
+      }
+      else
+      {
+        generateVisFromRemoteURL(splittedPath.get(0), saltUrl, request.getParameterMap());
+      }
+    }
+    else if(splittedPath.size() >= 3)
+    {
+      // a visualizer definition visname/corpusname/documentname
       if("htmldoc".equals(splittedPath.get(0)))
       {
         showHtmlDoc(splittedPath.get(1), splittedPath.get(2), request.getParameterMap());
       }
       else
       {
-        setContent(new Label("unknown visualizer \"" + splittedPath.get(0) + "\", only \"htmldoc\" is supported yet."));
+        displayMessage("Unknown visualizer \"" + splittedPath.get(0) + "\"", "Only \"htmldoc\" is supported yet.");
       }
     }
     else
@@ -76,17 +105,87 @@ public class EmbeddedVisUI extends CommonUI
   
   private void displayGeneralHelp()
   {
-    setContent(new Label("<h1>Path not complete</h1>"
-      + "<p>"
-      + "You have to specify what visualizer to use and which document of which corpus you want to visualizer by giving the correct path:<br />"
+    displayMessage("Path not complete",  
+      "You have to specify what visualizer to use and which document of which corpus you want to visualizer by giving the correct path:<br />"
       + "<code>http://example.com/annis/embeddedvis/&lt;vis&gt;/&lt;corpus&gt;/&lt;doc&gt;</code>"
       + "<ul>"
       + "<li><code>vis</code>: visualizer name (currently only \"htmldoc\" is supported)</li>"
       + "<li><code>corpus</code>: corpus name</li>"
       + "<li><code>doc</code>: name of the document to visualize</li>"
-      + "</ul>"
-      + "</p>",
-      ContentMode.HTML));
+      + "</ul>");
+  }
+  
+  private void generateVisFromRemoteURL(String visName, String rawUri, Map<String, String[]> args)
+  {
+    try
+    {
+      // find the matching visualizer
+      VisualizerPlugin visPlugin = this.getVisualizer(visName);
+      if(visPlugin == null)
+      {
+        displayMessage("Unknown visualizer \"" + visName + "\"", 
+          "This ANNIS instance does not know the given visualizer.");
+        return;
+      }
+      
+      URI uri = new URI(rawUri);
+      // fetch content of the URI
+      Client client = null;
+      AnnisUser user = Helper.getUser();
+      if(user != null)
+      {
+        client = user.getClient();
+      }
+      if(client == null)
+      {
+        client = Helper.createRESTClient();
+      }
+      WebResource saltRes = client.resource(uri);
+      SaltProject p = saltRes.get(SaltProject.class);
+      // TODO: allow to display several visualizers when there is more than one document
+      SCorpusGraph firstCorpusGraph = null;
+      SDocument doc = null;
+      if(p.getSCorpusGraphs() != null && !p.getSCorpusGraphs().isEmpty())
+      {
+        firstCorpusGraph = p.getSCorpusGraphs().get(0);
+        if(firstCorpusGraph.getSDocuments() != null && 
+          !firstCorpusGraph.getSDocuments().isEmpty())
+        {
+          doc = firstCorpusGraph.getSDocuments().get(0);
+        }
+      }
+      if(doc == null)
+      {
+        displayMessage("No documents found in provided URL.", "");
+        return;
+      }
+      // generate the visualizer
+      VisualizerInput visInput = new VisualizerInput();
+      visInput.setDocument(doc);
+      Properties mappings = new Properties();
+      for(Map.Entry<String, String[]> e : args.entrySet())
+      {
+        if(!"salt".equals(e.getKey()) && e.getValue().length > 0)
+        {
+          mappings.put(e.getKey(), e.getValue()[0]);
+        }
+      }
+      visInput.setMappings(mappings);
+      // TODO: which other thing do we have to provide?
+      
+      Component c = visPlugin.createComponent(visInput, null);
+      setContent(c);
+    }
+    catch (URISyntaxException ex)
+    {
+      displayMessage("Invalid URL", "The provided URL is malformed:<br />"
+        + ex.getMessage());
+    }
+    catch (LoginDataLostException ex)
+    {
+      displayMessage("LoginData Lost", "No login data available any longer in the session:<br /> "
+        + ex.getMessage());
+    }
   }
   
   
@@ -126,23 +225,27 @@ public class EmbeddedVisUI extends CommonUI
       }
       catch(UniformInterfaceException ex)
       {
-        setContent(new Label("Could not query document, error was \"" 
-          + ex.getMessage() + "\" (detailed error is available in the server log-files)"));
+        displayMessage("Could not query document", "error was \"" 
+          + ex.getMessage() + "\" (detailed error is available in the server log-files)");
         log.error("Could not get document for embedded visualizer", ex);
       }
 
     }
     else
     {
-      setContent(new Label("<h1>Missing required argument for visualizer \"htmldoc\"</h1>"
-        + "<p>"
-        + "The following arguments are required:"
+      displayMessage("Missing required argument for visualizer \"htmldoc\"",
+        "The following arguments are required:"
         + "<ul>"
         + "<li><code>config</code>: the internal config file to use (same as <a href=\"http://korpling.github.io/ANNIS/doc/classannis_1_1visualizers_1_1htmlvis_1_1HTMLVis.html\">\"config\" mapping parameter)</a></li>"
-        + "</ul>"
-        + "</p>", 
-        ContentMode.HTML ));
+        + "</ul>");
     }
+  }
+  
+  private void displayMessage(String header, String content)
+  {
+    setContent(new Label(
+      "<h1>" + header + "</h1>" + "<div>" + content + "</div>",
+      ContentMode.HTML));
   }
   
 }
