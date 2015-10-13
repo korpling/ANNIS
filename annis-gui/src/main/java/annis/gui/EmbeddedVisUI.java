@@ -32,6 +32,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -230,7 +231,10 @@ public class EmbeddedVisUI extends CommonUI
       }
       VerticalLayout layout = new VerticalLayout(link, c);
       layout.setComponentAlignment(link, Alignment.TOP_LEFT);
+      layout.setSpacing(true);
+      layout.setMargin(true);
       setContent(layout);
+      
       
     }
     catch (URISyntaxException ex)
