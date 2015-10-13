@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Theme("annis")
+@Theme("annis_embeddedvis")
 public class EmbeddedVisUI extends CommonUI
 {
   private static final Logger log = LoggerFactory.getLogger(EmbeddedVisUI.class);
@@ -59,7 +59,6 @@ public class EmbeddedVisUI extends CommonUI
   public static final String KEY_PREFIX = "embedded_";
   public static final String KEY_SALT =  KEY_PREFIX +  "salt";
   public static final String KEY_NAMESPACE =  KEY_PREFIX +  "ns";
-  public static final String KEY_ELEMENT =  KEY_PREFIX +  "element";
 
   @Override
   protected void init(VaadinRequest request)
@@ -185,6 +184,7 @@ public class EmbeddedVisUI extends CommonUI
       
       Component c = visPlugin.createComponent(visInput, null);
       setContent(c);
+      
     }
     catch (URISyntaxException ex)
     {

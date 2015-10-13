@@ -1,0 +1,31 @@
+@import "../valo/valo";
+@import "../annis/annis.scss";
+@import "../annis/partitur.scss";
+@import "../annis/pdf.scss";
+@import "../annis/raw_text.scss";
+
+$v-app-background-color: white;
+
+@mixin annis_embeddedvis {
+  @include valo;
+  @include annis;
+  @include partitur;
+
+}
+
+.annis_embeddedvis .v-app-loading:before {
+  background-image: url(images/annisloading.gif);
+  margin-top: -100px;
+  margin-left: -64px;
+  width: 128px;
+  height: 200px;
+  padding: 0px;
+}
+
+.annis_embeddedvis .v-app-loading:after {
+  padding-top: 110px;
+}
+
+.annis_embeddedvis .v-app-loading {
+  background-color: white
+}
