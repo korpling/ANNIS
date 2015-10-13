@@ -185,7 +185,7 @@ public class SingleResultPanel extends CssLayout implements
       @Override
       public void buttonClick(ClickEvent event)
       {
-        showEmbedVisGenerator();
+        showEmbeddedVisGenerator();
       }
     });
     infoBar.addComponent(btLink);
@@ -314,7 +314,7 @@ public class SingleResultPanel extends CssLayout implements
    this.result = CommonHelper.readSDocument(in);
   }
   
-  private void showEmbedVisGenerator()
+  private void showEmbeddedVisGenerator()
   {
     Window window = new Window("Embedded visualization generator");
     window.setWidth(70, Unit.EM);
@@ -332,7 +332,7 @@ public class SingleResultPanel extends CssLayout implements
       }
     });
     
-    window.setContent(new EmbedVisualizationGenerator(resolverEntries, match, query, ps));
+    window.setContent(new EmbedVisualizationGenerator(resolverEntries, match, query, segmentationName, ps));
     
     UI.getCurrent().addWindow(window);
   }

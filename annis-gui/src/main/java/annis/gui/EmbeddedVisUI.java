@@ -68,6 +68,7 @@ public class EmbeddedVisUI extends CommonUI
   public static final String KEY_SALT =  KEY_PREFIX +  "salt";
   public static final String KEY_NAMESPACE =  KEY_PREFIX +  "ns";
   public static final String KEY_SEARCH_INTERFACE =  KEY_PREFIX +  "interface";
+  public static final String KEY_BASE_TEXT =  KEY_PREFIX +  "base";
 
   @Override
   protected void init(VaadinRequest request)
@@ -189,12 +190,23 @@ public class EmbeddedVisUI extends CommonUI
       {
         visInput.setNamespace(namespace[0]);
       }
+      
+      String segmentation = null;
+      if(args.containsKey(KEY_BASE_TEXT))
+      {
+        String[] value = args.get(KEY_BASE_TEXT);
+        if(value.length > 0)
+        {
+          segmentation = value[0];
+        }
+      }
+      
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
-        null,
+        segmentation,
         doc.getSDocumentGraph());
 
       Map<String, String> markedColorMap = new HashMap<>();
-      Map<String, Long> markedAndCovered = Helper.calculateMarkedAndCoveredIDs(doc, segNodes, null);
+      Map<String, Long> markedAndCovered = Helper.calculateMarkedAndCoveredIDs(doc, segNodes, segmentation);
       Helper.calulcateColorsForMarkedAndCovered(doc, markedAndCovered, markedColorMap);
       visInput.setMarkedAndCovered(markedAndCovered);
       visInput.setMarkableMap(markedColorMap);

@@ -59,15 +59,18 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
   
   private final Match match;
   private final PagedResultQuery query;
+  private final String segmentation;
   private final PluginSystem ps;
   
   public EmbedVisualizationGenerator(List<ResolverEntry> visualizers, 
     Match match,
     PagedResultQuery query,
+    String segmentation,
     PluginSystem ps)
   { 
     this.match = match;
     this.query = query;
+    this.segmentation = segmentation;
     this.ps = ps;
     
     urlProperty = new ObjectProperty<>("");
@@ -168,6 +171,11 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
     // add the current view as "return back" parameter
     result = result.queryParam(EmbeddedVisUI.KEY_SEARCH_INTERFACE,
       appURI.toASCIIString());
+    
+    if (segmentation != null)
+    {
+      result = result.queryParam(EmbeddedVisUI.KEY_BASE_TEXT, segmentation);
+    }
     
     // add all mappings as parameter
     for(String key : entry.getMappings().stringPropertyNames())
