@@ -192,7 +192,7 @@ public class EmbeddedVisUI extends CommonUI
       Component c = visPlugin.createComponent(visInput, null);
       
       Link link = new Link();
-      link.setCaption("Show in search interface");
+      link.setCaption("Show in ANNIS search interface");
       link.setIcon(ANNISFontIcon.LOGO);
       link.setVisible(false);
       if(args.containsKey(KEY_SEARCH_INTERFACE))
