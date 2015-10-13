@@ -339,7 +339,7 @@ public class SingleResultPanel extends CssLayout implements
       }
     });
     
-    window.setContent(new EmbedVisualizationGenerator(resolverEntries, match, ps));
+    window.setContent(new EmbedVisualizationGenerator(resolverEntries, match, query, ps));
     
     UI.getCurrent().addWindow(window);
   }

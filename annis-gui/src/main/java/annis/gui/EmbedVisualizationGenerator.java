@@ -15,11 +15,14 @@
  */
 package annis.gui;
 
+import annis.gui.objects.PagedResultQuery;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
+import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
@@ -55,13 +58,16 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
   private final BeanItemContainer<ResolverEntry> visContainer;
   
   private final Match match;
+  private final PagedResultQuery query;
   private final PluginSystem ps;
   
   public EmbedVisualizationGenerator(List<ResolverEntry> visualizers, 
     Match match,
+    PagedResultQuery query,
     PluginSystem ps)
   { 
     this.match = match;
+    this.query = query;
     this.ps = ps;
     
     urlProperty = new ObjectProperty<>("");
@@ -119,11 +125,23 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
     VisualizerPlugin visPlugin = ps.getVisualizer(entry.getVisType());
     if(visPlugin != null && visPlugin.isUsingText())
     {
+      // generate a service URL that gets the whole document
       URI firstID = match.getSaltIDs().get(0);
       String pathAsString = firstID.getPath();
       List<String> path = Splitter.on('/').omitEmptyStrings().trimResults().splitToList(pathAsString);
       String corpusName = Helper.encodeJersey(path.get(0));
       String documentName = Helper.encodeJersey(path.get(path.size()-1));
+      
+      // apply any node annotation filters if possible
+      if(visPlugin instanceof FilteringVisualizerPlugin)
+      {
+        List<String> annos = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
+          corpusName, documentName, entry.getMappings());
+        if(annos != null)
+        {
+          serviceURL = serviceURL.queryParam("filternodeanno", Joiner.on(",").join(annos));
+        }
+      }
       
       serviceURL = serviceURL.path("graph")
         .path(corpusName)
@@ -132,15 +150,29 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
     else
     {
       // default to the subgraph URL for this specific match
+      serviceURL = serviceURL.path("search").path("subgraph")
+        .queryParam("match", Helper.encodeJersey(match.toString()))
+        .queryParam("left", query.getLeftContext())
+        .queryParam("right", query.getRightContext());
+      
+      if(query.getSegmentation() != null)
+      {
+        serviceURL = serviceURL.queryParam("segmentation", query.getSegmentation());
+      }
       
     }
-    result = result.queryParam("embedded_salt", 
+    // add the URL where to fetch the graph from
+    result = result.queryParam(EmbeddedVisUI.KEY_SALT, 
       Helper.encodeJersey(serviceURL.build().toASCIIString()));
+    
+    // add the current view as "return back" parameter
+    result = result.queryParam(EmbeddedVisUI.KEY_SEARCH_INTERFACE,
+      appURI.toASCIIString());
     
     // add all mappings as parameter
     for(String key : entry.getMappings().stringPropertyNames())
     {
-      if(!key.startsWith("embedded_"))
+      if(!key.startsWith(EmbeddedVisUI.KEY_PREFIX))
       {
         String value = Helper.encodeJersey(entry.getMappings().getProperty(key));
         result = result.queryParam(key, value);
