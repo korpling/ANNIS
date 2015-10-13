@@ -35,7 +35,6 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -103,6 +102,7 @@ public class SingleResultPanel extends CssLayout implements
   private final PluginSystem ps;
 
   private List<VisualizerPanel> visualizers;
+  private List<ResolverEntry> resolverEntries;
 
   private final Button btInfo;
   private final Button btLink;
@@ -339,7 +339,7 @@ public class SingleResultPanel extends CssLayout implements
       }
     });
     
-    window.setContent(new EmbedVisualizationGenerator());
+    window.setContent(new EmbedVisualizationGenerator(resolverEntries, match, ps));
     
     UI.getCurrent().addWindow(window);
   }
@@ -534,6 +534,8 @@ public class SingleResultPanel extends CssLayout implements
         = resolverProvider == null ? new ResolverEntry[0] 
         : resolverProvider.getResolverEntries(result);
       visualizers = new LinkedList<>();
+      resolverEntries = new LinkedList<>();
+      
       List<VisualizerPanel> openVisualizers = new LinkedList<>();
 
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
@@ -556,6 +558,8 @@ public class SingleResultPanel extends CssLayout implements
           htmlID, resultID, this, segmentationName, ps, instanceConfig);
 
         visualizers.add(p);
+        resolverEntries.add(entries[i]);
+        
         Properties mappings = entries[i].getMappings();
 
         // check if there is the visibility of a visualizer changed

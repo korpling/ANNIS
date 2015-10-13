@@ -276,9 +276,11 @@ public class EmbeddedVisUI extends CommonUI
   
   private void displayMessage(String header, String content)
   {
-    setContent(new Label(
+    Label label = new Label(
       "<h1>" + header + "</h1>" + "<div>" + content + "</div>",
-      ContentMode.HTML));
+      ContentMode.HTML);
+    label.setSizeFull();
+    setContent(label);
   }
   
 }
