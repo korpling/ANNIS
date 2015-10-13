@@ -28,11 +28,16 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -59,6 +64,7 @@ public class EmbeddedVisUI extends CommonUI
   public static final String KEY_PREFIX = "embedded_";
   public static final String KEY_SALT =  KEY_PREFIX +  "salt";
   public static final String KEY_NAMESPACE =  KEY_PREFIX +  "ns";
+  public static final String KEY_SEARCH_INTERFACE =  KEY_PREFIX +  "interface";
 
   @Override
   protected void init(VaadinRequest request)
@@ -183,7 +189,23 @@ public class EmbeddedVisUI extends CommonUI
       // TODO: which other thing do we have to provide?
       
       Component c = visPlugin.createComponent(visInput, null);
-      setContent(c);
+      
+      Link link = new Link();
+      link.setCaption("Show in search interface");
+      link.setIcon(FontAwesome.LINK);
+      link.setVisible(false);
+      if(args.containsKey(KEY_SEARCH_INTERFACE))
+      {
+        String[] interfaceLink = args.get(KEY_SEARCH_INTERFACE);
+        if(interfaceLink.length > 0)
+        {
+          link.setResource(new ExternalResource(interfaceLink[0]));
+          link.setVisible(true);
+        }
+      }
+      VerticalLayout layout = new VerticalLayout(link, c);
+      layout.setComponentAlignment(link, Alignment.TOP_LEFT);
+      setContent(layout);
       
     }
     catch (URISyntaxException ex)
