@@ -57,11 +57,18 @@ public class BinaryRequestHandler implements RequestHandler
   
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
+  private final String prefix;
+  
+  public BinaryRequestHandler(String urlPrefix)
+  {
+    this.prefix = urlPrefix + "/Binary";
+  }
+  
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if(request.getPathInfo() != null && request.getPathInfo().startsWith("/Binary"))
+    if(request.getPathInfo() != null && request.getPathInfo().startsWith(prefix))
     {
       if("GET".equalsIgnoreCase(request.getMethod()))
       {

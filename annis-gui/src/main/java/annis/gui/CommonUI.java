@@ -44,9 +44,9 @@ public class CommonUI extends AnnisBaseUI
   {
     super.init(request);
     
-    getSession().addRequestHandler(new LoginServletRequestHandler());    
+    getSession().addRequestHandler(new LoginServletRequestHandler(urlPrefix));    
     getSession().addRequestHandler(new ResourceRequestHandler(urlPrefix));
-    getSession().addRequestHandler(new BinaryRequestHandler());
+    getSession().addRequestHandler(new BinaryRequestHandler(urlPrefix));
 
     settings = new SettingsStorage(this);
   }
