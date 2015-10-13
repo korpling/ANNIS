@@ -32,7 +32,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -71,6 +70,11 @@ public class EmbeddedVisUI extends CommonUI
   public static final String KEY_SEARCH_INTERFACE =  KEY_PREFIX +  "interface";
   public static final String KEY_BASE_TEXT =  KEY_PREFIX +  "base";
 
+  public EmbeddedVisUI()
+  {
+    super(URL_PREFIX);
+  }
+  
   @Override
   protected void init(VaadinRequest request)
   {
@@ -211,6 +215,10 @@ public class EmbeddedVisUI extends CommonUI
       Helper.calulcateColorsForMarkedAndCovered(doc, markedAndCovered, markedColorMap);
       visInput.setMarkedAndCovered(markedAndCovered);
       visInput.setMarkableMap(markedColorMap);
+      visInput.setContextPath(Helper.getContext());
+      String template = Helper.getContext()
+        + "/Resource/" + visName + "/%s";
+      visInput.setResourcePathTemplate(template);
       
       // TODO: which other thing do we have to provide?
       

@@ -32,16 +32,23 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ResourceRequestHandler implements RequestHandler
 {
+  
+  private final String prefix;
+  
+  public ResourceRequestHandler(String urlPrefix)
+  {
+    this.prefix = urlPrefix + "/vis-iframe-res/";
+  }
 
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
     if (request.getPathInfo() != null && request.getPathInfo().
-      startsWith("/vis-iframe-res/"))
+      startsWith(prefix))
     {
       String uuidString = StringUtils.removeStart(request.getPathInfo(),
-        "/vis-iframe-res/");
+        prefix);
       UUID uuid = UUID.fromString(uuidString);
       IFrameResourceMap map = VaadinSession.getCurrent().
         getAttribute(IFrameResourceMap.class);

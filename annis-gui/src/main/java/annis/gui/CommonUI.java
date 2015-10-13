@@ -32,6 +32,12 @@ public class CommonUI extends AnnisBaseUI
   
   private SettingsStorage settings;
   
+  private final String urlPrefix;
+  
+  public CommonUI(String urlPrefix)
+  {
+    this.urlPrefix = urlPrefix;
+  }
   
   @Override
   protected void init(VaadinRequest request)
@@ -39,7 +45,7 @@ public class CommonUI extends AnnisBaseUI
     super.init(request);
     
     getSession().addRequestHandler(new LoginServletRequestHandler());    
-    getSession().addRequestHandler(new ResourceRequestHandler());
+    getSession().addRequestHandler(new ResourceRequestHandler(urlPrefix));
     getSession().addRequestHandler(new BinaryRequestHandler());
 
     settings = new SettingsStorage(this);
