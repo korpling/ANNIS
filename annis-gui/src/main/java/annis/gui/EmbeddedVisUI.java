@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.CommonHelper;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.util.ANNISFontIcon;
 import annis.libgui.AnnisUser;
@@ -30,7 +31,6 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -42,8 +42,10 @@ import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -187,6 +189,16 @@ public class EmbeddedVisUI extends CommonUI
       {
         visInput.setNamespace(namespace[0]);
       }
+      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
+        null,
+        doc.getSDocumentGraph());
+
+      Map<String, String> markedColorMap = new HashMap<>();
+      Map<String, Long> markedAndCovered = Helper.calculateMarkedAndCoveredIDs(doc, segNodes, null);
+      Helper.calulcateColorsForMarkedAndCovered(doc, markedAndCovered, markedColorMap);
+      visInput.setMarkedAndCovered(markedAndCovered);
+      visInput.setMarkableMap(markedColorMap);
+      
       // TODO: which other thing do we have to provide?
       
       Component c = visPlugin.createComponent(visInput, null);
