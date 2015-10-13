@@ -16,6 +16,7 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
+import annis.gui.EmbedVisualizationGenerator;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
 import annis.gui.objects.PagedResultQuery;
@@ -34,6 +35,7 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -103,6 +105,7 @@ public class SingleResultPanel extends CssLayout implements
   private List<VisualizerPanel> visualizers;
 
   private final Button btInfo;
+  private final Button btLink;
 
   private final List<String> path;
 
@@ -174,8 +177,25 @@ public class SingleResultPanel extends CssLayout implements
     btInfo = new Button();
     btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
     btInfo.setIcon(ICON_RESOURCE);
+    btInfo.setDescription("Show metadata");
     btInfo.addClickListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
+    
+    btLink = new Button();
+    btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+    btLink.setIcon(FontAwesome.PICTURE_O);
+    btLink.setDescription("Show embedded visualizer link generator");
+    btLink.setDisableOnClick(true);
+    btLink.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        showEmbedVisGenerator();
+      }
+    });
+    infoBar.addComponent(btLink);
 
     /**
      * Extract the top level corpus name and the document name of this single
@@ -200,7 +220,7 @@ public class SingleResultPanel extends CssLayout implements
     lblPath.setHeight("-1px");
     infoBar.addComponent(lblPath);
     infoBar.setExpandRatio(lblPath, 1.0f);
-    infoBar.setSpacing(true);
+    infoBar.setSpacing(false);
 
     this.visualizerState = new HashMap<>();
 
@@ -299,6 +319,29 @@ public class SingleResultPanel extends CssLayout implements
     in.defaultReadObject();
     
    this.result = CommonHelper.readSDocument(in);
+  }
+  
+  private void showEmbedVisGenerator()
+  {
+    Window window = new Window("Embedded visualization generator");
+    window.setWidth(70, Unit.EM);
+    window.setHeight(45, Unit.EM);
+    window.setResizable(true);
+    window.setModal(true);
+    window.setResizeLazy(true);
+    window.addCloseListener(new Window.CloseListener()
+    {
+
+      @Override
+      public void windowClose(Window.CloseEvent e)
+      {
+        btLink.setEnabled(true);
+      }
+    });
+    
+    window.setContent(new EmbedVisualizationGenerator());
+    
+    UI.getCurrent().addWindow(window);
   }
 
   public void setSegmentationLayer(String segmentationName)
@@ -876,6 +919,4 @@ public class SingleResultPanel extends CssLayout implements
   {
     return result;
   }
-  
-  
 }
