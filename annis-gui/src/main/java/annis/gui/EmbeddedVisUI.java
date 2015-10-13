@@ -54,8 +54,12 @@ public class EmbeddedVisUI extends CommonUI
 {
   private static final Logger log = LoggerFactory.getLogger(EmbeddedVisUI.class);
   
-  public static final String PREFIX = "/embeddedvis";
+  public static final String URL_PREFIX = "/embeddedvis";
   
+  public static final String KEY_PREFIX = "embedded_";
+  public static final String KEY_SALT =  KEY_PREFIX +  "salt";
+  public static final String KEY_NAMESPACE =  KEY_PREFIX +  "ns";
+  public static final String KEY_ELEMENT =  KEY_PREFIX +  "element";
 
   @Override
   protected void init(VaadinRequest request)
@@ -66,7 +70,7 @@ public class EmbeddedVisUI extends CommonUI
     List<String> splittedPath = new LinkedList<>();
     if(rawPath != null)
     {
-      rawPath = rawPath.substring(PREFIX.length());
+      rawPath = rawPath.substring(URL_PREFIX.length());
       splittedPath = Splitter.on("/").omitEmptyStrings().trimResults().limit(
         3).splitToList(rawPath);
     }
@@ -74,7 +78,7 @@ public class EmbeddedVisUI extends CommonUI
     if(splittedPath.size() == 1)
     {
       // a visualizer definition which get the results from a remote salt file
-      String saltUrl = request.getParameter("salt");
+      String saltUrl = request.getParameter(KEY_SALT);
       if(saltUrl == null)
       {
         displayGeneralHelp();
@@ -143,6 +147,7 @@ public class EmbeddedVisUI extends CommonUI
       WebResource saltRes = client.resource(uri);
       SaltProject p = saltRes.get(SaltProject.class);
       // TODO: allow to display several visualizers when there is more than one document
+
       SCorpusGraph firstCorpusGraph = null;
       SDocument doc = null;
       if(p.getSCorpusGraphs() != null && !p.getSCorpusGraphs().isEmpty())
@@ -165,12 +170,17 @@ public class EmbeddedVisUI extends CommonUI
       Properties mappings = new Properties();
       for(Map.Entry<String, String[]> e : args.entrySet())
       {
-        if(!"salt".equals(e.getKey()) && e.getValue().length > 0)
+        if(!KEY_SALT.equals(e.getKey()) && e.getValue().length > 0)
         {
           mappings.put(e.getKey(), e.getValue()[0]);
         }
       }
       visInput.setMappings(mappings);
+      String[] namespace = args.get(KEY_NAMESPACE);
+      if(namespace != null && namespace.length > 0)
+      {
+        visInput.setNamespace(namespace[0]);
+      }
       // TODO: which other thing do we have to provide?
       
       Component c = visPlugin.createComponent(visInput, null);
