@@ -99,6 +99,7 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
     
     preview = new BrowserFrame();
     preview.setCaption("Preview");
+    preview.addStyleName("citation");
     preview.setSizeFull();
     
     visSelector = new ListSelect("Select visualization");
