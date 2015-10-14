@@ -28,6 +28,7 @@ import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
+import com.google.common.html.HtmlEscapers;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
@@ -890,6 +891,21 @@ public class Helper
     String encoded = jerseyExtraEscape.escape(v);
     return encoded;
   }
+  
+  /**
+   * This will percent encode Jersey template argument braces (enclosed in
+   * "{...}") and the percent character. Both would not be esccaped by jersey
+   * and/or would cause an error when this is not a valid template.
+   *
+   * @param v
+   * @return
+   */
+  public static String encodeQueryParam(String v)
+  {
+    String encoded = UrlEscapers.urlFormParameterEscaper().escape(v);
+    return encoded;
+  }
+  
 
   /**
    * Casts a list of Annotations to the Type <code>List<Annotation></code>

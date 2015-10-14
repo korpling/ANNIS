@@ -184,7 +184,7 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
     }
     // add the URL where to fetch the graph from
     result = result.queryParam(EmbeddedVisUI.KEY_SALT, 
-      Helper.encodeJersey(serviceURL.build().toASCIIString()));
+      Helper.encodeQueryParam(serviceURL.build().toASCIIString()));
     
     // add the current view as "return back" parameter
     result = result.queryParam(EmbeddedVisUI.KEY_SEARCH_INTERFACE,
@@ -200,7 +200,7 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
     {
       if(!key.startsWith(EmbeddedVisUI.KEY_PREFIX))
       {
-        String value = Helper.encodeJersey(entry.getMappings().getProperty(key));
+        String value = Helper.encodeQueryParam(entry.getMappings().getProperty(key));
         result = result.queryParam(key, value);
       }
     }
