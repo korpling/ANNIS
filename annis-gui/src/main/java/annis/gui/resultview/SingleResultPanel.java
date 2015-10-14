@@ -176,8 +176,8 @@ public class SingleResultPanel extends CssLayout implements
     
     btLink = new Button();
     btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
-    btLink.setIcon(FontAwesome.PICTURE_O);
-    btLink.setDescription("Show embedded visualizer link generator");
+    btLink.setIcon(FontAwesome.SHARE_ALT);
+    btLink.setDescription("Share single match");
     btLink.setDisableOnClick(true);
     btLink.addClickListener(new Button.ClickListener()
     {
