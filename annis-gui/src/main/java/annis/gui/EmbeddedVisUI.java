@@ -243,6 +243,9 @@ public class EmbeddedVisUI extends CommonUI
       // TODO: which other thing do we have to provide?
       
       Component c = visPlugin.createComponent(visInput, null);
+      // add the styles
+      c.addStyleName("corpus-font");
+      c.addStyleName("vis-content");
       
       Link link = new Link();
       link.setCaption("Show in ANNIS search interface");
@@ -262,6 +265,7 @@ public class EmbeddedVisUI extends CommonUI
       layout.setComponentAlignment(link, Alignment.TOP_LEFT);
       layout.setSpacing(true);
       layout.setMargin(true);
+      
       setContent(layout);
       
       

@@ -231,7 +231,7 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
   {
     String url = generatorURLForVisualizer((ResolverEntry) event.getProperty().getValue());
     directURL.setValue(url);
-    iframeCode.setValue("<iframe width=\"100%\" height=\"300px\" src=\"" + url + "\"></iframe>");
+    iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + url + "\"></iframe>");
     preview.setSource(new ExternalResource(url));
   }
 }
