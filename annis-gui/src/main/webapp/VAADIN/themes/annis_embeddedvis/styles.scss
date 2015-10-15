@@ -24,23 +24,30 @@
   background-color: white
 }
 
+@media print {
+  .annis_embeddedvis {
+    @include annis_embeddedvis_print;
+  }
+}
+
 .annis_embeddedvis {
-  @include annis;
+  @include annis_embeddedvis;
+  
+  .v-app-loading:before {
+    background-image: url(../annis/images/annisloading.gif);
+    margin-top: -100px;
+    margin-left: -64px;
+    width: 128px;
+    height: 200px;
+    padding: 0px;
+  }
+  
+  .v-app-loading:after {
+    padding-top: 110px;
+  }
+  
+  .v-app-loading {
+    background-color: white;
+  }
 }
 
-.annis_embeddedvis .v-app-loading:before {
-  background-image: url(../annis/images/annisloading.gif);
-  margin-top: -100px;
-  margin-left: -64px;
-  width: 128px;
-  height: 200px;
-  padding: 0px;
-}
-
-.annis_embeddedvis .v-app-loading:after {
-  padding-top: 110px;
-}
-
-.annis_embeddedvis .v-app-loading {
-  background-color: white;
-}

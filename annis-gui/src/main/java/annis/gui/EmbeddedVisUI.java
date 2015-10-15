@@ -228,6 +228,7 @@ public class EmbeddedVisUI extends CommonUI
       link.setCaption("Show in ANNIS search interface");
       link.setIcon(ANNISFontIcon.LOGO);
       link.setVisible(false);
+      link.addStyleName("dontprint");
       if(args.containsKey(KEY_SEARCH_INTERFACE))
       {
         String[] interfaceLink = args.get(KEY_SEARCH_INTERFACE);

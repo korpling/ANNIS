@@ -9,23 +9,16 @@ $v-app-background-color: white;
 @mixin annis_embeddedvis {
   @include valo;
   @include annis;
-  @include partitur;
-
+  @include partitur;  
 }
 
-.annis_embeddedvis .v-app-loading:before {
-  background-image: url(images/annisloading.gif);
-  margin-top: -100px;
-  margin-left: -64px;
-  width: 128px;
-  height: 200px;
-  padding: 0px;
-}
+@mixin annis_embeddedvis_print {
+  @include valo;
+  @include annis;
+  @include partitur;  
 
-.annis_embeddedvis .v-app-loading:after {
-  padding-top: 110px;
-}
+  .dontprint {
+    visibility: hidden;
+  }
 
-.annis_embeddedvis .v-app-loading {
-  background-color: white
 }
