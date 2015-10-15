@@ -23,8 +23,14 @@ import annis.libgui.Helper;
 import annis.libgui.LoginDataLostException;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
+import annis.service.objects.Match;
 import annis.service.objects.Visualizer;
 import annis.visualizers.htmlvis.HTMLVis;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -39,9 +45,12 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -57,6 +66,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
+
 @Theme("annis_embeddedvis")
 public class EmbeddedVisUI extends CommonUI
 {
@@ -69,6 +79,7 @@ public class EmbeddedVisUI extends CommonUI
   public static final String KEY_NAMESPACE =  KEY_PREFIX +  "ns";
   public static final String KEY_SEARCH_INTERFACE =  KEY_PREFIX +  "interface";
   public static final String KEY_BASE_TEXT =  KEY_PREFIX +  "base";
+  public static final String KEY_MATCH =  KEY_PREFIX +  "match";
 
   public EmbeddedVisUI()
   {
@@ -210,6 +221,16 @@ public class EmbeddedVisUI extends CommonUI
         segmentation,
         doc.getSDocumentGraph());
 
+      if(args.containsKey(KEY_MATCH)) {
+        String[] rawMatch = args.get(KEY_MATCH);
+        if(rawMatch.length > 0)
+        {
+          // enhance the graph with match information from the arguments
+          Match match = Match.parseFromString(rawMatch[0]);
+          addMatchToDocumentGraph(match, doc);
+        }
+      }
+      
       Map<String, String> markedColorMap = new HashMap<>();
       Map<String, Long> markedAndCovered = Helper.calculateMarkedAndCoveredIDs(doc, segNodes, segmentation);
       Helper.calulcateColorsForMarkedAndCovered(doc, markedAndCovered, markedColorMap);
@@ -219,7 +240,6 @@ public class EmbeddedVisUI extends CommonUI
       String template = Helper.getContext()
         + "/Resource/" + visName + "/%s";
       visInput.setResourcePathTemplate(template);
-      
       // TODO: which other thing do we have to provide?
       
       Component c = visPlugin.createComponent(visInput, null);
@@ -256,6 +276,41 @@ public class EmbeddedVisUI extends CommonUI
       displayMessage("LoginData Lost", "No login data available any longer in the session:<br /> "
         + ex.getMessage());
     }
+  }
+  
+  private void addMatchToDocumentGraph(Match match , SDocument document)
+  {
+    List<String> allUrisAsString = new LinkedList<>();
+    long i=1;
+    for(URI u : match.getSaltIDs())
+    {
+      allUrisAsString.add(u.toASCIIString());
+      SNode matchedNode = document.getSDocumentGraph().getSNode(u.toASCIIString());
+      // set the feature for this specific node
+      if (matchedNode != null)
+        {
+          SFeature featMatchedNode = SaltFactory.eINSTANCE.createSFeature();
+          featMatchedNode.setSNS(ANNIS_NS);
+          featMatchedNode.setSName(FEAT_MATCHEDNODE);
+          featMatchedNode.setSValue(i);
+          matchedNode.addSFeature(featMatchedNode);
+      }
+      i++;
+    }
+    
+    SFeature featIDs = SaltFactory.eINSTANCE.createSFeature();
+    featIDs.setSNS(ANNIS_NS);
+    featIDs.setSName(FEAT_MATCHEDIDS);
+    featIDs.setSValue(Joiner.on(",").join(allUrisAsString));
+    document.addSFeature(featIDs);
+    
+    SFeature featAnnos = SaltFactory.eINSTANCE.createSFeature();
+    featAnnos.setSNS(ANNIS_NS);
+    featAnnos.setSName(FEAT_MATCHEDANNOS);
+    featAnnos.setSValue(Joiner.on(",").join(match.getAnnos()));
+    document.addSFeature(featAnnos);
+    
+    
   }
   
   

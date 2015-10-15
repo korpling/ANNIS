@@ -38,7 +38,9 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
 
 /**
@@ -156,17 +158,33 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
       // apply any node annotation filters if possible
       if(visPlugin instanceof FilteringVisualizerPlugin)
       {
-        List<String> annos = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
+        List<String> visAnnos = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
           corpusName, documentName, entry.getMappings());
-        if(annos != null)
+        if(visAnnos != null)
         {
-          serviceURL = serviceURL.queryParam("filternodeanno", Joiner.on(",").join(annos));
+          Set<String> annos = new HashSet<>(visAnnos);
+          // always add the matched node annotation as well
+          for (String matchedAnno : match.getAnnos())
+          {
+            if(!matchedAnno.isEmpty())
+            {
+              annos.add(matchedAnno);
+            }
+          }
+          serviceURL = serviceURL.queryParam("filternodeanno", Joiner.on(",").
+            join(annos));
         }
       }
       
       serviceURL = serviceURL.path("graph")
         .path(corpusName)
         .path(documentName);
+      
+      // add the original match so the embedded visualizer can add it
+      // (since we use the graph query it will not be included in the Salt XMI itself)
+      result = result
+        .queryParam(EmbeddedVisUI.KEY_MATCH, Helper.encodeJersey(match.toString()));
+
     }
     else
     {
