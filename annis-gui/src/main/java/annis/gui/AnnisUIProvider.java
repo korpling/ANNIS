@@ -30,7 +30,7 @@ public class AnnisUIProvider extends UIProvider
   public Class<? extends UI> getUIClass(UIClassSelectionEvent event)
   {
     String path = event.getRequest().getPathInfo();
-    if(path != null && path.startsWith(EmbeddedVisUI.PREFIX))
+    if(path != null && path.startsWith(EmbeddedVisUI.URL_PREFIX))
     {
       return EmbeddedVisUI.class;
     }

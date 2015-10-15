@@ -46,12 +46,12 @@ public class MatchGroup implements Serializable
   
   public MatchGroup()
   {
-    matches = new ArrayList<Match>();
+    matches = new ArrayList<>();
   }
   
   public MatchGroup(Collection<Match> orig)
   {
-    matches = new ArrayList<Match>(orig);
+    matches = new ArrayList<>(orig);
   }
   
   @XmlElement(name = "match")
@@ -101,7 +101,7 @@ public class MatchGroup implements Serializable
   @Override
   public String toString()
   {
-    List<String> lines = new LinkedList<String>();
+    List<String> lines = new LinkedList<>();
     
     for(Match m : this.matches)
     {

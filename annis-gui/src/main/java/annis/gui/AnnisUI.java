@@ -76,6 +76,7 @@ public class AnnisUI extends CommonUI
 
   public AnnisUI()
   {
+    super("");
     initTransients();
   }
 

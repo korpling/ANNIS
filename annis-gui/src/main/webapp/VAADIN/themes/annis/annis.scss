@@ -123,6 +123,14 @@ $font-size: 10pt;
     border-width: 1px;
     font-family: monospace;
   }
+  
+  div.citation {
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 4px
+  }
 
   textarea.license {
     background-color: white;

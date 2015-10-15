@@ -32,6 +32,7 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
@@ -50,6 +51,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -117,6 +119,7 @@ public class ResultViewPanel extends VerticalLayout implements
   private int currentResults;
 
   private int numberOfResults;
+  private ArrayList<Match> allMatches;
 
   private transient BlockingQueue<SaltProject> projectQueue;
 
@@ -215,14 +218,15 @@ public class ResultViewPanel extends VerticalLayout implements
    *
    * @param queue holds the salt graph
    * @param q holds the ordinary query
-   * @param numberOfResults the figure of all matches.
+   * @param allMatches All matches.
    */
   public void setQueryResultQueue(BlockingQueue<SaltProject> queue,
-    PagedResultQuery q, int numberOfResults)
+    PagedResultQuery q, ArrayList<Match> allMatches)
   {
     this.projectQueue = queue;
     this.currentQuery = q;
-    this.numberOfResults = numberOfResults;
+    this.numberOfResults = allMatches.size();
+    this.allMatches = allMatches;
 
     paging.setPageSize(q.getLimit(), false);
     paging.setInfo(q.getQuery());
@@ -287,7 +291,7 @@ public class ResultViewPanel extends VerticalLayout implements
         for (SaltProject p : subgraphList)
         {
           updateVariables(p);
-          newPanels = createPanels(p, q.getOffset() + currentResults);
+          newPanels = createPanels(p, currentResults, q.getOffset() + currentResults);
           currentResults += newPanels.size();
 
           String strResults = numberOfResults > 1 ? "results" : "result";
@@ -345,7 +349,7 @@ public class ResultViewPanel extends VerticalLayout implements
     qp.setStatus(qp.getLastPublicStatus());
   }
 
-  private List<SingleResultPanel> createPanels(SaltProject p, int offset)
+  private List<SingleResultPanel> createPanels(SaltProject p, int localMatchIndex, int globalOffset)
   {
     List<SingleResultPanel> result = new LinkedList<>();
 
@@ -354,17 +358,13 @@ public class ResultViewPanel extends VerticalLayout implements
     {
       SDocument doc = corpusGraph.getSDocuments().get(0);
       Match m = new Match();
-      try
+      if(allMatches != null && localMatchIndex >= 0 && localMatchIndex < allMatches.size())
       {
-        m = CommonHelper.extractMatch(doc);
-      }
-      catch (URISyntaxException ex)
-      {
-        log.error("Invalid Syntax in match", ex);
+        m = allMatches.get(localMatchIndex);
       }
       
       SingleResultPanel panel = new SingleResultPanel(doc, m,
-        i + offset, new ResolverProviderImpl(cacheResolver), ps,
+        i + globalOffset, new ResolverProviderImpl(cacheResolver), ps,
         getVisibleTokenAnnos(), segmentationName, controller,
         instanceConfig, initialQuery);
 

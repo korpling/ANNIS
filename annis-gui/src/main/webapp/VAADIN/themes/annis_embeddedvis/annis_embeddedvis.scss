@@ -1,0 +1,24 @@
+@import "../valo/valo";
+@import "../annis/annis.scss";
+@import "../annis/partitur.scss";
+@import "../annis/pdf.scss";
+@import "../annis/raw_text.scss";
+
+$v-app-background-color: white;
+
+@mixin annis_embeddedvis {
+  @include valo;
+  @include annis;
+  @include partitur;  
+}
+
+@mixin annis_embeddedvis_print {
+  @include valo;
+  @include annis;
+  @include partitur;  
+
+  .dontprint {
+    visibility: hidden;
+  }
+
+}
