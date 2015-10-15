@@ -25,6 +25,7 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
+import annis.security.ANNISUserRealm;
 import annis.service.QueryService;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
@@ -417,10 +418,10 @@ public class QueryServiceImpl implements QueryService
   }
   
   protected SaltProject basicSubgraph(MatchGroup matches, 
-    String segmentation, 
-    String leftRaw, 
-    String rightRaw, 
-    String filterRaw)
+    @QueryParam("segmentation") String segmentation, 
+    @DefaultValue("0") @QueryParam("left") String leftRaw, 
+    @DefaultValue("0") @QueryParam("right") String rightRaw, 
+    @DefaultValue("all") @QueryParam("filter") String filterRaw)
   {
     
     Subject user = SecurityUtils.getSubject();
@@ -479,17 +480,11 @@ public class QueryServiceImpl implements QueryService
   @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName,
-    @QueryParam("filternodeanno") String filternodeanno,
-    @QueryParam("match") String matchRaw)
+    @QueryParam("filternodeanno") String filternodeanno)
   {
 
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:subgraph:" + toplevelCorpusName);
-    
-    if(matchRaw != null)
-    {
-      MatchGroup matches = MatchGroup.parseString(matchRaw);
-    }
 
     List<String> nodeAnnotationFilter = null;
     if(filternodeanno != null)
