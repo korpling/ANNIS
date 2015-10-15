@@ -28,9 +28,11 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.server.ExternalResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
@@ -49,7 +51,7 @@ import javax.ws.rs.core.UriBuilder;
  */
 public class ShareSingleMatchGenerator extends Panel implements Property.ValueChangeListener
 {
-  private final HorizontalLayout layout;
+  private final VerticalLayout layout;
   private final ListSelect visSelector;
   private final VerticalLayout generatedLinks;
   
@@ -119,10 +121,22 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     
     generatedLinks.setSizeFull();
     
-    layout = new HorizontalLayout(visSelector, generatedLinks);
+    Label infoText = new Label(
+        "<p style=\"font-size: 18px\" >"
+        + "<strong>Share your excerpt:</strong>&nbsp;"
+        + "1. Chose the visualization to share&nbsp;2. Copy the generated link or code"
+        + "</p>",
+      ContentMode.HTML);
+    
+    
+    HorizontalLayout hLayout = new HorizontalLayout(visSelector, generatedLinks);
+    hLayout.setSizeFull();
+    hLayout.setSpacing(true);
+    hLayout.setExpandRatio(generatedLinks, 1.0f);
+    
+    layout = new VerticalLayout(infoText, hLayout);
     layout.setSizeFull();
-    layout.setSpacing(true);
-    layout.setExpandRatio(generatedLinks, 1.0f);
+    layout.setExpandRatio(hLayout, 1.0f);
     
     setContent(layout);
     setSizeFull();
