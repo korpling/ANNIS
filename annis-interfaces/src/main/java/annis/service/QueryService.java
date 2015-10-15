@@ -18,6 +18,7 @@ package annis.service;
 import annis.service.objects.MatchGroup;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 /**
@@ -211,12 +212,14 @@ public interface QueryService
    * @param filternodeanno A comma seperated list of node annotations which are 
    * used as a filter for the graph. Only nodes having one of the annotations
    * are included in the result.
+   * @param match Optional definition of a match inside this document.
    * @return 
    */
   public SaltProject graph(
     String top,
     String doc,
-    String filternodeanno);
+    String filternodeanno,
+    String match);
   
   /**
    * Get the content an ANNIS binary object for a specific document.
