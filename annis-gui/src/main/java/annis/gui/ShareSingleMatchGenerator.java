@@ -47,7 +47,7 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class EmbedVisualizationGenerator extends Panel implements Property.ValueChangeListener
+public class ShareSingleMatchGenerator extends Panel implements Property.ValueChangeListener
 {
   private final HorizontalLayout layout;
   private final ListSelect visSelector;
@@ -64,7 +64,7 @@ public class EmbedVisualizationGenerator extends Panel implements Property.Value
   private final String segmentation;
   private final PluginSystem ps;
   
-  public EmbedVisualizationGenerator(List<ResolverEntry> visualizers, 
+  public ShareSingleMatchGenerator(List<ResolverEntry> visualizers, 
     Match match,
     PagedResultQuery query,
     String segmentation,

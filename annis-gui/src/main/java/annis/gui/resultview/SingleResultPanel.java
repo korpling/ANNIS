@@ -16,7 +16,7 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.EmbedVisualizationGenerator;
+import annis.gui.ShareSingleMatchGenerator;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
 import annis.gui.objects.PagedResultQuery;
@@ -316,7 +316,7 @@ public class SingleResultPanel extends CssLayout implements
   
   private void showEmbeddedVisGenerator()
   {
-    Window window = new Window("Embedded visualization generator");
+    Window window = new Window("Share single match");
     window.setWidth(70, Unit.EM);
     window.setHeight(45, Unit.EM);
     window.setResizable(true);
@@ -332,7 +332,7 @@ public class SingleResultPanel extends CssLayout implements
       }
     });
     
-    window.setContent(new EmbedVisualizationGenerator(resolverEntries, match, query, segmentationName, ps));
+    window.setContent(new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName, ps));
     
     UI.getCurrent().addWindow(window);
   }
