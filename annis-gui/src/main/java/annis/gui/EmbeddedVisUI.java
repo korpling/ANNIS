@@ -252,7 +252,8 @@ public class EmbeddedVisUI extends CommonUI
       link.setIcon(ANNISFontIcon.LOGO);
       link.setVisible(false);
       link.addStyleName("dontprint");
-      if(args.containsKey(KEY_SEARCH_INTERFACE))
+      link.setTargetName("_blank"); 
+     if(args.containsKey(KEY_SEARCH_INTERFACE))
       {
         String[] interfaceLink = args.get(KEY_SEARCH_INTERFACE);
         if(interfaceLink.length > 0)
