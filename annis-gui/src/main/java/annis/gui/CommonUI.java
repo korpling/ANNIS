@@ -19,8 +19,11 @@ import annis.gui.components.SettingsStorage;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.requesthandler.ResourceRequestHandler;
+import annis.gui.servlets.ResourceServlet;
 import annis.libgui.AnnisBaseUI;
 import com.vaadin.server.VaadinRequest;
+import net.xeoh.plugins.base.PluginManager;
+import net.xeoh.plugins.base.util.uri.ClassURI;
 
 /**
  *
@@ -50,6 +53,15 @@ public class CommonUI extends AnnisBaseUI
 
     settings = new SettingsStorage(this);
   }
+
+  @Override
+  protected void addCustomUIPlugins(PluginManager pluginManager)
+  {
+    super.addCustomUIPlugins(pluginManager);        
+    pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
+  }
+  
+  
   
   public SettingsStorage getSettings()
   {
