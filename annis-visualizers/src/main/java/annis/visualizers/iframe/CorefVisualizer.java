@@ -220,19 +220,25 @@ public class CorefVisualizer extends WriterVisualizer
       }
       fonts.add("serif");
 
-      Link linkTooltip = new Link();
-      linkTooltip.setHref(input.getResourcePath("coref/jquery.tooltip.css"));
-      linkTooltip.setRel("stylesheet");
-      linkTooltip.setType("text/css");
-      head.appendChild(linkTooltip);
+      Link linkJQueryUI = new Link();
+      linkJQueryUI.setHref(input.getResourcePath("coref/jquery-ui-1.11.4.custom/jquery-ui.min.css"));
+      linkJQueryUI.setRel("stylesheet");
+      linkJQueryUI.setType("text/css");
+      head.appendChild(linkJQueryUI);
+      
+      Link linkJQueryUIStructure = new Link();
+      linkJQueryUIStructure.setHref(input.getResourcePath("coref/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css"));
+      linkJQueryUIStructure.setRel("stylesheet");
+      linkJQueryUIStructure.setType("text/css");
+      head.appendChild(linkJQueryUIStructure);
       
       Script scriptJquery = new Script("text/javascript");
-      scriptJquery.setSrc(input.getResourcePath("coref/jquery-1.6.2.min.js"));
+      scriptJquery.setSrc(input.getResourcePath("coref/jquery-1.11.3.min.js"));
       head.appendChild(scriptJquery);
       
-      Script scriptTooltip = new Script("text/javascript");
-      scriptTooltip.setSrc(input.getResourcePath("coref/jquery.tooltip.min.js"));
-      head.appendChild(scriptTooltip);
+      Script scriptUI = new Script("text/javascript");
+      scriptUI.setSrc(input.getResourcePath("coref/jquery-ui-1.11.4.custom/jquery-ui.min.js"));
+      head.appendChild(scriptUI);
       
       Link linkCoref = new Link();
       linkCoref.setHref(input.getResourcePath("coref/coref.css"));
