@@ -123,7 +123,7 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     visSelector.setSelectionMode(Grid.SelectionMode.SINGLE);
     visSelector.addSelectionListener(ShareSingleMatchGenerator.this);
     visSelector.select(visContainer.getIdByIndex(0));
-    visSelector.setWidth("-1px");
+    visSelector.setWidth("300px");
 
     
     generatedLinks.setSizeFull();
