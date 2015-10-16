@@ -35,7 +35,6 @@ import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.ListSelect;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
@@ -112,6 +111,11 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     preview.addStyleName("citation");
     preview.setSizeFull();
     
+    generatedLinks = new VerticalLayout(txtDirectURL, txtIFrameCode, preview);
+    generatedLinks.setComponentAlignment(txtDirectURL, Alignment.TOP_LEFT);
+    generatedLinks.setComponentAlignment(txtIFrameCode, Alignment.TOP_LEFT);
+    generatedLinks.setExpandRatio(preview, 1.0f);
+    
     visSelector = new Grid(visContainer);
     visSelector.setCaption("Select visualization");
     visSelector.setHeight("100%");
@@ -119,11 +123,8 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     visSelector.setSelectionMode(Grid.SelectionMode.SINGLE);
     visSelector.addSelectionListener(ShareSingleMatchGenerator.this);
     visSelector.select(visContainer.getIdByIndex(0));
+    visSelector.setWidth("-1px");
 
-    generatedLinks = new VerticalLayout(txtDirectURL, txtIFrameCode, preview);
-    generatedLinks.setComponentAlignment(txtDirectURL, Alignment.TOP_LEFT);
-    generatedLinks.setComponentAlignment(txtIFrameCode, Alignment.TOP_LEFT);
-    generatedLinks.setExpandRatio(preview, 1.0f);
     
     generatedLinks.setSizeFull();
     
@@ -261,15 +262,11 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     Set<Object> selected = event.getSelected();
     if(selected.isEmpty())
     {
-      txtDirectURL.setVisible(false);
-      txtIFrameCode.setVisible(false);
-      preview.setVisible(false);
+      generatedLinks.setVisible(false);
     }
     else
     {
-      txtDirectURL.setVisible(true);
-      txtIFrameCode.setVisible(true);
-      preview.setVisible(true);
+      generatedLinks.setVisible(true);
       
       String url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
       directURL.setValue(url);
