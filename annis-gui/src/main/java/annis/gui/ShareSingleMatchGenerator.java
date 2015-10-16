@@ -27,10 +27,12 @@ import com.google.common.base.Splitter;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ListSelect;
@@ -49,15 +51,20 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class ShareSingleMatchGenerator extends Panel implements Property.ValueChangeListener
+public class ShareSingleMatchGenerator extends Panel implements Property.ValueChangeListener,
+  SelectionEvent.SelectionListener
 {
   private final VerticalLayout layout;
   private final ListSelect visSelector;
+  private final Grid visSelectorGrid;
   private final VerticalLayout generatedLinks;
   
   private final Property<String> directURL;
   private final Property<String> iframeCode;
   private final BrowserFrame preview;
+  
+  private final  TextArea txtDirectURL;
+  private final TextArea txtIFrameCode;
   
   private final BeanItemContainer<ResolverEntry> visContainer;
   
@@ -83,7 +90,7 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     visContainer = new BeanItemContainer<>(ResolverEntry.class);
     visContainer.addAll(visualizers);
     
-    TextArea txtDirectURL = new TextArea(directURL);
+    txtDirectURL = new TextArea(directURL);
     txtDirectURL.setCaption("Link for publications");
     txtDirectURL.setWidth("100%");
     txtDirectURL.setHeight("-1px");
@@ -92,7 +99,7 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     txtDirectURL.setWordwrap(true);
     txtDirectURL.setReadOnly(true);
     
-    TextArea txtIFrameCode = new TextArea(iframeCode);
+    txtIFrameCode = new TextArea(iframeCode);
     txtIFrameCode.setCaption("Code for embedding visualization into web page");
     txtIFrameCode.setWidth("100%");
     txtIFrameCode.setHeight("-1px");
@@ -106,12 +113,20 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     preview.addStyleName("citation");
     preview.setSizeFull();
     
+    visSelectorGrid = new Grid(visContainer);
+    visSelectorGrid.setCaption("Select visualization");
+    visSelectorGrid.setHeight("100%");
+    visSelectorGrid.setColumns("displayName");
+    visSelectorGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+    visSelectorGrid.addSelectionListener(ShareSingleMatchGenerator.this);
+    visSelectorGrid.select(visContainer.getIdByIndex(0));
+    
     visSelector = new ListSelect("Select visualization");
     visSelector.setHeight("100%");
     visSelector.setContainerDataSource(visContainer);
     visSelector.setItemCaptionPropertyId("displayName");
     visSelector.setNullSelectionAllowed(false);
-    visSelector.addValueChangeListener(this);
+    visSelector.addValueChangeListener(ShareSingleMatchGenerator.this);
     visSelector.setValue(visContainer.getIdByIndex(0));
     
     generatedLinks = new VerticalLayout(txtDirectURL, txtIFrameCode, preview);
@@ -248,4 +263,29 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + url + "\"></iframe>");
     preview.setSource(new ExternalResource(url));
   }
+
+  @Override
+  public void select(SelectionEvent event)
+  {
+    Set<Object> selected = event.getSelected();
+    if(selected.isEmpty())
+    {
+      txtDirectURL.setVisible(false);
+      txtIFrameCode.setVisible(false);
+      preview.setVisible(false);
+    }
+    else
+    {
+      txtDirectURL.setVisible(true);
+      txtIFrameCode.setVisible(true);
+      preview.setVisible(true);
+      
+      String url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
+      directURL.setValue(url);
+      iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + url + "\"></iframe>");
+      preview.setSource(new ExternalResource(url));
+    }
+  }
+  
+  
 }
