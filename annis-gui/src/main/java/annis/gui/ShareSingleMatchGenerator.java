@@ -55,8 +55,7 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
   SelectionEvent.SelectionListener
 {
   private final VerticalLayout layout;
-  private final ListSelect visSelector;
-  private final Grid visSelectorGrid;
+  private final Grid visSelector;
   private final VerticalLayout generatedLinks;
   
   private final Property<String> directURL;
@@ -113,22 +112,14 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     preview.addStyleName("citation");
     preview.setSizeFull();
     
-    visSelectorGrid = new Grid(visContainer);
-    visSelectorGrid.setCaption("Select visualization");
-    visSelectorGrid.setHeight("100%");
-    visSelectorGrid.setColumns("displayName");
-    visSelectorGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-    visSelectorGrid.addSelectionListener(ShareSingleMatchGenerator.this);
-    visSelectorGrid.select(visContainer.getIdByIndex(0));
-    
-    visSelector = new ListSelect("Select visualization");
+    visSelector = new Grid(visContainer);
+    visSelector.setCaption("Select visualization");
     visSelector.setHeight("100%");
-    visSelector.setContainerDataSource(visContainer);
-    visSelector.setItemCaptionPropertyId("displayName");
-    visSelector.setNullSelectionAllowed(false);
-    visSelector.addValueChangeListener(ShareSingleMatchGenerator.this);
-    visSelector.setValue(visContainer.getIdByIndex(0));
-    
+    visSelector.setColumns("displayName");
+    visSelector.setSelectionMode(Grid.SelectionMode.SINGLE);
+    visSelector.addSelectionListener(ShareSingleMatchGenerator.this);
+    visSelector.select(visContainer.getIdByIndex(0));
+
     generatedLinks = new VerticalLayout(txtDirectURL, txtIFrameCode, preview);
     generatedLinks.setComponentAlignment(txtDirectURL, Alignment.TOP_LEFT);
     generatedLinks.setComponentAlignment(txtIFrameCode, Alignment.TOP_LEFT);
