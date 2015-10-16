@@ -689,7 +689,7 @@ public class SearchView extends GridLayout implements View,
 
     // set our fragment
     lastEvaluatedFragment = StringUtils.join(args, "&");
-    UI.getCurrent().getPage().setUriFragment(lastEvaluatedFragment);
+    UI.getCurrent().getPage().setUriFragment(lastEvaluatedFragment, false);
 
     // reset title
     Page.getCurrent().setTitle(
