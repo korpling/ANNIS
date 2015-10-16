@@ -8,13 +8,10 @@ var currentNumberIndex = 1;//0;
 $(document).ready(function()
 {
   $("td[title]").tooltip({
+    // no animation
+    show: false,
     content: function () {
-        var arrContent = $(this).attr('title').split(' - ');
-        var data = $(this).attr('title');
-        if(arrContent.length >= 2) {
-          data = '<h3>' + arrContent[0] + '</h3><div>' + arrContent[1] + '</div>';
-        }
-        return data;
+        return $(this).attr('title');
     }
   });
 });
