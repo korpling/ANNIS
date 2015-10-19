@@ -25,6 +25,7 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
+import annis.security.ANNISUserRealm;
 import annis.service.QueryService;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
@@ -381,8 +382,6 @@ public class QueryServiceImpl implements QueryService
     @DefaultValue("all") @QueryParam("filter") String filterRaw)
   {
     
-    Subject user = SecurityUtils.getSubject();
-    
     // some robustness stuff
     if (matches == null)
     {
@@ -391,6 +390,41 @@ public class QueryServiceImpl implements QueryService
         MediaType.TEXT_PLAIN).entity(
         "missing required request body").build());
     }
+    
+    return basicSubgraph(matches, segmentation, leftRaw, rightRaw, filterRaw);
+  }
+  
+  
+  @GET
+  @Path("search/subgraph")
+  @Produces(
+    {
+    "application/xml", "application/xmi+xml", "application/xmi+binary",
+      "application/graphml+xml"
+  })
+  public SaltProject subgraph(
+    @QueryParam("match") String matchRaw,
+    @QueryParam("segmentation") String segmentation, 
+    @DefaultValue("0") @QueryParam("left") String leftRaw, 
+    @DefaultValue("0") @QueryParam("right") String rightRaw, 
+    @DefaultValue("all") @QueryParam("filter") String filterRaw)
+  {
+    // some robustness stuff
+    requiredParameter(matchRaw, "match", "definition of the match");
+    
+    MatchGroup matches = MatchGroup.parseString(matchRaw);
+    
+    return basicSubgraph(matches, segmentation, leftRaw, rightRaw, filterRaw);
+  }
+  
+  protected SaltProject basicSubgraph(MatchGroup matches, 
+    @QueryParam("segmentation") String segmentation, 
+    @DefaultValue("0") @QueryParam("left") String leftRaw, 
+    @DefaultValue("0") @QueryParam("right") String rightRaw, 
+    @DefaultValue("all") @QueryParam("filter") String filterRaw)
+  {
+    
+    Subject user = SecurityUtils.getSubject();
     
     int left = Integer.parseInt(leftRaw);
     int right = Integer.parseInt(rightRaw);

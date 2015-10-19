@@ -76,6 +76,7 @@ public class AnnisUI extends CommonUI
 
   public AnnisUI()
   {
+    super("");
     initTransients();
   }
 
@@ -292,11 +293,11 @@ public class AnnisUI extends CommonUI
   @Override
   protected void addCustomUIPlugins(PluginManager pluginManager)
   {
+    super.addCustomUIPlugins(pluginManager);
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).
       toURI());
     pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
       toURI());
-    pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
   }
 
   /**

@@ -29,6 +29,7 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -151,13 +152,13 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
         });
 
         // prepare fetching subgraphs
-        final int totalResultSize = result.getMatches().size();
        
         final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<>(
-          totalResultSize);
-        int current = 0;
+          result.getMatches().size());
+        int current = 0;        
+        final ArrayList<Match> matchList = new ArrayList<>(result.getMatches());
 
-        for (Match m : result.getMatches())
+        for (Match m : matchList)
         {
           if (Thread.interrupted())
           {
@@ -174,6 +175,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           queue.put(p);
           log.debug("added match {} to queue", current+1);
 
+          
           if (current == 0)
           {
             ui.access(new Runnable()
@@ -181,7 +183,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
               @Override
               public void run()
               {
-                resultPanel.setQueryResultQueue(queue, query, totalResultSize);
+                resultPanel.setQueryResultQueue(queue, query, matchList);
               }
             });
           }

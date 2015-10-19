@@ -16,11 +16,8 @@
 package annis;
 
 import annis.model.AnnisConstants;
-import annis.service.objects.Match;
-import com.google.common.base.Splitter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +32,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
@@ -53,8 +51,6 @@ import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.graph.Label;
 import org.corpus_tools.salt.util.DataSourceSequence;
-import org.corpus_tools.salt.SALT_TYPE;
-import org.corpus_tools.salt.util.SaltUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,8 +140,8 @@ public class CommonHelper
       for (SNode n : graph.getNodes())
       {
         SFeature feat
-          = n.getFeature(SaltUtil.createQName(AnnisConstants.ANNIS_NS,
-              AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN));
+          = n.getFeature(AnnisConstants.ANNIS_NS,
+            AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
         if (feat != null && segName.equalsIgnoreCase(feat.getValue_STEXT()))
         {
           startNodes.add(n);
@@ -161,8 +157,7 @@ public class CommonHelper
         while (current != null)
         {
           token.add(current);
-          List<SRelation<SNode, SNode>> out = graph.getOutRelations(current.
-            getId());
+          List<SRelation<SNode,SNode>> out = graph.getOutRelations(current.getId());
           current = null;
           if (out != null)
           {
@@ -227,7 +222,7 @@ public class CommonHelper
 
   /**
    * Gets the spannend/covered text for a token. This will get all
-   * {@link STextualRelation} relations for a {@link SToken} from the
+   * {@link STextualRelation} edges for a {@link SToken} from the
    * {@link SDocumentGraph} and calculates the appropiate substring from the
    * {@link STextualDS}.
    *
@@ -239,8 +234,8 @@ public class CommonHelper
   {
     SDocumentGraph graph = tok.getGraph();
 
-    List<SRelation<SNode, SNode>> relations = graph.getOutRelations(tok.getId());
-    for (SRelation e : relations)
+    List<SRelation<SNode,SNode>> edges = graph.getOutRelations(tok.getId());
+    for (SRelation<? extends SNode,? extends SNode> e : edges)
     {
       if (e instanceof STextualRelation)
       {
@@ -293,11 +288,11 @@ public class CommonHelper
   public static List<String> getCorpusPath(SCorpusGraph corpusGraph,
     SDocument doc)
   {
-    final List<String> result = new LinkedList<>();
+    final List<String> result = new LinkedList<String>();
 
     result.add(doc.getName());
     SCorpus c = corpusGraph.getCorpus(doc);
-    ArrayList<SNode> cAsList = new ArrayList<>();
+    List<SNode> cAsList = new ArrayList<>();
     cAsList.add(c);
     corpusGraph.traverse(cAsList, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST,
       "getRootCorpora",
@@ -305,7 +300,7 @@ public class CommonHelper
       {
         @Override
         public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId, SNode currNode, SRelation relation, SNode fromNode,
+          String traversalId, SNode currNode, SRelation edge, SNode fromNode,
           long order)
         {
           result.add(currNode.getName());
@@ -314,13 +309,13 @@ public class CommonHelper
         @Override
         public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
           String traversalId,
-          SNode currNode, SRelation relation, SNode fromNode, long order)
+          SNode currNode, SRelation edge, SNode fromNode, long order)
         {
         }
 
         @Override
         public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId, SRelation relation, SNode currNode, long order)
+          String traversalId, SRelation edge, SNode currNode, long order)
         {
           return true;
         }
@@ -369,10 +364,9 @@ public class CommonHelper
       List<SALT_TYPE> types = new ArrayList<>();
       types.add(SALT_TYPE.STEXT_OVERLAPPING_RELATION);
 
-      List<DataSourceSequence> dataSources = graph.
-        getOverlappedDataSourceSequence(
-          node,
-          types);
+      List<DataSourceSequence> dataSources = graph.getOverlappedDataSourceSequence(
+        node,
+        types);
       if (dataSources != null)
       {
         for (DataSourceSequence seq : dataSources)
@@ -414,7 +408,7 @@ public class CommonHelper
    */
   public static Set<String> getToplevelCorpusNames(SaltProject p)
   {
-    Set<String> names = new HashSet<String>();
+    Set<String> names = new HashSet<>();
 
     if (p != null && p.getCorpusGraphs() != null)
     {
@@ -461,66 +455,5 @@ public class CommonHelper
 
     return result;
   }
-
-  public static Match extractMatch(SDocument doc) throws URISyntaxException
-  {
-    Splitter idSplit = Splitter.on(',').trimResults();
-    Match m = null;
-
-    // get the matched node IDs
-    SFeature featIDs = doc.getDocumentGraph().getFeature(SaltUtil.createQName(
-      AnnisConstants.ANNIS_NS,
-      AnnisConstants.FEAT_MATCHEDIDS));
-
-    if (featIDs != null)
-    {
-      LinkedList<URI> idList = new LinkedList<>();
-      for (String rawID : idSplit.split(featIDs.getValue_STEXT()))
-      {
-        idList.add(new URI(rawID));
-      }
-      SFeature featAnnos = doc.getDocumentGraph().getFeature(SaltUtil.createQName(
-        AnnisConstants.ANNIS_NS,
-        AnnisConstants.FEAT_MATCHEDANNOS));
-      if (featAnnos == null)
-      {
-        m = new Match(idList);
-      }
-      else
-      {
-        m = new Match(idList, idSplit.splitToList(featAnnos.getValue_STEXT()));
-      }
-    }
-
-    return m;
-  }
-
-  // TODO: remove if really not needed
-//  public static SNode[] getMatchedNodes(SDocument doc)
-//  {
-//    SNode[] result = new SNode[0];
-//
-//    // get the matched node IDs
-//    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS,
-//      AnnisConstants.FEAT_MATCHEDIDS);
-//    if (feat != null)
-//    {
-//      Match m = Match.parseFromString(feat.getSValueSTEXT());
-//      result = new SNode[m.getSaltIDs().size()];
-//
-//      int i = 0;
-//      for(URI u : m.getSaltIDs())
-//      {
-//        // get the specific node
-//        SNode node = doc.getDocumentGraph().getNode(u.toASCIIString());
-//        if (node != null)
-//        {
-//          result[i] = node;
-//        }
-//        i++;
-//      }
-//    }
-//
-//    return result;
-//  }
+  
 }

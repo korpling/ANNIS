@@ -27,7 +27,6 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-import annis.model.Edge;
 import annis.model.RelannisNodeFeature;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
@@ -61,7 +60,6 @@ import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

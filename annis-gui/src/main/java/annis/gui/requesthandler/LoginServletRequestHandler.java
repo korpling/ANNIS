@@ -46,12 +46,19 @@ public class LoginServletRequestHandler implements RequestHandler
 
   private final static Logger log = LoggerFactory.getLogger(
     LoginServletRequestHandler.class);
+  
+  private final String prefix;
+  
+  public LoginServletRequestHandler(String urlPrefix)
+  {
+    this.prefix = urlPrefix + "/login";
+  }
 
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if(request.getPathInfo() != null && request.getPathInfo().contains("login"))
+    if(request.getPathInfo() != null && request.getPathInfo().startsWith(prefix))
     {
       if("GET".equalsIgnoreCase(request.getMethod()))
       {
