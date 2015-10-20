@@ -329,7 +329,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doSet("export pcc2 /tmp/exportpcc2");
+    doDoc("NoSta-D-Kafka NoSta-D-Kafka");
   }
 
   public void doParse(String annisQuery)

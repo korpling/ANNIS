@@ -302,7 +302,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       long pre = 1;
       RelannisNodeFeature featSpan = RelannisNodeFeature.extract(span);
       ComponentEntry spanComponent = componentForSpan.get(span.getId());
-      if (spanComponent != null && featSpan != null)
+      if (spanComponent != null && featSpan != null 
+        && featSpan.getLeftToken() >= 0 && featSpan.getRightToken() >= 0)
       {
         for (long i = featSpan.getLeftToken(); i <= featSpan.getRightToken();
           i++)
