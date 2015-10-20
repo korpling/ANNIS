@@ -75,7 +75,6 @@ public class ExportPanel extends FormLayout
 
   private final Button btCancel;
 
-  private final CorpusListPanel corpusListPanel;
   private final QueryPanel queryPanel;
 
   private File tmpOutputFile;
@@ -95,11 +94,10 @@ public class ExportPanel extends FormLayout
   private UI ui;
   private final QueryUIState state;
   
-  public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
+  public ExportPanel(QueryPanel queryPanel,
     QueryController controller, QueryUIState state)
   {
     this.queryPanel = queryPanel;
-    this.corpusListPanel = corpusListPanel;
     this.controller = controller;
     this.state = state;
 
