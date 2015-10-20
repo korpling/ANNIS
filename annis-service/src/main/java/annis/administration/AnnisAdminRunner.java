@@ -22,6 +22,7 @@ import annis.corpuspathsearch.Search;
 import annis.dao.AnnisDao;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.utils.Utils;
+import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -140,6 +141,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     else if("check-db-schema-version".equals(command))
     {
       doCheckDBSchemaVersion();
+    }
+    else if("dump".equals(command))
+    {
+      doDumpTable(commandArgs);
+    }
+    else if("restore".equals(command))
+    {
+      doRestoreTable(commandArgs);
     }
     else
     {
@@ -589,6 +598,18 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       System.exit(1);
     }
     
+  }
+  
+  public void doDumpTable(List<String> commandArgs)
+  {
+    Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the output file as argument");
+    corpusAdministration.dumpTable(commandArgs.get(0), new File(commandArgs.get(1)));
+  }
+  
+  public void doRestoreTable(List<String> commandArgs)
+  {
+    Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the input file as argument");
+    corpusAdministration.restoreTable(commandArgs.get(0), new File(commandArgs.get(1)));
   }
 
   private void usage(String error)
