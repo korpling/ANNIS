@@ -19,20 +19,16 @@ package annis.service.internal;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.dao.AnnisDao;
-import annis.security.ANNISSecurityManager;
-import annis.security.ANNISUserRealm;
 import java.net.URI;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.PUT;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * Service to create and query unique IDs for URLs used by the frontend.
@@ -75,13 +71,15 @@ public class URLShortenerImpl
    * @param uriRaw The URI to shorten.
    * @return 
    */
-  @PUT
+  @POST
   public String addNewID(String uriRaw)
   {
     Subject user = SecurityUtils.getSubject();
     
     String remoteIP = request.getRemoteAddr().replaceAll("[.:]", "_");
     user.checkPermission("shortener:create:" + remoteIP);
+    
+    URI uri = URI.create(uriRaw);
     
     return "";
   }
