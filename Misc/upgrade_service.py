@@ -103,6 +103,27 @@ def initDatabase(config, instDir):
 		print("ERROR: initialization of database returned error code " + str(p.returncode))
 		exit(20)
 		
+def copyUserConfig(instDir, oldInstDir):
+	
+	tmpConfigDump = tempfile.NamedTemporaryFile()
+	
+	argsDump = [os.path.join(oldInstDir, "bin", "annis-admin.sh"), "dump", "user_config", tmpConfigDump.name]
+	
+	pDump = subprocess.Popen(argsDump, env=updateEnv(oldInstDir))
+	pDump.wait()
+	if pDump.returncode == 0:
+		argsRestore = [os.path.join(instDir, "bin", "annis-admin.sh"), "restore", "user_config", tmpConfigDump.name]
+		pRestore = subprocess.Popen(argsRestore, env=updateEnv(instDir))
+		pRestore.wait()
+		if pRestore.returncode == 0:
+			return True
+		else:
+			print("ERROR: restoring user configuration returned error code " + str(pDump.returncode))
+			exit(42)
+	else:
+		print("ERROR: dumping user configuration returned error code " + str(pDump.returncode))
+		exit(41)
+		
 def copyDatabase(instDir, oldInstDir, mail):
 	
 	a = [os.path.join(instDir, "bin", "annis-admin.sh"), "copy", 
@@ -200,6 +221,7 @@ if (not checkDBSchemaVersion(extracted, args.dir)):
 		print("New schema name: " + dbconfig["datasource.schema"])
 	print("======================================================")
 	initDatabase(dbconfig, extracted)
+	copyUserConfig(extracted, args.dir)
 	copyDatabase(extracted, args.dir, args.mail)
 	copiedCorpora = True
 
