@@ -67,7 +67,7 @@ public class URLShortenerImpl
    * {@code 
    * shortener:create:<ip>
    * }
-   * right is needed. "<ip>" is replaced by the IP of the client which makes this request.
+   * right is needed. "&lt;ip&gt;" is replaced by the IP of the client which makes this request.
    * Either IPv4 or IPv6 can be used. The dots (IPv4) or colons (IPv6) 
    * must be replaced with underscores since they conflict with the Apache
    * Shiro {@link WildcardPermission} format.
