@@ -72,16 +72,11 @@ public class URLShortenerImpl
    * must be replaced with underscores since they conflict with the Apache
    * Shiro {@link WildcardPermission} format.
    * 
-   * @param uri The URI to shorten.
-   * @param baseURI The base URI of the application. 
-   *                The scheme, host name, port and path from the base URI will 
-   *                be removed in the given URI. This parameter is optional,
-   *                if not given the URI is saved as it is.
- 
+   * @param uriRaw The URI to shorten.
    * @return 
    */
   @PUT
-  public String addNewID(URI uri, @QueryParam("baseURI") URI baseURI)
+  public String addNewID(String uriRaw)
   {
     Subject user = SecurityUtils.getSubject();
     
