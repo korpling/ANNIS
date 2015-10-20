@@ -511,7 +511,6 @@ public class JoinListener extends AqlParserBaseListener
     String label = ctx.label == null ? null : ctx.label.getText();
     
     left.addOutgoingJoin(addParsedLocation(ctx, new Sibling(right, label)));
-    left.addOutgoingJoin(addParsedLocation(ctx, new Sibling(right, label)));
   }
 
   @Override
