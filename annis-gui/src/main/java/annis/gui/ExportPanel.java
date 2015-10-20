@@ -263,7 +263,13 @@ public class ExportPanel extends GridLayout
 
     help4Exporter.put(SearchView.EXPORTER[2].getClass().getSimpleName(),
       "The Text Exporter exports the token covered by the matched nodes of every search result and "
-      + "its context, one line per result. Beside the text of the token it also contains all token annotations separated by \"/\".");
+      + "its context, one line per result. "
+      + "Beside the text of the token it also contains all token annotations separated by \"/\"."
+      + "<p>"
+      + "<strong>This exporter does not work well with dialog data "
+      + "(corpora that don't have only one primary text). "
+      + "Use the GridExporter instead.</strong>"
+      + "</p>");
 
     help4Exporter.put(SearchView.EXPORTER[3].getClass().getSimpleName(),
       "The Grid Exporter can export all annotations of a search result and its "
@@ -281,7 +287,13 @@ public class ExportPanel extends GridLayout
       + "<code>numbers=false</code>)");
     
     help4Exporter.put(SearchView.EXPORTER[4].getClass().getSimpleName(),
-      "The SimpleTextExporter exports only the plain text of every search result. ");
+      "The SimpleTextExporter exports only the plain text of every search result. "
+      + "<p>"
+      + "<strong>This exporter does not work well with dialog data "
+      + "(corpora that don't have only one primary text). "
+      + "Use the GridExporter instead.</strong>"
+      + "</p>"    
+    );
   }
 
   public class ExporterSelectionHelpListener implements
