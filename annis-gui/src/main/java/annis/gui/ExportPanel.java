@@ -30,10 +30,12 @@ import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -50,7 +52,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class ExportPanel extends HorizontalLayout
+public class ExportPanel extends GridLayout
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -93,11 +95,13 @@ public class ExportPanel extends HorizontalLayout
   private UI ui;
   private final QueryUIState state;
   
-  private FormLayout formLayout;
+  private final FormLayout formLayout;
+  private final Label lblHelp;
   
   public ExportPanel(QueryPanel queryPanel,
     QueryController controller, QueryUIState state)
   {
+    super(2, 3);
     this.queryPanel = queryPanel;
     this.controller = controller;
     this.state = state;
@@ -106,12 +110,17 @@ public class ExportPanel extends HorizontalLayout
     this.eventBus.register(ExportPanel.this);
     
     this.formLayout = new FormLayout();
+    formLayout.setWidth("-1px");
     
     setWidth("99%");
     setHeight("-1px");
 
     initHelpMessages();
 
+    setColumnExpandRatio(0, 0.0f);
+    setColumnExpandRatio(1, 1.0f);
+    
+    
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
@@ -124,10 +133,14 @@ public class ExportPanel extends HorizontalLayout
     
     cbExporter.setValue(SearchView.EXPORTER[0].getClass().getSimpleName());
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
-    cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
 
-    formLayout.addComponent(new HelpButton(cbExporter));
-    addComponent(formLayout);
+    formLayout.addComponent(cbExporter);
+    addComponent(formLayout, 0, 0);
+    
+    
+    lblHelp = new Label(help4Exporter.get((String) cbExporter.getValue()));
+    lblHelp.setContentMode(ContentMode.HTML);
+    addComponent(lblHelp, 1, 0);
 
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -187,10 +200,10 @@ public class ExportPanel extends HorizontalLayout
     HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport,
       btCancel,
       btDownload);
-    formLayout.addComponent(layoutExportButtons);
+    addComponent(layoutExportButtons, 0, 1, 1, 1);
 
     VerticalLayout vLayout = new VerticalLayout();
-    formLayout.addComponent(vLayout);
+    addComponent(vLayout, 0, 2, 1, 2);
 
     progressBar = new ProgressBar();
     progressBar.setVisible(false);
@@ -282,11 +295,11 @@ public class ExportPanel extends HorizontalLayout
         getValue());
       if (helpMessage != null)
       {
-        cbExporter.setDescription(helpMessage);
+        lblHelp.setValue(helpMessage);
       }
       else
       {
-        cbExporter.setDescription("No help available for this exporter");
+        lblHelp.setValue("No help available for this exporter");
       }
       
       Exporter exporter = controller.getExporterByName((String) event.getProperty().getValue());
