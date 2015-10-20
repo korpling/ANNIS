@@ -267,7 +267,7 @@ public class ExportPanel extends GridLayout
       + "Beside the text of the token it also contains all token annotations separated by \"/\"."
       + "<p>"
       + "<strong>This exporter does not work well with dialog data "
-      + "(corpora that don't have only one primary text). "
+      + "(corpora that have more than one primary text). "
       + "Use the GridExporter instead.</strong>"
       + "</p>");
 
@@ -290,7 +290,7 @@ public class ExportPanel extends GridLayout
       "The SimpleTextExporter exports only the plain text of every search result. "
       + "<p>"
       + "<strong>This exporter does not work well with dialog data "
-      + "(corpora that don't have only one primary text). "
+      + "(corpora that have more than one primary text). "
       + "Use the GridExporter instead.</strong>"
       + "</p>"    
     );
