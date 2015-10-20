@@ -55,6 +55,11 @@ public class URLShortenerImpl
   @Context
   private HttpServletRequest request;
   
+  public void init()
+  {
+    
+  }
+  
   /**
    * Takes a URI and returns an ID.
    * 
