@@ -16,7 +16,6 @@
 package annis.gui;
 
 import annis.gui.components.HelpButton;
-import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.converter.CommaSeperatedStringConverterList;
@@ -51,7 +50,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class ExportPanel extends FormLayout
+public class ExportPanel extends HorizontalLayout
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -94,6 +93,8 @@ public class ExportPanel extends FormLayout
   private UI ui;
   private final QueryUIState state;
   
+  private FormLayout formLayout;
+  
   public ExportPanel(QueryPanel queryPanel,
     QueryController controller, QueryUIState state)
   {
@@ -103,6 +104,8 @@ public class ExportPanel extends FormLayout
 
     this.eventBus = new EventBus();
     this.eventBus.register(ExportPanel.this);
+    
+    this.formLayout = new FormLayout();
     
     setWidth("99%");
     setHeight("-1px");
@@ -123,7 +126,8 @@ public class ExportPanel extends FormLayout
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
     cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
 
-    addComponent(new HelpButton(cbExporter));
+    formLayout.addComponent(new HelpButton(cbExporter));
+    addComponent(formLayout);
 
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -148,20 +152,20 @@ public class ExportPanel extends FormLayout
     cbLeftContext.setValue(5);
     cbRightContext.setValue(5);
     
-    addComponent(cbLeftContext);
-    addComponent(cbRightContext);
+    formLayout.addComponent(cbLeftContext);
+    formLayout.addComponent(cbRightContext);
 
     txtAnnotationKeys = new TextField("Annotation Keys");
     txtAnnotationKeys.setDescription("Some exporters will use this comma "
       + "seperated list of annotation keys to limit the exported data to these "
       + "annotations.");
-    addComponent(new HelpButton(txtAnnotationKeys));
+    formLayout.addComponent(new HelpButton(txtAnnotationKeys));
 
     txtParameters = new TextField("Parameters");
     txtParameters.setDescription("You can input special parameters "
       + "for certain exporters. See the description of each exporter "
       + "(‘?’ button above) for specific parameter settings.");
-    addComponent(new HelpButton(txtParameters));
+    formLayout.addComponent(new HelpButton(txtParameters));
 
     btExport = new Button("Perform Export");
     btExport.setIcon(FontAwesome.PLAY);
@@ -183,10 +187,10 @@ public class ExportPanel extends FormLayout
     HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport,
       btCancel,
       btDownload);
-    addComponent(layoutExportButtons);
+    formLayout.addComponent(layoutExportButtons);
 
     VerticalLayout vLayout = new VerticalLayout();
-    addComponent(vLayout);
+    formLayout.addComponent(vLayout);
 
     progressBar = new ProgressBar();
     progressBar.setVisible(false);
@@ -210,6 +214,7 @@ public class ExportPanel extends FormLayout
       txtParameters.setPropertyDataSource(state.getExportParameters());
       
     }
+    
   }
 
   @Override
