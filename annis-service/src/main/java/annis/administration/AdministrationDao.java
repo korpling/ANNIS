@@ -1554,6 +1554,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
       log.error("Cannot serialize user config JSON for database.", ex);
     }
   }
+  
+  @Transactional(readOnly = false)
+  public void deleteUserConfig(String userName)
+  {
+    getJdbcTemplate().update("DELETE FROM user_config WHERE id=?", userName);
+  }
 
   public void addCorpusAlias(long corpusID, String alias)
   {

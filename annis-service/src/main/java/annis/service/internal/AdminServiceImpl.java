@@ -253,6 +253,9 @@ public class AdminServiceImpl implements AdminService
       {
         if (confManager.deleteUser(userName))
         {
+          // also delete any possible user configs
+          adminDao.deleteUserConfig(userName);
+          // if no error until here everything went well
           return Response.ok().build();
         }
       }
