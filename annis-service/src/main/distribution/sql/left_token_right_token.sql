@@ -4,7 +4,7 @@ UPDATE _node AS parent SET
 left_token = (
   CASE
   WHEN parent.token_index IS NULL THEN (
-    SELECT min(token_index) FROM _node AS child 
+    SELECT COALESCE(min(token_index), -1) FROM _node AS child 
     WHERE 
       parent.left = child.left 
       AND parent.corpus_ref = child.corpus_ref 
@@ -17,7 +17,7 @@ left_token = (
 right_token = (
   CASE
     WHEN parent.token_index IS NULL THEN (
-    SELECT max(token_index) FROM _node AS child 
+    SELECT COALESCE(max(token_index), -1) FROM _node AS child 
     WHERE 
       parent.right = child.right 
       AND parent.corpus_ref = child.corpus_ref 
