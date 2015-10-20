@@ -57,4 +57,13 @@
   <bean id="metadataService" class="annis.service.internal.MetadataServiceImpl" init-method="init" lazy-init="true">
     <property name="annisDao" ref="annisDao" />
   </bean>
+  
+  <!-- URL shortener service -->
+  <bean id="urlShortenerService" class="annis.service.internal.URLShortenerImpl" 
+        init-method="init" lazy-init="true">
+    <property name="adminDao" ref="administrationDao"/>
+    <property name="annisDao" ref="annisDao" />
+    <property name="corpusAdmin" ref="corpusAdministration" />
+  </bean>
+
 </beans>

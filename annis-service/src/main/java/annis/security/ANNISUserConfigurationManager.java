@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -54,6 +55,8 @@ public class ANNISUserConfigurationManager
   private final Map<String, Group> groups = new TreeMap<>();
 
   private Date lastTimeReloaded = null;
+  
+  private Set<String> useShortenerWithoutLogin;
   
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -381,4 +384,16 @@ public class ANNISUserConfigurationManager
       lock.writeLock().unlock();
     }
   }
+
+  public Set<String> getUseShortenerWithoutLogin()
+  {
+    return useShortenerWithoutLogin;
+  }
+
+  public void setUseShortenerWithoutLogin(Set<String> useShortenerWithoutLogin)
+  {
+    this.useShortenerWithoutLogin = useShortenerWithoutLogin;
+  }
+
+  
 }
