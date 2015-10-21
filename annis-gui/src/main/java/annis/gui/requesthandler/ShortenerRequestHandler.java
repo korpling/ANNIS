@@ -55,7 +55,8 @@ public class ShortenerRequestHandler implements RequestHandler
       ServletResponse servletResponse = ((VaadinServletResponse) response).getResponse();
       if(servletResponse instanceof HttpServletResponse)
       {    
-        ((HttpServletResponse) servletResponse).sendRedirect(request.getContextPath() +  longURL);
+        HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+        httpResponse.sendRedirect(httpResponse.encodeRedirectURL(request.getContextPath() +  longURL));
         return true;
       }
     }
