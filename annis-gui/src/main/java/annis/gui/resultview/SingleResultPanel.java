@@ -16,10 +16,13 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
+import annis.gui.AnnisUI;
 import annis.gui.ShareSingleMatchGenerator;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
+import annis.gui.SearchView;
 import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
 import static annis.libgui.Helper.calculateMarkedAndCoveredIDs;
 import annis.libgui.InstanceConfig;
@@ -93,6 +96,8 @@ public class SingleResultPanel extends CssLayout implements
   private Map<String, String> markedExactMap;
 
   private final PluginSystem ps;
+  
+  private final AnnisUI ui;
 
   private List<VisualizerPanel> visualizers;
   private List<ResolverEntry> resolverEntries;
@@ -138,11 +143,13 @@ public class SingleResultPanel extends CssLayout implements
     Match match,
     long resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
+    AnnisUI ui,
     Set<String> visibleTokenAnnos, String segmentationName,
     QueryController controller, InstanceConfig instanceConfig,
     PagedResultQuery query)
   {
     this.ps = ps;
+    this.ui = ui;
     this.result = result;
     this.segmentationName = segmentationName;
     this.queryController = controller;
@@ -321,6 +328,11 @@ public class SingleResultPanel extends CssLayout implements
   
   private void showEmbeddedVisGenerator()
   {
+    // select the current match
+    ui.getQueryState().getSelectedMatches().getValue().clear();
+    ui.getQueryState().getSelectedMatches().getValue().add(resultNumber);
+    ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
+    
     Window window = new Window();
     window.setWidth(70, Unit.EM);
     window.setHeight(45, Unit.EM);

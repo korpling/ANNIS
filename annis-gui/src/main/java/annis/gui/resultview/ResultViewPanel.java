@@ -362,7 +362,7 @@ public class ResultViewPanel extends VerticalLayout implements
       }
       
       SingleResultPanel panel = new SingleResultPanel(doc, m,
-        i + globalOffset, new ResolverProviderImpl(cacheResolver), ps,
+        i + globalOffset, new ResolverProviderImpl(cacheResolver), ps, sui,
         getVisibleTokenAnnos(), segmentationName, controller,
         instanceConfig, initialQuery);
 
