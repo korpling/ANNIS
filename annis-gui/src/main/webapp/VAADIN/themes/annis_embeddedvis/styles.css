@@ -13746,6 +13746,10 @@ div.v-layout.v-horizontal.v-widget {
 	background-color: #81b8ff;
 }
 
+.annis_embeddedvis .selected .info-bar .path-label {
+	text-decoration: underline;
+}
+
 .annis_embeddedvis .v-menubar-popup .v-menubar-menuitem-huge, .annis_embeddedvis .v-menubar-popup .v-menubar-menuitem-huge-selected {
 	line-height: 40px;
 }

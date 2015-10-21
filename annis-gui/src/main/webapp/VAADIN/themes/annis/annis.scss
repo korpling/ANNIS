@@ -258,7 +258,10 @@ $font-size: 10pt;
   
   .selected .info-bar {
       background-color: rgb(129, 184, 255);
-    }
+      .path-label {
+        text-decoration: underline;
+      }
+   }
 
   $huge-menubar-height: 40px;
 

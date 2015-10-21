@@ -222,6 +222,7 @@ public class SingleResultPanel extends CssLayout implements
     sb.append(" - ").append(minMax.max).append(")");
 
     Label lblPath = new Label(sb.toString());
+    lblPath.addStyleName("path-label");
 
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
