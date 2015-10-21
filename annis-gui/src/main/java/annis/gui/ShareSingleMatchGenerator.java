@@ -173,7 +173,7 @@ public class ShareSingleMatchGenerator extends Panel implements
     
     String shortID = res.post(String.class, localURL);
     
-    return UriBuilder.fromUri(original).replacePath(appContext).replaceQuery(
+    return UriBuilder.fromUri(original).replacePath(appContext+"/").replaceQuery(
       "").fragment("").queryParam("id",
       shortID).build().toASCIIString();
     
