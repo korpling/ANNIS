@@ -121,8 +121,7 @@
     <property name="fetchSize" value="0"/>
   </bean>
 
-  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter" lazy-init="true">
-    <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
+  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter" lazy-init="true" parent="daoBase">
     <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
   </bean>
 
