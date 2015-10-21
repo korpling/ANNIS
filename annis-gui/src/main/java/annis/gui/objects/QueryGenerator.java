@@ -17,10 +17,10 @@ package annis.gui.objects;
 
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.OrderType;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Helper class to construct new {@link Query} objects (or one of the child classes)
@@ -127,8 +127,7 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     
     public PagedQueryGenerator selectedMatches(Set<Long> selected)
     {
-      getCurrent().getSelectedMatches().clear();
-      getCurrent().getSelectedMatches().addAll(selected);
+      getCurrent().setSelectedMatches(selected == null ? new TreeSet<Long>() : selected);
       return (PagedQueryGenerator) this;
     }
   }

@@ -67,6 +67,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -341,11 +342,17 @@ public class QueryController implements Serializable
       .build();
   }
 
-  public void executeSearch(boolean replaceOldTab, boolean startFromFirstPage)
+  /**
+   * Executes a query.
+   * @param replaceOldTab
+   * @param freshQuery If true the offset and the selected matches are reset before executing the query. 
+   */
+  public void executeSearch(boolean replaceOldTab, boolean freshQuery)
   {
-    if (startFromFirstPage)
+    if (freshQuery)
     {
       getState().getOffset().setValue(0l);
+      getState().getSelectedMatches().setValue(new TreeSet<Long>());
     }
     // construct a query from the current properties
     PagedResultQuery pagedQuery = getSearchQuery();
