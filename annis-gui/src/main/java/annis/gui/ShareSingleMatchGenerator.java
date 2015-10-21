@@ -24,6 +24,7 @@ import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
@@ -151,8 +152,31 @@ public class ShareSingleMatchGenerator extends Panel implements
   
   private String shortenURL(URI original)
   {
-    return "";
-    //String appContext = Helper.getContext();
+    WebResource res = Helper.getAnnisWebResource().path("shortener");
+    String appContext = Helper.getContext();
+    
+    String path = original.getRawPath();
+    if(path.startsWith(appContext))
+    {
+      path = path.substring(appContext.length());
+    }
+    
+    String localURL = path;
+    if(original.getRawQuery() != null)
+    {
+      localURL = localURL + "?" + original.getRawQuery();
+    }
+    if(original.getRawFragment() != null)
+    {
+      localURL = localURL + "#" + original.getRawFragment();
+    }
+    
+    String shortID = res.post(String.class, localURL);
+    
+    return UriBuilder.fromUri(original).replacePath(appContext).replaceQuery(
+      "").fragment("").queryParam("id",
+      shortID).build().toASCIIString();
+    
   }
   
   private URI generatorURLForVisualizer(ResolverEntry entry)
@@ -279,9 +303,10 @@ public class ShareSingleMatchGenerator extends Panel implements
       generatedLinks.setVisible(true);
       
       URI url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
-      directURL.setValue(url.toASCIIString());
-      iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + url + "\"></iframe>");
-      preview.setSource(new ExternalResource(url.toASCIIString()));
+      String shortURL = shortenURL(url);
+      directURL.setValue(shortURL);
+      iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + shortURL + "\"></iframe>");
+      preview.setSource(new ExternalResource(shortURL));
     }
   }
   
