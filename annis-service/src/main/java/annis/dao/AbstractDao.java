@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
+import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -167,6 +168,23 @@ public abstract class AbstractDao
   {
     return jdbcTemplate;
   }
+
+  public void setJdbcTemplate(JdbcTemplate jdbcTemplate)
+  {
+    this.jdbcTemplate = jdbcTemplate;
+    DataSource dsArg = jdbcTemplate.getDataSource();
+    if(dsArg instanceof DynamicDataSource)
+    {
+      this.dataSource = (DynamicDataSource) dsArg;
+    }
+    else
+    {
+      this.dataSource = new DynamicDataSource();
+      this.dataSource.setInnerDataSource(dsArg);
+    }
+  }
+  
+  
   
   public DynamicDataSource getDataSource()
   {

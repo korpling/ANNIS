@@ -75,7 +75,7 @@ public class BenchmarkTest
   @Rule
   public TestRule benchmarkRun = new BenchmarkRule();
 
-  @Resource(name = "annisDao")
+  @Resource(name = "queryDao")
   QueryDao annisDao;
 
   private List<Long> pcc2CorpusID;
@@ -96,9 +96,9 @@ public class BenchmarkTest
 
     try
     {
-      assumeNotNull(springAnnisDao.getSimpleJdbcTemplate());
+      assumeNotNull(springAnnisDao.getJdbcTemplate());
 
-      springAnnisDao.getSimpleJdbcTemplate().queryForInt("SELECT 1");
+      springAnnisDao.getJdbcTemplate().queryForInt("SELECT 1");
 
     }
     catch (DataAccessException ex)

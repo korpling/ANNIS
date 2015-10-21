@@ -57,7 +57,7 @@ public class CountTest
 
   Logger log = LoggerFactory.getLogger(CountTest.class);
 
-  @Resource(name = "annisDao")
+  @Resource(name = "queryDao")
   QueryDao annisDao;
 
   private List<Long> pcc2CorpusID;
@@ -72,9 +72,9 @@ public class CountTest
 
     try
     {
-      assumeNotNull(springAnnisDao.getSimpleJdbcTemplate());
+      assumeNotNull(springAnnisDao.getJdbcTemplate());
 
-      springAnnisDao.getSimpleJdbcTemplate().queryForInt("SELECT 1");
+      springAnnisDao.getJdbcTemplate().queryForInt("SELECT 1");
 
     }
     catch (DataAccessException ex)

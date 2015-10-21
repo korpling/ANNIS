@@ -140,8 +140,13 @@
     
   <!-- BEGIN EXPORTS -->
 
+  <bean id="daoBase" class="annis.dao.AbstractDao" abstract="true" lazy-init="true">
+    <property name="scriptPath" value="$dev{annis.script-path}"/>
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+
   <!-- exported bean: QueryDao -->
-  <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true">
+  <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true" parent="daoBase">
 
     <!-- configuration -->
     <property name="timeout" value="${annis.sql-timeout}"/>
@@ -155,7 +160,6 @@
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
 
     <property name="rawTextHelper" ref="rawTextSqlHelper" />
-    <property name="dataSource" ref="dataSource"/>
 
     <property name="aqlParser" ref="annisParserAntlr"/>
     <property name="sqlGenerator" ref="findSqlGenerator"/>
@@ -191,10 +195,9 @@
   </bean>
  
   <!-- exported Database API for administration tasks -->
- <bean id="adminDaoBase" class="annis.administration.AbstractAdminstrationDao" abstract="true" lazy-init="true">
-  <property name="scriptPath" value="$dev{annis.script-path}"/>
+ <bean id="adminDaoBase" class="annis.administration.AbstractAdminstrationDao" abstract="true" lazy-init="true"
+   parent="daoBase">
   <property name="externalFilesPath" value="${annis.external-data-path}"/>
-  <property name="dataSource" ref="dataSource" />
   <property name="queryDao" ref="queryDao" />
  </bean>
 

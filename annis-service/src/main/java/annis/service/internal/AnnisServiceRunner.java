@@ -346,7 +346,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
     if(ctx != null)
     {
-      QueryDao dao = (QueryDao) ctx.getBean("annisDao");
+      QueryDao dao = (QueryDao) ctx.getBean("queryDao");
       if(dao != null)
       {
         dao.setTimeout(milliseconds);
@@ -358,7 +358,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
     if(ctx != null)
     {
-      QueryDao dao = (QueryDao) ctx.getBean("annisDao");
+      QueryDao dao = (QueryDao) ctx.getBean("queryDao");
       if(dao != null)
       {
         return dao.getTimeout();
