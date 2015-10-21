@@ -52,6 +52,7 @@ public class SchemeFixer
   {
     log.info("fixing schema if necessary");
     corpusAlias();
+    urlShortener();
   }
   
   protected void corpusAlias()
