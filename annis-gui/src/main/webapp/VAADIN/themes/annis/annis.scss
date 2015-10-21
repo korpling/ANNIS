@@ -255,6 +255,10 @@ $font-size: 10pt;
     border-color: black;
     border-width: 1px 0px 0px 0px;
   }
+  
+  .selected .info-bar {
+      background-color: #E79FDC;
+    }
 
   $huge-menubar-height: 40px;
 

@@ -12676,6 +12676,10 @@ div.v-layout.v-horizontal.v-widget {
 	border-width: 1px 0px 0px 0px;
 }
 
+.annis .selected .info-bar {
+	background-color: #E79FDC;
+}
+
 .annis .v-menubar-popup .v-menubar-menuitem-huge, .annis .v-menubar-popup .v-menubar-menuitem-huge-selected {
 	line-height: 40px;
 }
