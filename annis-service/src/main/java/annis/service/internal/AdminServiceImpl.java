@@ -90,6 +90,11 @@ public class AdminServiceImpl implements AdminService
 
   public void init()
   {
+    // check scheme at each service startup
+    if(corpusAdmin.getSchemeFixer() != null)
+    {
+      corpusAdmin.getSchemeFixer().checkAndFix();
+    }
     importWorker.start();
   }
 

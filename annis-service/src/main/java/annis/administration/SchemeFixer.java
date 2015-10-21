@@ -50,9 +50,10 @@ public class SchemeFixer
    */
   public void checkAndFix()
   {
-    log.info("fixing schema if necessary");
+    log.info("testing if fixing schema is necessary");
     corpusAlias();
     urlShortener();
+    log.info("finished schema test");
   }
   
   protected void corpusAlias()

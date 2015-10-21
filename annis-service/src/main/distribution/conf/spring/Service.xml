@@ -17,7 +17,7 @@
   
   <!-- AdminService -->
   <bean id="adminService" class="annis.service.internal.AdminServiceImpl" 
-        init-method="init" lazy-init="true">
+        init-method="init" lazy-init="false">
     <property name="adminDao" ref="administrationDao"/>
     <property name="importWorker" ref="importWorker" />
     <property name="queryDao" ref="queryDao" />
