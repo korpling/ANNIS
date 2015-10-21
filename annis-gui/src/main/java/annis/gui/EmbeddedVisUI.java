@@ -20,6 +20,7 @@ import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.util.ANNISFontIcon;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
 import annis.libgui.LoginDataLostException;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
@@ -80,6 +81,7 @@ public class EmbeddedVisUI extends CommonUI
   public static final String KEY_SEARCH_INTERFACE =  KEY_PREFIX +  "interface";
   public static final String KEY_BASE_TEXT =  KEY_PREFIX +  "base";
   public static final String KEY_MATCH =  KEY_PREFIX +  "match";
+  public static final String KEY_INSTANCE =  KEY_PREFIX +  "instance";
 
   public EmbeddedVisUI()
   {
@@ -189,9 +191,26 @@ public class EmbeddedVisUI extends CommonUI
         displayMessage("No documents found in provided URL.", "");
         return;
       }
+      
+      if(args.containsKey(KEY_INSTANCE))
+      {
+        Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
+        InstanceConfig newConfig = allConfigs.get(args.get(KEY_INSTANCE)[0]);
+        if(newConfig != null)
+        {
+          setInstanceConfig(newConfig);
+        }
+      }
+      // now it is time to load the actual defined instance fonts
+      loadInstanceFonts();
+      
       // generate the visualizer
       VisualizerInput visInput = new VisualizerInput();
       visInput.setDocument(doc);
+      if (getInstanceConfig() != null && getInstanceConfig().getFont() != null)
+      {
+        visInput.setFont(getInstanceFont());
+      }
       Properties mappings = new Properties();
       for(Map.Entry<String, String[]> e : args.entrySet())
       {

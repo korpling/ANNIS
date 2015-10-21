@@ -50,7 +50,7 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class ShareSingleMatchGenerator extends Panel implements Property.ValueChangeListener,
+public class ShareSingleMatchGenerator extends Panel implements
   SelectionEvent.SelectionListener
 {
   private final VerticalLayout layout;
@@ -149,10 +149,18 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     setSizeFull();
   }
   
-  private String generatorURLForVisualizer(ResolverEntry entry)
+  private String shortenURL(URI original)
   {
+    return "";
+    //String appContext = Helper.getContext();
+  }
+  
+  private URI generatorURLForVisualizer(ResolverEntry entry)
+  {
+    String appContext = Helper.getContext();
     URI appURI = UI.getCurrent().getPage().getLocation();
     UriBuilder result = UriBuilder.fromUri(appURI)
+      .replacePath(appContext)
       .path("embeddedvis")
       .path(Helper.encodeJersey(entry.getVisType()))
       .fragment("");
@@ -160,6 +168,16 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     {
       result = result.queryParam("embedded_ns", 
         Helper.encodeJersey(entry.getNamespace()));
+    }
+    // test if the request was made from a sub-instance
+    String nonContextPath = appURI.getPath().substring(appContext.length());
+    if(!nonContextPath.isEmpty())
+    {
+      if(nonContextPath.startsWith("/"))
+      {
+        nonContextPath = nonContextPath.substring(1);
+      }
+      result = result.queryParam(EmbeddedVisUI.KEY_INSTANCE, nonContextPath);
     }
     
     UriBuilder serviceURL =
@@ -244,17 +262,9 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
       }
     }
     
-    return result.build().toASCIIString();
+    return result.build();
   }
 
-  @Override
-  public void valueChange(Property.ValueChangeEvent event)
-  {
-    String url = generatorURLForVisualizer((ResolverEntry) event.getProperty().getValue());
-    directURL.setValue(url);
-    iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + url + "\"></iframe>");
-    preview.setSource(new ExternalResource(url));
-  }
 
   @Override
   public void select(SelectionEvent event)
@@ -268,10 +278,10 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     {
       generatedLinks.setVisible(true);
       
-      String url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
-      directURL.setValue(url);
+      URI url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
+      directURL.setValue(url.toASCIIString());
       iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + url + "\"></iframe>");
-      preview.setSource(new ExternalResource(url));
+      preview.setSource(new ExternalResource(url.toASCIIString()));
     }
   }
   

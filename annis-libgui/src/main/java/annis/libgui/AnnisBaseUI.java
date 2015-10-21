@@ -205,7 +205,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   protected Map<String, InstanceConfig> loadInstanceConfig()
   {
-    TreeMap<String, InstanceConfig> result = new TreeMap<String, InstanceConfig>();
+    TreeMap<String, InstanceConfig> result = new TreeMap<>();
 
 
     // get a list of all directories that contain instance informations
