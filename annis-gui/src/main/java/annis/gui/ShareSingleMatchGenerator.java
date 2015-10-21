@@ -125,7 +125,7 @@ public class ShareSingleMatchGenerator extends Panel implements
     visSelector.addSelectionListener(ShareSingleMatchGenerator.this);
     visSelector.select(visContainer.getIdByIndex(0));
     visSelector.setWidth("300px");
-
+    visSelector.getColumn("displayName").setSortable(false);
     
     generatedLinks.setSizeFull();
     
