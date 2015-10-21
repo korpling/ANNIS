@@ -25,6 +25,7 @@ import com.vaadin.server.VaadinSession;
 import java.io.IOException;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.http.HttpStatus;
 
 /**
  *
@@ -56,7 +57,8 @@ public class ShortenerRequestHandler implements RequestHandler
       if(servletResponse instanceof HttpServletResponse)
       {    
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
-        httpResponse.sendRedirect(request.getContextPath() +  longURL);
+        httpResponse.setHeader("Location", request.getContextPath() +  longURL);
+        httpResponse.setStatus(307); // temporary redirect
         return true;
       }
     }
