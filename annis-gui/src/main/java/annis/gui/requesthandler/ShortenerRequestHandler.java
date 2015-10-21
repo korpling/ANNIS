@@ -56,7 +56,7 @@ public class ShortenerRequestHandler implements RequestHandler
       if(servletResponse instanceof HttpServletResponse)
       {    
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
-        httpResponse.sendRedirect(httpResponse.encodeRedirectURL(request.getContextPath() +  longURL));
+        httpResponse.sendRedirect(request.getContextPath() +  longURL);
         return true;
       }
     }
