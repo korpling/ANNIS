@@ -904,10 +904,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   @Transactional(readOnly = true)
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request)
   {
-    try
+    try(Connection conn = getDataSource().getConnection())
     {
       ResolverDaoHelper helper = new ResolverDaoHelper();
-      PreparedStatement stmt = helper.createPreparedStatement(getDataSource().getConnection());
+      PreparedStatement stmt = helper.createPreparedStatement(conn);
       helper.fillPreparedStatement(request, stmt);
       List<ResolverEntry> result = helper.extractData(stmt.executeQuery());
       return result;
