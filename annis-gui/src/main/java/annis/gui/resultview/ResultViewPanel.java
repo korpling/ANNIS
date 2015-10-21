@@ -32,7 +32,6 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
-import annis.service.objects.MatchGroup;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
@@ -50,7 +49,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -81,38 +79,38 @@ public class ResultViewPanel extends VerticalLayout implements
 
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
-  private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
+  private final Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
   public static final String FILESYSTEM_CACHE_RESULT
     = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
 
   public static final String MAPPING_HIDDEN_ANNOS = "hidden_annos";
 
-  private PagingComponent paging;
+  private final PagingComponent paging;
 
-  private PluginSystem ps;
+  private final PluginSystem ps;
 
-  private MenuItem miTokAnnos;
+  private final MenuItem miTokAnnos;
 
-  private MenuItem miSegmentation;
+  private final MenuItem miSegmentation;
 
-  private TreeMap<String, Boolean> tokenAnnoVisible;
+  private final TreeMap<String, Boolean> tokenAnnoVisible;
 
-  private QueryController controller;
+  private final QueryController controller;
 
   private String selectedSegmentationLayer;
 
-  private Set<String> segmentationLayerSet
+  private final Set<String> segmentationLayerSet
     = Collections.synchronizedSet(new TreeSet<String>());
 
-  private Set<String> tokenAnnotationLevelSet
+  private final Set<String> tokenAnnotationLevelSet
     = Collections.synchronizedSet(new TreeSet<String>());
 
-  private InstanceConfig instanceConfig;
+  private final InstanceConfig instanceConfig;
 
-  private CssLayout resultLayout;
+  private final CssLayout resultLayout;
 
-  private List<SingleResultPanel> resultPanelList;
+  private final List<SingleResultPanel> resultPanelList;
 
   private String segmentationName;
 
@@ -124,7 +122,7 @@ public class ResultViewPanel extends VerticalLayout implements
   private transient BlockingQueue<SaltProject> projectQueue;
 
   private PagedResultQuery currentQuery;
-  private PagedResultQuery initialQuery;
+  private final PagedResultQuery initialQuery;
   private final AnnisUI sui;
 
   public ResultViewPanel(AnnisUI ui,

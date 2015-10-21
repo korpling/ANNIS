@@ -158,6 +158,11 @@ public class SingleResultPanel extends CssLayout implements
     setWidth("100%");
     setHeight("-1px");
 
+    if(query.getSelectedMatches().contains(resultNumber))
+    {
+      addStyleName("selected");
+    }
+    
     infoBar = new HorizontalLayout();
     infoBar.addStyleName("info-bar");
     infoBar.setWidth("100%");

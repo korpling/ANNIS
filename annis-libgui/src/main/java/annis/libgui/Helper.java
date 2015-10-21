@@ -26,6 +26,7 @@ import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
+import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.html.HtmlEscapers;
@@ -383,13 +384,14 @@ public class Helper
     int start, int limit)
   {
     return citationFragment(aql, corpora, contextLeft, contextRight,
-      segmentation, start, limit, OrderType.ascending);
+      segmentation, start, limit, OrderType.ascending, null);
   }
 
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
     String segmentation,
-    long start, int limit, OrderType order)
+    long start, int limit, OrderType order,
+    Set<Long> selectedMatches)
   {
     List<String> result = new ArrayList<>();
     try
@@ -413,6 +415,10 @@ public class Helper
       if (order != OrderType.ascending && order != null)
       {
         result.add("o=" + order.toString());
+      }
+      if(selectedMatches != null && !selectedMatches.isEmpty())
+      {
+        result.add("m=" + Joiner.on(',').join(selectedMatches));
       }
     }
     catch (UnsupportedEncodingException ex)

@@ -17,8 +17,11 @@ package annis.gui.objects;
 
 import annis.service.objects.OrderType;
 import com.google.common.base.Preconditions;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +37,7 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
   private long offset;
   private int limit;
   private OrderType order = OrderType.ascending;
+  private Set<Long> selectedMatches = new TreeSet<>();
 
   public PagedResultQuery()
   {
@@ -85,7 +89,17 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     this.order = order;
   }
 
-  
+  public Set<Long> getSelectedMatches()
+  {
+    return selectedMatches;
+  }
+
+  public void setSelectedMatches(Set<Long> selectedMatches)
+  {
+    Preconditions.checkNotNull(selectedMatches, "The selected matches set of a paged result query must never be null (but can be empty)");
+    this.selectedMatches = selectedMatches;
+  }
+
   
   @Override
   public PagedResultQuery clone()
@@ -107,7 +121,7 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
   public int hashCode()
   {
     return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(), 
-      getLimit(), getOffset(), getOrder());
+      getLimit(), getOffset(), getOrder(), getSelectedMatches());
   }
 
   @Override
@@ -130,6 +144,7 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
       && Objects.equals(getSegmentation(), other.getSegmentation())
       && Objects.equals(getLimit(), other.getLimit())
       && Objects.equals(getOffset(), other.getOffset())
-      && Objects.equals(getOrder(), other.getOrder());
+      && Objects.equals(getOrder(), other.getOrder())
+      && Objects.equals(getSelectedMatches(), other.getSelectedMatches());
   }
 }

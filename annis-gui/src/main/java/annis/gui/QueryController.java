@@ -290,6 +290,7 @@ public class QueryController implements Serializable
       state.getOffset().setValue(((PagedResultQuery) q).getOffset());
       state.getLimit().setValue(((PagedResultQuery) q).getLimit());
       state.getOrder().setValue(((PagedResultQuery) q).getOrder());
+      state.getSelectedMatches().setValue(((PagedResultQuery) q).getSelectedMatches());
     }
     if (q instanceof ExportQuery)
     {
@@ -317,6 +318,7 @@ public class QueryController implements Serializable
       .limit(state.getLimit().getValue())
       .offset(state.getOffset().getValue())
       .order(state.getOrder().getValue())
+      .selectedMatches(state.getSelectedMatches().getValue())
       .build();
   }
 

@@ -41,6 +41,7 @@ import annis.service.objects.OrderType;
 import com.google.common.base.Strings;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
+import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -639,6 +640,23 @@ public class SearchView extends GridLayout implements View,
             Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
             args.get("seg"),
             args.get("q"), corpora);
+          
+          String matchSelectionRaw = args.get("m");
+          if(matchSelectionRaw != null)
+          {
+            for(String selectedMatchNr : Splitter.on(',').omitEmptyStrings().trimResults().split(matchSelectionRaw))
+            {
+              try
+              {
+                long nr = Long.parseLong(selectedMatchNr);
+                query.getSelectedMatches().add(nr);
+              }
+              catch(NumberFormatException ex)
+              {
+                log.warn("Invalid long provided as selected match", ex);
+              }
+            }
+          }
 
           if (args.get("o") != null)
           {
@@ -673,7 +691,7 @@ public class SearchView extends GridLayout implements View,
   }
 
   /**
-   * Updates the browser address bar with the current query paramaters and the
+   * Updates the browser address bar with the current query parameters and the
    * query itself.
    *
    * This is for convenient reloading the vaadin app and easy copying citation
@@ -685,7 +703,8 @@ public class SearchView extends GridLayout implements View,
   {
     List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(),
       q.getLeftContext(), q.getRightContext(),
-      q.getSegmentation(), q.getOffset(), q.getLimit(), q.getOrder());
+      q.getSegmentation(), q.getOffset(), q.getLimit(), q.getOrder(),
+      q.getSelectedMatches());
 
     // set our fragment
     lastEvaluatedFragment = StringUtils.join(args, "&");

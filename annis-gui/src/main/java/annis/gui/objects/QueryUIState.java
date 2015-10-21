@@ -56,6 +56,9 @@ public class QueryUIState implements Serializable
   
   private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
   
+  private final ObjectProperty<Set<Long>> selectedMatches = 
+    new ObjectProperty<Set<Long>>(new TreeSet<Long>());
+  
   private final ObjectProperty<String> exporterName = new ObjectProperty<>("");
   private final ObjectProperty<List<String>> exportAnnotationKeys 
     = new ObjectProperty<List<String>>(new ArrayList<String>());
@@ -119,6 +122,11 @@ public class QueryUIState implements Serializable
   public ObjectProperty<Long> getOffset()
   {
     return offset;
+  }
+
+  public ObjectProperty<Set<Long>> getSelectedMatches()
+  {
+    return selectedMatches;
   }
   
   public ObjectProperty<String> getBaseText()
