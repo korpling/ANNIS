@@ -27,7 +27,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.subject.Subject;
@@ -90,7 +92,12 @@ public class URLShortenerImpl
   @Produces(value = "text/plain")
   public String getLong(@PathParam("id") String id)
   {
-    return shortenerDao.getLong(id);
+    String result = shortenerDao.getLong(id);
+    if(result == null)
+    {
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
+    }
+    return result;
   }
 
   public ShortenerDao getShortenerDao()

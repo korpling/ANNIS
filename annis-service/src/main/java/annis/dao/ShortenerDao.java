@@ -77,8 +77,9 @@ public class ShortenerDao extends AbstractDao
   @Transactional(readOnly = true)
   public String getLong(String id)
   {
-    return getJdbcTemplate().queryForObject(
+    List<String> result = getJdbcTemplate().queryForList(
       "SELECT url FROM url_shortener WHERE id=? LIMIT 1", String.class, idToInternal(id));
+    return result.isEmpty() ? null : result.get(0);
   }
   
   private String getID(String str)
