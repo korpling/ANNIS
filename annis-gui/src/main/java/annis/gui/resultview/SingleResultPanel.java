@@ -46,6 +46,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
@@ -168,6 +169,7 @@ public class SingleResultPanel extends CssLayout implements
     if(query.getSelectedMatches().contains(resultNumber))
     {
       addStyleName("selected");
+      JavaScript.eval("$(\".v-panel-content-result-view-panel\").animate({scrollTop: $(\".selected\").offset().top - $(\".result-view-panel\").offset().top}, 2000);");
     }
     
     infoBar = new HorizontalLayout();
