@@ -166,7 +166,8 @@ public class SingleResultPanel extends CssLayout implements
     setWidth("100%");
     setHeight("-1px");
 
-    if(query.getSelectedMatches().contains(resultNumber))
+    if(query != null 
+      && query.getSelectedMatches().contains(resultNumber))
     {
       addStyleName("selected");
       JavaScript.eval("$(\".v-panel-content-result-view-panel\").animate({scrollTop: $(\".selected\").offset().top - $(\".result-view-panel\").offset().top}, 2000);");
@@ -332,9 +333,12 @@ public class SingleResultPanel extends CssLayout implements
   private void showEmbeddedVisGenerator()
   {
     // select the current match
-    ui.getQueryState().getSelectedMatches().getValue().clear();
-    ui.getQueryState().getSelectedMatches().getValue().add(resultNumber);
-    ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
+    if(ui != null)
+    {
+      ui.getQueryState().getSelectedMatches().getValue().clear();
+      ui.getQueryState().getSelectedMatches().getValue().add(resultNumber);
+      ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
+    }
     
     Window window = new Window();
     window.setWidth(70, Unit.EM);
