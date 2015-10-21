@@ -124,7 +124,17 @@ public class ANNISUserConfigurationManager
   public ImmutableMap<String, Group> getGroups()
   {
     checkConfiguration();
-    return ImmutableMap.copyOf(groups);
+    ImmutableMap<String, Group> result = ImmutableMap.of();
+    lock.readLock().lock();
+    try
+    {
+      result = ImmutableMap.copyOf(groups);
+    }
+    finally
+    {
+      lock.readLock().unlock();
+    }
+    return result;
   }
   
   public boolean writeGroup(Group group)
