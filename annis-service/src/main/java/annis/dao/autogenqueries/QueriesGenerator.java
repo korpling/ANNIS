@@ -16,7 +16,7 @@
 package annis.dao.autogenqueries;
 
 import annis.GraphHelper;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisCorpus;
@@ -49,7 +49,7 @@ public class QueriesGenerator
   private final Logger log = LoggerFactory.getLogger(QueriesGenerator.class);
 
   // for executing AQL queries
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
 
   // only contains one element: the top level corpus id of the imported corpus
   private List<Long> corpusIds;
@@ -347,7 +347,7 @@ public class QueriesGenerator
   /**
    * @return the annisDao
    */
-  public AnnisDao getAnnisDao()
+  public QueryDao getAnnisDao()
   {
     return annisDao;
   }
@@ -355,7 +355,7 @@ public class QueriesGenerator
   /**
    * @param annisDao the annisDao to set
    */
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setAnnisDao(QueryDao annisDao)
   {
     this.annisDao = annisDao;
   }

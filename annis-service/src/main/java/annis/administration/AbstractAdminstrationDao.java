@@ -15,7 +15,7 @@
  */
 package annis.administration;
 
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.utils.DynamicDataSource;
 import java.io.BufferedReader;
 import java.io.File;
@@ -58,7 +58,7 @@ public abstract class AbstractAdminstrationDao
   private String scriptPath;
   private StatementController statementController;
   private DynamicDataSource dataSource;
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
 
   protected boolean lockRepositoryMetadataTable(boolean waitForOtherTasks)
   {
@@ -355,12 +355,12 @@ public abstract class AbstractAdminstrationDao
 
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getAnnisDao()
   {
     return annisDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setAnnisDao(QueryDao annisDao)
   {
     this.annisDao = annisDao;
   }

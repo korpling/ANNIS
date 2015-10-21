@@ -18,7 +18,7 @@ package annis.service.internal;
 
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import java.net.URI;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.POST;
@@ -45,7 +45,7 @@ public class URLShortenerImpl
   private final static Logger log = LoggerFactory.getLogger(URLShortenerImpl.class);
   
   private AdministrationDao adminDao;
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
   private CorpusAdministration corpusAdmin;
   
   @Context
@@ -95,12 +95,12 @@ public class URLShortenerImpl
     this.adminDao = adminDao;
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getAnnisDao()
   {
     return annisDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setAnnisDao(QueryDao annisDao)
   {
     this.annisDao = annisDao;
   }

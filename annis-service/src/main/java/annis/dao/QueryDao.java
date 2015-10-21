@@ -43,7 +43,7 @@ import java.util.Properties;
 import java.util.UUID;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-public interface AnnisDao
+public interface QueryDao
 {
 
   public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,

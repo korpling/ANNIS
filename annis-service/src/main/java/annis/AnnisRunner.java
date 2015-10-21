@@ -15,7 +15,7 @@
  */
 package annis;
 
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.dao.MetaDataFilter;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.dao.objects.AnnotatedMatch;
@@ -92,7 +92,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private FrequencySqlGenerator frequencySqlGenerator;
   // dependencies
 
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
 
   private int context;
 
@@ -1278,12 +1278,12 @@ public class AnnisRunner extends AnnisBaseRunner
     this.annisParser = annisParser;
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getAnnisDao()
   {
     return annisDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setAnnisDao(QueryDao annisDao)
   {
     this.annisDao = annisDao;
   }

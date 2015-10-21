@@ -19,7 +19,7 @@ import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
 import annis.UsageException;
 import annis.corpuspathsearch.Search;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.utils.Utils;
 import com.google.common.base.Preconditions;
@@ -53,7 +53,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   // API for corpus administration
 
   private CorpusAdministration corpusAdministration;
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
 
   private QueriesGenerator queriesGenerator;
   
@@ -717,12 +717,12 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     this.corpusAdministration = administration;
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getAnnisDao()
   {
     return annisDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setAnnisDao(QueryDao annisDao)
   {
     this.annisDao = annisDao;
   }

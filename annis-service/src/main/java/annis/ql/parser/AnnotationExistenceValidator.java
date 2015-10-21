@@ -15,7 +15,7 @@
  */
 package annis.ql.parser;
 
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.AqlParseError;
 import annis.model.QueryAnnotation;
@@ -45,7 +45,7 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
   private final static Logger log = LoggerFactory.getLogger(
     AnnotationExistenceValidator.class);
 
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
 
   @Override
   public QueryData transform(QueryData data)
@@ -106,14 +106,14 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
 
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getAnnisDao()
   {
 
     return annisDao;
 
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setAnnisDao(QueryDao annisDao)
   {
 
     this.annisDao = annisDao;

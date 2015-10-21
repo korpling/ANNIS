@@ -19,7 +19,7 @@ package annis.service.internal;
 import annis.CommonHelper;
 import annis.GraphHelper;
 import annis.WekaHelper;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -105,7 +105,7 @@ public class QueryServiceImpl implements QueryService
 
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
 
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
 
   private WekaHelper wekaHelper;
 
@@ -1085,12 +1085,12 @@ public class QueryServiceImpl implements QueryService
     return result;
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getAnnisDao()
   {
     return annisDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setAnnisDao(QueryDao annisDao)
   {
     this.annisDao = annisDao;
   }

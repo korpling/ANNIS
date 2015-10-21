@@ -15,8 +15,8 @@
  */
 package annis;
 
-import annis.dao.AnnisDao;
-import annis.dao.SpringAnnisDao;
+import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
 import annis.provider.SaltProjectProvider;
 import annis.test.TestHelper;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
@@ -76,7 +76,7 @@ public class BenchmarkTest
   public TestRule benchmarkRun = new BenchmarkRule();
 
   @Resource(name = "annisDao")
-  AnnisDao annisDao;
+  QueryDao annisDao;
 
   private List<Long> pcc2CorpusID;
 
@@ -91,7 +91,7 @@ public class BenchmarkTest
   @Before
   public void setup()
   {
-    SpringAnnisDao springAnnisDao = (SpringAnnisDao) TestHelper.proxyTarget(
+    QueryDaoImpl springAnnisDao = (QueryDaoImpl) TestHelper.proxyTarget(
       annisDao);
 
     try

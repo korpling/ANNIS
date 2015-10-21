@@ -141,7 +141,7 @@
   <!-- BEGIN EXPORTS -->
 
   <!-- exported bean: AnnisDao -->
-  <bean id="annisDao" class="annis.dao.SpringAnnisDao" init-method="init" lazy-init="true">
+  <bean id="annisDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true">
 
     <!-- configuration -->
     <property name="timeout" value="${annis.sql-timeout}"/>

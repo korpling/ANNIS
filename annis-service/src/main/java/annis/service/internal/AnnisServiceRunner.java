@@ -18,7 +18,7 @@ package annis.service.internal;
 import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
 import annis.AnnisXmlContextHelper;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.exceptions.AnnisException;
 import annis.security.MultipleIniWebEnvironment;
 import annis.utils.Utils;
@@ -346,7 +346,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
     if(ctx != null)
     {
-      AnnisDao dao = (AnnisDao) ctx.getBean("annisDao");
+      QueryDao dao = (QueryDao) ctx.getBean("annisDao");
       if(dao != null)
       {
         dao.setTimeout(milliseconds);
@@ -358,7 +358,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
     if(ctx != null)
     {
-      AnnisDao dao = (AnnisDao) ctx.getBean("annisDao");
+      QueryDao dao = (QueryDao) ctx.getBean("annisDao");
       if(dao != null)
       {
         return dao.getTimeout();

@@ -18,7 +18,7 @@ package annis.service.internal;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.administration.DeleteCorpusDao;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
 import annis.security.ANNISUserRealm;
@@ -81,7 +81,7 @@ public class AdminServiceImpl implements AdminService
 
   private CorpusAdministration corpusAdmin;
 
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
 
   private ImportWorker importWorker;
 
@@ -570,12 +570,12 @@ public class AdminServiceImpl implements AdminService
     this.adminDao = adminDao;
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getAnnisDao()
   {
     return annisDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setAnnisDao(QueryDao annisDao)
   {
     this.annisDao = annisDao;
   }

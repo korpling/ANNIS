@@ -69,15 +69,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
   "file:src/main/distribution/conf/spring/SqlGenerator.xml",
   "file:src/main/distribution/conf/spring/Dao.xml"
 }, loader=AnnisXmlContextLoader.class)
-public class TestSpringAnnisDao
+public class TestQueryDaoImpl
 {
   
 
   @Resource(name="annisDao")
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
 
   // simple SpringDao instance with mocked dependencies
-  private SpringAnnisDao simpleAnnisDao;
+  private QueryDaoImpl simpleAnnisDao;
   @Mock
   private AnnisParserAntlr annisParser;
   @Mock
@@ -113,7 +113,7 @@ public class TestSpringAnnisDao
   public void setup()
   {
     initMocks(this);
-    simpleAnnisDao = new SpringAnnisDao();
+    simpleAnnisDao = new QueryDaoImpl();
     simpleAnnisDao.setAqlParser(annisParser);
     simpleAnnisDao.setSqlGenerator(sqlGenerator);
     simpleAnnisDao.setSaltAnnotateExtractor(saltAnnotateExtractor);
@@ -135,7 +135,7 @@ public class TestSpringAnnisDao
   public void springManagedInstanceHasAllDependencies()
   {
 
-    SpringAnnisDao springManagedDao = (SpringAnnisDao) TestHelper.proxyTarget(annisDao);
+    QueryDaoImpl springManagedDao = (QueryDaoImpl) TestHelper.proxyTarget(annisDao);
     assertThat(springManagedDao.getSimpleJdbcTemplate(), is(not(nullValue())));
     assertThat(springManagedDao.getAqlParser(), is(not(nullValue())));
     assertThat(springManagedDao.getSqlGenerator(), is(not(nullValue())));

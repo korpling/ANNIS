@@ -15,7 +15,7 @@
  */
 package annis.service.internal;
 
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.model.Annotation;
 import annis.service.MetadataService;
 import annis.service.objects.AnnisBinaryMetaData;
@@ -43,7 +43,7 @@ public class MetadataServiceImpl implements MetadataService
 
   private Logger log = LoggerFactory.getLogger(MetadataServiceImpl.class);
 
-  private AnnisDao annisDao;
+  private QueryDao annisDao;
 
   @GET
   @Path("corpus/{toplevel}/closure")
@@ -187,7 +187,7 @@ public class MetadataServiceImpl implements MetadataService
   /**
    * @return the annisDao
    */
-  public AnnisDao getAnnisDao()
+  public QueryDao getAnnisDao()
   {
     return annisDao;
   }
@@ -195,7 +195,7 @@ public class MetadataServiceImpl implements MetadataService
   /**
    * @param annisDao the annisDao to set
    */
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setAnnisDao(QueryDao annisDao)
   {
     this.annisDao = annisDao;
   }

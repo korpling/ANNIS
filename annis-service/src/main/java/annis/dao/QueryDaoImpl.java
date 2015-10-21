@@ -117,7 +117,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
-public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
+public class QueryDaoImpl extends SimpleJdbcDaoSupport implements QueryDao,
   SqlSessionModifier
 {
 
@@ -499,7 +499,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
   }
   private static final Logger log = LoggerFactory.
-    getLogger(SpringAnnisDao.class);
+    getLogger(QueryDaoImpl.class);
   // / old
 
   private SqlGenerator sqlGenerator;
@@ -534,7 +534,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private MetaByteHelper metaByteHelper;
 
-  public SpringAnnisDao()
+  public QueryDaoImpl()
   {
     planRowMapper = new ParameterizedSingleColumnRowMapper<>();
     sqlSessionModifiers = new ArrayList<>();
