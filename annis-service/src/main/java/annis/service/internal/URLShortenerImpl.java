@@ -21,6 +21,7 @@ import annis.administration.CorpusAdministration;
 import annis.dao.QueryDao;
 import annis.dao.ShortenerDao;
 import java.net.URI;
+import java.nio.BufferUnderflowException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -92,12 +93,20 @@ public class URLShortenerImpl
   @Produces(value = "text/plain")
   public String getLong(@PathParam("id") String id)
   {
-    String result = shortenerDao.getLong(id);
-    if(result == null)
+    try
     {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
+      String result = shortenerDao.getLong(id);
+      if(result == null)
+      {
+        throw new WebApplicationException(Response.Status.NOT_FOUND);
+      }
+      return result;
     }
-    return result;
+    catch(IllegalArgumentException | BufferUnderflowException ex)
+    {
+      
+    }
+    throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
 
   public ShortenerDao getShortenerDao()
