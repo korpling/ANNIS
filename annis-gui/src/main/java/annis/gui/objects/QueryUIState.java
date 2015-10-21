@@ -51,7 +51,7 @@ public class QueryUIState implements Serializable
   private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
   
   private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
-  private final ObjectProperty<Integer> offset = new ObjectProperty<>(0);
+  private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
   private final ObjectProperty<String> baseText = new ObjectProperty<>(null, String.class);
   
   private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
@@ -116,7 +116,7 @@ public class QueryUIState implements Serializable
     return limit;
   }
 
-  public ObjectProperty<Integer> getOffset()
+  public ObjectProperty<Long> getOffset()
   {
     return offset;
   }

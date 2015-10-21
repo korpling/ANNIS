@@ -79,7 +79,7 @@ public class PagingComponent extends Panel implements
 
   private int pageSize;
 
-  private int currentPage;
+  private long currentPage;
 
   private Label lblInfo;
 
@@ -238,12 +238,12 @@ public class PagingComponent extends Panel implements
     return (1 + (mycount / pageSize));
   }
 
-  public int getStartNumber()
+  public long getStartNumber()
   {
     return (currentPage - 1) * pageSize;
   }
 
-  public void setStartNumber(int startNumber)
+  public void setStartNumber(long startNumber)
   {
     currentPage = (startNumber / pageSize) + 1;
     update(false);
@@ -310,9 +310,9 @@ public class PagingComponent extends Panel implements
     update(true);
   }
 
-  private int sanitizePage(int page)
+  private long sanitizePage(long page)
   {
-    int val = Math.max(1, page);
+    long val = Math.max(1, page);
     val = Math.min(1 + (count.get() / pageSize), val);
     return val;
   }

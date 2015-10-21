@@ -61,6 +61,6 @@ public interface VisualizerContextChanger extends Serializable
    * @param left Which context must be change. If true the left context is
    * changed, otherwise the right one.
    */
-  public void changeContext(int resultNumber, int context,
+  public void changeContext(long resultNumber, int context,
     boolean left);
 }

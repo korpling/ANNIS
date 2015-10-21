@@ -343,7 +343,7 @@ public class QueryController implements Serializable
   {
     if (startFromFirstPage)
     {
-      getState().getOffset().setValue(0);
+      getState().getOffset().setValue(0l);
     }
     // construct a query from the current properties
     PagedResultQuery pagedQuery = getSearchQuery();
@@ -587,7 +587,7 @@ public class QueryController implements Serializable
 
   public void changeContext(PagedResultQuery originalQuery,
     Match match,
-    int offset, int newContext,
+    long offset, int newContext,
     final VisualizerContextChanger visCtxChange, boolean left)
   {
 

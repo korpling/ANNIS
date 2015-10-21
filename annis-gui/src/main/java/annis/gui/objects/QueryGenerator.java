@@ -112,7 +112,7 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
       return (PagedQueryGenerator) this;
     }
     
-    public PagedQueryGenerator offset(int offset)
+    public PagedQueryGenerator offset(long offset)
     {
       getCurrent().setOffset(offset);
       return (PagedQueryGenerator) this;

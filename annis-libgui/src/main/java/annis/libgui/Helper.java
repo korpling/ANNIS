@@ -389,7 +389,7 @@ public class Helper
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
     String segmentation,
-    int start, int limit, OrderType order)
+    long start, int limit, OrderType order)
   {
     List<String> result = new ArrayList<>();
     try

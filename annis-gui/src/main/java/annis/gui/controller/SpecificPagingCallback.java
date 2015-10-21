@@ -48,7 +48,7 @@ public class SpecificPagingCallback implements PagingCallback
   }
 
   @Override
-  public void switchPage(int offset, int limit)
+  public void switchPage(long offset, int limit)
   {
     if (query != null)
     {

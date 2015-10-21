@@ -349,7 +349,7 @@ public class ResultViewPanel extends VerticalLayout implements
     qp.setStatus(qp.getLastPublicStatus());
   }
 
-  private List<SingleResultPanel> createPanels(SaltProject p, int localMatchIndex, int globalOffset)
+  private List<SingleResultPanel> createPanels(SaltProject p, int localMatchIndex, long globalOffset)
   {
     List<SingleResultPanel> result = new LinkedList<>();
 

@@ -112,7 +112,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private final QueryController queryController;
 
-  private final int resultNumber;
+  private final long resultNumber;
 
   private final ResolverProvider resolverProvider;
 
@@ -136,7 +136,7 @@ public class SingleResultPanel extends CssLayout implements
 
   public SingleResultPanel(final SDocument result, 
     Match match,
-    int resultNumber,
+    long resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
     Set<String> visibleTokenAnnos, String segmentationName,
     QueryController controller, InstanceConfig instanceConfig,
@@ -514,7 +514,7 @@ public class SingleResultPanel extends CssLayout implements
   }
 
   @Override
-  public void changeContext(int resultNumber, int context,
+  public void changeContext(long resultNumber, int context,
     boolean left)
   {
     //delegates the task to the query controller.
@@ -582,12 +582,12 @@ public class SingleResultPanel extends CssLayout implements
     Property.ValueChangeListener
   {
 
-    int resultNumber;
+    long resultNumber;
 
     boolean left;
 
 
-    public ContextChangeListener(int resultNumber, boolean left)
+    public ContextChangeListener(long resultNumber, boolean left)
     {
       this.resultNumber = resultNumber;
       this.left = left;
