@@ -92,7 +92,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private FrequencySqlGenerator frequencySqlGenerator;
   // dependencies
 
-  private QueryDao annisDao;
+  private QueryDao queryDao;
 
   private int context;
 
@@ -296,7 +296,7 @@ public class AnnisRunner extends AnnisBaseRunner
             {
               try
               {
-                int result = annisDao.count(queryData);
+                int result = queryDao.count(queryData);
                 long end = new Date().getTime();
                 long runtime = end - start;
                 Object[] output =
@@ -409,7 +409,7 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
 
-    out.println(annisDao.explain(generator, queryData, analyze));
+    out.println(queryDao.explain(generator, queryData, analyze));
   }
 
   public void doPlan(String functionCall)
@@ -508,7 +508,7 @@ public class AnnisRunner extends AnnisBaseRunner
       out.println(benchmark.sql);
       try
       {
-        benchmark.plan = annisDao.explain(generator, benchmark.queryData, false);
+        benchmark.plan = queryDao.explain(generator, benchmark.queryData, false);
         out.println("---> query plan for: " + benchmark.functionCall);
         out.println(benchmark.plan);
       }
@@ -531,7 +531,7 @@ public class AnnisRunner extends AnnisBaseRunner
         long start = new Date().getTime();
         try
         {
-          annisDao.executeQueryFunction(benchmark.queryData, generator);
+          queryDao.executeQueryFunction(benchmark.queryData, generator);
         }
         catch (RuntimeException e)
         {
@@ -585,7 +585,7 @@ public class AnnisRunner extends AnnisBaseRunner
       long start = new Date().getTime();
       try
       {
-        annisDao.executeQueryFunction(benchmark.queryData, generator);
+        queryDao.executeQueryFunction(benchmark.queryData, generator);
       }
       catch (RuntimeException e)
       {
@@ -883,11 +883,11 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       if (show)
       {
-        value = String.valueOf(annisDao.getTimeout());
+        value = String.valueOf(queryDao.getTimeout());
       }
       else
       {
-        annisDao.setTimeout(Integer.parseInt(value));
+        queryDao.setTimeout(Integer.parseInt(value));
       }
     }
     else if ("clear-caches".equals(setting))
@@ -991,14 +991,14 @@ public class AnnisRunner extends AnnisBaseRunner
 
     if (queryFunction != null && !queryFunction.matches("(sql_)?subgraph"))
     {
-      queryData = annisDao.parseAQL(annisQuery, corpusList);
+      queryData = queryDao.parseAQL(annisQuery, corpusList);
     }
     else
     {
-      queryData = GraphHelper.createQueryData(MatchGroup.parseString(annisQuery), annisDao);
+      queryData = GraphHelper.createQueryData(MatchGroup.parseString(annisQuery), queryDao);
     }
 
-    queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
+    queryData.setCorpusConfiguration(queryDao.getCorpusConfiguration());
 
     // filter by meta data
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
@@ -1041,14 +1041,14 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCount(String annisQuery)
   {
-    out.println(annisDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count")));
+    out.println(queryDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count")));
   }
 
   public void doMatrix(String annisQuery)
   {
-//    List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery,
+//    List<AnnotatedMatch> matches = queryDao.matrix(analyzeQuery(annisQuery,
 //      "matrix"));
-    annisDao.matrix(analyzeQuery(annisQuery, "matrix"), false, System.out);
+    queryDao.matrix(analyzeQuery(annisQuery, "matrix"), false, System.out);
 //    if (matches.isEmpty())
 //    {
 //      out.println("(empty");
@@ -1062,14 +1062,14 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doFind(String annisQuery)
   {
-    List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
+    List<Match> matches = queryDao.find(analyzeQuery(annisQuery, "find"));
     MatchGroup group = new MatchGroup(matches);
     out.println(group.toString());
   }
   
   public void doFrequency(String definitions)
   {    
-    FrequencyTable result = annisDao.frequency(analyzeQuery(definitions, "frequency"));
+    FrequencyTable result = queryDao.frequency(analyzeQuery(definitions, "frequency"));
     for(FrequencyTable.Entry e : result.getEntries())
     {
       out.println(e.toString());
@@ -1083,7 +1083,7 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset + "; filter = " + filter.name());
 
-    SaltProject result = annisDao.graph(queryData);
+    SaltProject result = queryDao.graph(queryData);
 
     // write result to File
     URI path = URI.createFileURI("/tmp/annissalt");
@@ -1106,7 +1106,7 @@ public class AnnisRunner extends AnnisBaseRunner
         // check if there is a corpus with this name
         LinkedList<String> splitList = new LinkedList<>();
         splitList.add(split);
-        corpusList.addAll(annisDao.mapCorpusNamesToIds(splitList));
+        corpusList.addAll(queryDao.mapCorpusNamesToIds(splitList));
       }
     }
 
@@ -1122,7 +1122,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doList(String unused)
   {
-    List<AnnisCorpus> corpora = annisDao.listCorpora();
+    List<AnnisCorpus> corpora = queryDao.listCorpora();
     printAsTable(corpora, "id", "name", "textCount", "tokenCount");
   }
 
@@ -1130,7 +1130,7 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     boolean listValues = "values".equals(doListValues);
     List<AnnisAttribute> annotations =
-      annisDao.listAnnotations(getCorpusList(), listValues, true);
+      queryDao.listAnnotations(getCorpusList(), listValues, true);
     try
     {
       ObjectMapper om = new ObjectMapper();
@@ -1155,10 +1155,10 @@ public class AnnisRunner extends AnnisBaseRunner
     try
     {
       corpusIdAsList.add(Long.parseLong(corpusId));
-      List<String> toplevelNames = annisDao.mapCorpusIdsToNames(corpusIdAsList);
+      List<String> toplevelNames = queryDao.mapCorpusIdsToNames(corpusIdAsList);
 
       List<Annotation> corpusAnnotations =
-        annisDao.listCorpusAnnotations(toplevelNames.get(0));
+        queryDao.listCorpusAnnotations(toplevelNames.get(0));
       printAsTable(corpusAnnotations, "namespace", "name", "value");
     }
     catch (NumberFormatException ex)
@@ -1184,7 +1184,7 @@ public class AnnisRunner extends AnnisBaseRunner
     Validate.isTrue(splitted.size() > 1,
       "must have to arguments (toplevel corpus name and document name");
     
-    long corpusID = annisDao.mapCorpusNameToId(splitted.get(0));
+    long corpusID = queryDao.mapCorpusNameToId(splitted.get(0));
     System.out.println(graphSqlGenerator.getDocumentQuery(
       corpusID,
       splitted.get(1),
@@ -1205,7 +1205,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Validate.isTrue(splitted.size() > 1,
       "must have two arguments (toplevel corpus name and document name");
-    SaltProject p = annisDao.retrieveAnnotationGraph(splitted.get(0), 
+    SaltProject p = queryDao.retrieveAnnotationGraph(splitted.get(0), 
       splitted.get(1), annoFilter);
     System.out.println(printSaltAsXMI(p));
   }
@@ -1217,7 +1217,7 @@ public class AnnisRunner extends AnnisBaseRunner
       .splitToList(args);
     Validate.isTrue(splitted.size() == 2, "must have two arguments: toplevel corpus name and output directory");
     
-    annisDao.exportCorpus(splitted.get(0), new File(splitted.get(1)));
+    queryDao.exportCorpus(splitted.get(0), new File(splitted.get(1)));
   }
 
   public void doQuit(String dummy)
@@ -1278,14 +1278,14 @@ public class AnnisRunner extends AnnisBaseRunner
     this.annisParser = annisParser;
   }
 
-  public QueryDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
-  public void setAnnisDao(QueryDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
 
   public List<Long> getCorpusList()

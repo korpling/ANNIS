@@ -45,7 +45,7 @@ limitations under the License.
           scope="prototype"/>
     <bean class="annis.ql.parser.AnnotationExistenceValidator" 
           scope="prototype">
-        <property name="annisDao" ref="annisDao"/>
+        <property name="queryDao" ref="queryDao"/>
     </bean>
     
     <bean class="annis.ql.parser.ComponentSearchRelationNormalizer" 

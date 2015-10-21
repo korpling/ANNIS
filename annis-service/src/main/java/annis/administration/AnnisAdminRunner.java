@@ -53,7 +53,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   // API for corpus administration
 
   private CorpusAdministration corpusAdministration;
-  private QueryDao annisDao;
+  private QueryDao queryDao;
 
   private QueriesGenerator queriesGenerator;
   
@@ -427,7 +427,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         throw new ParseException(
           "Needs two arguments: corpus name and output folder");
       }
-      annisDao.exportCorpus(cmdLine.getArgs()[0], new File(cmdLine.getArgs()[1]));
+      queryDao.exportCorpus(cmdLine.getArgs()[0], new File(cmdLine.getArgs()[1]));
       
     }
     catch (ParseException ex)
@@ -458,7 +458,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         // interpret this as name
         try
         {
-          long numericID = annisDao.mapCorpusNameToId(id.trim());
+          long numericID = queryDao.mapCorpusNameToId(id.trim());
           ids.add(numericID);
         }
         catch(IllegalArgumentException ex)
@@ -717,14 +717,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     this.corpusAdministration = administration;
   }
 
-  public QueryDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
-  public void setAnnisDao(QueryDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
   
   

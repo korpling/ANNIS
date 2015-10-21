@@ -20,7 +20,7 @@
         init-method="init" lazy-init="true">
     <property name="adminDao" ref="administrationDao"/>
     <property name="importWorker" ref="importWorker" />
-    <property name="annisDao" ref="annisDao" />
+    <property name="queryDao" ref="queryDao" />
     <property name="corpusAdmin" ref="corpusAdministration" />
     <property name="deleteCorpusDao" ref="deleteCorpusDao" />
   </bean>
@@ -47,7 +47,7 @@
 
   <!-- QueryService -->
   <bean id="queryService" class="annis.service.internal.QueryServiceImpl" init-method="init" lazy-init="true">
-    <property name="annisDao" ref="annisDao"/>
+    <property name="queryDao" ref="queryDao"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="defaultCorpusConfig" ref="defaultCorpusConfig" />
     <property name="port" value="${annis.webservice-port}" />
@@ -55,14 +55,14 @@
 
   <!-- MetadataService -->
   <bean id="metadataService" class="annis.service.internal.MetadataServiceImpl" init-method="init" lazy-init="true">
-    <property name="annisDao" ref="annisDao" />
+    <property name="queryDao" ref="queryDao" />
   </bean>
   
   <!-- URL shortener service -->
   <bean id="urlShortenerService" class="annis.service.internal.URLShortenerImpl" 
         init-method="init" lazy-init="true">
     <property name="adminDao" ref="administrationDao"/>
-    <property name="annisDao" ref="annisDao" />
+    <property name="queryDao" ref="queryDao" />
     <property name="corpusAdmin" ref="corpusAdministration" />
   </bean>
 

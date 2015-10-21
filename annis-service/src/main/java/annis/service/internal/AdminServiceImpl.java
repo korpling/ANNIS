@@ -81,7 +81,7 @@ public class AdminServiceImpl implements AdminService
 
   private CorpusAdministration corpusAdmin;
 
-  private QueryDao annisDao;
+  private QueryDao queryDao;
 
   private ImportWorker importWorker;
 
@@ -401,7 +401,7 @@ public class AdminServiceImpl implements AdminService
     {
 
       // get ID of corpus
-      long id = annisDao.mapCorpusNameToId(corpusName);
+      long id = queryDao.mapCorpusNameToId(corpusName);
       deleteCorpusDao.deleteCorpora(Arrays.asList(id), true);
       return Response.status(Response.Status.OK).build();
     }
@@ -482,7 +482,7 @@ public class AdminServiceImpl implements AdminService
         }
         String caption = Joiner.on(", ").join(allNames);
 
-        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<>(
+        List<Long> corpusIDs = queryDao.mapCorpusNamesToIds(new LinkedList<>(
           allNames));
         if (overwrite || corpusIDs == null || corpusIDs.isEmpty())
         {
@@ -570,14 +570,14 @@ public class AdminServiceImpl implements AdminService
     this.adminDao = adminDao;
   }
 
-  public QueryDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
-  public void setAnnisDao(QueryDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
 
   public ImportWorker getImportWorker()

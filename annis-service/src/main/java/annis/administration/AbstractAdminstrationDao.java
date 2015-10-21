@@ -58,7 +58,7 @@ public abstract class AbstractAdminstrationDao
   private String scriptPath;
   private StatementController statementController;
   private DynamicDataSource dataSource;
-  private QueryDao annisDao;
+  private QueryDao queryDao;
 
   protected boolean lockRepositoryMetadataTable(boolean waitForOtherTasks)
   {
@@ -355,14 +355,14 @@ public abstract class AbstractAdminstrationDao
 
   }
 
-  public QueryDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
-  public void setAnnisDao(QueryDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
   
 

@@ -45,7 +45,7 @@ public class URLShortenerImpl
   private final static Logger log = LoggerFactory.getLogger(URLShortenerImpl.class);
   
   private AdministrationDao adminDao;
-  private QueryDao annisDao;
+  private QueryDao queryDao;
   private CorpusAdministration corpusAdmin;
   
   @Context
@@ -95,14 +95,14 @@ public class URLShortenerImpl
     this.adminDao = adminDao;
   }
 
-  public QueryDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
-  public void setAnnisDao(QueryDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
 
   public CorpusAdministration getCorpusAdmin()

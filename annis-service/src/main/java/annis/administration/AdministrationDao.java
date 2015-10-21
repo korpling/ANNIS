@@ -104,7 +104,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    */
   private void analyzeTextTable(String toplevelCorpusName)
   {
-    List<String> rawTexts = getAnnisDao().getRawText(toplevelCorpusName);
+    List<String> rawTexts = getQueryDao().getRawText(toplevelCorpusName);
 
     // pattern for checking the token layer
     final Pattern WHITESPACE_MATCHER = Pattern.compile("^\\s+$");
@@ -115,13 +115,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
       if (s != null && WHITESPACE_MATCHER.matcher(s).matches())
       {
         // deactivate doc browsing if no document browser configuration is exists
-        if (getAnnisDao().getDocBrowserConfiguration(toplevelCorpusName) == null)
+        if (getQueryDao().getDocBrowserConfiguration(toplevelCorpusName) == null)
         {
           // should exists anyway
           Properties corpusConf;
           try
           {
-            corpusConf = getAnnisDao().
+            corpusConf = getQueryDao().
               getCorpusConfiguration(toplevelCorpusName);
           }
           catch (FileNotFoundException ex)
@@ -142,7 +142,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
           {
             log.info("disable document browser");
             corpusConf.put("browse-documents", "false");
-            getAnnisDao().setCorpusConfiguration(toplevelCorpusName, corpusConf);
+            getQueryDao().setCorpusConfiguration(toplevelCorpusName, corpusConf);
           }
 
           // once disabled don't search in further texts
@@ -593,10 +593,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
 
     // create empty corpus properties file
-    if (getAnnisDao().getCorpusConfigurationSave(toplevelCorpusName) == null)
+    if (getQueryDao().getCorpusConfigurationSave(toplevelCorpusName) == null)
     {
       log.info("creating new corpus.properties file");
-      getAnnisDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
+      getQueryDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
     }
 
     analyzeFacts(corpusID);
@@ -683,10 +683,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
 
     // create empty corpus properties file
-    if (getAnnisDao().getCorpusConfigurationSave(toplevelCorpusName) == null)
+    if (getQueryDao().getCorpusConfigurationSave(toplevelCorpusName) == null)
     {
       log.info("creating new corpus.properties file");
-      getAnnisDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
+      getQueryDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
     }
 
     analyzeFacts(corpusID);
@@ -2076,7 +2076,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     for (ExampleQuery eQ : exampleQueries)
     {
 
-      QueryData query = getAnnisDao().parseAQL(eQ.getExampleQuery(), null);
+      QueryData query = getQueryDao().parseAQL(eQ.getExampleQuery(), null);
 
       int count = 0;
       for (List<QueryNode> qNodes : query.getAlternatives())
