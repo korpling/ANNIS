@@ -121,9 +121,6 @@
     <property name="fetchSize" value="0"/>
   </bean>
 
-  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter" lazy-init="true" parent="daoBase">
-    <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
-  </bean>
 
   <bean id="byteHelper" class="annis.sqlgen.ByteHelper" lazy-init="true" />
   <bean id="metaByteHelper" class="annis.sqlgen.MetaByteHelper" lazy-init="true" />
@@ -142,6 +139,14 @@
   <bean id="daoBase" class="annis.dao.AbstractDao" abstract="true" lazy-init="true">
     <property name="scriptPath" value="$dev{annis.script-path}"/>
     <property name="dataSource" ref="dataSource" />
+  </bean>
+  
+  
+  <bean id="shortenerDao" class="annis.dao.ShortenerDao" lazy-init="true" parent="daoBase">
+  </bean>
+  
+  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter" lazy-init="true" parent="daoBase">
+    <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
   </bean>
 
   <!-- exported bean: QueryDao -->

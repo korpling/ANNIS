@@ -32,7 +32,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * A helper class that allows you to fix the database scheme.
  * 
  * Currently it can
- * - create an corpus_alias table
+ * - create an corpus_alias table <br />
+ * - create an url_shortener table <br />
+ * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SchemeFixer
@@ -84,6 +86,50 @@ public class SchemeFixer
           // check if columns have correct type and name, if not throw an error
           Preconditions.checkState(Types.VARCHAR == columnType.get("alias"), "there must be an \"alias\" column of type \"text\"");
           Preconditions.checkState(Types.BIGINT == columnType.get("corpus_ref"), "there must be an \"corpus_ref\" column of type \"bigint\"");
+        }
+
+      }
+    }
+    catch (SQLException ex)
+    {
+      log.error("Could not get the metadata for the database", ex);
+    }
+    
+  }
+  
+  protected void urlShortener()
+  {
+    try(Connection conn = dataSource.getConnection();)
+    {
+      
+      DatabaseMetaData dbMeta = conn.getMetaData();
+      try(ResultSet result =  dbMeta.getColumns(null, null, "url_shortener", null);)
+      { 
+        Map<String, Integer> columnType = new HashMap<>();
+
+        while(result.next())
+        {
+          columnType.put(result.getString(4), result.getInt(5));
+        }
+
+        if(columnType.isEmpty())
+        {
+          // create the table
+          log.info("Creating url_shortener table");
+          jdbcTemplate.execute(
+            "CREATE  TABLE url_shortener\n" + "(\n"
+            + "	id bigint PRIMARY KEY,\n" + "	\"owner\" varchar,\n"
+            + "	created timestamp with time zone,\n" + "	url varchar UNIQUE\n"
+            + ");");
+          // since the "url" column is unique, an index will be created for it
+        }
+        else
+        {
+          // check if columns have correct type and name, if not throw an error
+          Preconditions.checkState(Types.BIGINT == columnType.get("id"), "there must be an \"alias\" column of type \"bigint\"");
+          Preconditions.checkState(Types.VARCHAR == columnType.get("owner"), "there must be an \"owner\" column of type \"varchar\"");
+          Preconditions.checkState(Types.TIMESTAMP == columnType.get("created"), "there must be an \"created\" column of type \"timestamp\"");
+          Preconditions.checkState(Types.VARCHAR == columnType.get("url"), "there must be an \"url\" column of type \"varchar\"");
         }
 
       }

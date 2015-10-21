@@ -19,10 +19,14 @@ package annis.service.internal;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.dao.QueryDao;
+import annis.dao.ShortenerDao;
 import java.net.URI;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -44,9 +48,7 @@ public class URLShortenerImpl
   
   private final static Logger log = LoggerFactory.getLogger(URLShortenerImpl.class);
   
-  private AdministrationDao adminDao;
-  private QueryDao queryDao;
-  private CorpusAdministration corpusAdmin;
+  private ShortenerDao shortenerDao;
   
   @Context
   private HttpServletRequest request;
@@ -68,51 +70,38 @@ public class URLShortenerImpl
    * must be replaced with underscores since they conflict with the Apache
    * Shiro {@link WildcardPermission} format.
    * 
-   * @param uriRaw The URI to shorten.
+   * @param str The string to shorten.
    * @return 
    */
   @POST
-  public String addNewID(String uriRaw)
+  @Produces(value = "text/plain")
+  public String addNewID(String str)
   {
     Subject user = SecurityUtils.getSubject();
     
     String remoteIP = request.getRemoteAddr().replaceAll("[.:]", "_");
     user.checkPermission("shortener:create:" + remoteIP);
     
-    URI uri = URI.create(uriRaw);
-    
-    return "";
+    return shortenerDao.shorten(str, "" + user.getPrincipal());
   }
   
+  @GET
+  @Path("{id}")
+  @Produces(value = "text/plain")
+  public String getLong(@PathParam("id") String id)
+  {
+    return shortenerDao.getLong(id);
+  }
+
+  public ShortenerDao getShortenerDao()
+  {
+    return shortenerDao;
+  }
+
+  public void setShortenerDao(ShortenerDao shortenerDao)
+  {
+    this.shortenerDao = shortenerDao;
+  }
   
-  public AdministrationDao getAdminDao()
-  {
-    return adminDao;
-  }
-
-  public void setAdminDao(AdministrationDao adminDao)
-  {
-    this.adminDao = adminDao;
-  }
-
-  public QueryDao getQueryDao()
-  {
-    return queryDao;
-  }
-
-  public void setQueryDao(QueryDao queryDao)
-  {
-    this.queryDao = queryDao;
-  }
-
-  public CorpusAdministration getCorpusAdmin()
-  {
-    return corpusAdmin;
-  }
-
-  public void setCorpusAdmin(CorpusAdministration corpusAdmin)
-  {
-    this.corpusAdmin = corpusAdmin;
-  }
   
 }

@@ -61,9 +61,7 @@
   <!-- URL shortener service -->
   <bean id="urlShortenerService" class="annis.service.internal.URLShortenerImpl" 
         init-method="init" lazy-init="true">
-    <property name="adminDao" ref="administrationDao"/>
-    <property name="queryDao" ref="queryDao" />
-    <property name="corpusAdmin" ref="corpusAdministration" />
+    <property name="shortenerDao" ref="shortenerDao"/>
   </bean>
 
 </beans>
