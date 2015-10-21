@@ -112,12 +112,11 @@ import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
-public class QueryDaoImpl extends SimpleJdbcDaoSupport implements QueryDao,
+public class QueryDaoImpl extends AbstractDao implements QueryDao,
   SqlSessionModifier
 {
 
@@ -908,7 +907,7 @@ public class QueryDaoImpl extends SimpleJdbcDaoSupport implements QueryDao,
     try
     {
       ResolverDaoHelper helper = new ResolverDaoHelper();
-      PreparedStatement stmt = helper.createPreparedStatement(getConnection());
+      PreparedStatement stmt = helper.createPreparedStatement(getDataSource().getConnection());
       helper.fillPreparedStatement(request, stmt);
       List<ResolverEntry> result = helper.extractData(stmt.executeQuery());
       return result;
