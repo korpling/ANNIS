@@ -192,7 +192,7 @@ public class SingleResultPanel extends CssLayout implements
     btLink = new Button();
     btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
     btLink.setIcon(FontAwesome.SHARE_ALT);
-    btLink.setDescription("Share single match");
+    btLink.setDescription("Share match reference");
     btLink.setDisableOnClick(true);
     btLink.addClickListener(new Button.ClickListener()
     {
