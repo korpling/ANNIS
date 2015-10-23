@@ -400,7 +400,7 @@ public class QueryController implements Serializable
 
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
       ui.getInstanceConfig(), pagedQuery);
-    newResultView.getPaging().addCallback(new SpecificPagingCallback(pagedQuery,
+    newResultView.getPaging().addCallback(new SpecificPagingCallback(
       ui, searchView, newResultView));
 
     TabSheet.Tab newTab;

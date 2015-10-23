@@ -31,17 +31,14 @@ import java.util.concurrent.Future;
  */
 public class SpecificPagingCallback implements PagingCallback
 {
-  private final PagedResultQuery query;
-
   private final ResultViewPanel panel;
 
   private final SearchView searchView;
   private final AnnisUI ui;
   
-  public SpecificPagingCallback(PagedResultQuery query, AnnisUI ui, SearchView searchView,
+  public SpecificPagingCallback(AnnisUI ui, SearchView searchView,
     ResultViewPanel panel)
   {
-    this.query = query.clone();
     this.panel = panel;
     this.ui = ui;
     this.searchView = searchView;
@@ -50,13 +47,11 @@ public class SpecificPagingCallback implements PagingCallback
   @Override
   public void switchPage(long offset, int limit)
   {
-    if (query != null)
-    {
-      query.setOffset(offset);
-      query.setLimit(limit);
-      // execute the result query again
-      updateMatches(query, panel);
-    }
+    ui.getQueryState().getOffset().setValue(offset);
+    ui.getQueryState().getLimit().setValue(limit);
+    // execute the result query again
+    updateMatches(ui.getQueryController().getSearchQuery(), panel);
+
   }
 
   private void updateMatches(PagedResultQuery newQuery, ResultViewPanel panel)
