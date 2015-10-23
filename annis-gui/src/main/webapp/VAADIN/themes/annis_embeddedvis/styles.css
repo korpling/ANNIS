@@ -981,7 +981,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.5.7";
+	content: "7.5.8";
 }
 
 .v-widget {
@@ -5386,6 +5386,11 @@ div.v-layout.v-horizontal.v-widget {
 	-ms-user-select: text;
 	user-select: text;
 	background-color: #fafafa;
+}
+
+.annis_embeddedvis .v-grid.v-disabled {
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
 }
 
 .annis_embeddedvis .v-grid-header .v-grid-cell {
