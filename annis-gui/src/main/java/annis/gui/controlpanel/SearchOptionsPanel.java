@@ -204,6 +204,9 @@ public class SearchOptionsPanel extends FormLayout
   {
     super.attach();
     
+    cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
+    cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
+    
     Background.run(new CorpusConfigUpdater(getUI()));
 
     if (getUI() instanceof AnnisUI)
@@ -800,26 +803,15 @@ public class SearchOptionsPanel extends FormLayout
             corpusConfigurations.get(DEFAULT_CONFIG).
             getConfig(KEY_MAX_CONTEXT_RIGHT));
 
-          Integer defaultCtx = Integer.parseInt(corpusConfigurations.get(
-            DEFAULT_CONFIG).getConfig(KEY_DEFAULT_CONTEXT));
-
           Integer ctxSteps = Integer.parseInt(
             corpusConfigurations.get(DEFAULT_CONFIG).
             getConfig(KEY_CONTEXT_STEPS));
-
-          String segment = corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
-            KEY_DEFAULT_CONTEXT_SEGMENTATION);
-
-          updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx, false);
-          updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx, false);
-          updateResultsPerPage(resultsPerPage, false);
-          updateSegmentations(segment, null);
-
+          
           cbLeftContext.setNewItemHandler(new CustomContext(cbLeftContext,
             leftCtx,
             ctxSteps));
           cbRightContext.setNewItemHandler(new CustomContext(cbRightContext,
-            leftCtx,
+            rightCtx,
             ctxSteps));
           cbResultsPerPage.setNewItemHandler(new CustomResultSize(
             cbResultsPerPage,
@@ -835,14 +827,14 @@ public class SearchOptionsPanel extends FormLayout
 
     ComboBox c;
 
-    int leftCtx;
+    int ctx;
 
     int ctxSteps;
 
-    CustomContext(ComboBox c, int leftCtx, int ctxSteps)
+    CustomContext(ComboBox c, int ctx, int ctxSteps)
     {
       this.c = c;
-      this.leftCtx = leftCtx;
+      this.ctx = ctx;
       this.ctxSteps = ctxSteps;
     }
 
@@ -861,13 +853,13 @@ public class SearchOptionsPanel extends FormLayout
               "context has to be a positive number or 0");
           }
 
-          if (i > leftCtx)
+          if (i > ctx)
           {
             throw new IllegalArgumentException(
               "The context is greater than, than the max value defined in the corpus property file.");
           }
 
-          updateContext(c, leftCtx, ctxSteps, i, true);
+          updateContext(c, ctx, ctxSteps, i, true);
         }
         catch (NumberFormatException ex)
         {
