@@ -40,9 +40,9 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     this.current = current;
   }
   
-  public static PagedQueryGenerator paged()
+  public static DisplayedResultQueryGenerator displayed()
   {
-    return new PagedQueryGenerator();
+    return new DisplayedResultQueryGenerator();
   }
   
   public static ExportQueryGenerator export()
@@ -100,35 +100,50 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     
   }
   
-  public static class PagedQueryGenerator
-     extends ContextQueryGenerator<PagedResultQuery, PagedQueryGenerator>
+  public static class PagedQueryGenerator <T extends PagedResultQuery, QG extends PagedQueryGenerator<T, QG>> 
+     extends ContextQueryGenerator<T, QG>
   {
-    private PagedQueryGenerator()
+    private PagedQueryGenerator(T query)
     {
-      super(new PagedResultQuery());
+      super(query);
     }
-    public PagedQueryGenerator limit(int limit)
+    public QG limit(int limit)
     {
       getCurrent().setLimit(limit);
-      return (PagedQueryGenerator) this;
+      return (QG) this;
     }
     
-    public PagedQueryGenerator offset(long offset)
+    public QG offset(long offset)
     {
       getCurrent().setOffset(offset);
-      return (PagedQueryGenerator) this;
+      return (QG) this;
     }
     
-    public PagedQueryGenerator order(OrderType order)
+    public QG order(OrderType order)
     {
       getCurrent().setOrder(order);
-      return (PagedQueryGenerator) this;
+      return (QG) this;
+    }
+  }
+  
+  public static class DisplayedResultQueryGenerator
+     extends PagedQueryGenerator<DisplayedResultQuery, DisplayedResultQueryGenerator>
+  {
+    private DisplayedResultQueryGenerator()
+    {
+      super(new DisplayedResultQuery());
     }
     
-    public PagedQueryGenerator selectedMatches(Set<Long> selected)
+    public DisplayedResultQueryGenerator selectedMatches(Set<Long> selected)
     {
       getCurrent().setSelectedMatches(selected == null ? new TreeSet<Long>() : selected);
-      return (PagedQueryGenerator) this;
+      return (DisplayedResultQueryGenerator) this;
+    }
+    
+    public DisplayedResultQueryGenerator visibleSegmentation(String val)
+    {
+      getCurrent().setVisibleSegmentation(val);
+      return (DisplayedResultQueryGenerator) this;
     }
   }
   

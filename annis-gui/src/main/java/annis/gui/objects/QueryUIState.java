@@ -52,7 +52,8 @@ public class QueryUIState implements Serializable
   
   private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
   private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
-  private final ObjectProperty<String> baseText = new ObjectProperty<>(null, String.class);
+  private final ObjectProperty<String> visibleBaseText = new ObjectProperty<>(null, String.class);
+  private final ObjectProperty<String> contextBaseText = new ObjectProperty<>(null, String.class);
   
   private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
   
@@ -129,10 +130,16 @@ public class QueryUIState implements Serializable
     return selectedMatches;
   }
   
-  public ObjectProperty<String> getBaseText()
+  public ObjectProperty<String> getVisibleBaseText()
   {
-    return baseText;
+    return visibleBaseText;
   }
+
+  public ObjectProperty<String> getContextBaseText()
+  {
+    return contextBaseText;
+  }
+  
 
   public Map<QueryType, Future<?>> getExecutedTasks()
   {

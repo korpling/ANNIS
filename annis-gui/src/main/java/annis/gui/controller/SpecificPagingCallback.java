@@ -17,7 +17,7 @@ package annis.gui.controller;
 
 import annis.gui.AnnisUI;
 import annis.gui.SearchView;
-import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.QueryUIState;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultfetch.ResultFetchJob;
@@ -54,7 +54,7 @@ public class SpecificPagingCallback implements PagingCallback
 
   }
 
-  private void updateMatches(PagedResultQuery newQuery, ResultViewPanel panel)
+  private void updateMatches(DisplayedResultQuery newQuery, ResultViewPanel panel)
   {
     if (panel != null)
     {

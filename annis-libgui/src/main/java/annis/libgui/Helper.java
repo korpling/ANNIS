@@ -69,6 +69,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -380,16 +381,16 @@ public class Helper
 
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation,
+    String segmentation, String visibleSegmentation,
     int start, int limit)
   {
     return citationFragment(aql, corpora, contextLeft, contextRight,
-      segmentation, start, limit, OrderType.ascending, null);
+      segmentation, visibleSegmentation, start, limit, OrderType.ascending, null);
   }
 
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation,
+    String segmentation, String visibleSegmentation,
     long start, int limit, OrderType order,
     Set<Long> selectedMatches)
   {
@@ -412,6 +413,15 @@ public class Helper
         result.add("_seg="
           + encodeBase64URL(segmentation));
       }
+      if (visibleSegmentation != null)
+      {
+        // only output "vseg" if it is not the same as the context segmentation
+        if(!Objects.equals(visibleSegmentation, segmentation))
+        {
+          result.add("_vseg="
+            + encodeBase64URL(visibleSegmentation));
+        }
+      }
       if (order != OrderType.ascending && order != null)
       {
         result.add("o=" + order.toString());
@@ -431,7 +441,7 @@ public class Helper
 
   public static String generateCitation(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation,
+    String segmentation, String visibleSegmentation,
     int start, int limit)
   {
     try
@@ -442,7 +452,7 @@ public class Helper
         appURI.getHost(), appURI.getPort(),
         appURI.getPath(), null,
         StringUtils.join(citationFragment(aql, corpora,
-            contextLeft, contextRight, segmentation, start, limit), "&"))
+            contextLeft, contextRight, segmentation, visibleSegmentation,  start, limit), "&"))
         .toASCIIString();
     }
     catch (URISyntaxException ex)

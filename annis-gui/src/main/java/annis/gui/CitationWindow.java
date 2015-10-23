@@ -45,7 +45,7 @@ public class CitationWindow extends Window
     wLayout.setSizeFull();
     
     String url = Helper.generateCitation(query, corpora, contextLeft,
-      contextRight, null, 0, 10);
+      contextRight, null, null, 0, 10);
     
     TextArea txtCitation = new TextArea();
 

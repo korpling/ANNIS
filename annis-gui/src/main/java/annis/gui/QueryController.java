@@ -25,6 +25,7 @@ import annis.gui.exporter.Exporter;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.ExportQuery;
 import annis.gui.objects.FrequencyQuery;
 import annis.gui.objects.PagedResultQuery;
@@ -284,14 +285,18 @@ public class QueryController implements Serializable
         setValue(((ContextualizedQuery) q).getLeftContext());
       state.getRightContext().setValue(((ContextualizedQuery) q).
         getRightContext());
-      state.getBaseText().setValue(((ContextualizedQuery) q).getSegmentation());
+      state.getContextBaseText().setValue(((ContextualizedQuery) q).getSegmentation());
     }
     if (q instanceof PagedResultQuery)
     {
       state.getOffset().setValue(((PagedResultQuery) q).getOffset());
       state.getLimit().setValue(((PagedResultQuery) q).getLimit());
       state.getOrder().setValue(((PagedResultQuery) q).getOrder());
-      state.getSelectedMatches().setValue(((PagedResultQuery) q).getSelectedMatches());
+    }
+    if(q instanceof DisplayedResultQuery)
+    {
+      state.getSelectedMatches().setValue(((DisplayedResultQuery) q).getSelectedMatches());
+      state.getVisibleBaseText().setValue(((DisplayedResultQuery) q).getVisibleSegmentation());
     }
     if (q instanceof ExportQuery)
     {
@@ -304,18 +309,19 @@ public class QueryController implements Serializable
   
 
   /**
-   * Get the current query as it is defined by the UI controls.
+   * Get the current query as it is defined by the current {@link QueryUIState}.
    *
    * @return
    */
-  public PagedResultQuery getSearchQuery()
+  public DisplayedResultQuery getSearchQuery()
   {
-    return QueryGenerator.paged()
+    return QueryGenerator.displayed()
       .query(state.getAql().getValue())
       .corpora(state.getSelectedCorpora().getValue())
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
-      .segmentation(state.getBaseText().getValue())
+      .segmentation(state.getContextBaseText().getValue())
+      .visibleSegmentation(state.getVisibleBaseText().getValue())
       .limit(state.getLimit().getValue())
       .offset(state.getOffset().getValue())
       .order(state.getOrder().getValue())
@@ -335,7 +341,7 @@ public class QueryController implements Serializable
       .corpora(state.getSelectedCorpora().getValue())
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
-      .segmentation(state.getBaseText().getValue())
+      .segmentation(state.getVisibleBaseText().getValue())
       .exporter(state.getExporterName().getValue())
       .annotations(state.getExportAnnotationKeys().getValue())
       .param(state.getExportParameters().getValue())
@@ -353,9 +359,12 @@ public class QueryController implements Serializable
     {
       getState().getOffset().setValue(0l);
       getState().getSelectedMatches().setValue(new TreeSet<Long>());
+      // get the value for the visible segmentation from the configured context
+      // TODO: how to encode this state in the URL?
+      getState().getVisibleBaseText().setValue(getState().getContextBaseText().getValue());
     }
     // construct a query from the current properties
-    PagedResultQuery pagedQuery = getSearchQuery();
+    DisplayedResultQuery displayedQuery = getSearchQuery();
 
     searchView.getControlPanel().getQueryPanel().setStatus("Searching...");
 
@@ -369,18 +378,18 @@ public class QueryController implements Serializable
       session.getAttribute(MediaController.class).clearMediaPlayers();
     }
 
-    searchView.updateFragment(pagedQuery);
+    searchView.updateFragment(displayedQuery);
 
-    addHistoryEntry(pagedQuery);
+    addHistoryEntry(displayedQuery);
 
-    if (pagedQuery.getCorpora() == null || pagedQuery.getCorpora().
+    if (displayedQuery.getCorpora() == null || displayedQuery.getCorpora().
       isEmpty())
     {
       Notification.show("Please select a corpus",
         Notification.Type.WARNING_MESSAGE);
       return;
     }
-    if ("".equals(pagedQuery.getQuery()))
+    if ("".equals(displayedQuery.getQuery()))
     {
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
       return;
@@ -399,7 +408,7 @@ public class QueryController implements Serializable
     }
 
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
-      ui.getInstanceConfig(), pagedQuery);
+      ui.getInstanceConfig(), displayedQuery);
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
       ui, searchView, newResultView));
 
@@ -416,7 +425,7 @@ public class QueryController implements Serializable
     searchView.getMainTab().setSelectedTab(newResultView);
     searchView.notifiyQueryStarted();
 
-    Background.run(new ResultFetchJob(pagedQuery,
+    Background.run(new ResultFetchJob(displayedQuery,
       newResultView, ui));
 
     //
@@ -430,13 +439,13 @@ public class QueryController implements Serializable
 
     Future<MatchAndDocumentCount> futureCount = res.path("query").path("search").
       path("count").
-      queryParam("q", Helper.encodeJersey(pagedQuery.getQuery()))
-      .queryParam("corpora", StringUtils.join(pagedQuery.getCorpora(), ",")).
+      queryParam("q", Helper.encodeJersey(displayedQuery.getQuery()))
+      .queryParam("corpora", StringUtils.join(displayedQuery.getCorpora(), ",")).
       get(
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 
-    Background.run(new CountCallback(newResultView, pagedQuery.getLimit(), ui));
+    Background.run(new CountCallback(newResultView, displayedQuery.getLimit(), ui));
 
     //
     // end execute count

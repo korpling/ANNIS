@@ -25,8 +25,10 @@ import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
 import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.Query;
+import annis.gui.objects.QueryGenerator;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Background;
 import annis.libgui.Helper;
@@ -634,13 +636,23 @@ public class SearchView extends GridLayout implements View,
 
           controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
-          PagedResultQuery query = new PagedResultQuery(
-            Integer.parseInt(args.get("cl")),
-            Integer.parseInt(args.get("cr")),
-            Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
-            args.get("seg"),
-            args.get("q"), corpora);
+          DisplayedResultQuery query = QueryGenerator.displayed()
+            .left(Integer.parseInt(args.get("cl")))
+            .right(Integer.parseInt(args.get("cr")))
+            .offset(Integer.parseInt(args.get("s")))
+            .limit(Integer.parseInt(args.get("l")))
+            .segmentation(args.get("seg"))
+            .visibleSegmentation(args.get("vseg"))
+            .query(args.get("q"))
+            .corpora(corpora)
+            .build();
           
+          if(query.getVisibleSegmentation() == null && query.getSegmentation() != null)
+          {
+            // if no explicit visible segmentation was given use the same as the context
+            query.setVisibleSegmentation(query.getSegmentation());
+          }
+            
           String matchSelectionRaw = args.get("m");
           if(matchSelectionRaw != null)
           {
@@ -699,11 +711,11 @@ public class SearchView extends GridLayout implements View,
    *
    * @param q The query where the parameters are extracted from.
    */
-  public void updateFragment(PagedResultQuery q)
+  public void updateFragment(DisplayedResultQuery q)
   {
     List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(),
       q.getLeftContext(), q.getRightContext(),
-      q.getSegmentation(), q.getOffset(), q.getLimit(), q.getOrder(),
+      q.getSegmentation(), q.getVisibleSegmentation(), q.getOffset(), q.getLimit(), q.getOrder(),
       q.getSelectedMatches());
 
     // set our fragment

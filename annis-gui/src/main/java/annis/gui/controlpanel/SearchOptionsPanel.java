@@ -215,8 +215,8 @@ public class SearchOptionsPanel extends FormLayout
       cbLeftContext.setPropertyDataSource(state.getLeftContext());
       cbRightContext.setPropertyDataSource(state.getRightContext());
       cbResultsPerPage.setPropertyDataSource(state.getLimit());
-      cbSegmentation.setPropertyDataSource(state.getBaseText());
-
+      cbSegmentation.setPropertyDataSource(state.getContextBaseText());
+      
       BeanItemContainer<OrderType> orderContainer
         = new BeanItemContainer<>(OrderType.class,
           Lists.newArrayList(OrderType.values()));
@@ -362,7 +362,7 @@ public class SearchOptionsPanel extends FormLayout
   private void updateSegmentations(String segment,
     List<String> segNames)
   {
-
+    
     cbSegmentation.removeAllItems();
     cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
     cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
@@ -788,6 +788,7 @@ public class SearchOptionsPanel extends FormLayout
             corpusConfigurations.put(DEFAULT_CONFIG, corpusConfig);
           }
 
+          // init the UI with the default configuration (as long as no corpus was selected)
           Integer resultsPerPage = Integer.parseInt(corpusConfigurations.get(
             DEFAULT_CONFIG).getConfig(KEY_RESULT_PER_PAGE));
 

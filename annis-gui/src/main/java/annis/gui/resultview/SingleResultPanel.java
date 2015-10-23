@@ -21,6 +21,7 @@ import annis.gui.ShareSingleMatchGenerator;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
 import annis.gui.SearchView;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
@@ -147,7 +148,7 @@ public class SingleResultPanel extends CssLayout implements
     AnnisUI ui,
     Set<String> visibleTokenAnnos, String segmentationName,
     QueryController controller, InstanceConfig instanceConfig,
-    PagedResultQuery query)
+    DisplayedResultQuery query)
   {
     this.ps = ps;
     this.ui = ui;

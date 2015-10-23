@@ -21,6 +21,7 @@ import annis.gui.QueryController;
 import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.controlpanel.QueryPanel;
 import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
@@ -98,8 +99,6 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private final QueryController controller;
 
-  private String selectedSegmentationLayer;
-
   private final Set<String> segmentationLayerSet
     = Collections.synchronizedSet(new TreeSet<String>());
 
@@ -122,17 +121,16 @@ public class ResultViewPanel extends VerticalLayout implements
   private transient BlockingQueue<SaltProject> projectQueue;
 
   private PagedResultQuery currentQuery;
-  private final PagedResultQuery initialQuery;
+  private final DisplayedResultQuery initialQuery;
   private final AnnisUI sui;
 
   public ResultViewPanel(AnnisUI ui,
-    PluginSystem ps, InstanceConfig instanceConfig, PagedResultQuery initialQuery)
+    PluginSystem ps, InstanceConfig instanceConfig, DisplayedResultQuery initialQuery)
   {
     this.sui = ui;
     this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
     this.controller = ui.getQueryController();
-    this.selectedSegmentationLayer = ui.getQueryState().getBaseText().getValue();
     this.initialQuery = initialQuery;
     
     cacheResolver
@@ -244,10 +242,10 @@ public class ResultViewPanel extends VerticalLayout implements
         && corpusConfig.getConfig().containsKey(
           KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
       {
-        if (selectedSegmentationLayer == null)
+        if (sui.getQueryState().getVisibleBaseText().getValue() == null)
         {
-          selectedSegmentationLayer = corpusConfig.getConfig(
-            KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
+          sui.getQueryState().getVisibleBaseText().setValue(
+            corpusConfig.getConfig(KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
         }
       }
     }
@@ -306,7 +304,7 @@ public class ResultViewPanel extends VerticalLayout implements
           {
             resultPanelList.add(panel);
             resultLayout.addComponent(panel);
-            panel.setSegmentationLayer(selectedSegmentationLayer);
+            panel.setSegmentationLayer(sui.getQueryState().getVisibleBaseText().getValue());
           }
         }
 
@@ -475,14 +473,14 @@ public class ResultViewPanel extends VerticalLayout implements
     public void menuSelected(MenuItem selectedItem)
     {
       // remember old value
-      String oldSegmentationLayer = selectedSegmentationLayer;
+      String oldSegmentationLayer = sui.getQueryState().getVisibleBaseText().getValue();
 
       // set the new selected item
-      selectedSegmentationLayer = selectedItem.getText();
+      String newSegmentationLayer = selectedItem.getText();
 
-      if (NULL_SEGMENTATION_VALUE.equals(selectedSegmentationLayer))
+      if (NULL_SEGMENTATION_VALUE.equals(newSegmentationLayer))
       {
-        selectedSegmentationLayer = null;
+        newSegmentationLayer = null;
       }
       for (MenuItem mi : miSegmentation.getChildren())
       {
@@ -491,23 +489,20 @@ public class ResultViewPanel extends VerticalLayout implements
 
       if (oldSegmentationLayer != null)
       {
-        if (!oldSegmentationLayer.equals(selectedSegmentationLayer))
+        if (!oldSegmentationLayer.equals(newSegmentationLayer))
         {
-          setSegmentationLayer(selectedSegmentationLayer);
+          setSegmentationLayer(newSegmentationLayer);
         }
       }
-      else if (selectedSegmentationLayer != null)
+      else if (newSegmentationLayer != null)
       {
         // oldSegmentation is null, but selected is not
-        setSegmentationLayer(selectedSegmentationLayer);
+        setSegmentationLayer(newSegmentationLayer);
       }
 
       //update URL with newly selected segmentation layer
-      PagedResultQuery q = initialQuery.clone();
-      //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
-      q.setSegmentation(selectedSegmentationLayer);
-
-      sui.getSearchView().updateFragment(q);
+      sui.getQueryState().getVisibleBaseText().setValue(newSegmentationLayer);
+      sui.getSearchView().updateFragment(sui.getQueryController().getSearchQuery());
     }
   }
 
@@ -549,6 +544,7 @@ public class ResultViewPanel extends VerticalLayout implements
        * Check if a segmentation item must set checked. If no segmentation layer
        * is selected, set the default layer as selected.
        */
+      final String selectedSegmentationLayer = sui.getQueryState().getVisibleBaseText().getValue();
       if ((selectedSegmentationLayer == null && "".equals(s))
         || s.equals(selectedSegmentationLayer))
       {
