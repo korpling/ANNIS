@@ -642,15 +642,15 @@ public class SearchView extends GridLayout implements View,
             .offset(Integer.parseInt(args.get("s")))
             .limit(Integer.parseInt(args.get("l")))
             .segmentation(args.get("seg"))
-            .visibleSegmentation(args.get("vseg"))
+            .baseText(args.get("vseg"))
             .query(args.get("q"))
             .corpora(corpora)
             .build();
           
-          if(query.getVisibleSegmentation() == null && query.getSegmentation() != null)
+          if(query.getBaseText() == null && query.getSegmentation() != null)
           {
             // if no explicit visible segmentation was given use the same as the context
-            query.setVisibleSegmentation(query.getSegmentation());
+            query.setBaseText(query.getSegmentation());
           }
             
           String matchSelectionRaw = args.get("m");
@@ -715,7 +715,7 @@ public class SearchView extends GridLayout implements View,
   {
     List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(),
       q.getLeftContext(), q.getRightContext(),
-      q.getSegmentation(), q.getVisibleSegmentation(), q.getOffset(), q.getLimit(), q.getOrder(),
+      q.getSegmentation(), q.getBaseText(), q.getOffset(), q.getLimit(), q.getOrder(),
       q.getSelectedMatches());
 
     // set our fragment

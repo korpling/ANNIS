@@ -53,7 +53,7 @@ public class QueryUIState implements Serializable
   private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
   private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
   private final ObjectProperty<String> visibleBaseText = new ObjectProperty<>(null, String.class);
-  private final ObjectProperty<String> contextBaseText = new ObjectProperty<>(null, String.class);
+  private final ObjectProperty<String> contextSegmentation = new ObjectProperty<>(null, String.class);
   
   private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
   
@@ -135,9 +135,9 @@ public class QueryUIState implements Serializable
     return visibleBaseText;
   }
 
-  public ObjectProperty<String> getContextBaseText()
+  public ObjectProperty<String> getContextSegmentation()
   {
-    return contextBaseText;
+    return contextSegmentation;
   }
   
 

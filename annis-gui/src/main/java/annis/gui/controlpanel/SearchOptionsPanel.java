@@ -218,7 +218,7 @@ public class SearchOptionsPanel extends FormLayout
       cbLeftContext.setPropertyDataSource(state.getLeftContext());
       cbRightContext.setPropertyDataSource(state.getRightContext());
       cbResultsPerPage.setPropertyDataSource(state.getLimit());
-      cbSegmentation.setPropertyDataSource(state.getContextBaseText());
+      cbSegmentation.setPropertyDataSource(state.getContextSegmentation());
       
       BeanItemContainer<OrderType> orderContainer
         = new BeanItemContainer<>(OrderType.class,

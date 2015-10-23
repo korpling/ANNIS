@@ -285,7 +285,7 @@ public class QueryController implements Serializable
         setValue(((ContextualizedQuery) q).getLeftContext());
       state.getRightContext().setValue(((ContextualizedQuery) q).
         getRightContext());
-      state.getContextBaseText().setValue(((ContextualizedQuery) q).getSegmentation());
+      state.getContextSegmentation().setValue(((ContextualizedQuery) q).getSegmentation());
     }
     if (q instanceof PagedResultQuery)
     {
@@ -296,7 +296,7 @@ public class QueryController implements Serializable
     if(q instanceof DisplayedResultQuery)
     {
       state.getSelectedMatches().setValue(((DisplayedResultQuery) q).getSelectedMatches());
-      state.getVisibleBaseText().setValue(((DisplayedResultQuery) q).getVisibleSegmentation());
+      state.getVisibleBaseText().setValue(((DisplayedResultQuery) q).getBaseText());
     }
     if (q instanceof ExportQuery)
     {
@@ -320,8 +320,8 @@ public class QueryController implements Serializable
       .corpora(state.getSelectedCorpora().getValue())
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
-      .segmentation(state.getContextBaseText().getValue())
-      .visibleSegmentation(state.getVisibleBaseText().getValue())
+      .segmentation(state.getContextSegmentation().getValue())
+      .baseText(state.getVisibleBaseText().getValue())
       .limit(state.getLimit().getValue())
       .offset(state.getOffset().getValue())
       .order(state.getOrder().getValue())
@@ -361,7 +361,7 @@ public class QueryController implements Serializable
       getState().getSelectedMatches().setValue(new TreeSet<Long>());
       // get the value for the visible segmentation from the configured context
       // TODO: how to encode this state in the URL?
-      getState().getVisibleBaseText().setValue(getState().getContextBaseText().getValue());
+      getState().getVisibleBaseText().setValue(getState().getContextSegmentation().getValue());
     }
     // construct a query from the current properties
     DisplayedResultQuery displayedQuery = getSearchQuery();

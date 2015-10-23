@@ -27,7 +27,7 @@ import java.util.TreeSet;
 public class DisplayedResultQuery extends PagedResultQuery
 {
   private Set<Long> selectedMatches = new TreeSet<>();
-  private String visibleSegmentation;
+  private String baseText;
   
   public Set<Long> getSelectedMatches()
   {
@@ -40,21 +40,21 @@ public class DisplayedResultQuery extends PagedResultQuery
     this.selectedMatches = selectedMatches;
   }
 
-  public String getVisibleSegmentation()
+  public String getBaseText()
   {
-    return visibleSegmentation;
+    return baseText;
   }
 
-  public void setVisibleSegmentation(String visibleSegmentation)
+  public void setBaseText(String baseText)
   {
-    this.visibleSegmentation = visibleSegmentation;
+    this.baseText = baseText;
   }
   
   @Override
   public int hashCode()
   {
     return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(), 
-      getLimit(), getOffset(), getOrder(), getVisibleSegmentation(), getSelectedMatches());
+      getLimit(), getOffset(), getOrder(), getBaseText(), getSelectedMatches());
   }
 
   @Override
@@ -78,7 +78,7 @@ public class DisplayedResultQuery extends PagedResultQuery
       && Objects.equals(getLimit(), other.getLimit())
       && Objects.equals(getOffset(), other.getOffset())
       && Objects.equals(getOrder(), other.getOrder())
-      && Objects.equals(getVisibleSegmentation(), other.getVisibleSegmentation())
+      && Objects.equals(getBaseText(), other.getBaseText())
       && Objects.equals(getSelectedMatches(), other.getSelectedMatches());
   }
 }

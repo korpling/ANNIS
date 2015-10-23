@@ -140,9 +140,9 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
       return (DisplayedResultQueryGenerator) this;
     }
     
-    public DisplayedResultQueryGenerator visibleSegmentation(String val)
+    public DisplayedResultQueryGenerator baseText(String val)
     {
-      getCurrent().setVisibleSegmentation(val);
+      getCurrent().setBaseText(val);
       return (DisplayedResultQueryGenerator) this;
     }
   }
