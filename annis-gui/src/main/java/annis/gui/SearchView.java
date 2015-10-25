@@ -642,15 +642,21 @@ public class SearchView extends GridLayout implements View,
             .offset(Integer.parseInt(args.get("s")))
             .limit(Integer.parseInt(args.get("l")))
             .segmentation(args.get("seg"))
-            .baseText(args.get("vseg"))
+            .baseText(args.get("bt"))
             .query(args.get("q"))
             .corpora(corpora)
             .build();
+          
           
           if(query.getBaseText() == null && query.getSegmentation() != null)
           {
             // if no explicit visible segmentation was given use the same as the context
             query.setBaseText(query.getSegmentation());
+          }
+          if(query.getBaseText() != null && query.getBaseText().isEmpty())
+          {
+            // empty string means "null"
+            query.setBaseText(null);
           }
             
           String matchSelectionRaw = args.get("m");
