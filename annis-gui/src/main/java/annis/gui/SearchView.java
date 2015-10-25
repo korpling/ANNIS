@@ -76,7 +76,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -634,8 +633,6 @@ public class SearchView extends GridLayout implements View,
           //String b = args.get("cr");
           //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
 
-          controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
-
           DisplayedResultQuery query = QueryGenerator.displayed()
             .left(Integer.parseInt(args.get("cl")))
             .right(Integer.parseInt(args.get("cr")))
@@ -694,9 +691,6 @@ public class SearchView extends GridLayout implements View,
         }
         else if (args.get("q") != null)
         {
-          // do not change the manually selected search options
-          controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
-
           // use default context
           ui.getQueryController().setQuery(new Query(args.get("q"), corpora));
           ui.getQueryController().executeSearch(true, true);
