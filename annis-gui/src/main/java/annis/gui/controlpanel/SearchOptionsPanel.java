@@ -586,12 +586,13 @@ public class SearchOptionsPanel extends FormLayout
     @Override
     public void run()
     {
-      corpora.add(DEFAULT_CONFIG);
-      
       final List<String> segmentations = getSegmentationNamesFromService(corpora);
       
+      final Set<String> corporaWithDefault = new TreeSet<>(corpora);
+      corporaWithDefault.add(DEFAULT_CONFIG);
+
       final CorpusConfigMap corpusConfigs = new CorpusConfigMap();
-      for(String c : corpora)
+      for(String c : corporaWithDefault)
       {
         corpusConfigs.put(c, ui.getCorpusConfigWithCache(c));
       }
@@ -625,7 +626,7 @@ public class SearchOptionsPanel extends FormLayout
           cbOrder.setVisible(true);
           segmentationHelp.setVisible(true);
           
-          CorpusConfig c = mergeConfigs(corpora, corpusConfigs);
+          CorpusConfig c = mergeConfigs(corporaWithDefault, corpusConfigs);
           
           Integer resultsPerPage = getInteger(KEY_RESULT_PER_PAGE, c);
           Integer leftCtx = getInteger(KEY_MAX_CONTEXT_LEFT, c);
