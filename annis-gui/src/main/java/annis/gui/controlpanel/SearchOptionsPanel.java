@@ -26,8 +26,6 @@ import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.OrderType;
 import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Multiset;
-import com.google.common.collect.TreeMultiset;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.google.gwt.thirdparty.guava.common.collect.Lists;
@@ -43,9 +41,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -57,7 +53,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class SearchOptionsPanel extends FormLayout
@@ -217,16 +213,21 @@ public class SearchOptionsPanel extends FormLayout
     
     cbLeftContext.setNewItemHandler(new CustomContext(maxLeftContext));
     cbRightContext.setNewItemHandler(new CustomContext(maxRightContext));
-    cbResultsPerPage.setNewItemHandler(new CustomResultSize(
-      cbResultsPerPage));
+    cbResultsPerPage.setNewItemHandler(new CustomResultSize());
           
     
     contextContainerLeft.setItemSorter(new IntegerIDSorter());
     contextContainerRight.setItemSorter(new IntegerIDSorter());
+    resultsPerPageContainer.setItemSorter(new IntegerIDSorter());
     
     cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
     cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
-    
+
+    resultsPerPageContainer.removeAllItems();
+    for(Integer i :PREDEFINED_PAGE_SIZES)
+    {
+      resultsPerPageContainer.addItem(i);
+    }
 
     if (getUI() instanceof AnnisUI)
     {
@@ -486,50 +487,6 @@ public class SearchOptionsPanel extends FormLayout
     }
   }
 
-  /**
-   * Updates the results per page combobox.
-   *
-   * @param resultsPerPage The value, which is added to the combobox.
-   * @param keepCustomValues If this flag is true, custom values are kept.
-   * Custom in a sense, that the values are not calculated with
-   * {@link #generateConfig(java.util.Set)}
-   *
-   */
-  private void updateResultsPerPage(Integer resultsPerPage,
-    boolean keepCustomValues)
-  {
-
-    Set<Integer> tmpResultsPerPage = new TreeSet<>();
-    if (keepCustomValues)
-    {
-      Collection<?> itemIds = cbResultsPerPage.getItemIds();
-      Iterator<?> iterator = itemIds.iterator();
-
-      while (iterator.hasNext())
-      {
-        Object next = iterator.next();
-        tmpResultsPerPage.add((Integer) next);
-      }
-    }
-    else
-    {
-      for (Integer i : PREDEFINED_PAGE_SIZES)
-      {
-        tmpResultsPerPage.add(i);
-      }
-    }
-
-    tmpResultsPerPage.add(resultsPerPage);
-    cbResultsPerPage.removeAllItems();
-
-    for (Integer i : tmpResultsPerPage)
-    {
-      cbResultsPerPage.addItem(i);
-    }
-
-    cbResultsPerPage.setValue(resultsPerPage);
-    // /update result per page
-  }
 
   /**
    * Updates context combo boxes.
@@ -592,42 +549,32 @@ public class SearchOptionsPanel extends FormLayout
   private class CustomResultSize implements AbstractSelect.NewItemHandler
   {
 
-    ComboBox c;
-
-    CustomResultSize(ComboBox c)
-    {
-      this.c = c;
-    }
-
     @Override
     public void addNewItem(String resultPerPage)
     {
-      if (!c.containsId(resultPerPage))
+      try
       {
-        try
-        {
-          int i = Integer.parseInt((String) resultPerPage);
+        int i = Integer.parseInt((String) resultPerPage);
 
-          if (i < 1)
-          {
-            throw new IllegalArgumentException(
-              "result number has to be a positive number greater or equal than 1");
-          }
+        if (i < 1)
+        {
+          throw new IllegalArgumentException(
+            "result number has to be a positive number greater or equal than 1");
+        }
 
-          updateResultsPerPage(i, true);
-        }
-        catch (NumberFormatException ex)
-        {
-          Notification.show("invalid result per page input",
-            "Please enter valid numbers [0-9]",
-            Notification.Type.WARNING_MESSAGE);
-        }
-        catch (IllegalArgumentException ex)
-        {
-          Notification.show("invalid result per page input",
-            ex.getMessage(), Notification.Type.WARNING_MESSAGE);
-        }
       }
+      catch (NumberFormatException ex)
+      {
+        Notification.show("invalid result per page input",
+          "Please enter valid numbers [0-9]",
+          Notification.Type.WARNING_MESSAGE);
+      }
+      catch (IllegalArgumentException ex)
+      {
+        Notification.show("invalid result per page input",
+          ex.getMessage(), Notification.Type.WARNING_MESSAGE);
+      }
+
     }
   }
 
@@ -711,9 +658,11 @@ public class SearchOptionsPanel extends FormLayout
             ui.getQueryState().getLeftContext().setValue(defaultCtx);
             ui.getQueryState().getRightContext().setValue(defaultCtx);
           }
-          updateResultsPerPage(resultsPerPage, true);
           updateSegmentations(segment, segmentations);
-          
+          if(resultsPerPage != null)
+          {
+            ui.getQueryState().getLimit().setValue(resultsPerPage);
+          }
         }
       });
     }
