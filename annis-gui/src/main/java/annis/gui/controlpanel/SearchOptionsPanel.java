@@ -26,6 +26,8 @@ import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.OrderType;
 import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.TreeMultiset;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.google.gwt.thirdparty.guava.common.collect.Lists;
@@ -40,7 +42,6 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.UI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -50,6 +51,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,14 +87,6 @@ public class SearchOptionsPanel extends FormLayout
   private final static Escaper urlPathEscape = UrlEscapers.
     urlPathSegmentEscaper();
 
-  /**
-   * Holds all available corpus configuarations, including the defautl
-   * configeruation.
-   *
-   * The default configuration is available with the key "default-config"
-   */
-  private CorpusConfigMap corpusConfigurations;
-
   private final ComboBox cbLeftContext;
 
   private final ComboBox cbRightContext;
@@ -125,12 +119,17 @@ public class SearchOptionsPanel extends FormLayout
   private final Map<String, CorpusConfig> lastSelection;
   
   
-  BeanItemContainer<OrderType> orderContainer
+  private final BeanItemContainer<OrderType> orderContainer
     = new BeanItemContainer<>(OrderType.class,
       Lists.newArrayList(OrderType.values()));
-  private IndexedContainer contextContainerLeft = new IndexedContainer();
-  private IndexedContainer contextContainerRight = new IndexedContainer();
-
+  private final IndexedContainer contextContainerLeft = new IndexedContainer();
+  private final IndexedContainer contextContainerRight = new IndexedContainer();
+  private final IndexedContainer segmentationContainer = new IndexedContainer();
+  private final IndexedContainer resultsPerPageContainer = new IndexedContainer();
+ 
+  private final AtomicInteger maxLeftContext = new AtomicInteger(Integer.MAX_VALUE);
+  private final AtomicInteger maxRightContext = new AtomicInteger(Integer.MAX_VALUE);
+  
   public SearchOptionsPanel()
   {
     setWidth("100%");
@@ -144,9 +143,9 @@ public class SearchOptionsPanel extends FormLayout
     pbLoadConfig.setCaption("Loading search options...");
     addComponent(pbLoadConfig);
     
-    cbLeftContext = new ComboBox("Left Context");
-    cbRightContext = new ComboBox("Right Context");
-    cbResultsPerPage = new ComboBox("Results Per Page");
+    cbLeftContext = new ComboBox("Left Context", contextContainerLeft);
+    cbRightContext = new ComboBox("Right Context", contextContainerRight);
+    cbResultsPerPage = new ComboBox("Results Per Page", resultsPerPageContainer);
 
     cbLeftContext.setNullSelectionAllowed(false);
     cbRightContext.setNullSelectionAllowed(false);
@@ -164,8 +163,6 @@ public class SearchOptionsPanel extends FormLayout
     cbRightContext.setImmediate(true);
     cbResultsPerPage.setImmediate(true);
     
-    cbLeftContext.setContainerDataSource(contextContainerLeft);
-    cbRightContext.setContainerDataSource(contextContainerRight);
 
 //    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
 //      Integer.MIN_VALUE, Integer.MAX_VALUE));
@@ -173,7 +170,7 @@ public class SearchOptionsPanel extends FormLayout
 //      Integer.MIN_VALUE, Integer.MAX_VALUE));
 //    cbResultsPerPage.addValidator(new IntegerRangeValidator("must be a number",
 //      Integer.MIN_VALUE, Integer.MAX_VALUE));
-    cbSegmentation = new ComboBox("Show context in");
+    cbSegmentation = new ComboBox("Show context in", segmentationContainer);
 
     cbSegmentation.setTextInputAllowed(
       false);
@@ -191,7 +188,7 @@ public class SearchOptionsPanel extends FormLayout
     
     segmentationHelp = new HelpButton(cbSegmentation);
 
-    cbOrder = new ComboBox("Order");
+    cbOrder = new ComboBox("Order", orderContainer);
     cbOrder.setNewItemsAllowed(false);
     cbOrder.setNullSelectionAllowed(false);
     cbOrder.setImmediate(true);
@@ -201,6 +198,7 @@ public class SearchOptionsPanel extends FormLayout
     cbResultsPerPage.setVisible(false);
     cbOrder.setVisible(false);
     segmentationHelp.setVisible(false);
+    
     
     
     addComponent(cbLeftContext);
@@ -217,19 +215,27 @@ public class SearchOptionsPanel extends FormLayout
   {
     super.attach();
     
+    cbLeftContext.setNewItemHandler(new CustomContext(maxLeftContext));
+    cbRightContext.setNewItemHandler(new CustomContext(maxRightContext));
+    cbResultsPerPage.setNewItemHandler(new CustomResultSize(
+      cbResultsPerPage));
+          
+    
     contextContainerLeft.setItemSorter(new IntegerIDSorter());
     contextContainerRight.setItemSorter(new IntegerIDSorter());
     
     cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
     cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
     
-    Background.run(new CorpusConfigUpdater(getUI()));
 
     if (getUI() instanceof AnnisUI)
     {
       AnnisUI ui = (AnnisUI) getUI();
-     
+      
       QueryUIState state = ui.getQueryState();
+      
+      
+      Background.run(new CorpusConfigUpdater(ui, state.getSelectedCorpora().getValue()));
       
       cbLeftContext.setPropertyDataSource(state.getLeftContext());
       cbRightContext.setPropertyDataSource(state.getRightContext());
@@ -246,67 +252,7 @@ public class SearchOptionsPanel extends FormLayout
   public void updateSearchPanelConfigurationInBackground(
     final Set<String> corpora, final AnnisUI ui)
   {
-    Background.run(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        final List<String> segNames = getSegmentationNamesFromService(corpora);
-        // check if a configuration is already calculated
-        final String key = buildKey(corpora);
-        if (!lastSelection.containsKey(key))
-        {
-          lastSelection.put(key, generateConfig(corpora));
-        }
-        ui.access(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            // get values from configuration
-            Integer maxLeftCtx = getInteger(KEY_MAX_CONTEXT_LEFT, lastSelection.get(key));
-            Integer maxRightCtx = getInteger(KEY_MAX_CONTEXT_RIGHT, lastSelection.get(key));
-            Integer defaultCtx = getInteger(KEY_DEFAULT_CONTEXT, lastSelection.get(key));
-            Integer ctxSteps = getInteger(KEY_CONTEXT_STEPS, lastSelection.get(key));
-            Integer resultsPerPage = getInteger(KEY_RESULT_PER_PAGE, lastSelection.get(key));
-            String segment = lastSelection.get(key).getConfig(
-              KEY_DEFAULT_CONTEXT_SEGMENTATION);
-
-            if (optionsManuallyChanged)
-            {
-              String oldSegment = (String) cbSegmentation.getValue();
-              if (oldSegment == null || segNames.contains(oldSegment))
-              {
-                segment = oldSegment;
-              }
-              Integer oldResultsPerPage = (Integer) cbResultsPerPage.getValue();
-              if (oldResultsPerPage != null)
-              {
-                resultsPerPage = oldResultsPerPage;
-              }
-
-              // require another explicit manual change if values should be 
-              // re-used on next corpus selection change
-              optionsManuallyChanged = false;
-            }
-
-            // update the left and right context
-            updateContext(contextContainerLeft, maxLeftCtx, ctxSteps, false);
-            updateContext(contextContainerRight, maxRightCtx, ctxSteps, false);
-            if(defaultCtx != null)
-            {
-              ui.getQueryState().getLeftContext().setValue(defaultCtx);
-              ui.getQueryState().getRightContext().setValue(defaultCtx);
-            }
-            updateResultsPerPage(resultsPerPage, false);
-
-            updateSegmentations(segment, segNames);
-
-          }
-        });
-      }
-    });
-
+    Background.run(new CorpusConfigUpdater(ui, corpora));
   }
   
   private static Integer getInteger(String key, CorpusConfig config)
@@ -389,108 +335,88 @@ public class SearchOptionsPanel extends FormLayout
 
   /**
    * If all values of a specific corpus property have the same value, this value
-   * is returned, otherwise the value from the default config is choosen.
+   * is returned, otherwise the value of the default configuration is choosen.
    *
    * @param key The property key.
    * @param corpora Specifies the selected corpora.
    * @return A value defined in the copurs.properties file or in the
    * admin-service.properties
    */
-  private String theGreatestCommonDenominator(String key, Set<String> corpora)
+  private String mergeConfigValue(String key, Set<String> corpora,
+    CorpusConfigMap corpusConfigurations)
   {
-    int value = -1;
-    for (String corpus : corpora)
+    Set<String> values = new TreeSet<>();
+    for(String corpus : corpora)
     {
-      CorpusConfig c = null;
-      try
+      CorpusConfig config = corpusConfigurations.get(corpus);
+      if(config != null)
       {
-        if (corpus.equals(Helper.DEFAULT_CONFIG))
+        String v = config.getConfig(key);
+        if(v != null)
         {
-          continue;
+          values.add(v);
         }
-
-        if (corpusConfigurations.get(corpus) == null)
-        {
-          c = corpusConfigurations.get(DEFAULT_CONFIG);
-        }
-        else
-        {
-          c = corpusConfigurations.get(corpus);
-        }
-
-        // do nothing if not even default config is set
-        if (c == null)
-        {
-          continue;
-        }
-
-        if (!c.getConfig().containsKey(key))
-        {
-          value = Integer.parseInt(
-            corpusConfigurations.get(Helper.DEFAULT_CONFIG).getConfig().
-            getProperty(key));
-          break;
-        }
-
-        int tmp = Integer.parseInt(c.getConfig().getProperty(key));
-        if (value < 0)
-        {
-          value = tmp;
-        }
-
-        if (value != tmp)
-        {
-          value = Integer.parseInt(
-            corpusConfigurations.get(Helper.DEFAULT_CONFIG).getConfig().
-            getProperty(key));
-        }
-      }
-      catch (NumberFormatException ex)
-      {
-        log.error(
-          "Cannot parse the string to an integer for key {} in corpus {} config",
-          key, corpus, ex);
       }
     }
+    if(values.size() > 1)
+    {
+      // fallback to the default values
+      CorpusConfig defaultConfig = corpusConfigurations.get(DEFAULT_CONFIG);
+      if(defaultConfig == null)
+      {
+        // ok, just return the first value as a fallback of the fallback
+        return values.iterator().next();
+      }
+      else
+      {
+        return defaultConfig.getConfig(key);
+      }
+    }
+    else if(!values.isEmpty())
+    {
+      return values.iterator().next();
+    }
 
-    return String.valueOf(value);
+    return null;
   }
 
   /**
-   * Builds a config for selection of one or muliple corpora.
+   * Builds a single config for selection of one or muliple corpora.
    *
    * @param corpora Specifies the combination of corpora, for which the config
    * is calculated.
+   * @param corpusConfigurations  A map containg the known corpus configurations.
    * @return A new config which takes into account the segementation of all
    * selected corpora.
    */
-  private CorpusConfig generateConfig(Set<String> corpora)
+  private CorpusConfig mergeConfigs(Set<String> corpora, 
+    CorpusConfigMap corpusConfigurations)
   {
-    corpusConfigurations = Helper.getCorpusConfigs();
     CorpusConfig corpusConfig = new CorpusConfig();
 
     // calculate the left and right context.
-    String leftCtx = theGreatestCommonDenominator(KEY_MAX_CONTEXT_LEFT, corpora);
-    String rightCtx = theGreatestCommonDenominator(KEY_MAX_CONTEXT_RIGHT,
-      corpora);
+    String leftCtx = mergeConfigValue(KEY_MAX_CONTEXT_LEFT, corpora,
+      corpusConfigurations);
+    String rightCtx = mergeConfigValue(KEY_MAX_CONTEXT_RIGHT,
+      corpora, corpusConfigurations);
     corpusConfig.setConfig(KEY_MAX_CONTEXT_LEFT, leftCtx);
     corpusConfig.setConfig(KEY_MAX_CONTEXT_RIGHT, rightCtx);
 
     // calculate the default-context
-    corpusConfig.setConfig(KEY_CONTEXT_STEPS, theGreatestCommonDenominator(
-      KEY_CONTEXT_STEPS, corpora));
-    corpusConfig.setConfig(KEY_DEFAULT_CONTEXT, theGreatestCommonDenominator(
-      KEY_DEFAULT_CONTEXT, corpora));
+    corpusConfig.setConfig(KEY_CONTEXT_STEPS, mergeConfigValue(
+      KEY_CONTEXT_STEPS, corpora, corpusConfigurations));
+    corpusConfig.setConfig(KEY_DEFAULT_CONTEXT, mergeConfigValue(
+      KEY_DEFAULT_CONTEXT, corpora, corpusConfigurations));
 
     // get the results per page
-    corpusConfig.setConfig(KEY_RESULT_PER_PAGE, theGreatestCommonDenominator(
-      KEY_RESULT_PER_PAGE, corpora));
+    corpusConfig.setConfig(KEY_RESULT_PER_PAGE, mergeConfigValue(
+      KEY_RESULT_PER_PAGE, corpora, corpusConfigurations));
 
     corpusConfig.setConfig(KEY_DEFAULT_CONTEXT_SEGMENTATION, checkSegments(
-      KEY_DEFAULT_CONTEXT_SEGMENTATION, corpora));
+      KEY_DEFAULT_CONTEXT_SEGMENTATION, corpora, corpusConfigurations));
 
     corpusConfig.setConfig(KEY_DEFAULT_BASE_TEXT_SEGMENTATION, checkSegments(
-      KEY_DEFAULT_BASE_TEXT_SEGMENTATION, corpora));
+      KEY_DEFAULT_BASE_TEXT_SEGMENTATION, corpora, corpusConfigurations));
 
     return corpusConfig;
   }
@@ -505,7 +431,7 @@ public class SearchOptionsPanel extends FormLayout
    * @param corpora the corpora which has to be checked.
    * @return "tok" or a segment which is defined in all corpora.
    */
-  private String checkSegments(String key, Set<String> corpora)
+  private String checkSegments(String key, Set<String> corpora, CorpusConfigMap corpusConfigurations)
   {
     String segmentation = null;
     for (String corpus : corpora)
@@ -668,12 +594,9 @@ public class SearchOptionsPanel extends FormLayout
 
     ComboBox c;
 
-    int resultPerPage;
-
-    CustomResultSize(ComboBox c, int resultPerPage)
+    CustomResultSize(ComboBox c)
     {
       this.c = c;
-      this.resultPerPage = resultPerPage;
     }
 
     @Override
@@ -711,20 +634,41 @@ public class SearchOptionsPanel extends FormLayout
   private class CorpusConfigUpdater implements Runnable
   {
     
-    private final UI ui;
-
-    public CorpusConfigUpdater(UI ui)
+    private final AnnisUI ui;
+    private final Set<String> corpora;
+    
+    public CorpusConfigUpdater(AnnisUI ui, Set<String> corpora)
     {
       this.ui = ui;
+      this.corpora = corpora;
     }
-    
-    
 
     @Override
     public void run()
     {
+      corpora.add(DEFAULT_CONFIG);
       
-      final CorpusConfigMap newCorpusConfigurations = Helper.getCorpusConfigs();
+      final List<String> segmentations = getSegmentationNamesFromService(corpora);
+      
+      final CorpusConfigMap corpusConfigs = new CorpusConfigMap();
+      for(String c : corpora)
+      {
+        corpusConfigs.put(c, ui.getCorpusConfigWithCache(c));
+      }
+      
+      // if there are not any defaults create them
+      if (!corpusConfigs.containsConfig(DEFAULT_CONFIG))
+      {
+        CorpusConfig defaultConfig = new CorpusConfig();
+        defaultConfig.setConfig(KEY_MAX_CONTEXT_LEFT, "5");
+        defaultConfig.setConfig(KEY_MAX_CONTEXT_RIGHT, "5");
+        defaultConfig.setConfig(KEY_CONTEXT_STEPS, "5");
+        defaultConfig.setConfig(KEY_RESULT_PER_PAGE, "10");
+        defaultConfig.setConfig(KEY_DEFAULT_CONTEXT, "5");
+        defaultConfig.setConfig(KEY_DEFAULT_CONTEXT_SEGMENTATION, "tok");
+        defaultConfig.setConfig(KEY_DEFAULT_BASE_TEXT_SEGMENTATION, "tok");
+        corpusConfigs.put(DEFAULT_CONFIG, defaultConfig);
+      }
 
       // update GUI
       ui.accessSynchronously(new Runnable()
@@ -741,49 +685,35 @@ public class SearchOptionsPanel extends FormLayout
           cbOrder.setVisible(true);
           segmentationHelp.setVisible(true);
           
-          corpusConfigurations = newCorpusConfigurations;
-
-          if (corpusConfigurations == null
-            || corpusConfigurations.get(DEFAULT_CONFIG) == null
-            || corpusConfigurations.get(DEFAULT_CONFIG).isEmpty())
-          {
-            CorpusConfig corpusConfig = new CorpusConfig();
-            corpusConfig.setConfig(KEY_MAX_CONTEXT_LEFT, "5");
-            corpusConfig.setConfig(KEY_MAX_CONTEXT_RIGHT, "5");
-            corpusConfig.setConfig(KEY_CONTEXT_STEPS, "5");
-            corpusConfig.setConfig(KEY_RESULT_PER_PAGE, "10");
-            corpusConfig.setConfig(KEY_DEFAULT_CONTEXT, "5");
-            corpusConfig.setConfig(KEY_DEFAULT_CONTEXT_SEGMENTATION, "tok");
-            corpusConfig.setConfig(KEY_DEFAULT_BASE_TEXT_SEGMENTATION, "tok");
-            corpusConfigurations = new CorpusConfigMap();
-            corpusConfigurations.put(DEFAULT_CONFIG, corpusConfig);
-          }
-
-          // init the UI with the default configuration (as long as no corpus was selected)
-          Integer resultsPerPage = getInteger(KEY_RESULT_PER_PAGE, corpusConfigurations.get(
-            DEFAULT_CONFIG));
-
-          Integer leftCtx = getInteger(KEY_MAX_CONTEXT_LEFT,corpusConfigurations.
-            get(DEFAULT_CONFIG));
-
-          Integer rightCtx = getInteger(KEY_MAX_CONTEXT_RIGHT,
-            corpusConfigurations.get(DEFAULT_CONFIG));
-
-          Integer ctxSteps = getInteger(KEY_CONTEXT_STEPS,
-            corpusConfigurations.get(DEFAULT_CONFIG));
+          CorpusConfig c = mergeConfigs(corpora, corpusConfigs);
           
-          cbLeftContext.setNewItemHandler(new CustomContext(cbLeftContext,
-            leftCtx,
-            ctxSteps));
-          cbRightContext.setNewItemHandler(new CustomContext(cbRightContext,
-            rightCtx,
-            ctxSteps));
-          cbResultsPerPage.setNewItemHandler(new CustomResultSize(
-            cbResultsPerPage,
-            resultsPerPage));
+          Integer resultsPerPage = getInteger(KEY_RESULT_PER_PAGE, c);
+          Integer leftCtx = getInteger(KEY_MAX_CONTEXT_LEFT, c);
+          if(leftCtx != null)
+          {
+            maxLeftContext.set(leftCtx);
+          }
+          
+          Integer rightCtx = getInteger(KEY_MAX_CONTEXT_RIGHT, c);
+          if(rightCtx != null)
+          {
+            maxRightContext.set(rightCtx);
+          }
+          Integer defaultCtx = getInteger(KEY_DEFAULT_CONTEXT, c);
+
+          Integer ctxSteps = getInteger(KEY_CONTEXT_STEPS, c);
+          String segment = c.getConfig(KEY_DEFAULT_CONTEXT_SEGMENTATION);
           
           updateContext(contextContainerLeft, leftCtx, ctxSteps, true);
           updateContext(contextContainerRight, rightCtx, ctxSteps, true);
+          if (defaultCtx != null)
+          {
+            ui.getQueryState().getLeftContext().setValue(defaultCtx);
+            ui.getQueryState().getRightContext().setValue(defaultCtx);
+          }
+          updateResultsPerPage(resultsPerPage, true);
+          updateSegmentations(segment, segmentations);
+          
         }
       });
     }
@@ -792,56 +722,44 @@ public class SearchOptionsPanel extends FormLayout
 
   private class CustomContext implements AbstractSelect.NewItemHandler
   {
-
-    ComboBox c;
-
-    int ctx;
-
-    int ctxSteps;
-
-    CustomContext(ComboBox c, int ctx, int ctxSteps)
+    private AtomicInteger maxCtx;
+    public CustomContext(AtomicInteger maxCtx)
     {
-      this.c = c;
-      this.ctx = ctx;
-      this.ctxSteps = ctxSteps;
+      this.maxCtx = maxCtx;
     }
 
     @Override
     public void addNewItem(String context)
     {
-      if (!c.containsId(context))
+      try
       {
-        try
+        int i = Integer.parseInt((String) context);
+
+        if (i < 0)
         {
-          int i = Integer.parseInt((String) context);
-
-          if (i < 0)
-          {
-            throw new IllegalArgumentException(
-              "context has to be a positive number or 0");
-          }
-
-          if (i > ctx)
-          {
-            throw new IllegalArgumentException(
-              "The context is greater than, than the max value defined in the corpus property file.");
-          }
-
-          updateContext(c.getContainerDataSource(), ctx, ctxSteps, true);
+          throw new IllegalArgumentException(
+            "context has to be a positive number or 0");
         }
-        catch (NumberFormatException ex)
+
+        if (i > maxCtx.get())
         {
-          Notification.show("invalid context input",
-            "Please enter valid numbers [0-9]",
-            Notification.Type.WARNING_MESSAGE);
-        }
-        catch (IllegalArgumentException ex)
-        {
-          Notification.show("invalid context input",
-            ex.getMessage(),
-            Notification.Type.WARNING_MESSAGE);
+          throw new IllegalArgumentException(
+            "The context is greater than, than the max value defined in the corpus property file.");
         }
       }
+      catch (NumberFormatException ex)
+      {
+        Notification.show("invalid context input",
+          "Please enter valid numbers [0-9]",
+          Notification.Type.WARNING_MESSAGE);
+      }
+      catch (IllegalArgumentException ex)
+      {
+        Notification.show("invalid context input",
+          ex.getMessage(),
+          Notification.Type.WARNING_MESSAGE);
+      }
+
     }
   }
   
