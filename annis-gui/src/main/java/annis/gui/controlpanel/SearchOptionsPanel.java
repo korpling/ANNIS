@@ -350,21 +350,18 @@ public class SearchOptionsPanel extends FormLayout
         }
       }
     }
-    if(values.size() > 1)
+    if(values.size() > 1 || values.isEmpty())
     {
       // fallback to the default values
       CorpusConfig defaultConfig = corpusConfigurations.get(DEFAULT_CONFIG);
-      if(defaultConfig == null)
-      {
-        // ok, just return the first value as a fallback of the fallback
-        return values.iterator().next();
-      }
-      else
+      if(defaultConfig != null && defaultConfig.containsKey(key))
       {
         return defaultConfig.getConfig(key);
       }
-    }
-    else if(!values.isEmpty())
+    }    
+
+      // ok, just return the first value as a fallback of the fallback
+    if(!values.isEmpty())
     {
       return values.iterator().next();
     }
@@ -609,7 +606,7 @@ public class SearchOptionsPanel extends FormLayout
           cbOrder.setVisible(true);
           segmentationHelp.setVisible(true);
           
-          CorpusConfig c = mergeConfigs(corporaWithDefault, corpusConfigs);
+          CorpusConfig c = mergeConfigs(corpora, corpusConfigs);
           
           Integer resultsPerPage = getInteger(KEY_RESULT_PER_PAGE, c);
           Integer leftCtx = getInteger(KEY_MAX_CONTEXT_LEFT, c);
