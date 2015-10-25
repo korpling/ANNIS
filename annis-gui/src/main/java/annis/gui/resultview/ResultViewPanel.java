@@ -230,26 +230,6 @@ public class ResultViewPanel extends VerticalLayout implements
     resultLayout.removeAllComponents();
     resultPanelList.clear();
 
-    Set<String> corpora = q.getCorpora();
-
-    if (corpora.size() == 1)
-    {
-
-      // fetched corpus config
-      CorpusConfig corpusConfig = Helper.getCorpusConfig(corpora.iterator().
-        next());
-      if (corpusConfig != null && corpusConfig.getConfig() != null
-        && corpusConfig.getConfig().containsKey(
-          KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
-      {
-        if (sui.getQueryState().getVisibleBaseText().getValue() == null)
-        {
-          sui.getQueryState().getVisibleBaseText().setValue(
-            corpusConfig.getConfig(KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
-        }
-      }
-    }
-
     // get the first query result
     SaltProject first = queue.poll();
     Preconditions.checkState(first != null,

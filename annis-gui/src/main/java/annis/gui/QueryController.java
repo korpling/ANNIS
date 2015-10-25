@@ -21,6 +21,7 @@ import annis.gui.controller.ExportBackgroundJob;
 import annis.gui.controller.FrequencyBackgroundJob;
 import annis.gui.controller.SpecificPagingCallback;
 import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
@@ -42,6 +43,7 @@ import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.model.AqlParseError;
 import annis.model.QueryNode;
+import annis.service.objects.CorpusConfig;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.FrequencyTableQuery;
@@ -360,8 +362,16 @@ public class QueryController implements Serializable
       getState().getOffset().setValue(0l);
       getState().getSelectedMatches().setValue(new TreeSet<Long>());
       // get the value for the visible segmentation from the configured context
-      // TODO: how to encode this state in the URL?
-      getState().getVisibleBaseText().setValue(getState().getContextSegmentation().getValue());
+      CorpusConfig config = ui.getCorpusConfigWithCache(
+        getState().getSelectedCorpora().getValue().iterator().next());
+      if(config.containsKey(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
+      {
+        getState().getVisibleBaseText().setValue(config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
+      }
+      else
+      {
+        getState().getVisibleBaseText().setValue(getState().getContextSegmentation().getValue());
+      }
     }
     // construct a query from the current properties
     DisplayedResultQuery displayedQuery = getSearchQuery();

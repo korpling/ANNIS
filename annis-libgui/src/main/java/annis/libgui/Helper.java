@@ -413,14 +413,10 @@ public class Helper
         result.add("_seg="
           + encodeBase64URL(segmentation));
       }
-      if (visibleSegmentation != null)
+      // only output "bt" if it is not the same as the context segmentation
+      if(!Objects.equals(visibleSegmentation, segmentation))
       {
-        // only output "vseg" if it is not the same as the context segmentation
-        if(!Objects.equals(visibleSegmentation, segmentation))
-        {
-          result.add("_vseg="
-            + encodeBase64URL(visibleSegmentation));
-        }
+        result.add("_bt=" + (visibleSegmentation == null ? "" : encodeBase64URL(visibleSegmentation)));
       }
       if (order != OrderType.ascending && order != null)
       {
