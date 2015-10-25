@@ -31,7 +31,10 @@ import com.google.common.net.UrlEscapers;
 import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.ItemSorter;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
@@ -120,6 +123,12 @@ public class SearchOptionsPanel extends FormLayout
    * {@link #buildKey()}.
    */
   private final Map<String, CorpusConfig> lastSelection;
+  
+  
+  BeanItemContainer<OrderType> orderContainer
+    = new BeanItemContainer<>(OrderType.class,
+      Lists.newArrayList(OrderType.values()));
+  IndexedContainer contextContainer = new IndexedContainer();
 
   public SearchOptionsPanel()
   {
@@ -153,6 +162,9 @@ public class SearchOptionsPanel extends FormLayout
     cbLeftContext.setImmediate(true);
     cbRightContext.setImmediate(true);
     cbResultsPerPage.setImmediate(true);
+    
+    cbLeftContext.setContainerDataSource(contextContainer);
+    cbRightContext.setContainerDataSource(contextContainer);
 
 //    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
 //      Integer.MIN_VALUE, Integer.MAX_VALUE));
@@ -204,6 +216,8 @@ public class SearchOptionsPanel extends FormLayout
   {
     super.attach();
     
+    contextContainer.setItemSorter(new IntegerIDSorter());
+    
     cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
     cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
     
@@ -220,22 +234,15 @@ public class SearchOptionsPanel extends FormLayout
       cbResultsPerPage.setPropertyDataSource(state.getLimit());
       cbSegmentation.setPropertyDataSource(state.getContextSegmentation());
       
-      BeanItemContainer<OrderType> orderContainer
-        = new BeanItemContainer<>(OrderType.class,
-          Lists.newArrayList(OrderType.values()));
       
-      // Unset the property data source first, otherwise the setting of 
-      // the container data source will set the property value to null 
-      cbOrder.setPropertyDataSource(null);
-      cbOrder.setContainerDataSource(orderContainer);
-      
+      orderContainer.removeAllItems();
       cbOrder.setPropertyDataSource(state.getOrder());
       
     }
   }
 
   public void updateSearchPanelConfigurationInBackground(
-    final Set<String> corpora, final UI ui)
+    final Set<String> corpora, final AnnisUI ui)
   {
     Background.run(new Runnable()
     {
@@ -273,23 +280,8 @@ public class SearchOptionsPanel extends FormLayout
             String segment = lastSelection.get(key).getConfig(
               KEY_DEFAULT_CONTEXT_SEGMENTATION);
 
-            int selectedLeftCtx = defaultCtx;
-            int selectedRightCtx = defaultCtx;
             if (optionsManuallyChanged)
             {
-              // check if we can re-use the old values
-              Integer oldValueLeft = (Integer) cbLeftContext.getValue();
-              Integer oldValueRight = (Integer) cbRightContext.getValue();
-
-              if (oldValueLeft != null && oldValueLeft >= 0 && oldValueLeft <= maxLeftCtx)
-              {
-                selectedLeftCtx = oldValueLeft;
-              }
-
-              if (oldValueRight != null && oldValueRight >= 0 && oldValueRight <= maxRightCtx)
-              {
-                selectedRightCtx = oldValueRight;
-              }
               String oldSegment = (String) cbSegmentation.getValue();
               if (oldSegment == null || segNames.contains(oldSegment))
               {
@@ -307,10 +299,7 @@ public class SearchOptionsPanel extends FormLayout
             }
 
             // update the left and right context
-            updateContext(cbLeftContext, maxLeftCtx, ctxSteps, selectedLeftCtx,
-              false);
-            updateContext(cbRightContext, maxRightCtx, ctxSteps,
-              selectedRightCtx, false);
+            updateContext(maxLeftCtx, ctxSteps, false);
             updateResultsPerPage(resultsPerPage, false);
 
             updateSegmentations(segment, segNames);
@@ -402,7 +391,7 @@ public class SearchOptionsPanel extends FormLayout
   private String theGreatestCommonDenominator(String key, Set<String> corpora)
   {
     int value = -1;
-
+    AnnisUI ui;
     for (String corpus : corpora)
     {
       CorpusConfig c = null;
@@ -615,57 +604,31 @@ public class SearchOptionsPanel extends FormLayout
    * @param c the combo box, which is updated.
    * @param maxCtx the larges context values until context steps are calculated.
    * @param ctxSteps the step range.
-   * @param defaultCtx the value the combobox is set to.
    * @param keepCustomValues If this is true all custom values are kept.
    */
-  private void updateContext(ComboBox c, int maxCtx, int ctxSteps,
-    int defaultCtx, boolean keepCustomValues)
+  private void updateContext(int maxCtx, int ctxSteps, boolean keepCustomValues)
   {
 
-    /**
-     * The sorting via index container is much to complex for me, so I sort the
-     * items first and put them afterwards into the combo boxes.
-     */
-    SortedSet<Integer> steps = new TreeSet<>();
-
-    if (keepCustomValues)
+    if(!keepCustomValues)
     {
-      Collection<?> itemIds = c.getItemIds();
-      Iterator<?> iterator = itemIds.iterator();
-
-      while (iterator.hasNext())
-      {
-        Object next = iterator.next();
-        steps.add((Integer) next);
-      }
+      contextContainer.removeAllItems();
     }
-    else
+    
+    for (Integer i : PREDEFINED_CONTEXTS)
     {
-
-      for (Integer i : PREDEFINED_CONTEXTS)
+      if (i < maxCtx)
       {
-        if (i < maxCtx)
-        {
-          steps.add(i);
-        }
-      }
-
-      for (int step = ctxSteps; step < maxCtx; step += ctxSteps)
-      {
-        steps.add(step);
+        contextContainer.addItem(i);
       }
     }
 
-    steps.add(maxCtx);
-    steps.add(defaultCtx);
-
-    c.removeAllItems();
-    for (Integer i : steps)
+    for (int step = ctxSteps; step < maxCtx; step += ctxSteps)
     {
-      c.addItem(i);
+      contextContainer.addItem(step);
     }
 
-    c.setValue(defaultCtx);
+    contextContainer.addItem(maxCtx);
+
   }
 
   /**
@@ -857,7 +820,7 @@ public class SearchOptionsPanel extends FormLayout
               "The context is greater than, than the max value defined in the corpus property file.");
           }
 
-          updateContext(c, ctx, ctxSteps, i, true);
+          updateContext(ctx, ctxSteps, true);
         }
         catch (NumberFormatException ex)
         {
@@ -874,4 +837,27 @@ public class SearchOptionsPanel extends FormLayout
       }
     }
   }
+  
+  public static class IntegerIDSorter implements ItemSorter
+  {
+
+    @Override
+    public void setSortProperties(Container.Sortable container,
+      Object[] propertyId, boolean[] ascending)
+    {
+      // does nothing
+    }
+
+    @Override
+    public int compare(Object itemId1, Object itemId2)
+    { 
+      if(itemId1 instanceof Integer && itemId2 instanceof Integer)
+      {
+        return Integer.compare((Integer) itemId1, (Integer) itemId2);
+      }
+      return 0;
+    }
+    
+  }
+  
 }
