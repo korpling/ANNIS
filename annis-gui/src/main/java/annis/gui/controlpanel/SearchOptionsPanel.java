@@ -211,9 +211,9 @@ public class SearchOptionsPanel extends FormLayout
   {
     super.attach();
     
-    cbLeftContext.setNewItemHandler(new CustomContext(maxLeftContext));
-    cbRightContext.setNewItemHandler(new CustomContext(maxRightContext));
-    cbResultsPerPage.setNewItemHandler(new CustomResultSize());
+    cbLeftContext.setNewItemHandler(new CustomContext(maxLeftContext, contextContainerLeft));
+    cbRightContext.setNewItemHandler(new CustomContext(maxRightContext, contextContainerRight));
+    cbResultsPerPage.setNewItemHandler(new CustomResultSize(resultsPerPageContainer));
           
     
     contextContainerLeft.setItemSorter(new IntegerIDSorter());
@@ -521,33 +521,20 @@ public class SearchOptionsPanel extends FormLayout
 
   }
 
-  /**
-   * Builds a Key for {@link #lastSelection} of multiple corpus selections.
-   *
-   * @param corpusNames A List of corpusnames, for which the key is generated.
-   * @return A String which is a concatenation of all corpus names, sorted by
-   * their names.
-   */
-  private static String buildKey(Set<String> corpusNames)
-  {
-    SortedSet<String> names = new TreeSet<>(corpusNames);
-    StringBuilder key = new StringBuilder();
-
-    for (String name : names)
-    {
-      key.append(name);
-    }
-
-    return key.toString();
-  }
 
   public void setOptionsManuallyChanged(boolean optionsManuallyChanged)
   {
     this.optionsManuallyChanged = optionsManuallyChanged;
   }
 
-  private class CustomResultSize implements AbstractSelect.NewItemHandler
+  private static class CustomResultSize implements AbstractSelect.NewItemHandler
   {
+    private final IndexedContainer container;
+    
+    public CustomResultSize(IndexedContainer container)
+    {
+      this.container = container;
+    }
 
     @Override
     public void addNewItem(String resultPerPage)
@@ -561,6 +548,7 @@ public class SearchOptionsPanel extends FormLayout
           throw new IllegalArgumentException(
             "result number has to be a positive number greater or equal than 1");
         }
+        container.addItem(i);
 
       }
       catch (NumberFormatException ex)
@@ -669,12 +657,14 @@ public class SearchOptionsPanel extends FormLayout
 
   }
 
-  private class CustomContext implements AbstractSelect.NewItemHandler
+  private static class CustomContext implements AbstractSelect.NewItemHandler
   {
-    private AtomicInteger maxCtx;
-    public CustomContext(AtomicInteger maxCtx)
+    private final AtomicInteger maxCtx;
+    private final IndexedContainer container;
+    public CustomContext(AtomicInteger maxCtx,IndexedContainer container)
     {
       this.maxCtx = maxCtx;
+      this.container = container;
     }
 
     @Override
@@ -695,6 +685,9 @@ public class SearchOptionsPanel extends FormLayout
           throw new IllegalArgumentException(
             "The context is greater than, than the max value defined in the corpus property file.");
         }
+        
+        // everything ok, add the value
+        container.addItem(i);
       }
       catch (NumberFormatException ex)
       {
