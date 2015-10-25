@@ -32,6 +32,7 @@ import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Container;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.ItemSorter;
@@ -211,11 +212,6 @@ public class SearchOptionsPanel extends FormLayout
   {
     super.attach();
     
-    cbLeftContext.setNewItemHandler(new CustomContext(maxLeftContext, contextContainerLeft));
-    cbRightContext.setNewItemHandler(new CustomContext(maxRightContext, contextContainerRight));
-    cbResultsPerPage.setNewItemHandler(new CustomResultSize(resultsPerPageContainer));
-          
-    
     contextContainerLeft.setItemSorter(new IntegerIDSorter());
     contextContainerRight.setItemSorter(new IntegerIDSorter());
     resultsPerPageContainer.setItemSorter(new IntegerIDSorter());
@@ -235,8 +231,14 @@ public class SearchOptionsPanel extends FormLayout
       
       QueryUIState state = ui.getQueryState();
       
-      
-      Background.run(new CorpusConfigUpdater(ui, state.getSelectedCorpora().getValue()));
+      Background.run(new CorpusConfigUpdater(ui, state.getSelectedCorpora().getValue()));      
+
+      cbLeftContext.setNewItemHandler(new CustomContext(maxLeftContext, contextContainerLeft,
+        state.getLeftContext()));
+      cbRightContext.setNewItemHandler(new CustomContext(maxRightContext, contextContainerRight,
+        state.getRightContext()));
+      cbResultsPerPage.setNewItemHandler(new CustomResultSize(resultsPerPageContainer, state.getLimit()));
+
       
       cbLeftContext.setPropertyDataSource(state.getLeftContext());
       cbRightContext.setPropertyDataSource(state.getRightContext());
@@ -530,10 +532,12 @@ public class SearchOptionsPanel extends FormLayout
   private static class CustomResultSize implements AbstractSelect.NewItemHandler
   {
     private final IndexedContainer container;
+    private final Property<Integer> prop;
     
-    public CustomResultSize(IndexedContainer container)
+    public CustomResultSize(IndexedContainer container, Property<Integer> prop)
     {
       this.container = container;
+      this.prop = prop;
     }
 
     @Override
@@ -549,7 +553,8 @@ public class SearchOptionsPanel extends FormLayout
             "result number has to be a positive number greater or equal than 1");
         }
         container.addItem(i);
-
+        container.sort(null, null);
+        prop.setValue(i);
       }
       catch (NumberFormatException ex)
       {
@@ -661,10 +666,14 @@ public class SearchOptionsPanel extends FormLayout
   {
     private final AtomicInteger maxCtx;
     private final IndexedContainer container;
-    public CustomContext(AtomicInteger maxCtx,IndexedContainer container)
+    private final Property<Integer> prop;
+    
+    public CustomContext(AtomicInteger maxCtx,IndexedContainer container,
+      Property<Integer> prop)
     {
       this.maxCtx = maxCtx;
       this.container = container;
+      this.prop = prop;
     }
 
     @Override
@@ -688,6 +697,8 @@ public class SearchOptionsPanel extends FormLayout
         
         // everything ok, add the value
         container.addItem(i);
+        container.sort(null, null);
+        prop.setValue(i);
       }
       catch (NumberFormatException ex)
       {
