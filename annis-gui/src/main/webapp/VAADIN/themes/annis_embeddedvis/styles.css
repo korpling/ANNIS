@@ -13417,15 +13417,18 @@ div.v-layout.v-horizontal.v-widget {
 	direction: rtl;
 }
 
-.annis_embeddedvis .shared-text {
+.annis_embeddedvis textarea.shared-text, .annis_embeddedvis div.shared-text {
 	background-color: white;
 	border-style: solid;
 	border-color: black;
 	border-width: 1px;
+	border-width: 1px;
+	border-radius: 4px;
+	padding: 4px;
 	font-family: monospace;
 }
 
-.annis_embeddedvis .shared-text:focus {
+.annis_embeddedvis textarea.shared-text:focus, .annis_embeddedvis div.shared-text:focus {
 	border-color: black;
 }
 
@@ -13736,7 +13739,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .annis_embeddedvis .selected-match .info-bar .path-label {
-	text-decoration: underline;
+	font-weight: bold;
 }
 
 .annis_embeddedvis .v-menubar-popup .v-menubar-menuitem-huge, .annis_embeddedvis .v-menubar-popup .v-menubar-menuitem-huge-selected {

@@ -341,8 +341,8 @@ public class SingleResultPanel extends CssLayout implements
     }
     
     Window window = new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName, ps);
-    window.setWidth(70, Unit.EM);
-    window.setHeight(45, Unit.EM);
+    window.setWidth(800, Unit.PIXELS);
+    window.setHeight(600, Unit.PIXELS);
     window.setResizable(true);
     window.setModal(true);
     

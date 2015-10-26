@@ -12351,15 +12351,18 @@ div.v-layout.v-horizontal.v-widget {
 	direction: rtl;
 }
 
-.annis .shared-text {
+.annis textarea.shared-text, .annis div.shared-text {
 	background-color: white;
 	border-style: solid;
 	border-color: black;
 	border-width: 1px;
+	border-width: 1px;
+	border-radius: 4px;
+	padding: 4px;
 	font-family: monospace;
 }
 
-.annis .shared-text:focus {
+.annis textarea.shared-text:focus, .annis div.shared-text:focus {
 	border-color: black;
 }
 
@@ -12670,7 +12673,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .annis .selected-match .info-bar .path-label {
-	text-decoration: underline;
+	font-weight: bold;
 }
 
 .annis .v-menubar-popup .v-menubar-menuitem-huge, .annis .v-menubar-popup .v-menubar-menuitem-huge-selected {

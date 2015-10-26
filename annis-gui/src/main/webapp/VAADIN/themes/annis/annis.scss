@@ -116,11 +116,14 @@ $font-size: 10pt;
     direction: rtl;
   }
   
-  .shared-text {
+  textarea.shared-text, div.shared-text {
     background-color: white;
     border-style: solid;
     border-color: black;
     border-width: 1px;
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 4px;
     font-family: monospace;
     &:focus {
       border-color: black;
@@ -243,7 +246,7 @@ $font-size: 10pt;
   .selected-match .info-bar {
       background-color: rgb(129, 184, 255);
       .path-label {
-        text-decoration: underline;
+        font-weight: bold;
       }
    }
 
