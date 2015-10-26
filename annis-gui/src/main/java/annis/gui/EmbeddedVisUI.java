@@ -226,18 +226,18 @@ public class EmbeddedVisUI extends CommonUI
         visInput.setNamespace(namespace[0]);
       }
       
-      String segmentation = null;
+      String baseText = null;
       if(args.containsKey(KEY_BASE_TEXT))
       {
         String[] value = args.get(KEY_BASE_TEXT);
         if(value.length > 0)
         {
-          segmentation = value[0];
+          baseText = value[0];
         }
       }
       
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
-        segmentation,
+        baseText,
         doc.getSDocumentGraph());
 
       if(args.containsKey(KEY_MATCH)) {
@@ -251,7 +251,7 @@ public class EmbeddedVisUI extends CommonUI
       }
       
       Map<String, String> markedColorMap = new HashMap<>();
-      Map<String, Long> markedAndCovered = Helper.calculateMarkedAndCoveredIDs(doc, segNodes, segmentation);
+      Map<String, Long> markedAndCovered = Helper.calculateMarkedAndCoveredIDs(doc, segNodes, baseText);
       Helper.calulcateColorsForMarkedAndCovered(doc, markedAndCovered, markedColorMap);
       visInput.setMarkedAndCovered(markedAndCovered);
       visInput.setMarkableMap(markedColorMap);
@@ -259,6 +259,7 @@ public class EmbeddedVisUI extends CommonUI
       String template = Helper.getContext()
         + "/Resource/" + visName + "/%s";
       visInput.setResourcePathTemplate(template);
+      visInput.setSegmentationName(baseText);
       // TODO: which other thing do we have to provide?
       
       Component c = visPlugin.createComponent(visInput, null);
