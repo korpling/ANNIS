@@ -150,34 +150,6 @@ public class ShareSingleMatchGenerator extends Panel implements
     setSizeFull();
   }
   
-  private String shortenURL(URI original)
-  {
-    WebResource res = Helper.getAnnisWebResource().path("shortener");
-    String appContext = Helper.getContext();
-    
-    String path = original.getRawPath();
-    if(path.startsWith(appContext))
-    {
-      path = path.substring(appContext.length());
-    }
-    
-    String localURL = path;
-    if(original.getRawQuery() != null)
-    {
-      localURL = localURL + "?" + original.getRawQuery();
-    }
-    if(original.getRawFragment() != null)
-    {
-      localURL = localURL + "#" + original.getRawFragment();
-    }
-    
-    String shortID = res.post(String.class, localURL);
-    
-    return UriBuilder.fromUri(original).replacePath(appContext+"/").replaceQuery(
-      "").fragment("").queryParam("id",
-      shortID).build().toASCIIString();
-    
-  }
   
   private URI generatorURLForVisualizer(ResolverEntry entry)
   {
@@ -303,7 +275,7 @@ public class ShareSingleMatchGenerator extends Panel implements
       generatedLinks.setVisible(true);
       
       URI url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
-      String shortURL = shortenURL(url);
+      String shortURL = Helper.shortenURL(url);
       directURL.setValue(shortURL);
       iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + shortURL + "\"></iframe>");
       preview.setSource(new ExternalResource(shortURL));

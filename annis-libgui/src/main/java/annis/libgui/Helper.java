@@ -73,6 +73,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
@@ -435,7 +436,7 @@ public class Helper
     return result;
   }
 
-  public static String generateCitation(String aql,
+  public static URI generateCitation(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
     String segmentation, String visibleBaseText,
     long start, int limit)
@@ -449,13 +450,13 @@ public class Helper
         appURI.getPath(), null,
         StringUtils.join(citationFragment(aql, corpora,
             contextLeft, contextRight, segmentation, visibleBaseText,  start, limit), "&"))
-        .toASCIIString();
+        ;
     }
     catch (URISyntaxException ex)
     {
       log.error(null, ex);
     }
-    return "ERROR";
+    return null;
   }
 
   public static String generateCorpusLink(Set<String> corpora)
@@ -1148,5 +1149,34 @@ public class Helper
     {
       return matchedAndCovered;
     }
+  }
+  
+  public static String shortenURL(URI original)
+  {
+    WebResource res = Helper.getAnnisWebResource().path("shortener");
+    String appContext = Helper.getContext();
+    
+    String path = original.getRawPath();
+    if(path.startsWith(appContext))
+    {
+      path = path.substring(appContext.length());
+    }
+    
+    String localURL = path;
+    if(original.getRawQuery() != null)
+    {
+      localURL = localURL + "?" + original.getRawQuery();
+    }
+    if(original.getRawFragment() != null)
+    {
+      localURL = localURL + "#" + original.getRawFragment();
+    }
+    
+    String shortID = res.post(String.class, localURL);
+    
+    return UriBuilder.fromUri(original).replacePath(appContext+"/").replaceQuery(
+      "").fragment("").queryParam("id",
+      shortID).build().toASCIIString();
+    
   }
 }

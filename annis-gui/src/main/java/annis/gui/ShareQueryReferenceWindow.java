@@ -25,6 +25,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import java.net.URI;
 
 
 /**
@@ -43,9 +44,11 @@ public class ShareQueryReferenceWindow extends Window
     setContent(wLayout);
     wLayout.setSizeFull();
     
-    String url = Helper.generateCitation(query.getQuery(), query.getCorpora(), 
+    URI url = Helper.generateCitation(query.getQuery(), query.getCorpora(), 
       query.getLeftContext(), query.getRightContext(), query.getSegmentation(), 
       query.getBaseText(), query.getOffset(), query.getLimit());
+    
+    String shortURL = Helper.shortenURL(url);
     
     TextArea txtCitation = new TextArea();
 
@@ -53,7 +56,7 @@ public class ShareQueryReferenceWindow extends Window
     txtCitation.setHeight("100%");
     txtCitation.addStyleName(ValoTheme.TEXTFIELD_LARGE);
     txtCitation.addStyleName("citation");
-    txtCitation.setValue(url);
+    txtCitation.setValue(shortURL);
     txtCitation.setWordwrap(true);
     txtCitation.setReadOnly(true);
     
