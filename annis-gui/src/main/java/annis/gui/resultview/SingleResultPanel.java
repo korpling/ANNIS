@@ -170,8 +170,7 @@ public class SingleResultPanel extends CssLayout implements
     if(query != null 
       && query.getSelectedMatches().contains(resultNumber))
     {
-      addStyleName("selected");
-      JavaScript.eval("$(\".v-panel-content-result-view-panel\").animate({scrollTop: $(\".selected\").offset().top - $(\".result-view-panel\").offset().top}, 2000);");
+      addStyleName("selected-match");
     }
     
     infoBar = new HorizontalLayout();

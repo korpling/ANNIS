@@ -37,6 +37,7 @@ import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
@@ -291,6 +292,12 @@ public class ResultViewPanel extends VerticalLayout implements
         if (currentResults == numberOfResults)
         {
           showFinishedSubgraphSearch();
+          if(!initialQuery.getSelectedMatches().isEmpty())
+          {
+            // scroll to the first selected match
+            JavaScript.eval(
+              "$(\".v-panel-content-result-view-panel\").animate({scrollTop: $(\".selected-match\").offset().top - $(\".result-view-panel\").offset().top}, 1000);");
+          }
         }
 
         if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)

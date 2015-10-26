@@ -12681,11 +12681,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-width: 1px 0px 0px 0px;
 }
 
-.annis .selected .info-bar {
+.annis .selected-match .info-bar {
 	background-color: #81b8ff;
 }
 
-.annis .selected .info-bar .path-label {
+.annis .selected-match .info-bar .path-label {
 	text-decoration: underline;
 }
 
