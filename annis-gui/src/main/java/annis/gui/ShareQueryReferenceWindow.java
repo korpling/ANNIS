@@ -17,9 +17,11 @@ package annis.gui;
 
 import annis.gui.objects.DisplayedResultQuery;
 import annis.libgui.Helper;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -44,6 +46,14 @@ public class ShareQueryReferenceWindow extends Window
     setContent(wLayout);
     wLayout.setSizeFull();
     wLayout.setMargin(true);
+    
+    Label lblInfo = new Label("<p style=\"font-size: 18px\" >"
+        + "<strong>Share your query:</strong>&nbsp;"
+        + "1.&nbsp;Copy the generated link 2.&nbsp;Share this link with your peers. "
+        + "</p>",
+      ContentMode.HTML);
+    wLayout.addComponent(lblInfo);
+    wLayout.setExpandRatio(lblInfo, 0.0f);
     
     String shortURL = "ERROR";
     if(query != null)
@@ -78,7 +88,7 @@ public class ShareQueryReferenceWindow extends Window
     wLayout.setComponentAlignment(btOk, Alignment.BOTTOM_CENTER);
     
     setWidth("400px");
-    setHeight("200px");
+    setHeight("300px");
     
   }
 
