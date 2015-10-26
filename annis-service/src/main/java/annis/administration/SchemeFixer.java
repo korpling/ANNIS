@@ -45,6 +45,8 @@ public class SchemeFixer
   // use Spring's JDBC support
   private DataSource dataSource;
   private JdbcTemplate jdbcTemplate;
+  
+  private String databaseSchema;
 
   /**
    *  Execute all fixes that are available.
@@ -63,7 +65,7 @@ public class SchemeFixer
     {
       
       DatabaseMetaData dbMeta = conn.getMetaData();
-      try(ResultSet result =  dbMeta.getColumns(null, null, "corpus_alias", null);)
+      try(ResultSet result =  dbMeta.getColumns(null, getDatabaseSchema(), "corpus_alias", null);)
       { 
         Map<String, Integer> columnType = new HashMap<>();
 
@@ -106,7 +108,7 @@ public class SchemeFixer
     {
       
       DatabaseMetaData dbMeta = conn.getMetaData();
-      try(ResultSet result =  dbMeta.getColumns(null, null, "url_shortener", null);)
+      try(ResultSet result =  dbMeta.getColumns(null, getDatabaseSchema(), "url_shortener", null);)
       { 
         Map<String, Integer> columnType = new HashMap<>();
 
@@ -163,6 +165,16 @@ public class SchemeFixer
   {
     this.dataSource = dataSource;
     this.jdbcTemplate = new JdbcTemplate(dataSource);
+  }
+
+  public String getDatabaseSchema()
+  {
+    return databaseSchema;
+  }
+
+  public void setDatabaseSchema(String databaseSchema)
+  {
+    this.databaseSchema = databaseSchema;
   }
   
   
