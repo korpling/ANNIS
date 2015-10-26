@@ -140,6 +140,8 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
             .corpora(citationProvider.getCorpora())
             .left(citationProvider.getLeftContext())
             .right(citationProvider.getRightContext())
+            .offset(0)
+            .limit(10)
             .build());
         UI.getCurrent().addWindow(c);
         c.center();
