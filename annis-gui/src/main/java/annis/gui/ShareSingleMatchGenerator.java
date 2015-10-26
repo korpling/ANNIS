@@ -134,7 +134,7 @@ public class ShareSingleMatchGenerator extends Window implements
     Label infoText = new Label(
         "<p style=\"font-size: 18px\" >"
         + "<strong>Share your match:</strong>&nbsp;"
-        + "1.&nbsp;Chose the visualization to share. 2.&nbsp;Copy the generated link or code. "
+        + "1.&nbsp;Choose the visualization to share. 2.&nbsp;Copy the generated link or code. "
         + "3.&nbsp;Share this link with your peers or include the code in your website. "
         + "</p>",
       ContentMode.HTML);
