@@ -48,9 +48,10 @@ public class ShareQueryReferenceWindow extends Window
     String shortURL = "ERROR";
     if(query != null)
     {
-      URI url = Helper.generateCitation(query.getQuery(), query.getCorpora(), 
-      query.getLeftContext(), query.getRightContext(), query.getSegmentation(), 
-      query.getBaseText(), query.getOffset(), query.getLimit());
+      URI url = Helper.generateCitation(query.getQuery(), query.getCorpora(),
+        query.getLeftContext(), query.getRightContext(), query.getSegmentation(),
+        query.getBaseText(), query.getOffset(), query.getLimit(),
+        query.getOrder(), query.getSelectedMatches());
     
       shortURL = Helper.shortenURL(url);
     }

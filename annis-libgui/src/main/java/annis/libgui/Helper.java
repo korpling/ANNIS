@@ -382,16 +382,7 @@ public class Helper
 
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation, String visibleSegmentation,
-    long start, int limit)
-  {
-    return citationFragment(aql, corpora, contextLeft, contextRight,
-      segmentation, visibleSegmentation, start, limit, OrderType.ascending, null);
-  }
-
-  public static List<String> citationFragment(String aql,
-    Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation, String visibleSegmentation,
+    String segmentation, String visibleBaseText,
     long start, int limit, OrderType order,
     Set<Long> selectedMatches)
   {
@@ -415,9 +406,9 @@ public class Helper
           + encodeBase64URL(segmentation));
       }
       // only output "bt" if it is not the same as the context segmentation
-      if(!Objects.equals(visibleSegmentation, segmentation))
+      if(!Objects.equals(visibleBaseText, segmentation))
       {
-        result.add("_bt=" + (visibleSegmentation == null ? "" : encodeBase64URL(visibleSegmentation)));
+        result.add("_bt=" + (visibleBaseText == null ? "" : encodeBase64URL(visibleBaseText)));
       }
       if (order != OrderType.ascending && order != null)
       {
@@ -439,7 +430,8 @@ public class Helper
   public static URI generateCitation(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
     String segmentation, String visibleBaseText,
-    long start, int limit)
+    long start, int limit, OrderType order,
+    Set<Long> selectedMatches)
   {
     try
     {
@@ -448,8 +440,10 @@ public class Helper
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
         appURI.getPath(), null,
-        StringUtils.join(citationFragment(aql, corpora,
-            contextLeft, contextRight, segmentation, visibleBaseText,  start, limit), "&"))
+        StringUtils.join(citationFragment(
+          aql, corpora, contextLeft, contextRight, segmentation,
+          visibleBaseText, start, limit, order, selectedMatches
+        ), "&"))
         ;
     }
     catch (URISyntaxException ex)

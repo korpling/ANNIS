@@ -15,12 +15,15 @@
  */
 package annis.gui.paging;
 
+import annis.gui.AnnisUI;
+import annis.gui.ShareQueryReferenceWindow;
 import annis.gui.util.ANNISFontIcon;
 import annis.libgui.Helper;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -32,6 +35,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,6 +86,8 @@ public class PagingComponent extends Panel implements
   private long currentPage;
 
   private Label lblInfo;
+  
+  private final Button btShareQuery;
 
   public PagingComponent()
   {
@@ -118,7 +124,11 @@ public class PagingComponent extends Panel implements
     lblInfo = new Label();
     lblInfo.setContentMode(ContentMode.HTML);
     lblInfo.addStyleName("right-aligned-text");
-
+    
+    btShareQuery = new Button(FontAwesome.SHARE_ALT);
+    btShareQuery.setDescription("Share query reference link");
+    btShareQuery.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+    
     layout.setWidth("100%");
     layout.setHeight("-1px");
 
@@ -179,6 +189,7 @@ public class PagingComponent extends Panel implements
     layout.addComponent(btLast);
     layout.addComponent(lblStatus);
     layout.addComponent(lblInfo);
+    layout.addComponent(btShareQuery);
 
     layout.setComponentAlignment(btFirst, Alignment.MIDDLE_LEFT);
     layout.setComponentAlignment(btPrevious, Alignment.MIDDLE_LEFT);
@@ -196,6 +207,22 @@ public class PagingComponent extends Panel implements
 
     update(false);
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    if(getUI() instanceof AnnisUI)
+    {
+      btShareQuery.addClickListener(new QueryReferenceLinkHandler((AnnisUI) getUI()));
+    }
+    else
+    {
+      btShareQuery.setVisible(false);
+    }
+  }
+  
+  
 
   private void update(boolean informCallbacks)
   {
@@ -316,8 +343,28 @@ public class PagingComponent extends Panel implements
     val = Math.min(1 + (count.get() / pageSize), val);
     return val;
   }
+  
+  private class QueryReferenceLinkHandler implements Button.ClickListener
+  {
+    private final AnnisUI ui;
 
-  public class EnterHandler implements Action.Handler
+    public QueryReferenceLinkHandler(AnnisUI ui)
+    {
+      this.ui = ui;
+    }
+    
+    
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      ShareQueryReferenceWindow w = new ShareQueryReferenceWindow(ui.getQueryController().getSearchQuery());
+      getUI().addWindow(w);
+      w.center();
+    }
+    
+  }
+
+  private class EnterHandler implements Action.Handler
   {
     private final Action enterKeyShortcutAction 
       = new ShortcutAction(null, ShortcutAction.KeyCode.ENTER, null);
