@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.gui.beans.CitationProvider;
 import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.Query;
 import annis.gui.objects.QueryGenerator;
 import com.vaadin.server.FontAwesome;
@@ -47,14 +48,19 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
     btLink.setDescription("Share query reference link");
     btLink.addClickListener(this);
 
-    if(itemId instanceof CitationProvider)
+    
+    if(itemId instanceof DisplayedResultQuery)
     {
-      final CitationProvider citationProvider = (CitationProvider) itemId;
-      btLink.addClickListener(new LinkClickListener(citationProvider));
+      btLink.addClickListener(new LinkClickListener((DisplayedResultQuery) itemId));
     }
     else if(itemId instanceof Query)
     {
       final CitationProvider citationProvider = new CitationProviderForQuery((Query) itemId);
+      btLink.addClickListener(new LinkClickListener(citationProvider));
+    }
+    else if(itemId instanceof CitationProvider)
+    {
+      final CitationProvider citationProvider = (CitationProvider) itemId;
       btLink.addClickListener(new LinkClickListener(citationProvider));
     }
 
@@ -122,17 +128,32 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
   {
 
     private final CitationProvider citationProvider;
+    private final DisplayedResultQuery query;
 
     public LinkClickListener(CitationProvider citationProvider)
     {
       this.citationProvider = citationProvider;
+      this.query = null;
+    }
+    
+    public LinkClickListener(DisplayedResultQuery query)
+    {
+      this.citationProvider = null;
+      this.query = query;
     }
 
     @Override
     public void buttonClick(ClickEvent event)
     {
 
-      if(citationProvider != null)
+      if(query != null)
+      {
+        ShareQueryReferenceWindow c
+          = new ShareQueryReferenceWindow(query);
+        UI.getCurrent().addWindow(c);
+        c.center();
+      }
+      else if(citationProvider != null)
       {
         ShareQueryReferenceWindow c
           = new ShareQueryReferenceWindow(
