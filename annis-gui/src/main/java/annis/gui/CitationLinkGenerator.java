@@ -26,6 +26,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,7 +42,7 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
   public Object generateCell(Table source, Object itemId, Object columnId)
   {
     Button btLink = new Button();
-    btLink.setStyleName(BaseTheme.BUTTON_LINK);
+    btLink.addStyleName(ValoTheme.BUTTON_BORDERLESS);
     btLink.setIcon(FontAwesome.SHARE_ALT);
     btLink.setDescription("Share query reference link");
     btLink.addClickListener(this);

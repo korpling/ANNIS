@@ -200,7 +200,7 @@ public class SingleResultPanel extends CssLayout implements
       @Override
       public void buttonClick(ClickEvent event)
       {
-        showEmbeddedVisGenerator();
+        showShareSingleMatchGenerator();
       }
     });
     infoBar.addComponent(btLink);
@@ -330,7 +330,7 @@ public class SingleResultPanel extends CssLayout implements
    this.result = CommonHelper.readSDocument(in);
   }
   
-  private void showEmbeddedVisGenerator()
+  private void showShareSingleMatchGenerator()
   {
     // select the current match
     if(ui != null)
