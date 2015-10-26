@@ -124,6 +124,27 @@ def copyUserConfig(instDir, oldInstDir):
 		print("ERROR: dumping user configuration returned error code " + str(pDump.returncode))
 		exit(41)
 		
+def copyUrlShortener(instDir, oldInstDir):
+	
+	tmpUserDump = tempfile.NamedTemporaryFile()
+	
+	argsDump = [os.path.join(oldInstDir, "bin", "annis-admin.sh"), "dump", "url_shortener", tmpUserDump.name]
+	
+	pDump = subprocess.Popen(argsDump, env=updateEnv(oldInstDir))
+	pDump.wait()
+	if pDump.returncode == 0:
+		argsRestore = [os.path.join(instDir, "bin", "annis-admin.sh"), "restore", "url_shortener", tmpUserDump.name]
+		pRestore = subprocess.Popen(argsRestore, env=updateEnv(instDir))
+		pRestore.wait()
+		if pRestore.returncode == 0:
+			return True
+		else:
+			print("ERROR: restoring url shortener data returned error code " + str(pDump.returncode))
+			exit(42)
+	else:
+		print("ERROR: dumping url shortener data returned error code " + str(pDump.returncode))
+		exit(42)
+		
 def copyDatabase(instDir, oldInstDir, mail):
 	
 	a = [os.path.join(instDir, "bin", "annis-admin.sh"), "copy", 
@@ -222,6 +243,7 @@ if (not checkDBSchemaVersion(extracted, args.dir)):
 	print("======================================================")
 	initDatabase(dbconfig, extracted)
 	copyUserConfig(extracted, args.dir)
+	copyUrlShortener(extracted, args.dir)
 	copyDatabase(extracted, args.dir, args.mail)
 	copiedCorpora = True
 
