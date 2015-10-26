@@ -74,6 +74,10 @@ public class SearchOptionsPanel extends FormLayout
   public static final String KEY_RESULT_PER_PAGE = "results-per-page";
 
   public static final String DEFAULT_CONFIG = "default-config";
+  
+  public static final int DEFAULT_CONTEXT = 5;
+  public static final int DEFAULT_CONTEXT_STEPS = 5;
+  public static final int DEFAULT_MAX_CONTEXT = 20;
 
   private static final Logger log = LoggerFactory.getLogger(
     SearchOptionsPanel.class);
@@ -596,11 +600,11 @@ public class SearchOptionsPanel extends FormLayout
       if (!corpusConfigs.containsConfig(DEFAULT_CONFIG))
       {
         CorpusConfig defaultConfig = new CorpusConfig();
-        defaultConfig.setConfig(KEY_MAX_CONTEXT_LEFT, "5");
-        defaultConfig.setConfig(KEY_MAX_CONTEXT_RIGHT, "5");
-        defaultConfig.setConfig(KEY_CONTEXT_STEPS, "5");
+        defaultConfig.setConfig(KEY_MAX_CONTEXT_LEFT, "" + DEFAULT_MAX_CONTEXT);
+        defaultConfig.setConfig(KEY_MAX_CONTEXT_RIGHT, "" + DEFAULT_MAX_CONTEXT);
+        defaultConfig.setConfig(KEY_CONTEXT_STEPS, "" + DEFAULT_CONTEXT_STEPS);
         defaultConfig.setConfig(KEY_RESULT_PER_PAGE, "10");
-        defaultConfig.setConfig(KEY_DEFAULT_CONTEXT, "5");
+        defaultConfig.setConfig(KEY_DEFAULT_CONTEXT, "" + DEFAULT_CONTEXT);
         defaultConfig.setConfig(KEY_DEFAULT_CONTEXT_SEGMENTATION, "tok");
         defaultConfig.setConfig(KEY_DEFAULT_BASE_TEXT_SEGMENTATION, "tok");
         corpusConfigs.put(DEFAULT_CONFIG, defaultConfig);
@@ -634,8 +638,10 @@ public class SearchOptionsPanel extends FormLayout
           Integer ctxSteps = getInteger(KEY_CONTEXT_STEPS, c);
           String segment = c.getConfig(KEY_DEFAULT_CONTEXT_SEGMENTATION);
           
-          updateContext(contextContainerLeft, leftCtx, ctxSteps, true);
-          updateContext(contextContainerRight, rightCtx, ctxSteps, true);
+          updateContext(contextContainerLeft, leftCtx == null ? DEFAULT_CONTEXT : leftCtx, 
+            ctxSteps == null ? DEFAULT_CONTEXT_STEPS : ctxSteps, true);
+          updateContext(contextContainerRight, rightCtx == null ? DEFAULT_CONTEXT : rightCtx, 
+            ctxSteps == null ? DEFAULT_CONTEXT_STEPS : ctxSteps, true);
           if (defaultCtx != null)
           {
             ui.getQueryState().getLeftContext().setValue(defaultCtx);
