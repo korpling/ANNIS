@@ -137,11 +137,11 @@ public class SearchOptionsPanel extends FormLayout
     cbLeftContext.setNullSelectionAllowed(false);
     cbRightContext.setNullSelectionAllowed(false);
     cbResultsPerPage.setNullSelectionAllowed(false);
-//
+
     cbLeftContext.setNewItemsAllowed(true);
     cbRightContext.setNewItemsAllowed(true);
     cbResultsPerPage.setNewItemsAllowed(true);
-//
+
     cbLeftContext.setTextInputAllowed(true);
     cbRightContext.setTextInputAllowed(true);
     cbResultsPerPage.setTextInputAllowed(true);
@@ -150,13 +150,6 @@ public class SearchOptionsPanel extends FormLayout
     cbRightContext.setImmediate(true);
     cbResultsPerPage.setImmediate(true);
     
-
-//    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
-//      Integer.MIN_VALUE, Integer.MAX_VALUE));
-//    cbRightContext.addValidator(new IntegerRangeValidator("must be a number",
-//      Integer.MIN_VALUE, Integer.MAX_VALUE));
-//    cbResultsPerPage.addValidator(new IntegerRangeValidator("must be a number",
-//      Integer.MIN_VALUE, Integer.MAX_VALUE));
     cbSegmentation = new ComboBox("Show context in", segmentationContainer);
 
     cbSegmentation.setTextInputAllowed(
@@ -237,6 +230,10 @@ public class SearchOptionsPanel extends FormLayout
       
       
       orderContainer.removeAllItems();
+      for(OrderType t : OrderType.values())
+      {
+        orderContainer.addItem(t);
+      }
       cbOrder.setPropertyDataSource(state.getOrder());
       
     }
