@@ -133,8 +133,8 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
 
       if(citationProvider != null)
       {
-        CitationWindow c
-          = new CitationWindow(
+        ShareQueryReferenceWindow c
+          = new ShareQueryReferenceWindow(
             QueryGenerator.displayed()
             .query(citationProvider.getQuery())
             .corpora(citationProvider.getCorpora())

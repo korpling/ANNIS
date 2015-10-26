@@ -29,13 +29,13 @@ import com.vaadin.ui.themes.ValoTheme;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class CitationWindow extends Window
+public class ShareQueryReferenceWindow extends Window
   implements Button.ClickListener
 {
   
-  public CitationWindow(DisplayedResultQuery query)
+  public ShareQueryReferenceWindow(DisplayedResultQuery query)
   {
     super("Query reference link");
     
