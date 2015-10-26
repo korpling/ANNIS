@@ -268,7 +268,7 @@ public class EmbeddedVisUI extends CommonUI
       c.addStyleName("vis-content");
       
       Link link = new Link();
-      link.setCaption("Show complete query in ANNIS search interface");
+      link.setCaption("Show in ANNIS search interface");
       link.setIcon(ANNISFontIcon.LOGO);
       link.setVisible(false);
       link.addStyleName("dontprint");
