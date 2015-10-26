@@ -127,13 +127,13 @@ public class AboutWindow extends Window
     
     layout.addComponent(txtThirdParty);
     
-    Button btOK = new Button("OK");
+    Button btClose = new Button("Close");
     final AboutWindow finalThis = this;
-    btOK.addClickListener(new OkClickListener(finalThis));
-    layout.addComponent(btOK);
+    btClose.addClickListener(new OkClickListener(finalThis));
+    layout.addComponent(btClose);
     
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
-    layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
+    layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(txtThirdParty, 1.0f);
     
   }
