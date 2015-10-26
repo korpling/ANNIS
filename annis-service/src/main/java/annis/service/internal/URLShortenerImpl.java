@@ -16,12 +16,9 @@
 
 package annis.service.internal;
 
-import annis.administration.AdministrationDao;
-import annis.administration.CorpusAdministration;
-import annis.dao.QueryDao;
 import annis.dao.ShortenerDao;
-import java.net.URI;
 import java.nio.BufferUnderflowException;
+import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -85,17 +82,23 @@ public class URLShortenerImpl
     String remoteIP = request.getRemoteAddr().replaceAll("[.:]", "_");
     user.checkPermission("shortener:create:" + remoteIP);
     
-    return shortenerDao.shorten(str, "" + user.getPrincipal());
+    return shortenerDao.shorten(str, "" + user.getPrincipal()).toString();
   }
   
   @GET
   @Path("{id}")
   @Produces(value = "text/plain")
-  public String getLong(@PathParam("id") String id)
+  public String getLong(@PathParam("id") String idRaw)
   {
+    if(idRaw == null)
+    {
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
+    }
+    
     try
     {
-      String result = shortenerDao.getLong(id);
+      UUID id = UUID.fromString(idRaw);
+      String result = shortenerDao.unshorten(id);
       if(result == null)
       {
         throw new WebApplicationException(Response.Status.NOT_FOUND);

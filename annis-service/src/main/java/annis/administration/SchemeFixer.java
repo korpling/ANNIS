@@ -24,6 +24,7 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
+import org.postgresql.core.types.PGType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -120,7 +121,7 @@ public class SchemeFixer
           log.info("Creating url_shortener table");
           jdbcTemplate.execute(
             "CREATE  TABLE url_shortener\n" + "(\n"
-            + "	id bigint PRIMARY KEY,\n" + "	\"owner\" varchar,\n"
+            + "	id UUID PRIMARY KEY,\n" + "	\"owner\" varchar,\n"
             + "	created timestamp with time zone,\n" + "	url varchar UNIQUE\n"
             + ");");
           // since the "url" column is unique, an index will be created for it
@@ -128,7 +129,7 @@ public class SchemeFixer
         else
         {
           // check if columns have correct type and name, if not throw an error
-          Preconditions.checkState(Types.BIGINT == columnType.get("id"), "there must be an \"alias\" column of type \"bigint\"");
+          Preconditions.checkState(Types.OTHER == columnType.get("id"), "there must be an \"alias\" column of type \"UUID\"");
           Preconditions.checkState(Types.VARCHAR == columnType.get("owner"), "there must be an \"owner\" column of type \"varchar\"");
           Preconditions.checkState(Types.TIMESTAMP == columnType.get("created"), "there must be an \"created\" column of type \"timestamp\"");
           Preconditions.checkState(Types.VARCHAR == columnType.get("url"), "there must be an \"url\" column of type \"varchar\"");

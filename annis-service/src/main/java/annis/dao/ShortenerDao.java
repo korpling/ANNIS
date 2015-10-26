@@ -21,6 +21,7 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -39,68 +40,53 @@ public class ShortenerDao extends AbstractDao
    * @return 
    */
   @Transactional(readOnly = false)
-  public String shorten(String str, String userName)
+  public UUID shorten(String str, String userName)
   {
     // check if the string to shorten was already shortened before
-    String result = getID(str);
+    UUID result = getExistingShortID(str);
     if(result == null)
     {
       // no, this string is new
       
       // find a new random identifier for that string
-      Long newID = null;
+      
       int numberOfTries = 0;
-      while(newID == null)
+      while(result == null)
       {
         Preconditions.checkState(numberOfTries < 1000, "Can't find a new random "
           + "ID that is not already taken even after trying 1000 times. "
           + "Will abort since it seems that no new shortener IDs are available.");
         
-        long randomValue = random.nextLong();
+        UUID randomUUID = UUID.randomUUID();
         long existing = 
-          getJdbcTemplate().queryForObject("SELECT count(*) FROM url_shortener WHERE id = ?", Long.class, randomValue);
+          getJdbcTemplate().queryForObject("SELECT count(*) FROM url_shortener WHERE id = ?", Long.class, randomUUID);
         if(existing == 0l) 
         {
-          newID = randomValue;
+          result = randomUUID;
         }
         numberOfTries++;
       }
       
       getJdbcTemplate().update("INSERT INTO url_shortener(id, \"owner\", created, url) VALUES(?, ?, ?, ?)",
-        newID, userName, new Date(), str);
-      result = idFromInternal(newID);
+        result, userName, new Date(), str);
 
     }
     return result;
   }
   
   @Transactional(readOnly = true)
-  public String getLong(String id)
+  public String unshorten(UUID id)
   {
     List<String> result = getJdbcTemplate().queryForList(
-      "SELECT url FROM url_shortener WHERE id=? LIMIT 1", String.class, idToInternal(id));
+      "SELECT url FROM url_shortener WHERE id=? LIMIT 1", String.class, id);
     return result.isEmpty() ? null : result.get(0);
   }
   
-  private String getID(String str)
+  private UUID getExistingShortID(String str)
   {
-    List<Long> result = getJdbcTemplate().queryForList(
-      "SELECT id FROM url_shortener WHERE url=? LIMIT 1", Long.class, str);
-    return result.isEmpty() ? null : idFromInternal(result.get(0));
+    List<UUID> result = getJdbcTemplate().queryForList(
+      "SELECT id FROM url_shortener WHERE url=? LIMIT 1", UUID.class, str);
+    return result.isEmpty() ? null : result.get(0);
   }
   
-  private static String idFromInternal(long val)
-  {
-    int numberOfBytes = Long.SIZE / Byte.SIZE;
-    ByteBuffer buffer = ByteBuffer.allocate(numberOfBytes).putLong(val);
-    return encoding.encode(buffer.array());
-  }
-  
-  private static long idToInternal(String val)
-  {
-    Preconditions.checkNotNull(val);
-    byte[] bytesForVal = encoding.decode(val);
-    ByteBuffer buffer = ByteBuffer.wrap(bytesForVal);
-    return buffer.getLong();
-  }
 }
