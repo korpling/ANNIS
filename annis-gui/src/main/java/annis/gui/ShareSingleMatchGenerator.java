@@ -24,7 +24,6 @@ import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
@@ -33,13 +32,14 @@ import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import java.net.URI;
 import java.util.HashSet;
@@ -51,7 +51,7 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class ShareSingleMatchGenerator extends Panel implements
+public class ShareSingleMatchGenerator extends Window implements
   SelectionEvent.SelectionListener
 {
   private final VerticalLayout layout;
@@ -82,6 +82,8 @@ public class ShareSingleMatchGenerator extends Panel implements
     this.query = query;
     this.segmentation = segmentation;
     this.ps = ps;
+    
+    setResizeLazy(true);
     
     directURL = new ObjectProperty<>("");
     iframeCode = new ObjectProperty<>("");
@@ -143,12 +145,24 @@ public class ShareSingleMatchGenerator extends Panel implements
     hLayout.setSpacing(true);
     hLayout.setExpandRatio(generatedLinks, 1.0f);
     
-    layout = new VerticalLayout(infoText, hLayout);
+    Button btClose = new Button("Close");
+    btClose.setSizeUndefined();
+    btClose.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        getUI().removeWindow(ShareSingleMatchGenerator.this);
+      }
+    });
+    
+    layout = new VerticalLayout(infoText, hLayout, btClose);
     layout.setSizeFull();
     layout.setExpandRatio(hLayout, 1.0f);
+    layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     
     setContent(layout);
-    setSizeFull();
   }
   
   

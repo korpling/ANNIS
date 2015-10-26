@@ -340,12 +340,12 @@ public class SingleResultPanel extends CssLayout implements
       ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
     }
     
-    Window window = new Window();
+    Window window = new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName, ps);
     window.setWidth(70, Unit.EM);
     window.setHeight(45, Unit.EM);
     window.setResizable(true);
     window.setModal(true);
-    window.setResizeLazy(true);
+    
     window.addCloseListener(new Window.CloseListener()
     {
 
@@ -355,8 +355,7 @@ public class SingleResultPanel extends CssLayout implements
         btLink.setEnabled(true);
       }
     });
-    
-    window.setContent(new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName, ps));
+    window.setCaption("Match reference link");
     
     UI.getCurrent().addWindow(window);
   }

@@ -78,14 +78,14 @@ public class ShareQueryReferenceWindow extends Window
     
     wLayout.addComponent(txtCitation);
     
-    Button btOk = new Button("OK");
-    btOk.addListener((Button.ClickListener) this);
-    btOk.setSizeUndefined();
+    Button btClose = new Button("Close");
+    btClose.addClickListener((Button.ClickListener) this);
+    btClose.setSizeUndefined();
     
-    wLayout.addComponent(btOk);
+    wLayout.addComponent(btClose);
     
     wLayout.setExpandRatio(txtCitation, 1.0f);
-    wLayout.setComponentAlignment(btOk, Alignment.BOTTOM_CENTER);
+    wLayout.setComponentAlignment(btClose, Alignment.BOTTOM_CENTER);
     
     setWidth("400px");
     setHeight("300px");
