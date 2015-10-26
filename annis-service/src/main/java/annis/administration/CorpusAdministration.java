@@ -114,6 +114,7 @@ public class CorpusAdministration
     // create tables and other stuff that is handled by the scheme fixer
     if (schemeFixer != null)
     {
+      schemeFixer.setDatabaseSchema(pgSchema);
       schemeFixer.checkAndFix();
     }
   }
