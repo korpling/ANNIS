@@ -12,3 +12,4 @@ This documentation is targeted to developers or administrators.
 - \ref admin
 - \ref dev
 - \ref api
+- \ref embed
