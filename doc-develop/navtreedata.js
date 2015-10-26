@@ -7,6 +7,18 @@ var NAVTREE =
       [ "Available APIs ", "api.html#api-available-list", null ]
     ] ],
     [ "Developing", "dev.html", "dev" ],
+    [ "Embed ANNIS visualization", "embed.html", [
+      [ "Introduction ", "embed.html#embed-intro", null ],
+      [ "Parameters ", "embed.html#embed-params", [
+        [ "embedded_salt ", "embed.html#embed-param-salt", null ],
+        [ "embedded_interface ", "embed.html#embed-param-interface", null ],
+        [ "embedded_match ", "embed.html#embed-param-match", null ],
+        [ "embedded_instance ", "embed.html#embed-param-instance", null ],
+        [ "embedded_ns ", "embed.html#embed-param-namespace", null ],
+        [ "embedded_base ", "embed.html#embed-param-base", null ]
+      ] ],
+      [ "Examples ", "embed.html#embed-examples", null ]
+    ] ],
     [ "Classes", null, [
       [ "Class List", "annotated.html", "annotated" ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
@@ -22,21 +34,21 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"classannis_1_1administration_1_1_administration_dao.html#a1633b910176e1d7c194d610e16b24ce5",
-"classannis_1_1dao_1_1autogenqueries_1_1_auto_tok_query.html#a2f95d0ffb5b28ce4d43168608127f254",
-"classannis_1_1gui_1_1admin_1_1_edit_single_user.html",
-"classannis_1_1gui_1_1controller_1_1_frequency_background_job.html#a2a5a05cbfd893a6b0b3c71ac3046de57",
-"classannis_1_1gui_1_1objects_1_1_export_query.html#aed0a2849a8a7139ae61bef2741470b16",
-"classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#a3088bf7073e63b0a2c39e29c0931cb8c",
-"classannis_1_1model_1_1_annotation.html#a57ad3b1fa8973122a562c31d6e93f17e",
-"classannis_1_1ql_1_1parser_1_1_annotation_existence_validator.html",
-"classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a2e41558935d1934b66dab02899a53931",
-"classannis_1_1service_1_1objects_1_1_match.html#a0c7c530e9fae07bfb0868f1455ec41ae",
-"classannis_1_1sqlgen_1_1_default_where_clause_generator.html#af387a2a48b3326dd282b3f5de3c57cb0",
-"classannis_1_1sqlgen_1_1model_1_1_precedence.html#a122f8c4803dd14da98249951eda6a6a9",
-"classannis_1_1visualizers_1_1htmlvis_1_1_annotation_name_matcher.html#a810483955191495e691683011c2f8b36",
-"enumannis_1_1gui_1_1util_1_1_a_n_n_i_s_font_icon.html#a0a24aa46b4adf771fcf7d638812663c3",
-"interfaceannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1autoheightiframe_1_1_auto_height_i_frame_server_rpc.html"
+"classannis_1_1administration_1_1_administration_dao.html#a356825bb971e4c38a867c4c98d437a54",
+"classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a03cf38570e91542c395ac61f6bdbf1d3",
+"classannis_1_1gui_1_1_search_view.html#ab3ff0f8058eb3713ea46c0bf41f7661f",
+"classannis_1_1gui_1_1components_1_1medialement_1_1_media_element_player.html",
+"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#ae94a28f1184de45dd9d1ba3d1a6dee96",
+"classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#af88e5832656e01e6db910b998b09e6a4",
+"classannis_1_1model_1_1_annis_node.html#a86ccc3a4a25ad97d53c809778dc2cda8",
+"classannis_1_1model_1_1_relannis_node_feature.html#af2bb131941ae7e1cd96aa4caa4bee163",
+"classannis_1_1security_1_1_group.html#aff9038de99e659f8419f09ce84fd7014",
+"classannis_1_1service_1_1objects_1_1_document_browser_config.html#ad25d2a9c9b7b368712d9835b8038275c",
+"classannis_1_1sqlgen_1_1_default_where_clause_generator.html",
+"classannis_1_1sqlgen_1_1model_1_1_left_alignment.html#a4e9a6bddd27879badd52c1a251665da3",
+"classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html#a75194d52e72fb629f4e6bf4c83ce6a84",
+"dev-release.html#dev-release-process",
+"interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html#a0aaac35cb89766b6e5e0d103953af87b"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

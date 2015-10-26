@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -114,10 +114,20 @@ $(document).ready(function(){initNavTree('classannis_1_1visualizers_1_1component
 <div class="title">annis.visualizers.component.gridtree.GridTreeVisualizer Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>A grid visualizing hierarchical tree annotations as ordered grid layers.  
- <a href="classannis_1_1visualizers_1_1component_1_1gridtree_1_1_grid_tree_visualizer.html#details">More...</a></p>
-
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A grid visualizing hierarchical tree annotations as ordered grid layers. </p>
+<p>Note that all layers represent the same annotation name at different hierarchical depths, marked level:0,1,2,... etc. on the left</p>
+<p>Known Bug: the visualizer does not handle crossing edges. Equal annotation names which cover the same range or a subset of nodes and have the same hierarchical depths are not rendered correctly by grid_tree. <a href="https://github.com/korpling/ANNIS/issues/14">https://github.com/korpling/ANNIS/issues/14</a></p>
+<h2>Mappings:</h2>
+<ul>
+<li>
+Specify the name of the annotation to be visualized in the grid with <b>node_key:name</b>. Note that all grid levels visualize the same annotation name at different hierarchical depths. </li>
+<li>
+<p class="startli">Specify the name of the base row with the <b>tok_key:name</b>. This is useful, if you want to use a specific annotation layer for instead of the always existing tok layer. E.g. the falko corpora often contain the ZH (Zielhypothesen)-layers.</p>
+<dl class="section author"><dt>Author</dt><dd>Benjamin Weißenfels &lt;b.pixeldrama&gt; </dd></dl>
+</li>
+</ul>
+</div>
 <p>Inherits <a class="el" href="classannis_1_1libgui_1_1visualizers_1_1_abstract_visualizer.html">annis.libgui.visualizers.AbstractVisualizer&lt; I extends Component &gt;</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -167,26 +177,13 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="i
 <tr class="memdesc:a2b801a7c32a4cd1ac34e5cae7503d735 inherit pub_methods_interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if this visaulizer wants to use the original text.  <a href="#a2b801a7c32a4cd1ac34e5cae7503d735">More...</a><br /></td></tr>
 <tr class="separator:a2b801a7c32a4cd1ac34e5cae7503d735 inherit pub_methods_interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A grid visualizing hierarchical tree annotations as ordered grid layers. </p>
-<p>Note that all layers represent the same annotation name at different hierarchical depths, marked level:0,1,2,... etc. on the left</p>
-<p>Known Bug: the visualizer does not handle crossing edges. Equal annotation names which cover the same range or a subset of nodes and have the same hierarchical depths are not rendered correctly by grid_tree. <a href="https://github.com/korpling/ANNIS/issues/14">https://github.com/korpling/ANNIS/issues/14</a></p>
-<h2>Mappings:</h2>
-<ul>
-<li>
-Specify the name of the annotation to be visualized in the grid with <b>node_key:name</b>. Note that all grid levels visualize the same annotation name at different hierarchical depths. </li>
-<li>
-<p class="startli">Specify the name of the base row with the <b>tok_key:name</b>. This is useful, if you want to use a specific annotation layer for instead of the always existing tok layer. E.g. the falko corpora often contain the ZH (Zielhypothesen)-layers.</p>
-<dl class="section author"><dt>Author</dt><dd>Benjamin Weißenfels &lt;b.pixeldrama&gt; </dd></dl>
-</li>
-</ul>
-</div></div><!-- contents -->
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>visualizers</b></li><li class="navelem"><b>component</b></li><li class="navelem"><b>gridtree</b></li><li class="navelem"><a class="el" href="classannis_1_1visualizers_1_1component_1_1gridtree_1_1_grid_tree_visualizer.html">GridTreeVisualizer</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

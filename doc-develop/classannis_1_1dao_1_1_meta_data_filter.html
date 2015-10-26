@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -113,8 +113,10 @@ $(document).ready(function(){initNavTree('classannis_1_1dao_1_1_meta_data_filter
 <div class="title">annis.dao.MetaDataFilter Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>Inherits SimpleJdbcDaoSupport.</p>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><dl class="section author"><dt>Author</dt><dd>thomas </dd></dl>
+</div>
+<p>Inherits <a class="el" href="classannis_1_1dao_1_1_abstract_dao.html">annis.dao.AbstractDao</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -127,10 +129,43 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1aa2596d0d8b8a0f35bec63f41e99dac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1aa2596d0d8b8a0f35bec63f41e99dac"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setSubQueryCorpusSelectionStrategy</b> (<a class="el" href="classannis_1_1sqlgen_1_1_sub_query_corpus_selection_strategy.html">SubQueryCorpusSelectionStrategy</a> subQueryCorpusSelectionStrategy)</td></tr>
 <tr class="separator:a1aa2596d0d8b8a0f35bec63f41e99dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classannis_1_1dao_1_1_abstract_dao"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classannis_1_1dao_1_1_abstract_dao')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classannis_1_1dao_1_1_abstract_dao.html">annis.dao.AbstractDao</a></td></tr>
+<tr class="memitem:a1ea3c6c0eb92743e1c05b6dba38c2c58 inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ea3c6c0eb92743e1c05b6dba38c2c58"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>registerGUICancelThread</b> (<a class="el" href="interfaceannis_1_1administration_1_1_statement_controller.html">StatementController</a> statementCon)</td></tr>
+<tr class="separator:a1ea3c6c0eb92743e1c05b6dba38c2c58 inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4e49484458fb6b6fbb3d994e66be2ca inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4e49484458fb6b6fbb3d994e66be2ca"></a>
+JdbcTemplate&#160;</td><td class="memItemRight" valign="bottom"><b>getJdbcTemplate</b> ()</td></tr>
+<tr class="separator:ab4e49484458fb6b6fbb3d994e66be2ca inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65bf4395c133e18da6bf840aab204f61 inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65bf4395c133e18da6bf840aab204f61"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setJdbcTemplate</b> (JdbcTemplate jdbcTemplate)</td></tr>
+<tr class="separator:a65bf4395c133e18da6bf840aab204f61 inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a027708e384288c1e40f12f4df21db551 inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a027708e384288c1e40f12f4df21db551"></a>
+<a class="el" href="classannis_1_1utils_1_1_dynamic_data_source.html">DynamicDataSource</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getDataSource</b> ()</td></tr>
+<tr class="separator:a027708e384288c1e40f12f4df21db551 inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a373147b9b72ba92bb775238434499ebc inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a373147b9b72ba92bb775238434499ebc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setDataSource</b> (<a class="el" href="classannis_1_1utils_1_1_dynamic_data_source.html">DynamicDataSource</a> dataSource)</td></tr>
+<tr class="separator:a373147b9b72ba92bb775238434499ebc inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a438fde598b6d883f605d24681d5dcccb inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a438fde598b6d883f605d24681d5dcccb"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getScriptPath</b> ()</td></tr>
+<tr class="separator:a438fde598b6d883f605d24681d5dcccb inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a685cdcbfc55d713beac32606e119da65 inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a685cdcbfc55d713beac32606e119da65"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setScriptPath</b> (String scriptPath)</td></tr>
+<tr class="separator:a685cdcbfc55d713beac32606e119da65 inherit pub_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_methods_classannis_1_1dao_1_1_abstract_dao"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classannis_1_1dao_1_1_abstract_dao')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classannis_1_1dao_1_1_abstract_dao.html">annis.dao.AbstractDao</a></td></tr>
+<tr class="memitem:aaa27d1c3bbc351320168ce2f6f457a32 inherit pro_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top">PreparedStatement&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1_abstract_dao.html#aaa27d1c3bbc351320168ce2f6f457a32">executeSql</a> (String sql, MapSqlParameterSource args)</td></tr>
+<tr class="memdesc:aaa27d1c3bbc351320168ce2f6f457a32 inherit pro_methods_classannis_1_1dao_1_1_abstract_dao"><td class="mdescLeft">&#160;</td><td class="mdescRight">executes an SQL string, substituting the parameters found in args  <a href="#aaa27d1c3bbc351320168ce2f6f457a32">More...</a><br /></td></tr>
+<tr class="separator:aaa27d1c3bbc351320168ce2f6f457a32 inherit pro_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6d1037f120c665ecd6d4c0e46d40e93 inherit pro_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top">PreparedStatement&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1_abstract_dao.html#ab6d1037f120c665ecd6d4c0e46d40e93">executeSqlFromScript</a> (String script, MapSqlParameterSource args)</td></tr>
+<tr class="memdesc:ab6d1037f120c665ecd6d4c0e46d40e93 inherit pro_methods_classannis_1_1dao_1_1_abstract_dao"><td class="mdescLeft">&#160;</td><td class="mdescRight">executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args  <a href="#ab6d1037f120c665ecd6d4c0e46d40e93">More...</a><br /></td></tr>
+<tr class="separator:ab6d1037f120c665ecd6d4c0e46d40e93 inherit pro_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7d5f9c6c67b2b309e7db4215bb56238 inherit pro_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7d5f9c6c67b2b309e7db4215bb56238"></a>
+MapSqlParameterSource&#160;</td><td class="memItemRight" valign="bottom"><b>makeArgs</b> ()</td></tr>
+<tr class="separator:ae7d5f9c6c67b2b309e7db4215bb56238 inherit pro_methods_classannis_1_1dao_1_1_abstract_dao"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><dl class="section author"><dt>Author</dt><dd>thomas </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a35549e1e9f75f99e201b863562a7f5f5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -162,7 +197,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setSubQueryCorpusSele
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>dao</b></li><li class="navelem"><a class="el" href="classannis_1_1dao_1_1_meta_data_filter.html">MetaDataFilter</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -114,10 +114,11 @@ $(document).ready(function(){initNavTree('classannis_1_1dao_1_1autogenqueries_1_
 <div class="title">annis.dao.autogenqueries.QueriesGenerator Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>Controlls the generating of automatic generated queries.  
- <a href="classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#details">More...</a></p>
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Controlls the generating of automatic generated queries. </p>
+<p>For creating automatic generated queries, you have to implement the <a class="el" href="interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html">QueryBuilder</a> interface and register the new class in the CommonDAO.xml file.</p>
+<dl class="section author"><dt>Author</dt><dd>Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+'eld'+'ra'+'ma@'+'gm'+'ail'+'.c'+'om'; return false;">b.pix<span style="display: none;">.nosp@m.</span>eldr<span style="display: none;">.nosp@m.</span>ama@g<span style="display: none;">.nosp@m.</span>mail<span style="display: none;">.nosp@m.</span>.com</a> </dd></dl>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html">QueryBuilder</a></td></tr>
@@ -154,20 +155,16 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a59ed055ca1877291e4f1c07d7a9b252e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63b34d09bd2e4526d09e408b0885769a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#a63b34d09bd2e4526d09e408b0885769a">setJdbcTemplate</a> (JdbcTemplate jdbcTemplate)</td></tr>
 <tr class="separator:a63b34d09bd2e4526d09e408b0885769a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58f6e490a41e430954823d6cc4082dcb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="interfaceannis_1_1dao_1_1_annis_dao.html">AnnisDao</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#a58f6e490a41e430954823d6cc4082dcb">getAnnisDao</a> ()</td></tr>
-<tr class="separator:a58f6e490a41e430954823d6cc4082dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefbf5f8821c8887de68d7ad39209222e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#aefbf5f8821c8887de68d7ad39209222e">setAnnisDao</a> (<a class="el" href="interfaceannis_1_1dao_1_1_annis_dao.html">AnnisDao</a> annisDao)</td></tr>
-<tr class="separator:aefbf5f8821c8887de68d7ad39209222e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab15b02b40b0440e7487af450e54b5051"><td class="memItemLeft" align="right" valign="top"><a class="el" href="interfaceannis_1_1dao_1_1_query_dao.html">QueryDao</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#ab15b02b40b0440e7487af450e54b5051">getQueryDao</a> ()</td></tr>
+<tr class="separator:ab15b02b40b0440e7487af450e54b5051"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa17819764e06691b5bde9c9e1199c663"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#aa17819764e06691b5bde9c9e1199c663">setQueryDao</a> (<a class="el" href="interfaceannis_1_1dao_1_1_query_dao.html">QueryDao</a> queryDao)</td></tr>
+<tr class="separator:aa17819764e06691b5bde9c9e1199c663"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa96ca51c5c2f580f7fc79062a0aae382"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html">QueryBuilder</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#aa96ca51c5c2f580f7fc79062a0aae382">getQueryBuilder</a> ()</td></tr>
 <tr class="separator:aa96ca51c5c2f580f7fc79062a0aae382"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43dfcad16962df73d3acfcf065015635"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#a43dfcad16962df73d3acfcf065015635">setQueryBuilder</a> (Set&lt; <a class="el" href="interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html">QueryBuilder</a> &gt; queryBuilder)</td></tr>
 <tr class="separator:a43dfcad16962df73d3acfcf065015635"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Controlls the generating of automatic generated queries. </p>
-<p>For creating automatic generated queries, you have to implement the <a class="el" href="interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html">QueryBuilder</a> interface and register the new class in the CommonDAO.xml file.</p>
-<dl class="section author"><dt>Author</dt><dd>Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+'eld'+'ra'+'ma@'+'gm'+'ail'+'.c'+'om'; return false;">b.pix<span style="display: none;">.nosp@m.</span>eldr<span style="display: none;">.nosp@m.</span>ama@g<span style="display: none;">.nosp@m.</span>mail<span style="display: none;">.nosp@m.</span>.com</a> </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a920ed5c6e11c500baa7c544b45357038"></a>
 <div class="memitem">
 <div class="memproto">
@@ -333,22 +330,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a58f6e490a41e430954823d6cc4082dcb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="interfaceannis_1_1dao_1_1_annis_dao.html">AnnisDao</a> annis.dao.autogenqueries.QueriesGenerator.getAnnisDao </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>the annisDao </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="a59ed055ca1877291e4f1c07d7a9b252e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -381,6 +362,22 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ab15b02b40b0440e7487af450e54b5051"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="interfaceannis_1_1dao_1_1_query_dao.html">QueryDao</a> annis.dao.autogenqueries.QueriesGenerator.getQueryDao </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>the queryDao </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ac41885b9b64fbe1a1e78b32830eb5cce"></a>
 <div class="memitem">
 <div class="memproto">
@@ -397,28 +394,6 @@ Public Member Functions</h2></td></tr>
 <p>Defines the table columns of the temporary example query table are copied to the final table. </p>
 <p>The important table name for example queries is "example_queries".</p>
 <dl class="section return"><dt>Returns</dt><dd>Returns a map of table names to column names. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="aefbf5f8821c8887de68d7ad39209222e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.dao.autogenqueries.QueriesGenerator.setAnnisDao </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="interfaceannis_1_1dao_1_1_annis_dao.html">AnnisDao</a>&#160;</td>
-          <td class="paramname"><em>annisDao</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">annisDao</td><td>the annisDao to set </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -466,6 +441,28 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="aa17819764e06691b5bde9c9e1199c663"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void annis.dao.autogenqueries.QueriesGenerator.setQueryDao </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="interfaceannis_1_1dao_1_1_query_dao.html">QueryDao</a>&#160;</td>
+          <td class="paramname"><em>queryDao</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">queryDao</td><td>the queryDao to set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a68c5800cfc57579fa4cbeed90e283eb1"></a>
 <div class="memitem">
 <div class="memproto">
@@ -497,7 +494,7 @@ Public Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>dao</b></li><li class="navelem"><b>autogenqueries</b></li><li class="navelem"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html">QueriesGenerator</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

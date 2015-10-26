@@ -20,7 +20,7 @@ var classannis_1_1gui_1_1_search_view =
     [ "selectedTabChange", "classannis_1_1gui_1_1_search_view.html#a78b736d37b588ef457e9a18f2aa192d7", null ],
     [ "setToolbar", "classannis_1_1gui_1_1_search_view.html#a775cdd776b91ebc7bacebb16ce24343c", null ],
     [ "updateFragementWithSelectedCorpus", "classannis_1_1gui_1_1_search_view.html#a7a880763e1de100181c2367879ca17a9", null ],
-    [ "updateFragment", "classannis_1_1gui_1_1_search_view.html#a8c2f09e50e063a6334f4906d20babdd3", null ],
+    [ "updateFragment", "classannis_1_1gui_1_1_search_view.html#afc728dfb5c973fcba9e5f90c589046f9", null ],
     [ "updateSidebarState", "classannis_1_1gui_1_1_search_view.html#abcf91feb44beb6b98b0f72f74e9afc71", null ],
     [ "uriFragmentChanged", "classannis_1_1gui_1_1_search_view.html#a07f07c850320140f4c4682568282b911", null ]
 ];

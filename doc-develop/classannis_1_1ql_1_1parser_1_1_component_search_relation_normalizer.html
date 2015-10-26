@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -113,18 +113,6 @@ $(document).ready(function(){initNavTree('classannis_1_1ql_1_1parser_1_1_compone
 <div class="title">annis.ql.parser.ComponentSearchRelationNormalizer Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>Fix queries where a node is contained in two linguistic relations that could query different components.  
- <a href="classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html#details">More...</a></p>
-
-<p>Inherits <a class="el" href="interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.html">annis.ql.parser.QueryDataTransformer</a>.</p>
-<table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a8d3cb6ddfffa572e63aee6b3dda4938e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html#a8d3cb6ddfffa572e63aee6b3dda4938e">transform</a> (<a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a> data)</td></tr>
-<tr class="memdesc:a8d3cb6ddfffa572e63aee6b3dda4938e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms or optimizes a specific <a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a>.  <a href="#a8d3cb6ddfffa572e63aee6b3dda4938e">More...</a><br /></td></tr>
-<tr class="separator:a8d3cb6ddfffa572e63aee6b3dda4938e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Fix queries where a node is contained in two linguistic relations that could query different components. </p>
 <p>The normalization is needed since our SQL generation does not work well on database tuples from different components which represent the same node. E.g. a query like </p><pre>
@@ -135,7 +123,16 @@ node &amp; node &amp; node &amp; node
 &amp; #1 = #3 &amp; #2 = #4
 </pre><p> in order to actually get the results the user expects.</p>
 <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+</div>
+<p>Inherits <a class="el" href="interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.html">annis.ql.parser.QueryDataTransformer</a>.</p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a8d3cb6ddfffa572e63aee6b3dda4938e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html#a8d3cb6ddfffa572e63aee6b3dda4938e">transform</a> (<a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a> data)</td></tr>
+<tr class="memdesc:a8d3cb6ddfffa572e63aee6b3dda4938e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms or optimizes a specific <a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a>.  <a href="#a8d3cb6ddfffa572e63aee6b3dda4938e">More...</a><br /></td></tr>
+<tr class="separator:a8d3cb6ddfffa572e63aee6b3dda4938e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a8d3cb6ddfffa572e63aee6b3dda4938e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -169,7 +166,7 @@ node &amp; node &amp; node &amp; node
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>ql</b></li><li class="navelem"><b>parser</b></li><li class="navelem"><a class="el" href="classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html">ComponentSearchRelationNormalizer</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

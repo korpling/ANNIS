@@ -9,6 +9,8 @@ var searchData=
   ['querybuilderplugin_3c_20flatquerybuilder_20_3e',['QueryBuilderPlugin&lt; FlatQueryBuilder &gt;',['../interfaceannis_1_1gui_1_1querybuilder_1_1_query_builder_plugin.html',1,'annis::gui::querybuilder']]],
   ['querybuilderplugin_3c_20tigerquerybuilderplugin_2etigerquerybuilder_20_3e',['QueryBuilderPlugin&lt; TigerQueryBuilderPlugin.TigerQueryBuilder &gt;',['../interfaceannis_1_1gui_1_1querybuilder_1_1_query_builder_plugin.html',1,'annis::gui::querybuilder']]],
   ['querycontroller',['QueryController',['../classannis_1_1gui_1_1_query_controller.html',1,'annis::gui']]],
+  ['querydao',['QueryDao',['../interfaceannis_1_1dao_1_1_query_dao.html',1,'annis::dao']]],
+  ['querydaoimpl',['QueryDaoImpl',['../classannis_1_1dao_1_1_query_dao_impl.html',1,'annis::dao']]],
   ['querydata',['QueryData',['../classannis_1_1ql_1_1parser_1_1_query_data.html',1,'annis::ql::parser']]],
   ['querydatatransformer',['QueryDataTransformer',['../interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.html',1,'annis::ql::parser']]],
   ['querygenerator',['QueryGenerator',['../classannis_1_1gui_1_1objects_1_1_query_generator.html',1,'annis::gui::objects']]],

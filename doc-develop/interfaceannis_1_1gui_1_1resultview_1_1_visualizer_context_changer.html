@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -113,10 +113,12 @@ $(document).ready(function(){initNavTree('interfaceannis_1_1gui_1_1resultview_1_
 <div class="title">annis.gui.resultview.VisualizerContextChanger Interface Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>Defines a facade for changing the context of all visualizer for a single result.  
- <a href="interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html#details">More...</a></p>
-
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Defines a facade for changing the context of all visualizer for a single result. </p>
+<p>Typically this interface should be implement by the controller of the single results or the container class.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html">SingleResultPanel</a></dd></dl>
+<dl class="section author"><dt>Author</dt><dd>Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+'eld'+'ra'+'ma@'+'gm'+'ail'+'.c'+'om'; return false;">b.pix<span style="display: none;">.nosp@m.</span>eldr<span style="display: none;">.nosp@m.</span>ama@g<span style="display: none;">.nosp@m.</span>mail<span style="display: none;">.nosp@m.</span>.com</a> </dd></dl>
+</div>
 <p>Inherits Serializable.</p>
 
 <p>Inherited by <a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html">annis.gui.resultview.SingleResultPanel</a>.</p>
@@ -129,24 +131,19 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae0bdc8ae8a06446c88f9ccc4d1ec05e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html#ae0bdc8ae8a06446c88f9ccc4d1ec05e3">updateResult</a> (SaltProject p, <a class="el" href="classannis_1_1gui_1_1objects_1_1_paged_result_query.html">PagedResultQuery</a> q)</td></tr>
 <tr class="memdesc:ae0bdc8ae8a06446c88f9ccc4d1ec05e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reinitiates all registered visualizer with a new salt project.  <a href="#ae0bdc8ae8a06446c88f9ccc4d1ec05e3">More...</a><br /></td></tr>
 <tr class="separator:ae0bdc8ae8a06446c88f9ccc4d1ec05e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c377d15f3ddffab34fc878a8200594a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html#a6c377d15f3ddffab34fc878a8200594a">changeContext</a> (int resultNumber, int context, boolean left)</td></tr>
-<tr class="memdesc:a6c377d15f3ddffab34fc878a8200594a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a new query to the ANNIS-Service in order to increase/decrease the context of a single result.  <a href="#a6c377d15f3ddffab34fc878a8200594a">More...</a><br /></td></tr>
-<tr class="separator:a6c377d15f3ddffab34fc878a8200594a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbe459ac405b022af513882ad7a49d59"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html#abbe459ac405b022af513882ad7a49d59">changeContext</a> (long resultNumber, int context, boolean left)</td></tr>
+<tr class="memdesc:abbe459ac405b022af513882ad7a49d59"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a new query to the ANNIS-Service in order to increase/decrease the context of a single result.  <a href="#abbe459ac405b022af513882ad7a49d59">More...</a><br /></td></tr>
+<tr class="separator:abbe459ac405b022af513882ad7a49d59"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Defines a facade for changing the context of all visualizer for a single result. </p>
-<p>Typically this interface should be implement by the controller of the single results or the container class.</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html">SingleResultPanel</a></dd></dl>
-<dl class="section author"><dt>Author</dt><dd>Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+'eld'+'ra'+'ma@'+'gm'+'ail'+'.c'+'om'; return false;">b.pix<span style="display: none;">.nosp@m.</span>eldr<span style="display: none;">.nosp@m.</span>ama@g<span style="display: none;">.nosp@m.</span>mail<span style="display: none;">.nosp@m.</span>.com</a> </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a6c377d15f3ddffab34fc878a8200594a"></a>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="abbe459ac405b022af513882ad7a49d59"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void annis.gui.resultview.VisualizerContextChanger.changeContext </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">long&#160;</td>
           <td class="paramname"><em>resultNumber</em>, </td>
         </tr>
         <tr>
@@ -179,7 +176,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Implemented in <a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a3c249e8082ef1d7f19982a4ed40fbc0e">annis.gui.resultview.SingleResultPanel</a>.</p>
+<p>Implemented in <a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#afc53f385f9450dbcc8fae317559e9c44">annis.gui.resultview.SingleResultPanel</a>.</p>
 
 </div>
 </div>
@@ -264,7 +261,7 @@ Public Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>resultview</b></li><li class="navelem"><a class="el" href="interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html">VisualizerContextChanger</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

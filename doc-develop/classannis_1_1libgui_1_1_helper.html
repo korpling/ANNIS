@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -108,7 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1libgui_1_1_helper.html',
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
-<a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="classannis_1_1libgui_1_1_helper-members.html">List of all members</a>  </div>
@@ -116,18 +115,17 @@ $(document).ready(function(){initNavTree('classannis_1_1libgui_1_1_helper.html',
 <div class="title">annis.libgui.Helper Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><dl class="section author"><dt>Author</dt><dd>thomas </dd></dl>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>AnnotationListType</b></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Casts a list of Annotations to the Type <code>List&lt;Annotation&gt;</code> <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr class="memitem:a3b6c9be6a56a2a60521797b04425bc29"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3b6c9be6a56a2a60521797b04425bc29"></a>
-static&lt; T &gt; JsonValue&#160;</td><td class="memItemRight" valign="bottom"><b>encodeGeneric</b> (Object v)</td></tr>
-<tr class="separator:a3b6c9be6a56a2a60521797b04425bc29"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>CoveredMatchesCalculator</b></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Marks all nodes which are dominated by already marked nodes. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -161,15 +159,12 @@ static String&#160;</td><td class="memItemRight" valign="bottom"><b>getContext</
 <tr class="memitem:a8ac549aa52d16ae425035bd800adb87e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ac549aa52d16ae425035bd800adb87e"></a>
 static String&#160;</td><td class="memItemRight" valign="bottom"><b>encodeBase64URL</b> (String val)</td></tr>
 <tr class="separator:a8ac549aa52d16ae425035bd800adb87e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab184045422749a0aaac3979ebc3dfa7d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab184045422749a0aaac3979ebc3dfa7d"></a>
-static List&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>citationFragment</b> (String aql, Set&lt; String &gt; corpora, int contextLeft, int contextRight, String segmentation, int start, int limit)</td></tr>
-<tr class="separator:ab184045422749a0aaac3979ebc3dfa7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afaea4e59478ba58f55ac12a02bc95b28"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afaea4e59478ba58f55ac12a02bc95b28"></a>
-static List&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>citationFragment</b> (String aql, Set&lt; String &gt; corpora, int contextLeft, int contextRight, String segmentation, int start, int limit, <a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html">OrderType</a> order)</td></tr>
-<tr class="separator:afaea4e59478ba58f55ac12a02bc95b28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a365b40fa84e099cb88e9a353de3b26"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7a365b40fa84e099cb88e9a353de3b26"></a>
-static String&#160;</td><td class="memItemRight" valign="bottom"><b>generateCitation</b> (String aql, Set&lt; String &gt; corpora, int contextLeft, int contextRight, String segmentation, int start, int limit)</td></tr>
-<tr class="separator:a7a365b40fa84e099cb88e9a353de3b26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1138d28bf1cf9ce045f5bc67b1b07015"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1138d28bf1cf9ce045f5bc67b1b07015"></a>
+static List&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>citationFragment</b> (String aql, Set&lt; String &gt; corpora, int contextLeft, int contextRight, String segmentation, String visibleBaseText, long start, int limit, <a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html">OrderType</a> order, Set&lt; Long &gt; selectedMatches)</td></tr>
+<tr class="separator:a1138d28bf1cf9ce045f5bc67b1b07015"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae6bb6a43969a50e2cb480cc09e0cabe3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6bb6a43969a50e2cb480cc09e0cabe3"></a>
+static URI&#160;</td><td class="memItemRight" valign="bottom"><b>generateCitation</b> (String aql, Set&lt; String &gt; corpora, int contextLeft, int contextRight, String segmentation, String visibleBaseText, long start, int limit, <a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html">OrderType</a> order, Set&lt; Long &gt; selectedMatches)</td></tr>
+<tr class="separator:ae6bb6a43969a50e2cb480cc09e0cabe3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1bf36e46f170de45bf43333c5281ec7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1bf36e46f170de45bf43333c5281ec7"></a>
 static String&#160;</td><td class="memItemRight" valign="bottom"><b>generateCorpusLink</b> (Set&lt; String &gt; corpora)</td></tr>
 <tr class="separator:ac1bf36e46f170de45bf43333c5281ec7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -215,6 +210,21 @@ static <a class="el" href="classannis_1_1service_1_1objects_1_1_raw_text_wrapper
 <tr class="memitem:ab7dac8e253b507ec3f6a22a1d20fd287"><td class="memItemLeft" align="right" valign="top">static String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_helper.html#ab7dac8e253b507ec3f6a22a1d20fd287">encodeJersey</a> (String v)</td></tr>
 <tr class="memdesc:ab7dac8e253b507ec3f6a22a1d20fd287"><td class="mdescLeft">&#160;</td><td class="mdescRight">This will percent encode Jersey template argument braces (enclosed in "{...}") and the percent character.  <a href="#ab7dac8e253b507ec3f6a22a1d20fd287">More...</a><br /></td></tr>
 <tr class="separator:ab7dac8e253b507ec3f6a22a1d20fd287"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d0c042a4dab2bdc5ac5e6ebe47b359c"><td class="memItemLeft" align="right" valign="top">static String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_helper.html#a8d0c042a4dab2bdc5ac5e6ebe47b359c">encodeQueryParam</a> (String v)</td></tr>
+<tr class="memdesc:a8d0c042a4dab2bdc5ac5e6ebe47b359c"><td class="mdescLeft">&#160;</td><td class="mdescRight">This will percent encode Jersey template argument braces (enclosed in "{...}") and the percent character.  <a href="#a8d0c042a4dab2bdc5ac5e6ebe47b359c">More...</a><br /></td></tr>
+<tr class="separator:a8d0c042a4dab2bdc5ac5e6ebe47b359c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa36e7aff66a3ff0aa54595244c3e35c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa36e7aff66a3ff0aa54595244c3e35c7"></a>
+static&lt; T &gt; JsonValue&#160;</td><td class="memItemRight" valign="bottom"><b>encodeGeneric</b> (Object v)</td></tr>
+<tr class="separator:aa36e7aff66a3ff0aa54595244c3e35c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fd90b1dab6f63571499112905c8ac31"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9fd90b1dab6f63571499112905c8ac31"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>calulcateColorsForMarkedAndCovered</b> (SDocument result, Map&lt; String, Long &gt; markedAndCovered, Map&lt; String, String &gt; markedCoveredMap)</td></tr>
+<tr class="separator:a9fd90b1dab6f63571499112905c8ac31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a827f5601568f9900af13141081ffa56c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a827f5601568f9900af13141081ffa56c"></a>
+static Map&lt; String, Long &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>calculateMarkedAndCoveredIDs</b> (SDocument doc, List&lt; SNode &gt; segNodes, String segmentationName)</td></tr>
+<tr class="separator:a827f5601568f9900af13141081ffa56c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bda991f431f7c0911ccf7718fe8b9fc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2bda991f431f7c0911ccf7718fe8b9fc"></a>
+static String&#160;</td><td class="memItemRight" valign="bottom"><b>shortenURL</b> (URI original)</td></tr>
+<tr class="separator:a2bda991f431f7c0911ccf7718fe8b9fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -231,9 +241,7 @@ static final String&#160;</td><td class="memItemRight" valign="bottom"><b>CORPUS
 static final String&#160;</td><td class="memItemRight" valign="bottom"><b>CORPUS_FONT</b> = &quot;corpus-font&quot;</td></tr>
 <tr class="separator:a09cfd0cdad42e3b6b65c05af390e7ab9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><dl class="section author"><dt>Author</dt><dd>thomas </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a2a9c289e168fb5099cf2af1d4eed86b1"></a>
 <div class="memitem">
 <div class="memproto">
@@ -360,7 +368,42 @@ static final String&#160;</td><td class="memItemRight" valign="bottom"><b>CORPUS
 </div><div class="memdoc">
 
 <p>This will percent encode Jersey template argument braces (enclosed in "{...}") and the percent character. </p>
-<p>Both would not be esccaped by jersey and/or would cause an error when this is not a valid template. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Both would not be esccaped by jersey and/or would cause an error when this is not a valid template.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a8d0c042a4dab2bdc5ac5e6ebe47b359c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static String annis.libgui.Helper.encodeQueryParam </td>
+          <td>(</td>
+          <td class="paramtype">String&#160;</td>
+          <td class="paramname"><em>v</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This will percent encode Jersey template argument braces (enclosed in "{...}") and the percent character. </p>
+<p>Both would not be esccaped by jersey and/or would cause an error when this is not a valid template.</p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">v</td><td></td></tr>
   </table>
@@ -791,7 +834,7 @@ static final String&#160;</td><td class="memItemRight" valign="bottom"><b>CORPUS
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>libgui</b></li><li class="navelem"><a class="el" href="classannis_1_1libgui_1_1_helper.html">Helper</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

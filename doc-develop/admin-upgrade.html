@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -161,6 +161,7 @@ Full upgrade </h2>
 </div><!-- fragment --><p> the existing corpora of the old installation will be imported. This can take a long time, so if you use SSH you might want use <code>nohup</code> to make sure the process will continue to run in the background even if the connection is interrupted. </p><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;nohup annis-admin.sh copy &lt;old installation director&gt;/conf/database.properties &amp;</div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;tail -f nohup.out</div>
 </div><!-- fragment --><p> At the end a summary of all successfull and failed imports will be given. If there where any errors please try to import the corpus manually. When all corpora are imported, proceed to the next step.</p>
+<p>Additionally copy the "user_config" and "url_shortener" tables from the old installation, e.g. with the PostgreSQL <code>COPY</code> command (<a href="http://www.postgresql.org/docs/9.3/static/sql-copy.html#AEN69268">http://www.postgresql.org/docs/9.3/static/sql-copy.html#AEN69268</a>)</p>
 <h3>4. Switch service</h3>
 <p>Stop the old service and start the new service. Remember to set the <code>ANNIS_HOME</code> variable to the right value in both cases before you call <code>annis-service.sh start/stop</code> command.</p>
 <h3>5. Upgrade front-end</h3>
@@ -175,7 +176,7 @@ Full upgrade </h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="admin.html">Administration</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

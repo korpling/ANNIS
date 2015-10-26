@@ -15,6 +15,7 @@ var searchData=
   ['delexamplequeries',['delExampleQueries',['../classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#a920ed5c6e11c500baa7c544b45357038',1,'annis.dao.autogenqueries.QueriesGenerator.delExampleQueries(long corpusId)'],['../classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#a1ceffda4e6f4f93db532d12006de46ed',1,'annis.dao.autogenqueries.QueriesGenerator.delExampleQueries(List&lt; String &gt; corpusNames)']]],
   ['detectholes',['DetectHoles',['../classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_detect_holes.html',1,'annis::visualizers::iframe::partitur']]],
   ['developing',['Developing',['../dev.html',1,'']]],
+  ['displayedresultquery',['DisplayedResultQuery',['../classannis_1_1gui_1_1objects_1_1_displayed_result_query.html',1,'annis::gui::objects']]],
   ['dnftransformer',['DNFTransformer',['../classannis_1_1ql_1_1parser_1_1_d_n_f_transformer.html',1,'annis::ql::parser']]],
   ['docbrowsercontroller',['DocBrowserController',['../classannis_1_1gui_1_1docbrowser_1_1_doc_browser_controller.html',1,'annis::gui::docbrowser']]],
   ['docbrowserpanel',['DocBrowserPanel',['../classannis_1_1gui_1_1docbrowser_1_1_doc_browser_panel.html',1,'annis::gui::docbrowser']]],

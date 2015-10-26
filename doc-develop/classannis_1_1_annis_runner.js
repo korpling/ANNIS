@@ -34,7 +34,6 @@ var classannis_1_1_annis_runner =
     [ "doSqlDoc", "classannis_1_1_annis_runner.html#ae725b9774d8eb0c887e6b3696072ccd8", null ],
     [ "doSubgraph", "classannis_1_1_annis_runner.html#a616378d61c4172ec649ff30d78b75023", null ],
     [ "doVersion", "classannis_1_1_annis_runner.html#a6fb7c2f92b9120f71f29e1e686fd54e1", null ],
-    [ "getAnnisDao", "classannis_1_1_annis_runner.html#ab4cf93ffaae01ab00f1cf9e91693641c", null ],
     [ "getAnnisParser", "classannis_1_1_annis_runner.html#a9b413c62a809c500829fd2559d1995f7", null ],
     [ "getContext", "classannis_1_1_annis_runner.html#aa43d396ad03c56a49c6d6eaffd728146", null ],
     [ "getCorpusList", "classannis_1_1_annis_runner.html#aa8ea46f7ea43c4eea1a12d025e865f1b", null ],
@@ -46,7 +45,7 @@ var classannis_1_1_annis_runner =
     [ "getMatrixSqlGenerator", "classannis_1_1_annis_runner.html#a081745b876816e1ae47a9719525db123", null ],
     [ "getMetaDataFilter", "classannis_1_1_annis_runner.html#ade2a5f773d788c4fb88ebed5ab4a3b55", null ],
     [ "getQueriesGenerator", "classannis_1_1_annis_runner.html#ab40c1ee3ecae3e01626d32dd13d57a95", null ],
-    [ "setAnnisDao", "classannis_1_1_annis_runner.html#aee1b1a3cf53de5b21e1e609e8c350688", null ],
+    [ "getQueryDao", "classannis_1_1_annis_runner.html#a50417ab5d1235d01c685d31e4268ea66", null ],
     [ "setAnnisParser", "classannis_1_1_annis_runner.html#a99e3d2d6d29c886791c47612c96b6e9c", null ],
     [ "setContext", "classannis_1_1_annis_runner.html#a2ff70b610ce6edc512103ea93afc4a2c", null ],
     [ "setCorpusList", "classannis_1_1_annis_runner.html#a10f5680d107ffc1472907133afcf726e", null ],
@@ -57,5 +56,6 @@ var classannis_1_1_annis_runner =
     [ "setMatchLimit", "classannis_1_1_annis_runner.html#a3c8048384297ea755c04510ca4c97256", null ],
     [ "setMatrixSqlGenerator", "classannis_1_1_annis_runner.html#aaeb61011a79104107a50408cbad4cb9b", null ],
     [ "setMetaDataFilter", "classannis_1_1_annis_runner.html#abf78b1ced1018d7b6e6a6a26010ed926", null ],
-    [ "setQueriesGenerator", "classannis_1_1_annis_runner.html#aaaa6a84b03bb2744f63dc34d23d9f184", null ]
+    [ "setQueriesGenerator", "classannis_1_1_annis_runner.html#aaaa6a84b03bb2744f63dc34d23d9f184", null ],
+    [ "setQueryDao", "classannis_1_1_annis_runner.html#a30b329511b5bb39fc6b4d9ebefc4c8f2", null ]
 ];

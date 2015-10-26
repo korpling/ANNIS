@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -113,10 +113,11 @@ $(document).ready(function(){initNavTree('classannis_1_1libgui_1_1visualizers_1_
 <div class="title">annis.libgui.visualizers.AbstractVisualizer&lt; I extends Component &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>Base class for all Visualizer.  
- <a href="classannis_1_1libgui_1_1visualizers_1_1_abstract_visualizer.html#details">More...</a></p>
-
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Base class for all Visualizer. </p>
+<p>This class sets some defaults, so you may implement the <a class="el" href="">VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)</a> method for pure Vaadin component plugins.</p>
+<dl class="section author"><dt>Author</dt><dd>Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+'eld'+'ra'+'ma@'+'gm'+'ail'+'.c'+'om'; return false;">b.pix<span style="display: none;">.nosp@m.</span>eldr<span style="display: none;">.nosp@m.</span>ama@g<span style="display: none;">.nosp@m.</span>mail<span style="display: none;">.nosp@m.</span>.com</a> </dd></dl>
+</div>
 <p>Inherits <a class="el" href="interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin.html">annis.libgui.visualizers.VisualizerPlugin&lt; I &gt;</a>, and <a class="el" href="interfaceannis_1_1libgui_1_1visualizers_1_1_filtering_visualizer_plugin.html">annis.libgui.visualizers.FilteringVisualizerPlugin</a>.</p>
 
 <p>Inherited by <a class="el" href="classannis_1_1libgui_1_1visualizers_1_1_abstract_i_frame_visualizer.html">annis.libgui.visualizers.AbstractIFrameVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1_abstract_dot_visualizer.html">annis.visualizers.component.AbstractDotVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1_abstract_image_visualizer.html">annis.visualizers.component.AbstractImageVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1_audio_visualizer.html">annis.visualizers.component.AudioVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_visualizer.html">annis.visualizers.component.grid.GridVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1gridtree_1_1_grid_tree_visualizer.html">annis.visualizers.component.gridtree.GridTreeVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1kwic_1_1_k_w_i_c_visualizer.html">annis.visualizers.component.kwic.KWICVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1pdf_1_1_p_d_f_full_visualizer.html">annis.visualizers.component.pdf.PDFFullVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1pdf_1_1_p_d_f_visualizer.html">annis.visualizers.component.pdf.PDFVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1_raw_text_visualizer.html">annis.visualizers.component.RawTextVisualizer</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1rst_1_1_r_s_t.html">annis.visualizers.component.rst.RST</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1rst_1_1_r_s_t_full.html">annis.visualizers.component.rst.RSTFull</a>, <a class="el" href="classannis_1_1visualizers_1_1component_1_1_video_visualizer.html">annis.visualizers.component.VideoVisualizer</a>, and <a class="el" href="classannis_1_1visualizers_1_1htmlvis_1_1_h_t_m_l_vis.html">annis.visualizers.htmlvis.HTMLVis</a>.</p>
@@ -161,11 +162,7 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="i
 <tr class="memdesc:a2b801a7c32a4cd1ac34e5cae7503d735 inherit pub_methods_interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if this visaulizer wants to use the original text.  <a href="#a2b801a7c32a4cd1ac34e5cae7503d735">More...</a><br /></td></tr>
 <tr class="separator:a2b801a7c32a4cd1ac34e5cae7503d735 inherit pub_methods_interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Base class for all Visualizer. </p>
-<p>This class sets some defaults, so you may implement the <a class="el" href="">VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)</a> method for pure Vaadin component plugins.</p>
-<dl class="section author"><dt>Author</dt><dd>Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+'eld'+'ra'+'ma@'+'gm'+'ail'+'.c'+'om'; return false;">b.pix<span style="display: none;">.nosp@m.</span>eldr<span style="display: none;">.nosp@m.</span>ama@g<span style="display: none;">.nosp@m.</span>mail<span style="display: none;">.nosp@m.</span>.com</a> </dd></dl>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="aa63bceda1a629caed8e09cc3bb03baa4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -217,7 +214,7 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="i
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>libgui</b></li><li class="navelem"><b>visualizers</b></li><li class="navelem"><a class="el" href="classannis_1_1libgui_1_1visualizers_1_1_abstract_visualizer.html">AbstractVisualizer</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

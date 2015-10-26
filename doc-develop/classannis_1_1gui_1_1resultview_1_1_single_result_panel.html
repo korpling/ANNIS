@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -115,19 +115,15 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1resultview_1_1_si
 <div class="title">annis.gui.resultview.SingleResultPanel Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><dl class="section author"><dt>Author</dt><dd>thomas </dd></dl>
+</div>
 <p>Inherits CssLayout, ClickListener, and <a class="el" href="interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html">annis.gui.resultview.VisualizerContextChanger</a>.</p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>CoveredMatchesCalculator</b></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Marks all nodes which are dominated by already marked nodes. <br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3d8a085eebcf385def50ba80d11a0a2b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a3d8a085eebcf385def50ba80d11a0a2b">SingleResultPanel</a> (final SDocument result, <a class="el" href="classannis_1_1service_1_1objects_1_1_match.html">Match</a> match, int resultNumber, <a class="el" href="interfaceannis_1_1libgui_1_1_resolver_provider.html">ResolverProvider</a> resolverProvider, <a class="el" href="interfaceannis_1_1libgui_1_1_plugin_system.html">PluginSystem</a> ps, Set&lt; String &gt; visibleTokenAnnos, String segmentationName, <a class="el" href="classannis_1_1gui_1_1_query_controller.html">QueryController</a> controller, <a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> instanceConfig, <a class="el" href="classannis_1_1gui_1_1objects_1_1_paged_result_query.html">PagedResultQuery</a> query)</td></tr>
-<tr class="separator:a3d8a085eebcf385def50ba80d11a0a2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c70e63598fe48cfd7ae695128e59366"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a7c70e63598fe48cfd7ae695128e59366">SingleResultPanel</a> (final SDocument result, <a class="el" href="classannis_1_1service_1_1objects_1_1_match.html">Match</a> match, long resultNumber, <a class="el" href="interfaceannis_1_1libgui_1_1_resolver_provider.html">ResolverProvider</a> resolverProvider, <a class="el" href="interfaceannis_1_1libgui_1_1_plugin_system.html">PluginSystem</a> ps, <a class="el" href="classannis_1_1gui_1_1_annis_u_i.html">AnnisUI</a> ui, Set&lt; String &gt; visibleTokenAnnos, String segmentationName, <a class="el" href="classannis_1_1gui_1_1_query_controller.html">QueryController</a> controller, <a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> instanceConfig, <a class="el" href="classannis_1_1gui_1_1objects_1_1_displayed_result_query.html">DisplayedResultQuery</a> query)</td></tr>
+<tr class="separator:a7c70e63598fe48cfd7ae695128e59366"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8bc78aa204a3fca676307e478c066d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad8bc78aa204a3fca676307e478c066d8"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setSegmentationLayer</b> (String segmentationName)</td></tr>
 <tr class="separator:ad8bc78aa204a3fca676307e478c066d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -140,9 +136,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>buttonClick</b> (Clic
 <tr class="memitem:a832803a75288dd4afdd00789f17f3fbb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a832803a75288dd4afdd00789f17f3fbb">registerVisibilityStatus</a> (long entryId, boolean status)</td></tr>
 <tr class="memdesc:a832803a75288dd4afdd00789f17f3fbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Registers the visibility status of single visualizer.  <a href="#a832803a75288dd4afdd00789f17f3fbb">More...</a><br /></td></tr>
 <tr class="separator:a832803a75288dd4afdd00789f17f3fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c249e8082ef1d7f19982a4ed40fbc0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a3c249e8082ef1d7f19982a4ed40fbc0e">changeContext</a> (int resultNumber, int context, boolean left)</td></tr>
-<tr class="memdesc:a3c249e8082ef1d7f19982a4ed40fbc0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a new query to the ANNIS-Service in order to increase/decrease the context of a single result.  <a href="#a3c249e8082ef1d7f19982a4ed40fbc0e">More...</a><br /></td></tr>
-<tr class="separator:a3c249e8082ef1d7f19982a4ed40fbc0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc53f385f9450dbcc8fae317559e9c44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#afc53f385f9450dbcc8fae317559e9c44">changeContext</a> (long resultNumber, int context, boolean left)</td></tr>
+<tr class="memdesc:afc53f385f9450dbcc8fae317559e9c44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sends a new query to the ANNIS-Service in order to increase/decrease the context of a single result.  <a href="#afc53f385f9450dbcc8fae317559e9c44">More...</a><br /></td></tr>
+<tr class="separator:afc53f385f9450dbcc8fae317559e9c44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72aa8594c23ceea595cc7b56a0d8cf6a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a72aa8594c23ceea595cc7b56a0d8cf6a">updateResult</a> (SaltProject p, <a class="el" href="classannis_1_1gui_1_1objects_1_1_paged_result_query.html">PagedResultQuery</a> query)</td></tr>
 <tr class="memdesc:a72aa8594c23ceea595cc7b56a0d8cf6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reinitiates all registered visualizer with a new salt project.  <a href="#a72aa8594c23ceea595cc7b56a0d8cf6a">More...</a><br /></td></tr>
 <tr class="separator:a72aa8594c23ceea595cc7b56a0d8cf6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,10 +149,8 @@ Protected Member Functions</h2></td></tr>
 SDocument&#160;</td><td class="memItemRight" valign="bottom"><b>getResult</b> ()</td></tr>
 <tr class="separator:a6fc5c9b5a12c6fdf59a4ef6f82b1d47d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><dl class="section author"><dt>Author</dt><dd>thomas </dd></dl>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a3d8a085eebcf385def50ba80d11a0a2b"></a>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a7c70e63598fe48cfd7ae695128e59366"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -175,7 +169,7 @@ SDocument&#160;</td><td class="memItemRight" valign="bottom"><b>getResult</b> ()
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">long&#160;</td>
           <td class="paramname"><em>resultNumber</em>, </td>
         </tr>
         <tr>
@@ -189,6 +183,12 @@ SDocument&#160;</td><td class="memItemRight" valign="bottom"><b>getResult</b> ()
           <td></td>
           <td class="paramtype"><a class="el" href="interfaceannis_1_1libgui_1_1_plugin_system.html">PluginSystem</a>&#160;</td>
           <td class="paramname"><em>ps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1_annis_u_i.html">AnnisUI</a>&#160;</td>
+          <td class="paramname"><em>ui</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -217,7 +217,7 @@ SDocument&#160;</td><td class="memItemRight" valign="bottom"><b>getResult</b> ()
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1objects_1_1_paged_result_query.html">PagedResultQuery</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1objects_1_1_displayed_result_query.html">DisplayedResultQuery</a>&#160;</td>
           <td class="paramname"><em>query</em>&#160;</td>
         </tr>
         <tr>
@@ -232,14 +232,14 @@ SDocument&#160;</td><td class="memItemRight" valign="bottom"><b>getResult</b> ()
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a3c249e8082ef1d7f19982a4ed40fbc0e"></a>
+<a class="anchor" id="afc53f385f9450dbcc8fae317559e9c44"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void annis.gui.resultview.SingleResultPanel.changeContext </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">long&#160;</td>
           <td class="paramname"><em>resultNumber</em>, </td>
         </tr>
         <tr>
@@ -272,7 +272,7 @@ SDocument&#160;</td><td class="memItemRight" valign="bottom"><b>getResult</b> ()
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html#a6c377d15f3ddffab34fc878a8200594a">annis.gui.resultview.VisualizerContextChanger</a>.</p>
+<p>Implements <a class="el" href="interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html#abbe459ac405b022af513882ad7a49d59">annis.gui.resultview.VisualizerContextChanger</a>.</p>
 
 </div>
 </div>
@@ -357,7 +357,7 @@ SDocument&#160;</td><td class="memItemRight" valign="bottom"><b>getResult</b> ()
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>resultview</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1resultview_1_1_single_result_panel.html">SingleResultPanel</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

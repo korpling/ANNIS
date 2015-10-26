@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -133,34 +133,38 @@ Complete List of Operators </h1>
 <h2><a class="anchor" id="dev-aql-directprec"></a>
 direct precedence: "."</h2>
 <div class="image">
-<img src="A-pred-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 . #2
+<img src="A-pred-B.svg" alt="A-pred-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 . #2
 </pre><p>For non-terminal nodes, precedence is determined by the right most and left most terminal children.</p>
 <h2><a class="anchor" id="dev-aql-indirectprec"></a>
 indirect precedence: ".*"</h2>
 <div class="image">
-<img src="A-pred-ind-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 .* #2
+<img src="A-pred-ind-B.svg" alt="A-pred-ind-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 .* #2
 A &amp; B &amp; #1 .4 #2
 A &amp; B &amp; #1 .2,4 #2
 </pre><p>For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance</p>
 <h2><a class="anchor" id="dev-aql-directdom"></a>
 direct dominance: "&gt;"</h2>
 <div class="image">
-<img src="A-dom-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 &gt; #2
+<img src="A-dom-B.svg" alt="A-dom-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 &gt; #2
 A &amp; B &amp; #1 &gt;secedge #2
 A &amp; B &amp; #1 &gt;secedge[func="OA"] #2
 </pre><p>A specific edge type may be specifed, e.g.: <code>&gt;secedge</code> to find secondary edges. Edges labels are specified in brackets, e.g. <code>&gt;[func="OA"]</code> for an edge with the function 'object, accusative.</p>
 <h2><a class="anchor" id="dev-aql-indirectprec"></a>
 indirect precedence: ".*"</h2>
 <div class="image">
-<img src="A-dom-ind-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 &gt;* #2
+<img src="A-dom-ind-B.svg" alt="A-dom-ind-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 &gt;* #2
 A &amp; B &amp; #1 &gt;2,4 #2
 A &amp; B &amp; #1 &gt;secedge[func="OA"] * #2
 A &amp; B &amp; #1 &gt;[func="OA"] 2,4 #2
@@ -168,39 +172,44 @@ A &amp; B &amp; #1 &gt;[func="OA"] 2,4 #2
 <h2><a class="anchor" id="dev-aql-identcov"></a>
 identical coveragee: "_=_"</h2>
 <div class="image">
-<img src="A-cov-ident-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 _=_ #2
+<img src="A-cov-ident-B.svg" alt="A-cov-ident-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 _=_ #2
 </pre><p>Applies when two annotation cover the exact same span of tokens.</p>
 <h2><a class="anchor" id="dev-aql-inclusion"></a>
 inclusion: "_i_"</h2>
 <div class="image">
-<img src="A-cov-incl-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 _i_ #2
+<img src="A-cov-incl-B.svg" alt="A-cov-incl-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 _i_ #2
 </pre><p>Applies when one annotation covers a span identical to or larger than another.</p>
 <h2><a class="anchor" id="dev-aql-overlap"></a>
 overlap: "_o_"</h2>
 <div class="image">
-<img src="A-cov-over-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 _o_ #2
+<img src="A-cov-over-B.svg" alt="A-cov-over-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 _o_ #2
 A &amp; B &amp; #1 _ol_ #2
 A &amp; B &amp; #1 _or_ #2
 </pre><p>For overlap only on the left or right side, use <code>_ol_</code> and <code>_or_</code> respectively.</p>
 <h2><a class="anchor" id="dev-aql-leftalign"></a>
 left aligned: "_l_"</h2>
 <div class="image">
-<img src="A-cov-left-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 _l_ #2
+<img src="A-cov-left-B.svg" alt="A-cov-left-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 _l_ #2
 </pre><p>Both elements span an area beginning with the same token.</p>
 <h2><a class="anchor" id="dev-aql-rightalign"></a>
 right aligned: "_r_"</h2>
 <div class="image">
-<img src="A-cov-right-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 _r_ #2
+<img src="A-cov-right-B.svg" alt="A-cov-right-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 _r_ #2
 </pre><p>Both elements span an area ending with the same token.</p>
 <h2><a class="anchor" id="dev-aql-directnear"></a>
 directly near: "^"</h2>
@@ -215,63 +224,72 @@ A &amp; B &amp; #1 ^2,4 #2
 <h2><a class="anchor" id="dev-aql-directpoint"></a>
 labeled direct pointing relation: "-&gt;LABEL"</h2>
 <div class="image">
-<img src="A-point-direct-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 -&gt;LABEL #2
+<img src="A-point-direct-B.svg" alt="A-point-direct-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 -&gt;LABEL #2
 A &amp; B &amp; #1 -&gt;LABEL[annotation="VALUE"] #2
 </pre><p>A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation="VALUE"]</code></p>
 <h2><a class="anchor" id="dev-aql-indirectpoint"></a>
 labeled indirect pointing relation: "-&gt;LABEL *"</h2>
 <div class="image">
-<img src="A-point-ind-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 -&gt;LABEL * #2
+<img src="A-point-ind-B.svg" alt="A-point-ind-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 -&gt;LABEL * #2
 A &amp; B &amp; #1 -&gt;LABEL 4,7 #2
 </pre><p>An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length <code>n</code> to <code>m</code>.</p>
 <h2><a class="anchor" id="dev-aql-leftchild"></a>
 left-most child: "&gt;@l"</h2>
 <div class="image">
-<img src="A-left-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 &gt;@l #2
+<img src="A-left-B.svg" alt="A-left-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 &gt;@l #2
 </pre><h2><a class="anchor" id="dev-aql-rightchild"></a>
 right-most child: "&gt;@r"</h2>
 <div class="image">
-<img src="A-right-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 &gt;@r #2
+<img src="A-right-B.svg" alt="A-right-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 &gt;@r #2
 </pre><h2><a class="anchor" id="dev-aql-commonparent"></a>
 common parent node: "&gt;$"</h2>
 <div class="image">
-<img src="A-parent-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 &gt;$ #2
+<img src="A-parent-B.svg" alt="A-parent-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 &gt;$ #2
 </pre><h2><a class="anchor" id="dev-aql-commonancestor"></a>
 common ancestor node: "&gt;$*"</h2>
 <div class="image">
-<img src="A-ancestor-B.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; B &amp; #1 &gt;$* #2
+<img src="A-ancestor-B.svg" alt="A-ancestor-B.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; B &amp; #1 &gt;$* #2
 </pre><h2><a class="anchor" id="dev-aql-arity"></a>
 arity: "#x:arity=n"</h2>
 <div class="image">
-<img src="A-arity.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; #1:arity=2
+<img src="A-arity.svg" alt="A-arity.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; #1:arity=2
 </pre><p>Specifies the amount of directly dominated children that the searched node has.</p>
 <h2><a class="anchor" id="dev-aql-length"></a>
 length: "#x:length=n"</h2>
 <div class="image">
-<img src="A-length.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; #1:length=2
+<img src="A-length.svg" alt="A-length.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; #1:length=2
 </pre><p>Specifies the length of the span of tokens covered by the node.</p>
 <h2><a class="anchor" id="dev-aql-root"></a>
 root: "#x:root"</h2>
 <div class="image">
-<img src="A-root.svg"  alt="(Illustration)"/>
-</div>
- <pre class="fragment">A &amp; #1:root
+<img src="A-root.svg" alt="A-root.svg"/>
+<div class="caption">
+(Illustration)</div></div>
+<pre class="fragment">A &amp; #1:root
 </pre><p>node x is the root of a subgraph (i.e. it is not dominated by any node) </p>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
@@ -279,7 +297,7 @@ root: "#x:root"</h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dev.html">Developing</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

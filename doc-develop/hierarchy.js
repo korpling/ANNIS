@@ -1,8 +1,13 @@
 var hierarchy =
 [
-    [ "annis.administration.AbstractAdminstrationDao", "classannis_1_1administration_1_1_abstract_adminstration_dao.html", [
-      [ "annis.administration.AdministrationDao", "classannis_1_1administration_1_1_administration_dao.html", null ],
-      [ "annis.administration.DeleteCorpusDao", "classannis_1_1administration_1_1_delete_corpus_dao.html", null ]
+    [ "annis.dao.AbstractDao", "classannis_1_1dao_1_1_abstract_dao.html", [
+      [ "annis.administration.AbstractAdminstrationDao", "classannis_1_1administration_1_1_abstract_adminstration_dao.html", [
+        [ "annis.administration.AdministrationDao", "classannis_1_1administration_1_1_administration_dao.html", null ],
+        [ "annis.administration.DeleteCorpusDao", "classannis_1_1administration_1_1_delete_corpus_dao.html", null ]
+      ] ],
+      [ "annis.dao.MetaDataFilter", "classannis_1_1dao_1_1_meta_data_filter.html", null ],
+      [ "annis.dao.QueryDaoImpl", "classannis_1_1dao_1_1_query_dao_impl.html", null ],
+      [ "annis.dao.ShortenerDao", "classannis_1_1dao_1_1_shortener_dao.html", null ]
     ] ],
     [ "annis.gui.resultfetch.AbstractResultFetchJob", "classannis_1_1gui_1_1resultfetch_1_1_abstract_result_fetch_job.html", [
       [ "annis.gui.resultfetch.ResultFetchJob", "classannis_1_1gui_1_1resultfetch_1_1_result_fetch_job.html", null ],
@@ -28,9 +33,6 @@ var hierarchy =
       [ "annis.service.internal.AnnisServiceRunner", "classannis_1_1service_1_1internal_1_1_annis_service_runner.html", null ]
     ] ],
     [ "annis.model.AnnisConstants", "classannis_1_1model_1_1_annis_constants.html", null ],
-    [ "annis.dao.AnnisDao", "interfaceannis_1_1dao_1_1_annis_dao.html", [
-      [ "annis.dao.SpringAnnisDao", "classannis_1_1dao_1_1_spring_annis_dao.html", null ]
-    ] ],
     [ "annis.utils.ANNISFormatHelper", "classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html", null ],
     [ "annis.administration.ANNISFormatVersion", "enumannis_1_1administration_1_1_a_n_n_i_s_format_version.html", null ],
     [ "annis.ql.parser.AnnisParserAntlr", "classannis_1_1ql_1_1parser_1_1_annis_parser_antlr.html", null ],
@@ -51,7 +53,6 @@ var hierarchy =
     ] ],
     [ "ClickListener", null, [
       [ "annis.gui.CitationLinkGenerator", "classannis_1_1gui_1_1_citation_link_generator.html", null ],
-      [ "annis.gui.CitationWindow", "classannis_1_1gui_1_1_citation_window.html", null ],
       [ "annis.gui.components.ExceptionDialog", "classannis_1_1gui_1_1components_1_1_exception_dialog.html", null ],
       [ "annis.gui.components.HelpButton< T >", "classannis_1_1gui_1_1components_1_1_help_button.html", null ],
       [ "annis.gui.controlpanel.QueryPanel.ShowResultClickListener", "classannis_1_1gui_1_1controlpanel_1_1_query_panel_1_1_show_result_click_listener.html", null ],
@@ -65,10 +66,13 @@ var hierarchy =
       [ "annis.gui.querybuilder.EdgeWindow", "classannis_1_1gui_1_1querybuilder_1_1_edge_window.html", null ],
       [ "annis.gui.querybuilder.NodeWindow", "classannis_1_1gui_1_1querybuilder_1_1_node_window.html", null ],
       [ "annis.gui.resultview.SingleResultPanel", "classannis_1_1gui_1_1resultview_1_1_single_result_panel.html", null ],
-      [ "annis.gui.resultview.VisualizerPanel", "classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html", null ]
+      [ "annis.gui.resultview.VisualizerPanel", "classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html", null ],
+      [ "annis.gui.ShareQueryReferenceWindow", "classannis_1_1gui_1_1_share_query_reference_window.html", null ]
     ] ],
     [ "Cloneable", null, [
-      [ "annis.gui.objects.PagedResultQuery", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html", null ],
+      [ "annis.gui.objects.PagedResultQuery", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html", [
+        [ "annis.gui.objects.DisplayedResultQuery", "classannis_1_1gui_1_1objects_1_1_displayed_result_query.html", null ]
+      ] ],
       [ "annis.ql.parser.QueryData", "classannis_1_1ql_1_1parser_1_1_query_data.html", null ]
     ] ],
     [ "CloseHandler", null, [
@@ -202,8 +206,7 @@ var hierarchy =
     [ "Handler", null, [
       [ "annis.gui.admin.GroupManagementPanel.AddGroupHandler", "classannis_1_1gui_1_1admin_1_1_group_management_panel_1_1_add_group_handler.html", null ],
       [ "annis.gui.admin.UserManagementPanel.AddUserHandler", "classannis_1_1gui_1_1admin_1_1_user_management_panel_1_1_add_user_handler.html", null ],
-      [ "annis.gui.controlpanel.CorpusListPanel", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html", null ],
-      [ "annis.gui.paging.PagingComponent.EnterHandler", "classannis_1_1gui_1_1paging_1_1_paging_component_1_1_enter_handler.html", null ]
+      [ "annis.gui.controlpanel.CorpusListPanel", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html", null ]
     ] ],
     [ "annis.libgui.Helper", "classannis_1_1libgui_1_1_helper.html", null ],
     [ "annis.visualizers.component.tree.HorizontalOrientation", "enumannis_1_1visualizers_1_1component_1_1tree_1_1_horizontal_orientation.html", null ],
@@ -286,6 +289,9 @@ var hierarchy =
     [ "annis.gui.querybuilder.QueryBuilderPlugin< TigerQueryBuilderPlugin.TigerQueryBuilder >", "interfaceannis_1_1gui_1_1querybuilder_1_1_query_builder_plugin.html", [
       [ "annis.gui.querybuilder.TigerQueryBuilderPlugin", "classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_plugin.html", null ]
     ] ],
+    [ "annis.dao.QueryDao", "interfaceannis_1_1dao_1_1_query_dao.html", [
+      [ "annis.dao.QueryDaoImpl", "classannis_1_1dao_1_1_query_dao_impl.html", null ]
+    ] ],
     [ "annis.ql.parser.QueryDataTransformer", "interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.html", [
       [ "annis.ql.parser.AnnotationExistenceValidator", "classannis_1_1ql_1_1parser_1_1_annotation_existence_validator.html", null ],
       [ "annis.ql.parser.ComponentSearchRelationNormalizer", "classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html", null ],
@@ -342,6 +348,9 @@ var hierarchy =
     [ "SelectedTabChangeListener", null, [
       [ "annis.gui.AdminView", "classannis_1_1gui_1_1_admin_view.html", null ],
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
+    ] ],
+    [ "SelectionListener", null, [
+      [ "annis.gui.ShareSingleMatchGenerator", "classannis_1_1gui_1_1_share_single_match_generator.html", null ]
     ] ],
     [ "annis.visualizers.component.tree.Shape", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_shape.html", [
       [ "annis.visualizers.component.tree.Shape.AbstractShape", "classannis_1_1visualizers_1_1component_1_1tree_1_1_shape_1_1_abstract_shape.html", [
@@ -404,8 +413,8 @@ var hierarchy =
       [ "annis.sqlgen.AnnotateSqlGenerator< T >", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html", null ]
     ] ],
     [ "annis.dao.SqlSessionModifier", "interfaceannis_1_1dao_1_1_sql_session_modifier.html", [
-      [ "annis.dao.ScriptFileSqlSessionModifier", "classannis_1_1dao_1_1_script_file_sql_session_modifier.html", null ],
-      [ "annis.dao.SpringAnnisDao", "classannis_1_1dao_1_1_spring_annis_dao.html", null ]
+      [ "annis.dao.QueryDaoImpl", "classannis_1_1dao_1_1_query_dao_impl.html", null ],
+      [ "annis.dao.ScriptFileSqlSessionModifier", "classannis_1_1dao_1_1_script_file_sql_session_modifier.html", null ]
     ] ],
     [ "StartedListener", null, [
       [ "annis.gui.admin.ImportPanel", "classannis_1_1gui_1_1admin_1_1_import_panel.html", null ]
@@ -447,12 +456,13 @@ var hierarchy =
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
     ] ],
-    [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
     [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
+    [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
     [ "annis.model.QueryNode.Type", "classannis_1_1model_1_1_query_node.html#enumannis_1_1model_1_1_query_node_1_1_type", null ],
     [ "UriFragmentChangedListener", null, [
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
     ] ],
+    [ "annis.service.internal.URLShortenerImpl", "classannis_1_1service_1_1internal_1_1_u_r_l_shortener_impl.html", null ],
     [ "annis.utils.Utils", "classannis_1_1utils_1_1_utils.html", null ],
     [ "ValueChangeListener", null, [
       [ "annis.gui.admin.PopupTwinColumnSelect.UpdateContainerListener", "classannis_1_1gui_1_1admin_1_1_popup_twin_column_select_1_1_update_container_listener.html", null ],
@@ -623,11 +633,11 @@ var hierarchy =
     ] ],
     [ "FormLayout", null, [
       [ "annis.gui.controlpanel.ExportOptionsPanel", "classannis_1_1gui_1_1controlpanel_1_1_export_options_panel.html", null ],
-      [ "annis.gui.controlpanel.SearchOptionsPanel", "classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html", null ],
-      [ "annis.gui.ExportPanel", "classannis_1_1gui_1_1_export_panel.html", null ]
+      [ "annis.gui.controlpanel.SearchOptionsPanel", "classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html", null ]
     ] ],
     [ "GridLayout", null, [
       [ "annis.gui.controlpanel.QueryPanel", "classannis_1_1gui_1_1controlpanel_1_1_query_panel.html", null ],
+      [ "annis.gui.ExportPanel", "classannis_1_1gui_1_1_export_panel.html", null ],
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
     ] ],
     [ "HashMap", null, [
@@ -777,7 +787,8 @@ var hierarchy =
     [ "RequestHandler", null, [
       [ "annis.gui.requesthandler.BinaryRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_binary_request_handler.html", null ],
       [ "annis.gui.requesthandler.LoginServletRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_login_servlet_request_handler.html", null ],
-      [ "annis.gui.requesthandler.ResourceRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_resource_request_handler.html", null ]
+      [ "annis.gui.requesthandler.ResourceRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_resource_request_handler.html", null ],
+      [ "annis.gui.requesthandler.ShortenerRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_shortener_request_handler.html", null ]
     ] ],
     [ "ResultSetExtractor", null, [
       [ "annis.dao.ResolverDaoHelper", "classannis_1_1dao_1_1_resolver_dao_helper.html", null ],
@@ -970,10 +981,6 @@ var hierarchy =
       [ "annis.CoveredTextsCalculator", "classannis_1_1_covered_texts_calculator.html", null ],
       [ "annis.visualizers.component.rst.RSTImpl", "classannis_1_1visualizers_1_1component_1_1rst_1_1_r_s_t_impl.html", null ]
     ] ],
-    [ "SimpleJdbcDaoSupport", null, [
-      [ "annis.dao.MetaDataFilter", "classannis_1_1dao_1_1_meta_data_filter.html", null ],
-      [ "annis.dao.SpringAnnisDao", "classannis_1_1dao_1_1_spring_annis_dao.html", null ]
-    ] ],
     [ "Table", null, [
       [ "annis.gui.docbrowser.DocBrowserTable", "classannis_1_1gui_1_1docbrowser_1_1_doc_browser_table.html", null ]
     ] ],
@@ -1026,11 +1033,12 @@ var hierarchy =
     [ "Window", null, [
       [ "annis.gui.AboutWindow", "classannis_1_1gui_1_1_about_window.html", null ],
       [ "annis.gui.admin.NewPasswordWindow", "classannis_1_1gui_1_1admin_1_1_new_password_window.html", null ],
-      [ "annis.gui.CitationWindow", "classannis_1_1gui_1_1_citation_window.html", null ],
       [ "annis.gui.components.ExceptionDialog", "classannis_1_1gui_1_1components_1_1_exception_dialog.html", null ],
       [ "annis.gui.HelpUsWindow", "classannis_1_1gui_1_1_help_us_window.html", null ],
       [ "annis.gui.LoginWindow", "classannis_1_1gui_1_1_login_window.html", null ],
-      [ "annis.gui.ReportBugWindow", "classannis_1_1gui_1_1_report_bug_window.html", null ]
+      [ "annis.gui.ReportBugWindow", "classannis_1_1gui_1_1_report_bug_window.html", null ],
+      [ "annis.gui.ShareQueryReferenceWindow", "classannis_1_1gui_1_1_share_query_reference_window.html", null ],
+      [ "annis.gui.ShareSingleMatchGenerator", "classannis_1_1gui_1_1_share_single_match_generator.html", null ]
     ] ],
     [ "XmlAdapter", null, [
       [ "annis.adapter.DateTimeAdapter", "classannis_1_1adapter_1_1_date_time_adapter.html", null ]

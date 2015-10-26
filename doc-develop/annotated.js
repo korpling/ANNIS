@@ -32,14 +32,16 @@ var annotated =
           [ "AnnotatedMatch", "classannis_1_1dao_1_1objects_1_1_annotated_match.html", "classannis_1_1dao_1_1objects_1_1_annotated_match" ],
           [ "AnnotatedSpan", "classannis_1_1dao_1_1objects_1_1_annotated_span.html", "classannis_1_1dao_1_1objects_1_1_annotated_span" ]
         ] ],
-        [ "AnnisDao", "interfaceannis_1_1dao_1_1_annis_dao.html", "interfaceannis_1_1dao_1_1_annis_dao" ],
+        [ "AbstractDao", "classannis_1_1dao_1_1_abstract_dao.html", "classannis_1_1dao_1_1_abstract_dao" ],
         [ "DocumentNameMapRow", "classannis_1_1dao_1_1_document_name_map_row.html", "classannis_1_1dao_1_1_document_name_map_row" ],
         [ "ListCorpusByNameDaoHelper", "classannis_1_1dao_1_1_list_corpus_by_name_dao_helper.html", "classannis_1_1dao_1_1_list_corpus_by_name_dao_helper" ],
         [ "MetaDataFilter", "classannis_1_1dao_1_1_meta_data_filter.html", "classannis_1_1dao_1_1_meta_data_filter" ],
+        [ "QueryDao", "interfaceannis_1_1dao_1_1_query_dao.html", "interfaceannis_1_1dao_1_1_query_dao" ],
+        [ "QueryDaoImpl", "classannis_1_1dao_1_1_query_dao_impl.html", "classannis_1_1dao_1_1_query_dao_impl" ],
         [ "ResolverDaoHelper", "classannis_1_1dao_1_1_resolver_dao_helper.html", "classannis_1_1dao_1_1_resolver_dao_helper" ],
         [ "ResultSetConverter", "interfaceannis_1_1dao_1_1_result_set_converter.html", "interfaceannis_1_1dao_1_1_result_set_converter" ],
         [ "ScriptFileSqlSessionModifier", "classannis_1_1dao_1_1_script_file_sql_session_modifier.html", "classannis_1_1dao_1_1_script_file_sql_session_modifier" ],
-        [ "SpringAnnisDao", "classannis_1_1dao_1_1_spring_annis_dao.html", "classannis_1_1dao_1_1_spring_annis_dao" ],
+        [ "ShortenerDao", "classannis_1_1dao_1_1_shortener_dao.html", "classannis_1_1dao_1_1_shortener_dao" ],
         [ "SqlSessionModifier", "interfaceannis_1_1dao_1_1_sql_session_modifier.html", "interfaceannis_1_1dao_1_1_sql_session_modifier" ]
       ] ],
       [ "examplequeries", null, [
@@ -166,6 +168,7 @@ var annotated =
         ] ],
         [ "objects", null, [
           [ "ContextualizedQuery", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html", "classannis_1_1gui_1_1objects_1_1_contextualized_query" ],
+          [ "DisplayedResultQuery", "classannis_1_1gui_1_1objects_1_1_displayed_result_query.html", "classannis_1_1gui_1_1objects_1_1_displayed_result_query" ],
           [ "ExportQuery", "classannis_1_1gui_1_1objects_1_1_export_query.html", "classannis_1_1gui_1_1objects_1_1_export_query" ],
           [ "FrequencyQuery", "classannis_1_1gui_1_1objects_1_1_frequency_query.html", "classannis_1_1gui_1_1objects_1_1_frequency_query" ],
           [ "PagedResultQuery", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html", "classannis_1_1gui_1_1objects_1_1_paged_result_query" ],
@@ -190,7 +193,8 @@ var annotated =
           [ "BinaryRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_binary_request_handler.html", "classannis_1_1gui_1_1requesthandler_1_1_binary_request_handler" ],
           [ "ContentRange", "classannis_1_1gui_1_1requesthandler_1_1_content_range.html", "classannis_1_1gui_1_1requesthandler_1_1_content_range" ],
           [ "LoginServletRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_login_servlet_request_handler.html", "classannis_1_1gui_1_1requesthandler_1_1_login_servlet_request_handler" ],
-          [ "ResourceRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_resource_request_handler.html", "classannis_1_1gui_1_1requesthandler_1_1_resource_request_handler" ]
+          [ "ResourceRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_resource_request_handler.html", "classannis_1_1gui_1_1requesthandler_1_1_resource_request_handler" ],
+          [ "ShortenerRequestHandler", "classannis_1_1gui_1_1requesthandler_1_1_shortener_request_handler.html", "classannis_1_1gui_1_1requesthandler_1_1_shortener_request_handler" ]
         ] ],
         [ "resultfetch", null, [
           [ "AbstractResultFetchJob", "classannis_1_1gui_1_1resultfetch_1_1_abstract_result_fetch_job.html", "classannis_1_1gui_1_1resultfetch_1_1_abstract_result_fetch_job" ],
@@ -251,7 +255,6 @@ var annotated =
         [ "AnnisUI", "classannis_1_1gui_1_1_annis_u_i.html", "classannis_1_1gui_1_1_annis_u_i" ],
         [ "AnnisUIProvider", "classannis_1_1gui_1_1_annis_u_i_provider.html", "classannis_1_1gui_1_1_annis_u_i_provider" ],
         [ "CitationLinkGenerator", "classannis_1_1gui_1_1_citation_link_generator.html", "classannis_1_1gui_1_1_citation_link_generator" ],
-        [ "CitationWindow", "classannis_1_1gui_1_1_citation_window.html", "classannis_1_1gui_1_1_citation_window" ],
         [ "CommonUI", "classannis_1_1gui_1_1_common_u_i.html", "classannis_1_1gui_1_1_common_u_i" ],
         [ "CorpusBrowserPanel", "classannis_1_1gui_1_1_corpus_browser_panel.html", "classannis_1_1gui_1_1_corpus_browser_panel" ],
         [ "CriticalServiceQueryException", "classannis_1_1gui_1_1_critical_service_query_exception.html", "classannis_1_1gui_1_1_critical_service_query_exception" ],
@@ -270,6 +273,8 @@ var annotated =
         [ "ReportBugWindow", "classannis_1_1gui_1_1_report_bug_window.html", "classannis_1_1gui_1_1_report_bug_window" ],
         [ "SearchView", "classannis_1_1gui_1_1_search_view.html", "classannis_1_1gui_1_1_search_view" ],
         [ "ServiceQueryException", "classannis_1_1gui_1_1_service_query_exception.html", "classannis_1_1gui_1_1_service_query_exception" ],
+        [ "ShareQueryReferenceWindow", "classannis_1_1gui_1_1_share_query_reference_window.html", "classannis_1_1gui_1_1_share_query_reference_window" ],
+        [ "ShareSingleMatchGenerator", "classannis_1_1gui_1_1_share_single_match_generator.html", "classannis_1_1gui_1_1_share_single_match_generator" ],
         [ "Sidebar", "interfaceannis_1_1gui_1_1_sidebar.html", "interfaceannis_1_1gui_1_1_sidebar" ],
         [ "SidebarState", "enumannis_1_1gui_1_1_sidebar_state.html", "enumannis_1_1gui_1_1_sidebar_state" ]
       ] ],
@@ -298,7 +303,7 @@ var annotated =
         [ "AnnisUser", "classannis_1_1libgui_1_1_annis_user.html", "classannis_1_1libgui_1_1_annis_user" ],
         [ "Background", "classannis_1_1libgui_1_1_background.html", null ],
         [ "CorpusSet", "classannis_1_1libgui_1_1_corpus_set.html", "classannis_1_1libgui_1_1_corpus_set" ],
-        [ "Helper", "classannis_1_1libgui_1_1_helper.html", "classannis_1_1libgui_1_1_helper" ],
+        [ "Helper", "classannis_1_1libgui_1_1_helper.html", null ],
         [ "ImagePanel", "classannis_1_1libgui_1_1_image_panel.html", "classannis_1_1libgui_1_1_image_panel" ],
         [ "InstanceConfig", "classannis_1_1libgui_1_1_instance_config.html", "classannis_1_1libgui_1_1_instance_config" ],
         [ "LoginDataLostException", "classannis_1_1libgui_1_1_login_data_lost_exception.html", null ],
@@ -386,6 +391,7 @@ var annotated =
           [ "ImportWorker", "classannis_1_1service_1_1internal_1_1_import_worker.html", "classannis_1_1service_1_1internal_1_1_import_worker" ],
           [ "MetadataServiceImpl", "classannis_1_1service_1_1internal_1_1_metadata_service_impl.html", "classannis_1_1service_1_1internal_1_1_metadata_service_impl" ],
           [ "QueryServiceImpl", "classannis_1_1service_1_1internal_1_1_query_service_impl.html", "classannis_1_1service_1_1internal_1_1_query_service_impl" ],
+          [ "URLShortenerImpl", "classannis_1_1service_1_1internal_1_1_u_r_l_shortener_impl.html", "classannis_1_1service_1_1internal_1_1_u_r_l_shortener_impl" ],
           [ "VersionServiceImpl", "classannis_1_1service_1_1internal_1_1_version_service_impl.html", "classannis_1_1service_1_1internal_1_1_version_service_impl" ]
         ] ],
         [ "objects", null, [

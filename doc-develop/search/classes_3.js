@@ -11,6 +11,7 @@ var searchData=
   ['defaultwhereclausegenerator',['DefaultWhereClauseGenerator',['../classannis_1_1sqlgen_1_1_default_where_clause_generator.html',1,'annis::sqlgen']]],
   ['deletecorpusdao',['DeleteCorpusDao',['../classannis_1_1administration_1_1_delete_corpus_dao.html',1,'annis::administration']]],
   ['detectholes',['DetectHoles',['../classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_detect_holes.html',1,'annis::visualizers::iframe::partitur']]],
+  ['displayedresultquery',['DisplayedResultQuery',['../classannis_1_1gui_1_1objects_1_1_displayed_result_query.html',1,'annis::gui::objects']]],
   ['dnftransformer',['DNFTransformer',['../classannis_1_1ql_1_1parser_1_1_d_n_f_transformer.html',1,'annis::ql::parser']]],
   ['docbrowsercontroller',['DocBrowserController',['../classannis_1_1gui_1_1docbrowser_1_1_doc_browser_controller.html',1,'annis::gui::docbrowser']]],
   ['docbrowserpanel',['DocBrowserPanel',['../classannis_1_1gui_1_1docbrowser_1_1_doc_browser_panel.html',1,'annis::gui::docbrowser']]],

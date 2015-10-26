@@ -1,6 +1,7 @@
 var classannis_1_1service_1_1internal_1_1_query_service_impl =
 [
     [ "annotations", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#ad8aa5835058f6bb8906dd11d3ab77da8", null ],
+    [ "basicSubgraph", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#ac2a6b9522de3eaa6ef5c6446b971542f", null ],
     [ "binary", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a3919332fb99f7c684e215b4d083c300e", null ],
     [ "binary1", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#aa678e7c174638df8aaf57da873116c36", null ],
     [ "binary2", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a88f6aed90a2e7e36565ac987828271d0", null ],
@@ -14,13 +15,13 @@ var classannis_1_1service_1_1internal_1_1_query_service_impl =
     [ "count", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a7c4d3f7419f8c6b8186a4e76a5521140", null ],
     [ "find", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a99470b54f3c3668def72f09d49bff5a5", null ],
     [ "frequency", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a9b6d820042260dd26d826823870e2b68", null ],
-    [ "getAnnisDao", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#adc4db446b6fbf438644963143f42290c", null ],
     [ "getContextLeft", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a227738d53361c93b8ef75ddecbe79e7f", null ],
     [ "getContextRight", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a402dc7539d9477377e894004138127c4", null ],
     [ "getDefaultCorpusConfig", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#afccaea635f6febeaf9b34dc2fe35e28b", null ],
     [ "getDocumentBrowserConfig", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#ade17f982b27af8dad82690021b5b5fb0", null ],
     [ "getExampleQueries", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#aa7eec41b735a4ac2c04a561e353417a3", null ],
     [ "getPort", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a400e1530f4e81630bbcd1b427667e2a6", null ],
+    [ "getQueryDao", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a4e61506621b0f3574048683432c09f0e", null ],
     [ "getRawText", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#adcc27e462cd020ea7f602ebbcdf6e942", null ],
     [ "getWekaHelper", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a53cf99b8214938623d37b1cd33f4c34c", null ],
     [ "graph", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#ad7b6ba35b5d8dc71506eb6f334eb58c5", null ],
@@ -29,10 +30,11 @@ var classannis_1_1service_1_1internal_1_1_query_service_impl =
     [ "parseNodes", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#ac296f486dd5dba9f0d4aadeef2e64151", null ],
     [ "resolver", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a713c303e20902271a5f79ae4a26817e5", null ],
     [ "segmentationNames", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a16bc31c5afa446b5631a9c04be85f079", null ],
-    [ "setAnnisDao", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a7315a52416ce8e9bf08460cb62299ac6", null ],
     [ "setDefaultCorpusConfig", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a9adb0b5bb8c635ec7aff7d0cd92e81f2", null ],
     [ "setPort", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#adea88cd881ab8189b9e212c2d0212238", null ],
+    [ "setQueryDao", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a0fc6e718230c7930309b6e688b538c1c", null ],
     [ "setWekaHelper", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a8215a314a4e1fc6f5b1625669ce91cb0", null ],
     [ "singleCorpus", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a20b5c3320401c79305e3cfd2bb143240", null ],
-    [ "subgraph", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a7d58c37fee6c45d08240dd460021b11c", null ]
+    [ "subgraph", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#a7d58c37fee6c45d08240dd460021b11c", null ],
+    [ "subgraph", "classannis_1_1service_1_1internal_1_1_query_service_impl.html#ac995d9a3fcc2cd992907801351292834", null ]
 ];

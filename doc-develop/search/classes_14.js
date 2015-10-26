@@ -2,6 +2,7 @@ var searchData=
 [
   ['uiview',['UIView',['../interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html',1,'annis::gui::admin::view']]],
   ['updatecontainerlistener',['UpdateContainerListener',['../classannis_1_1gui_1_1admin_1_1_popup_twin_column_select_1_1_update_container_listener.html',1,'annis::gui::admin::PopupTwinColumnSelect']]],
+  ['urlshortenerimpl',['URLShortenerImpl',['../classannis_1_1service_1_1internal_1_1_u_r_l_shortener_impl.html',1,'annis::service::internal']]],
   ['usageexception',['UsageException',['../classannis_1_1_usage_exception.html',1,'annis']]],
   ['user',['User',['../classannis_1_1security_1_1_user.html',1,'annis::security']]],
   ['userconfig',['UserConfig',['../classannis_1_1security_1_1_user_config.html',1,'annis::security']]],

@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview4</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -114,10 +114,16 @@ $(document).ready(function(){initNavTree('classannis_1_1administration_1_1_schem
 <div class="title">annis.administration.SchemeFixer Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-
-<p>A helper class that allows you to fix the database scheme.  
- <a href="classannis_1_1administration_1_1_scheme_fixer.html#details">More...</a></p>
-<table class="memberdecls">
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A helper class that allows you to fix the database scheme. </p>
+<p>Currently it can</p><ul>
+<li>create an corpus_alias table <br />
+</li>
+<li>create an url_shortener table <br />
+</li>
+</ul>
+<dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
+</div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ae29f591d3274d0a0bf70b6af693b2da2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae29f591d3274d0a0bf70b6af693b2da2"></a>
@@ -136,26 +142,29 @@ DataSource&#160;</td><td class="memItemRight" valign="bottom"><b>getDataSource</
 <tr class="memitem:a177eb83efb12b6dc3573836433035b53"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a177eb83efb12b6dc3573836433035b53"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setDataSource</b> (DataSource dataSource)</td></tr>
 <tr class="separator:a177eb83efb12b6dc3573836433035b53"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e8f351ccf14059f3bd39bf416e5a8b4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e8f351ccf14059f3bd39bf416e5a8b4"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getDatabaseSchema</b> ()</td></tr>
+<tr class="separator:a4e8f351ccf14059f3bd39bf416e5a8b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5c71a1600ee89a509e550917a7ffb24"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af5c71a1600ee89a509e550917a7ffb24"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setDatabaseSchema</b> (String databaseSchema)</td></tr>
+<tr class="separator:af5c71a1600ee89a509e550917a7ffb24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:aef8a9b494b7648c0a7023bea4e6e836d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef8a9b494b7648c0a7023bea4e6e836d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>corpusAlias</b> ()</td></tr>
 <tr class="separator:aef8a9b494b7648c0a7023bea4e6e836d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af133a913ac61ba3a150d2b17dc07902c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af133a913ac61ba3a150d2b17dc07902c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>urlShortener</b> ()</td></tr>
+<tr class="separator:af133a913ac61ba3a150d2b17dc07902c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A helper class that allows you to fix the database scheme. </p>
-<p>Currently it can</p><ul>
-<li>create an corpus_alias table <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</li>
-</ul>
-</div></div><!-- contents -->
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>administration</b></li><li class="navelem"><a class="el" href="classannis_1_1administration_1_1_scheme_fixer.html">SchemeFixer</a></li>
-    <li class="footer">Generated on Mon Oct 12 2015 16:15:33 for ANNIS by
+    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

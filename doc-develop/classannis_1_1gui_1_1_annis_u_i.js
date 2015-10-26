@@ -8,8 +8,6 @@ var classannis_1_1gui_1_1_annis_u_i =
     [ "clearCorpusConfigCache", "classannis_1_1gui_1_1_annis_u_i.html#a7ee8048bc8e3e2579e4f3da37a82649a", null ],
     [ "error", "classannis_1_1gui_1_1_annis_u_i.html#a1aaa610f1b3dca1d282f08938be74b92", null ],
     [ "getCorpusConfigWithCache", "classannis_1_1gui_1_1_annis_u_i.html#ab494dfb10d2eebe81d4aecbdf0c150fd", null ],
-    [ "getInstanceConfig", "classannis_1_1gui_1_1_annis_u_i.html#a3524bb1a4d6c38f3e55d1a0a381e4a6a", null ],
-    [ "getInstanceFont", "classannis_1_1gui_1_1_annis_u_i.html#a6920a5e8b751dac6c7b095557bdf29b0", null ],
     [ "getQueryController", "classannis_1_1gui_1_1_annis_u_i.html#a355db78d2104707f4195d5cb584e4d9b", null ],
     [ "getQueryState", "classannis_1_1gui_1_1_annis_u_i.html#a4aa5f72e11485e783929ad90d3d5ac33", null ],
     [ "getSearchView", "classannis_1_1gui_1_1_annis_u_i.html#ad5fd62ae6ea8e88a18c31cb56950ba81", null ],
