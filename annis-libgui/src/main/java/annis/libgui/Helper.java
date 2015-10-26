@@ -382,7 +382,7 @@ public class Helper
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
     String segmentation, String visibleSegmentation,
-    int start, int limit)
+    long start, int limit)
   {
     return citationFragment(aql, corpora, contextLeft, contextRight,
       segmentation, visibleSegmentation, start, limit, OrderType.ascending, null);
@@ -437,8 +437,8 @@ public class Helper
 
   public static String generateCitation(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation, String visibleSegmentation,
-    int start, int limit)
+    String segmentation, String visibleBaseText,
+    long start, int limit)
   {
     try
     {
@@ -448,7 +448,7 @@ public class Helper
         appURI.getHost(), appURI.getPort(),
         appURI.getPath(), null,
         StringUtils.join(citationFragment(aql, corpora,
-            contextLeft, contextRight, segmentation, visibleSegmentation,  start, limit), "&"))
+            contextLeft, contextRight, segmentation, visibleBaseText,  start, limit), "&"))
         .toASCIIString();
     }
     catch (URISyntaxException ex)

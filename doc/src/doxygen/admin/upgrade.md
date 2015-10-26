@@ -112,6 +112,9 @@ At the end a summary of all successfull and failed imports
 will be given. If there where any errors please try to import the corpus
 manually. When all corpora are imported, proceed to the next step.
 
+Additionally copy  the "user_config" and "url_shortener" tables from the
+old installation, e.g. with the PostgreSQL `COPY` command (http://www.postgresql.org/docs/9.3/static/sql-copy.html#AEN69268)
+
 ### 4. Switch service
 
 Stop the old service and start the

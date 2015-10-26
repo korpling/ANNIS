@@ -18,6 +18,7 @@ package annis.gui;
 import annis.gui.beans.CitationProvider;
 import annis.gui.objects.ContextualizedQuery;
 import annis.gui.objects.Query;
+import annis.gui.objects.QueryGenerator;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -41,8 +42,8 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
   {
     Button btLink = new Button();
     btLink.setStyleName(BaseTheme.BUTTON_LINK);
-    btLink.setIcon(FontAwesome.LINK);
-    btLink.setDescription("show citation link");
+    btLink.setIcon(FontAwesome.SHARE_ALT);
+    btLink.setDescription("Share query reference link");
     btLink.addClickListener(this);
 
     if(itemId instanceof CitationProvider)
@@ -132,12 +133,14 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
 
       if(citationProvider != null)
       {
-        CitationWindow c =
-          new CitationWindow(
-          citationProvider.getQuery(),
-          citationProvider.getCorpora(),
-          citationProvider.getLeftContext(),
-          citationProvider.getRightContext());
+        CitationWindow c
+          = new CitationWindow(
+            QueryGenerator.displayed()
+            .query(citationProvider.getQuery())
+            .corpora(citationProvider.getCorpora())
+            .left(citationProvider.getLeftContext())
+            .right(citationProvider.getRightContext())
+            .build());
         UI.getCurrent().addWindow(c);
         c.center();
       }

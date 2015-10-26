@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.gui.objects.DisplayedResultQuery;
 import annis.libgui.Helper;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -24,7 +25,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.Set;
 
 
 /**
@@ -35,17 +35,17 @@ public class CitationWindow extends Window
   implements Button.ClickListener
 {
   
-  public CitationWindow( String query, Set<String> corpora, 
-    int contextLeft, int contextRight)
+  public CitationWindow(DisplayedResultQuery query)
   {
-    super("Citation");
+    super("Query reference link");
     
     VerticalLayout wLayout = new VerticalLayout();
     setContent(wLayout);
     wLayout.setSizeFull();
     
-    String url = Helper.generateCitation(query, corpora, contextLeft,
-      contextRight, null, null, 0, 10);
+    String url = Helper.generateCitation(query.getQuery(), query.getCorpora(), 
+      query.getLeftContext(), query.getRightContext(), query.getSegmentation(), 
+      query.getBaseText(), query.getOffset(), query.getLimit());
     
     TextArea txtCitation = new TextArea();
 

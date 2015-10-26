@@ -131,7 +131,7 @@ public class ShareSingleMatchGenerator extends Panel implements
     
     Label infoText = new Label(
         "<p style=\"font-size: 18px\" >"
-        + "<strong>Share your excerpt:</strong>&nbsp;"
+        + "<strong>Share your match:</strong>&nbsp;"
         + "1. Chose the visualization to share&nbsp;2. Copy the generated link or code"
         + "</p>",
       ContentMode.HTML);
