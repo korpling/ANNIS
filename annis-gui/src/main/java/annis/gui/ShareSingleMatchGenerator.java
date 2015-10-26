@@ -94,7 +94,7 @@ public class ShareSingleMatchGenerator extends Panel implements
     txtDirectURL.setWidth("100%");
     txtDirectURL.setHeight("-1px");
     txtDirectURL.addStyleName(ValoTheme.TEXTFIELD_LARGE);
-    txtDirectURL.addStyleName("citation");
+    txtDirectURL.addStyleName("shared-text");
     txtDirectURL.setWordwrap(true);
     txtDirectURL.setReadOnly(true);
     
@@ -103,13 +103,13 @@ public class ShareSingleMatchGenerator extends Panel implements
     txtIFrameCode.setWidth("100%");
     txtIFrameCode.setHeight("-1px");
     txtIFrameCode.addStyleName(ValoTheme.TEXTFIELD_LARGE);
-    txtIFrameCode.addStyleName("citation");
+    txtIFrameCode.addStyleName("shared-text");
     txtIFrameCode.setWordwrap(true);
     txtIFrameCode.setReadOnly(true);
     
     preview = new BrowserFrame();
     preview.setCaption("Preview");
-    preview.addStyleName("citation");
+    preview.addStyleName("shared-text");
     preview.setSizeFull();
     
     generatedLinks = new VerticalLayout(txtDirectURL, txtIFrameCode, preview);

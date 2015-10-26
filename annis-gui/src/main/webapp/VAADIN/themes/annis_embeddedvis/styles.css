@@ -13417,7 +13417,7 @@ div.v-layout.v-horizontal.v-widget {
 	direction: rtl;
 }
 
-.annis_embeddedvis textarea.citation {
+.annis_embeddedvis .shared-text {
 	background-color: white;
 	border-style: solid;
 	border-color: black;
@@ -13425,20 +13425,8 @@ div.v-layout.v-horizontal.v-widget {
 	font-family: monospace;
 }
 
-.annis_embeddedvis div.citation {
-	border-style: solid;
+.annis_embeddedvis .shared-text:focus {
 	border-color: black;
-	border-width: 1px;
-	border-radius: 4px;
-	padding: 4px;
-}
-
-.annis_embeddedvis textarea.license {
-	background-color: white;
-	border-style: solid;
-	border-color: black;
-	border-width: 1px;
-	font-family: monospace;
 }
 
 .annis_embeddedvis textarea.query {

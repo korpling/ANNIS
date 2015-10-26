@@ -115,30 +115,18 @@ $font-size: 10pt;
   .rtl {
     direction: rtl;
   }
-
-  textarea.citation {
-    background-color: white;
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;
-    font-family: monospace;
-  }
   
-  div.citation {
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;
-    border-radius: 4px;
-    padding: 4px
-  }
-
-  textarea.license {
+  .shared-text {
     background-color: white;
     border-style: solid;
     border-color: black;
     border-width: 1px;
     font-family: monospace;
+    &:focus {
+      border-color: black;
+    }
   }
+
 
   textarea.query {
     font-family: monospace;

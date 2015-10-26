@@ -12351,7 +12351,7 @@ div.v-layout.v-horizontal.v-widget {
 	direction: rtl;
 }
 
-.annis textarea.citation {
+.annis .shared-text {
 	background-color: white;
 	border-style: solid;
 	border-color: black;
@@ -12359,20 +12359,8 @@ div.v-layout.v-horizontal.v-widget {
 	font-family: monospace;
 }
 
-.annis div.citation {
-	border-style: solid;
+.annis .shared-text:focus {
 	border-color: black;
-	border-width: 1px;
-	border-radius: 4px;
-	padding: 4px;
-}
-
-.annis textarea.license {
-	background-color: white;
-	border-style: solid;
-	border-color: black;
-	border-width: 1px;
-	font-family: monospace;
 }
 
 .annis textarea.query {

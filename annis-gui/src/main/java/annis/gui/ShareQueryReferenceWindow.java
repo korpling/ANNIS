@@ -43,19 +43,24 @@ public class ShareQueryReferenceWindow extends Window
     VerticalLayout wLayout = new VerticalLayout();
     setContent(wLayout);
     wLayout.setSizeFull();
+    wLayout.setMargin(true);
     
-    URI url = Helper.generateCitation(query.getQuery(), query.getCorpora(), 
+    String shortURL = "ERROR";
+    if(query != null)
+    {
+      URI url = Helper.generateCitation(query.getQuery(), query.getCorpora(), 
       query.getLeftContext(), query.getRightContext(), query.getSegmentation(), 
       query.getBaseText(), query.getOffset(), query.getLimit());
     
-    String shortURL = Helper.shortenURL(url);
+      shortURL = Helper.shortenURL(url);
+    }
     
     TextArea txtCitation = new TextArea();
 
     txtCitation.setWidth("100%");
     txtCitation.setHeight("100%");
     txtCitation.addStyleName(ValoTheme.TEXTFIELD_LARGE);
-    txtCitation.addStyleName("citation");
+    txtCitation.addStyleName("shared-text");
     txtCitation.setValue(shortURL);
     txtCitation.setWordwrap(true);
     txtCitation.setReadOnly(true);
