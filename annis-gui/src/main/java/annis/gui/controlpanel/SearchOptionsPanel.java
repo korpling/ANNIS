@@ -42,11 +42,8 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
@@ -244,6 +241,13 @@ public class SearchOptionsPanel extends FormLayout
   public void updateSearchPanelConfigurationInBackground(
     final Set<String> corpora, final AnnisUI ui)
   {
+    setLoadingState(true);
+    // remove custom adjustments
+    contextContainerLeft.removeAllItems();
+    contextContainerRight.removeAllItems();
+    
+    
+    // reload the config in the background
     Background.run(new CorpusConfigUpdater(ui, corpora));
   }
   
@@ -508,6 +512,17 @@ public class SearchOptionsPanel extends FormLayout
     c.addItem(maxCtx);
 
   }
+  
+  private void setLoadingState(boolean isLoading)
+  {
+    pbLoadConfig.setVisible(isLoading);
+          
+    cbLeftContext.setVisible(!isLoading);
+    cbRightContext.setVisible(!isLoading);
+    cbResultsPerPage.setVisible(!isLoading);
+    cbOrder.setVisible(!isLoading);
+    segmentationHelp.setVisible(!isLoading);
+  }
 
   private static class CustomResultSize implements AbstractSelect.NewItemHandler
   {
@@ -592,19 +607,13 @@ public class SearchOptionsPanel extends FormLayout
       }
 
       // update GUI
-      ui.accessSynchronously(new Runnable()
+      ui.access(new Runnable()
       {
 
         @Override
         public void run()
         {
-          pbLoadConfig.setVisible(false);
-          
-          cbLeftContext.setVisible(true);
-          cbRightContext.setVisible(true);
-          cbResultsPerPage.setVisible(true);
-          cbOrder.setVisible(true);
-          segmentationHelp.setVisible(true);
+          setLoadingState(false);
           
           CorpusConfig c = mergeConfigs(corpora, corpusConfigs);
           
