@@ -82,9 +82,6 @@ public class SearchOptionsPanel extends FormLayout
   private static final Logger log = LoggerFactory.getLogger(
     SearchOptionsPanel.class);
 
-  private final static Escaper urlPathEscape = UrlEscapers.
-    urlPathSegmentEscaper();
-
   private final ComboBox cbLeftContext;
 
   private final ComboBox cbRightContext;
@@ -277,7 +274,7 @@ public class SearchOptionsPanel extends FormLayout
         try
         {
           SegmentationList segList
-            = service.path("query").path("corpora").path(urlPathEscape.escape(
+            = service.path("query").path("corpora").path(Helper.encodeJersey(
                 corpus))
             .path("segmentation-names")
             .get(SegmentationList.class);
