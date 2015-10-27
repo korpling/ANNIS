@@ -117,7 +117,7 @@ var hierarchy =
       [ "annis.gui.exporter.GeneralTextExporter", "classannis_1_1gui_1_1exporter_1_1_general_text_exporter.html", [
         [ "annis.gui.exporter.GridExporter", "classannis_1_1gui_1_1exporter_1_1_grid_exporter.html", null ],
         [ "annis.gui.exporter.SimpleTextExporter", "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter.html", null ],
-        [ "annis.gui.exporter.TextExporter", "classannis_1_1gui_1_1exporter_1_1_text_exporter.html", null ]
+        [ "annis.gui.exporter.TokenExporter", "classannis_1_1gui_1_1exporter_1_1_token_exporter.html", null ]
       ] ],
       [ "annis.gui.exporter.WekaExporter", "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html", null ]
     ] ],
@@ -450,15 +450,15 @@ var hierarchy =
     [ "Thread", null, [
       [ "annis.service.internal.ImportWorker", "classannis_1_1service_1_1internal_1_1_import_worker.html", null ]
     ] ],
-    [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
     [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
+    [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
     [ "annis.visualizers.component.tree.TreeElementLabeler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_labeler.html", null ],
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
     ] ],
-    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
-    [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
     [ "annis.model.QueryNode.Type", "classannis_1_1model_1_1_query_node.html#enumannis_1_1model_1_1_query_node_1_1_type", null ],
+    [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
+    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
     [ "UriFragmentChangedListener", null, [
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
     ] ],
@@ -998,6 +998,9 @@ var hierarchy =
     ] ],
     [ "UIProvider", null, [
       [ "annis.gui.AnnisUIProvider", "classannis_1_1gui_1_1_annis_u_i_provider.html", null ]
+    ] ],
+    [ "VaadinServlet", null, [
+      [ "annis.gui.servlets.AnnisServlet", "classannis_1_1gui_1_1servlets_1_1_annis_servlet.html", null ]
     ] ],
     [ "ValueChangeListener", null, [
       [ "annis.gui.controlpanel.QueryPanel", "classannis_1_1gui_1_1controlpanel_1_1_query_panel.html", null ],

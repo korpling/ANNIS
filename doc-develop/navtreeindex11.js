@@ -1,5 +1,8 @@
 var NAVTREEINDEX11 =
 {
+"classannis_1_1sqlgen_1_1_count_sql_generator.html":[4,0,0,15,21],
+"classannis_1_1sqlgen_1_1_count_sql_generator.html#a2da32e2666b3a7484f2bd7e7bf098ac8":[4,0,0,15,21,1],
+"classannis_1_1sqlgen_1_1_count_sql_generator.html#aed177b9a1bcc33375dbc41bc0ad93e41":[4,0,0,15,21,0],
 "classannis_1_1sqlgen_1_1_default_where_clause_generator.html":[4,0,0,15,22],
 "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a0423c6b18934d0910db16deeaee8f0d6":[4,0,0,15,22,21],
 "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a05c3a39027328d4752d83507075015dc":[4,0,0,15,22,4],
@@ -246,8 +249,5 @@ var NAVTREEINDEX11 =
 "classannis_1_1sqlgen_1_1model_1_1_inclusion.html":[4,0,0,15,1,4],
 "classannis_1_1sqlgen_1_1model_1_1_inclusion.html#a2475fa10d15bcc41c6de0b3ef69d8bea":[4,0,0,15,1,4,1],
 "classannis_1_1sqlgen_1_1model_1_1_inclusion.html#aeef91c22752d44d93f8c338568d9d3ad":[4,0,0,15,1,4,0],
-"classannis_1_1sqlgen_1_1model_1_1_inclusion.html#afddbac3999c0bb871fa8d6a425f809da":[4,0,0,15,1,4,2],
-"classannis_1_1sqlgen_1_1model_1_1_join.html":[4,0,0,15,1,5],
-"classannis_1_1sqlgen_1_1model_1_1_join.html#a3f0415b3ac4406b9477c1b7abd247d3d":[4,0,0,15,1,5,0],
-"classannis_1_1sqlgen_1_1model_1_1_left_alignment.html":[4,0,0,15,1,6]
+"classannis_1_1sqlgen_1_1model_1_1_inclusion.html#afddbac3999c0bb871fa8d6a425f809da":[4,0,0,15,1,4,2]
 };

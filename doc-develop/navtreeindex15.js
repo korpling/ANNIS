@@ -1,5 +1,8 @@
 var NAVTREEINDEX15 =
 {
+"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view_1_1_listener.html":[4,0,0,6,0,2,0,0],
+"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view_1_1_listener.html#a6daf60b9f6c5b2dca2d55732d4be1a6b":[4,0,0,6,0,2,0,0,0],
+"interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html":[4,0,0,6,0,2,1],
 "interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html#a0aaac35cb89766b6e5e0d103953af87b":[4,0,0,6,0,2,1,5],
 "interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html#a3b1d32e79f8a1f89d96b8c2a69b1943a":[4,0,0,6,0,2,1,1],
 "interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html#a48ea588484c4b9cb8e8f932c6fdedb27":[4,0,0,6,0,2,1,4],

@@ -71,7 +71,9 @@ var NAVTREEINDEX4 =
 "classannis_1_1gui_1_1controlpanel_1_1_query_panel_1_1_show_result_click_listener.html":[4,0,0,6,4,4,0],
 "classannis_1_1gui_1_1controlpanel_1_1_query_panel_1_1_show_result_click_listener.html#a7b4fe211fdbbad5444652c3087714a56":[4,0,0,6,4,4,0,0],
 "classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html":[4,0,0,6,4,5],
-"classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html#a1e882f717609f7bf7f7c95ef49127307":[4,0,0,6,4,5,2],
+"classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html#a1e882f717609f7bf7f7c95ef49127307":[4,0,0,6,4,5,4],
+"classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html#a5b8db2cfa947539ca5d8619c54b645cf":[4,0,0,6,4,5,3],
+"classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html#a74d2e1a37190c19d12d8925e57c3c5da":[4,0,0,6,4,5,2],
 "classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html#a91961cf940f1a26daa8aafbd95e29e90":[4,0,0,6,4,5,0],
 "classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html#ab5cba8e5e925cbe33136249de5706616":[4,0,0,6,4,5,1],
 "classannis_1_1gui_1_1converter_1_1_comma_seperated_string_converter_list.html":[4,0,0,6,5,0],
@@ -126,9 +128,9 @@ var NAVTREEINDEX4 =
 "classannis_1_1gui_1_1exporter_1_1_grid_exporter.html#ad6363c7bf5ea16cb29a9bc1e0380db06":[4,0,0,6,7,3,1],
 "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter.html":[4,0,0,6,7,4],
 "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter.html#a9b82574792f5da0d0fa87216bc47e2b2":[4,0,0,6,7,4,0],
-"classannis_1_1gui_1_1exporter_1_1_text_exporter.html":[4,0,0,6,7,5],
-"classannis_1_1gui_1_1exporter_1_1_text_exporter.html#a6446cf02592b41d98e0af5ba0a4c8a12":[4,0,0,6,7,5,1],
-"classannis_1_1gui_1_1exporter_1_1_text_exporter.html#aba7fb6bc4fb81ccbbd314a3f10fdd460":[4,0,0,6,7,5,0],
+"classannis_1_1gui_1_1exporter_1_1_token_exporter.html":[4,0,0,6,7,5],
+"classannis_1_1gui_1_1exporter_1_1_token_exporter.html#a2146337c6ca1ac9fe7d5639c2559cfb8":[4,0,0,6,7,5,0],
+"classannis_1_1gui_1_1exporter_1_1_token_exporter.html#abd207abae68c0189b5a7955079cbf6ac":[4,0,0,6,7,5,1],
 "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html":[4,0,0,6,7,6],
 "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html#a33ac8bfb4090bc31bdb87a024c311fb6":[4,0,0,6,7,6,1],
 "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html#afc18b5fe48bd6c6872c5abb582c72e31":[4,0,0,6,7,6,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX4 =
 "classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a027823ab9d45f394d8c064811f6b4aac":[4,0,0,6,10,2,4],
 "classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a0f4b99a82808dd262788ce282671e346":[4,0,0,6,10,2,6],
 "classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a1647d76f303aad66945db6c3e1877e5d":[4,0,0,6,10,2,1],
-"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a20919005349e44910f6871f8456ef9e5":[4,0,0,6,10,2,3],
-"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a524ca676a24c5d682780b140995754f0":[4,0,0,6,10,2,0],
-"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#acfba04bf0002003da8ffe8b513aea608":[4,0,0,6,10,2,2]
+"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a20919005349e44910f6871f8456ef9e5":[4,0,0,6,10,2,3]
 };

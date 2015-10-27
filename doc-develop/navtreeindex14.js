@@ -1,5 +1,8 @@
 var NAVTREEINDEX14 =
 {
+"dev-release.html#dev-release-preview-init":[2,3,3,0],
+"dev-release.html#dev-release-preview-process":[2,3,3],
+"dev-release.html#dev-release-preview-test":[2,3,3,1],
 "dev-release.html#dev-release-process":[2,3,2],
 "dev-release.html#dev-release-test":[2,3,2,1],
 "dev-release.html#dev-release-version-update":[2,3,1,0],
@@ -122,8 +125,8 @@ var NAVTREEINDEX14 =
 "functions_d.html":[4,2,0,3],
 "functions_e.html":[4,2,0,4],
 "functions_f.html":[4,2,0,5],
-"functions_func.html":[4,2,1,0],
 "functions_func.html":[4,2,1],
+"functions_func.html":[4,2,1,0],
 "functions_func_b.html":[4,2,1,1],
 "functions_func_c.html":[4,2,1,2],
 "functions_func_d.html":[4,2,1,3],
@@ -246,8 +249,5 @@ var NAVTREEINDEX14 =
 "interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html#ad4cee40b27f8cf49bae7004ccbfe608a":[4,0,0,6,0,1,3,1],
 "interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html":[4,0,0,6,0,2,0],
 "interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html#a8ce7a20fb783a78f4dbd6478f5d7f0ab":[4,0,0,6,0,2,0,2],
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html#abb5a6dd2eb7c873d9f713ff8a0ab9c6b":[4,0,0,6,0,2,0,1],
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view_1_1_listener.html":[4,0,0,6,0,2,0,0],
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view_1_1_listener.html#a6daf60b9f6c5b2dca2d55732d4be1a6b":[4,0,0,6,0,2,0,0,0],
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html":[4,0,0,6,0,2,1]
+"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html#abb5a6dd2eb7c873d9f713ff8a0ab9c6b":[4,0,0,6,0,2,0,1]
 };

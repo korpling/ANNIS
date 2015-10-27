@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
+   &#160;<span id="projectnumber">3.4.0-preview5</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -109,6 +109,7 @@ $(document).ready(function(){initNavTree('classannis_1_1libgui_1_1_annis_base_u_
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="classannis_1_1libgui_1_1_annis_base_u_i-members.html">List of all members</a>  </div>
@@ -153,6 +154,12 @@ ObjectMapper&#160;</td><td class="memItemRight" valign="bottom"><b>getJsonMapper
 EventBus&#160;</td><td class="memItemRight" valign="bottom"><b>getLoginDataLostBus</b> ()</td></tr>
 <tr class="separator:a79e13f92c344a80ebfd32be79199eccd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a7e2b58ee28225b72a777b467caac79ca"><td class="memItemLeft" align="right" valign="top">static List&lt; File &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a7e2b58ee28225b72a777b467caac79ca">getAllConfigLocations</a> (String configFile)</td></tr>
+<tr class="memdesc:a7e2b58ee28225b72a777b467caac79ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an configuration file name (might include directory) this function returns all locations for this file in the "ANNIS configuration system".  <a href="#a7e2b58ee28225b72a777b467caac79ca">More...</a><br /></td></tr>
+<tr class="separator:a7e2b58ee28225b72a777b467caac79ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
 <tr class="memitem:a017ef2a9307566f3f2e89c2db5546643"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a017ef2a9307566f3f2e89c2db5546643"></a>
@@ -180,12 +187,6 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a14e77d4f4985129054c41c8f84aa0912"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a14e77d4f4985129054c41c8f84aa0912"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (VaadinRequest request)</td></tr>
 <tr class="separator:a14e77d4f4985129054c41c8f84aa0912"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77ab166f7b26bd230b95f84396762908"><td class="memItemLeft" align="right" valign="top">List&lt; File &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a77ab166f7b26bd230b95f84396762908">getAllConfigLocations</a> (String configFile)</td></tr>
-<tr class="memdesc:a77ab166f7b26bd230b95f84396762908"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an configuration file name (might include directory) this function returns all locations for this file in the "ANNIS configuration system".  <a href="#a77ab166f7b26bd230b95f84396762908">More...</a><br /></td></tr>
-<tr class="separator:a77ab166f7b26bd230b95f84396762908"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af90865a625858cff76bf196e8579e9a7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af90865a625858cff76bf196e8579e9a7"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>loadApplicationProperties</b> (String configFile)</td></tr>
-<tr class="separator:af90865a625858cff76bf196e8579e9a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af506f488092dc69257b602a9beeff135"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af506f488092dc69257b602a9beeff135"></a>
 Map&lt; String, <a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>loadInstanceConfig</b> ()</td></tr>
 <tr class="separator:af506f488092dc69257b602a9beeff135"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -230,7 +231,7 @@ final void&#160;</td><td class="memItemRight" valign="bottom"><b>initLogging</b>
 
 </div>
 </div>
-<a class="anchor" id="a77ab166f7b26bd230b95f84396762908"></a>
+<a class="anchor" id="a7e2b58ee28225b72a777b467caac79ca"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -238,7 +239,7 @@ final void&#160;</td><td class="memItemRight" valign="bottom"><b>initLogging</b>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">List&lt;File&gt; annis.libgui.AnnisBaseUI.getAllConfigLocations </td>
+          <td class="memname">static List&lt;File&gt; annis.libgui.AnnisBaseUI.getAllConfigLocations </td>
           <td>(</td>
           <td class="paramtype">String&#160;</td>
           <td class="paramname"><em>configFile</em></td><td>)</td>
@@ -247,7 +248,7 @@ final void&#160;</td><td class="memItemRight" valign="bottom"><b>initLogging</b>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -334,7 +335,7 @@ final void&#160;</td><td class="memItemRight" valign="bottom"><b>initLogging</b>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>libgui</b></li><li class="navelem"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html">AnnisBaseUI</a></li>
-    <li class="footer">Generated on Mon Oct 26 2015 17:20:10 for ANNIS by
+    <li class="footer">Generated on Tue Oct 27 2015 18:34:16 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

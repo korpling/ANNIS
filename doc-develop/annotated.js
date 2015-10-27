@@ -142,7 +142,7 @@ var annotated =
           [ "GeneralTextExporter", "classannis_1_1gui_1_1exporter_1_1_general_text_exporter.html", "classannis_1_1gui_1_1exporter_1_1_general_text_exporter" ],
           [ "GridExporter", "classannis_1_1gui_1_1exporter_1_1_grid_exporter.html", "classannis_1_1gui_1_1exporter_1_1_grid_exporter" ],
           [ "SimpleTextExporter", "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter.html", "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter" ],
-          [ "TextExporter", "classannis_1_1gui_1_1exporter_1_1_text_exporter.html", "classannis_1_1gui_1_1exporter_1_1_text_exporter" ],
+          [ "TokenExporter", "classannis_1_1gui_1_1exporter_1_1_token_exporter.html", "classannis_1_1gui_1_1exporter_1_1_token_exporter" ],
           [ "WekaExporter", "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html", "classannis_1_1gui_1_1exporter_1_1_weka_exporter" ]
         ] ],
         [ "filter", null, [
@@ -208,6 +208,7 @@ var annotated =
           [ "VisualizerPanel", "classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html", "classannis_1_1gui_1_1resultview_1_1_visualizer_panel" ]
         ] ],
         [ "servlets", null, [
+          [ "AnnisServlet", "classannis_1_1gui_1_1servlets_1_1_annis_servlet.html", "classannis_1_1gui_1_1servlets_1_1_annis_servlet" ],
           [ "CitationRedirectionServlet", "classannis_1_1gui_1_1servlets_1_1_citation_redirection_servlet.html", "classannis_1_1gui_1_1servlets_1_1_citation_redirection_servlet" ],
           [ "ResourceServlet", "classannis_1_1gui_1_1servlets_1_1_resource_servlet.html", "classannis_1_1gui_1_1servlets_1_1_resource_servlet" ]
         ] ],
