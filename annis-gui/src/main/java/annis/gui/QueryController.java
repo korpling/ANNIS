@@ -447,11 +447,11 @@ public class QueryController implements Serializable
     // start count query
     searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
 
-    Future<MatchAndDocumentCount> futureCount = res.path("query").path("search").
+    AsyncWebResource countRes = res.path("query").path("search").
       path("count").
       queryParam("q", Helper.encodeJersey(displayedQuery.getQuery()))
-      .queryParam("corpora", StringUtils.join(displayedQuery.getCorpora(), ",")).
-      get(
+      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")));
+    Future<MatchAndDocumentCount> futureCount = countRes.get(
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 
