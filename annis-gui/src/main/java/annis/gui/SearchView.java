@@ -628,10 +628,8 @@ public class SearchView extends GridLayout implements View,
         }
         else if (args.get("cl") != null && args.get("cr") != null)
         {
-          // do not change the manually selected search options
-          //String a = args.get("cl");
-          //String b = args.get("cr");
-          //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+          // make sure the properties are not overwritten by the background process
+          getControlPanel().getSearchOptions().setUpdateStateFromConfig(false);
 
           DisplayedResultQuery query = QueryGenerator.displayed()
             .left(Integer.parseInt(args.get("cl")))

@@ -120,6 +120,10 @@ public class SearchOptionsPanel extends FormLayout
   private final AtomicInteger maxLeftContext = new AtomicInteger(Integer.MAX_VALUE);
   private final AtomicInteger maxRightContext = new AtomicInteger(Integer.MAX_VALUE);
   
+  private boolean updateStateFromConfig = true;
+  
+  private QueryUIState state;
+  
   public SearchOptionsPanel()
   {
     setWidth("100%");
@@ -152,10 +156,9 @@ public class SearchOptionsPanel extends FormLayout
     
     cbSegmentation = new ComboBox("Show context in", segmentationContainer);
 
-    cbSegmentation.setTextInputAllowed(
-      false);
-    cbSegmentation.setNullSelectionAllowed(
-      true);
+    cbSegmentation.setTextInputAllowed(false);
+    cbSegmentation.setNullSelectionAllowed(true);
+    cbSegmentation.setNewItemsAllowed(true);
 
     cbSegmentation.setDescription(
       "If corpora with multiple "
@@ -212,9 +215,9 @@ public class SearchOptionsPanel extends FormLayout
     {
       AnnisUI ui = (AnnisUI) getUI();
       
-      QueryUIState state = ui.getQueryState();
+      state = ui.getQueryState();
       
-      Background.run(new CorpusConfigUpdater(ui, state.getSelectedCorpora().getValue()));      
+      Background.run(new CorpusConfigUpdater(ui, state.getSelectedCorpora().getValue(), false));      
 
       cbLeftContext.setNewItemHandler(new CustomContext(maxLeftContext, contextContainerLeft,
         state.getLeftContext()));
@@ -246,10 +249,11 @@ public class SearchOptionsPanel extends FormLayout
     // remove custom adjustments
     contextContainerLeft.removeAllItems();
     contextContainerRight.removeAllItems();
+    cbSegmentation.removeAllItems();
     
     
     // reload the config in the background
-    Background.run(new CorpusConfigUpdater(ui, corpora));
+    Background.run(new CorpusConfigUpdater(ui, corpora, true));
   }
   
   private static Integer getInteger(String key, CorpusConfig config)
@@ -301,21 +305,26 @@ public class SearchOptionsPanel extends FormLayout
   }
 
   private void updateSegmentations(String segment,
-    List<String> segNames)
+    List<String> segNames, boolean updateValue)
   {
     
-    cbSegmentation.removeAllItems();
     cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
     cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
 
     if ("tok".equalsIgnoreCase(segment))
     {
-      cbSegmentation.setValue(NULL_SEGMENTATION_VALUE);
+      if(state != null && updateValue)
+      {
+        state.getContextSegmentation().setValue(NULL_SEGMENTATION_VALUE);
+      }
     }
     else if (segment != null)
     {
       cbSegmentation.addItem(segment);
-      cbSegmentation.setValue(segment);
+      if(state != null && updateValue)
+      {
+        cbSegmentation.setValue(segment);
+      }
     }
 
     if (segNames != null && !segNames.isEmpty())
@@ -525,6 +534,18 @@ public class SearchOptionsPanel extends FormLayout
     segmentationHelp.setVisible(!isLoading);
   }
 
+  public boolean isUpdateStateFromConfig()
+  {
+    return updateStateFromConfig;
+  }
+
+  public void setUpdateStateFromConfig(boolean updateStateFromConfig)
+  {
+    this.updateStateFromConfig = updateStateFromConfig;
+  }
+  
+  
+
   private static class CustomResultSize implements AbstractSelect.NewItemHandler
   {
     private final IndexedContainer container;
@@ -572,11 +593,15 @@ public class SearchOptionsPanel extends FormLayout
     
     private final AnnisUI ui;
     private final Set<String> corpora;
+    private final QueryUIState state;
+    private final boolean corpusSelectionChanged;
     
-    public CorpusConfigUpdater(AnnisUI ui, Set<String> corpora)
+    public CorpusConfigUpdater(AnnisUI ui, Set<String> corpora, boolean corpusSelectionChanged)
     {
       this.ui = ui;
+      this.state = ui.getQueryState();
       this.corpora = corpora;
+      this.corpusSelectionChanged = corpusSelectionChanged;
     }
 
     @Override
@@ -639,17 +664,23 @@ public class SearchOptionsPanel extends FormLayout
             ctxSteps == null ? DEFAULT_CONTEXT_STEPS : ctxSteps, true);
           updateContext(contextContainerRight, rightCtx == null ? DEFAULT_CONTEXT : rightCtx, 
             ctxSteps == null ? DEFAULT_CONTEXT_STEPS : ctxSteps, true);
-          if (defaultCtx != null)
+          if (defaultCtx != null && updateStateFromConfig && corpusSelectionChanged)
           {
-            ui.getQueryState().getLeftContext().setValue(defaultCtx);
-            ui.getQueryState().getRightContext().setValue(defaultCtx);
+            state.getLeftContext().setValue(defaultCtx);
+            state.getRightContext().setValue(defaultCtx);
           }
-          updateSegmentations(segment, segmentations);
-          if(resultsPerPage != null)
+          updateSegmentations(segment, segmentations, updateStateFromConfig && !corpora.isEmpty());
+          if(resultsPerPage != null && updateStateFromConfig && corpusSelectionChanged)
           {
-            ui.getQueryState().getLimit().setValue(resultsPerPage);
+            state.getLimit().setValue(resultsPerPage);
+          }
+          // reset if corpus selection has changed
+          if(corpusSelectionChanged)
+          {
+            updateStateFromConfig = true;
           }
         }
+        
       });
     }
 
