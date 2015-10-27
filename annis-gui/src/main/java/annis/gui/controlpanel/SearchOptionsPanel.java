@@ -314,7 +314,7 @@ public class SearchOptionsPanel extends FormLayout
     {
       if(state != null && updateValue)
       {
-        state.getContextSegmentation().setValue(NULL_SEGMENTATION_VALUE);
+        state.getContextSegmentation().setValue(null);
       }
     }
     else if (segment != null)
