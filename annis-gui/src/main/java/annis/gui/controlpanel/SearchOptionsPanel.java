@@ -159,6 +159,8 @@ public class SearchOptionsPanel extends FormLayout
     cbSegmentation.setTextInputAllowed(false);
     cbSegmentation.setNullSelectionAllowed(true);
     cbSegmentation.setNewItemsAllowed(true);
+    cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
+    cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
 
     cbSegmentation.setDescription(
       "If corpora with multiple "
@@ -202,9 +204,6 @@ public class SearchOptionsPanel extends FormLayout
     contextContainerRight.setItemSorter(new IntegerIDSorter());
     resultsPerPageContainer.setItemSorter(new IntegerIDSorter());
     
-    cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
-    cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
-
     resultsPerPageContainer.removeAllItems();
     for(Integer i :PREDEFINED_PAGE_SIZES)
     {
