@@ -131,7 +131,7 @@ public class SchemeFixer
         else
         {
           // check if columns have correct type and name, if not throw an error
-          Preconditions.checkState(Types.OTHER == columnType.get("id"), "there must be an \"alias\" column of type \"UUID\"");
+          Preconditions.checkState(Types.OTHER == columnType.get("id"), "there must be an \"id\" column of type \"UUID\"");
           Preconditions.checkState(Types.VARCHAR == columnType.get("owner"), "there must be an \"owner\" column of type \"varchar\"");
           Preconditions.checkState(Types.TIMESTAMP == columnType.get("created"), "there must be an \"created\" column of type \"timestamp\"");
           Preconditions.checkState(Types.VARCHAR == columnType.get("url"), "there must be an \"url\" column of type \"varchar\"");
