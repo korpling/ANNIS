@@ -19,13 +19,18 @@ import annis.gui.components.SettingsStorage;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.requesthandler.ResourceRequestHandler;
-import annis.gui.requesthandler.ShortenerRequestHandler;
 import annis.gui.servlets.ResourceServlet;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinServletResponse;
 import java.util.Map;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.slf4j.Logger;
@@ -58,11 +63,41 @@ public class CommonUI extends AnnisBaseUI
     getSession().addRequestHandler(new LoginServletRequestHandler(urlPrefix));    
     getSession().addRequestHandler(new ResourceRequestHandler(urlPrefix));
     getSession().addRequestHandler(new BinaryRequestHandler(urlPrefix));
-    getSession().addRequestHandler(new ShortenerRequestHandler());
-
+    
     settings = new SettingsStorage(this);
     
     this.instanceConfig = getInstanceConfig(request);
+    
+    checkUrlShortenerRedirect(request, VaadinService.getCurrentResponse());
+  }
+  
+  private boolean checkUrlShortenerRedirect(VaadinRequest request, VaadinResponse response)
+  {
+    
+    String id = request.getParameter("id");
+    if(id == null)
+    {
+      return false;
+    }
+    
+    // get the actual URL
+    WebResource res = Helper.getAnnisWebResource();
+    res = res.path("shortener").path(id);
+    String longURL = res.get(String.class);
+    
+    // redirects only work in http servlets
+    if(response instanceof VaadinServletResponse)
+    {
+      ServletResponse servletResponse = ((VaadinServletResponse) response).getResponse();
+      if(servletResponse instanceof HttpServletResponse)
+      {    
+        HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+        httpResponse.setHeader("Location", request.getContextPath() +  longURL);
+        httpResponse.setStatus(307); // temporary redirect
+        return true;
+      }
+    }
+    return false;
   }
   
   private InstanceConfig getInstanceConfig(VaadinRequest request)

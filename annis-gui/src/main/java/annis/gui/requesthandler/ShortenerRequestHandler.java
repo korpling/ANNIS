@@ -25,7 +25,6 @@ import com.vaadin.server.VaadinSession;
 import java.io.IOException;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.http.HttpStatus;
 
 /**
  *

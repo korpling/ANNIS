@@ -27,7 +27,7 @@
   
   <servlet>
     <servlet-name>VaadinUI</servlet-name>
-    <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+    <servlet-class>annis.gui.servlets.AnnisServlet</servlet-class>
     <init-param>
       <param-name>UIProvider</param-name>
       <param-value>annis.gui.AnnisUIProvider</param-value>
