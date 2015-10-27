@@ -24,6 +24,9 @@ import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.uri.UriComponent;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
@@ -41,11 +44,15 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -54,6 +61,8 @@ import javax.ws.rs.core.UriBuilder;
 public class ShareSingleMatchGenerator extends Window implements
   SelectionEvent.SelectionListener
 {
+  private final static Logger log = LoggerFactory.getLogger(ShareSingleMatchGenerator.class);
+  
   private final VerticalLayout layout;
   private final Grid visSelector;
   private final VerticalLayout generatedLinks;
@@ -71,6 +80,8 @@ public class ShareSingleMatchGenerator extends Window implements
   private final PagedResultQuery query;
   private final String segmentation;
   private final PluginSystem ps;
+  
+  private final Escaper urlParamEscaper = UrlEscapers.urlFormParameterEscaper();
   
   public ShareSingleMatchGenerator(List<ResolverEntry> visualizers, 
     Match match,
@@ -200,10 +211,19 @@ public class ShareSingleMatchGenerator extends Window implements
     {
       // generate a service URL that gets the whole document
       URI firstID = match.getSaltIDs().get(0);
-      String pathAsString = firstID.getPath();
+      String pathAsString = firstID.getRawPath();
       List<String> path = Splitter.on('/').omitEmptyStrings().trimResults().splitToList(pathAsString);
-      String corpusName = Helper.encodeJersey(path.get(0));
-      String documentName = Helper.encodeJersey(path.get(path.size()-1));
+      String corpusName = path.get(0);
+      String documentName = path.get(path.size()-1);
+      try
+      {
+        corpusName = URLDecoder.decode(corpusName, "UTF-8");
+        documentName =URLDecoder.decode(documentName, "UTF-8"); ;
+      }
+      catch(UnsupportedEncodingException ex)
+      {
+        log.warn("Could not decode URL", ex);
+      }
       
       // apply any node annotation filters if possible
       if(visPlugin instanceof FilteringVisualizerPlugin)
@@ -227,8 +247,8 @@ public class ShareSingleMatchGenerator extends Window implements
       }
       
       serviceURL = serviceURL.path("graph")
-        .path(corpusName)
-        .path(documentName);
+        .path(Helper.encodePath(corpusName))
+        .path(Helper.encodePath(documentName));
       
       // add the original match so the embedded visualizer can add it
       // (since we use the graph query it will not be included in the Salt XMI itself)
@@ -240,7 +260,7 @@ public class ShareSingleMatchGenerator extends Window implements
     {
       // default to the subgraph URL for this specific match
       serviceURL = serviceURL.path("search").path("subgraph")
-        .queryParam("match", Helper.encodeJersey(match.toString()))
+        .queryParam("match", Helper.encodeQueryParam(match.toString()))
         .queryParam("left", query.getLeftContext())
         .queryParam("right", query.getRightContext());
       

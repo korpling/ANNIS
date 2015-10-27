@@ -900,9 +900,19 @@ public class Helper
   }
   
   /**
-   * This will percent encode Jersey template argument braces (enclosed in
-   * "{...}") and the percent character. Both would not be esccaped by jersey
-   * and/or would cause an error when this is not a valid template.
+   * Encodes a String so it can be used as path param.
+   *
+   * @param v
+   * @return
+   */
+  public static String encodePath(String v)
+  {
+    String encoded = urlPathEscape.escape(v);
+    return encoded;
+  }
+  
+  /**
+   * Encodes a String so it can be used as query param.
    *
    * @param v
    * @return
