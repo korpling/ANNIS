@@ -1,3 +1,13 @@
+Version 3.4.0-preview5
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview5+is%3Aclosed
+
+[Enhancements]
+ #454 Allow to share single matches as links for publications
+ #107 Share ANNIS visualizers as web service without front end
+
 Version 3.4.0-preview4
 ======================
 
