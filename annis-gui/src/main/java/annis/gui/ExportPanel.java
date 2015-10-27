@@ -262,7 +262,7 @@ public class ExportPanel extends GridLayout
       + "<code>metakeys=title,documentname</code>)");
 
     help4Exporter.put(SearchView.EXPORTER[2].getClass().getSimpleName(),
-      "The Text Exporter exports the token covered by the matched nodes of every search result and "
+      "The Token Exporter exports the token covered by the matched nodes of every search result and "
       + "its context, one line per result. "
       + "Beside the text of the token it also contains all token annotations separated by \"/\"."
       + "<p>"

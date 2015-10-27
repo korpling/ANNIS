@@ -22,7 +22,7 @@ import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
-import annis.gui.exporter.TextExporter;
+import annis.gui.exporter.TokenExporter;
 import annis.gui.exporter.WekaExporter;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.DisplayedResultQuery;
@@ -103,7 +103,7 @@ public class SearchView extends GridLayout implements View,
   {
     new WekaExporter(),
     new CSVExporter(),
-    new TextExporter(),
+    new TokenExporter(),
     new GridExporter(),
     new SimpleTextExporter()
   };
