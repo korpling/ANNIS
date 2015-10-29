@@ -211,7 +211,7 @@ public class QueryController implements Serializable
   }
 
   /**
-   * Show errors that occured during the exeuction of a query to the user.
+   * Show errors that occured during the execution of a query to the user.
    *
    * @param ex The exception to report in the user interface
    * @param showNotification If true a notification is shown instead of only

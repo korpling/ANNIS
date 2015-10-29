@@ -229,7 +229,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
               }
               else if (ex.getResponse().getStatus() == 504)
               {
-                paging.setInfo("Timeout: query exeuction took too long");
+                paging.setInfo("Timeout: query execution took too long");
               }
               else if(ex.getResponse().getStatus() == 403)
               {
