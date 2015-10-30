@@ -101,7 +101,11 @@ CREATE TABLE facts (
   edge_qannotext varchar COLLATE "C", -- the combined qualified name (with namespace) of the annotation, separated by ":"
   n_sample boolean,
   n_na_sample boolean,
-  PRIMARY KEY (fid)
+  PRIMARY KEY (fid),
+  -- additional check constraints
+  CHECK(left_token <= right_token),
+  CHECK(pre <= post),
+  CHECK("left" <= "right")
 );
 
 COMMENT ON COLUMN facts.component_id IS 'component id';
