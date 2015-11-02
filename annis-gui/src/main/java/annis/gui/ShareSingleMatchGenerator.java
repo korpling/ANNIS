@@ -26,7 +26,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.uri.UriComponent;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
@@ -260,7 +259,7 @@ public class ShareSingleMatchGenerator extends Window implements
     {
       // default to the subgraph URL for this specific match
       serviceURL = serviceURL.path("search").path("subgraph")
-        .queryParam("match", Helper.encodeQueryParam(match.toString()))
+        .queryParam("match", Helper.encodeJersey(match.toString()))
         .queryParam("left", query.getLeftContext())
         .queryParam("right", query.getRightContext());
       
