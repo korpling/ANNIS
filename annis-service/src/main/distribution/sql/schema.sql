@@ -103,7 +103,7 @@ CREATE TABLE facts (
   n_na_sample boolean,
   PRIMARY KEY (fid),
   -- additional check constraints
-  CHECK(left_token <= right_token),
+  CHECK(left_token IS NULL OR right_token IS NULL OR (left_token <= right_token)),
   CHECK(pre <= post),
   CHECK("left" <= "right")
 );
