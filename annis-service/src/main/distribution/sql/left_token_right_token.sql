@@ -6,7 +6,7 @@ left_token = (
   WHEN parent.token_index IS NULL THEN (
     SELECT COALESCE(min(token_index), -1) FROM _node AS child 
     WHERE 
-      parent.left = child.left 
+      parent.left <= child.left 
       AND parent.corpus_ref = child.corpus_ref 
       AND parent.text_ref = child.text_ref 
       AND child.token_index IS NOT NULL
@@ -17,9 +17,9 @@ left_token = (
 right_token = (
   CASE
     WHEN parent.token_index IS NULL THEN (
-    SELECT COALESCE(max(token_index), -1) FROM _node AS child 
+    SELECT COALESCE(max(token_index), -1) FROM _node AS child
     WHERE 
-      parent.right = child.right 
+      parent.right >= child.right 
       AND parent.corpus_ref = child.corpus_ref 
       AND parent.text_ref = child.text_ref 
       AND child.token_index IS NOT NULL
