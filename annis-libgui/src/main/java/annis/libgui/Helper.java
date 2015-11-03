@@ -29,7 +29,6 @@ import annis.service.objects.RawTextWrapper;
 import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
-import com.google.common.html.HtmlEscapers;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
@@ -939,6 +938,39 @@ public class Helper
   {
     return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).
       getEncodedValue();
+  }
+  
+  public static Map<String, String> calculateColorsForMarkedExact(SDocument result)
+  {
+    Map<String, String> markedExactMap = new HashMap<>();
+    if (result != null)
+    {
+      SDocumentGraph g = result.getSDocumentGraph();
+      if (g != null)
+      {
+        for (SNode n : result.getSDocumentGraph().getSNodes())
+        {
+
+          SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          Long matchNum = featMatched == null ? null : featMatched.
+            getSValueSNUMERIC();
+
+          if (matchNum != null)
+          {
+            int color = Math.max(0, Math.min((int) matchNum.longValue() - 1,
+              MatchedNodeColors.values().length - 1));
+            RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
+            if (feat != null)
+            {
+              markedExactMap.put("" + feat.getInternalID(),
+                MatchedNodeColors.values()[color].name());
+            }
+          }
+
+        }
+      } // end if g not null
+    } // end if result not null
+    return markedExactMap;
   }
 
   public static void calulcateColorsForMarkedAndCovered(SDocument result,

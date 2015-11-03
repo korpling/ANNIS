@@ -251,10 +251,13 @@ public class EmbeddedVisUI extends CommonUI
       }
       
       Map<String, String> markedColorMap = new HashMap<>();
+      Map<String, String> exactMarkedMap = 
+        Helper.calculateColorsForMarkedExact(doc);
       Map<String, Long> markedAndCovered = Helper.calculateMarkedAndCoveredIDs(doc, segNodes, baseText);
       Helper.calulcateColorsForMarkedAndCovered(doc, markedAndCovered, markedColorMap);
       visInput.setMarkedAndCovered(markedAndCovered);
       visInput.setMarkableMap(markedColorMap);
+      visInput.setMarkableExactMap(exactMarkedMap);
       visInput.setContextPath(Helper.getContext());
       String template = Helper.getContext()
         + "/Resource/" + visName + "/%s";

@@ -387,36 +387,9 @@ public class SingleResultPanel extends CssLayout implements
 
   private void calculateHelperVariables()
   {
-    markedExactMap = new HashMap<>();
     markedCoveredMap = new HashMap<>();
-
-    if (result != null)
-    {
-      SDocumentGraph g = result.getSDocumentGraph();
-      if (g != null)
-      {
-        for (SNode n : result.getSDocumentGraph().getSNodes())
-        {
-
-          SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-          Long matchNum = featMatched == null ? null : featMatched.
-            getSValueSNUMERIC();
-
-          if (matchNum != null)
-          {
-            int color = Math.max(0, Math.min((int) matchNum.longValue() - 1,
-              MatchedNodeColors.values().length - 1));
-            RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
-            if (feat != null)
-            {
-              markedExactMap.put("" + feat.getInternalID(),
-                MatchedNodeColors.values()[color].name());
-            }
-          }
-
-        }
-      } // end if g not null
-    } // end if result not null
+    
+    markedExactMap = Helper.calculateColorsForMarkedExact(result);
   }
 
   @Override
