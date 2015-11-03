@@ -91,7 +91,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |layer|text| | | |
 |name|text| | | A human readable identfier of the node. Must be unique for each document. |
 |left|integer||X|position of first covered character|
-|right|integer||X|position of last covered character|
+|right|integer||X|position of the character after the last covered character|
 |token_index|integer|||index of this token (if it is a token, otherwise NULL)|
 |left_token|integer||X|index of first covered token, for token, this value is the token_index|
 |right_token|integer||X|index of last covered token, for token, this value is the token_index|
