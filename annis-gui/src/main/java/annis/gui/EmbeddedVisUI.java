@@ -317,11 +317,15 @@ public class EmbeddedVisUI extends CommonUI
       // set the feature for this specific node
       if (matchedNode != null)
         {
-          SFeature featMatchedNode = SaltFactory.eINSTANCE.createSFeature();
-          featMatchedNode.setSNS(ANNIS_NS);
-          featMatchedNode.setSName(FEAT_MATCHEDNODE);
-          featMatchedNode.setSValue(i);
-          matchedNode.addSFeature(featMatchedNode);
+          SFeature existing = matchedNode.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          if(existing == null)
+          {
+            SFeature featMatchedNode = SaltFactory.eINSTANCE.createSFeature();
+            featMatchedNode.setSNS(ANNIS_NS);
+            featMatchedNode.setSName(FEAT_MATCHEDNODE);
+            featMatchedNode.setSValue(i);
+            matchedNode.addSFeature(featMatchedNode);
+          }
       }
       i++;
     }
