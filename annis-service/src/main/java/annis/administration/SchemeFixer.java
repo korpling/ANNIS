@@ -24,7 +24,6 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
-import org.postgresql.core.types.PGType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -55,7 +54,6 @@ public class SchemeFixer
   {
     log.info("testing if fixing schema is necessary");
     corpusAlias();
-    urlShortener();
     log.info("finished schema test");
   }
   
@@ -100,50 +98,6 @@ public class SchemeFixer
     
   }
   
-  protected void urlShortener()
-  {
-    try(Connection conn = dataSource.getConnection();)
-    {
-      
-      DatabaseMetaData dbMeta = conn.getMetaData();
-      try(ResultSet result =  dbMeta.getColumns(null, getDatabaseSchema(), "url_shortener", null);)
-      { 
-        Map<String, Integer> columnType = new HashMap<>();
-
-        while(result.next())
-        {
-          columnType.put(result.getString(4), result.getInt(5));
-        }
-
-        if(columnType.isEmpty())
-        {
-          // create the table
-          log.info("Creating url_shortener table");
-          jdbcTemplate.execute(
-            "CREATE  TABLE url_shortener\n" + "(\n"
-            + "	id UUID PRIMARY KEY,\n" + "	\"owner\" varchar,\n"
-            + "	created timestamp with time zone,\n" + "	url varchar UNIQUE\n"
-            + ");");
-          // since the "url" column is unique, an index will be created for it
-        }
-        else
-        {
-          // check if columns have correct type and name, if not throw an error
-          Preconditions.checkState(Types.OTHER == columnType.get("id"), "there must be an \"id\" column of type \"UUID\"");
-          Preconditions.checkState(Types.VARCHAR == columnType.get("owner"), "there must be an \"owner\" column of type \"varchar\"");
-          Preconditions.checkState(Types.TIMESTAMP == columnType.get("created"), "there must be an \"created\" column of type \"timestamp\"");
-          Preconditions.checkState(Types.VARCHAR == columnType.get("url"), "there must be an \"url\" column of type \"varchar\"");
-        }
-
-      }
-    }
-    catch (SQLException ex)
-    {
-      log.error("Could not get the metadata for the database", ex);
-    }
-    
-  }
-
   public JdbcTemplate getJdbcTemplate()
   {
     return jdbcTemplate;

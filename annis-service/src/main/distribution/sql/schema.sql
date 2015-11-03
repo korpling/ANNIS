@@ -147,7 +147,7 @@ CREATE  TABLE url_shortener
   id UUID PRIMARY KEY,
 	"owner" varchar,
   created timestamp with time zone,
-  url varchar UNIQUE
+  url varchar
 );
 
 -- stats

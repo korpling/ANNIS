@@ -11,3 +11,5 @@ CREATE INDEX idx__annocat__corpus ON annotation_category("toplevel_corpus");
 
 CREATE INDEX idx__annocat__namebyid ON annotation_category(id, toplevel_corpus, "name");
 CREATE INDEX idx__annocat__namespacebyid ON annotation_category(id, toplevel_corpus, "namespace");
+
+CREATE INDEX idx__urlshortener__url ON url_shortener(url, id);
