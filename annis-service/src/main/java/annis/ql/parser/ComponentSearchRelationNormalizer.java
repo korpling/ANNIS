@@ -112,7 +112,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     
     QueryNode newTargetNode = new QueryNode(maxID.incrementAndGet(), targetNode, false); 
     newTargetNode.setArtificial(true);
-    newTargetNode.setVariable("x" + targetNode.getVariable());
+    newTargetNode.setVariable("x" + targetNode.getVariable() + "_" + newTargetNode.getId());
     
     newTargetNode.setThisNodeAsTarget(join);
     
