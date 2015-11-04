@@ -38,7 +38,7 @@ public class ShareQueryReferenceWindow extends Window
   implements Button.ClickListener
 {
   
-  public ShareQueryReferenceWindow(DisplayedResultQuery query)
+  public ShareQueryReferenceWindow(DisplayedResultQuery query, boolean shorten)
   {
     super("Query reference link");
     
@@ -63,7 +63,14 @@ public class ShareQueryReferenceWindow extends Window
         query.getBaseText(), query.getOffset(), query.getLimit(),
         query.getOrder(), query.getSelectedMatches());
     
-      shortURL = Helper.shortenURL(url);
+      if(shorten)
+      {
+        shortURL = Helper.shortenURL(url);
+      }
+      else
+      {
+        shortURL = url.toASCIIString();
+      }
     }
     
     TextArea txtCitation = new TextArea();

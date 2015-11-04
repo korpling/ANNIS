@@ -504,6 +504,18 @@ public class SingleResultPanel extends CssLayout implements
   }
 
   @Override
+  public void attach()
+  {
+    super.attach();
+    if (Helper.isKickstarter(getSession()))
+    {
+      btLink.setVisible(false);
+    }
+  }
+  
+  
+
+  @Override
   public void registerVisibilityStatus(long entryId, boolean status)
   {
     visualizerState.put(entryId, status);

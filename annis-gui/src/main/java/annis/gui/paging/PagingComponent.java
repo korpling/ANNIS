@@ -357,7 +357,10 @@ public class PagingComponent extends Panel implements
     @Override
     public void buttonClick(ClickEvent event)
     {
-      ShareQueryReferenceWindow w = new ShareQueryReferenceWindow(ui.getQueryController().getSearchQuery());
+      ShareQueryReferenceWindow w = new ShareQueryReferenceWindow(
+        ui.getQueryController().getSearchQuery(),
+        !Helper.isKickstarter(getSession())
+      );
       getUI().addWindow(w);
       w.center();
     }

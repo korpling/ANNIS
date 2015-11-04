@@ -20,7 +20,9 @@ import annis.gui.objects.ContextualizedQuery;
 import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.Query;
 import annis.gui.objects.QueryGenerator;
+import annis.libgui.Helper;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification;
@@ -149,7 +151,7 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
       if(query != null)
       {
         ShareQueryReferenceWindow c
-          = new ShareQueryReferenceWindow(query);
+          = new ShareQueryReferenceWindow(query, !Helper.isKickstarter(VaadinSession.getCurrent()));
         UI.getCurrent().addWindow(c);
         c.center();
       }
@@ -164,7 +166,8 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
             .right(citationProvider.getRightContext())
             .offset(0)
             .limit(10)
-            .build());
+            .build(),
+          !Helper.isKickstarter(VaadinSession.getCurrent()));
         UI.getCurrent().addWindow(c);
         c.center();
       }

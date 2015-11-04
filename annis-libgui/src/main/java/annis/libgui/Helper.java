@@ -405,15 +405,16 @@ public class Helper
           + encodeBase64URL(segmentation));
       }
       // only output "bt" if it is not the same as the context segmentation
-      if(!Objects.equals(visibleBaseText, segmentation))
+      if (!Objects.equals(visibleBaseText, segmentation))
       {
-        result.add("_bt=" + (visibleBaseText == null ? "" : encodeBase64URL(visibleBaseText)));
+        result.add("_bt=" + (visibleBaseText == null ? "" : encodeBase64URL(
+          visibleBaseText)));
       }
       if (order != OrderType.ascending && order != null)
       {
         result.add("o=" + order.toString());
       }
-      if(selectedMatches != null && !selectedMatches.isEmpty())
+      if (selectedMatches != null && !selectedMatches.isEmpty())
       {
         result.add("m=" + Joiner.on(',').join(selectedMatches));
       }
@@ -440,10 +441,9 @@ public class Helper
         appURI.getHost(), appURI.getPort(),
         appURI.getPath(), null,
         StringUtils.join(citationFragment(
-          aql, corpora, contextLeft, contextRight, segmentation,
-          visibleBaseText, start, limit, order, selectedMatches
-        ), "&"))
-        ;
+            aql, corpora, contextLeft, contextRight, segmentation,
+            visibleBaseText, start, limit, order, selectedMatches
+          ), "&"));
     }
     catch (URISyntaxException ex)
     {
@@ -897,7 +897,7 @@ public class Helper
     String encoded = jerseyExtraEscape.escape(v);
     return encoded;
   }
-  
+
   /**
    * Encodes a String so it can be used as path param.
    *
@@ -909,7 +909,7 @@ public class Helper
     String encoded = urlPathEscape.escape(v);
     return encoded;
   }
-  
+
   /**
    * Encodes a String so it can be used as query param.
    *
@@ -921,7 +921,6 @@ public class Helper
     String encoded = UrlEscapers.urlFormParameterEscaper().escape(v);
     return encoded;
   }
-  
 
   /**
    * Casts a list of Annotations to the Type <code>List<Annotation></code>
@@ -939,8 +938,9 @@ public class Helper
     return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).
       getEncodedValue();
   }
-  
-  public static Map<String, String> calculateColorsForMarkedExact(SDocument result)
+
+  public static Map<String, String> calculateColorsForMarkedExact(
+    SDocument result)
   {
     Map<String, String> markedExactMap = new HashMap<>();
     if (result != null)
@@ -1062,7 +1062,7 @@ public class Helper
 
     return covered;
   }
-  
+
   /**
    * Marks all nodes which are dominated by already marked nodes.
    *
@@ -1150,7 +1150,7 @@ public class Helper
       long order)
     {
       if (fromNode != null
-        && matchedAndCovered.containsKey(fromNode.getSId()) 
+        && matchedAndCovered.containsKey(fromNode.getSId())
         && currNode != null
         && !matchedAndCovered.containsKey(currNode.getSId()))
       {
@@ -1186,33 +1186,49 @@ public class Helper
       return matchedAndCovered;
     }
   }
-  
+
   public static String shortenURL(URI original)
   {
     WebResource res = Helper.getAnnisWebResource().path("shortener");
     String appContext = Helper.getContext();
-    
+
     String path = original.getRawPath();
-    if(path.startsWith(appContext))
+    if (path.startsWith(appContext))
     {
       path = path.substring(appContext.length());
     }
-    
+
     String localURL = path;
-    if(original.getRawQuery() != null)
+    if (original.getRawQuery() != null)
     {
       localURL = localURL + "?" + original.getRawQuery();
     }
-    if(original.getRawFragment() != null)
+    if (original.getRawFragment() != null)
     {
       localURL = localURL + "#" + original.getRawFragment();
     }
-    
+
     String shortID = res.post(String.class, localURL);
-    
-    return UriBuilder.fromUri(original).replacePath(appContext+"/").replaceQuery(
-      "").fragment("").queryParam("id",
-      shortID).build().toASCIIString();
-    
+
+    return UriBuilder.fromUri(original).replacePath(appContext + "/").
+      replaceQuery(
+        "").fragment("").queryParam("id",
+        shortID).build().toASCIIString();
+
+  }
+
+  public static boolean isKickstarter(VaadinSession session)
+  {
+    if(session != null)
+    {
+      return Boolean.parseBoolean(
+        session.getConfiguration().getInitParameters()
+        .getProperty("kickstarterEnvironment",
+          "false"));
+    }
+    else
+    {
+      return false;
+    }
   }
 }
