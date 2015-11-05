@@ -104,8 +104,9 @@ CREATE TABLE facts (
   PRIMARY KEY (fid),
   -- additional check constraints
   CHECK(left_token <= right_token),
-  CHECK(pre <= post),
-  CHECK("left" <= "right")
+  CHECK(pre <= post)
+-- this check causes problems with some corpora that were created with a buggy version of the Pepepr ANNIS Exporter
+--  CHECK("left" <= "right")
 );
 
 COMMENT ON COLUMN facts.component_id IS 'component id';
