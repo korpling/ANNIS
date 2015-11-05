@@ -112,7 +112,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     
     QueryNode newTargetNode = new QueryNode(maxID.incrementAndGet(), targetNode, false); 
     newTargetNode.setArtificial(true);
-    newTargetNode.setVariable("x" + targetNode.getVariable() + "_" + newTargetNode.getId());
+    newTargetNode.setVariable("x" + newTargetNode.getId() + "(" + targetNode.getVariable() + ")");
     
     newTargetNode.setThisNodeAsTarget(join);
     
@@ -128,7 +128,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     Preconditions.checkState(sourceNode.removeOutgoingJoin(join), "The join was not attached to the source node.");
     
     QueryNode newNode = new QueryNode(maxID.incrementAndGet(), sourceNode, false);
-    newNode.setVariable("x" + sourceNode.getVariable() + "_" + newNode.getId());
+    newNode.setVariable("x" + newNode.getId() + "(" + sourceNode.getVariable() + ")");
     newNode.addOutgoingJoin(join);
     newNode.setArtificial(true);
     
