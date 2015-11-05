@@ -77,7 +77,7 @@ public class SchemeFixer
           // create the table
           log.info("Creating corpus_alias table");
           jdbcTemplate.execute(
-            "CREATE TABLE corpus_alias\n" + "(\n"
+            "CREATE TABLE IF NOT EXISTS corpus_alias\n" + "(\n"
             + "  alias text COLLATE \"C\",\n"
             + "  corpus_ref bigint references corpus(id) ON DELETE CASCADE,\n"
             + "   PRIMARY KEY (alias, corpus_ref)\n" + ");\n" + "");
