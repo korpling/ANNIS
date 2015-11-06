@@ -7,6 +7,5 @@ var classannis_1_1administration_1_1_scheme_fixer =
     [ "getJdbcTemplate", "classannis_1_1administration_1_1_scheme_fixer.html#a2b14a3f2ae3783eb6f339b83bd13c34e", null ],
     [ "setDatabaseSchema", "classannis_1_1administration_1_1_scheme_fixer.html#af5c71a1600ee89a509e550917a7ffb24", null ],
     [ "setDataSource", "classannis_1_1administration_1_1_scheme_fixer.html#a177eb83efb12b6dc3573836433035b53", null ],
-    [ "setJdbcTemplate", "classannis_1_1administration_1_1_scheme_fixer.html#aeedcfdf00fbd5ab7a7545b63c4f4c03e", null ],
-    [ "urlShortener", "classannis_1_1administration_1_1_scheme_fixer.html#af133a913ac61ba3a150d2b17dc07902c", null ]
+    [ "setJdbcTemplate", "classannis_1_1administration_1_1_scheme_fixer.html#aeedcfdf00fbd5ab7a7545b63c4f4c03e", null ]
 ];
