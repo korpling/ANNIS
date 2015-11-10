@@ -431,11 +431,7 @@ public class MainToolbar extends HorizontalLayout
     VaadinSession session = VaadinSession.getCurrent();
     if (session != null)
     {
-      DeploymentConfiguration configuration = session.getConfiguration();
-
-      boolean kickstarter = Boolean.parseBoolean(
-        configuration.getInitParameters().getProperty("kickstarterEnvironment",
-          "false"));
+      boolean kickstarter = Helper.isKickstarter(session);
 
       if (!kickstarter)
       {

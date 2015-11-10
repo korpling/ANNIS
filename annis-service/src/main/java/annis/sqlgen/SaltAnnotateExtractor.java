@@ -299,8 +299,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     // add the missing spanning relations for each continuous span of the graph
     for (SSpan span : graph.getSpans())
     {
-      long pre = 1;
-      RelannisNodeFeature featSpan = RelannisNodeFeature.extract(span);
+      long pre=1;
+      RelannisNodeFeature featSpan = RelannisNodeFeature.extract(span);      
       ComponentEntry spanComponent = componentForSpan.get(span.getId());
       if (spanComponent != null && featSpan != null 
         && featSpan.getLeftToken() >= 0 && featSpan.getRightToken() >= 0)

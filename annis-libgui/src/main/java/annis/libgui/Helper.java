@@ -26,6 +26,7 @@ import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
+import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
@@ -56,9 +57,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
@@ -378,17 +381,9 @@ public class Helper
 
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation,
-    int start, int limit)
-  {
-    return citationFragment(aql, corpora, contextLeft, contextRight,
-      segmentation, start, limit, OrderType.ascending);
-  }
-
-  public static List<String> citationFragment(String aql,
-    Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation,
-    int start, int limit, OrderType order)
+    String segmentation, String visibleBaseText,
+    long start, int limit, OrderType order,
+    Set<Long> selectedMatches)
   {
     List<String> result = new ArrayList<>();
     try
@@ -409,9 +404,19 @@ public class Helper
         result.add("_seg="
           + encodeBase64URL(segmentation));
       }
+      // only output "bt" if it is not the same as the context segmentation
+      if (!Objects.equals(visibleBaseText, segmentation))
+      {
+        result.add("_bt=" + (visibleBaseText == null ? "" : encodeBase64URL(
+          visibleBaseText)));
+      }
       if (order != OrderType.ascending && order != null)
       {
         result.add("o=" + order.toString());
+      }
+      if (selectedMatches != null && !selectedMatches.isEmpty())
+      {
+        result.add("m=" + Joiner.on(',').join(selectedMatches));
       }
     }
     catch (UnsupportedEncodingException ex)
@@ -422,10 +427,11 @@ public class Helper
     return result;
   }
 
-  public static String generateCitation(String aql,
+  public static URI generateCitation(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation,
-    int start, int limit)
+    String segmentation, String visibleBaseText,
+    long start, int limit, OrderType order,
+    Set<Long> selectedMatches)
   {
     try
     {
@@ -434,15 +440,16 @@ public class Helper
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
         appURI.getPath(), null,
-        StringUtils.join(citationFragment(aql, corpora,
-            contextLeft, contextRight, segmentation, start, limit), "&"))
-        .toASCIIString();
+        StringUtils.join(citationFragment(
+            aql, corpora, contextLeft, contextRight, segmentation,
+            visibleBaseText, start, limit, order, selectedMatches
+          ), "&"));
     }
     catch (URISyntaxException ex)
     {
       log.error(null, ex);
     }
-    return "ERROR";
+    return null;
   }
 
   public static String generateCorpusLink(Set<String> corpora)
@@ -890,11 +897,21 @@ public class Helper
     String encoded = jerseyExtraEscape.escape(v);
     return encoded;
   }
-  
+
   /**
-   * This will percent encode Jersey template argument braces (enclosed in
-   * "{...}") and the percent character. Both would not be esccaped by jersey
-   * and/or would cause an error when this is not a valid template.
+   * Encodes a String so it can be used as path param.
+   *
+   * @param v
+   * @return
+   */
+  public static String encodePath(String v)
+  {
+    String encoded = urlPathEscape.escape(v);
+    return encoded;
+  }
+
+  /**
+   * Encodes a String so it can be used as query param.
    *
    * @param v
    * @return
@@ -904,7 +921,6 @@ public class Helper
     String encoded = UrlEscapers.urlFormParameterEscaper().escape(v);
     return encoded;
   }
-  
 
   /**
    * Casts a list of Annotations to the Type <code>List<Annotation></code>
@@ -921,6 +937,40 @@ public class Helper
   {
     return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).
       getEncodedValue();
+  }
+
+  public static Map<String, String> calculateColorsForMarkedExact(
+    SDocument result)
+  {
+    Map<String, String> markedExactMap = new HashMap<>();
+    if (result != null)
+    {
+      SDocumentGraph g = result.getDocumentGraph();
+      if (g != null)
+      {
+        for (SNode n : result.getDocumentGraph().getNodes())
+        {
+
+          SFeature featMatched = n.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          Long matchNum = featMatched == null ? null : featMatched.
+            getValue_SNUMERIC();
+
+          if (matchNum != null)
+          {
+            int color = Math.max(0, Math.min((int) matchNum.longValue() - 1,
+              MatchedNodeColors.values().length - 1));
+            RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
+            if (feat != null)
+            {
+              markedExactMap.put("" + feat.getInternalID(),
+                MatchedNodeColors.values()[color].name());
+            }
+          }
+
+        }
+      } // end if g not null
+    } // end if result not null
+    return markedExactMap;
   }
 
   public static void calulcateColorsForMarkedAndCovered(SDocument result,
@@ -1012,7 +1062,7 @@ public class Helper
 
     return covered;
   }
-  
+
   /**
    * Marks all nodes which are dominated by already marked nodes.
    *
@@ -1100,7 +1150,7 @@ public class Helper
       long order)
     {
       if (fromNode != null
-        && matchedAndCovered.containsKey(fromNode.getId()) 
+        && matchedAndCovered.containsKey(fromNode.getId())
         && currNode != null
         && !matchedAndCovered.containsKey(currNode.getId()))
       {
@@ -1134,6 +1184,51 @@ public class Helper
     public Map<String, Long> getMatchedAndCovered()
     {
       return matchedAndCovered;
+    }
+  }
+
+  public static String shortenURL(URI original)
+  {
+    WebResource res = Helper.getAnnisWebResource().path("shortener");
+    String appContext = Helper.getContext();
+
+    String path = original.getRawPath();
+    if (path.startsWith(appContext))
+    {
+      path = path.substring(appContext.length());
+    }
+
+    String localURL = path;
+    if (original.getRawQuery() != null)
+    {
+      localURL = localURL + "?" + original.getRawQuery();
+    }
+    if (original.getRawFragment() != null)
+    {
+      localURL = localURL + "#" + original.getRawFragment();
+    }
+
+    String shortID = res.post(String.class, localURL);
+
+    return UriBuilder.fromUri(original).replacePath(appContext + "/").
+      replaceQuery(
+        "").fragment("").queryParam("id",
+        shortID).build().toASCIIString();
+
+  }
+
+  public static boolean isKickstarter(VaadinSession session)
+  {
+    if(session != null)
+    {
+      return Boolean.parseBoolean(
+        session.getConfiguration().getInitParameters()
+        .getProperty("kickstarterEnvironment",
+          "false"));
+    }
+    else
+    {
+      return false;
     }
   }
 }

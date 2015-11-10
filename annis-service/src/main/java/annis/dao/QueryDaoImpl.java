@@ -110,12 +110,11 @@ import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
-public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
+public class QueryDaoImpl extends AbstractDao implements QueryDao,
   SqlSessionModifier
 {
 
@@ -497,7 +496,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
   }
   private static final Logger log = LoggerFactory.
-    getLogger(SpringAnnisDao.class);
+    getLogger(QueryDaoImpl.class);
   // / old
 
   private SqlGenerator sqlGenerator;
@@ -532,7 +531,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private MetaByteHelper metaByteHelper;
 
-  public SpringAnnisDao()
+  public QueryDaoImpl()
   {
     planRowMapper = new ParameterizedSingleColumnRowMapper<>();
     sqlSessionModifiers = new ArrayList<>();
@@ -903,10 +902,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request)
   {
-    try
+    try(Connection conn = getDataSource().getConnection())
     {
       ResolverDaoHelper helper = new ResolverDaoHelper();
-      PreparedStatement stmt = helper.createPreparedStatement(getConnection());
+      PreparedStatement stmt = helper.createPreparedStatement(conn);
       helper.fillPreparedStatement(request, stmt);
       List<ResolverEntry> result = helper.extractData(stmt.executeQuery());
       return result;

@@ -115,30 +115,21 @@ $font-size: 10pt;
   .rtl {
     direction: rtl;
   }
-
-  textarea.citation {
+  
+  textarea.shared-text, div.shared-text {
     background-color: white;
     border-style: solid;
     border-color: black;
     border-width: 1px;
-    font-family: monospace;
-  }
-  
-  div.citation {
-    border-style: solid;
-    border-color: black;
     border-width: 1px;
     border-radius: 4px;
-    padding: 4px
+    padding: 4px;
+    font-family: monospace;
+    &:focus {
+      border-color: black;
+    }
   }
 
-  textarea.license {
-    background-color: white;
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;
-    font-family: monospace;
-  }
 
   textarea.query {
     font-family: monospace;
@@ -245,16 +236,19 @@ $font-size: 10pt;
     }
   } 
 
-  .grey-selection tr.v-selected {
-    background-color: #808080;
-  } 
-
   .info-bar {
     background-color: $annis-color;
     border-style: solid;
     border-color: black;
     border-width: 1px 0px 0px 0px;
   }
+  
+  .selected-match .info-bar {
+      background-color: rgb(129, 184, 255);
+      .path-label {
+        font-weight: bold;
+      }
+   }
 
   $huge-menubar-height: 40px;
 

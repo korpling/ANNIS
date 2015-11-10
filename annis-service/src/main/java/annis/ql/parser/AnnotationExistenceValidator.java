@@ -15,7 +15,7 @@
  */
 package annis.ql.parser;
 
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.AqlParseError;
 import annis.model.QueryAnnotation;
@@ -45,23 +45,23 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
   private final static Logger log = LoggerFactory.getLogger(
     AnnotationExistenceValidator.class);
 
-  private AnnisDao annisDao;
+  private QueryDao queryDao;
 
   @Override
   public QueryData transform(QueryData data)
   {
     List<Long> corpusList = data.getCorpusList();
 
-    if (annisDao != null && (corpusList != null) && !corpusList.isEmpty())
+    if (queryDao != null && (corpusList != null) && !corpusList.isEmpty())
     {
       // get first corpus name
-      //List<AnnisCorpus> mycorpora = annisDao.listCorpora();
+      //List<AnnisCorpus> mycorpora = queryDao.listCorpora();
       //String firstcorpusname =  mycorpora.get(0).getName();
       Set<String> result = new TreeSet<>();
 
       /*get a list of all annotations in a similar way that TigerQueryBuilder gets it through 
-       QueryServiceImpl in annisDao.listAnnotations()*/
-      List<AnnisAttribute> atts = annisDao.listAnnotations(corpusList, false,
+       QueryServiceImpl in queryDao.listAnnotations()*/
+      List<AnnisAttribute> atts = queryDao.listAnnotations(corpusList, false,
         true);
 
       //among them, get only node annotations
@@ -106,17 +106,17 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
 
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
 
-    return annisDao;
+    return queryDao;
 
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
 
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
 
   }
 }

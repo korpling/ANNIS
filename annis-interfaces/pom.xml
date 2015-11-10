@@ -56,10 +56,19 @@
     
     
     <dependency>
-      <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
+      <groupId>org.corpus-tools</groupId>
       <artifactId>salt-api</artifactId>
       <version>3.0.0-SNAPSHOT</version>
-      <type>bundle</type>
+      <exclusions>
+        <exclusion>  
+          <groupId>org.apache.felix</groupId>  
+          <artifactId>javax.servlet</artifactId>
+        </exclusion>
+        <exclusion>  
+          <groupId>log4j</groupId>  
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions> 
       <scope>compile</scope>
     </dependency>
 

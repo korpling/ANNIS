@@ -31,16 +31,17 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
 {
   private final static Logger log = LoggerFactory.getLogger(PagedResultQuery.class);
   
-  private int offset;
+  private long offset;
   private int limit;
   private OrderType order = OrderType.ascending;
+  
 
   public PagedResultQuery()
   {
     
   }
 
-  public PagedResultQuery(int contextLeft, int contextRight, int offset,
+  public PagedResultQuery(int contextLeft, int contextRight, long offset,
     int limit, String segmentation, String query,
     Set<String> corpora)
   {
@@ -54,12 +55,12 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     this.limit = limit;
   }
 
-  public int getOffset()
+  public long getOffset()
   {
     return offset;
   }
 
-  public void setOffset(int offset)
+  public void setOffset(long offset)
   {
     this.offset = offset;
   }
@@ -85,7 +86,6 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     this.order = order;
   }
 
-  
   
   @Override
   public PagedResultQuery clone()

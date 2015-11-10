@@ -22,11 +22,13 @@ import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
-import annis.gui.exporter.TextExporter;
+import annis.gui.exporter.TokenExporter;
 import annis.gui.exporter.WekaExporter;
 import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.Query;
+import annis.gui.objects.QueryGenerator;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Background;
 import annis.libgui.Helper;
@@ -41,6 +43,7 @@ import annis.service.objects.OrderType;
 import com.google.common.base.Strings;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
+import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -73,7 +76,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -101,7 +103,7 @@ public class SearchView extends GridLayout implements View,
   {
     new WekaExporter(),
     new CSVExporter(),
-    new TextExporter(),
+    new TokenExporter(),
     new GridExporter(),
     new SimpleTextExporter()
   };
@@ -626,19 +628,48 @@ public class SearchView extends GridLayout implements View,
         }
         else if (args.get("cl") != null && args.get("cr") != null)
         {
-          // do not change the manually selected search options
-          //String a = args.get("cl");
-          //String b = args.get("cr");
-          //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+          // make sure the properties are not overwritten by the background process
+          getControlPanel().getSearchOptions().setUpdateStateFromConfig(false);
 
-          controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
-
-          PagedResultQuery query = new PagedResultQuery(
-            Integer.parseInt(args.get("cl")),
-            Integer.parseInt(args.get("cr")),
-            Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
-            args.get("seg"),
-            args.get("q"), corpora);
+          DisplayedResultQuery query = QueryGenerator.displayed()
+            .left(Integer.parseInt(args.get("cl")))
+            .right(Integer.parseInt(args.get("cr")))
+            .offset(Integer.parseInt(args.get("s")))
+            .limit(Integer.parseInt(args.get("l")))
+            .segmentation(args.get("seg"))
+            .baseText(args.get("bt"))
+            .query(args.get("q"))
+            .corpora(corpora)
+            .build();
+          
+          
+          if(query.getBaseText() == null && query.getSegmentation() != null)
+          {
+            // if no explicit visible segmentation was given use the same as the context
+            query.setBaseText(query.getSegmentation());
+          }
+          if(query.getBaseText() != null && query.getBaseText().isEmpty())
+          {
+            // empty string means "null"
+            query.setBaseText(null);
+          }
+            
+          String matchSelectionRaw = args.get("m");
+          if(matchSelectionRaw != null)
+          {
+            for(String selectedMatchNr : Splitter.on(',').omitEmptyStrings().trimResults().split(matchSelectionRaw))
+            {
+              try
+              {
+                long nr = Long.parseLong(selectedMatchNr);
+                query.getSelectedMatches().add(nr);
+              }
+              catch(NumberFormatException ex)
+              {
+                log.warn("Invalid long provided as selected match", ex);
+              }
+            }
+          }
 
           if (args.get("o") != null)
           {
@@ -658,9 +689,6 @@ public class SearchView extends GridLayout implements View,
         }
         else if (args.get("q") != null)
         {
-          // do not change the manually selected search options
-          controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
-
           // use default context
           ui.getQueryController().setQuery(new Query(args.get("q"), corpora));
           ui.getQueryController().executeSearch(true, true);
@@ -673,7 +701,7 @@ public class SearchView extends GridLayout implements View,
   }
 
   /**
-   * Updates the browser address bar with the current query paramaters and the
+   * Updates the browser address bar with the current query parameters and the
    * query itself.
    *
    * This is for convenient reloading the vaadin app and easy copying citation
@@ -681,11 +709,12 @@ public class SearchView extends GridLayout implements View,
    *
    * @param q The query where the parameters are extracted from.
    */
-  public void updateFragment(PagedResultQuery q)
+  public void updateFragment(DisplayedResultQuery q)
   {
     List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(),
       q.getLeftContext(), q.getRightContext(),
-      q.getSegmentation(), q.getOffset(), q.getLimit(), q.getOrder());
+      q.getSegmentation(), q.getBaseText(), q.getOffset(), q.getLimit(), q.getOrder(),
+      q.getSelectedMatches());
 
     // set our fragment
     lastEvaluatedFragment = StringUtils.join(args, "&");

@@ -63,7 +63,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -642,7 +641,7 @@ public class CorpusListPanel extends VerticalLayout implements
     {
       final String id = (String) itemId;
       final Button l = new Button();
-      l.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+      l.addStyleName(ValoTheme.BUTTON_BORDERLESS);
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + id);
       l.addClickListener(new Button.ClickListener()

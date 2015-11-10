@@ -151,10 +151,7 @@ public class AdminView extends VerticalLayout implements View,
   public void enter(ViewChangeListener.ViewChangeEvent event)
   {
 
-    boolean kickstarter = Boolean.parseBoolean(
-      getSession().getConfiguration().getInitParameters()
-      .getProperty("kickstarterEnvironment",
-        "false"));
+    boolean kickstarter = Helper.isKickstarter(getSession());
 
     importPanel.updateMode(kickstarter, Helper.getUser() != null);
 

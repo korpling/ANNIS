@@ -21,10 +21,12 @@ import annis.gui.controller.ExportBackgroundJob;
 import annis.gui.controller.FrequencyBackgroundJob;
 import annis.gui.controller.SpecificPagingCallback;
 import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.ExportQuery;
 import annis.gui.objects.FrequencyQuery;
 import annis.gui.objects.PagedResultQuery;
@@ -41,6 +43,7 @@ import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.model.AqlParseError;
 import annis.model.QueryNode;
+import annis.service.objects.CorpusConfig;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.FrequencyTableQuery;
@@ -65,6 +68,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -206,7 +211,7 @@ public class QueryController implements Serializable
   }
 
   /**
-   * Show errors that occured during the exeuction of a query to the user.
+   * Show errors that occured during the execution of a query to the user.
    *
    * @param ex The exception to report in the user interface
    * @param showNotification If true a notification is shown instead of only
@@ -282,13 +287,18 @@ public class QueryController implements Serializable
         setValue(((ContextualizedQuery) q).getLeftContext());
       state.getRightContext().setValue(((ContextualizedQuery) q).
         getRightContext());
-      state.getBaseText().setValue(((ContextualizedQuery) q).getSegmentation());
+      state.getContextSegmentation().setValue(((ContextualizedQuery) q).getSegmentation());
     }
     if (q instanceof PagedResultQuery)
     {
       state.getOffset().setValue(((PagedResultQuery) q).getOffset());
       state.getLimit().setValue(((PagedResultQuery) q).getLimit());
       state.getOrder().setValue(((PagedResultQuery) q).getOrder());
+    }
+    if(q instanceof DisplayedResultQuery)
+    {
+      state.getSelectedMatches().setValue(((DisplayedResultQuery) q).getSelectedMatches());
+      state.getVisibleBaseText().setValue(((DisplayedResultQuery) q).getBaseText());
     }
     if (q instanceof ExportQuery)
     {
@@ -301,21 +311,23 @@ public class QueryController implements Serializable
   
 
   /**
-   * Get the current query as it is defined by the UI controls.
+   * Get the current query as it is defined by the current {@link QueryUIState}.
    *
    * @return
    */
-  public PagedResultQuery getSearchQuery()
+  public DisplayedResultQuery getSearchQuery()
   {
-    return QueryGenerator.paged()
+    return QueryGenerator.displayed()
       .query(state.getAql().getValue())
       .corpora(state.getSelectedCorpora().getValue())
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
-      .segmentation(state.getBaseText().getValue())
+      .segmentation(state.getContextSegmentation().getValue())
+      .baseText(state.getVisibleBaseText().getValue())
       .limit(state.getLimit().getValue())
       .offset(state.getOffset().getValue())
       .order(state.getOrder().getValue())
+      .selectedMatches(state.getSelectedMatches().getValue())
       .build();
   }
 
@@ -331,21 +343,38 @@ public class QueryController implements Serializable
       .corpora(state.getSelectedCorpora().getValue())
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
-      .segmentation(state.getBaseText().getValue())
+      .segmentation(state.getVisibleBaseText().getValue())
       .exporter(state.getExporterName().getValue())
       .annotations(state.getExportAnnotationKeys().getValue())
       .param(state.getExportParameters().getValue())
       .build();
   }
 
-  public void executeSearch(boolean replaceOldTab, boolean startFromFirstPage)
+  /**
+   * Executes a query.
+   * @param replaceOldTab
+   * @param freshQuery If true the offset and the selected matches are reset before executing the query. 
+   */
+  public void executeSearch(boolean replaceOldTab, boolean freshQuery)
   {
-    if (startFromFirstPage)
+    if (freshQuery)
     {
-      getState().getOffset().setValue(0);
+      getState().getOffset().setValue(0l);
+      getState().getSelectedMatches().setValue(new TreeSet<Long>());
+      // get the value for the visible segmentation from the configured context
+      CorpusConfig config = ui.getCorpusConfigWithCache(
+        getState().getSelectedCorpora().getValue().iterator().next());
+      if(config.containsKey(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
+      {
+        getState().getVisibleBaseText().setValue(config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
+      }
+      else
+      {
+        getState().getVisibleBaseText().setValue(getState().getContextSegmentation().getValue());
+      }
     }
     // construct a query from the current properties
-    PagedResultQuery pagedQuery = getSearchQuery();
+    DisplayedResultQuery displayedQuery = getSearchQuery();
 
     searchView.getControlPanel().getQueryPanel().setStatus("Searching...");
 
@@ -359,18 +388,18 @@ public class QueryController implements Serializable
       session.getAttribute(MediaController.class).clearMediaPlayers();
     }
 
-    searchView.updateFragment(pagedQuery);
+    searchView.updateFragment(displayedQuery);
 
-    addHistoryEntry(pagedQuery);
+    addHistoryEntry(displayedQuery);
 
-    if (pagedQuery.getCorpora() == null || pagedQuery.getCorpora().
+    if (displayedQuery.getCorpora() == null || displayedQuery.getCorpora().
       isEmpty())
     {
       Notification.show("Please select a corpus",
         Notification.Type.WARNING_MESSAGE);
       return;
     }
-    if ("".equals(pagedQuery.getQuery()))
+    if ("".equals(displayedQuery.getQuery()))
     {
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
       return;
@@ -389,8 +418,8 @@ public class QueryController implements Serializable
     }
 
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
-      ui.getInstanceConfig(), pagedQuery);
-    newResultView.getPaging().addCallback(new SpecificPagingCallback(pagedQuery,
+      ui.getInstanceConfig(), displayedQuery);
+    newResultView.getPaging().addCallback(new SpecificPagingCallback(
       ui, searchView, newResultView));
 
     TabSheet.Tab newTab;
@@ -406,7 +435,7 @@ public class QueryController implements Serializable
     searchView.getMainTab().setSelectedTab(newResultView);
     searchView.notifiyQueryStarted();
 
-    Background.run(new ResultFetchJob(pagedQuery,
+    Background.run(new ResultFetchJob(displayedQuery,
       newResultView, ui));
 
     //
@@ -418,15 +447,15 @@ public class QueryController implements Serializable
     // start count query
     searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
 
-    Future<MatchAndDocumentCount> futureCount = res.path("query").path("search").
+    AsyncWebResource countRes = res.path("query").path("search").
       path("count").
-      queryParam("q", Helper.encodeJersey(pagedQuery.getQuery()))
-      .queryParam("corpora", StringUtils.join(pagedQuery.getCorpora(), ",")).
-      get(
+      queryParam("q", Helper.encodeJersey(displayedQuery.getQuery()))
+      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")));
+    Future<MatchAndDocumentCount> futureCount = countRes.get(
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 
-    Background.run(new CountCallback(newResultView, pagedQuery.getLimit(), ui));
+    Background.run(new CountCallback(newResultView, displayedQuery.getLimit(), ui));
 
     //
     // end execute count
@@ -586,7 +615,7 @@ public class QueryController implements Serializable
 
   public void changeContext(PagedResultQuery originalQuery,
     Match match,
-    int offset, int newContext,
+    long offset, int newContext,
     final VisualizerContextChanger visCtxChange, boolean left)
   {
 

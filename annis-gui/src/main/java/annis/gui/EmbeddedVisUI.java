@@ -20,6 +20,7 @@ import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.util.ANNISFontIcon;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
 import annis.libgui.LoginDataLostException;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
@@ -79,6 +80,7 @@ public class EmbeddedVisUI extends CommonUI
   public static final String KEY_SEARCH_INTERFACE =  KEY_PREFIX +  "interface";
   public static final String KEY_BASE_TEXT =  KEY_PREFIX +  "base";
   public static final String KEY_MATCH =  KEY_PREFIX +  "match";
+  public static final String KEY_INSTANCE =  KEY_PREFIX +  "instance";
 
   public EmbeddedVisUI()
   {
@@ -188,9 +190,26 @@ public class EmbeddedVisUI extends CommonUI
         displayMessage("No documents found in provided URL.", "");
         return;
       }
+      
+      if(args.containsKey(KEY_INSTANCE))
+      {
+        Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
+        InstanceConfig newConfig = allConfigs.get(args.get(KEY_INSTANCE)[0]);
+        if(newConfig != null)
+        {
+          setInstanceConfig(newConfig);
+        }
+      }
+      // now it is time to load the actual defined instance fonts
+      loadInstanceFonts();
+      
       // generate the visualizer
       VisualizerInput visInput = new VisualizerInput();
       visInput.setDocument(doc);
+      if (getInstanceConfig() != null && getInstanceConfig().getFont() != null)
+      {
+        visInput.setFont(getInstanceFont());
+      }
       Properties mappings = new Properties();
       for(Map.Entry<String, String[]> e : args.entrySet())
       {
@@ -206,18 +225,18 @@ public class EmbeddedVisUI extends CommonUI
         visInput.setNamespace(namespace[0]);
       }
       
-      String segmentation = null;
+      String baseText = null;
       if(args.containsKey(KEY_BASE_TEXT))
       {
         String[] value = args.get(KEY_BASE_TEXT);
         if(value.length > 0)
         {
-          segmentation = value[0];
+          baseText = value[0];
         }
       }
       
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
-        segmentation,
+        baseText,
         doc.getDocumentGraph());
 
       if(args.containsKey(KEY_MATCH)) {
@@ -231,14 +250,18 @@ public class EmbeddedVisUI extends CommonUI
       }
       
       Map<String, String> markedColorMap = new HashMap<>();
-      Map<String, Long> markedAndCovered = Helper.calculateMarkedAndCoveredIDs(doc, segNodes, segmentation);
+      Map<String, String> exactMarkedMap = 
+        Helper.calculateColorsForMarkedExact(doc);
+      Map<String, Long> markedAndCovered = Helper.calculateMarkedAndCoveredIDs(doc, segNodes, baseText);
       Helper.calulcateColorsForMarkedAndCovered(doc, markedAndCovered, markedColorMap);
       visInput.setMarkedAndCovered(markedAndCovered);
       visInput.setMarkableMap(markedColorMap);
+      visInput.setMarkableExactMap(exactMarkedMap);
       visInput.setContextPath(Helper.getContext());
       String template = Helper.getContext()
         + "/Resource/" + visName + "/%s";
       visInput.setResourcePathTemplate(template);
+      visInput.setSegmentationName(baseText);
       // TODO: which other thing do we have to provide?
       
       Component c = visPlugin.createComponent(visInput, null);
@@ -293,11 +316,15 @@ public class EmbeddedVisUI extends CommonUI
       // set the feature for this specific node
       if (matchedNode != null)
         {
-          SFeature featMatchedNode = SaltFactory.createSFeature();
-          featMatchedNode.setNamespace(ANNIS_NS);
-          featMatchedNode.setName(FEAT_MATCHEDNODE);
-          featMatchedNode.setValue(i);
-          matchedNode.addFeature(featMatchedNode);
+          SFeature existing = matchedNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          if(existing == null)
+          {
+            SFeature featMatchedNode = SaltFactory.createSFeature();
+            featMatchedNode.setNamespace(ANNIS_NS);
+            featMatchedNode.setName(FEAT_MATCHEDNODE);
+            featMatchedNode.setValue(i);
+            matchedNode.addFeature(featMatchedNode);
+          }
       }
       i++;
     }

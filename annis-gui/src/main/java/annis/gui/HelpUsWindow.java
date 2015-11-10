@@ -96,12 +96,12 @@ public class HelpUsWindow extends Window
 
     final HelpUsWindow finalThis = this;
 
-    Button btOK = new Button("OK");
-    btOK.addClickListener(new OkClickListener(finalThis));
-    layout.addComponent(btOK);
+    Button btClose = new Button("Close");
+    btClose.addClickListener(new OkClickListener(finalThis));
+    layout.addComponent(btClose);
 
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
-    layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
+    layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(hLayout, 1.0f);
 
   }

@@ -16,10 +16,14 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
+import annis.gui.AnnisUI;
 import annis.gui.ShareSingleMatchGenerator;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
+import annis.gui.SearchView;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
 import static annis.libgui.Helper.calculateMarkedAndCoveredIDs;
 import annis.libgui.InstanceConfig;
@@ -43,6 +47,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
@@ -89,6 +94,8 @@ public class SingleResultPanel extends CssLayout implements
   private Map<String, String> markedExactMap;
 
   private final PluginSystem ps;
+  
+  private final AnnisUI ui;
 
   private List<VisualizerPanel> visualizers;
   private List<ResolverEntry> resolverEntries;
@@ -108,7 +115,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private final QueryController queryController;
 
-  private final int resultNumber;
+  private final long resultNumber;
 
   private final ResolverProvider resolverProvider;
 
@@ -132,13 +139,15 @@ public class SingleResultPanel extends CssLayout implements
 
   public SingleResultPanel(final SDocument result, 
     Match match,
-    int resultNumber,
+    long resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
+    AnnisUI ui,
     Set<String> visibleTokenAnnos, String segmentationName,
     QueryController controller, InstanceConfig instanceConfig,
-    PagedResultQuery query)
+    DisplayedResultQuery query)
   {
     this.ps = ps;
+    this.ui = ui;
     this.result = result;
     this.segmentationName = segmentationName;
     this.queryController = controller;
@@ -154,6 +163,12 @@ public class SingleResultPanel extends CssLayout implements
     setWidth("100%");
     setHeight("-1px");
 
+    if(query != null 
+      && query.getSelectedMatches().contains(resultNumber))
+    {
+      addStyleName("selected-match");
+    }
+    
     infoBar = new HorizontalLayout();
     infoBar.addStyleName("info-bar");
     infoBar.setWidth("100%");
@@ -173,7 +188,7 @@ public class SingleResultPanel extends CssLayout implements
     btLink = new Button();
     btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
     btLink.setIcon(FontAwesome.SHARE_ALT);
-    btLink.setDescription("Share single match");
+    btLink.setDescription("Share match reference");
     btLink.setDisableOnClick(true);
     btLink.addClickListener(new Button.ClickListener()
     {
@@ -181,7 +196,7 @@ public class SingleResultPanel extends CssLayout implements
       @Override
       public void buttonClick(ClickEvent event)
       {
-        showEmbeddedVisGenerator();
+        showShareSingleMatchGenerator();
       }
     });
     infoBar.addComponent(btLink);
@@ -204,6 +219,7 @@ public class SingleResultPanel extends CssLayout implements
     sb.append(" - ").append(minMax.max).append(")");
 
     Label lblPath = new Label(sb.toString());
+    lblPath.addStyleName("path-label");
 
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
@@ -295,15 +311,23 @@ public class SingleResultPanel extends CssLayout implements
     addComponent(infoBar);
     initVisualizer();
   }
-  
-  private void showEmbeddedVisGenerator()
+
+  private void showShareSingleMatchGenerator()
   {
-    Window window = new Window();
-    window.setWidth(70, Unit.EM);
-    window.setHeight(45, Unit.EM);
+    // select the current match
+    if(ui != null)
+    {
+      ui.getQueryState().getSelectedMatches().getValue().clear();
+      ui.getQueryState().getSelectedMatches().getValue().add(resultNumber);
+      ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
+    }
+    
+    Window window = new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName, ps);
+    window.setWidth(790, Unit.PIXELS);
+    window.setHeight(580, Unit.PIXELS);
     window.setResizable(true);
     window.setModal(true);
-    window.setResizeLazy(true);
+    
     window.addCloseListener(new Window.CloseListener()
     {
 
@@ -313,8 +337,7 @@ public class SingleResultPanel extends CssLayout implements
         btLink.setEnabled(true);
       }
     });
-    
-    window.setContent(new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName, ps));
+    window.setCaption("Match reference link");
     
     UI.getCurrent().addWindow(window);
   }
@@ -346,36 +369,9 @@ public class SingleResultPanel extends CssLayout implements
 
   private void calculateHelperVariables()
   {
-    markedExactMap = new HashMap<>();
     markedCoveredMap = new HashMap<>();
-
-    if (result != null)
-    {
-      SDocumentGraph g = result.getDocumentGraph();
-      if (g != null)
-      {
-        for (SNode n : result.getDocumentGraph().getNodes())
-        {
-
-          SFeature featMatched = n.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-          Long matchNum = featMatched == null ? null : featMatched.
-            getValue_SNUMERIC();
-
-          if (matchNum != null)
-          {
-            int color = Math.max(0, Math.min((int) matchNum.longValue() - 1,
-              MatchedNodeColors.values().length - 1));
-            RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
-            if (feat != null)
-            {
-              markedExactMap.put("" + feat.getInternalID(),
-                MatchedNodeColors.values()[color].name());
-            }
-          }
-
-        }
-      } // end if g not null
-    } // end if result not null
+    
+    markedExactMap = Helper.calculateColorsForMarkedExact(result);
   }
 
   @Override
@@ -490,13 +486,25 @@ public class SingleResultPanel extends CssLayout implements
   }
 
   @Override
+  public void attach()
+  {
+    super.attach();
+    if (Helper.isKickstarter(getSession()))
+    {
+      btLink.setVisible(false);
+    }
+  }
+  
+  
+
+  @Override
   public void registerVisibilityStatus(long entryId, boolean status)
   {
     visualizerState.put(entryId, status);
   }
 
   @Override
-  public void changeContext(int resultNumber, int context,
+  public void changeContext(long resultNumber, int context,
     boolean left)
   {
     //delegates the task to the query controller.
@@ -564,12 +572,12 @@ public class SingleResultPanel extends CssLayout implements
     Property.ValueChangeListener
   {
 
-    int resultNumber;
+    long resultNumber;
 
     boolean left;
 
 
-    public ContextChangeListener(int resultNumber, boolean left)
+    public ContextChangeListener(long resultNumber, boolean left)
     {
       this.resultNumber = resultNumber;
       this.left = left;

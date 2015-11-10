@@ -17,7 +17,7 @@ package annis.gui.controller;
 
 import annis.gui.AnnisUI;
 import annis.gui.SearchView;
-import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.QueryUIState;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultfetch.ResultFetchJob;
@@ -31,35 +31,30 @@ import java.util.concurrent.Future;
  */
 public class SpecificPagingCallback implements PagingCallback
 {
-  private final PagedResultQuery query;
-
   private final ResultViewPanel panel;
 
   private final SearchView searchView;
   private final AnnisUI ui;
   
-  public SpecificPagingCallback(PagedResultQuery query, AnnisUI ui, SearchView searchView,
+  public SpecificPagingCallback(AnnisUI ui, SearchView searchView,
     ResultViewPanel panel)
   {
-    this.query = query.clone();
     this.panel = panel;
     this.ui = ui;
     this.searchView = searchView;
   }
 
   @Override
-  public void switchPage(int offset, int limit)
+  public void switchPage(long offset, int limit)
   {
-    if (query != null)
-    {
-      query.setOffset(offset);
-      query.setLimit(limit);
-      // execute the result query again
-      updateMatches(query, panel);
-    }
+    ui.getQueryState().getOffset().setValue(offset);
+    ui.getQueryState().getLimit().setValue(limit);
+    // execute the result query again
+    updateMatches(ui.getQueryController().getSearchQuery(), panel);
+
   }
 
-  private void updateMatches(PagedResultQuery newQuery, ResultViewPanel panel)
+  private void updateMatches(DisplayedResultQuery newQuery, ResultViewPanel panel)
   {
     if (panel != null)
     {

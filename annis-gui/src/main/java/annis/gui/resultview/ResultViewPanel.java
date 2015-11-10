@@ -20,7 +20,7 @@ import annis.gui.AnnisUI;
 import annis.gui.QueryController;
 import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.controlpanel.QueryPanel;
-import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
@@ -36,13 +36,14 @@ import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -79,38 +80,36 @@ public class ResultViewPanel extends VerticalLayout implements
 
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
-  private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
+  private final Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
   public static final String FILESYSTEM_CACHE_RESULT
     = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
 
   public static final String MAPPING_HIDDEN_ANNOS = "hidden_annos";
 
-  private PagingComponent paging;
+  private final PagingComponent paging;
 
-  private PluginSystem ps;
+  private final PluginSystem ps;
 
-  private MenuItem miTokAnnos;
+  private final MenuItem miTokAnnos;
 
-  private MenuItem miSegmentation;
+  private final MenuItem miSegmentation;
 
-  private TreeMap<String, Boolean> tokenAnnoVisible;
+  private final TreeMap<String, Boolean> tokenAnnoVisible;
 
-  private QueryController controller;
+  private final QueryController controller;
 
-  private String selectedSegmentationLayer;
-
-  private Set<String> segmentationLayerSet
+  private final Set<String> segmentationLayerSet
     = Collections.synchronizedSet(new TreeSet<String>());
 
-  private Set<String> tokenAnnotationLevelSet
+  private final Set<String> tokenAnnotationLevelSet
     = Collections.synchronizedSet(new TreeSet<String>());
 
-  private InstanceConfig instanceConfig;
+  private final InstanceConfig instanceConfig;
 
-  private CssLayout resultLayout;
+  private final CssLayout resultLayout;
 
-  private List<SingleResultPanel> resultPanelList;
+  private final List<SingleResultPanel> resultPanelList;
 
   private String segmentationName;
 
@@ -122,17 +121,16 @@ public class ResultViewPanel extends VerticalLayout implements
   private transient BlockingQueue<SaltProject> projectQueue;
 
   private PagedResultQuery currentQuery;
-  private PagedResultQuery initialQuery;
+  private final DisplayedResultQuery initialQuery;
   private final AnnisUI sui;
 
   public ResultViewPanel(AnnisUI ui,
-    PluginSystem ps, InstanceConfig instanceConfig, PagedResultQuery initialQuery)
+    PluginSystem ps, InstanceConfig instanceConfig, DisplayedResultQuery initialQuery)
   {
     this.sui = ui;
     this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
     this.controller = ui.getQueryController();
-    this.selectedSegmentationLayer = ui.getQueryState().getBaseText().getValue();
     this.initialQuery = initialQuery;
     
     cacheResolver
@@ -146,7 +144,7 @@ public class ResultViewPanel extends VerticalLayout implements
     resultLayout.addStyleName("result-view-css");
     Panel resultPanel = new Panel(resultLayout);
     resultPanel.setSizeFull();
-    resultPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    resultPanel.addStyleName(ValoTheme.PANEL_BORDERLESS);
     resultPanel.addStyleName("result-view-panel");
 
     this.instanceConfig = instanceConfig;
@@ -232,26 +230,6 @@ public class ResultViewPanel extends VerticalLayout implements
     resultLayout.removeAllComponents();
     resultPanelList.clear();
 
-    Set<String> corpora = q.getCorpora();
-
-    if (corpora.size() == 1)
-    {
-
-      // fetched corpus config
-      CorpusConfig corpusConfig = Helper.getCorpusConfig(corpora.iterator().
-        next());
-      if (corpusConfig != null && corpusConfig.getConfig() != null
-        && corpusConfig.getConfig().containsKey(
-          KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
-      {
-        if (selectedSegmentationLayer == null)
-        {
-          selectedSegmentationLayer = corpusConfig.getConfig(
-            KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
-        }
-      }
-    }
-
     // get the first query result
     SaltProject first = queue.poll();
     Preconditions.checkState(first != null,
@@ -306,13 +284,19 @@ public class ResultViewPanel extends VerticalLayout implements
           {
             resultPanelList.add(panel);
             resultLayout.addComponent(panel);
-            panel.setSegmentationLayer(selectedSegmentationLayer);
+            panel.setSegmentationLayer(sui.getQueryState().getVisibleBaseText().getValue());
           }
         }
 
         if (currentResults == numberOfResults)
         {
           showFinishedSubgraphSearch();
+          if(!initialQuery.getSelectedMatches().isEmpty())
+          {
+            // scroll to the first selected match
+            JavaScript.eval(
+              "$(\".v-panel-content-result-view-panel\").animate({scrollTop: $(\".selected-match\").offset().top - $(\".result-view-panel\").offset().top}, 1000);");
+          }
         }
 
         if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
@@ -347,7 +331,7 @@ public class ResultViewPanel extends VerticalLayout implements
     qp.setStatus(qp.getLastPublicStatus());
   }
 
-  private List<SingleResultPanel> createPanels(SaltProject p, int localMatchIndex, int globalOffset)
+  private List<SingleResultPanel> createPanels(SaltProject p, int localMatchIndex, long globalOffset)
   {
     List<SingleResultPanel> result = new LinkedList<>();
 
@@ -362,7 +346,7 @@ public class ResultViewPanel extends VerticalLayout implements
       }
       
       SingleResultPanel panel = new SingleResultPanel(doc, m,
-        i + globalOffset, new ResolverProviderImpl(cacheResolver), ps,
+        i + globalOffset, new ResolverProviderImpl(cacheResolver), ps, sui,
         getVisibleTokenAnnos(), segmentationName, controller,
         instanceConfig, initialQuery);
 
@@ -475,14 +459,14 @@ public class ResultViewPanel extends VerticalLayout implements
     public void menuSelected(MenuItem selectedItem)
     {
       // remember old value
-      String oldSegmentationLayer = selectedSegmentationLayer;
+      String oldSegmentationLayer = sui.getQueryState().getVisibleBaseText().getValue();
 
       // set the new selected item
-      selectedSegmentationLayer = selectedItem.getText();
+      String newSegmentationLayer = selectedItem.getText();
 
-      if (NULL_SEGMENTATION_VALUE.equals(selectedSegmentationLayer))
+      if (NULL_SEGMENTATION_VALUE.equals(newSegmentationLayer))
       {
-        selectedSegmentationLayer = null;
+        newSegmentationLayer = null;
       }
       for (MenuItem mi : miSegmentation.getChildren())
       {
@@ -491,23 +475,20 @@ public class ResultViewPanel extends VerticalLayout implements
 
       if (oldSegmentationLayer != null)
       {
-        if (!oldSegmentationLayer.equals(selectedSegmentationLayer))
+        if (!oldSegmentationLayer.equals(newSegmentationLayer))
         {
-          setSegmentationLayer(selectedSegmentationLayer);
+          setSegmentationLayer(newSegmentationLayer);
         }
       }
-      else if (selectedSegmentationLayer != null)
+      else if (newSegmentationLayer != null)
       {
         // oldSegmentation is null, but selected is not
-        setSegmentationLayer(selectedSegmentationLayer);
+        setSegmentationLayer(newSegmentationLayer);
       }
 
       //update URL with newly selected segmentation layer
-      PagedResultQuery q = initialQuery.clone();
-      //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
-      q.setSegmentation(selectedSegmentationLayer);
-
-      sui.getSearchView().updateFragment(q);
+      sui.getQueryState().getVisibleBaseText().setValue(newSegmentationLayer);
+      sui.getSearchView().updateFragment(sui.getQueryController().getSearchQuery());
     }
   }
 
@@ -549,6 +530,7 @@ public class ResultViewPanel extends VerticalLayout implements
        * Check if a segmentation item must set checked. If no segmentation layer
        * is selected, set the default layer as selected.
        */
+      final String selectedSegmentationLayer = sui.getQueryState().getVisibleBaseText().getValue();
       if ((selectedSegmentationLayer == null && "".equals(s))
         || s.equals(selectedSegmentationLayer))
       {

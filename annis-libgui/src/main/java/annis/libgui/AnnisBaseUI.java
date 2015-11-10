@@ -112,8 +112,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   {  
     
     initLogging();
-    // load some additional properties from our ANNIS configuration
-    loadApplicationProperties("annis-gui.properties");
     
     // store the webservice URL property explicitly in the session in order to 
     // access it from the "external" servlets
@@ -166,7 +164,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    * @param configFile The file path of the configuration file relative to the base config folder.
    * @return list of files or directories in the order in which they should be processed (most important is last)
    */
-  protected List<File> getAllConfigLocations(String configFile)
+  public static List<File> getAllConfigLocations(String configFile)
   {
     LinkedList<File> locations = new LinkedList<File>();
 
@@ -191,21 +189,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return locations;
   }
 
-  protected void loadApplicationProperties(String configFile)
-  {
-
-    List<File> locations = getAllConfigLocations(configFile);
-
-    // load properties in the right order
-    for(File f : locations)
-    {
-      loadPropertyFile(f);
-    }
-  }
-
   protected Map<String, InstanceConfig> loadInstanceConfig()
   {
-    TreeMap<String, InstanceConfig> result = new TreeMap<String, InstanceConfig>();
+    TreeMap<String, InstanceConfig> result = new TreeMap<>();
 
 
     // get a list of all directories that contain instance informations
@@ -248,28 +234,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return result;
   }
 
-  private void loadPropertyFile(File f)
-  {
-   if(f.canRead() && f.isFile())
-    {
-      try(FileInputStream fis = new FileInputStream(f))
-      {
-        Properties p = new Properties();
-        p.load(fis);
-        
-        // copy all properties to the session
-        for(String name : p.stringPropertyNames())
-        {
-          getSession().setAttribute(name, p.getProperty(name));
-        }
-        
-      }
-      catch(IOException ex)
-      {
-
-      }
-    }
-  }
 
   protected final void initLogging()
   {

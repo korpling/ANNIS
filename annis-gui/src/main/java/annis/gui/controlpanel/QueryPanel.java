@@ -473,7 +473,7 @@ public class QueryPanel extends GridLayout implements
     {
       if(panel == null)
       {
-        panel = new ExportPanel(QueryPanel.this, ui.getSearchView().getControlPanel().getCorpusList(), 
+        panel = new ExportPanel(QueryPanel.this, 
           ui.getQueryController(), state);
       }
       

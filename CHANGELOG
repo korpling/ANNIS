@@ -1,3 +1,36 @@
+Version 3.4.0-preview7
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview7+is%3Aclosed
+
+[Bugs]
+ #458 component normalization fails to generate unique variable name
+ #457 share match: exception when a node is matched twice (as AQL node) 
+ #456 share match: some visualizers don't show the matched nodes
+
+[Enhancements]
+ #463 improve indexes for token related queries
+
+Version 3.4.0-preview6
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestones/3.4.0-preview6
+
+[Bugs]
+ #455 can't create reference link (match) for queries with more than one node
+
+Version 3.4.0-preview5
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview5+is%3Aclosed
+
+[Enhancements]
+ #454 Allow to share single matches as links for publications
+ #107 Share ANNIS visualizers as web service without front end
+
 Version 3.4.0-preview4
 ======================
 

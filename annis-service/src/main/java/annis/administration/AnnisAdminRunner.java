@@ -19,9 +19,10 @@ import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
 import annis.UsageException;
 import annis.corpuspathsearch.Search;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.utils.Utils;
+import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   // API for corpus administration
 
   private CorpusAdministration corpusAdministration;
-  private AnnisDao annisDao;
+  private QueryDao queryDao;
 
   private QueriesGenerator queriesGenerator;
   
@@ -140,6 +141,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     else if("check-db-schema-version".equals(command))
     {
       doCheckDBSchemaVersion();
+    }
+    else if("dump".equals(command))
+    {
+      doDumpTable(commandArgs);
+    }
+    else if("restore".equals(command))
+    {
+      doRestoreTable(commandArgs);
     }
     else
     {
@@ -418,7 +427,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         throw new ParseException(
           "Needs two arguments: corpus name and output folder");
       }
-      annisDao.exportCorpus(cmdLine.getArgs()[0], new File(cmdLine.getArgs()[1]));
+      queryDao.exportCorpus(cmdLine.getArgs()[0], new File(cmdLine.getArgs()[1]));
       
     }
     catch (ParseException ex)
@@ -449,7 +458,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         // interpret this as name
         try
         {
-          long numericID = annisDao.mapCorpusNameToId(id.trim());
+          long numericID = queryDao.mapCorpusNameToId(id.trim());
           ids.add(numericID);
         }
         catch(IllegalArgumentException ex)
@@ -590,6 +599,18 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
     
   }
+  
+  public void doDumpTable(List<String> commandArgs)
+  {
+    Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the output file as argument");
+    corpusAdministration.dumpTable(commandArgs.get(0), new File(commandArgs.get(1)));
+  }
+  
+  public void doRestoreTable(List<String> commandArgs)
+  {
+    Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the input file as argument");
+    corpusAdministration.restoreTable(commandArgs.get(0), new File(commandArgs.get(1)));
+  }
 
   private void usage(String error)
   {
@@ -696,14 +717,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     this.corpusAdministration = administration;
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
   
   

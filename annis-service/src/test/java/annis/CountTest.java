@@ -15,8 +15,8 @@
  */
 package annis;
 
-import annis.dao.AnnisDao;
-import annis.dao.SpringAnnisDao;
+import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
 import annis.ql.parser.QueryData;
 import annis.test.TestHelper;
 import java.util.LinkedList;
@@ -57,8 +57,8 @@ public class CountTest
 
   Logger log = LoggerFactory.getLogger(CountTest.class);
 
-  @Resource(name = "annisDao")
-  AnnisDao annisDao;
+  @Resource(name = "queryDao")
+  QueryDao annisDao;
 
   private List<Long> pcc2CorpusID;
 
@@ -67,14 +67,14 @@ public class CountTest
   @Before
   public void setup()
   {
-    SpringAnnisDao springAnnisDao = (SpringAnnisDao) TestHelper.proxyTarget(
+    QueryDaoImpl springAnnisDao = (QueryDaoImpl) TestHelper.proxyTarget(
       annisDao);
 
     try
     {
-      assumeNotNull(springAnnisDao.getSimpleJdbcTemplate());
+      assumeNotNull(springAnnisDao.getJdbcTemplate());
 
-      springAnnisDao.getSimpleJdbcTemplate().queryForInt("SELECT 1");
+      springAnnisDao.getJdbcTemplate().queryForInt("SELECT 1");
 
     }
     catch (DataAccessException ex)

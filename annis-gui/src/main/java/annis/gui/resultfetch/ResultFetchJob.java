@@ -78,7 +78,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       .queryParam("q", Helper.encodeJersey(query.getQuery()))
       .queryParam("offset", "" + query.getOffset())
       .queryParam("limit", "" + query.getLimit())
-      .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
+      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(query.getCorpora(), ",")))
       .queryParam("order", query.getOrder().toString())
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(MatchGroup.class);
@@ -229,7 +229,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
               }
               else if (ex.getResponse().getStatus() == 504)
               {
-                paging.setInfo("Timeout: query exeuction took too long");
+                paging.setInfo("Timeout: query execution took too long");
               }
               else if(ex.getResponse().getStatus() == 403)
               {

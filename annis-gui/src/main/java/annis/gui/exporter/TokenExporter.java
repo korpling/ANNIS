@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class TextExporter extends GeneralTextExporter
+public class TokenExporter extends GeneralTextExporter
 {
 
   @Override

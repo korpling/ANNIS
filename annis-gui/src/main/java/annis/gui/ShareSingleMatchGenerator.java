@@ -24,6 +24,8 @@ import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
@@ -32,27 +34,34 @@ import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class ShareSingleMatchGenerator extends Panel implements Property.ValueChangeListener,
+public class ShareSingleMatchGenerator extends Window implements
   SelectionEvent.SelectionListener
 {
+  private final static Logger log = LoggerFactory.getLogger(ShareSingleMatchGenerator.class);
+  
   private final VerticalLayout layout;
   private final Grid visSelector;
   private final VerticalLayout generatedLinks;
@@ -71,6 +80,8 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
   private final String segmentation;
   private final PluginSystem ps;
   
+  private final Escaper urlParamEscaper = UrlEscapers.urlFormParameterEscaper();
+  
   public ShareSingleMatchGenerator(List<ResolverEntry> visualizers, 
     Match match,
     PagedResultQuery query,
@@ -81,6 +92,8 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     this.query = query;
     this.segmentation = segmentation;
     this.ps = ps;
+    
+    setResizeLazy(true);
     
     directURL = new ObjectProperty<>("");
     iframeCode = new ObjectProperty<>("");
@@ -93,7 +106,7 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     txtDirectURL.setWidth("100%");
     txtDirectURL.setHeight("-1px");
     txtDirectURL.addStyleName(ValoTheme.TEXTFIELD_LARGE);
-    txtDirectURL.addStyleName("citation");
+    txtDirectURL.addStyleName("shared-text");
     txtDirectURL.setWordwrap(true);
     txtDirectURL.setReadOnly(true);
     
@@ -102,13 +115,13 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     txtIFrameCode.setWidth("100%");
     txtIFrameCode.setHeight("-1px");
     txtIFrameCode.addStyleName(ValoTheme.TEXTFIELD_LARGE);
-    txtIFrameCode.addStyleName("citation");
+    txtIFrameCode.addStyleName("shared-text");
     txtIFrameCode.setWordwrap(true);
     txtIFrameCode.setReadOnly(true);
     
     preview = new BrowserFrame();
     preview.setCaption("Preview");
-    preview.addStyleName("citation");
+    preview.addStyleName("shared-text");
     preview.setSizeFull();
     
     generatedLinks = new VerticalLayout(txtDirectURL, txtIFrameCode, preview);
@@ -124,14 +137,15 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     visSelector.addSelectionListener(ShareSingleMatchGenerator.this);
     visSelector.select(visContainer.getIdByIndex(0));
     visSelector.setWidth("300px");
-
+    visSelector.getColumn("displayName").setSortable(false);
     
     generatedLinks.setSizeFull();
     
     Label infoText = new Label(
         "<p style=\"font-size: 18px\" >"
-        + "<strong>Share your excerpt:</strong>&nbsp;"
-        + "1. Chose the visualization to share&nbsp;2. Copy the generated link or code"
+        + "<strong>Share your match:</strong>&nbsp;"
+        + "1.&nbsp;Choose the visualization to share. 2.&nbsp;Copy the generated link or code. "
+        + "3.&nbsp;Share this link with your peers or include the code in your website. "
         + "</p>",
       ContentMode.HTML);
     
@@ -141,18 +155,33 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     hLayout.setSpacing(true);
     hLayout.setExpandRatio(generatedLinks, 1.0f);
     
-    layout = new VerticalLayout(infoText, hLayout);
+    Button btClose = new Button("Close");
+    btClose.setSizeUndefined();
+    btClose.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        getUI().removeWindow(ShareSingleMatchGenerator.this);
+      }
+    });
+    
+    layout = new VerticalLayout(infoText, hLayout, btClose);
     layout.setSizeFull();
     layout.setExpandRatio(hLayout, 1.0f);
+    layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     
     setContent(layout);
-    setSizeFull();
   }
   
-  private String generatorURLForVisualizer(ResolverEntry entry)
+  
+  private URI generatorURLForVisualizer(ResolverEntry entry)
   {
+    String appContext = Helper.getContext();
     URI appURI = UI.getCurrent().getPage().getLocation();
     UriBuilder result = UriBuilder.fromUri(appURI)
+      .replacePath(appContext)
       .path("embeddedvis")
       .path(Helper.encodeJersey(entry.getVisType()))
       .fragment("");
@@ -160,6 +189,16 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     {
       result = result.queryParam("embedded_ns", 
         Helper.encodeJersey(entry.getNamespace()));
+    }
+    // test if the request was made from a sub-instance
+    String nonContextPath = appURI.getPath().substring(appContext.length());
+    if(!nonContextPath.isEmpty())
+    {
+      if(nonContextPath.startsWith("/"))
+      {
+        nonContextPath = nonContextPath.substring(1);
+      }
+      result = result.queryParam(EmbeddedVisUI.KEY_INSTANCE, nonContextPath);
     }
     
     UriBuilder serviceURL =
@@ -171,10 +210,19 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     {
       // generate a service URL that gets the whole document
       URI firstID = match.getSaltIDs().get(0);
-      String pathAsString = firstID.getPath();
+      String pathAsString = firstID.getRawPath();
       List<String> path = Splitter.on('/').omitEmptyStrings().trimResults().splitToList(pathAsString);
-      String corpusName = Helper.encodeJersey(path.get(0));
-      String documentName = Helper.encodeJersey(path.get(path.size()-1));
+      String corpusName = path.get(0);
+      String documentName = path.get(path.size()-1);
+      try
+      {
+        corpusName = URLDecoder.decode(corpusName, "UTF-8");
+        documentName =URLDecoder.decode(documentName, "UTF-8"); ;
+      }
+      catch(UnsupportedEncodingException ex)
+      {
+        log.warn("Could not decode URL", ex);
+      }
       
       // apply any node annotation filters if possible
       if(visPlugin instanceof FilteringVisualizerPlugin)
@@ -198,8 +246,8 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
       }
       
       serviceURL = serviceURL.path("graph")
-        .path(corpusName)
-        .path(documentName);
+        .path(Helper.encodePath(corpusName))
+        .path(Helper.encodePath(documentName));
       
       // add the original match so the embedded visualizer can add it
       // (since we use the graph query it will not be included in the Salt XMI itself)
@@ -244,17 +292,9 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
       }
     }
     
-    return result.build().toASCIIString();
+    return result.build();
   }
 
-  @Override
-  public void valueChange(Property.ValueChangeEvent event)
-  {
-    String url = generatorURLForVisualizer((ResolverEntry) event.getProperty().getValue());
-    directURL.setValue(url);
-    iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + url + "\"></iframe>");
-    preview.setSource(new ExternalResource(url));
-  }
 
   @Override
   public void select(SelectionEvent event)
@@ -268,10 +308,11 @@ public class ShareSingleMatchGenerator extends Panel implements Property.ValueCh
     {
       generatedLinks.setVisible(true);
       
-      String url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
-      directURL.setValue(url);
-      iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + url + "\"></iframe>");
-      preview.setSource(new ExternalResource(url));
+      URI url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
+      String shortURL = Helper.shortenURL(url);
+      directURL.setValue(shortURL);
+      iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + shortURL + "\"></iframe>");
+      preview.setSource(new ExternalResource(shortURL));
     }
   }
   

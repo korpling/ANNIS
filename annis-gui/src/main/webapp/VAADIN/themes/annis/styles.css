@@ -667,7 +667,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.5.7";
+	content: "7.5.8";
 }
 
 .v-widget {
@@ -4374,6 +4374,11 @@ div.v-layout.v-horizontal.v-widget {
 	-ms-user-select: text;
 	user-select: text;
 	background-color: #fafafa;
+}
+
+.annis .v-grid.v-disabled {
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
 }
 
 .annis .v-grid-header .v-grid-cell {
@@ -12346,28 +12351,19 @@ div.v-layout.v-horizontal.v-widget {
 	direction: rtl;
 }
 
-.annis textarea.citation {
+.annis textarea.shared-text, .annis div.shared-text {
 	background-color: white;
 	border-style: solid;
 	border-color: black;
 	border-width: 1px;
-	font-family: monospace;
-}
-
-.annis div.citation {
-	border-style: solid;
-	border-color: black;
 	border-width: 1px;
 	border-radius: 4px;
 	padding: 4px;
+	font-family: monospace;
 }
 
-.annis textarea.license {
-	background-color: white;
-	border-style: solid;
+.annis textarea.shared-text:focus, .annis div.shared-text:focus {
 	border-color: black;
-	border-width: 1px;
-	font-family: monospace;
 }
 
 .annis textarea.query {
@@ -12665,15 +12661,19 @@ div.v-layout.v-horizontal.v-widget {
 	color: black;
 }
 
-.annis .grey-selection tr.v-selected {
-	background-color: #808080;
-}
-
 .annis .info-bar {
 	background-color: #ecf0f6;
 	border-style: solid;
 	border-color: black;
 	border-width: 1px 0px 0px 0px;
+}
+
+.annis .selected-match .info-bar {
+	background-color: #81b8ff;
+}
+
+.annis .selected-match .info-bar .path-label {
+	font-weight: bold;
 }
 
 .annis .v-menubar-popup .v-menubar-menuitem-huge, .annis .v-menubar-popup .v-menubar-menuitem-huge-selected {

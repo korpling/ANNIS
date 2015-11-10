@@ -15,7 +15,7 @@
  */
 package annis.service.internal;
 
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.model.Annotation;
 import annis.service.MetadataService;
 import annis.service.objects.AnnisBinaryMetaData;
@@ -43,7 +43,7 @@ public class MetadataServiceImpl implements MetadataService
 
   private Logger log = LoggerFactory.getLogger(MetadataServiceImpl.class);
 
-  private AnnisDao annisDao;
+  private QueryDao queryDao;
 
   @GET
   @Path("corpus/{toplevel}/closure")
@@ -69,7 +69,7 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);
 
-    return getAnnisDao().listCorpusAnnotations(topLevelCorpus);
+    return getQueryDao().listCorpusAnnotations(topLevelCorpus);
   }
 
   @Override
@@ -80,7 +80,7 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);
 
-    return getAnnisDao().listDocumentsAnnotations(topLevelCorpus, closure);
+    return getQueryDao().listDocumentsAnnotations(topLevelCorpus, closure);
   }
 
   @GET
@@ -96,7 +96,7 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);
 
-    return getAnnisDao().listDocuments(topLevelCorpus);
+    return getQueryDao().listDocuments(topLevelCorpus);
   }
 
   @GET
@@ -113,7 +113,7 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + toplevelCorpusName);
 
-    return getAnnisDao().getBinaryMeta(toplevelCorpusName, doc);
+    return getQueryDao().getBinaryMeta(toplevelCorpusName, doc);
   }
 
   @GET
@@ -127,7 +127,7 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevel);
     
-    return getAnnisDao().listDocumentsAnnotations(topLevel, false);
+    return getQueryDao().listDocumentsAnnotations(topLevel, false);
   }
 
   @GET
@@ -143,7 +143,7 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);
 
-    return getAnnisDao().listCorpusAnnotations(topLevelCorpus, doc, true);
+    return getQueryDao().listCorpusAnnotations(topLevelCorpus, doc, true);
   }
 
   @GET
@@ -165,7 +165,7 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);
 
-    return getAnnisDao().listCorpusAnnotations(topLevelCorpus, docname, path);
+    return getQueryDao().listCorpusAnnotations(topLevelCorpus, docname, path);
   }
 
   /**
@@ -178,25 +178,25 @@ public class MetadataServiceImpl implements MetadataService
   public void init()
   {
     // check version of PostgreSQL
-    annisDao.checkDatabaseVersion();
+    queryDao.checkDatabaseVersion();
 
     // log a message after successful startup
     log.info("ANNIS MetadataService loaded.");
   }
 
   /**
-   * @return the annisDao
+   * @return the queryDao
    */
-  public AnnisDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
   /**
-   * @param annisDao the annisDao to set
+   * @param queryDao the queryDao to set
    */
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
 }

@@ -15,61 +15,87 @@
  */
 package annis.gui;
 
+import annis.gui.objects.DisplayedResultQuery;
 import annis.libgui.Helper;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.Set;
+import java.net.URI;
 
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class CitationWindow extends Window
+public class ShareQueryReferenceWindow extends Window
   implements Button.ClickListener
 {
   
-  public CitationWindow( String query, Set<String> corpora, 
-    int contextLeft, int contextRight)
+  public ShareQueryReferenceWindow(DisplayedResultQuery query, boolean shorten)
   {
-    super("Citation");
+    super("Query reference link");
     
     VerticalLayout wLayout = new VerticalLayout();
     setContent(wLayout);
     wLayout.setSizeFull();
+    wLayout.setMargin(true);
     
-    String url = Helper.generateCitation(query, corpora, contextLeft,
-      contextRight, null, 0, 10);
+    Label lblInfo = new Label("<p style=\"font-size: 18px\" >"
+        + "<strong>Share your query:</strong>&nbsp;"
+        + "1.&nbsp;Copy the generated link 2.&nbsp;Share this link with your peers. "
+        + "</p>",
+      ContentMode.HTML);
+    wLayout.addComponent(lblInfo);
+    wLayout.setExpandRatio(lblInfo, 0.0f);
+    
+    String shortURL = "ERROR";
+    if(query != null)
+    {
+      URI url = Helper.generateCitation(query.getQuery(), query.getCorpora(),
+        query.getLeftContext(), query.getRightContext(), query.getSegmentation(),
+        query.getBaseText(), query.getOffset(), query.getLimit(),
+        query.getOrder(), query.getSelectedMatches());
+    
+      if(shorten)
+      {
+        shortURL = Helper.shortenURL(url);
+      }
+      else
+      {
+        shortURL = url.toASCIIString();
+      }
+    }
     
     TextArea txtCitation = new TextArea();
 
     txtCitation.setWidth("100%");
     txtCitation.setHeight("100%");
     txtCitation.addStyleName(ValoTheme.TEXTFIELD_LARGE);
-    txtCitation.addStyleName("citation");
-    txtCitation.setValue(url);
+    txtCitation.addStyleName("shared-text");
+    txtCitation.setValue(shortURL);
     txtCitation.setWordwrap(true);
     txtCitation.setReadOnly(true);
     
     wLayout.addComponent(txtCitation);
     
-    Button btOk = new Button("OK");
-    btOk.addListener((Button.ClickListener) this);
-    btOk.setSizeUndefined();
+    Button btClose = new Button("Close");
+    btClose.addClickListener((Button.ClickListener) this);
+    btClose.setSizeUndefined();
     
-    wLayout.addComponent(btOk);
+    wLayout.addComponent(btClose);
     
     wLayout.setExpandRatio(txtCitation, 1.0f);
-    wLayout.setComponentAlignment(btOk, Alignment.BOTTOM_CENTER);
+    wLayout.setComponentAlignment(btClose, Alignment.BOTTOM_CENTER);
     
     setWidth("400px");
-    setHeight("200px");
+    setHeight("300px");
     
   }
 

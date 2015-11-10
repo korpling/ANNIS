@@ -190,15 +190,10 @@ public class BinaryRequestHandler implements RequestHandler
     }
     catch (IOException ex)
     {
-      log.error("IOException in BinaryRequestHandler", ex);
+      log.warn("IOException in BinaryRequestHandler", ex);
       response.setStatus(500);
     }
-    catch (ClientHandlerException ex)
-    {
-      log.error(null, ex);
-      response.setStatus(500);
-    }
-    catch (UniformInterfaceException ex)
+    catch (ClientHandlerException | UniformInterfaceException ex)
     {
       log.error(null, ex);
       response.setStatus(500);

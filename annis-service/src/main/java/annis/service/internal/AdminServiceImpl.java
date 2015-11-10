@@ -18,7 +18,7 @@ package annis.service.internal;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.administration.DeleteCorpusDao;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
 import annis.security.ANNISUserRealm;
@@ -81,7 +81,7 @@ public class AdminServiceImpl implements AdminService
 
   private CorpusAdministration corpusAdmin;
 
-  private AnnisDao annisDao;
+  private QueryDao queryDao;
 
   private ImportWorker importWorker;
 
@@ -90,6 +90,11 @@ public class AdminServiceImpl implements AdminService
 
   public void init()
   {
+    // check scheme at each service startup
+    if(corpusAdmin.getSchemeFixer() != null)
+    {
+      corpusAdmin.getSchemeFixer().checkAndFix();
+    }
     importWorker.start();
   }
 
@@ -253,6 +258,9 @@ public class AdminServiceImpl implements AdminService
       {
         if (confManager.deleteUser(userName))
         {
+          // also delete any possible user configs
+          adminDao.deleteUserConfig(userName);
+          // if no error until here everything went well
           return Response.ok().build();
         }
       }
@@ -398,7 +406,7 @@ public class AdminServiceImpl implements AdminService
     {
 
       // get ID of corpus
-      long id = annisDao.mapCorpusNameToId(corpusName);
+      long id = queryDao.mapCorpusNameToId(corpusName);
       deleteCorpusDao.deleteCorpora(Arrays.asList(id), true);
       return Response.status(Response.Status.OK).build();
     }
@@ -479,7 +487,7 @@ public class AdminServiceImpl implements AdminService
         }
         String caption = Joiner.on(", ").join(allNames);
 
-        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<>(
+        List<Long> corpusIDs = queryDao.mapCorpusNamesToIds(new LinkedList<>(
           allNames));
         if (overwrite || corpusIDs == null || corpusIDs.isEmpty())
         {
@@ -567,14 +575,14 @@ public class AdminServiceImpl implements AdminService
     this.adminDao = adminDao;
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
 
   public ImportWorker getImportWorker()

@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AboutWindow extends Window
 {
@@ -57,6 +57,7 @@ public class AboutWindow extends Window
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
+    layout.setMargin(true);
  
     HorizontalLayout hLayout = new HorizontalLayout();
     
@@ -121,18 +122,18 @@ public class AboutWindow extends Window
     
     txtThirdParty.setValue(sb.toString());
     txtThirdParty.setReadOnly(true);
-    txtThirdParty.addStyleName("license");
+    txtThirdParty.addStyleName("shared-text");
     txtThirdParty.setWordwrap(false);
     
     layout.addComponent(txtThirdParty);
     
-    Button btOK = new Button("OK");
+    Button btClose = new Button("Close");
     final AboutWindow finalThis = this;
-    btOK.addClickListener(new OkClickListener(finalThis));
-    layout.addComponent(btOK);
+    btClose.addClickListener(new OkClickListener(finalThis));
+    layout.addComponent(btClose);
     
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
-    layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
+    layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(txtThirdParty, 1.0f);
     
   }
