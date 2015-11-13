@@ -24,6 +24,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
+import com.google.common.io.Files;
 import com.google.common.io.PatternFilenameFilter;
 import java.awt.HeadlessException;
 import java.io.File;
@@ -566,10 +567,10 @@ public class ImportDialog extends javax.swing.JDialog
 
       if (!"".equals(txtInputDir.getText()))
       {
-        File dir = new File(txtInputDir.getText());
-        if (dir.exists() && dir.isDirectory())
+        File f = new File(txtInputDir.getText());
+        if (f.exists() && (f.isDirectory() || "zip".equals(Files.getFileExtension(f.getName()))))
         {
-          fileChooser.setSelectedFile(dir);
+          fileChooser.setSelectedFile(f);
         }
       }
 
