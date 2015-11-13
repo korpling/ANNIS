@@ -50,7 +50,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.net.URI;
@@ -60,6 +59,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,6 +172,7 @@ public class EmbeddedVisUI extends CommonUI
         client = Helper.createRESTClient();
       }
       WebResource saltRes = client.resource(uri);
+      
       SaltProject p = saltRes.get(SaltProject.class);
       // TODO: allow to display several visualizers when there is more than one document
 
@@ -307,6 +308,19 @@ public class EmbeddedVisUI extends CommonUI
     {
       displayMessage("LoginData Lost", "No login data available any longer in the session:<br /> "
         + ex.getMessage());
+    }
+    catch(UniformInterfaceException ex)
+    {
+      if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode())
+      {
+        displayMessage("Corpus access forbidden", 
+          "You are not allowed to access this corpus. "
+            + "Please login at the <a target=\"_blank\" href=\"" + Helper.getContext() + "\">main application</a> first and then reload this page.");
+      }
+      else
+      {
+        displayMessage("Service error", ex.getMessage());
+      }
     }
   }
   
