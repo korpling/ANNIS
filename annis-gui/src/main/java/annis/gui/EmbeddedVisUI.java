@@ -225,6 +225,10 @@ public class EmbeddedVisUI extends CommonUI
       {
         visInput.setNamespace(namespace[0]);
       }
+      else
+      {
+        visInput.setNamespace(null);
+      }
       
       String baseText = null;
       if(args.containsKey(KEY_BASE_TEXT))
