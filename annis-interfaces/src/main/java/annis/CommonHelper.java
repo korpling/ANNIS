@@ -343,7 +343,7 @@ public class CommonHelper
     String[] path = rawPath.split("/");
 
     // decode every single part by itself
-    ArrayList<String> result = new ArrayList<String>(path.length);
+    ArrayList<String> result = new ArrayList<>(path.length);
     for (int i = 0; i < path.length; i++)
     {
       try

@@ -27,6 +27,8 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -49,6 +51,9 @@ import org.apache.commons.lang3.Validate;
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
+  
+  private static final Escaper ARRAY_ELEM_ESC = 
+      Escapers.builder().addEscape(',', "\\,").build();
     
   private String selectForNode(
     TableAccessStrategy tas, AnnotateQueryData annotateQueryData,
@@ -208,8 +213,14 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     List<String> path = CommonHelper.getCorpusPath(uri);
     Collections.reverse(path);
 
+    List<String> escapedPath = new LinkedList<>();
+    for (String p : path)
+    {
+      escapedPath.add(ARRAY_ELEM_ESC.escape(p));
+    }
+
     sb.append("{");
-    sb.append(StringUtils.join(path, ", "));
+    Joiner.on(", ").appendTo(sb, escapedPath);
     sb.append("}");
     
     return  sqlString(sb.toString());
