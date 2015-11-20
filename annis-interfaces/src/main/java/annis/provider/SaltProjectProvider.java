@@ -163,10 +163,6 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
               c = null;
             }
           }
-          docGraph.createFeature(AnnisConstants.ANNIS_NS, 
-            AnnisConstants.FEAT_CORPUS_STRUCTURE, Joiner.on('/').join(path));
-          
-          
           writer.writeDocumentGraph(xml, docGraph);
         }
       }
@@ -217,15 +213,29 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       
       for(SDocumentGraph g : handler.getDocGraphs())
       {
+        
         // create a separate corpus graph for each document
         SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
-        SFeature featCorpusStructure = g.getFeature(SaltUtil.createQName(AnnisConstants.ANNIS_NS,
-          AnnisConstants.FEAT_CORPUS_STRUCTURE));
         
         SCorpus parentCorpus = null;
         SDocument doc = null;
-        Iterator<String> it = Splitter.on('/').omitEmptyStrings().trimResults()
-          .split(featCorpusStructure.getValue_STEXT()).iterator();
+        
+        List<SNode> nodes = g.getNodes();
+        Iterator<String> it;
+        if(nodes != null && !nodes.isEmpty())
+        {
+          // the path of each node ID is always the document/corpus path
+          it = nodes.get(0).getPath().segmentsList().iterator();
+        }
+        else
+        {
+          // Old salt versions had a separate ID for the document graph
+          // which was the document name with the suffix "_graph".
+          // Thus this method of getting the corpus path is only the fallback.
+          it = g.getPath().segmentsList().iterator();
+        }
+        
+        
         while(it.hasNext())
         {
           String name = it.next();
