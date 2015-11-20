@@ -410,7 +410,6 @@ public class QueryController implements Serializable
 
     searchView.updateFragment(displayedQuery);
 
-    addHistoryEntry(displayedQuery);
 
     if (displayedQuery.getCorpora() == null || displayedQuery.getCorpora().
       isEmpty())
@@ -424,6 +423,8 @@ public class QueryController implements Serializable
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
       return;
     }
+    
+    addHistoryEntry(displayedQuery);
 
     AsyncWebResource res = Helper.getAnnisAsyncWebResource();
 
