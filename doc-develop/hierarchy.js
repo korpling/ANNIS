@@ -70,8 +70,14 @@ var hierarchy =
       [ "annis.gui.ShareQueryReferenceWindow", "classannis_1_1gui_1_1_share_query_reference_window.html", null ]
     ] ],
     [ "Cloneable", null, [
-      [ "annis.gui.objects.PagedResultQuery", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html", [
-        [ "annis.gui.objects.DisplayedResultQuery", "classannis_1_1gui_1_1objects_1_1_displayed_result_query.html", null ]
+      [ "annis.gui.objects.Query", "classannis_1_1gui_1_1objects_1_1_query.html", [
+        [ "annis.gui.objects.ContextualizedQuery", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html", [
+          [ "annis.gui.objects.ExportQuery", "classannis_1_1gui_1_1objects_1_1_export_query.html", null ],
+          [ "annis.gui.objects.PagedResultQuery", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html", [
+            [ "annis.gui.objects.DisplayedResultQuery", "classannis_1_1gui_1_1objects_1_1_displayed_result_query.html", null ]
+          ] ]
+        ] ],
+        [ "annis.gui.objects.FrequencyQuery", "classannis_1_1gui_1_1objects_1_1_frequency_query.html", null ]
       ] ],
       [ "annis.ql.parser.QueryData", "classannis_1_1ql_1_1parser_1_1_query_data.html", null ]
     ] ],
@@ -852,13 +858,7 @@ var hierarchy =
         [ "annis.gui.MainToolbar", "classannis_1_1gui_1_1_main_toolbar.html", null ],
         [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
       ] ],
-      [ "annis.gui.objects.Query", "classannis_1_1gui_1_1objects_1_1_query.html", [
-        [ "annis.gui.objects.ContextualizedQuery", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html", [
-          [ "annis.gui.objects.ExportQuery", "classannis_1_1gui_1_1objects_1_1_export_query.html", null ],
-          [ "annis.gui.objects.PagedResultQuery", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html", null ]
-        ] ],
-        [ "annis.gui.objects.FrequencyQuery", "classannis_1_1gui_1_1objects_1_1_frequency_query.html", null ]
-      ] ],
+      [ "annis.gui.objects.Query", "classannis_1_1gui_1_1objects_1_1_query.html", null ],
       [ "annis.gui.objects.QueryUIState", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html", null ],
       [ "annis.gui.paging.PagingCallback", "interfaceannis_1_1gui_1_1paging_1_1_paging_callback.html", [
         [ "annis.gui.controller.SpecificPagingCallback", "classannis_1_1gui_1_1controller_1_1_specific_paging_callback.html", null ]

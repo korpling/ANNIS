@@ -2,7 +2,6 @@ var classannis_1_1gui_1_1objects_1_1_paged_result_query =
 [
     [ "PagedResultQuery", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html#aec94ef31f83965ca5d63600d1c2a1420", null ],
     [ "PagedResultQuery", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html#a5623aa241718f5c2e88fefc81128c0db", null ],
-    [ "clone", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html#a015517bf18b0a5f099be1ef315128739", null ],
     [ "equals", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html#a44a762e4a3b8651f5ff4c21d5038e278", null ],
     [ "getLimit", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html#a43b46e31dfcc4c40da77bd09629702b5", null ],
     [ "getOffset", "classannis_1_1gui_1_1objects_1_1_paged_result_query.html#a15c107e141cdbc2c6342556cd23ec963", null ],
