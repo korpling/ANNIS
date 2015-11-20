@@ -87,12 +87,4 @@ public class ContextualizedQuery extends Query
       && Objects.equals(rightContext, other.rightContext)
       && Objects.equals(segmentation, other.segmentation);
   }
-
-  
-
-  
-  
-  
-  
-  
 }

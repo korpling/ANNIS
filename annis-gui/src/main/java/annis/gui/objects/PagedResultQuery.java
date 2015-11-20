@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class PagedResultQuery extends ContextualizedQuery implements Cloneable
+public class PagedResultQuery extends ContextualizedQuery
 {
   private final static Logger log = LoggerFactory.getLogger(PagedResultQuery.class);
   
@@ -85,23 +85,6 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     Preconditions.checkNotNull(order, "The order of a paged result query must never be null.");
     this.order = order;
   }
-
-  
-  @Override
-  public PagedResultQuery clone()
-  {
-    PagedResultQuery c = null;    
-    try
-    {
-      c = (PagedResultQuery) super.clone();
-    }
-    catch (CloneNotSupportedException ex)
-    {
-      log.error("cloning of {} failed", PagedResultQuery.class.getName());
-    }
-    
-    return c;
-  }
   
   @Override
   public int hashCode()
@@ -132,4 +115,5 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
       && Objects.equals(getOffset(), other.getOffset())
       && Objects.equals(getOrder(), other.getOrder());
   }
+  
 }

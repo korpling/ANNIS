@@ -76,6 +76,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -628,10 +629,18 @@ public class QueryController implements Serializable
    */
   public void addHistoryEntry(Query q)
   {
-    // remove it first in order to let it appear on the beginning of the list
-    state.getHistory().removeItem(q);
-    state.getHistory().addItemAt(0, q);
-    searchView.getControlPanel().getQueryPanel().updateShortHistory();
+    try
+    {
+      Query queryCopy = q.clone();
+      // remove it first in order to let it appear on the beginning of the list
+      state.getHistory().removeItem(queryCopy);
+      state.getHistory().addItemAt(0, queryCopy);
+      searchView.getControlPanel().getQueryPanel().updateShortHistory();
+    }
+    catch(CloneNotSupportedException ex)
+    {
+      log.error("Can't clone the query", ex);
+    }
   }
 
   public void changeContext(PagedResultQuery originalQuery,
@@ -640,36 +649,42 @@ public class QueryController implements Serializable
     final VisualizerContextChanger visCtxChange, boolean left)
   {
 
-    final PagedResultQuery newQuery = originalQuery.clone();
-    if (left)
+    try
     {
-      newQuery.setLeftContext(newContext);
-    }
-    else
-    {
-      newQuery.setRightContext(newContext);
-    }
-
-    newQuery.setOffset(offset);
-    
-
-    Background.runWithCallback(new SingleResultFetchJob(match, newQuery), 
-      new FutureCallback<SaltProject>()
+    final PagedResultQuery newQuery = (PagedResultQuery) originalQuery.clone();
+      if (left)
       {
-
-      @Override
-      public void onSuccess(SaltProject result)
+        newQuery.setLeftContext(newContext);
+      }
+      else
       {
-        visCtxChange.updateResult(result, newQuery);
+        newQuery.setRightContext(newContext);
       }
 
-      @Override
-      public void onFailure(Throwable t)
-      {
-        ExceptionDialog.show(t, "Could not extend context.");
-      }
-    });
+      newQuery.setOffset(offset);
 
+
+      Background.runWithCallback(new SingleResultFetchJob(match, newQuery), 
+        new FutureCallback<SaltProject>()
+        {
+
+        @Override
+        public void onSuccess(SaltProject result)
+        {
+          visCtxChange.updateResult(result, newQuery);
+        }
+
+        @Override
+        public void onFailure(Throwable t)
+        {
+          ExceptionDialog.show(t, "Could not extend context.");
+        }
+      });
+    }
+    catch(CloneNotSupportedException ex)
+    {
+      log.error("Can't clone the query", ex);
+    }
   }
 
   public void corpusSelectionChangedInBackground()
