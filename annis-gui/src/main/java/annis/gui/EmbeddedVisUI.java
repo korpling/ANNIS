@@ -53,6 +53,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import javax.ws.rs.core.Response;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
@@ -171,6 +172,7 @@ public class EmbeddedVisUI extends CommonUI
         client = Helper.createRESTClient();
       }
       WebResource saltRes = client.resource(uri);
+      
       SaltProject p = saltRes.get(SaltProject.class);
       // TODO: allow to display several visualizers when there is more than one document
 
@@ -223,6 +225,10 @@ public class EmbeddedVisUI extends CommonUI
       if(namespace != null && namespace.length > 0)
       {
         visInput.setNamespace(namespace[0]);
+      }
+      else
+      {
+        visInput.setNamespace(null);
       }
       
       String baseText = null;
@@ -302,6 +308,19 @@ public class EmbeddedVisUI extends CommonUI
     {
       displayMessage("LoginData Lost", "No login data available any longer in the session:<br /> "
         + ex.getMessage());
+    }
+    catch(UniformInterfaceException ex)
+    {
+      if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode())
+      {
+        displayMessage("Corpus access forbidden", 
+          "You are not allowed to access this corpus. "
+            + "Please login at the <a target=\"_blank\" href=\"" + Helper.getContext() + "\">main application</a> first and then reload this page.");
+      }
+      else
+      {
+        displayMessage("Service error", ex.getMessage());
+      }
     }
   }
   

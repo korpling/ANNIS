@@ -331,7 +331,7 @@ public class CommonHelper
     String[] path = rawPath.split("/");
 
     // decode every single part by itself
-    ArrayList<String> result = new ArrayList<String>(path.length);
+    ArrayList<String> result = new ArrayList<>(path.length);
     for (int i = 0; i < path.length; i++)
     {
       try
@@ -360,13 +360,9 @@ public class CommonHelper
   {
     if (node != null)
     {
-      STextualDS tokenText = null;
-      List<SALT_TYPE> types = new ArrayList<>();
-      types.add(SALT_TYPE.STEXT_OVERLAPPING_RELATION);
-
       List<DataSourceSequence> dataSources = graph.getOverlappedDataSourceSequence(
         node,
-        types);
+        SALT_TYPE.STEXT_OVERLAPPING_RELATION);
       if (dataSources != null)
       {
         for (DataSourceSequence seq : dataSources)

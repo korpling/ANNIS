@@ -388,10 +388,9 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   private String getText(SNode node, VisualizerInput input)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getDocumentGraph();
-    List<SALT_TYPE> textRelations = new ArrayList<>();
-    textRelations.add(SALT_TYPE.STEXT_OVERLAPPING_RELATION);
+
     List<DataSourceSequence> sequences = sDocumentGraph.
-      getOverlappedDataSourceSequence(node, textRelations);
+      getOverlappedDataSourceSequence(node, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
 
     if (sequences != null && sequences.size() > 0)
     {

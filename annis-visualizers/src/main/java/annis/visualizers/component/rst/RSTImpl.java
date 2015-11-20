@@ -500,10 +500,9 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
    * one STEXT is overlapped by this node
    */
   private String getText(SToken currNode) {
-    List<SALT_TYPE> relationTypes = new ArrayList<SALT_TYPE>();
-    relationTypes.add(SALT_TYPE.STEXT_OVERLAPPING_RELATION);
+
     List<DataSourceSequence> sSequences = currNode.getGraph().
-            getOverlappedDataSourceSequence(currNode, relationTypes);
+            getOverlappedDataSourceSequence(currNode, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
 
     // only support one text for spanns
     if (sSequences == null || sSequences.size() != 1) {
