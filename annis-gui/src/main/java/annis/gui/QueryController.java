@@ -69,6 +69,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
@@ -276,36 +277,50 @@ public class QueryController implements Serializable
     }
 
   }
+  
+  /**
+   * Only changes the value of the property if it is not equals to the old one.
+   * @param <T>
+   * @param prop
+   * @param newValue 
+   */
+  private static <T> void  setIfNew(Property<T> prop, T newValue)
+  {
+    if(!Objects.equals(prop.getValue(), newValue))
+    {
+      prop.setValue(newValue);
+    }
+  }
 
   public void setQuery(Query q)
   {
-    state.getAql().setValue(q.getQuery());
-    state.getSelectedCorpora().setValue(q.getCorpora());
+    // only change the values if actually changed (the value change listeners should not be triggered if not necessary)
+    setIfNew(state.getAql(), q.getQuery());
+    setIfNew(state.getSelectedCorpora(), q.getCorpora());
+   
     if (q instanceof ContextualizedQuery)
     {
-      state.getLeftContext().
-        setValue(((ContextualizedQuery) q).getLeftContext());
-      state.getRightContext().setValue(((ContextualizedQuery) q).
-        getRightContext());
-      state.getContextSegmentation().setValue(((ContextualizedQuery) q).getSegmentation());
+      setIfNew(state.getLeftContext(), ((ContextualizedQuery) q).getLeftContext());
+      setIfNew(state.getRightContext(), ((ContextualizedQuery) q).getRightContext());
+      setIfNew(state.getContextSegmentation(), ((ContextualizedQuery) q).getSegmentation());
     }
     if (q instanceof PagedResultQuery)
     {
-      state.getOffset().setValue(((PagedResultQuery) q).getOffset());
-      state.getLimit().setValue(((PagedResultQuery) q).getLimit());
-      state.getOrder().setValue(((PagedResultQuery) q).getOrder());
+      setIfNew(state.getOffset(), ((PagedResultQuery) q).getOffset());
+      setIfNew(state.getLimit(), ((PagedResultQuery) q).getLimit());
+      setIfNew(state.getOrder(), ((PagedResultQuery) q).getOrder());
     }
     if(q instanceof DisplayedResultQuery)
     {
-      state.getSelectedMatches().setValue(((DisplayedResultQuery) q).getSelectedMatches());
-      state.getVisibleBaseText().setValue(((DisplayedResultQuery) q).getBaseText());
+      setIfNew(state.getSelectedMatches(), ((DisplayedResultQuery) q).getSelectedMatches());
+      setIfNew(state.getVisibleBaseText(), ((DisplayedResultQuery) q).getBaseText());
     }
     if (q instanceof ExportQuery)
     {
-      state.getExporterName().setValue(((ExportQuery) q).getExporterName());
-      state.getExportAnnotationKeys().setValue(((ExportQuery) q).
+      setIfNew(state.getExporterName(), ((ExportQuery) q).getExporterName());
+      setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).
         getAnnotationKeys());
-      state.getExportParameters().setValue(((ExportQuery) q).getParameters());
+      setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
     }
   }
   
@@ -425,7 +440,7 @@ public class QueryController implements Serializable
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
       ui.getInstanceConfig(), displayedQuery);
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
-      ui, searchView, newResultView));
+      ui, searchView, newResultView, displayedQuery));
 
     TabSheet.Tab newTab;
 
