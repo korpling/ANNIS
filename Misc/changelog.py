@@ -39,7 +39,7 @@ for issue in j:
 		other.append(title)
 
 if len(bugs) > 0:
-	print("[Bugs]")
+	print("[Fixed Bugs]")
 	for t in bugs:
 		print(t)
 if len(enhancements) > 0:
