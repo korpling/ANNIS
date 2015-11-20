@@ -1,3 +1,18 @@
+Version 3.4.0-preview8
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview8+is%3Aclosed
+
+[Fixed Bugs]
+ #468 switching to next page results in empty entry in history panel
+ #467 switching to next page does not work when corpus was de-selected after submitting the query
+ #465 executing search with empty corpus selection throws exception
+ #464 Can't query for corpora where document names contain ","
+
+[Enhancements]
+ #466  allow to import ZIP files in Kickstarter
+
 Version 3.4.0-preview7
 ======================
 
