@@ -362,8 +362,13 @@ public class QueryController implements Serializable
       getState().getOffset().setValue(0l);
       getState().getSelectedMatches().setValue(new TreeSet<Long>());
       // get the value for the visible segmentation from the configured context
-      CorpusConfig config = ui.getCorpusConfigWithCache(
-        getState().getSelectedCorpora().getValue().iterator().next());
+      Set<String> selectedCorpora = getState().getSelectedCorpora().getValue();
+      CorpusConfig config = new CorpusConfig();
+      if(selectedCorpora != null && !selectedCorpora.isEmpty())
+      {
+        config = ui.getCorpusConfigWithCache(selectedCorpora.iterator().next());
+      }
+
       if(config.containsKey(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
       {
         getState().getVisibleBaseText().setValue(config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
