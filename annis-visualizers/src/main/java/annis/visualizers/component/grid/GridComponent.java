@@ -65,6 +65,7 @@ public class GridComponent extends Panel
   public static final String MAPPING_TOK_ANNOS_KEY = "tok_anno";
   public static final String MAPPING_ESCAPE_HTML = "escape_html";
   public static final String MAPPING_SHOW_NAMESPACE = "show_ns";
+  public static final String MAPPING_HIDE_NAMESPACE_REGEX = "hide_ns_regex";
   
   private AnnotationGrid grid;
   private final transient VisualizerInput input;
@@ -133,6 +134,8 @@ public class GridComponent extends Panel
       getProperty(MAPPING_ESCAPE_HTML, "true")));
     grid.setShowNamespace(Boolean.parseBoolean(input.getMappings().
       getProperty(MAPPING_SHOW_NAMESPACE, "false")));
+    grid.setHideNamespaceRegex(input.getMappings().
+      getProperty(MAPPING_HIDE_NAMESPACE_REGEX));
     
     
     layout.addComponent(grid);

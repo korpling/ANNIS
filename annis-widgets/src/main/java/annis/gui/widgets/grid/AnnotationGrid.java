@@ -49,6 +49,8 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   private boolean showCaption = true;
   
   private boolean showNamespace = false;
+  
+  private String hideNamespaceRegex = null;
 
   /**
    * when true, all html tags are rendered as text and are shown in grid cells.
@@ -203,6 +205,23 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     }
 
   }
+  
+  private boolean showNamespaceForAnno()
+  {
+    if(showNamespace)
+    {
+      // check if there is any regex for non-visible namespaces
+      if(hideNamespaceRegex != null)
+      {
+        
+      }
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
 
   private ArrayList<String> getStyles(GridEvent event, String annoName)
   {
@@ -301,6 +320,16 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   public void setShowNamespace(boolean showNamespace)
   {
     this.showNamespace = showNamespace;
+  }
+
+  public String getHideNamespaceRegex()
+  {
+    return hideNamespaceRegex;
+  }
+
+  public void setHideNamespaceRegex(String hideNamespaceRegex)
+  {
+    this.hideNamespaceRegex = hideNamespaceRegex;
   }
   
   
