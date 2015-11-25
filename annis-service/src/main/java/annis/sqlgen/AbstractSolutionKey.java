@@ -1,13 +1,11 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -19,7 +19,6 @@ import annis.gui.objects.PagedResultQuery;
 import annis.libgui.ResolverProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.Serializable;
-import java.util.UUID;
 
 /**
  * Defines a facade for changing the context of all visualizer for a single
@@ -62,6 +61,6 @@ public interface VisualizerContextChanger extends Serializable
    * @param left Which context must be change. If true the left context is
    * changed, otherwise the right one.
    */
-  public void changeContext(int resultNumber, int context,
+  public void changeContext(long resultNumber, int context,
     boolean left);
 }

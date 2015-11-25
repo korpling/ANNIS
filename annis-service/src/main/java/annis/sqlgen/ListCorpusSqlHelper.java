@@ -15,17 +15,15 @@
  */
 package annis.sqlgen;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
 import annis.service.objects.AnnisCorpus;
 import com.google.common.base.Joiner;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 public class ListCorpusSqlHelper implements ParameterizedRowMapper<AnnisCorpus>
 {

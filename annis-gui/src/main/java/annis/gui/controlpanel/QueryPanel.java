@@ -15,11 +15,9 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.AnnisUI;
 import annis.gui.ExportPanel;
 import annis.gui.HistoryPanel;
-import annis.gui.QueryController;
-import annis.gui.SearchUI;
-import annis.gui.components.VirtualKeyboard;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -27,22 +25,31 @@ import annis.gui.objects.Query;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.libgui.Helper;
+import annis.model.AqlParseError;
+import annis.model.QueryNode;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import java.util.List;
 import org.slf4j.LoggerFactory;
 import org.vaadin.hene.popupbutton.PopupButton;
 
@@ -67,7 +74,6 @@ public class QueryPanel extends GridLayout implements
   //private Button btShowResultNewTab;
   private PopupButton btHistory;
   private final ListSelect lstHistory;
-  private QueryController controller;
   private final QueryUIState state;
   private ProgressBar piCount;
   private String lastPublicStatus;
@@ -75,14 +81,16 @@ public class QueryPanel extends GridLayout implements
   private PopupButton btMoreActions;
   private FrequencyQueryPanel frequencyPanel;
   
+  private final AnnisUI ui;
+  
   private final BeanItemContainer<Query> historyContainer =
     new BeanItemContainer<>(Query.class);;
   
-  public QueryPanel(final SearchUI ui)
+  public QueryPanel(final AnnisUI ui)
   {
     super(4,5);
+    this.ui = ui;
     
-    this.controller = ui.getQueryController();
     this.lastPublicStatus = "Welcome to ANNIS! "
       + "A tutorial is available on the right side.";
 
@@ -98,31 +106,24 @@ public class QueryPanel extends GridLayout implements
     setColumnExpandRatio(3, 0.0f);
 
     txtQuery = new AqlCodeEditor();
-    txtQuery.setPropertyDataSource(ui.getQueryState().getAql());
+    txtQuery.setPropertyDataSource(state.getAql());
     txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
     if(ui.getInstanceFont() == null)
     {
       txtQuery.addStyleName("default-query-font");
+      txtQuery.setTextareaStyle("default-query-font");
     }
     else
     {
       txtQuery.addStyleName(Helper.CORPUS_FONT);
+      txtQuery.setTextareaStyle(Helper.CORPUS_FONT);
     }
     
     txtQuery.addStyleName("keyboardInput");
     txtQuery.setWidth("100%");
     txtQuery.setHeight(15f, Unit.EM);
     txtQuery.setTextChangeTimeout(500);
-    txtQuery.addTextChangeListener(new TextChangeListener()
-    {
-
-      @Override
-      public void textChange(TextChangeEvent event)
-      {
-        ui.getQueryController().validateQuery(event.getText());
-      }
-    });
 
     final VirtualKeyboardCodeEditor virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)
@@ -219,7 +220,7 @@ public class QueryPanel extends GridLayout implements
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
       btShowKeyboard.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
       btShowKeyboard.addStyleName(ValoTheme.BUTTON_SMALL);
-      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
+      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboardCodeEditor.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
     }
     
@@ -342,6 +343,17 @@ public class QueryPanel extends GridLayout implements
     return "";
   }
   
+  public void setNodes(List<QueryNode> nodes)
+  {
+    txtQuery.setNodes(nodes);
+  }
+  
+  public void setErrors(List<AqlParseError> errors)
+  {
+    txtQuery.setErrors(errors);
+  }
+  
+  
   public void notifyFrequencyTabClose()
   {
     txtQuery.removeTextChangeListener(frequencyPanel);
@@ -355,9 +367,9 @@ public class QueryPanel extends GridLayout implements
   {
     btHistory.setPopupVisible(false);
     Object q = event.getProperty().getValue();
-    if(controller != null && q instanceof Query)
+    if(ui != null && ui.getQueryController() != null && q instanceof Query)
     {
-      controller.setQuery((Query) q);
+      ui.getQueryController().setQuery((Query) q);
     }
   }
 
@@ -367,9 +379,9 @@ public class QueryPanel extends GridLayout implements
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if(controller != null)
+      if(ui != null && ui.getQueryController() != null)
       {
-        controller.executeSearch(true);
+        ui.getQueryController().executeSearch(true, true);
       }
     }
   }
@@ -448,10 +460,10 @@ public class QueryPanel extends GridLayout implements
   
   private class ShowExportClickListener implements ClickListener
   {
-    private SearchUI ui;
+    private AnnisUI ui;
     private ExportPanel panel;
     
-    public ShowExportClickListener(SearchUI ui)
+    public ShowExportClickListener(AnnisUI ui)
     {
       this.ui = ui;
     }
@@ -461,11 +473,11 @@ public class QueryPanel extends GridLayout implements
     {
       if(panel == null)
       {
-        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), 
-          ui.getQueryController(), ui.getQueryState());
+        panel = new ExportPanel(QueryPanel.this, 
+          ui.getQueryController(), state);
       }
       
-      final TabSheet tabSheet = ui.getMainTab();
+      final TabSheet tabSheet = ui.getSearchView().getMainTab();
       Tab tab = tabSheet.getTab(panel);
       
       if(tab == null)
@@ -485,9 +497,9 @@ public class QueryPanel extends GridLayout implements
   
   private class ShowFrequencyClickListener implements ClickListener
   {
-    private SearchUI ui;
+    private AnnisUI ui;
     
-    public ShowFrequencyClickListener(SearchUI ui)
+    public ShowFrequencyClickListener(AnnisUI ui)
     {
       this.ui = ui;
     }
@@ -497,12 +509,11 @@ public class QueryPanel extends GridLayout implements
     {
       if(frequencyPanel == null)
       {
-        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController(),
-        ui.getQueryState());
+        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController(), state);
         txtQuery.addTextChangeListener(frequencyPanel);
       }
       
-      final TabSheet tabSheet = ui.getMainTab();
+      final TabSheet tabSheet = ui.getSearchView().getMainTab();
       Tab tab = tabSheet.getTab(frequencyPanel);
       
       if(tab == null)
@@ -524,9 +535,9 @@ public class QueryPanel extends GridLayout implements
   {
     
     private QueryBuilderChooser queryBuilder;
-    private SearchUI ui;
+    private AnnisUI ui;
     
-    public ShowQueryBuilderClickListener(SearchUI ui)
+    public ShowQueryBuilderClickListener(AnnisUI ui)
     {
       this.ui = ui;
     }
@@ -538,7 +549,7 @@ public class QueryPanel extends GridLayout implements
       {
          queryBuilder = new QueryBuilderChooser(ui.getQueryController(), ui, ui.getInstanceConfig());
       }
-      final TabSheet tabSheet = ui.getMainTab();
+      final TabSheet tabSheet = ui.getSearchView().getMainTab();
       Tab tab = tabSheet.getTab(queryBuilder);
       
       if(tab == null)

@@ -15,8 +15,10 @@
  */
 package annis.gui.objects;
 
-import annis.service.objects.OrderType;
+import annis.gui.controlpanel.CorpusSorter;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.OrderType;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
@@ -49,10 +51,14 @@ public class QueryUIState implements Serializable
   private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
   
   private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
-  private final ObjectProperty<Integer> offset = new ObjectProperty<>(0);
-  private final ObjectProperty<String> baseText = new ObjectProperty<>(null, String.class);
+  private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
+  private final ObjectProperty<String> visibleBaseText = new ObjectProperty<>(null, String.class);
+  private final ObjectProperty<String> contextSegmentation = new ObjectProperty<>(null, String.class);
   
-  private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.normal);
+  private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
+  
+  private final ObjectProperty<Set<Long>> selectedMatches = 
+    new ObjectProperty<Set<Long>>(new TreeSet<Long>());
   
   private final ObjectProperty<String> exporterName = new ObjectProperty<>("");
   private final ObjectProperty<List<String>> exportAnnotationKeys 
@@ -69,9 +75,13 @@ public class QueryUIState implements Serializable
   
   private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
   
+  private final BeanContainer<String, AnnisCorpus> availableCorpora = new BeanContainer<>(AnnisCorpus.class);;
+  
   public QueryUIState()
   {
     initTransients();
+    availableCorpora.setBeanIdProperty("name");
+    availableCorpora.setItemSorter(new CorpusSorter());
   }
   
   private void initTransients()
@@ -110,15 +120,26 @@ public class QueryUIState implements Serializable
     return limit;
   }
 
-  public ObjectProperty<Integer> getOffset()
+  public ObjectProperty<Long> getOffset()
   {
     return offset;
   }
-  
-  public ObjectProperty<String> getBaseText()
+
+  public ObjectProperty<Set<Long>> getSelectedMatches()
   {
-    return baseText;
+    return selectedMatches;
   }
+  
+  public ObjectProperty<String> getVisibleBaseText()
+  {
+    return visibleBaseText;
+  }
+
+  public ObjectProperty<String> getContextSegmentation()
+  {
+    return contextSegmentation;
+  }
+  
 
   public Map<QueryType, Future<?>> getExecutedTasks()
   {
@@ -158,6 +179,11 @@ public class QueryUIState implements Serializable
   public ObjectProperty<OrderType> getOrder()
   {
     return order;
+  }
+
+  public BeanContainer<String, AnnisCorpus> getAvailableCorpora()
+  {
+    return availableCorpora;
   }
   
   

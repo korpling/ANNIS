@@ -17,8 +17,8 @@ package annis.visualizers.component.pdf;
 
 import annis.CommonHelper;
 import annis.libgui.Helper;
-import static annis.libgui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
 import static annis.libgui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
+import static annis.libgui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.google.common.escape.Escaper;

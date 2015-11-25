@@ -15,114 +15,105 @@
  */
 package annis.ql.parser;
 
+import annis.AnnisXmlContextLoader;
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.exceptions.AnnisQLSyntaxException;
+import annis.test.SpringQueryExamples;
+import annis.test.SpringSyntaxTreeExamples;
+import annis.test.SyntaxTreeExample;
+import java.util.LinkedList;
+import javax.annotation.Resource;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static annis.test.TestHelper.springFiles;
-
 import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.Test;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
 import org.junit.runner.RunWith;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestContextManager;
 
-import annis.test.SpringQueryExamples;
-import annis.test.SpringSyntaxTreeExamples;
-import annis.test.SyntaxTreeExample;
-import java.util.LinkedList;
-import org.junit.Ignore;
-import org.junit.Test;
-
-// see http://junit.sourceforge.net/doc/ReleaseNotes4.4.html
-// and http://popper.tigris.org/tutorial.html
 @RunWith(Theories.class)
-public class TestAnnisParserExamples {
-	
-	// where to find query and syntax tree examples
-	private static final String EXAMPLES = "annis/ql/parser/TestAnnisParser-examples.xml";
+@ContextConfiguration(locations =
+{
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml",
+  "/annis/ql/parser/AnnisParser-context.xml"
+}, loader = AnnisXmlContextLoader.class)
+public class TestAnnisParserExamples
+{
 
-	// access to AnnisParser
-	static ApplicationContext ctx;
+  // where to find query and syntax tree examples
+  private static final String EXAMPLES = "annis/ql/parser/TestAnnisParser-examples.xml";
 
-	// simple AnnisParser instance
+  private TestContextManager testContextManager;
+
+  // simple AnnisParser instance
+  @Resource(name = "annisParserAntlr")
   private AnnisParserAntlr parserAntlr;
-  
-	// load Spring application context once
-	@BeforeClass
-	public static void loadApplicationContext() {
-		final String[] ctxFiles = 
-			springFiles(TestAnnisParserExamples.class, "AnnisParser-context.xml");
-		ctx = new ClassPathXmlApplicationContext(ctxFiles);
-	}
-	
-	// setup a fresh parser
-	@Before
-	public void setup() {
-    parserAntlr = (AnnisParserAntlr) ctx.getBean("annisParserAntlr");
-	}
-	
-	///// Syntax-Tree tests
-	
-	@Theory
-  @Test
-	public void testSyntaxTrees(
-			@SpringSyntaxTreeExamples(exampleMap = "exampleSyntaxTrees", contextLocation=EXAMPLES) 
-			SyntaxTreeExample example) 
-  {
-  
-    QueryData data = parserAntlr.parse(example.getQuery(), new LinkedList<Long>());
-    assertThat(data, is(not(nullValue())));
-    
-    String actual = data.toAQL().trim();
-    
-    String provided = example.getSyntaxTree();
-    
-		assertEquals("wrong parse result for: " + example.getQuery(),provided.trim(), actual.trim());
-	}
 
-  
+  @Before
+  public void setUpContext() throws Exception
+  {
+    this.testContextManager = new TestContextManager(getClass());
+    this.testContextManager.prepareTestInstance(this);
+  }
+
+	///// Syntax-Tree tests
   @Theory
   @Test
-	public void testGoodQueriesAntLR(
-			@SpringQueryExamples(exampleList = "good", contextLocation=EXAMPLES) 
-			String annisQuery) 
+  public void testSyntaxTrees(
+    @SpringSyntaxTreeExamples(exampleMap = "exampleSyntaxTrees", contextLocation = EXAMPLES) SyntaxTreeExample example)
   {
-    
+
+    QueryData data = parserAntlr.parse(example.getQuery(), new LinkedList<Long>());
+    assertThat(data, is(not(nullValue())));
+
+    String actual = data.toAQL().trim();
+
+    String provided = example.getSyntaxTree();
+
+    assertEquals("wrong parse result for: " + example.getQuery(), provided.trim(), actual.trim());
+  }
+
+  @Theory
+  @Test
+  public void testGoodQueriesAntLR(
+    @SpringQueryExamples(exampleList = "good", contextLocation = EXAMPLES) String annisQuery)
+  {
+
     try
     {
-      QueryData result = parserAntlr.parse(annisQuery, 
+      QueryData result = parserAntlr.parse(annisQuery,
         new LinkedList<Long>());
       assertThat(result, is(not(nullValue())));
-    }
-    catch (Exception ex)
+    } catch (Exception ex)
     {
       ex.printStackTrace(System.err);
       fail("good query throw exception: " + annisQuery);
     }
-	}
-	
-	@Theory
+  }
+
+  @Theory
   @Test
-	public void testBadQueriesAntLR(
-			@SpringQueryExamples(exampleList = "bad", contextLocation=EXAMPLES) 
-			String annisQuery) {
-		
+  public void testBadQueriesAntLR(
+    @SpringQueryExamples(exampleList = "bad", contextLocation = EXAMPLES) String annisQuery)
+  {
+
     try
     {
       parserAntlr.parse(annisQuery, new LinkedList<Long>());
-      
-			fail("bad query passed as good: " + annisQuery);
-    }
-    catch (Exception ex)
+
+      fail("bad query passed as good: " + annisQuery);
+    } catch (AnnisQLSyntaxException | AnnisQLSemanticsException ex)
     {
       // ok
     }
 
-	}
-	
+  }
+
 }

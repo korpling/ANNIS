@@ -15,13 +15,11 @@
  */
 package annis.sqlgen;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
 import annis.model.Annotation;
 import static annis.sqlgen.SqlConstraints.sqlString;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 public class ListCorpusAnnotationsSqlHelper implements
   ParameterizedRowMapper<Annotation>

@@ -15,10 +15,8 @@
  */
 package annis.service.objects;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement

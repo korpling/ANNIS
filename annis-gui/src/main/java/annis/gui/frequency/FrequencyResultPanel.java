@@ -35,7 +35,6 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -263,14 +262,14 @@ public class FrequencyResultPanel extends VerticalLayout
     switch (e.getType())
     {
       case annotation:
-        caption = "#" + e.getReferencedNode() + " ("
-          + e.getKey() + ")";
+        caption = "#" + e.getReferencedNode() + "|"
+          + e.getKey();
         break;
       case span:
-        caption = "#" + e.getReferencedNode() + " (spanned text)";
+        caption = "#" + e.getReferencedNode() + "|spanned text";
         break;
       case meta:
-        caption = "meta (" + e.getKey() + ")";
+        caption = "meta|" + e.getKey();
         break;
       default:
         caption = "<unknown>";

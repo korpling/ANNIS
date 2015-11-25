@@ -15,17 +15,17 @@
  */
 package annis.gui.controller;
 
+import annis.gui.AnnisUI;
 import annis.gui.ExportPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.objects.ExportQuery;
 import annis.libgui.Helper;
 import com.google.common.eventbus.EventBus;
-import com.vaadin.ui.UI;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
@@ -39,11 +39,13 @@ public class ExportBackgroundJob implements Callable<File>
 
   private final ExportQuery query;
 
-  private final UI ui;
+  private final AnnisUI ui;
 
   private final Exporter exporter;
+  
+  private Exception exportError;
 
-  public ExportBackgroundJob(ExportQuery query, Exporter exporter, UI ui,
+  public ExportBackgroundJob(ExportQuery query, Exporter exporter, AnnisUI ui,
     EventBus eventBus, ExportPanel panel)
   {
     this.query = query;
@@ -58,15 +60,13 @@ public class ExportBackgroundJob implements Callable<File>
   {
     final File currentTmpFile = File.createTempFile("annis-export", ".txt");
     currentTmpFile.deleteOnExit();
-    final AtomicBoolean success = new AtomicBoolean(false);
     try (final OutputStreamWriter outWriter = new OutputStreamWriter(new FileOutputStream(currentTmpFile),
       "UTF-8"))
     {
-      boolean result = exporter.convertText(query.getQuery(), query.getLeftContext(),
+      exportError = exporter.convertText(query.getQuery(), query.getLeftContext(),
         query.getRightContext(), query.getCorpora(), query.getAnnotationKeys(),
         query.getParameters(), Helper.getAnnisWebResource().path("query"),
         outWriter, eventBus);
-      success.set(result);
     }
     finally
     {
@@ -77,7 +77,11 @@ public class ExportBackgroundJob implements Callable<File>
         {
           if (panel != null)
           {
-            panel.showResult(currentTmpFile, success.get());
+            panel.showResult(currentTmpFile, exportError instanceof InterruptedException);
+          }
+          if(exportError instanceof UniformInterfaceException)
+          {
+            ui.getQueryController().reportServiceException((UniformInterfaceException) exportError, true);
           }
         }
       });

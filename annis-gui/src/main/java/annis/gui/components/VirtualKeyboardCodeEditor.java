@@ -22,23 +22,30 @@ import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.shared.JavaScriptExtensionState;
 import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.TextArea;
-import org.json.JSONArray;
+import elemental.json.JsonArray;
+import elemental.json.impl.JreJsonNull;
 import org.json.JSONException;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@StyleSheet({"keyboard.css"})
-@JavaScript({"vaadin://jquery.js","keyboard.js", "virtualkeyboard_codeeditor.js"})
+@StyleSheet(
+{
+  "keyboard.css"
+})
+@JavaScript(
+{
+  "vaadin://jquery.js", "keyboard.js", "virtualkeyboard_codeeditor.js"
+})
 public class VirtualKeyboardCodeEditor extends AbstractJavaScriptExtension
 {
+
   public VirtualKeyboardCodeEditor()
   {
     addFunction("updateLang", new UpdateLangJSFunction());
   }
-  
+
   @Override
   protected Class<? extends ClientConnector> getSupportedParentType()
   {
@@ -48,27 +55,28 @@ public class VirtualKeyboardCodeEditor extends AbstractJavaScriptExtension
   public void extend(AqlCodeEditor target)
   {
     super.extend(target);
-    
+
   }
-  
+
   @Override
   protected VKState getState()
   {
     return (VKState) super.getState();
   }
-  
+
   public void show()
   {
     callFunction("show");
   }
-  
+
   public void setKeyboardLayout(String layout)
   {
     getState().setKeyboardLayout(layout);
   }
-  
+
   public static class VKState extends JavaScriptExtensionState
   {
+
     private String keyboardLayout = "";
 
     public String getKeyboardLayout()
@@ -80,7 +88,7 @@ public class VirtualKeyboardCodeEditor extends AbstractJavaScriptExtension
     {
       this.keyboardLayout = keyboardLayout;
     }
-    
+
   }
 
   private class UpdateLangJSFunction implements JavaScriptFunction
@@ -91,10 +99,17 @@ public class VirtualKeyboardCodeEditor extends AbstractJavaScriptExtension
     }
 
     @Override
-    public void call(JSONArray arguments) throws JSONException
+    public void call(JsonArray arguments) throws JSONException
     {
-      ((VKState) getState()).setKeyboardLayout(arguments.getString(0));
+      if (arguments.length() > 0 && !(arguments.get(0) instanceof JreJsonNull))
+      {
+        ((VKState) getState()).setKeyboardLayout(arguments.getString(0));
+      }
+      else
+      {
+        ((VKState) getState()).setKeyboardLayout(null);
+      }
     }
   }
-  
+
 }

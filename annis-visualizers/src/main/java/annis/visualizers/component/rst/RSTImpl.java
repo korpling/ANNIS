@@ -16,12 +16,13 @@
 package annis.visualizers.component.rst;
 
 import annis.CommonHelper;
-import annis.libgui.MatchedNodeColors;
 import annis.gui.components.CssRenderInfo;
-import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import annis.gui.widgets.gwt.client.ui.VJITWrapper;
-import static annis.model.AnnisConstants.*;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.visualizers.VisualizerInput;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;

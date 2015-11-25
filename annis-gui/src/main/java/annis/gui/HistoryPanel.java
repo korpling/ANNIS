@@ -37,7 +37,7 @@ public class HistoryPanel extends Panel
   implements ValueChangeListener, ItemClickListener
 {
 
-  private Table tblHistory;
+  private final Table tblHistory;
   private QueryController controller;
   private final CitationLinkGenerator citationGenerator;
 
@@ -67,7 +67,8 @@ public class HistoryPanel extends Panel
       @Override
       public Object generateCell(Table source, Object itemId, Object columnId)
       {
-        return new Label("" + (containerHistory.indexOfId(itemId) + 1));
+        int idx = containerHistory.indexOfId(itemId);
+        return new Label("" + (idx+1));
       }
     });
     citationGenerator = new CitationLinkGenerator();
@@ -101,7 +102,7 @@ public class HistoryPanel extends Panel
   {
     if(controller != null && event.isDoubleClick())
     {
-      controller.executeSearch(true);
+      controller.executeSearch(true, true);
       if(getParent() instanceof Window)
       {
         UI.getCurrent().removeWindow((Window) getParent());

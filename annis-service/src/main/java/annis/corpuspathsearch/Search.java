@@ -4,15 +4,10 @@
  */
 package annis.corpuspathsearch;
 
-import annis.utils.RelANNISHelper;
-import au.com.bytecode.opencsv.CSVReader;
-import com.google.common.base.Charsets;
+import annis.utils.ANNISFormatHelper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -20,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Searches for relANNIS corpora in file system locations.
+ * Searches for ANNIS corpora in file system locations.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class Search
@@ -67,7 +62,7 @@ public class Search
       {
         try
         {
-          String toplevel = RelANNISHelper.extractToplevelCorpusNames(new FileInputStream(path));
+          String toplevel = ANNISFormatHelper.extractToplevelCorpusNames(new FileInputStream(path));
           corpusPaths.put(toplevel, path);
         }
         catch (FileNotFoundException ex)

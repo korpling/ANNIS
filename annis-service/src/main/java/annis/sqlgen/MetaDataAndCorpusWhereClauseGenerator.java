@@ -15,17 +15,15 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import static annis.sqlgen.SqlConstraints.in;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
-import java.util.LinkedList;
 
 /**
  *

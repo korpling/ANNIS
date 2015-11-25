@@ -18,6 +18,7 @@ package annis.visualizers.htmlvis;
 import annis.CommonHelper;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
+import annis.libgui.MatchedNodeColors;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
@@ -35,6 +36,7 @@ import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -43,6 +45,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
@@ -61,6 +64,7 @@ import org.slf4j.LoggerFactory;
  * <strong>Mappings:</strong><br />
  * <ul>
  * <li>config - path of the visualization configuration file</li>
+ * <li>hitmark - if "true" (which is the default) hit are marked in their corresponding colors</li>
  * </ul>
  * </p>
  *
@@ -75,6 +79,14 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
   private HashMap<String, Integer> instruction_priorities = new HashMap<>();
+  
+  private Map<SNode, Long> mc;
+  
+  private String tokenColor = "";  
+  
+  private boolean hitMark = true;    
+  
+  
 
   @Override
   public String getShortName()
@@ -108,7 +120,11 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
   
     String visConfigName = vi.getMappings().getProperty("config");
-  
+    String hitMarkConfig = vi.getMappings().getProperty("hitmark","true");
+    hitMark = Boolean.parseBoolean(hitMarkConfig);
+    mc = vi.getMarkedAndCovered();
+    
+    
     VisualizationDefinition[] definitions = parseDefinitions(corpusName, vi.getMappings());
 
     if (definitions != null)
@@ -332,14 +348,18 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     
     for (SToken t : token)
     {
-
+      tokenColor="";
+      if (mc.containsKey(t) && hitMark){
+          tokenColor = MatchedNodeColors
+                  .getHTMLColorByMatch(mc.get(t));
+      }
       for (VisualizationDefinition vis : definitions)
       {
         String matched = vis.getMatcher().matchedAnnotation(t);
         if (matched != null)
         {
           vis.getOutputter().outputHTML(t, matched, outputStartTags,
-            outputEndTags);
+            outputEndTags,tokenColor);
         }
       }
     }
@@ -347,13 +367,20 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     List<SSpan> spans = graph.getSSpans();
     for (VisualizationDefinition vis : definitions)
     {
+      
+     
       for (SSpan span : spans)
       {
+        tokenColor="";  
+        if (mc.containsKey(span) && hitMark){
+          tokenColor = MatchedNodeColors
+                  .getHTMLColorByMatch(mc.get(span));
+        }  
         String matched = vis.getMatcher().matchedAnnotation(span);
         if (matched != null)
         {
           vis.getOutputter().outputHTML(span, matched, outputStartTags,
-            outputEndTags);
+            outputEndTags,tokenColor);
         }
       }
     }

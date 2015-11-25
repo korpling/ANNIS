@@ -1,11 +1,12 @@
 $annis-color: #ecf0f6;
 
 /* TODO: adjust Valo parameters here */
+
 $v-app-loading-text: "ANNIS corpus search";
 $v-font-size: 13px;
 $v-font-weight: 400;
 $v-app-background-color: $annis-color;
-$v-panel-background-color: white;
+$v-panel-background-color: #ffffff;
 $v-unit-size: 25px;
 $v-animations-enabled: false;
 
@@ -15,15 +16,9 @@ $v-layout-margin-bottom: 12px;
 $v-layout-margin-left: 12px;
 
 
-/*
-$v-layout-spacing-vertical: 5px;
-$v-layout-spacing-horizontal: 5px;
-*/
-
 @import "../valo/valo";
 
 /* @import "../chameleon/chameleon.scss"; */
-/* @import "annis-base.scss"; */
 
 @import "partitur.scss";
 @import "pdf.scss";
@@ -49,7 +44,6 @@ $font-size: 10pt;
 
 @mixin annis {
   @include valo;
-  /*  @include annis-base; */
   @include partitur;
 
   .hidden {
@@ -121,22 +115,21 @@ $font-size: 10pt;
   .rtl {
     direction: rtl;
   }
-
-  textarea.citation {
+  
+  textarea.shared-text, div.shared-text {
     background-color: white;
     border-style: solid;
     border-color: black;
     border-width: 1px;
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 4px;
     font-family: monospace;
+    &:focus {
+      border-color: black;
+    }
   }
 
-  textarea.license {
-    background-color: white;
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;
-    font-family: monospace;
-  }
 
   textarea.query {
     font-family: monospace;
@@ -152,7 +145,7 @@ $font-size: 10pt;
   textarea.border-layout {
     border-width: 1px;
     border-style: solid;
-    border-colkwor: #b3b3b3;
+    border-color: #b3b3b3;
   }
 
   .border-layout {
@@ -243,16 +236,19 @@ $font-size: 10pt;
     }
   } 
 
-  .grey-selection tr.v-selected {
-    background-color: #808080;
-  } 
-
   .info-bar {
     background-color: $annis-color;
     border-style: solid;
     border-color: black;
     border-width: 1px 0px 0px 0px;
   }
+  
+  .selected-match .info-bar {
+      background-color: rgb(129, 184, 255);
+      .path-label {
+        font-weight: bold;
+      }
+   }
 
   $huge-menubar-height: 40px;
 
@@ -273,6 +269,18 @@ $font-size: 10pt;
   .v-menubar-huge {
     line-height: $huge-menubar-height;
     height: $huge-menubar-height + 2px;
+  }
+  
+  .v-tabsheet-tabs {
+    .v-tabsheet-tabitem-selected {
+      .v-caption {
+        cursor: default;
+        .v-icon, .v-captiontext {
+          color: #4C607F;
+        }
+      }
+      
+    }
   }
   
   .default-query-font {

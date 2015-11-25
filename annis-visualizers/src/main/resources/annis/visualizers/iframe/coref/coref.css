@@ -3,6 +3,9 @@ body {
     font-style:normal;
 }
 
+.ui-tooltip  {
+  background-color: white;
+}
 
 .highlightedToken {
   background-color:yellow;

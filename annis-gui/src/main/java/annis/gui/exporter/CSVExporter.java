@@ -20,8 +20,6 @@ import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.server.Page;
-import com.vaadin.ui.Notification;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -38,18 +36,17 @@ public class CSVExporter implements Exporter, Serializable
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CSVExporter.class);
 
   @Override
-  public boolean convertText(String queryAnnisQL, int contextLeft, int contextRight,
+  public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys,String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
-    //this is a full result export
     
     try
     {
       WebResource res = annisResource.path("search").path("matrix")
         .queryParam("csv", "true")
         .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("q", Helper.encodeTemplate(queryAnnisQL));
+        .queryParam("q", Helper.encodeJersey(queryAnnisQL));
       
       
       if(argsAsString.startsWith("metakeys="))
@@ -65,24 +62,12 @@ public class CSVExporter implements Exporter, Serializable
       
       out.flush();
       
-      return true;
+      return null;
     }
-    catch(UniformInterfaceException ex)
+    catch(UniformInterfaceException | ClientHandlerException | IOException ex)
     {
-      log.error(null, ex);
-      Notification n = new Notification("Service exception", ex.getResponse().getEntity(String.class),
-        Notification.Type.WARNING_MESSAGE, true);
-      n.show(Page.getCurrent());
+      return ex;
     }
-    catch(ClientHandlerException ex)
-    {
-      log.error(null, ex);
-    }
-    catch (IOException ex)
-    {
-      log.error(null, ex);
-    }
-    return false;
   }
 
   @Override

@@ -15,11 +15,10 @@
  */
 package annis.service.internal;
 
-import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.administration.DeleteCorpusDao;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
 import annis.security.ANNISUserRealm;
@@ -27,7 +26,8 @@ import annis.security.Group;
 import annis.security.User;
 import annis.security.UserConfig;
 import annis.service.AdminService;
-import annis.utils.RelANNISHelper;
+import annis.service.objects.ImportJob;
+import annis.utils.ANNISFormatHelper;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import java.io.File;
@@ -81,7 +81,7 @@ public class AdminServiceImpl implements AdminService
 
   private CorpusAdministration corpusAdmin;
 
-  private AnnisDao annisDao;
+  private QueryDao queryDao;
 
   private ImportWorker importWorker;
 
@@ -90,17 +90,32 @@ public class AdminServiceImpl implements AdminService
 
   public void init()
   {
+    // check scheme at each service startup
+    if(corpusAdmin.getSchemeFixer() != null)
+    {
+      corpusAdmin.getSchemeFixer().checkAndFix();
+    }
     importWorker.start();
   }
 
   @GET
   @Path("is-authenticated")
   @Produces("text/plain")
-  public String isAuthenticated()
+  public Response isAuthenticated()
   {
     Subject user = SecurityUtils.getSubject();
-
-    return Boolean.toString(user.isAuthenticated());
+    Object principal = user.getPrincipal();
+    if(principal instanceof String)
+    {
+      // if a use has an expired account it won't have it's own name as role
+      boolean hasOwnRole = user.hasRole((String) principal);
+      if(!hasOwnRole)
+      {
+        return Response.status(Response.Status.FORBIDDEN).entity("Account expired").build();
+      }
+    }
+    
+    return Response.ok(Boolean.toString(user.isAuthenticated())).build();
   }
 
   /**
@@ -243,6 +258,9 @@ public class AdminServiceImpl implements AdminService
       {
         if (confManager.deleteUser(userName))
         {
+          // also delete any possible user configs
+          adminDao.deleteUserConfig(userName);
+          // if no error until here everything went well
           return Response.ok().build();
         }
       }
@@ -388,7 +406,7 @@ public class AdminServiceImpl implements AdminService
     {
 
       // get ID of corpus
-      long id = annisDao.mapCorpusNameToId(corpusName);
+      long id = queryDao.mapCorpusNameToId(corpusName);
       deleteCorpusDao.deleteCorpora(Arrays.asList(id), true);
       return Response.status(Response.Status.OK).build();
     }
@@ -459,7 +477,7 @@ public class AdminServiceImpl implements AdminService
       {
         ByteStreams.copy(request.getInputStream(), tmpOut);
       }
-      Set<String> allNames = RelANNISHelper.corporaInZipfile(tmpZip).keySet();
+      Set<String> allNames = ANNISFormatHelper.corporaInZipfile(tmpZip).keySet();
 
       if (!allNames.isEmpty())
       {
@@ -469,7 +487,7 @@ public class AdminServiceImpl implements AdminService
         }
         String caption = Joiner.on(", ").join(allNames);
 
-        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<>(
+        List<Long> corpusIDs = queryDao.mapCorpusNamesToIds(new LinkedList<>(
           allNames));
         if (overwrite || corpusIDs == null || corpusIDs.isEmpty())
         {
@@ -557,14 +575,14 @@ public class AdminServiceImpl implements AdminService
     this.adminDao = adminDao;
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
 
   public ImportWorker getImportWorker()

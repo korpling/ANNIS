@@ -83,7 +83,7 @@
 
   <bean id="queriesGenerator" class="annis.dao.autogenqueries.QueriesGenerator" lazy-init="true">
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
-    <property name="annisDao" ref="annisDao" />
+    <property name="queryDao" ref="queryDao" />
     <property name="tableInsertSelect" ref="tableInsertSelect" />
     <property name="queryBuilder">
       <util:set>
@@ -121,10 +121,6 @@
     <property name="fetchSize" value="0"/>
   </bean>
 
-  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter" lazy-init="true">
-    <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
-    <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
-  </bean>
 
   <bean id="byteHelper" class="annis.sqlgen.ByteHelper" lazy-init="true" />
   <bean id="metaByteHelper" class="annis.sqlgen.MetaByteHelper" lazy-init="true" />
@@ -140,8 +136,21 @@
     
   <!-- BEGIN EXPORTS -->
 
-  <!-- exported bean: AnnisDao -->
-  <bean id="annisDao" class="annis.dao.SpringAnnisDao" init-method="init" lazy-init="true">
+  <bean id="daoBase" class="annis.dao.AbstractDao" abstract="true" lazy-init="true">
+    <property name="scriptPath" value="$dev{annis.script-path}"/>
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+  
+  
+  <bean id="shortenerDao" class="annis.dao.ShortenerDao" lazy-init="true" parent="daoBase">
+  </bean>
+  
+  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter" lazy-init="true" parent="daoBase">
+    <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
+  </bean>
+
+  <!-- exported bean: QueryDao -->
+  <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true" parent="daoBase">
 
     <!-- configuration -->
     <property name="timeout" value="${annis.sql-timeout}"/>
@@ -155,7 +164,6 @@
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
 
     <property name="rawTextHelper" ref="rawTextSqlHelper" />
-    <property name="dataSource" ref="dataSource"/>
 
     <property name="aqlParser" ref="annisParserAntlr"/>
     <property name="sqlGenerator" ref="findSqlGenerator"/>
@@ -171,7 +179,7 @@
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="sqlSessionModifiers">
       <util:list>
-        <ref bean="annisDao"/>
+        <ref bean="queryDao"/>
         <ref bean="sqlScriptSessionModifier"/>
       </util:list>
     </property>
@@ -188,14 +196,14 @@
   
   <bean id="schemeFixerBase" class="annis.administration.SchemeFixer" lazy-init="true">
     <property name="dataSource" ref="dataSource" />
+    <property name="databaseSchema" value="$dao{datasource.schema:#{'public'}}" />
   </bean>
  
   <!-- exported Database API for administration tasks -->
- <bean id="adminDaoBase" class="annis.administration.AbstractAdminstrationDao" abstract="true" lazy-init="true">
-  <property name="scriptPath" value="$dev{annis.script-path}"/>
+ <bean id="adminDaoBase" class="annis.administration.AbstractAdminstrationDao" abstract="true" lazy-init="true"
+   parent="daoBase">
   <property name="externalFilesPath" value="${annis.external-data-path}"/>
-  <property name="dataSource" ref="dataSource" />
-  <property name="annisDao" ref="annisDao" />
+  <property name="queryDao" ref="queryDao" />
  </bean>
 
  <bean id="deleteCorpusDao" class="annis.administration.DeleteCorpusDao" lazy-init="true"
@@ -227,7 +235,7 @@
     <property name="tableInsertFrom" ref="tableInsertFrom" />
     <property name="tableInsertSelect" ref="tableInsertSelect" />
     <property name="queriesGenerator" ref="queriesGenerator" />
-    <property name="schemaVersion" value="3.3.0"/>
+    <property name="schemaVersion" value="3.4.2"/>
   </bean>
   
   <bean id="schemeFixer" class="annis.administration.SchemeFixer" parent="schemeFixerBase" lazy-init="true">

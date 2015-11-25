@@ -23,7 +23,6 @@ import annis.gui.admin.view.CorpusListView;
 import annis.gui.admin.view.UIView;
 import annis.service.objects.AnnisCorpus;
 import com.google.common.base.Joiner;
-import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -40,7 +39,8 @@ public class CorpusController
   private final CorpusListView view;
   private final UIView uiView;
   private boolean isLoggedIn = false;
-
+  private boolean viewIsActive = false;
+  
   public CorpusController(CorpusManagement model,
     CorpusListView view, UIView uiView, boolean isLoggedIn)
   {
@@ -78,11 +78,14 @@ public class CorpusController
   }
 
   @Override
-  public void loginChanged(WebResource annisRootResource, boolean isLoggedIn)
+  public void loginChanged(boolean isLoggedIn)
   {
     this.isLoggedIn = isLoggedIn;
-    model.setRootResource(annisRootResource);
-    if(isLoggedIn)
+    if(model.getWebResourceProvider() != null)
+    {
+      model.getWebResourceProvider().invalidateWebResource();
+    }
+    if(isLoggedIn && viewIsActive)
     {
       fetchFromService();
     }
@@ -91,11 +94,13 @@ public class CorpusController
       clearModel();
     }
   }
+  
 
   @Override
-  public void selectedTabChanged(Object selectedTab)
+  public void loadedTab(Object selectedTab)
   {
-    if(isLoggedIn && selectedTab == view)
+    viewIsActive = selectedTab == view;
+    if(isLoggedIn && viewIsActive)
     {
       fetchFromService();
     }

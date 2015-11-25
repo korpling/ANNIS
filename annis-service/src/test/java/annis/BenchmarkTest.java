@@ -15,8 +15,8 @@
  */
 package annis;
 
-import annis.dao.AnnisDao;
-import annis.dao.SpringAnnisDao;
+import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
 import annis.provider.SaltProjectProvider;
 import annis.test.TestHelper;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
@@ -30,19 +30,18 @@ import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.ws.rs.core.MediaType;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeNotNull;
 import static org.junit.Assume.assumeTrue;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.Ignore;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.springframework.dao.DataAccessException;
@@ -76,8 +75,8 @@ public class BenchmarkTest
   @Rule
   public TestRule benchmarkRun = new BenchmarkRule();
 
-  @Resource(name = "annisDao")
-  AnnisDao annisDao;
+  @Resource(name = "queryDao")
+  QueryDao annisDao;
 
   private List<Long> pcc2CorpusID;
 
@@ -92,14 +91,14 @@ public class BenchmarkTest
   @Before
   public void setup()
   {
-    SpringAnnisDao springAnnisDao = (SpringAnnisDao) TestHelper.proxyTarget(
+    QueryDaoImpl springAnnisDao = (QueryDaoImpl) TestHelper.proxyTarget(
       annisDao);
 
     try
     {
-      assumeNotNull(springAnnisDao.getSimpleJdbcTemplate());
+      assumeNotNull(springAnnisDao.getJdbcTemplate());
 
-      springAnnisDao.getSimpleJdbcTemplate().queryForInt("SELECT 1");
+      springAnnisDao.getJdbcTemplate().queryForInt("SELECT 1");
 
     }
     catch (DataAccessException ex)

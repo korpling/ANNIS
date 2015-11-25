@@ -15,23 +15,19 @@
  */
 package annis.administration;
 
-import annis.utils.RelANNISHelper;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 
 public class TestCorpusAdministration
@@ -57,7 +53,7 @@ public class TestCorpusAdministration
   @Test
   public void importCorporaOne() throws IOException
   {
-    File f = createDummyRelannis("somePath", "corpus1");
+    File f = createDummyANNIS("somePath", "corpus1");
     
     String path = f.getAbsolutePath();
     
@@ -82,9 +78,9 @@ public class TestCorpusAdministration
   @Test
   public void importCorporaMany() throws IOException
   {
-    File f1 = createDummyRelannis("somePath", "corpus1");
-    File f2 = createDummyRelannis("anotherPath", "corpus2");
-    File f3 = createDummyRelannis("yetAnotherPath", "corpus3");
+    File f1 = createDummyANNIS("somePath", "corpus1");
+    File f2 = createDummyANNIS("anotherPath", "corpus2");
+    File f3 = createDummyANNIS("yetAnotherPath", "corpus3");
     
     String path1 = f1.getPath();
     String path2 = f2.getPath();
@@ -109,7 +105,7 @@ public class TestCorpusAdministration
     verifyNoMoreInteractions(administrationDao);
   }
   
-  private File createDummyRelannis(String path, String corpusName) throws IOException
+  private File createDummyANNIS(String path, String corpusName) throws IOException
   {
     File tmp = Files.createTempDir();
     tmp.deleteOnExit();
@@ -117,7 +113,7 @@ public class TestCorpusAdministration
     root.mkdirs();
     
     Files.append("0\t" + corpusName  + "\tCORPUS\tNULL\t0\t1", 
-      new File(root, "corpus.relannis"), Charsets.UTF_8);
+      new File(root, "corpus.annis"), Charsets.UTF_8);
     
     return root;
   }

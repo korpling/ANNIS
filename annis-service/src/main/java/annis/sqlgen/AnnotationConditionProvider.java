@@ -24,7 +24,6 @@ import com.google.common.base.Objects;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 /**

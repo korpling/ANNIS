@@ -15,11 +15,12 @@
  */
 package annis.gui.objects;
 
-import annis.service.objects.OrderType;
 import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.OrderType;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Helper class to construct new {@link Query} objects (or one of the child classes)
@@ -39,9 +40,9 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     this.current = current;
   }
   
-  public static PagedQueryGenerator paged()
+  public static DisplayedResultQueryGenerator displayed()
   {
-    return new PagedQueryGenerator();
+    return new DisplayedResultQueryGenerator();
   }
   
   public static ExportQueryGenerator export()
@@ -99,29 +100,50 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     
   }
   
-  public static class PagedQueryGenerator
-     extends ContextQueryGenerator<PagedResultQuery, PagedQueryGenerator>
+  public static class PagedQueryGenerator <T extends PagedResultQuery, QG extends PagedQueryGenerator<T, QG>> 
+     extends ContextQueryGenerator<T, QG>
   {
-    private PagedQueryGenerator()
+    private PagedQueryGenerator(T query)
     {
-      super(new PagedResultQuery());
+      super(query);
     }
-    public PagedQueryGenerator limit(int limit)
+    public QG limit(int limit)
     {
       getCurrent().setLimit(limit);
-      return (PagedQueryGenerator) this;
+      return (QG) this;
     }
     
-    public PagedQueryGenerator offset(int offset)
+    public QG offset(long offset)
     {
       getCurrent().setOffset(offset);
-      return (PagedQueryGenerator) this;
+      return (QG) this;
     }
     
-    public PagedQueryGenerator order(OrderType order)
+    public QG order(OrderType order)
     {
       getCurrent().setOrder(order);
-      return (PagedQueryGenerator) this;
+      return (QG) this;
+    }
+  }
+  
+  public static class DisplayedResultQueryGenerator
+     extends PagedQueryGenerator<DisplayedResultQuery, DisplayedResultQueryGenerator>
+  {
+    private DisplayedResultQueryGenerator()
+    {
+      super(new DisplayedResultQuery());
+    }
+    
+    public DisplayedResultQueryGenerator selectedMatches(Set<Long> selected)
+    {
+      getCurrent().setSelectedMatches(selected == null ? new TreeSet<Long>() : selected);
+      return (DisplayedResultQueryGenerator) this;
+    }
+    
+    public DisplayedResultQueryGenerator baseText(String val)
+    {
+      getCurrent().setBaseText(val);
+      return (DisplayedResultQueryGenerator) this;
     }
   }
   

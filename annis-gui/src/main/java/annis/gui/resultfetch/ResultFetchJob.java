@@ -15,12 +15,11 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
-import annis.libgui.PollControl;
 import annis.model.AqlParseError;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
@@ -30,8 +29,8 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.uri.UriComponent;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -63,11 +62,11 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
 
   protected PagedResultQuery query;
 
-  protected SearchUI ui;
+  protected AnnisUI ui;
 
   public ResultFetchJob(PagedResultQuery query,
     ResultViewPanel resultPanel,
-    SearchUI ui)
+    AnnisUI ui)
   {
     this.resultPanel = resultPanel;
     this.query = query;
@@ -76,10 +75,10 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
     res = Helper.getAnnisAsyncWebResource();
     
     futureMatches = res.path("query").path("search").path("find")
-      .queryParam("q", Helper.encodeTemplate(query.getQuery()))
+      .queryParam("q", Helper.encodeJersey(query.getQuery()))
       .queryParam("offset", "" + query.getOffset())
       .queryParam("limit", "" + query.getLimit())
-      .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
+      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(query.getCorpora(), ",")))
       .queryParam("order", query.getOrder().toString())
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(MatchGroup.class);
@@ -153,13 +152,13 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
         });
 
         // prepare fetching subgraphs
-        final int totalResultSize = result.getMatches().size();
        
         final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<>(
-          totalResultSize);
-        int current = 0;
+          result.getMatches().size());
+        int current = 0;        
+        final ArrayList<Match> matchList = new ArrayList<>(result.getMatches());
 
-        for (Match m : result.getMatches())
+        for (Match m : matchList)
         {
           if (Thread.interrupted())
           {
@@ -176,15 +175,15 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           queue.put(p);
           log.debug("added match {} to queue", current+1);
 
+          
           if (current == 0)
           {
-            PollControl.changePollingTime(ui, PollControl.DEFAULT_TIME);
             ui.access(new Runnable()
             {
               @Override
               public void run()
               {
-                resultPanel.setQueryResultQueue(queue, query, totalResultSize);
+                resultPanel.setQueryResultQueue(queue, query, matchList);
               }
             });
           }
@@ -230,7 +229,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
               }
               else if (ex.getResponse().getStatus() == 504)
               {
-                paging.setInfo("Timeout: query exeuction took too long");
+                paging.setInfo("Timeout: query execution took too long");
               }
               else if(ex.getResponse().getStatus() == 403)
               {

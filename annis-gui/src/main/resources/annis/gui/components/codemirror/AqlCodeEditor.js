@@ -19,9 +19,10 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var rootDiv = this.getElement(this.getConnectorId());
     
     var changeDelayTimerID = null;
-    var lastSentText = "";
     
     var changeDelayTime = 500;
+    
+    var lastServerRequestCounter = 0;
     
     var errorList = [];
 
@@ -40,7 +41,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       matchBrackets: true,
       gutters: ["CodeMirror-lint-markers"],
       lint: true,
-      placeholder: ""
+      placeholder: "",
+      inputStyle: 'textarea'
     });
         
     this.sendTextIfNecessary = function() 
@@ -52,7 +54,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         window.clearTimeout(changeDelayTimerID);
       }
       
-      if(lastSentText !== current)
+      if(connector.getState().text !== current)
       {
         var cursor = cmTextArea.getCursor();
         // calculate the absolute cursor position
@@ -65,7 +67,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         absPos += cursor.ch;
         
         connector.textChanged(current, absPos);
-        lastSentText = current;
       }
     };
     
@@ -81,13 +82,24 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       cmTextArea.setOption('mode', newMode);
       cmTextArea.setOption("placeholder", connector.getState().inputPrompt);
       
-      if(connector.getState().clientText !== connector.getState().text)
+      // set the text from the server defined state if a new request was made
+      if(lastServerRequestCounter < connector.getState().serverRequestCounter)
       {
+        lastServerRequestCounter = connector.getState().serverRequestCounter;
         cmTextArea.setValue(connector.getState().text);
 
         // restore the cursor position
         cmTextArea.setCursor(cursor);
       }
+      
+      // apply parent code class
+      if(connector.getState().textareaClass && connector.getState().textareaClass !== "") {
+        var c = connector.getState().textareaClass;
+        if(!$(cmTextArea.getWrapperElement()).find("pre").hasClass(c)) {
+          $(cmTextArea.getWrapperElement()).find("pre").addClass(c);
+        }
+      } 
+      
       
       // copy all error messages
       errorList = [];
@@ -119,6 +131,9 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       changeDelayTimerID = window.setTimeout(connector.sendTextIfNecessary, changeDelayTime);
     });
     
+    // While the text changing event has a timeout before it is send
+    // to the server we must be sure it has always the current text
+    // whenever the user leaves the textfield, otherwise the query might be old.
     cmTextArea.on("blur", function(instance)
     {
       connector.sendTextIfNecessary();

@@ -32,7 +32,7 @@ public class LimitOffsetQueryData
   {
     this.offset = offset;
     this.limit = limit;
-    this.order = OrderType.normal;
+    this.order = OrderType.ascending;
   }
 
   public LimitOffsetQueryData(int offset, int limit, OrderType order)

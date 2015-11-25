@@ -22,9 +22,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.google.common.base.Charsets;
+import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
 import com.vaadin.sass.internal.ScssStylesheet;
 import com.vaadin.server.ClassResource;
@@ -35,10 +35,13 @@ import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
-import java.io.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -102,19 +105,19 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
   
+  private transient EventBus loginDataLostBus;
+  
   @Override
   protected void init(VaadinRequest request)
   {  
     
     initLogging();
-    // load some additional properties from our ANNIS configuration
-    loadApplicationProperties("annis-gui.properties");
     
     // store the webservice URL property explicitly in the session in order to 
     // access it from the "external" servlets
-    getSession().getSession().setAttribute(WEBSERVICEURL_KEY, 
-    getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
-    
+    getSession().getSession().setAttribute(WEBSERVICEURL_KEY,
+      getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
+
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     alreadyAddedCSS.clear();
     
@@ -161,7 +164,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    * @param configFile The file path of the configuration file relative to the base config folder.
    * @return list of files or directories in the order in which they should be processed (most important is last)
    */
-  protected List<File> getAllConfigLocations(String configFile)
+  public static List<File> getAllConfigLocations(String configFile)
   {
     LinkedList<File> locations = new LinkedList<File>();
 
@@ -186,21 +189,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return locations;
   }
 
-  protected void loadApplicationProperties(String configFile)
-  {
-
-    List<File> locations = getAllConfigLocations(configFile);
-
-    // load properties in the right order
-    for(File f : locations)
-    {
-      loadPropertyFile(f);
-    }
-  }
-
   protected Map<String, InstanceConfig> loadInstanceConfig()
   {
-    TreeMap<String, InstanceConfig> result = new TreeMap<String, InstanceConfig>();
+    TreeMap<String, InstanceConfig> result = new TreeMap<>();
 
 
     // get a list of all directories that contain instance informations
@@ -243,28 +234,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return result;
   }
 
-  private void loadPropertyFile(File f)
-  {
-   if(f.canRead() && f.isFile())
-    {
-      try(FileInputStream fis = new FileInputStream(f))
-      {
-        Properties p = new Properties();
-        p.load(fis);
-        
-        // copy all properties to the session
-        for(String name : p.stringPropertyNames())
-        {
-          getSession().setAttribute(name, p.getProperty(name));
-        }
-        
-      }
-      catch(IOException ex)
-      {
-
-      }
-    }
-  }
 
   protected final void initLogging()
   {
@@ -331,16 +300,18 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
-    
     addCustomUIPlugins(pluginManager);
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
     
     File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-" 
       + VersionInfo.getReleaseName() + ".jar");
-    pluginManager.addPluginsFrom(builtin.toURI());
-    log.info("added plugins from {}", builtin.getPath());
-    
+    if(builtin.canRead()) { 
+      pluginManager.addPluginsFrom(builtin.toURI());
+      log.info("added built-in plugins from  {}", builtin.getPath());
+    } else {
+      log.warn("could not find built-in plugin file {}", builtin.getPath());
+    }
     File basicPlugins = new File(baseDir, "WEB-INF/plugins");
     if (basicPlugins.isDirectory())
     {
@@ -381,9 +352,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       String remoteUser = request.getRemoteUser();
       if(remoteUser != null)
       { 
-        // treat as anonymous user
-        Client client = Helper.createRESTClient();;
-        Helper.setUser(new AnnisUser(remoteUser, client, true));
+        Helper.setUser(new AnnisUser(remoteUser, null, true));
       }
   }
   
@@ -500,7 +469,17 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       checkIfRemoteLoggedIn(request);
       // we never write any information in this handler
       return false;
-    }
-    
+    }  
   }
+
+  public EventBus getLoginDataLostBus()
+  {
+    if(loginDataLostBus == null)
+    {
+      loginDataLostBus = new EventBus();
+    }
+    return loginDataLostBus;
+  }
+  
+  
 }

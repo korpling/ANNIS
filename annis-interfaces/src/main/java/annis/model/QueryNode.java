@@ -15,22 +15,20 @@
  */
 package annis.model;
 
+import annis.sqlgen.model.RankTableJoin;
+import com.google.common.base.Joiner;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import annis.sqlgen.model.RankTableJoin;
-import com.google.common.base.Joiner;
-import java.util.Collections;
-import java.util.LinkedList;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
 public class QueryNode implements Serializable
@@ -65,6 +63,7 @@ public class QueryNode implements Serializable
   private Range tokenArity;
   private boolean artificial;
   private Integer alternativeNumber;
+  private ParsedEntityLocation parseLocation;
   
   public enum TextMatching
   {
@@ -875,5 +874,15 @@ public class QueryNode implements Serializable
     this.alternativeNumber = alternativeNumber;
   }
 
+  public ParsedEntityLocation getParseLocation()
+  {
+    return parseLocation;
+  }
+
+  public void setParseLocation(ParsedEntityLocation parseLocation)
+  {
+    this.parseLocation = parseLocation;
+  }
+  
   
 }

@@ -16,10 +16,10 @@
 package annis.gui.objects;
 
 import annis.service.objects.OrderType;
+import com.google.common.base.Preconditions;
 import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
-
 import org.slf4j.LoggerFactory;
 
 /**
@@ -27,20 +27,21 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class PagedResultQuery extends ContextualizedQuery implements Cloneable
+public class PagedResultQuery extends ContextualizedQuery
 {
   private final static Logger log = LoggerFactory.getLogger(PagedResultQuery.class);
   
-  private int offset;
+  private long offset;
   private int limit;
-  private OrderType order = OrderType.normal;
+  private OrderType order = OrderType.ascending;
+  
 
   public PagedResultQuery()
   {
     
   }
 
-  public PagedResultQuery(int contextLeft, int contextRight, int offset,
+  public PagedResultQuery(int contextLeft, int contextRight, long offset,
     int limit, String segmentation, String query,
     Set<String> corpora)
   {
@@ -54,12 +55,12 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     this.limit = limit;
   }
 
-  public int getOffset()
+  public long getOffset()
   {
     return offset;
   }
 
-  public void setOffset(int offset)
+  public void setOffset(long offset)
   {
     this.offset = offset;
   }
@@ -81,25 +82,8 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
 
   public void setOrder(OrderType order)
   {
+    Preconditions.checkNotNull(order, "The order of a paged result query must never be null.");
     this.order = order;
-  }
-
-  
-  
-  @Override
-  public PagedResultQuery clone()
-  {
-    PagedResultQuery c = null;    
-    try
-    {
-      c = (PagedResultQuery) super.clone();
-    }
-    catch (CloneNotSupportedException ex)
-    {
-      log.error("cloning of {} failed", PagedResultQuery.class.getName());
-    }
-    
-    return c;
   }
   
   @Override
@@ -131,4 +115,5 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
       && Objects.equals(getOffset(), other.getOffset())
       && Objects.equals(getOrder(), other.getOrder());
   }
+  
 }

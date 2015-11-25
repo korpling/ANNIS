@@ -15,8 +15,8 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.administration.ImportStatus;
 import annis.administration.CorpusAdministration;
+import annis.administration.ImportStatus;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

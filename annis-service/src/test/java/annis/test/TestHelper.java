@@ -15,13 +15,11 @@
  */
 package annis.test;
 
+import java.lang.reflect.Proxy;
+import org.apache.commons.lang3.Validate;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
-import java.lang.reflect.Proxy;
-
-import org.apache.commons.lang3.Validate;
 import org.junit.Test;
 import org.springframework.aop.target.SingletonTargetSource;
 

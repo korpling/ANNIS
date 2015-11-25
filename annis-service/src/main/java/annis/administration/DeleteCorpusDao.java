@@ -49,7 +49,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
       log.info("delete conflicting corpus: {}", corpusName);
       List<String> corpusNames = new LinkedList<>();
       corpusNames.add(corpusName);
-      deleteCorpora(getAnnisDao().mapCorpusNamesToIds(corpusNames), false);
+      deleteCorpora(getQueryDao().mapCorpusNamesToIds(corpusNames), false);
     }
   }
   

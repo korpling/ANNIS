@@ -1,15 +1,26 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import json
 import io
 from subprocess import call
 
-milestone_id = "22"
+milestone_id = "38"
 
-call(["curl", "-H", "Accept: application/vnd.github.beta.full+json", "-o", "issues.json", "https://api.github.com/repos/korpling/ANNIS/issues?state=closed&milestone=" + milestone_id + "&sort=created"])
+import http.client
 
-f = open("issues.json")
-j = json.load(f)
+conn = http.client.HTTPSConnection("api.github.com")
+
+payload = ""
+
+headers = { 'User-Agent': 'python3', 'accept': "application/vnd.github.beta.full+json" }
+
+conn.request("GET", "/repos/korpling/ANNIS/issues?state=closed&milestone=" + milestone_id + "&sort=created", payload, headers)
+
+res = conn.getresponse()
+data = res.read()
+data_str = data.decode("utf-8")
+
+j = json.loads(data_str)
 
 bugs = []
 enhancements = []
@@ -28,18 +39,18 @@ for issue in j:
 		other.append(title)
 
 if len(bugs) > 0:
-	print "[Bugs]"
+	print("[Fixed Bugs]")
 	for t in bugs:
-		print t
+		print(t)
 if len(enhancements) > 0:
-	print ""
-	print "[Enhancements]"
+	print("")
+	print("[Enhancements]")
 	for t in enhancements:
-		print t
+		print(t)
 
 if len(other) > 0:
-	print ""
-	print "[Other]"
+	print("")
+	print("[Other]")
 	for t in other:
-		print t
+		print(t)
 		

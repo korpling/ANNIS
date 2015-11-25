@@ -15,13 +15,13 @@
  */
 package annis.gui;
 
-import com.sun.jersey.api.client.WebResource;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface LoginListener
+public interface LoginListener extends Serializable
 {
 
   public void onLogin();

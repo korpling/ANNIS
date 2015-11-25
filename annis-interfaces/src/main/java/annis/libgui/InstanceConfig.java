@@ -17,10 +17,8 @@ package annis.libgui;
 
 import annis.gui.FontConfig;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -46,15 +44,16 @@ public class InstanceConfig implements Serializable
   private FontConfig font;
   private FontConfig frequencyFont;
   private String keyboardLayout;
+  private boolean loginOnStart;
   
   public InstanceConfig()
   {
     instanceName = "";
     instanceDisplayName = "";
     defaultQueryBuilder = "";
-    corpusSets = new LinkedList<CorpusSet>();
+    corpusSets = new LinkedList<>();
     defaultCorpusSet = "";
-    
+    loginOnStart = false;
   }
 
   /**
@@ -67,7 +66,10 @@ public class InstanceConfig implements Serializable
     return instanceName;
   }
 
-  /** @see #getInstanceName()  */
+  /**
+   * @param instanceName
+   * @see #getInstanceName()  
+   */
   public void setInstanceName(String instanceName)
   {
     this.instanceName = instanceName;
@@ -75,6 +77,7 @@ public class InstanceConfig implements Serializable
 
   /** 
    * Get the external display name (used e.g. in the user interface) of this instance. 
+   * @return 
    */
   @XmlElement(name="display-name")
   public String getInstanceDisplayName()
@@ -82,7 +85,10 @@ public class InstanceConfig implements Serializable
     return instanceDisplayName;
   }
 
-  /** @see #getInstanceDisplayName()  */
+  /**
+   * @param instanceDisplayName 
+   * @see #getInstanceDisplayName() 
+   */
   public void setInstanceDisplayName(String instanceDisplayName)
   {
     this.instanceDisplayName = instanceDisplayName;
@@ -98,7 +104,10 @@ public class InstanceConfig implements Serializable
     return defaultQueryBuilder;
   }
 
-  /** @see #getDefaultQueryBuilder()  */
+  /**
+   * @param defaultQueryBuilder
+   * @see #getDefaultQueryBuilder()  
+   */
   public void setDefaultQueryBuilder(String defaultQueryBuilder)
   {
     this.defaultQueryBuilder = defaultQueryBuilder;
@@ -114,7 +123,10 @@ public class InstanceConfig implements Serializable
     return corpusSets;
   }
 
-  /** @see #getCorpusSets()  */
+  /**
+   * @param corpusSets
+   * @see #getCorpusSets()  
+   */
   public void setCorpusSets(List<CorpusSet> corpusSets)
   {
     this.corpusSets = corpusSets;
@@ -130,7 +142,10 @@ public class InstanceConfig implements Serializable
     return defaultCorpusSet;
   }
 
-  /** @see #getDefaultCorpusSet()  */
+  /**
+   * @param defaultCorpusSet
+   * @see #getDefaultCorpusSet()  
+   */
   public void setDefaultCorpusSet(String defaultCorpusSet)
   {
     this.defaultCorpusSet = defaultCorpusSet;
@@ -196,8 +211,24 @@ public class InstanceConfig implements Serializable
   {
     this.frequencyFont = frequencyFont;
   }
-  
-  
-  
+
+  /**
+   * If true the login window is shown at each startup automatically.
+   * @return 
+   */
+  @XmlElement(name = "login-on-start")
+  public boolean isLoginOnStart()
+  {
+    return loginOnStart;
+  }
+
+  /**
+   * @see #isLoginOnStart() 
+   * @param loginOnStart 
+   */
+  public void setLoginOnStart(boolean loginOnStart)
+  {
+    this.loginOnStart = loginOnStart;
+  }
   
 }

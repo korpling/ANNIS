@@ -15,6 +15,7 @@
  */
 package annis.gui.controller;
 
+import annis.gui.AnnisUI;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.FrequencyQuery;
 import annis.libgui.Helper;
@@ -22,8 +23,6 @@ import annis.service.objects.FrequencyTable;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 import java.util.concurrent.Callable;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -38,13 +37,12 @@ public class FrequencyBackgroundJob implements Callable<FrequencyTable>
   private static final Logger log = LoggerFactory.getLogger(
     FrequencyBackgroundJob.class);
   
-  private final UI ui;
-
+  private final AnnisUI ui;
   private final FrequencyQuery query;
 
   private final FrequencyQueryPanel panel;
 
-  public FrequencyBackgroundJob(UI ui, FrequencyQuery query,
+  public FrequencyBackgroundJob(AnnisUI ui, FrequencyQuery query,
     FrequencyQueryPanel panel)
   {
     this.ui = ui;
@@ -74,28 +72,21 @@ public class FrequencyBackgroundJob implements Callable<FrequencyTable>
     try
     {
       annisResource = annisResource.path("query").path("search").
-        path("frequency").queryParam("q", Helper.encodeTemplate(query.getQuery())).
+        path("frequency").queryParam("q", Helper.encodeJersey(query.getQuery())).
         queryParam("corpora", StringUtils.join(query.getCorpora(), ",")).
         queryParam("fields", query.getFrequencyDefinition().toString());
       result = annisResource.get(FrequencyTable.class);
     }
-    catch (UniformInterfaceException ex)
+    catch (final UniformInterfaceException ex)
     {
-      String message;
-      if (ex.getResponse().getStatus() == 400)
+      ui.access(new Runnable()
       {
-        message = ex.getResponse().getEntity(String.class);
-      }
-      else if (ex.getResponse().getStatus() == 504)
-      {
-        message = "Timeout: query exeuction took too long";
-      }
-      else
-      {
-        message = "unknown error: " + ex;
-        log.error(ex.getResponse().getEntity(String.class), ex);
-      }
-      Notification.show(message, Notification.Type.WARNING_MESSAGE);
+        @Override
+        public void run()
+        {
+          ui.getQueryController().reportServiceException(ex, true);
+        }
+      });
     }
     catch (ClientHandlerException ex)
     {

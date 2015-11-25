@@ -16,11 +16,12 @@
 
 package annis.gui.admin.model;
 
-import annis.security.Group;
+import annis.CaseSensitiveOrder;
 import annis.security.User;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -33,26 +34,28 @@ import org.slf4j.LoggerFactory;
  * A model that manages users.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class UserManagement
+public class UserManagement implements Serializable
 {
-  private WebResource rootResource;
+  private WebResourceProvider webResourceProvider;
 
-  private final Map<String, User> users = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+  private final Map<String, User> users = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
   private final TreeSet<String> usedGroupNames = new TreeSet<>();
+  private final TreeSet<String> usedPermissions = new TreeSet<>();
   
   private final Logger log = LoggerFactory.getLogger(UserManagement.class);
   
   public boolean createOrUpdateUser(User newUser)
   {
-    if(rootResource != null)
+    if(webResourceProvider != null)
     {
-      WebResource res = rootResource.path("admin/users").path(newUser.getName());
+      WebResource res = webResourceProvider.getWebResource()
+        .path("admin/users").path(newUser.getName());
       try
       {
         res.put(newUser);
         users.put(newUser.getName(), newUser);
         
-        updateUsedGroupNames();
+        updateUsedGroupNamesAndPermissions();
         return true;
       }
       catch(UniformInterfaceException ex)
@@ -65,23 +68,28 @@ public class UserManagement
   
   public void deleteUser(String userName)
   {
-    if(rootResource != null)
+    if(webResourceProvider != null)
     {
-      WebResource res = rootResource.path("admin/users").path(userName);
+      WebResource res = webResourceProvider.getWebResource()
+        .path("admin/users").path(userName);
       res.delete();
       users.remove(userName);
-      updateUsedGroupNames();
+      updateUsedGroupNamesAndPermissions();
     }
   }
   
   public User setPassword(String userName, String newPassword)
   {
+    User newUser = null;
 
-    WebResource res = rootResource.path("admin/users").path(userName).path("password");
-    User newUser = res.post(User.class, newPassword);
-    if(newUser != null)
+    if(webResourceProvider != null)
     {
-      users.put(newUser.getName(), newUser);
+      WebResource res = webResourceProvider.getWebResource().path("admin/users").path(userName).path("password");
+      newUser = res.post(User.class, newPassword);
+      if(newUser != null)
+      {
+        users.put(newUser.getName(), newUser);
+      }
     }
     return newUser;
 
@@ -91,15 +99,17 @@ public class UserManagement
   {
     users.clear();
     usedGroupNames.clear();
+    usedPermissions.clear();
   }
   
   public boolean fetchFromService()
   {
-    if(rootResource != null)
+    if(webResourceProvider != null)
     {
-      WebResource res = rootResource.path("admin/users");
+      WebResource res = webResourceProvider.getWebResource().path("admin/users");
       users.clear();
       usedGroupNames.clear();
+      usedPermissions.clear();
       try
       {
         List<User> list = res.get(new GenericType<List<User>>() {});
@@ -107,6 +117,7 @@ public class UserManagement
         {
           users.put(u.getName(), u);
           usedGroupNames.addAll(u.getGroups());
+          usedPermissions.addAll(u.getPermissions());
         }
         return true;
       }
@@ -118,12 +129,14 @@ public class UserManagement
     return false;
   }
   
-  private void updateUsedGroupNames()
+  private void updateUsedGroupNamesAndPermissions()
   {
     usedGroupNames.clear();
+    usedPermissions.clear();
     for(User u : users.values())
     {
       usedGroupNames.addAll(u.getGroups());
+      usedPermissions.addAll(u.getPermissions());
     }
   }
   
@@ -142,17 +155,21 @@ public class UserManagement
     return usedGroupNames;
   }
   
-  
-  
-  public WebResource getRootResource()
+  public TreeSet<String> getUsedPermissions()
   {
-    return rootResource;
+    return usedPermissions;
   }
 
-  public void setRootResource(WebResource rootResource)
+  public WebResourceProvider getWebResourceProvider()
   {
-    this.rootResource = rootResource;
+    return webResourceProvider;
   }
+
+  public void setWebResourceProvider(WebResourceProvider webResourceProvider)
+  {
+    this.webResourceProvider = webResourceProvider;
+  }
+  
   
   
 }

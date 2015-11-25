@@ -15,8 +15,8 @@
  */
 package annis.gui.visualizers.partitur;
 
-import annis.visualizers.iframe.partitur.DetectHoles;
 import annis.model.AnnisNode;
+import annis.visualizers.iframe.partitur.DetectHoles;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.assertEquals;

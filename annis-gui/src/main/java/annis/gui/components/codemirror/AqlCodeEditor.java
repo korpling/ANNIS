@@ -15,13 +15,8 @@
  */
 package annis.gui.components.codemirror;
 
-import annis.libgui.Helper;
 import annis.model.AqlParseError;
 import annis.model.QueryNode;
-import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.data.Property;
@@ -29,19 +24,15 @@ import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
-import java.util.ArrayList;
+import elemental.json.JsonArray;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A code editor component for the ANNIQ Query Language.
@@ -65,35 +56,45 @@ import org.json.JSONException;
     "AqlCodeEditor.css"
   })
 public class AqlCodeEditor extends AbstractJavaScriptComponent
-  implements FieldEvents.TextChangeNotifier, Property.Viewer, Property.ValueChangeListener
+  implements FieldEvents.TextChangeNotifier, Property.Viewer,
+  Property.ValueChangeListener
 {
 
+  private static final Logger log = LoggerFactory.getLogger(AqlCodeEditor.class);
+
   private int timeout;
+
   private Property<String> dataSource;
 
   public AqlCodeEditor()
   {
     addFunction("textChanged", new TextChangedFunction());
     addStyleName("aql-code-editor");
-    
-    AqlCodeEditor.this.setPropertyDataSource(new ObjectProperty("", String.class));
+
+    AqlCodeEditor.this.setPropertyDataSource(
+      new ObjectProperty("", String.class));
+
+    // init to one so the client (which starts with 0) at initialization always uses
+    // the the values provided by the server state
+    AqlCodeEditor.this.getState().serverRequestCounter = 1;
   }
 
   @Override
   public void setPropertyDataSource(Property newDataSource)
   {
-    if(newDataSource == null)
+    if (newDataSource == null)
     {
       throw new IllegalArgumentException("Data source must not be null");
     }
-    
-    if(this.dataSource instanceof Property.ValueChangeNotifier)
+
+    if (this.dataSource instanceof Property.ValueChangeNotifier)
     {
-      ((Property.ValueChangeNotifier) this.dataSource).removeValueChangeListener(this);
+      ((Property.ValueChangeNotifier) this.dataSource).
+        removeValueChangeListener(this);
     }
-        
+
     this.dataSource = newDataSource;
-   
+
     if (newDataSource instanceof Property.ValueChangeNotifier)
     {
       ((Property.ValueChangeNotifier) this.dataSource).
@@ -111,11 +112,18 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   @Override
   public void valueChange(Property.ValueChangeEvent event)
   {
+    log.debug("valueChange \"{}\"/\"{}", event.getProperty().getValue(),
+      this.dataSource.getValue());
     String oldText = getState().text;
-    getState().text = this.dataSource.getValue();
-    
-    if(oldText == null || !oldText.equals(getState().text))
+    String newText = this.dataSource.getValue();
+
+    if (oldText == null || !oldText.equals(newText))
     {
+      getState().text = newText;
+      // this is a server side state change and we have to explicitly tell the client we want to change the text
+      getState().serverRequestCounter++;
+
+      log.debug("invalidating \"{}\"/\"{}\"", oldText, getState().text);
       markAsDirty();
     }
   }
@@ -124,15 +132,14 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   {
 
     @Override
-    public void call(JSONArray args) throws JSONException
+    public void call(JsonArray args) throws JSONException
     {
+      log.debug("TextChangedFunction \"{}\"", args.getString(0));
       getState().text = args.getString(0);
       getPropertyDataSource().setValue(args.getString(0));
-      getState().clientText = getState().text;
-      
-      validate(dataSource.getValue());
+
       final String textCopy = dataSource.getValue();
-      final int cursorPos = args.getInt(1);
+      final int cursorPos = (int) args.getNumber(1);
       fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this)
       {
 
@@ -151,81 +158,42 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     }
   }
 
-  private void validate(String query)
+  public void setNodes(List<QueryNode> nodes)
   {
-    setErrors(null);
     getState().nodeMappings.clear();
-    if(query == null || query.isEmpty())
+    if(nodes != null)
     {
-      // don't validate the empty query
-      return;
-    }
-    try
-    {
-      AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
-      Future<List<QueryNode>> future = annisResource.path("query").path("parse/nodes").
-        queryParam("q", Helper.encodeTemplate(query))
-        .get(new GenericType<List<QueryNode>>(){});
-
-      // wait for maximal one seconds
-      try
-      {
-        List<QueryNode> result = future.get(1, TimeUnit.SECONDS);
-        
-        getState().nodeMappings.putAll(mapQueryNodes(result));
-      }
-      catch (InterruptedException ex)
-      {
-      }
-      catch (ExecutionException ex)
-      {
-        if (ex.getCause() instanceof UniformInterfaceException)
-        {
-          UniformInterfaceException cause = (UniformInterfaceException) ex.
-            getCause();
-          if (cause.getResponse().getStatus() == 400)
-          {
-            List<AqlParseError> errorsFromServer = 
-                cause.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
-            
-            setErrors(errorsFromServer);
-          }
-        }
-      }
-      catch (TimeoutException ex)
-      {
-      }
-    }
-    catch (ClientHandlerException ex)
-    {
+      getState().nodeMappings.putAll(mapQueryNodes(nodes));
     }
   }
-  
+
   private TreeMap<String, Integer> mapQueryNodes(List<QueryNode> nodes)
   {
+    TreeMap<String, Integer> result = new TreeMap<>();
     Map<Integer, TreeSet<Long>> alternative2Nodes = new HashMap<>();
-   
+
     for (QueryNode n : nodes)
     {
-      TreeSet<Long> orderedNodeSet = alternative2Nodes.get(n.getAlternativeNumber());
-      if(orderedNodeSet == null)
+      TreeSet<Long> orderedNodeSet = alternative2Nodes.get(n.
+        getAlternativeNumber());
+      if (orderedNodeSet == null)
       {
         orderedNodeSet = new TreeSet<>();
         alternative2Nodes.put(n.getAlternativeNumber(), orderedNodeSet);
       }
       orderedNodeSet.add(n.getId());
     }
-    
-    TreeMap<String, Integer> result = new TreeMap<>();
-    for(TreeSet<Long> orderedNodeSet : alternative2Nodes.values())
+
+    for (TreeSet<Long> orderedNodeSet : alternative2Nodes.values())
     {
-      int newID=1;
-      for(long var : orderedNodeSet)
+      int newID = 1;
+      for (long var : orderedNodeSet)
       {
         result.put("" + var, newID);
         newID++;
       }
     }
+
     return result;
   }
 
@@ -252,6 +220,16 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     addListener(FieldEvents.TextChangeListener.EVENT_ID,
       FieldEvents.TextChangeEvent.class,
       listener, FieldEvents.TextChangeListener.EVENT_METHOD);
+  }
+
+  public String getTextareaStyle()
+  {
+    return getState().textareaClass == null ? "" : getState().textareaClass;
+  }
+
+  public void setTextareaStyle(String style)
+  {
+    getState().textareaClass = "".equals(style) ? null : style;
   }
 
   @Override
@@ -291,11 +269,14 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   }
 
   public void setErrors(List<AqlParseError> errors)
-  {    
+  {
     getState().errors.clear();
     if (errors != null)
     {
-      getState().errors.addAll(errors);
+      for (AqlParseError e : errors)
+      {
+        getState().errors.add(new AqlCodeEditorState.ParseError(e));
+      }
     }
     markAsDirty();
   }

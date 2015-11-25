@@ -50,7 +50,17 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -333,7 +343,7 @@ public class CommonHelper
     String[] path = rawPath.split("/");
 
     // decode every single part by itself
-    ArrayList<String> result = new ArrayList<String>(path.length);
+    ArrayList<String> result = new ArrayList<>(path.length);
     for (int i = 0; i < path.length; i++)
     {
       try
@@ -504,63 +514,4 @@ public class CommonHelper
     return result;
   }
   
-  public static Match extractMatch(SDocument doc) throws URISyntaxException
-  {
-    Splitter idSplit = Splitter.on(',').trimResults();
-    Match m = null;
-
-    // get the matched node IDs
-    SFeature featIDs = doc.getSFeature(AnnisConstants.ANNIS_NS,
-      AnnisConstants.FEAT_MATCHEDIDS);
-    
-    if (featIDs != null)
-    {
-      LinkedList<URI> idList = new LinkedList<>();
-      for(String rawID : idSplit.split(featIDs.getSValueSTEXT()))
-      {
-        idList.add(new URI(rawID));
-      }
-      SFeature featAnnos = doc.getSFeature(AnnisConstants.ANNIS_NS,
-      AnnisConstants.FEAT_MATCHEDANNOS);
-      if(featAnnos == null)
-      {
-        m = new Match(idList);
-      }
-      else
-      {
-        m = new Match(idList, idSplit.splitToList(featAnnos.getSValueSTEXT()));
-      }
-    }
-
-    return m;
-  }
-
-  // TODO: remove if really not needed
-//  public static SNode[] getMatchedNodes(SDocument doc)
-//  {
-//    SNode[] result = new SNode[0];
-//
-//    // get the matched node IDs
-//    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS,
-//      AnnisConstants.FEAT_MATCHEDIDS);
-//    if (feat != null)
-//    {
-//      Match m = Match.parseFromString(feat.getSValueSTEXT());
-//      result = new SNode[m.getSaltIDs().size()];
-//
-//      int i = 0;
-//      for(URI u : m.getSaltIDs())
-//      {
-//        // get the specific node
-//        SNode node = doc.getSDocumentGraph().getSNode(u.toASCIIString());
-//        if (node != null)
-//        {
-//          result[i] = node;
-//        }
-//        i++;
-//      }
-//    }
-//
-//    return result;
-//  }
 }

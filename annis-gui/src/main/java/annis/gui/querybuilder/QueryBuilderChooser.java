@@ -15,9 +15,9 @@
  */
 package annis.gui.querybuilder;
 
+import annis.gui.QueryController;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
-import annis.gui.QueryController;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.ComboBox;

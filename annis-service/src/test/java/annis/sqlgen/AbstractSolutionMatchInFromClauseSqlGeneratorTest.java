@@ -15,25 +15,21 @@
  */
 package annis.sqlgen;
 
-import static annis.test.TestUtils.uniqueString;
-import static org.hamcrest.text.IsEqualIgnoringWhiteSpace.equalToIgnoringWhiteSpace;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
-
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.test.TestUtils.uniqueString;
+import java.util.List;
+import static org.hamcrest.text.IsEqualIgnoringWhiteSpace.equalToIgnoringWhiteSpace;
+import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import static org.mockito.BDDMockito.given;
+import org.mockito.InjectMocks;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class AbstractSolutionMatchInFromClauseSqlGeneratorTest
 {

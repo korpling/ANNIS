@@ -24,6 +24,25 @@
       <Bug pattern="DM_EXIT" />
     </And>
   </Match>
+  <Match>
+    <And>
+      <Class name="annis.administration.AnnisAdminRunner" />
+      <Bug pattern="DM_EXIT" />
+    </And>
+  </Match>
+  
+  <Match>
+    <And>
+      <Class name="annis.security.SerializableByteSource" />
+      <Bug pattern="EI_EXPOSE_REP" />
+    </And>
+  </Match>
+  <Match>
+    <And>
+      <Class name="annis.security.SerializableByteSource" />
+      <Bug pattern="EI_EXPOSE_REP2" />
+    </And>
+  </Match>
   
   <Match>
     <Bug category="EXPERIMENTAL" />

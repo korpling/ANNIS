@@ -20,7 +20,6 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
 import com.google.common.html.HtmlEscapers;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
@@ -48,14 +47,18 @@ public class SpanHTMLOutputter
   private String constant;
   private String metaname;
   private HashMap<String, String> hshMeta = new HashMap<>();
+  private String tokenColor;
   
   private final static Escaper htmlEscaper = HtmlEscapers.htmlEscaper();
   
   
   public void outputHTML(SNode node, String matchedQName,
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
+    SortedMap<Long, SortedSet<OutputItem>> outputEndTags, String tokenColor)
   {
+      
+    this.tokenColor = tokenColor;
+    
     if(node instanceof SToken && "tok".equals(matchedQName))
     {
         SToken tok = (SToken) node;
@@ -154,7 +157,7 @@ public class SpanHTMLOutputter
   }
   
   public void outputAny(long left, long right, String matchedQName,
-    String value, 
+    String value,
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
@@ -170,6 +173,8 @@ public class SpanHTMLOutputter
       else
       {
         startTag += " class=\"" + style + "\" ";
+        String colorStyle= " style=\" color:" + tokenColor + "\" ";
+        startTag += colorStyle;
       }
     }
     String inner = "";

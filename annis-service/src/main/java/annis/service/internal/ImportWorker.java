@@ -15,10 +15,9 @@
  */
 package annis.service.internal;
 
-import annis.service.objects.ImportJob;
-import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
+import annis.service.objects.ImportJob;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;

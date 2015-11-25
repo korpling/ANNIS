@@ -101,7 +101,12 @@ CREATE TABLE facts (
   edge_qannotext varchar COLLATE "C", -- the combined qualified name (with namespace) of the annotation, separated by ":"
   n_sample boolean,
   n_na_sample boolean,
-  PRIMARY KEY (fid)
+  PRIMARY KEY (fid),
+  -- additional check constraints
+  CHECK(left_token <= right_token),
+  CHECK(pre <= post)
+-- this check causes problems with some corpora that were created with a buggy version of the Pepepr ANNIS Exporter
+--  CHECK("left" <= "right")
 );
 
 COMMENT ON COLUMN facts.component_id IS 'component id';
@@ -137,6 +142,15 @@ CREATE TABLE corpus_alias
    PRIMARY KEY (alias, corpus_ref)
 );
 
+DROP TABLE IF EXISTS url_shortener CASCADE;
+CREATE  TABLE url_shortener 
+(
+  id UUID PRIMARY KEY,
+	"owner" varchar,
+  created timestamp with time zone,
+  url varchar
+);
+
 -- stats
 DROP TABLE IF EXISTS corpus_stats CASCADE;
 CREATE TABLE corpus_stats
@@ -149,7 +163,7 @@ CREATE TABLE corpus_stats
   max_corpus_pre integer NULL,
   max_corpus_post integer NULL,
   max_node_id bigint NULL,
-  source_path varchar COLLATE "C" -- original path to the folder containing the relANNIS sources
+  source_path varchar COLLATE "C" -- original path to the folder containing the ANNIS format sources
 );
 
 

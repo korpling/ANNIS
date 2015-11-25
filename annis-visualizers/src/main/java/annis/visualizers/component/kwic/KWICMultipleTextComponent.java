@@ -16,13 +16,11 @@
 
 package annis.visualizers.component.kwic;
 
-import annis.visualizers.component.*;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import com.vaadin.ui.CssLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;

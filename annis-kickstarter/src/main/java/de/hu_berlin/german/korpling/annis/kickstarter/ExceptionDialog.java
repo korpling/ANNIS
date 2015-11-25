@@ -17,8 +17,6 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.ImportStatus;
 import java.awt.Dialog;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *

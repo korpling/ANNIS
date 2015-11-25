@@ -29,8 +29,6 @@ import com.vaadin.client.Paintable;
 import com.vaadin.client.UIDL;
 import com.vaadin.client.Util;
 import com.vaadin.client.VConsole;
-import com.vaadin.client.ui.VLabel;
-
 import java.util.HashMap;
 import java.util.Map;
 

@@ -31,20 +31,20 @@ import com.hp.gagawa.java.elements.Td;
 import com.hp.gagawa.java.elements.Text;
 import com.hp.gagawa.java.elements.Tr;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import java.io.IOException;
-import java.io.Writer;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructuredNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.IOException;
 import java.io.Serializable;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -220,19 +220,25 @@ public class CorefVisualizer extends WriterVisualizer
       }
       fonts.add("serif");
 
-      Link linkTooltip = new Link();
-      linkTooltip.setHref(input.getResourcePath("coref/jquery.tooltip.css"));
-      linkTooltip.setRel("stylesheet");
-      linkTooltip.setType("text/css");
-      head.appendChild(linkTooltip);
+      Link linkJQueryUI = new Link();
+      linkJQueryUI.setHref(input.getResourcePath("coref/jquery-ui-1.11.4.custom/jquery-ui.min.css"));
+      linkJQueryUI.setRel("stylesheet");
+      linkJQueryUI.setType("text/css");
+      head.appendChild(linkJQueryUI);
+      
+      Link linkJQueryUIStructure = new Link();
+      linkJQueryUIStructure.setHref(input.getResourcePath("coref/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css"));
+      linkJQueryUIStructure.setRel("stylesheet");
+      linkJQueryUIStructure.setType("text/css");
+      head.appendChild(linkJQueryUIStructure);
       
       Script scriptJquery = new Script("text/javascript");
-      scriptJquery.setSrc(input.getResourcePath("coref/jquery-1.6.2.min.js"));
+      scriptJquery.setSrc(input.getResourcePath("coref/jquery-2.1.4.min.js"));
       head.appendChild(scriptJquery);
       
-      Script scriptTooltip = new Script("text/javascript");
-      scriptTooltip.setSrc(input.getResourcePath("coref/jquery.tooltip.min.js"));
-      head.appendChild(scriptTooltip);
+      Script scriptUI = new Script("text/javascript");
+      scriptUI.setSrc(input.getResourcePath("coref/jquery-ui-1.11.4.custom/jquery-ui.min.js"));
+      head.appendChild(scriptUI);
       
       Link linkCoref = new Link();
       linkCoref.setHref(input.getResourcePath("coref/coref.css"));

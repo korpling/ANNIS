@@ -15,15 +15,13 @@
  */
 package annis.model;
 
+import java.util.Arrays;
+import java.util.Collection;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-
-import java.util.Arrays;
-import java.util.Collection;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.junit.Before;
 import org.junit.Test;
 

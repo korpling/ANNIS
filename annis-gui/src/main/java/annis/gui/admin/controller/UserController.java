@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package annis.gui.admin.controller;
 
 import annis.gui.admin.model.UserManagement;
@@ -21,52 +20,85 @@ import annis.gui.admin.view.UIView;
 import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.google.common.base.Joiner;
-import com.sun.jersey.api.client.WebResource;
+import com.google.common.util.concurrent.FutureCallback;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.Callable;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class UserController
-  implements UserListView.Listener, UIView.Listener
+public class UserController implements UserListView.Listener, UIView.Listener
 {
-  
+
   private final UserManagement model;
+
   private final UserListView view;
+
   private final UIView uiView;
+
   private boolean isLoggedIn = false;
+  
+  private boolean viewIsActive = false;
 
   public UserController(UserManagement model,
     UserListView view, UIView uiView, boolean isLoggedIn)
   {
     this.model = model;
-    this.view = view;    
+    this.view = view;
     this.uiView = uiView;
     this.isLoggedIn = isLoggedIn;
     view.addListener(UserController.this);
     uiView.addListener(UserController.this);
   }
-  
+
   private void clearModel()
   {
     model.clear();
     view.setUserList(model.getUsers());
   }
-  
+
   private void fetchFromService()
   {
-    if(model.fetchFromService())
+    view.setLoadingAnimation(true);
+    uiView.runInBackground(new Callable<Boolean>()
     {
-      view.setUserList(model.getUsers());
-    }
-    
-    else
+
+      @Override
+      public Boolean call() throws Exception
+      {
+        return model.fetchFromService();
+      }
+    }, new FutureCallback<Boolean>()
     {
-      uiView.showWarning("Cannot get the user list", null);
-      view.setUserList(new LinkedList<User>());
-    }
+      @Override
+      public void onSuccess(Boolean result)
+      {
+        view.setLoadingAnimation(false);
+        if (result)
+        {
+          view.setUserList(model.getUsers());
+        }
+        else
+        {
+          uiView.showWarning("Cannot get the user list", null);
+          view.setUserList(new LinkedList<User>());
+        }
+        view.addAvailableGroupNames(model.getUsedGroupNames());
+        view.addAvailablePermissions(model.getUsedPermissions());
+      }
+
+      @Override
+      public void onFailure(Throwable t)
+      {
+        view.setLoadingAnimation(false);
+        uiView.showWarning("Cannot get the user list", t.getMessage());
+        view.setUserList(new LinkedList<User>());
+        view.addAvailableGroupNames(new TreeSet<String>());
+      }
+    });
   }
 
   @Override
@@ -79,16 +111,17 @@ public class UserController
   public void passwordChanged(String userName, String newPassword)
   {
     model.setPassword(userName, newPassword);
+    view.setUserList(model.getUsers());
   }
 
   @Override
   public void addNewUser(String userName)
   {
-    if(userName == null || userName.isEmpty())
+    if (userName == null || userName.isEmpty())
     {
       uiView.showError("User name is empty", null);
     }
-    else if(model.getUser(userName) != null)
+    else if (model.getUser(userName) != null)
     {
       uiView.showError("User already exists", null);
     }
@@ -96,9 +129,11 @@ public class UserController
     {
       // create new user with empty password
       User u = new User(userName);
-      if(model.createOrUpdateUser(u))
+      // each user should be per default able to see the same corpora as a non-logged in user
+      u.getGroups().add("anonymous");
+      if (model.createOrUpdateUser(u))
       {
-        view.askForPasswordChange(userName); 
+        view.askForPasswordChange(userName);
         view.setUserList(model.getUsers());
         view.emptyNewUserNameTextField();
       }
@@ -108,15 +143,16 @@ public class UserController
   @Override
   public void deleteUsers(Set<String> userName)
   {
-    for(String u : userName)
+    for (String u : userName)
     {
       model.deleteUser(u);
     }
     view.setUserList(model.getUsers());
-    
-    if(userName.size() == 1)
+
+    if (userName.size() == 1)
     {
-      uiView.showInfo("User \"" + userName.iterator().next() +  "\" was deleted", null);
+      uiView.showInfo("User \"" + userName.iterator().next() + "\" was deleted",
+        null);
     }
     else
     {
@@ -125,11 +161,14 @@ public class UserController
   }
 
   @Override
-  public void loginChanged(WebResource annisRootResource, boolean isLoggedIn)
+  public void loginChanged(boolean isLoggedIn)
   {
     this.isLoggedIn = isLoggedIn;
-    model.setRootResource(annisRootResource);
-    if(isLoggedIn)
+    if (model.getWebResourceProvider() != null)
+    {
+      model.getWebResourceProvider().invalidateWebResource();
+    }
+    if (isLoggedIn && viewIsActive)
     {
       fetchFromService();
     }
@@ -140,15 +179,14 @@ public class UserController
   }
 
   @Override
-  public void selectedTabChanged(Object selectedTab)
+  public void loadedTab(Object selectedTab)
   {
-    if(isLoggedIn && selectedTab == view)
+    viewIsActive = selectedTab == view;
+    if (isLoggedIn && viewIsActive)
     {
       fetchFromService();
     }
 
   }
-  
-  
-  
+
 }

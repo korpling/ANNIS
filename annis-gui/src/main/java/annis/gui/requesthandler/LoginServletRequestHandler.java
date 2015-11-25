@@ -18,10 +18,10 @@ package annis.gui.requesthandler;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
+import annis.libgui.LoginDataLostException;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -46,12 +46,19 @@ public class LoginServletRequestHandler implements RequestHandler
 
   private final static Logger log = LoggerFactory.getLogger(
     LoginServletRequestHandler.class);
+  
+  private final String prefix;
+  
+  public LoginServletRequestHandler(String urlPrefix)
+  {
+    this.prefix = urlPrefix + "/login";
+  }
 
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if(request.getPathInfo() != null && request.getPathInfo().contains("login"))
+    if(request.getPathInfo() != null && request.getPathInfo().startsWith(prefix))
     {
       if("GET".equalsIgnoreCase(request.getMethod()))
       {
@@ -145,16 +152,15 @@ public class LoginServletRequestHandler implements RequestHandler
 
       String webserviceURL = (String) annisServiceURLObject;
 
-      Client client = Helper.createRESTClient(username, password);
-
       try
       {
-        WebResource res = client.resource(webserviceURL)
+        AnnisUser user = new AnnisUser(username, password);
+        WebResource res = user.getClient().resource(webserviceURL)
           .path("admin").path("is-authenticated");
         if ("true".equalsIgnoreCase(res.get(String.class)))
         {
           // everything ok, save this user configuration for re-use
-          Helper.setUser(new AnnisUser(username, client));
+          Helper.setUser(user);
         }
       }
       catch (ClientHandlerException ex)
@@ -163,6 +169,12 @@ public class LoginServletRequestHandler implements RequestHandler
           "Authentification error: " + ex.getMessage());
         response.setStatus(502); // bad gateway
       }
+      catch (LoginDataLostException ex)
+      {
+        session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+          "Lost password in memory. Sorry.");
+        response.setStatus(500); // server error
+      }
       catch (UniformInterfaceException ex)
       {
         if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
@@ -170,7 +182,14 @@ public class LoginServletRequestHandler implements RequestHandler
         {
           session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Username or password wrong");
-          response.setStatus(403); // Forbidden
+          response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
+        }
+        else if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.
+          getStatusCode())
+        {
+          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+            "Account has expired");
+          response.setStatus(Response.Status.FORBIDDEN.getStatusCode()); // Forbidden
         }
         else
         {

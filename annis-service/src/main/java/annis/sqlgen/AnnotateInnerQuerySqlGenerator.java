@@ -1,16 +1,12 @@
   package annis.sqlgen;
 
-import annis.sqlgen.extensions.AnnotateQueryData;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-
-import java.util.ArrayList;
-import java.util.List;
-
-
-import org.apache.commons.lang3.StringUtils;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator

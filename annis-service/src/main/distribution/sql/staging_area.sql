@@ -120,7 +120,7 @@ CREATE :tmp TABLE _edge_annotation
 );
 
 -- resolver visualization mappings
--- this table is just a subset of resolver_vis_map. It contains all columns needed for copying data from relANNIS format
+-- this table is just a subset of resolver_vis_map. It contains all columns needed for copying data from ANNIS format
 CREATE :tmp TABLE _resolver_vis_map
 (
   "corpus"   varchar, -- the name of the supercorpus

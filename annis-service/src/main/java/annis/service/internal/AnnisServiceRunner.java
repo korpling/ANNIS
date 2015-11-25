@@ -16,9 +16,11 @@
 package annis.service.internal;
 
 import annis.AnnisBaseRunner;
+import annis.AnnisRunnerException;
 import annis.AnnisXmlContextHelper;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.exceptions.AnnisException;
+import annis.security.MultipleIniWebEnvironment;
 import annis.utils.Utils;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -30,6 +32,7 @@ import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
 import javax.servlet.DispatcherType;
+import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.server.Server;
@@ -50,6 +53,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private static AnnisServiceRunner annisServiceRunner;
 
   private boolean isShutdownRequested = false;
+  private int errorCode = 0;
 
   private static Thread mainThread;
 
@@ -131,7 +135,12 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     {
       log.error("interrupted in endless loop", ex);
     }
-
+    
+    // explicitly exit so we can decide if there was an error or not and everything is closed.
+    if(annisServiceRunner.errorCode != 0)
+    {
+      System.exit(annisServiceRunner.errorCode);
+    }
   }
 
   /**
@@ -217,16 +226,18 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
       ServletHolder holder = new ServletHolder(jerseyContainer);
       context.addServlet(holder, "/*");
+      context.setInitParameter(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM, MultipleIniWebEnvironment.class.getName());
 
 
       if (useAuthentification)
       {
-        context.setInitParameter("shiroConfigLocations",
-          "file:" + System.getProperty("annis.home") + "/conf/shiro.ini");
+        context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
+          "file:" + System.getProperty("annis.home") + "/conf/shiro.ini,"
+          + "file:" + System.getProperty("annis.home") + "/conf/develop_shiro.ini");
       }
       else
       {
-        context.setInitParameter("shiroConfigLocations",
+        context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
           "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
       }
 
@@ -245,12 +256,18 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     catch (IllegalArgumentException ex)
     {
       log.error("IllegalArgumentException at ANNIS service startup", ex);
-      isShutdownRequested = true;;
+      isShutdownRequested = true;
+      errorCode = 101;
     }
     catch (NullPointerException ex)
     {
       log.error("NullPointerException at ANNIS service startup", ex);
       isShutdownRequested = true;
+      errorCode = 101;
+    }
+    catch(AnnisRunnerException ex)
+    {
+      errorCode = ex.getExitCode();
     }
 
   }
@@ -271,6 +288,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       if (server == null)
       {
         isShutdownRequested = true;
+        errorCode = 100;
       }
       else
       {
@@ -281,6 +299,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     {
       log.error("could not start ANNIS REST service", ex);
       isShutdownRequested = true;
+      errorCode = 100;
 
       if (rethrowExceptions)
       {
@@ -327,7 +346,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
     if(ctx != null)
     {
-      AnnisDao dao = (AnnisDao) ctx.getBean("annisDao");
+      QueryDao dao = (QueryDao) ctx.getBean("queryDao");
       if(dao != null)
       {
         dao.setTimeout(milliseconds);
@@ -339,7 +358,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
     if(ctx != null)
     {
-      AnnisDao dao = (AnnisDao) ctx.getBean("annisDao");
+      QueryDao dao = (QueryDao) ctx.getBean("queryDao");
       if(dao != null)
       {
         return dao.getTimeout();
