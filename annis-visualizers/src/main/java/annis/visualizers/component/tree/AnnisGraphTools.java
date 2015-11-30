@@ -254,20 +254,23 @@ public class AnnisGraphTools implements Serializable
   public static String extractAnnotation(Set<Annotation> annotations,
     String namespace, String featureName)
   {
-    for (Annotation a : annotations)
+    if(annotations != null)
     {
-      if(namespace == null)
+      for (Annotation a : annotations)
       {
-        if (a.getName().equals(featureName))
+        if(namespace == null)
         {
-          return a.getValue();
+          if (a.getName().equals(featureName))
+          {
+            return a.getValue();
+          }
         }
-      }
-      else
-      {
-        if (a.getNamespace().equals(namespace) && a.getName().equals(featureName))
+        else
         {
-          return a.getValue();
+          if (a.getNamespace().equals(namespace) && a.getName().equals(featureName))
+          {
+            return a.getValue();
+          }
         }
       }
     }
