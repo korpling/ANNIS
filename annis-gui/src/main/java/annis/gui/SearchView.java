@@ -19,6 +19,7 @@ import annis.VersionInfo;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.exporter.CSVExporter;
+import annis.gui.exporter.DialogExporter;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
@@ -105,7 +106,8 @@ public class SearchView extends GridLayout implements View,
     new CSVExporter(),
     new TokenExporter(),
     new GridExporter(),
-    new SimpleTextExporter()
+    new SimpleTextExporter(),
+    new DialogExporter()
   };
 
   private final static Escaper urlPathEscape = UrlEscapers.

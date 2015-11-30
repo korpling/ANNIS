@@ -16,8 +16,15 @@
 package annis.gui.exporter;
 
 import annis.service.objects.SubgraphFilter;
+import com.google.common.base.Strings;
+import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,11 +39,69 @@ import java.util.Map;
 public class DialogExporter extends SaltBasedExporter
 {
 
+  
   @Override
   public void convertText(SDocumentGraph graph, List<String> annoKeys,
     Map<String, String> args, int matchNumber, Writer out)
+    throws IOException
   {
+    if(graph != null)
+    {
+      List<SToken> token = graph.getSortedSTokenByText();
+      // a map which is used to determine how much space each column will need
+      Map<Integer, Integer> columnToWidth = new HashMap<>();
+      
+      int maxCaptionWidth = 0;
+      
+      // row: annotation name, column: token index, value: the textual output
+      Table<String, Integer, String> grid = TreeBasedTable.create();
+      // add the token with the special empty name as row caption
+      int i=0;
+      for(SToken t : token)
+      {
+        String coveredText = graph.getSText(t);
+        grid.put("", i, coveredText);
+        // a token will need at least its own number of characters as width
+        columnToWidth.put(i, coveredText.length());
+        i++;
+      }
+      
+      // TODO: add the segmentation nodes to the output
+      
+      // actually output the grid
+      for(Map.Entry<String, Map<Integer, String>> entry : grid.rowMap().entrySet())
+      {
+        String caption = entry.getKey();
+        Map<Integer, String> row = entry.getValue();
+        
+        // add the caption
+        out.append(Strings.padEnd(caption, maxCaptionWidth, ' '));
+        // we separate the entries with tab
+        if(maxCaptionWidth > 0)
+        {
+          out.append("\t");
+        }
+        
+        // we know the row is ordered by the index and that each position is filled
+        Iterator<Map.Entry<Integer, String>> itRowEntry = row.entrySet().iterator();
+        while(itRowEntry.hasNext())
+        {
+          Map.Entry<Integer, String> rowEntry = itRowEntry.next();
+          
+          int index = rowEntry.getKey();
+          int width = columnToWidth.get(index);
+          out.append(Strings.padEnd(rowEntry.getValue(), width, ' '));
+          
+          if(itRowEntry.hasNext())
+          {
+            out.append("\t");
+          }
+        }
+      }
+
+    }
     
+    out.append("\n");
   }
 
   

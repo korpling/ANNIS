@@ -246,7 +246,7 @@ public abstract class SaltBasedExporter implements Exporter, Serializable
    * @param out 
    */
   private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, int offset,
-    Writer out)
+    Writer out) throws IOException
   {
     int matchNumber = offset;
     if(p != null && p.getSCorpusGraphs() != null)
@@ -266,7 +266,7 @@ public abstract class SaltBasedExporter implements Exporter, Serializable
   }
 
   public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, int matchNumber,
-    Writer out);
+    Writer out) throws IOException;
 
   @Override
   public boolean isCancelable()
