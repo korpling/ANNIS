@@ -47,7 +47,9 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -503,6 +505,88 @@ public class EventExtractor {
       }
     }
     return annos;
+  }
+  
+  /**
+   * Returns the annotations to which should be displayed together with their namespace.
+   *
+   * This will check the "show_ns" paramter for determining.
+   * the annotations to display. It also iterates over all nodes of the graph
+   * matching the type.
+   *
+   * @param input The input for the visualizer.
+   * @param type Which type of nodes to include
+   * @return
+   */
+  public static Set<String> computeDisplayedNamespace(VisualizerInput input,
+          Class<? extends SNode> type) {
+    if (input == null) {
+      return new HashSet<>();
+    }
+
+    
+
+    String showNamespaceConfig = input.getMappings().getProperty(
+            GridComponent.MAPPING_SHOW_NAMESPACE);
+    
+    if (showNamespaceConfig != null)
+    {
+      
+      SDocumentGraph graph = input.getDocument().getSDocumentGraph();
+
+      Set<String> annoPool = SToken.class.isAssignableFrom(type)
+        ? getAnnotationLevelSet(graph, null, type)
+        : getAnnotationLevelSet(graph, input.getNamespace(), type);
+      
+      if ("true".equalsIgnoreCase(showNamespaceConfig))
+      {
+        // all annotations should be displayed with a namespace
+        return annoPool;
+      }
+      else if("false".equalsIgnoreCase(showNamespaceConfig))
+      {
+        return new LinkedHashSet<>();
+      }
+      else
+      {
+        Set<String> annos = new LinkedHashSet<>();
+        
+        List<String> defs = Splitter.on(',').omitEmptyStrings()
+          .trimResults().splitToList(showNamespaceConfig);
+        for (String s : defs)
+        {
+          // is regular expression?
+          if (s.startsWith("/") && s.endsWith("/"))
+          {
+            // go over all remaining items in our pool of all annotations and
+            // check if they match
+            Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
+
+            LinkedList<String> matchingAnnos = new LinkedList<>();
+            for (String a : annoPool)
+            {
+              if (regex.matcher(a).matches())
+              {
+                matchingAnnos.add(a);
+              }
+            }
+
+            annos.addAll(matchingAnnos);
+            annoPool.removeAll(matchingAnnos);
+
+          }
+          else
+          {
+            annos.add(s);
+            annoPool.remove(s);
+          }
+        }
+        
+        return annos;
+      }
+    }
+    
+    return new LinkedHashSet<>();
   }
 
   /**

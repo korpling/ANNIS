@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -48,10 +49,8 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   
   private boolean showCaption = true;
   
-  private boolean showNamespace = false;
+  private Set<String> annosWithNamespace;
   
-  private String hideNamespaceRegex = null;
-
   /**
    * when true, all html tags are rendered as text and are shown in grid cells.
    * Does not effect row captions.
@@ -143,7 +142,7 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
           target.startTag("row");
           target.addAttribute("caption", anno.getKey());
           target.addAttribute("show-caption", showCaption);
-          target.addAttribute("show-namespace", showNamespace);
+          target.addAttribute("show-namespace", showNamespaceForAnno(anno.getKey()));
 
           ArrayList<GridEvent> rowEvents = row.getEvents();
           // sort the events by their natural order
@@ -206,16 +205,11 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 
   }
   
-  private boolean showNamespaceForAnno()
+  private boolean showNamespaceForAnno(String qname)
   {
-    if(showNamespace)
+    if(annosWithNamespace != null)
     {
-      // check if there is any regex for non-visible namespaces
-      if(hideNamespaceRegex != null)
-      {
-        
-      }
-      return true;
+      return annosWithNamespace.contains(qname);
     }
     else
     {
@@ -312,25 +306,19 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     this.showCaption = showCaption;
   }
 
-  public boolean isShowNamespace()
+  /**
+   * A set of qualified names for annotations which namespace should be shown.
+   * @return 
+   */
+  public Set<String> getAnnosWithNamespace()
   {
-    return showNamespace;
+    return annosWithNamespace;
   }
 
-  public void setShowNamespace(boolean showNamespace)
+  public void setAnnosWithNamespace(Set<String> annosWithNamespace)
   {
-    this.showNamespace = showNamespace;
+    this.annosWithNamespace = annosWithNamespace;
   }
 
-  public String getHideNamespaceRegex()
-  {
-    return hideNamespaceRegex;
-  }
-
-  public void setHideNamespaceRegex(String hideNamespaceRegex)
-  {
-    this.hideNamespaceRegex = hideNamespaceRegex;
-  }
-  
   
 }
