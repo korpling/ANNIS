@@ -515,16 +515,14 @@ public class EventExtractor {
    * matching the type.
    *
    * @param input The input for the visualizer.
-   * @param type Which type of nodes to include
+   * @param types Which types of nodes to include
    * @return
    */
   public static Set<String> computeDisplayedNamespace(VisualizerInput input,
-          Class<? extends SNode> type) {
+          List<Class<? extends SNode>> types) {
     if (input == null) {
       return new HashSet<>();
-    }
-
-    
+    }    
 
     String showNamespaceConfig = input.getMappings().getProperty(
             GridComponent.MAPPING_SHOW_NAMESPACE);
@@ -534,9 +532,14 @@ public class EventExtractor {
       
       SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
-      Set<String> annoPool = SToken.class.isAssignableFrom(type)
-        ? getAnnotationLevelSet(graph, null, type)
-        : getAnnotationLevelSet(graph, input.getNamespace(), type);
+      Set<String> annoPool = new LinkedHashSet<>();
+      for(Class<? extends SNode> t : types)
+      {
+        annoPool.addAll(SToken.class.isAssignableFrom(t)
+        ? getAnnotationLevelSet(graph, null, t)
+        : getAnnotationLevelSet(graph, input.getNamespace(), t));
+      }
+      
       
       if ("true".equalsIgnoreCase(showNamespaceConfig))
       {

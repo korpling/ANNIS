@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -131,7 +132,16 @@ public class GridComponent extends Panel
     grid.addStyleName(Helper.CORPUS_FONT_FORCE);
     grid.setEscapeHTML(Boolean.parseBoolean(input.getMappings().
       getProperty(MAPPING_ESCAPE_HTML, "true")));
-    grid.setAnnosWithNamespace(EventExtractor.computeDisplayedNamespace(input, SSpan.class));
+    LinkedList<Class<? extends SNode>> types = new LinkedList<>();
+    if(isShowingSpanAnnotations())
+    {
+      types.add(SSpan.class);
+    }
+    if(isShowingTokenAnnotations())
+    {
+      types.add(SToken.class);
+    }
+    grid.setAnnosWithNamespace(EventExtractor.computeDisplayedNamespace(input, types));
     
     
     layout.addComponent(grid);
