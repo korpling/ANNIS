@@ -4,7 +4,7 @@ import json
 import io
 from subprocess import call
 
-milestone_id = "37"
+milestone_id = "38"
 
 import http.client
 
@@ -39,7 +39,7 @@ for issue in j:
 		other.append(title)
 
 if len(bugs) > 0:
-	print("[Bugs]")
+	print("[Fixed Bugs]")
 	for t in bugs:
 		print(t)
 if len(enhancements) > 0:

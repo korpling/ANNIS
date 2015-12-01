@@ -35,20 +35,23 @@ public class SpecificPagingCallback implements PagingCallback
 
   private final SearchView searchView;
   private final AnnisUI ui;
+  private final DisplayedResultQuery query;
   
   public SpecificPagingCallback(AnnisUI ui, SearchView searchView,
-    ResultViewPanel panel)
+    ResultViewPanel panel, DisplayedResultQuery initialQuery)
   {
     this.panel = panel;
     this.ui = ui;
     this.searchView = searchView;
+    this.query = initialQuery;
   }
 
   @Override
   public void switchPage(long offset, int limit)
   {
-    ui.getQueryState().getOffset().setValue(offset);
-    ui.getQueryState().getLimit().setValue(limit);
+    query.setOffset(offset);
+    query.setLimit(limit);
+    ui.getQueryController().setQuery(query);
     // execute the result query again
     updateMatches(ui.getQueryController().getSearchQuery(), panel);
 

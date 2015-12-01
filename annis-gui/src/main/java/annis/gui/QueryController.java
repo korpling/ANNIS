@@ -68,12 +68,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
@@ -276,36 +278,50 @@ public class QueryController implements Serializable
     }
 
   }
+  
+  /**
+   * Only changes the value of the property if it is not equals to the old one.
+   * @param <T>
+   * @param prop
+   * @param newValue 
+   */
+  private static <T> void  setIfNew(Property<T> prop, T newValue)
+  {
+    if(!Objects.equals(prop.getValue(), newValue))
+    {
+      prop.setValue(newValue);
+    }
+  }
 
   public void setQuery(Query q)
   {
-    state.getAql().setValue(q.getQuery());
-    state.getSelectedCorpora().setValue(q.getCorpora());
+    // only change the values if actually changed (the value change listeners should not be triggered if not necessary)
+    setIfNew(state.getAql(), q.getQuery());
+    setIfNew(state.getSelectedCorpora(), q.getCorpora());
+   
     if (q instanceof ContextualizedQuery)
     {
-      state.getLeftContext().
-        setValue(((ContextualizedQuery) q).getLeftContext());
-      state.getRightContext().setValue(((ContextualizedQuery) q).
-        getRightContext());
-      state.getContextSegmentation().setValue(((ContextualizedQuery) q).getSegmentation());
+      setIfNew(state.getLeftContext(), ((ContextualizedQuery) q).getLeftContext());
+      setIfNew(state.getRightContext(), ((ContextualizedQuery) q).getRightContext());
+      setIfNew(state.getContextSegmentation(), ((ContextualizedQuery) q).getSegmentation());
     }
     if (q instanceof PagedResultQuery)
     {
-      state.getOffset().setValue(((PagedResultQuery) q).getOffset());
-      state.getLimit().setValue(((PagedResultQuery) q).getLimit());
-      state.getOrder().setValue(((PagedResultQuery) q).getOrder());
+      setIfNew(state.getOffset(), ((PagedResultQuery) q).getOffset());
+      setIfNew(state.getLimit(), ((PagedResultQuery) q).getLimit());
+      setIfNew(state.getOrder(), ((PagedResultQuery) q).getOrder());
     }
     if(q instanceof DisplayedResultQuery)
     {
-      state.getSelectedMatches().setValue(((DisplayedResultQuery) q).getSelectedMatches());
-      state.getVisibleBaseText().setValue(((DisplayedResultQuery) q).getBaseText());
+      setIfNew(state.getSelectedMatches(), ((DisplayedResultQuery) q).getSelectedMatches());
+      setIfNew(state.getVisibleBaseText(), ((DisplayedResultQuery) q).getBaseText());
     }
     if (q instanceof ExportQuery)
     {
-      state.getExporterName().setValue(((ExportQuery) q).getExporterName());
-      state.getExportAnnotationKeys().setValue(((ExportQuery) q).
+      setIfNew(state.getExporterName(), ((ExportQuery) q).getExporterName());
+      setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).
         getAnnotationKeys());
-      state.getExportParameters().setValue(((ExportQuery) q).getParameters());
+      setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
     }
   }
   
@@ -362,8 +378,13 @@ public class QueryController implements Serializable
       getState().getOffset().setValue(0l);
       getState().getSelectedMatches().setValue(new TreeSet<Long>());
       // get the value for the visible segmentation from the configured context
-      CorpusConfig config = ui.getCorpusConfigWithCache(
-        getState().getSelectedCorpora().getValue().iterator().next());
+      Set<String> selectedCorpora = getState().getSelectedCorpora().getValue();
+      CorpusConfig config = new CorpusConfig();
+      if(selectedCorpora != null && !selectedCorpora.isEmpty())
+      {
+        config = ui.getCorpusConfigWithCache(selectedCorpora.iterator().next());
+      }
+
       if(config.containsKey(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
       {
         getState().getVisibleBaseText().setValue(config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
@@ -390,7 +411,6 @@ public class QueryController implements Serializable
 
     searchView.updateFragment(displayedQuery);
 
-    addHistoryEntry(displayedQuery);
 
     if (displayedQuery.getCorpora() == null || displayedQuery.getCorpora().
       isEmpty())
@@ -404,6 +424,8 @@ public class QueryController implements Serializable
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
       return;
     }
+    
+    addHistoryEntry(displayedQuery);
 
     AsyncWebResource res = Helper.getAnnisAsyncWebResource();
 
@@ -420,7 +442,7 @@ public class QueryController implements Serializable
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
       ui.getInstanceConfig(), displayedQuery);
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
-      ui, searchView, newResultView));
+      ui, searchView, newResultView, displayedQuery));
 
     TabSheet.Tab newTab;
 
@@ -607,10 +629,18 @@ public class QueryController implements Serializable
    */
   public void addHistoryEntry(Query q)
   {
-    // remove it first in order to let it appear on the beginning of the list
-    state.getHistory().removeItem(q);
-    state.getHistory().addItemAt(0, q);
-    searchView.getControlPanel().getQueryPanel().updateShortHistory();
+    try
+    {
+      Query queryCopy = q.clone();
+      // remove it first in order to let it appear on the beginning of the list
+      state.getHistory().removeItem(queryCopy);
+      state.getHistory().addItemAt(0, queryCopy);
+      searchView.getControlPanel().getQueryPanel().updateShortHistory();
+    }
+    catch(CloneNotSupportedException ex)
+    {
+      log.error("Can't clone the query", ex);
+    }
   }
 
   public void changeContext(PagedResultQuery originalQuery,
@@ -619,36 +649,42 @@ public class QueryController implements Serializable
     final VisualizerContextChanger visCtxChange, boolean left)
   {
 
-    final PagedResultQuery newQuery = originalQuery.clone();
-    if (left)
+    try
     {
-      newQuery.setLeftContext(newContext);
-    }
-    else
-    {
-      newQuery.setRightContext(newContext);
-    }
-
-    newQuery.setOffset(offset);
-    
-
-    Background.runWithCallback(new SingleResultFetchJob(match, newQuery), 
-      new FutureCallback<SaltProject>()
+    final PagedResultQuery newQuery = (PagedResultQuery) originalQuery.clone();
+      if (left)
       {
-
-      @Override
-      public void onSuccess(SaltProject result)
+        newQuery.setLeftContext(newContext);
+      }
+      else
       {
-        visCtxChange.updateResult(result, newQuery);
+        newQuery.setRightContext(newContext);
       }
 
-      @Override
-      public void onFailure(Throwable t)
-      {
-        ExceptionDialog.show(t, "Could not extend context.");
-      }
-    });
+      newQuery.setOffset(offset);
 
+
+      Background.runWithCallback(new SingleResultFetchJob(match, newQuery), 
+        new FutureCallback<SaltProject>()
+        {
+
+        @Override
+        public void onSuccess(SaltProject result)
+        {
+          visCtxChange.updateResult(result, newQuery);
+        }
+
+        @Override
+        public void onFailure(Throwable t)
+        {
+          ExceptionDialog.show(t, "Could not extend context.");
+        }
+      });
+    }
+    catch(CloneNotSupportedException ex)
+    {
+      log.error("Can't clone the query", ex);
+    }
   }
 
   public void corpusSelectionChangedInBackground()

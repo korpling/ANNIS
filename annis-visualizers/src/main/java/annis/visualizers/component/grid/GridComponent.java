@@ -131,8 +131,16 @@ public class GridComponent extends Panel
     grid.addStyleName(Helper.CORPUS_FONT_FORCE);
     grid.setEscapeHTML(Boolean.parseBoolean(input.getMappings().
       getProperty(MAPPING_ESCAPE_HTML, "true")));
-    grid.setShowNamespace(Boolean.parseBoolean(input.getMappings().
-      getProperty(MAPPING_SHOW_NAMESPACE, "false")));
+    LinkedList<Class<? extends SNode>> types = new LinkedList<>();
+    if(isShowingSpanAnnotations())
+    {
+      types.add(SSpan.class);
+    }
+    if(isShowingTokenAnnotations())
+    {
+      types.add(SToken.class);
+    }
+    grid.setAnnosWithNamespace(EventExtractor.computeDisplayedNamespace(input, types));
     
     
     layout.addComponent(grid);

@@ -29,7 +29,7 @@ import java.util.Set;
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class Query implements Serializable
+public class Query implements Serializable, Cloneable
 {
   private String query;
   private Set<String> corpora;
@@ -91,8 +91,11 @@ public class Query implements Serializable
       && Objects.equals(this.corpora, other.corpora);
   }
 
-  
-  
-  
+  @Override
+  public Query clone() throws CloneNotSupportedException
+  {
+    return (Query) super.clone();
+  }
+
   
 }
