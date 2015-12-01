@@ -121,9 +121,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       long startTime = System.currentTimeMillis();
       
       // output XMI root element
-      SaltXML10Writer.writeXMIRootElement(xml);
-      
-      //writer.writeSaltProject(xml, project);
+      writer.writeXMIRootElement(xml);
       
       for(SCorpusGraph corpusGraph : project.getCorpusGraphs())
       {
@@ -141,25 +139,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
             }
           }
           
-          // add the corpus graph structure as feature 
-          // (this could be generatedd by the ID, but we can't be sure how it is generated)
-          List<String> path = new ArrayList<>();
-          path.add(doc.getName());
-          SNode c = corpusGraph.getCorpus(doc);
-          while(c != null)
-          {
-            path.add(0, c.getName());
-            List<SRelation<SNode, SNode>> inRels = corpusGraph.getInRelations(c.getId());
-            if(inRels != null && !inRels.isEmpty())
-            {
-              c = inRels.get(0).getSource();
-            }
-            else
-            {
-              c = null;
-            }
-          }
-          writer.writeDocumentGraph(xml, docGraph);
+          writer.writeObjects(xml, docGraph);
         }
       }
       xml.writeEndDocument();
