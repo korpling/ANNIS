@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.WebApplicationException;
@@ -120,12 +121,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       long startTime = System.currentTimeMillis();
       
       // output XMI root element
-      xml.writeStartElement(NS_XMI, "XMI", NS_VALUE_XMI);
-			xml.writeNamespace(NS_SDOCUMENTSTRUCTURE, NS_VALUE_SDOCUMENTSTRUCTURE);
-			xml.writeNamespace(NS_XMI, NS_VALUE_XMI);
-			xml.writeNamespace(NS_XSI, NS_VALUE_XSI);
-			xml.writeNamespace(NS_SALTCORE, NS_VALUE_SALTCORE);
-			xml.writeAttribute(NS_VALUE_XMI, ATT_XMI_VERSION, "2.0");
+      SaltXML10Writer.writeXMIRootElement(xml);
       
       //writer.writeSaltProject(xml, project);
       
@@ -170,7 +166,6 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       long endTime = System.currentTimeMillis();
       log.debug("Saving XMI (" + mediaType.toString() + ") needed {} ms",
         endTime - startTime);
-      xml.writeEndDocument();
     }
     catch (XMLStreamException ex)
     {
@@ -268,37 +263,17 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
   
   public static class MixedContentHandler extends SaltXML10Handler
   {
-    
-    private SaltProject project;
-    private final List<SDocumentGraph> docGraphs = new ArrayList<>();
-
-    @Override
-    public void endElement(String uri, String localName, String qName) throws SAXException
-    {
-      if(TAG_SALT_PROJECT.equals(qName) && getSaltObject() instanceof SaltProject)
-      {
-        this.project = (SaltProject) getSaltObject();
-      }
-      else if(TAG_SDOCUMENT_GRAPH.equals(qName) && getSaltObject() instanceof SDocumentGraph)
-      {
-        this.docGraphs.add((SDocumentGraph) getSaltObject());
-      }
-      
-      super.endElement(uri, localName, qName);
-    }
-
-    public SaltProject getProject()
-    {
-      return project;
-    }
-
     public List<SDocumentGraph> getDocGraphs()
     {
+      List<SDocumentGraph> docGraphs = new LinkedList<>();
+      for(Object o : getRootObjects())
+      {
+        if(o instanceof SDocumentGraph) {
+          docGraphs.add((SDocumentGraph) o);
+        }
+      }
       return docGraphs;
     }
-    
-    
-    
   }
 
   /**
