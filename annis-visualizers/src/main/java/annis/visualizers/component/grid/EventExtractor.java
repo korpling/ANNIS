@@ -530,7 +530,7 @@ public class EventExtractor {
     if (showNamespaceConfig != null)
     {
       
-      SDocumentGraph graph = input.getDocument().getSDocumentGraph();
+      SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
       Set<String> annoPool = new LinkedHashSet<>();
       for(Class<? extends SNode> t : types)
