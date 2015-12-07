@@ -69,7 +69,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   // generate two-sided boundaries for both left and right text borders
   // for the inclusion operators
   private boolean optimizeInclusion;
-  // where to attach component constraints for edge operators
+  // where to attach component constraints for relation operators
   // (lhs, rhs or both)
   private String componentPredicates;
   // use dedicated is_token column
@@ -197,10 +197,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   
   private void addComponentPredicates(List<String> conditions, QueryNode node,
-    final String edgeType, String componentName)
+    final String relationType, String componentName)
   {
     conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"),
-      sqlString(edgeType)));
+      sqlString(relationType)));
     if (componentName == null)
     {
       conditions.add(isNull(tables(node).aliasedColumn(COMPONENT_TABLE, "name")));
@@ -214,7 +214,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   }
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
-    QueryNode target, String componentName, String edgeType)
+    QueryNode target, String componentName, String relationType)
   {
     conditions.add(join("=", 
       tables(node).aliasedColumn(COMPONENT_TABLE, "id"), 
@@ -222,11 +222,11 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     
     if ("lhs".equals(componentPredicates) || "both".equals(componentPredicates))
     {
-      addComponentPredicates(conditions, node, edgeType, componentName);
+      addComponentPredicates(conditions, node, relationType, componentName);
     }
     if ("rhs".equals(componentPredicates) || "both".equals(componentPredicates))
     {
-      addComponentPredicates(conditions, target, edgeType, componentName);
+      addComponentPredicates(conditions, target, relationType, componentName);
     }
   }
 
@@ -235,14 +235,14 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode node, QueryNode target, PointingRelation join,
     QueryData queryData)
   {
-    addSingleEdgeCondition(node, target, conditions, join, "p");
+    addSingleRelationCondition(node, target, conditions, join, "p");
   }
 
   @Override
   protected void addDominanceConditions(List<String> conditions,
     QueryNode node, QueryNode target, Dominance join, QueryData queryData)
   {
-    addSingleEdgeCondition(node, target, conditions, join, "d");
+    addSingleRelationCondition(node, target, conditions, join, "d");
   }
 
   @Override
@@ -261,7 +261,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       "left_token");
   }
 
-  // FIXME: why not in addSingleEdgeConditions() ?
+  // FIXME: why not in addSingleRelationConditions() ?
   protected void addLeftOrRightDominance(List<String> conditions, QueryNode node,
     QueryNode target, QueryData queryData, RankTableJoin join,
     String aggregationFunction, String tokenBoarder)
@@ -648,7 +648,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     conditions.add(sb.toString());
   }
 
-  // FIXME: Why not in addSingleEdgeCondition
+  // FIXME: Why not in addSingleRelationCondition
   @Override
   protected void addSiblingConditions(List<String> conditions, QueryNode node,
     QueryNode target, Sibling join, QueryData queryData)
@@ -667,12 +667,12 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   }
 
   @Override
-  protected void addSingleEdgeCondition(QueryNode node, QueryNode target,
-    List<String> conditions, Join join, final String edgeType)
+  protected void addSingleRelationCondition(QueryNode node, QueryNode target,
+    List<String> conditions, Join join, final String relationType)
   {
     RankTableJoin rankTableJoin = (RankTableJoin) join;
     String componentName = rankTableJoin.getName();
-    addComponentPredicates(conditions, node, target, componentName, edgeType);
+    addComponentPredicates(conditions, node, target, componentName, relationType);
 
     int min = rankTableJoin.getMinDistance();
     int max = rankTableJoin.getMaxDistance();

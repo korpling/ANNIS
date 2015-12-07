@@ -27,13 +27,13 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 import com.google.common.io.ByteStreams;
 import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.ws.rs.core.MediaType;
+import org.corpus_tools.salt.common.SaltProject;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assume.assumeNoException;
 import static org.junit.Assume.assumeNotNull;
@@ -132,7 +132,7 @@ public class BenchmarkTest
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282", null);
 
-    assertEquals(1, p.getSCorpusGraphs().size());
+    assertEquals(1, p.getCorpusGraphs().size());
   }
 
   @Test
@@ -147,17 +147,6 @@ public class BenchmarkTest
       nullStream);
   }
 
-  @Test
-  public void mapSaltAndSaveBinary_Pcc4282() throws IOException
-  {
-    assumeTrue(ridgesCorpusID.size() > 0);
-
-    SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282", null);
-    provider.writeTo(p, SaltProject.class, null, null,
-      typeBinary, null,
-      nullStream);
-  }
 
   @Test
   public void mapSalt_SonderbaresKraeuterBuch()
@@ -167,7 +156,7 @@ public class BenchmarkTest
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21", null);
 
-    assertEquals(1, p.getSCorpusGraphs().size());
+    assertEquals(1, p.getCorpusGraphs().size());
   }
 
   @Test
@@ -177,20 +166,9 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21", null);
-    provider.writeTo(p, SaltProject.class, null, null,
+    provider.writeTo(p, 
+      SaltProject.class, null, null,
       typeXMI, null,
-      nullStream);
-  }
-
-  @Test
-  public void mapSaltAndSaveBinary_SonderbaresKraeuterBuch() throws IOException
-  {
-    assumeTrue(ridgesCorpusID.size() > 0);
-
-    SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21", null);
-    provider.writeTo(p, SaltProject.class, null, null,
-      new MediaType("application", "xmi+binary"), null,
       nullStream);
   }
 }

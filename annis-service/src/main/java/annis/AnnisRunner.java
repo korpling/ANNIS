@@ -40,11 +40,7 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Splitter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -67,9 +63,9 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.util.SaltUtil;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -333,9 +329,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doCorpus("pcc2");
-    doSet("freq-def to 1:tok, 2:lemma");
-    doFrequency("tok . tok");
+    doDoc("NoSta-D-Kafka NoSta-D-Kafka");
   }
 
   public void doParse(String annisQuery)
@@ -1087,7 +1081,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     // write result to File
     URI path = URI.createFileURI("/tmp/annissalt");
-    result.saveSaltProject_DOT(path);
+    SaltUtil.save_DOT(result, path);
     System.out.println("graph as dot written to /tmp/annissalt");
   }
 
@@ -1239,33 +1233,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private String printSaltAsXMI(SaltProject project)
   {
-    try
-    {
-      Resource resource = new XMIResourceImpl();
-      // add the project itself
-      resource.getContents().add(project);
+    // TODO: actuall transform it
+    throw new UnsupportedOperationException("Not implemented yet");
 
-      // add all SDocumentGraph elements
-      for (SCorpusGraph corpusGraph : project.getSCorpusGraphs())
-      {
-        for (SDocument doc : corpusGraph.getSDocuments())
-        {
-          if (doc.getSDocumentGraph() != null)
-          {
-            resource.getContents().add(doc.getSDocumentGraph());
-          }
-        }
-      }
-      ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-      resource.save(outStream, null);
-      return new String(outStream.toByteArray(), "UTF-8");
-
-    }
-    catch (IOException ex)
-    {
-      log.error(null, ex);
-    }
-    return "";
   }
 
   public AnnisParserAntlr getAnnisParser()

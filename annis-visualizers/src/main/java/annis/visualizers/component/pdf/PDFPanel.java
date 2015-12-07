@@ -103,7 +103,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
   private String getBinaryPath() {
     List<String> corpusPath =
-            CommonHelper.getCorpusPath(input.getDocument().getSCorpusGraph(),
+            CommonHelper.getCorpusPath(input.getDocument().getGraph(),
             input.getDocument());
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);

@@ -618,7 +618,7 @@ public class QueryNode implements Serializable
   // .append(this.spanTextMatching, other.spanTextMatching)
   // .append(this.outgoingJoins, other.outgoingJoins)
   // .append(this.variable, other.variable)
-  // .append(this.edgeAnnotations, other.edgeAnnotations)
+  // .append(this.relationAnnotations, other.relationAnnotations)
   // .append(this.marker, other.marker)
   // .isEquals();
   // }
@@ -642,7 +642,7 @@ public class QueryNode implements Serializable
   @XmlTransient
   public Set<QueryAnnotation> getEdgeAnnotations()
   {
-    Set<QueryAnnotation> edgeAnnotations = new TreeSet<QueryAnnotation>();
+    Set<QueryAnnotation> edgeAnnotations = new TreeSet<>();
     
     for(Join j : ingoingJoins)
     {

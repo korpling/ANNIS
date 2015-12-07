@@ -398,7 +398,7 @@ public class JoinListener extends AqlParserBaseListener
     left.addOutgoingJoin(addParsedLocation(ctx, j));
     if(ctx.anno != null)
     {
-      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
+      LinkedList<QueryAnnotation> annotations = fromRelationAnnotation(ctx.anno);
       for (QueryAnnotation a : annotations)
       {
         j.addEdgeAnnotation(a);
@@ -454,7 +454,7 @@ public class JoinListener extends AqlParserBaseListener
     Join j = new PointingRelation(right, label, 1);
     if (ctx.anno != null)
     {
-      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
+      LinkedList<QueryAnnotation> annotations = fromRelationAnnotation(ctx.anno);
       for (QueryAnnotation a : annotations)
       {
         j.addEdgeAnnotation(a);
@@ -594,7 +594,7 @@ public class JoinListener extends AqlParserBaseListener
     }
   }
   
-  private LinkedList<QueryAnnotation> fromEdgeAnnotation(
+  private LinkedList<QueryAnnotation> fromRelationAnnotation(
     AqlParser.EdgeSpecContext ctx)
   {
     LinkedList<QueryAnnotation> annos = new LinkedList<>();

@@ -28,10 +28,10 @@ import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import java.util.regex.Pattern;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SaltProject;
 
 /**
  * Renders the plain text from the text table.

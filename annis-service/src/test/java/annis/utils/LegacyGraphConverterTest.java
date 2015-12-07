@@ -19,7 +19,6 @@ import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SolutionKey;
 import annis.sqlgen.TestAnnotateSqlGenerator;
 import annis.test.CsvResultSetProvider;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +26,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import org.corpus_tools.salt.common.SaltProject;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.assertEquals;
@@ -104,7 +104,7 @@ public class LegacyGraphConverterTest
     TestAnnotateSqlGenerator.setupOuterQueryFactsTableColumnAliases(saltExtractor);
     
     List<Match> matches = new ArrayList<>();
-    matches.add(Match.parseFromString("salt:/pcc2/4282/#tok_155 tiger::pos::salt:/pcc2/4282/#tok_156"));
+    matches.add(Match.parseFromString("salt:/pcc2/4282/#tok_155 tiger::pos::salt:/pcc2/4282#tok_156"));
     MatchGroup matchGroup = new MatchGroup(matches);
     
     SaltProject p =

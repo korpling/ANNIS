@@ -22,10 +22,6 @@ import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
 import annis.service.objects.RawTextWrapper;
 import annis.utils.LegacyGraphConverter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -36,6 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SNode;
 
 /**
  * Contains all needed data for a visualizer to perform the visualization.
@@ -46,7 +46,7 @@ public class VisualizerInput implements Serializable
 {
   private static final long serialVersionUID = 2L;
   
-  private transient SDocument document = SaltFactory.eINSTANCE.createSDocument();
+  private SDocument document = SaltFactory.createSDocument();
 
   private String namespace = "";
 
@@ -80,20 +80,6 @@ public class VisualizerInput implements Serializable
   private FontConfig font;
 
   private RawTextWrapper rawText;
-
-  private void writeObject(ObjectOutputStream out) throws IOException
-  {
-    out.defaultWriteObject();
-
-    CommonHelper.writeSDocument(document, out);
-  }
-
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
-
-    this.document = CommonHelper.readSDocument(in);
-  }
 
   public String getAnnisWebServiceURL()
   {
@@ -276,7 +262,7 @@ public class VisualizerInput implements Serializable
       if (document != null)
       {
         cachedMarkedAndCoveredNodes = CommonHelper.createSNodeMapFromIDs(
-          markedAndCovered, document.getSDocumentGraph());
+          markedAndCovered, document.getDocumentGraph());
       }
     }
     
@@ -376,7 +362,7 @@ public class VisualizerInput implements Serializable
   {
     if(this.cachedToken == null)
     {
-      this.cachedToken = getSResult().getSDocumentGraph().getSortedSTokenByText();
+      this.cachedToken = getSResult().getDocumentGraph().getSortedTokenByText();
     }
     return this.cachedToken;
   }

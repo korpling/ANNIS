@@ -63,7 +63,6 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,6 +77,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

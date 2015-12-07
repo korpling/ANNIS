@@ -158,7 +158,7 @@ public abstract class AbstractWhereClauseGenerator extends
             NODE_ANNOTATION_TABLE, queryData);
       }
 
-      // edge annotations
+      // relation annotations
       int j = 0;
       for (QueryAnnotation annotation : node.getEdgeAnnotations())
       {
@@ -192,9 +192,9 @@ public abstract class AbstractWhereClauseGenerator extends
   protected abstract void addTokenArityConditions(List<String> conditions,
       QueryData queryData, QueryNode node);
 
-  protected abstract void addSingleEdgeCondition(QueryNode node,
+  protected abstract void addSingleRelationCondition(QueryNode node,
       QueryNode target, List<String> conditions, Join join,
-      final String edgeType);
+      final String relationType);
 
   protected abstract void addSiblingConditions(List<String> conditions,
       QueryNode node, QueryNode target, Sibling join, QueryData queryData);

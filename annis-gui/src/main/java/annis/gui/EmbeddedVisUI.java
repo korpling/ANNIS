@@ -46,12 +46,6 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -60,6 +54,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import javax.ws.rs.core.Response;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -178,13 +178,13 @@ public class EmbeddedVisUI extends CommonUI
 
       SCorpusGraph firstCorpusGraph = null;
       SDocument doc = null;
-      if(p.getSCorpusGraphs() != null && !p.getSCorpusGraphs().isEmpty())
+      if(p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty())
       {
-        firstCorpusGraph = p.getSCorpusGraphs().get(0);
-        if(firstCorpusGraph.getSDocuments() != null && 
-          !firstCorpusGraph.getSDocuments().isEmpty())
+        firstCorpusGraph = p.getCorpusGraphs().get(0);
+        if(firstCorpusGraph.getDocuments() != null && 
+          !firstCorpusGraph.getDocuments().isEmpty())
         {
-          doc = firstCorpusGraph.getSDocuments().get(0);
+          doc = firstCorpusGraph.getDocuments().get(0);
         }
       }
       if(doc == null)
@@ -243,7 +243,7 @@ public class EmbeddedVisUI extends CommonUI
       
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         baseText,
-        doc.getSDocumentGraph());
+        doc.getDocumentGraph());
 
       if(args.containsKey(KEY_MATCH)) {
         String[] rawMatch = args.get(KEY_MATCH);
@@ -331,34 +331,34 @@ public class EmbeddedVisUI extends CommonUI
     for(URI u : match.getSaltIDs())
     {
       allUrisAsString.add(u.toASCIIString());
-      SNode matchedNode = document.getSDocumentGraph().getSNode(u.toASCIIString());
+      SNode matchedNode = document.getDocumentGraph().getNode(u.toASCIIString());
       // set the feature for this specific node
       if (matchedNode != null)
         {
-          SFeature existing = matchedNode.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          SFeature existing = matchedNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
           if(existing == null)
           {
-            SFeature featMatchedNode = SaltFactory.eINSTANCE.createSFeature();
-            featMatchedNode.setSNS(ANNIS_NS);
-            featMatchedNode.setSName(FEAT_MATCHEDNODE);
-            featMatchedNode.setSValue(i);
-            matchedNode.addSFeature(featMatchedNode);
+            SFeature featMatchedNode = SaltFactory.createSFeature();
+            featMatchedNode.setNamespace(ANNIS_NS);
+            featMatchedNode.setName(FEAT_MATCHEDNODE);
+            featMatchedNode.setValue(i);
+            matchedNode.addFeature(featMatchedNode);
           }
       }
       i++;
     }
     
-    SFeature featIDs = SaltFactory.eINSTANCE.createSFeature();
-    featIDs.setSNS(ANNIS_NS);
-    featIDs.setSName(FEAT_MATCHEDIDS);
-    featIDs.setSValue(Joiner.on(",").join(allUrisAsString));
-    document.addSFeature(featIDs);
+    SFeature featIDs = SaltFactory.createSFeature();
+    featIDs.setNamespace(ANNIS_NS);
+    featIDs.setName(FEAT_MATCHEDIDS);
+    featIDs.setValue(Joiner.on(",").join(allUrisAsString));
+    document.addFeature(featIDs);
     
-    SFeature featAnnos = SaltFactory.eINSTANCE.createSFeature();
-    featAnnos.setSNS(ANNIS_NS);
-    featAnnos.setSName(FEAT_MATCHEDANNOS);
-    featAnnos.setSValue(Joiner.on(",").join(match.getAnnos()));
-    document.addSFeature(featAnnos);
+    SFeature featAnnos = SaltFactory.createSFeature();
+    featAnnos.setNamespace(ANNIS_NS);
+    featAnnos.setName(FEAT_MATCHEDANNOS);
+    featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
+    document.addFeature(featAnnos);
     
     
   }
