@@ -30,7 +30,7 @@ public class Edge implements Serializable
     COVERAGE("c", "Coverage"),
     DOMINANCE("d", "Dominance"),
     POINTING_RELATION("p", "Pointing Relation"),
-    UNKNOWN(null, "UnknownRelationType");
+    UNKNOWN(null, "UnknownEdgeType");
     private String type;
     private String name;
 
