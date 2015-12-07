@@ -316,16 +316,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       edges = currNode.getGraph().getOutRelations(currNode.getId());
 
       // get all tokens directly dominated tokens and build a string
-      for (SRelation<SNode, SNode> e : edges) {
-        SRelation sedge;
-
-        if (e instanceof SRelation) {
-          sedge = (SRelation) e;
-        } else {
-          log.error("wrong type of edge for {}", e);
-          continue;
-        }
-
+      for (SRelation<SNode, SNode> sedge : edges) {
         if (sedge.getTarget() instanceof SToken) 
         {
           token.add((SToken) sedge.getTarget());
@@ -407,7 +398,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       if (in != null) {
 
         for (SRelation<SNode, SNode> e : in) {
-          if (e instanceof SRelation && hasRSTType((SRelation) e)) {
+          if (hasRSTType(e)) {
             JSONObject tmp;
 
 
