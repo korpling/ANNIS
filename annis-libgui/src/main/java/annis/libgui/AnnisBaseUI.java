@@ -345,7 +345,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
   }
   
-  private void checkIfRemoteLoggedIn(VaadinRequest request)
+  private static void checkIfRemoteLoggedIn(VaadinRequest request)
   {
      // check if we are logged in using an external authentification mechanism
       // like Schibboleth
@@ -459,7 +459,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return jsonMapper;
   }
   
-  private class RemoteUserRequestHandler implements RequestHandler
+  private static class RemoteUserRequestHandler implements RequestHandler
   {
 
     @Override
