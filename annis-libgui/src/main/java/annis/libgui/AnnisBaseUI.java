@@ -203,20 +203,23 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
         // get all sub-files ending on ".json"
         File[] instanceFiles =
           root.listFiles((FilenameFilter) new SuffixFileFilter(".json"));
-        for(File i : instanceFiles)
+        if(instanceFiles != null)
         {
-          if(i.isFile() && i.canRead())
+          for(File i : instanceFiles)
           {
-            try
+            if(i.isFile() && i.canRead())
             {
-              InstanceConfig config = getJsonMapper().readValue(i, InstanceConfig.class);
-              String name = StringUtils.removeEnd(i.getName(), ".json");
-              config.setInstanceName(name);
-              result.put(name, config);
-            }
-            catch (IOException ex)
-            {
-              log.warn("could not parse instance config: " + ex.getMessage());
+              try
+              {
+                InstanceConfig config = getJsonMapper().readValue(i, InstanceConfig.class);
+                String name = StringUtils.removeEnd(i.getName(), ".json");
+                config.setInstanceName(name);
+                result.put(name, config);
+              }
+              catch (IOException ex)
+              {
+                log.warn("could not parse instance config: " + ex.getMessage());
+              }
             }
           }
         }
