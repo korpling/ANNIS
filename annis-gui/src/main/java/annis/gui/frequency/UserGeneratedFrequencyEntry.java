@@ -18,6 +18,7 @@ package annis.gui.frequency;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -81,4 +82,42 @@ public class UserGeneratedFrequencyEntry implements Serializable
     
     return result;
   }
+
+  @Override
+  public int hashCode()
+  {
+    int hash = 7;
+    hash = 53 * hash + Objects.hashCode(this.nr);
+    hash = 53 * hash + Objects.hashCode(this.annotation);
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (this == obj)
+    {
+      return true;
+    }
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final UserGeneratedFrequencyEntry other = (UserGeneratedFrequencyEntry) obj;
+    if (!Objects.equals(this.nr, other.nr))
+    {
+      return false;
+    }
+    if (!Objects.equals(this.annotation, other.annotation))
+    {
+      return false;
+    }
+    return true;
+  }
+
+  
 }

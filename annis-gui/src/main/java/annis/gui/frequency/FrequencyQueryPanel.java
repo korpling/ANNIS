@@ -533,6 +533,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         lblErrorOrMsg.setVisible(true);
       }
       
+      Set<UserGeneratedFrequencyEntry> generatedEntries = new HashSet<>();
       
       for(QueryNode n : nodes)
       {
@@ -540,24 +541,33 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           if(n.getNodeAnnotations().isEmpty())
           {
-            int id = counter++;
-            
             UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
             entry.setAnnotation("tok");
             entry.setComment("automatically created from " + n.toAQLNodeFragment());
             entry.setNr(n.getVariable());
-            state.getFrequencyTableDefinition().addItem(id, entry);
+            
+            if(!generatedEntries.contains(entry))
+            {
+              int id = counter++;
+              state.getFrequencyTableDefinition().addItem(id, entry);
+              generatedEntries.add(entry);
+            }
           }
           else
           {
-            int id = counter++;
             QueryAnnotation firstAnno = n.getNodeAnnotations().iterator().next();
             
             UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
             entry.setAnnotation(firstAnno.getName());
             entry.setComment("automatically created from " + n.toAQLNodeFragment());
             entry.setNr(n.getVariable());
-            state.getFrequencyTableDefinition().addItem(id, entry);
+            
+            if(!generatedEntries.contains(entry))
+            {
+              int id = counter++;
+              state.getFrequencyTableDefinition().addItem(id, entry);
+              generatedEntries.add(entry);
+            }
           }
         }
       }
