@@ -161,7 +161,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       + "(n1#tok=\"fun\" | n1#tok=\"severity\")"
       + "</pre>");
     lblErrorOrMsg.setContentMode(ContentMode.HTML);
-    lblErrorOrMsg.addStyleName("warning");
+    lblErrorOrMsg.addStyleName("embedded-warning");
     lblErrorOrMsg.setWidth("100%");
     lblErrorOrMsg.setVisible(false);
     queryLayout.addComponent(lblErrorOrMsg);

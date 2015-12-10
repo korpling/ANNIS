@@ -13771,6 +13771,13 @@ div.v-layout.v-horizontal.v-widget {
 	font-family: monospace;
 }
 
+.annis_embeddedvis .embedded-warning {
+	background-color: #FFF3D2;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #AC7C00;
+}
+
 .annis_embeddedvis .cm-s-default .cm-string, .annis_embeddedvis .cm-s-default .cm-string-2 {
 	color: #811b00;
 }

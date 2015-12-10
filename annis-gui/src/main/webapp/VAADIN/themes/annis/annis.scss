@@ -287,6 +287,13 @@ $font-size: 10pt;
     font-family: monospace;
   }
   
+  .embedded-warning {
+    background-color: #FFF3D2;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #AC7C00;
+  }
+  
   /* Code mirror theme changes */
   .cm-s-default {
     .cm-string, .cm-string-2 {
