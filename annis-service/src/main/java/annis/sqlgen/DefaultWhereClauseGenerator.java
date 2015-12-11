@@ -270,8 +270,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String componentName = rankTableJoin.getName();
     addComponentPredicates(conditions, node, target, componentName, "d");
 
-    TableAccessStrategy tas = tables(null);
-
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "id"),
       tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
