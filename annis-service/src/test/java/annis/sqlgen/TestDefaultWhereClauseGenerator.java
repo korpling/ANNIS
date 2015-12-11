@@ -729,7 +729,8 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new SameSpan(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.left_token", "_node42.left_token"),
-        join("=", "(_node23.right_token - _node23.left_token)", "(_node42.right_token - _node42.left_token)"),
+        join(">=", "_node23.right_token", "_node42.right_token"),
+        join("<=", "_node23.right_token", "_node42.right_token"),
         join("<>", "_node23.id", "_node42.id")
     );
   }
