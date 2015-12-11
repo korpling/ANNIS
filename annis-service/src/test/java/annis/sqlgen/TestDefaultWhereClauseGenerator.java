@@ -289,15 +289,21 @@ public class TestDefaultWhereClauseGenerator
   {
     // given
     node23.addOutgoingJoin(new LeftDominance(node42));
+    
+    long corpusId = uniqueLong();
+    given(queryData.getCorpusList()).willReturn(asList(corpusId));
+    
     // then
     checkEdgeConditions(
-        componentPredicate,
-        "d",
-        null,
-        join("=", "_rank23.id", "_rank42.parent"),
-        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.id AND "
-      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
-      + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
+      componentPredicate,
+      "d",
+      null,
+      join("=", "_rank23.id", "_rank42.parent"),
+      "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts_"
+      + corpusId
+      + " AS lrsub WHERE parent=_rank23.id AND "
+      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(" + corpusId + ")"
+      + ")");
   }
 
   /**
@@ -309,15 +315,19 @@ public class TestDefaultWhereClauseGenerator
   {
     // given
     node23.addOutgoingJoin(new RightDominance(node42));
+    
+    long corpusId = uniqueLong();
+    given(queryData.getCorpusList()).willReturn(asList(corpusId));
+    
     // then
     checkEdgeConditions(
         componentPredicate,
         "d",
         null,
         join("=", "_rank23.id", "_rank42.parent"),
-        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.id AND "
-      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
-      + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
+        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts_" + corpusId + " AS lrsub WHERE parent=_rank23.id AND "
+      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN("  + corpusId + ")"
+      + ")");
   }
 
   /**

@@ -278,26 +278,16 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     List<Long> corpusList = queryData.getCorpusList();
     
     
-    boolean doJoin = !tas.isMaterialized(NODE_TABLE, RANK_TABLE);
-    
     String innerSelect = 
        "SELECT "
       + aggregationFunction
       + "(lrsub."
       + tokenBoarder
       + ") FROM ";
-    if(doJoin)
-    {
-      innerSelect +=
-          tas.tableName(NODE_TABLE) + " AS lrsub, "
-        + tas.tableName(RANK_TABLE) + " AS lrsub_rank ";
-    }
-    else
-    {
-      innerSelect += 
-        tas.tableName(RANK_TABLE)
-        + " as lrsub ";
-    }
+    
+    innerSelect += SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, "")
+      + " AS lrsub ";
+
     
     innerSelect +=
         "WHERE parent="
@@ -309,15 +299,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       + " AND lrsub.toplevel_corpus IN("
       + (corpusList == null || corpusList.isEmpty() ? "NULL"
       : StringUtils.join(corpusList, ",")) + ")";
-    
-    if(doJoin)
-    {
-      innerSelect +=
-        " AND lrsub_rank.toplevel_corpus IN("
-        + (corpusList == null || corpusList.isEmpty() ? "NULL"
-        : StringUtils.join(corpusList, ",")) + ")"
-        + " AND lrsub_rank.node_ref = lrsub.id";
-    }
     
     conditions.add(in(
       tables(target).aliasedColumn(NODE_TABLE, tokenBoarder), innerSelect));
