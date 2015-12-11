@@ -1310,7 +1310,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     executeSqlFromScript("indexes.sql", args);
 
     log.info("indexing the new facts table (edge related indexes)");
-    executeSqlFromScript("indexes_edges.sql", args);
+    executeSqlFromScript("indexes_edge.sql", args);
 
   }
 
