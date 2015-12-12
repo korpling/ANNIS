@@ -13,6 +13,7 @@ var searchData=
   ['clearmediaplayers',['clearMediaPlayers',['../interfaceannis_1_1libgui_1_1media_1_1_media_controller.html#abebb5ecd499d89a725476399873de243',1,'annis.libgui.media.MediaController.clearMediaPlayers()'],['../classannis_1_1libgui_1_1media_1_1_media_controller_impl.html#af90307881e9caf41e25e1c35419e6eef',1,'annis.libgui.media.MediaControllerImpl.clearMediaPlayers()']]],
   ['closeallconnections',['closeAllConnections',['../classannis_1_1administration_1_1_abstract_adminstration_dao.html#a3c3a821c5e864b311bba2d28ee8aa939',1,'annis::administration::AbstractAdminstrationDao']]],
   ['computedisplayannotations',['computeDisplayAnnotations',['../classannis_1_1visualizers_1_1component_1_1grid_1_1_event_extractor.html#a7b6de82f51a271e004ed970fdc9b2429',1,'annis::visualizers::component::grid::EventExtractor']]],
+  ['computedisplayednamespace',['computeDisplayedNamespace',['../classannis_1_1visualizers_1_1component_1_1grid_1_1_event_extractor.html#ae6a71bc65da03d28e1d81a1c6292c15d',1,'annis::visualizers::component::grid::EventExtractor']]],
   ['containsconfig',['containsConfig',['../classannis_1_1service_1_1objects_1_1_corpus_config_map.html#a60904f739a95252931b96ffca33aa4e0',1,'annis::service::objects::CorpusConfigMap']]],
   ['containskey',['containsKey',['../classannis_1_1service_1_1objects_1_1_corpus_config.html#aaadbe28f07bfea3c15ea79dd4d79a66e',1,'annis::service::objects::CorpusConfig']]],
   ['containsrtltext',['containsRTLText',['../classannis_1_1_common_helper.html#a57a5336fc57f46822faf784d0a9fe644',1,'annis::CommonHelper']]],

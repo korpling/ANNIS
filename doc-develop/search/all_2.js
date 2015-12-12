@@ -30,6 +30,7 @@ var searchData=
   ['commonui',['CommonUI',['../classannis_1_1gui_1_1_common_u_i.html',1,'annis::gui']]],
   ['componentsearchrelationnormalizer',['ComponentSearchRelationNormalizer',['../classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html',1,'annis::ql::parser']]],
   ['computedisplayannotations',['computeDisplayAnnotations',['../classannis_1_1visualizers_1_1component_1_1grid_1_1_event_extractor.html#a7b6de82f51a271e004ed970fdc9b2429',1,'annis::visualizers::component::grid::EventExtractor']]],
+  ['computedisplayednamespace',['computeDisplayedNamespace',['../classannis_1_1visualizers_1_1component_1_1grid_1_1_event_extractor.html#ae6a71bc65da03d28e1d81a1c6292c15d',1,'annis::visualizers::component::grid::EventExtractor']]],
   ['constituentlayouter',['ConstituentLayouter',['../classannis_1_1visualizers_1_1component_1_1tree_1_1_constituent_layouter.html',1,'annis::visualizers::component::tree']]],
   ['constraintlayout',['ConstraintLayout',['../classannis_1_1gui_1_1querybuilder_1_1_node_window_1_1_constraint_layout.html',1,'annis::gui::querybuilder::NodeWindow']]],
   ['containsconfig',['containsConfig',['../classannis_1_1service_1_1objects_1_1_corpus_config_map.html#a60904f739a95252931b96ffca33aa4e0',1,'annis::service::objects::CorpusConfigMap']]],

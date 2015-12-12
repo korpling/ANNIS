@@ -24,7 +24,7 @@ var classannis_1_1sqlgen_1_1_abstract_where_clause_generator =
     [ "addRightOverlapConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a3b155da1da8b091e00c08b7f701ee776", null ],
     [ "addSameSpanConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a57d33d6bbc9977cd4315a0512aec4a9c", null ],
     [ "addSiblingConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a2c7b1e4935a2634421a823e0e84b09f0", null ],
-    [ "addSingleEdgeCondition", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a0ab03624ed7ee36fcad4c0fe2af76f67", null ],
+    [ "addSingleRelationCondition", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#ae728cac0e8d03b02e09bc88b281dfcc9", null ],
     [ "addSpanConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#ae793dc55d70b5686c0f913b3f006cdc6", null ],
     [ "addTokenArityConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#abf70611efddb43d29d2b9287c97e2a70", null ],
     [ "whereConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#ad636c404cd1ae39b31454c0fc6299d92", null ]

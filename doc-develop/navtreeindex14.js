@@ -1,5 +1,7 @@
 var NAVTREEINDEX14 =
 {
+"dev-release.html#dev-release-intro":[2,3,0],
+"dev-release.html#dev-release-preview-finish":[2,3,3,2],
 "dev-release.html#dev-release-preview-init":[2,3,3,0],
 "dev-release.html#dev-release-preview-process":[2,3,3],
 "dev-release.html#dev-release-preview-test":[2,3,3,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX14 =
 "interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html#a66cbc8d79d8e022927aec1b35f80185a":[4,0,0,6,0,1,3,2],
 "interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html#ab4f5a33727fdab4536dfc003f0e49434":[4,0,0,6,0,1,3,0],
 "interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html#ad4cee40b27f8cf49bae7004ccbfe608a":[4,0,0,6,0,1,3,1],
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html":[4,0,0,6,0,2,0],
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html#a8ce7a20fb783a78f4dbd6478f5d7f0ab":[4,0,0,6,0,2,0,2],
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html#abb5a6dd2eb7c873d9f713ff8a0ab9c6b":[4,0,0,6,0,2,0,1]
+"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html":[4,0,0,6,0,2,0]
 };

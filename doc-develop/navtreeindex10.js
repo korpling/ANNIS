@@ -1,5 +1,7 @@
 var NAVTREEINDEX10 =
 {
+"classannis_1_1service_1_1objects_1_1_document_browser_config.html#a28593d3ea80e44c02fbf8debe6d2add1":[4,0,0,14,2,9,4],
+"classannis_1_1service_1_1objects_1_1_document_browser_config.html#a35a5e6ebff292f03cfa5590e19f5ae36":[4,0,0,14,2,9,6],
 "classannis_1_1service_1_1objects_1_1_document_browser_config.html#a9b13ee65f75a991796dc05df3928654a":[4,0,0,14,2,9,1],
 "classannis_1_1service_1_1objects_1_1_document_browser_config.html#aba6ea6fa41d0353fb9d7af60af8016e8":[4,0,0,14,2,9,2],
 "classannis_1_1service_1_1objects_1_1_document_browser_config.html#ac07e7aaaee3b116ef020b5af5405fdec":[4,0,0,14,2,9,5],
@@ -147,7 +149,6 @@ var NAVTREEINDEX10 =
 "classannis_1_1sqlgen_1_1_abstract_union_sql_generator.html#a612209a56c8d0959f478008481e204e7":[4,0,0,15,6,0],
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html":[4,0,0,15,7],
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a074cd56f07255ca11b8d05200c57c9b9":[4,0,0,15,7,19],
-"classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a0ab03624ed7ee36fcad4c0fe2af76f67":[4,0,0,15,7,24],
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a2147de6889a92b7de71968af42281891":[4,0,0,15,7,10],
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a215a3312d12356580b4dd4e6de6c20eb":[4,0,0,15,7,12],
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a255fb8499959b2553632f5a6151bdeb3":[4,0,0,15,7,15],
@@ -172,6 +173,7 @@ var NAVTREEINDEX10 =
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#abf70611efddb43d29d2b9287c97e2a70":[4,0,0,15,7,26],
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#ad4620d47a407b17e3c7cbfbba6555454":[4,0,0,15,7,13],
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#ad636c404cd1ae39b31454c0fc6299d92":[4,0,0,15,7,27],
+"classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#ae728cac0e8d03b02e09bc88b281dfcc9":[4,0,0,15,7,24],
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#ae793dc55d70b5686c0f913b3f006cdc6":[4,0,0,15,7,25],
 "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#aefa0699c5535e54d5a328600ee929840":[4,0,0,15,7,7],
 "classannis_1_1sqlgen_1_1_annotate_inner_query_sql_generator.html":[4,0,0,15,11],
@@ -247,7 +249,5 @@ var NAVTREEINDEX10 =
 "classannis_1_1sqlgen_1_1_common_annotate_with_clause_generator.html#af6e0d23fbaab602de7b80e06f09de832":[4,0,0,15,17,4],
 "classannis_1_1sqlgen_1_1_common_limit_offset_generator.html":[4,0,0,15,18],
 "classannis_1_1sqlgen_1_1_common_limit_offset_generator.html#acf103bf00cf9133d0677870e595b109b":[4,0,0,15,18,0],
-"classannis_1_1sqlgen_1_1_count_matches_and_documents_sql_generator.html":[4,0,0,15,20],
-"classannis_1_1sqlgen_1_1_count_matches_and_documents_sql_generator.html#a0462828756765913a3e28c3e82d31892":[4,0,0,15,20,0],
-"classannis_1_1sqlgen_1_1_count_matches_and_documents_sql_generator.html#a5e3afae6ef5649465e98080c9e5dc3b3":[4,0,0,15,20,1]
+"classannis_1_1sqlgen_1_1_count_matches_and_documents_sql_generator.html":[4,0,0,15,20]
 };

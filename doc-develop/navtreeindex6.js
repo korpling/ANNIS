@@ -1,11 +1,13 @@
 var NAVTREEINDEX6 =
 {
+"classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#a7568a3cca38aba878ef9d9585f53efc8":[4,0,0,6,20,0,0,6],
 "classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#a817169f6254992a5de2c411809a22776":[4,0,0,6,20,0,0,2],
+"classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#a8a572862a9dd57e91741e20d665af993":[4,0,0,6,20,0,0,9],
 "classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#ab0e41cfa45e34c45f9b43e05e5a7e78f":[4,0,0,6,20,0,0,3],
-"classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#abc1b3f8c0c6c048f14df23c8c482fd70":[4,0,0,6,20,0,0,6],
+"classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#abc1b3f8c0c6c048f14df23c8c482fd70":[4,0,0,6,20,0,0,7],
 "classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#acdeeecf21fa08ddba97891186fc03919":[4,0,0,6,20,0,0,13],
-"classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#ad1b3233bcb483c6983eb556751e04d57":[4,0,0,6,20,0,0,9],
-"classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#af88e5832656e01e6db910b998b09e6a4":[4,0,0,6,20,0,0,10],
+"classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#ad1b3233bcb483c6983eb556751e04d57":[4,0,0,6,20,0,0,10],
+"classannis_1_1gui_1_1widgets_1_1grid_1_1_annotation_grid.html#af88e5832656e01e6db910b998b09e6a4":[4,0,0,6,20,0,0,11],
 "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html":[4,0,0,6,20,0,1],
 "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a00d12233a82febb232c869be975e2446":[4,0,0,6,20,0,1,4],
 "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a024136a9b7746c4fef1dfc3f57f829cb":[4,0,0,6,20,0,1,2],
@@ -247,7 +249,5 @@ var NAVTREEINDEX6 =
 "classannis_1_1model_1_1_annis_node.html#a426cd01ff1736396a0e5ee26725410b6":[4,0,0,8,1,20],
 "classannis_1_1model_1_1_annis_node.html#a44fb2265fee6d1c671e6991d4b666a17":[4,0,0,8,1,31],
 "classannis_1_1model_1_1_annis_node.html#a538496c4a5268ed2bbb28d709a2ff672":[4,0,0,8,1,32],
-"classannis_1_1model_1_1_annis_node.html#a53d7777ec30ae637ee171d21cacbc46e":[4,0,0,8,1,46],
-"classannis_1_1model_1_1_annis_node.html#a596ae01b2fa9dff600fbf4e4c6a35c89":[4,0,0,8,1,44],
-"classannis_1_1model_1_1_annis_node.html#a640b5564f7add89f78cd314a97ab6124":[4,0,0,8,1,18]
+"classannis_1_1model_1_1_annis_node.html#a53d7777ec30ae637ee171d21cacbc46e":[4,0,0,8,1,46]
 };

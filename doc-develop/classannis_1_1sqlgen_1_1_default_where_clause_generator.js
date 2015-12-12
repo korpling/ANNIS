@@ -25,7 +25,7 @@ var classannis_1_1sqlgen_1_1_default_where_clause_generator =
     [ "addRightOverlapConditions", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a56f950360ddc49f267354e9a6af02457", null ],
     [ "addSameSpanConditions", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a828305f9cb431f2354aea9703ce19392", null ],
     [ "addSiblingConditions", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#ad49bcf7133531ea6033a18870acf4505", null ],
-    [ "addSingleEdgeCondition", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a067ba1607bc0c622d739e24eeec429a7", null ],
+    [ "addSingleRelationCondition", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#abba3757118b7c77bfbb52eeddc3ec71a", null ],
     [ "addSpanConditions", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a2c03544a2477c60497d17e745b70a744", null ],
     [ "addTokenArityConditions", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#ade5c4f5d9ea8735ef8109d730ef861cb", null ],
     [ "getAnnoCondition", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a7eb074230a01d6ff410c5425cb98b419", null ],

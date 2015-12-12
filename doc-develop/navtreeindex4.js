@@ -245,9 +245,9 @@ var NAVTREEINDEX4 =
 "classannis_1_1gui_1_1frequency_1_1_frequency_result_panel.html#a54f268f26e79c820d7b8bf822092b600":[4,0,0,6,10,1,0],
 "classannis_1_1gui_1_1frequency_1_1_frequency_result_panel.html#a7e6be2937a19ce889ed527ddee3ebc45":[4,0,0,6,10,1,1],
 "classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html":[4,0,0,6,10,2],
-"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a027823ab9d45f394d8c064811f6b4aac":[4,0,0,6,10,2,4],
-"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a0f4b99a82808dd262788ce282671e346":[4,0,0,6,10,2,6],
-"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a1647d76f303aad66945db6c3e1877e5d":[4,0,0,6,10,2,1],
-"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a20919005349e44910f6871f8456ef9e5":[4,0,0,6,10,2,3],
-"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a524ca676a24c5d682780b140995754f0":[4,0,0,6,10,2,0]
+"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a027823ab9d45f394d8c064811f6b4aac":[4,0,0,6,10,2,6],
+"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a0f4b99a82808dd262788ce282671e346":[4,0,0,6,10,2,8],
+"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a1647d76f303aad66945db6c3e1877e5d":[4,0,0,6,10,2,2],
+"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a20919005349e44910f6871f8456ef9e5":[4,0,0,6,10,2,5],
+"classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a4136490b262af3ef2f5704216037f29c":[4,0,0,6,10,2,4]
 };

@@ -2,7 +2,7 @@ var classannis_1_1model_1_1_annotation_graph =
 [
     [ "AnnotationGraph", "classannis_1_1model_1_1_annotation_graph.html#a32be385db091fd4f8affad7e4f593bdd", null ],
     [ "AnnotationGraph", "classannis_1_1model_1_1_annotation_graph.html#a20a37bcace4d3ee3a862787a6a4f14b2", null ],
-    [ "addEdge", "classannis_1_1model_1_1_annotation_graph.html#a59906c991161b16b0c7db172524e68d8", null ],
+    [ "addEdge", "classannis_1_1model_1_1_annotation_graph.html#a33718953a52075933baf66a0a35752e7", null ],
     [ "addMatchedNodeId", "classannis_1_1model_1_1_annotation_graph.html#ae7fcb9e28294ef0d5ff3f60d83104170", null ],
     [ "addNode", "classannis_1_1model_1_1_annotation_graph.html#ae081620f0794e84dc3fc7cf82102600b", null ],
     [ "equals", "classannis_1_1model_1_1_annotation_graph.html#a18268a7b0c84ecfcea37f47d9befcca9", null ],
