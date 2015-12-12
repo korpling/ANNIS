@@ -1,3 +1,15 @@
+Version 3.4.0-preview9
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview9+is%3Aclosed
+
+[Enhancements]
+ #472 don't output the same frequency definition twice
+ #471 Update to Salt 3.0
+ #469 grid: allow to choose which annotations should show their namespace
+
+
 Version 3.4.0-preview8
 ======================
 
