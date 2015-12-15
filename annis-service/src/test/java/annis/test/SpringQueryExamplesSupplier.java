@@ -17,7 +17,6 @@ package annis.test;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.experimental.theories.ParameterSignature;
 import org.junit.experimental.theories.ParameterSupplier;
 import org.junit.experimental.theories.PotentialAssignment;

@@ -15,13 +15,14 @@
  */
 package annis.gui.controller;
 
-import annis.gui.SearchUI;
-import annis.gui.objects.PagedResultQuery;
+import annis.gui.AnnisUI;
+import annis.gui.SearchView;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.QueryUIState;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
-import annis.libgui.PollControl;
+import annis.libgui.Background;
 import java.util.concurrent.Future;
 
 /**
@@ -30,41 +31,40 @@ import java.util.concurrent.Future;
  */
 public class SpecificPagingCallback implements PagingCallback
 {
-  private final PagedResultQuery query;
-
   private final ResultViewPanel panel;
 
-  private final SearchUI ui;
-
-  public SpecificPagingCallback(PagedResultQuery query, SearchUI ui,
-    ResultViewPanel panel)
+  private final SearchView searchView;
+  private final AnnisUI ui;
+  private final DisplayedResultQuery query;
+  
+  public SpecificPagingCallback(AnnisUI ui, SearchView searchView,
+    ResultViewPanel panel, DisplayedResultQuery initialQuery)
   {
-    this.query = query.clone();
     this.panel = panel;
     this.ui = ui;
+    this.searchView = searchView;
+    this.query = initialQuery;
   }
 
   @Override
-  public void switchPage(int offset, int limit)
+  public void switchPage(long offset, int limit)
   {
-    if (query != null)
-    {
-      query.setOffset(offset);
-      query.setLimit(limit);
-      // execute the result query again
-      updateMatches(query, panel);
-    }
+    query.setOffset(offset);
+    query.setLimit(limit);
+    ui.getQueryController().setQuery(query);
+    // execute the result query again
+    updateMatches(ui.getQueryController().getSearchQuery(), panel);
+
   }
 
-  private void updateMatches(PagedResultQuery newQuery, ResultViewPanel panel)
+  private void updateMatches(DisplayedResultQuery newQuery, ResultViewPanel panel)
   {
     if (panel != null)
     {
-      ui.updateFragment(newQuery);
-      ui.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
-      ui.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
-      Future<?> future = PollControl.runInBackground(500, ui,
-        new ResultFetchJob(newQuery, panel, ui));
+      searchView.updateFragment(newQuery);
+      searchView.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
+      searchView.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
+      Future<?> future = Background.run(new ResultFetchJob(newQuery, panel, ui));
       ui.getQueryState().getExecutedTasks().
         put(QueryUIState.QueryType.FIND, future);
     }

@@ -16,24 +16,30 @@
 package annis.libgui;
 
 import com.sun.jersey.api.client.Client;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 
-public class AnnisUser
+public class AnnisUser implements Serializable
 {
   private transient Client client;
-  private String userName = "";
-  private boolean remote = false;
   
-
-  public AnnisUser(String userName, Client client)
+  private final String userName;
+  /** Never store the password on the disk */
+  private transient String password;
+  private final boolean remote;
+  
+  public AnnisUser(String userName, String password)
   {
     this.userName = userName;
-    this.client = client;
+    this.password = password;
+    this.remote = false;
   }
   
-  public AnnisUser(String userName, Client client, boolean remote)
+  public AnnisUser(String userName, String password, boolean remote)
   {
     this.userName = userName;
-    this.client = client;
+    this.password = password;
     this.remote = remote;
   }
 
@@ -42,21 +48,37 @@ public class AnnisUser
   {
     return userName;
   }
-
-  public void setUserName(String userName)
+  
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
   {
-    this.userName = userName;
+    in.defaultReadObject();
+
+    // explicitly set the password to "null" to make findbugs happy
+    this.password = null;
   }
 
-  public Client getClient()
+
+  public Client getClient() throws LoginDataLostException
   {
+    if(client == null)
+    {
+      if(remote == true)
+      {
+        // treat as anonymous user
+        client = Helper.createRESTClient();
+      }
+      else
+      {
+        if(password == null)
+        {
+          throw new LoginDataLostException();
+        }
+        client = Helper.createRESTClient(userName, password);
+      }
+    }
     return client;
   }
 
-  public void setClient(Client client)
-  {
-    this.client = client;
-  }
 
   /**
    * True if the user a remote user, thus cannot e.g. logout by itself
@@ -66,12 +88,4 @@ public class AnnisUser
   {
     return remote;
   }
-
-  public void setRemote(boolean remote)
-  {
-    this.remote = remote;
-  }
-
-  
-  
 }

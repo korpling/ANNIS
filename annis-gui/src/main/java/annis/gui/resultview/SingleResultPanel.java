@@ -15,15 +15,24 @@
  */
 package annis.gui.resultview;
 
-import annis.libgui.ResolverProvider;
 import annis.CommonHelper;
-import annis.libgui.MatchedNodeColors;
+import annis.gui.AnnisUI;
+import annis.gui.ShareSingleMatchGenerator;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
+import annis.gui.SearchView;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.QueryUIState;
+import annis.libgui.Helper;
+import static annis.libgui.Helper.calculateMarkedAndCoveredIDs;
 import annis.libgui.InstanceConfig;
+import annis.libgui.MatchedNodeColors;
 import annis.libgui.PluginSystem;
-import static annis.model.AnnisConstants.*;
+import annis.libgui.ResolverProvider;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
@@ -38,39 +47,29 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.TreeMap;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -88,17 +87,21 @@ public class SingleResultPanel extends CssLayout implements
 
   private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
-  private transient SDocument result;
+  private SDocument result;
 
   private Map<String, String> markedCoveredMap;
 
   private Map<String, String> markedExactMap;
 
   private final PluginSystem ps;
+  
+  private final AnnisUI ui;
 
   private List<VisualizerPanel> visualizers;
+  private List<ResolverEntry> resolverEntries;
 
   private final Button btInfo;
+  private final Button btLink;
 
   private final List<String> path;
 
@@ -112,7 +115,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private final QueryController queryController;
 
-  private final int resultNumber;
+  private final long resultNumber;
 
   private final ResolverProvider resolverProvider;
 
@@ -136,13 +139,15 @@ public class SingleResultPanel extends CssLayout implements
 
   public SingleResultPanel(final SDocument result, 
     Match match,
-    int resultNumber,
+    long resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
+    AnnisUI ui,
     Set<String> visibleTokenAnnos, String segmentationName,
     QueryController controller, InstanceConfig instanceConfig,
-    PagedResultQuery query)
+    DisplayedResultQuery query)
   {
     this.ps = ps;
+    this.ui = ui;
     this.result = result;
     this.segmentationName = segmentationName;
     this.queryController = controller;
@@ -158,6 +163,12 @@ public class SingleResultPanel extends CssLayout implements
     setWidth("100%");
     setHeight("-1px");
 
+    if(query != null 
+      && query.getSelectedMatches().contains(resultNumber))
+    {
+      addStyleName("selected-match");
+    }
+    
     infoBar = new HorizontalLayout();
     infoBar.addStyleName("info-bar");
     infoBar.setWidth("100%");
@@ -170,19 +181,36 @@ public class SingleResultPanel extends CssLayout implements
     btInfo = new Button();
     btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
     btInfo.setIcon(ICON_RESOURCE);
+    btInfo.setDescription("Show metadata");
     btInfo.addClickListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
+    
+    btLink = new Button();
+    btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+    btLink.setIcon(FontAwesome.SHARE_ALT);
+    btLink.setDescription("Share match reference");
+    btLink.setDisableOnClick(true);
+    btLink.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        showShareSingleMatchGenerator();
+      }
+    });
+    infoBar.addComponent(btLink);
 
     /**
      * Extract the top level corpus name and the document name of this single
      * result.
      */
-    path = CommonHelper.getCorpusPath(result.getSCorpusGraph(), result);
+    path = CommonHelper.getCorpusPath(result.getGraph(), result);
     Collections.reverse(path);
     corpusName = path.get(0);
     documentName = path.get(path.size() - 1);
 
-    MinMax minMax = getIds(result.getSDocumentGraph());
+    MinMax minMax = getIds(result.getDocumentGraph());
 
     // build label
     StringBuilder sb = new StringBuilder("Path: ");
@@ -191,12 +219,13 @@ public class SingleResultPanel extends CssLayout implements
     sb.append(" - ").append(minMax.max).append(")");
 
     Label lblPath = new Label(sb.toString());
+    lblPath.addStyleName("path-label");
 
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
     infoBar.addComponent(lblPath);
     infoBar.setExpandRatio(lblPath, 1.0f);
-    infoBar.setSpacing(true);
+    infoBar.setSpacing(false);
 
     this.visualizerState = new HashMap<>();
 
@@ -282,19 +311,35 @@ public class SingleResultPanel extends CssLayout implements
     addComponent(infoBar);
     initVisualizer();
   }
-  
-  private void writeObject(ObjectOutputStream out) throws IOException
+
+  private void showShareSingleMatchGenerator()
   {
-    out.defaultWriteObject();
+    // select the current match
+    if(ui != null)
+    {
+      ui.getQueryState().getSelectedMatches().getValue().clear();
+      ui.getQueryState().getSelectedMatches().getValue().add(resultNumber);
+      ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
+    }
     
-    CommonHelper.writeSDocument(result, out);
-  }
-  
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
+    Window window = new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName, ps);
+    window.setWidth(790, Unit.PIXELS);
+    window.setHeight(580, Unit.PIXELS);
+    window.setResizable(true);
+    window.setModal(true);
     
-   this.result = CommonHelper.readSDocument(in);
+    window.addCloseListener(new Window.CloseListener()
+    {
+
+      @Override
+      public void windowClose(Window.CloseEvent e)
+      {
+        btLink.setEnabled(true);
+      }
+    });
+    window.setCaption("Match reference link");
+    
+    UI.getCurrent().addWindow(window);
   }
 
   public void setSegmentationLayer(String segmentationName)
@@ -305,8 +350,8 @@ public class SingleResultPanel extends CssLayout implements
     {
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
-        result.getSDocumentGraph());
-      Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+        result.getDocumentGraph());
+      Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes, segmentationName);
       for (VisualizerPanel p : visualizers)
       {
         p.setSegmentationLayer(segmentationName, markedAndCovered);
@@ -324,125 +369,9 @@ public class SingleResultPanel extends CssLayout implements
 
   private void calculateHelperVariables()
   {
-    markedExactMap = new HashMap<>();
     markedCoveredMap = new HashMap<>();
-
-    if (result != null)
-    {
-      SDocumentGraph g = result.getSDocumentGraph();
-      if (g != null)
-      {
-        for (SNode n : result.getSDocumentGraph().getSNodes())
-        {
-
-          SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-          Long matchNum = featMatched == null ? null : featMatched.
-            getSValueSNUMERIC();
-
-          if (matchNum != null)
-          {
-            int color = Math.max(0, Math.min((int) matchNum.longValue() - 1,
-              MatchedNodeColors.values().length - 1));
-            RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
-            if (feat != null)
-            {
-              markedExactMap.put("" + feat.getInternalID(),
-                MatchedNodeColors.values()[color].name());
-            }
-          }
-
-        }
-      } // end if g not null
-    } // end if result not null
-  }
-
-  private void calulcateColorsForMarkedAndCovered(Map<String, Long> markedAndCovered)
-  {
-    if (markedAndCovered != null)
-    {
-      for (Entry<String, Long> markedEntry : markedAndCovered.entrySet())
-      {
-        int color = Math.max(0, Math.min((int) markedEntry.getValue().
-          longValue()
-          - 1,
-          MatchedNodeColors.values().length - 1));
-        SNode n = result.getSDocumentGraph().getSNode(markedEntry.getKey());
-        RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
-
-        if (feat != null)
-        {
-          markedCoveredMap.put("" + feat.getInternalID(),
-            MatchedNodeColors.values()[color].name());
-        }
-      } // end for each entry in markedAndCoverd
-    } // end if markedAndCovered not null
-  }
-
-  private Map<String, Long> calculateMarkedAndCoveredIDs(
-    SDocument doc, List<SNode> segNodes)
-  {
-    Map<String, Long> initialCovered = new HashMap<>();
-
-    // add all covered nodes
-    for (SNode n : doc.getSDocumentGraph().getSNodes())
-    {
-      SFeature featMatched = n.getSFeature(ANNIS_NS,
-        FEAT_MATCHEDNODE);
-      Long match = featMatched == null ? null : featMatched.getSValueSNUMERIC();
-
-      if (match != null)
-      {
-        initialCovered.put(n.getSId(), match);
-      }
-    }
-
-    // calculate covered nodes
-    SingleResultPanel.CoveredMatchesCalculator cmc = new SingleResultPanel.CoveredMatchesCalculator(
-      doc.
-      getSDocumentGraph(), initialCovered);
-    Map<String, Long> covered = cmc.getMatchedAndCovered();
-
-    if (segmentationName != null)
-    {
-      // filter token
-      Map<SToken, Long> coveredToken = new HashMap<>();
-      for (Map.Entry<String, Long> e : covered.entrySet())
-      {
-        SNode n = doc.getSDocumentGraph().getSNode(e.getKey());
-        if (n instanceof SToken)
-        {
-          coveredToken.put((SToken) n, e.getValue());
-        }
-      }
-
-      for (SNode segNode : segNodes)
-      {
-        RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.
-          getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-
-        if (!covered.containsKey(segNode.getSId()))
-        {
-          long leftTok = featSegNode.getLeftToken();
-          long rightTok = featSegNode.getRightToken();
-
-          // check for each covered token if this segment is covering it
-          for (Map.Entry<SToken, Long> e : coveredToken.entrySet())
-          {
-            RelannisNodeFeature featTok = (RelannisNodeFeature) e.getKey().
-              getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-            long entryTokenIndex = featTok.getTokenIndex();
-            if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
-            {
-              // add this segmentation node to the covered set
-              covered.put(segNode.getSId(), e.getValue());
-              break;
-            }
-          } // end for each covered token
-        } // end if not already contained
-      } // end for each segmentation node
-    }
-
-    return covered;
+    
+    markedExactMap = Helper.calculateColorsForMarkedExact(result);
   }
 
   @Override
@@ -450,7 +379,7 @@ public class SingleResultPanel extends CssLayout implements
   {
     if (event.getButton() == btInfo && result != null)
     {
-      Window infoWindow = new Window("Info for " + result.getSId());
+      Window infoWindow = new Window("Info for " + result.getId());
 
       infoWindow.setModal(false);
       MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size()
@@ -487,14 +416,17 @@ public class SingleResultPanel extends CssLayout implements
         = resolverProvider == null ? new ResolverEntry[0] 
         : resolverProvider.getResolverEntries(result);
       visualizers = new LinkedList<>();
+      resolverEntries = new LinkedList<>();
+      
       List<VisualizerPanel> openVisualizers = new LinkedList<>();
 
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
-        result.getSDocumentGraph());
+        result.getDocumentGraph());
 
-      Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
-      calulcateColorsForMarkedAndCovered(markedAndCovered);
+      Map<String, Long> markedAndCovered = 
+        Helper.calculateMarkedAndCoveredIDs(result, segNodes, segmentationName);
+      Helper.calulcateColorsForMarkedAndCovered(result, markedAndCovered, markedCoveredMap);
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
 
@@ -509,6 +441,8 @@ public class SingleResultPanel extends CssLayout implements
           htmlID, resultID, this, segmentationName, ps, instanceConfig);
 
         visualizers.add(p);
+        resolverEntries.add(entries[i]);
+        
         Properties mappings = entries[i].getMappings();
 
         // check if there is the visibility of a visualizer changed
@@ -552,13 +486,25 @@ public class SingleResultPanel extends CssLayout implements
   }
 
   @Override
+  public void attach()
+  {
+    super.attach();
+    if (Helper.isKickstarter(getSession()))
+    {
+      btLink.setVisible(false);
+    }
+  }
+  
+  
+
+  @Override
   public void registerVisibilityStatus(long entryId, boolean status)
   {
     visualizerState.put(entryId, status);
   }
 
   @Override
-  public void changeContext(int resultNumber, int context,
+  public void changeContext(long resultNumber, int context,
     boolean left)
   {
     //delegates the task to the query controller.
@@ -626,12 +572,12 @@ public class SingleResultPanel extends CssLayout implements
     Property.ValueChangeListener
   {
 
-    int resultNumber;
+    long resultNumber;
 
     boolean left;
 
 
-    public ContextChangeListener(int resultNumber, boolean left)
+    public ContextChangeListener(long resultNumber, boolean left)
     {
       this.resultNumber = resultNumber;
       this.left = left;
@@ -648,129 +594,6 @@ public class SingleResultPanel extends CssLayout implements
     }
   }
 
-  /**
-   * Marks all nodes which are dominated by already marked nodes.
-   *
-   * 1. Sort ascending all initial marked nodes by the size of the intervall
-   * between left and right token index.
-   *
-   * 2. Traverse the salt document graph with the sorted list of step 1. as root
-   * nodes and mark all children with the same match position. Already marked
-   * nodes are omitted.
-   *
-   * Note: The algorithm prevents nested marked nodes to be overwritten. Nested
-   * nodes must have a smaller intervall from left to right by default, so this
-   * should always work.
-   *
-   */
-  public static class CoveredMatchesCalculator implements SGraphTraverseHandler
-  {
-
-    private Map<String, Long> matchedAndCovered;
-
-    private long currentMatchPos;
-
-    public CoveredMatchesCalculator(SDocumentGraph graph,
-      Map<String, Long> initialMatches)
-    {
-      this.matchedAndCovered = initialMatches;
-
-      Map<SNode, Long> sortedByOverlappedTokenIntervall = new TreeMap<>(
-        new Comparator<SNode>()
-        {
-          @Override
-          public int compare(SNode o1, SNode o2)
-          {
-            RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getSFeature(
-              ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-            RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getSFeature(
-              ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-
-            long leftTokIdxO1 = feat1.getLeftToken();
-            long rightTokIdxO1 = feat1.getRightToken();
-            long leftTokIdxO2 = feat2.getLeftToken();
-            long rightTokIdxO2 = feat2.getRightToken();
-
-            int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
-            int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);
-
-            if (intervallO1 - intervallO2 != 0)
-            {
-              return intervallO1 - intervallO2;
-            }
-            else if (feat1.getLeftToken() - feat2.getRightToken() != 0)
-            {
-              return (int) (feat1.getLeftToken() - feat2.getRightToken());
-            }
-            else if (feat1.getRightToken() - feat2.getRightToken() != 0)
-            {
-              return (int) (feat1.getRightToken() - feat2.getRightToken());
-            }
-            else
-            {
-              return (int) (feat1.getInternalID() - feat2.getInternalID());
-            }
-          }
-        });
-
-      for (Map.Entry<String, Long> entry : initialMatches.entrySet())
-      {
-        SNode n = graph.getSNode(entry.getKey());
-        sortedByOverlappedTokenIntervall.put(n, entry.getValue());
-      }
-
-      currentMatchPos = 1;
-      if (initialMatches.size() > 0)
-      {
-        graph.traverse(new BasicEList<>(sortedByOverlappedTokenIntervall.
-          keySet()),
-          GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
-          (SGraphTraverseHandler) this, true);
-      }
-    }
-
-    @Override
-    public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
-      String traversalId, SNode currNode, SRelation edge, SNode fromNode,
-      long order)
-    {
-      if (fromNode != null
-        && matchedAndCovered.containsKey(fromNode.getSId()) 
-        && currNode != null
-        && !matchedAndCovered.containsKey(currNode.getSId()))
-      {
-        currentMatchPos = matchedAndCovered.get(fromNode.getSId());
-        matchedAndCovered.put(currNode.getSId(), currentMatchPos);
-      }
-
-    }
-
-    @Override
-    public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-      SNode currNode, SRelation edge, SNode fromNode, long order)
-    {
-    }
-
-    @Override
-    public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-      String traversalId, SRelation edge, SNode currNode, long order)
-    {
-      if (edge == null || edge instanceof SDominanceRelation
-        || edge instanceof SSpanningRelation)
-      {
-        return true;
-      }
-      else
-      {
-        return false;
-      }
-    }
-
-    public Map<String, Long> getMatchedAndCovered()
-    {
-      return matchedAndCovered;
-    }
-  }
 
   private static class MinMax
   {
@@ -785,7 +608,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private MinMax getIds(SDocumentGraph graph)
   {
-    EList<SToken> sTokens = graph.getSTokens();
+    List<SToken> sTokens = graph.getTokens();
 
     MinMax minMax = new MinMax();
     minMax.min = Long.MAX_VALUE;
@@ -799,7 +622,7 @@ public class SingleResultPanel extends CssLayout implements
       {
         for (SToken t : sTokens)
         {
-          SFeature feature = t.getSFeature(ANNIS_NS,
+          SFeature feature = t.getFeature(ANNIS_NS,
             FEAT_RELANNIS_NODE);
           if(feature != null && feature.getValue() instanceof RelannisNodeFeature)
           {
@@ -852,13 +675,13 @@ public class SingleResultPanel extends CssLayout implements
   {
     this.query = query;
     if (p != null
-      && p.getSCorpusGraphs() != null
-      && !p.getSCorpusGraphs().isEmpty()
-      && p.getSCorpusGraphs().get(0) != null
-      && p.getSCorpusGraphs().get(0).getSDocuments() != null
-      && !p.getSCorpusGraphs().get(0).getSDocuments().isEmpty())
+      && p.getCorpusGraphs() != null
+      && !p.getCorpusGraphs().isEmpty()
+      && p.getCorpusGraphs().get(0) != null
+      && p.getCorpusGraphs().get(0).getDocuments() != null
+      && !p.getCorpusGraphs().get(0).getDocuments().isEmpty())
     {
-      this.result = p.getSCorpusGraphs().get(0).getSDocuments().get(0);
+      this.result = p.getCorpusGraphs().get(0).getDocuments().get(0);
     }
 
     removeComponent(reloadVisualizer);
@@ -872,6 +695,4 @@ public class SingleResultPanel extends CssLayout implements
   {
     return result;
   }
-  
-  
 }

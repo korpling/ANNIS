@@ -10,19 +10,19 @@ CREATE INDEX idx__facts_id__:id
 CREATE INDEX idx__facts_is_token__:id
   ON facts_:id
   USING btree
-  (is_token, corpus_ref)
+  (is_token, corpus_ref, text_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_left__:id
   ON facts_:id
   USING btree
-  ("left", corpus_ref)
+  ("left", corpus_ref, text_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_left_token__:id
   ON facts_:id
   USING btree
-  (left_token, corpus_ref)
+  (left_token, corpus_ref, text_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_node_annotext__:id
@@ -52,14 +52,14 @@ CREATE INDEX idx__facts_node_namespace__:id
 CREATE INDEX idx__facts_right__:id
   ON facts_:id
   USING btree
-  ("right", corpus_ref)
+  ("right", corpus_ref, text_ref)
   WITH (FILLFACTOR=100);
 
 
 CREATE INDEX idx__facts_right_token__:id
   ON facts_:id
   USING btree
-  (right_token, corpus_ref)
+  (right_token, corpus_ref, text_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_root__:id
@@ -89,7 +89,7 @@ CREATE INDEX idx__facts_span__:id
 CREATE INDEX idx__facts_token_index__:id
   ON facts_:id
   USING btree
-  (token_index, corpus_ref)
+  (token_index, corpus_ref, text_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_corpus_ref_index__:id

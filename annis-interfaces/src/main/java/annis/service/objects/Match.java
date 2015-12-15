@@ -211,10 +211,17 @@ public class Match implements Serializable
       {
         
         uri = new java.net.URI(id).normalize();
-
+        
         if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
         {
           throw new URISyntaxException("not a Salt id", uri.toString());
+        }
+        // check if the path ends with "/" (which was wrongly used by older ANNIS versions)
+        String path = uri.getPath();
+        if(path.endsWith("/"))
+        {
+          path = path.substring(0, path.length()-1);
+          uri = new URI(uri.getScheme(), uri.getHost(), path, uri.getFragment());
         }
         
       }

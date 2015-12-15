@@ -15,16 +15,14 @@
  */
 package annis.sqlgen;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-
-import org.springframework.dao.DataAccessException;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.MatchAndDocumentCount;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import org.springframework.dao.DataAccessException;
 
 
 public class CountMatchesAndDocumentsSqlGenerator extends AbstractSolutionMatchInFromClauseSqlGenerator

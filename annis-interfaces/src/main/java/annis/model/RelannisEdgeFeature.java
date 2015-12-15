@@ -17,9 +17,9 @@ package annis.model;
 
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_EDGE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.Serializable;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SRelation;
 
 /**
  * Common Features included in the Salt graph that are available
@@ -60,7 +60,7 @@ public class RelannisEdgeFeature implements Serializable
 
   /**
    * The pre order inside of the corresponding artificial relANNIS component if
-   * this was a dominance edge.
+   * this was a dominance relation.
    *
    * @return
    */
@@ -76,7 +76,7 @@ public class RelannisEdgeFeature implements Serializable
 
   /**
    * The ID of the corresponding artificial relANNIS component if this was a
-   * dominance edge.
+   * dominance relation.
    *
    * @return
    */
@@ -104,13 +104,13 @@ public class RelannisEdgeFeature implements Serializable
 
   public static RelannisEdgeFeature extract(SRelation rel)
   {
-    RelannisEdgeFeature featEdge = null;
-    SFeature sfeatEdge = rel.getSFeature(ANNIS_NS, FEAT_RELANNIS_EDGE);
-    if (sfeatEdge != null)
+    RelannisEdgeFeature featRelation = null;
+    SFeature sfeatRelation = rel.getFeature(ANNIS_NS + "::" + FEAT_RELANNIS_EDGE);
+    if (sfeatRelation != null)
     {
-      featEdge = (RelannisEdgeFeature) sfeatEdge.getValue();
+      featRelation = (RelannisEdgeFeature) sfeatRelation.getValue();
     }
-    return featEdge;
+    return featRelation;
   }
   
 }

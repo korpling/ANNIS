@@ -15,11 +15,13 @@
  */
 package annis.gui;
 
-import annis.libgui.Helper;
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.objects.Query;
+import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -38,10 +40,14 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.LoggerFactory;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
 /**
  *
  * @author thomas
@@ -136,6 +142,7 @@ public class CorpusBrowserPanel extends Panel
     HashSet<String> edgeNames = new HashSet<>();
     HashSet<String> fullEdgeNames = new HashSet<>();
     boolean hasDominance = false;
+    boolean hasEmptyDominance = false;
 
     List<AnnisAttribute> attributes = fetchAnnos(corpus.getName());
 
@@ -160,6 +167,10 @@ public class CorpusBrowserPanel extends Panel
         if (a.getSubtype() == AnnisAttribute.SubType.d)
         {
           hasDominance = true;
+          if(a.getEdgeName() == null || a.getEdgeName().isEmpty())
+          {
+            hasEmptyDominance = true;
+          }
         }
 
         String annoName = killNamespace(a.getName());
@@ -183,7 +194,7 @@ public class CorpusBrowserPanel extends Panel
       edgeNames.add(name);
     }
 
-    if (hasDominance)
+    if (hasDominance && !hasEmptyDominance)
     {
       CorpusBrowserEntry cbe = new CorpusBrowserEntry();
       cbe.setName("(dominance)");
@@ -225,7 +236,14 @@ public class CorpusBrowserPanel extends Panel
         CorpusBrowserEntry cbeEdgeType = new CorpusBrowserEntry();
         String name = stripEdgeName ? killNamespace(a.getEdgeName()) : a.
           getEdgeName();
-        cbeEdgeType.setName(name);
+        if((name == null || name.isEmpty()) && a.getSubtype() == AnnisAttribute.SubType.d)
+        {
+          cbeEdgeType.setName("(dominance)");
+        }
+        else
+        {
+          cbeEdgeType.setName(name);
+        }
         cbeEdgeType.setCorpus(corpus);
         if (a.getSubtype() == AnnisAttribute.SubType.p)
         {
@@ -429,6 +447,10 @@ public class CorpusBrowserPanel extends Panel
 
   private String killNamespace(String qName)
   {
+    if(qName == null)
+    {
+      return "";
+    }
     String[] splitted = qName.split(":");
     return splitted[splitted.length - 1];
   }

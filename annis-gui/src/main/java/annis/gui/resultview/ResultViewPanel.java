@@ -16,16 +16,16 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.libgui.PluginSystem;
+import annis.gui.AnnisUI;
 import annis.gui.QueryController;
-import annis.gui.SearchUI;
 import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.controlpanel.QueryPanel;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
-import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
+import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProviderImpl;
 import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
@@ -33,24 +33,17 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
-import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.net.URISyntaxException;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,9 +58,13 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -83,59 +80,57 @@ public class ResultViewPanel extends VerticalLayout implements
 
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
-  private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
+  private final Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
   public static final String FILESYSTEM_CACHE_RESULT
     = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
 
   public static final String MAPPING_HIDDEN_ANNOS = "hidden_annos";
 
-  private PagingComponent paging;
+  private final PagingComponent paging;
 
-  private PluginSystem ps;
+  private final PluginSystem ps;
 
-  private MenuItem miTokAnnos;
+  private final MenuItem miTokAnnos;
 
-  private MenuItem miSegmentation;
+  private final MenuItem miSegmentation;
 
-  private TreeMap<String, Boolean> tokenAnnoVisible;
+  private final TreeMap<String, Boolean> tokenAnnoVisible;
 
-  private QueryController controller;
+  private final QueryController controller;
 
-  private String selectedSegmentationLayer;
-
-  private Set<String> segmentationLayerSet
+  private final Set<String> segmentationLayerSet
     = Collections.synchronizedSet(new TreeSet<String>());
 
-  private Set<String> tokenAnnotationLevelSet
+  private final Set<String> tokenAnnotationLevelSet
     = Collections.synchronizedSet(new TreeSet<String>());
 
-  private InstanceConfig instanceConfig;
+  private final InstanceConfig instanceConfig;
 
-  private CssLayout resultLayout;
+  private final CssLayout resultLayout;
 
-  private List<SingleResultPanel> resultPanelList;
+  private final List<SingleResultPanel> resultPanelList;
 
   private String segmentationName;
 
   private int currentResults;
 
   private int numberOfResults;
+  private ArrayList<Match> allMatches;
 
   private transient BlockingQueue<SaltProject> projectQueue;
 
   private PagedResultQuery currentQuery;
-  private PagedResultQuery initialQuery;
-  private final SearchUI sui;
+  private final DisplayedResultQuery initialQuery;
+  private final AnnisUI sui;
 
-  public ResultViewPanel(SearchUI ui,
-    PluginSystem ps, InstanceConfig instanceConfig, PagedResultQuery initialQuery)
+  public ResultViewPanel(AnnisUI ui,
+    PluginSystem ps, InstanceConfig instanceConfig, DisplayedResultQuery initialQuery)
   {
     this.sui = ui;
     this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
     this.controller = ui.getQueryController();
-    this.selectedSegmentationLayer = ui.getQueryState().getBaseText().getValue();
     this.initialQuery = initialQuery;
     
     cacheResolver
@@ -149,7 +144,7 @@ public class ResultViewPanel extends VerticalLayout implements
     resultLayout.addStyleName("result-view-css");
     Panel resultPanel = new Panel(resultLayout);
     resultPanel.setSizeFull();
-    resultPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    resultPanel.addStyleName(ValoTheme.PANEL_BORDERLESS);
     resultPanel.addStyleName("result-view-panel");
 
     this.instanceConfig = instanceConfig;
@@ -219,40 +214,21 @@ public class ResultViewPanel extends VerticalLayout implements
    *
    * @param queue holds the salt graph
    * @param q holds the ordinary query
-   * @param numberOfResults the figure of all matches.
+   * @param allMatches All matches.
    */
   public void setQueryResultQueue(BlockingQueue<SaltProject> queue,
-    PagedResultQuery q, int numberOfResults)
+    PagedResultQuery q, ArrayList<Match> allMatches)
   {
     this.projectQueue = queue;
     this.currentQuery = q;
-    this.numberOfResults = numberOfResults;
+    this.numberOfResults = allMatches.size();
+    this.allMatches = allMatches;
 
     paging.setPageSize(q.getLimit(), false);
     paging.setInfo(q.getQuery());
 
     resultLayout.removeAllComponents();
     resultPanelList.clear();
-
-    Set<String> corpora = q.getCorpora();
-
-    if (corpora.size() == 1)
-    {
-
-      // fetched corpus config
-      CorpusConfig corpusConfig = Helper.getCorpusConfig(corpora.iterator().
-        next());
-      if (corpusConfig != null && corpusConfig.getConfig() != null
-        && corpusConfig.getConfig().containsKey(
-          KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
-      {
-        if (selectedSegmentationLayer == null)
-        {
-          selectedSegmentationLayer = corpusConfig.getConfig(
-            KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
-        }
-      }
-    }
 
     // get the first query result
     SaltProject first = queue.poll();
@@ -291,11 +267,11 @@ public class ResultViewPanel extends VerticalLayout implements
         for (SaltProject p : subgraphList)
         {
           updateVariables(p);
-          newPanels = createPanels(p, q.getOffset() + currentResults);
+          newPanels = createPanels(p, currentResults, q.getOffset() + currentResults);
           currentResults += newPanels.size();
 
           String strResults = numberOfResults > 1 ? "results" : "result";
-          sui.getControlPanel().getQueryPanel().setStatus(sui.getControlPanel().
+          sui.getSearchView().getControlPanel().getQueryPanel().setStatus(sui.getSearchView().getControlPanel().
             getQueryPanel().getLastPublicStatus(),
             " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");
 
@@ -308,13 +284,19 @@ public class ResultViewPanel extends VerticalLayout implements
           {
             resultPanelList.add(panel);
             resultLayout.addComponent(panel);
-            panel.setSegmentationLayer(selectedSegmentationLayer);
+            panel.setSegmentationLayer(sui.getQueryState().getVisibleBaseText().getValue());
           }
         }
 
         if (currentResults == numberOfResults)
         {
           showFinishedSubgraphSearch();
+          if(!initialQuery.getSelectedMatches().isEmpty())
+          {
+            // scroll to the first selected match
+            JavaScript.eval(
+              "$(\".v-panel-content-result-view-panel\").animate({scrollTop: $(\".selected-match\").offset().top - $(\".result-view-panel\").offset().top}, 1000);");
+          }
         }
 
         if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
@@ -336,39 +318,35 @@ public class ResultViewPanel extends VerticalLayout implements
   public void showFinishedSubgraphSearch()
   {
     //Search complete, stop progress bar control
-    if (sui.getControlPanel().getQueryPanel().getPiCount() != null)
+    if (sui.getSearchView().getControlPanel().getQueryPanel().getPiCount() != null)
     {
-      if (sui.getControlPanel().getQueryPanel().getPiCount().isVisible())
+      if (sui.getSearchView().getControlPanel().getQueryPanel().getPiCount().isVisible())
       {
-        sui.getControlPanel().getQueryPanel().getPiCount().setVisible(false);
-        sui.getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
+        sui.getSearchView().getControlPanel().getQueryPanel().getPiCount().setVisible(false);
+        sui.getSearchView().getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
       }
     }
     // also remove the info how many results have been fetched
-    QueryPanel qp = sui.getControlPanel().getQueryPanel();
+    QueryPanel qp = sui.getSearchView().getControlPanel().getQueryPanel();
     qp.setStatus(qp.getLastPublicStatus());
   }
 
-  private List<SingleResultPanel> createPanels(SaltProject p, int offset)
+  private List<SingleResultPanel> createPanels(SaltProject p, int localMatchIndex, long globalOffset)
   {
     List<SingleResultPanel> result = new LinkedList<>();
 
     int i = 0;
-    for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
+    for (SCorpusGraph corpusGraph : p.getCorpusGraphs())
     {
-      SDocument doc = corpusGraph.getSDocuments().get(0);
+      SDocument doc = corpusGraph.getDocuments().get(0);
       Match m = new Match();
-      try
+      if(allMatches != null && localMatchIndex >= 0 && localMatchIndex < allMatches.size())
       {
-        m = CommonHelper.extractMatch(doc);
-      }
-      catch (URISyntaxException ex)
-      {
-        log.error("Invalid Syntax in match", ex);
+        m = allMatches.get(localMatchIndex);
       }
       
       SingleResultPanel panel = new SingleResultPanel(doc, m,
-        i + offset, new ResolverProviderImpl(cacheResolver), ps,
+        i + globalOffset, new ResolverProviderImpl(cacheResolver), ps, sui,
         getVisibleTokenAnnos(), segmentationName, controller,
         instanceConfig, initialQuery);
 
@@ -425,22 +403,22 @@ public class ResultViewPanel extends VerticalLayout implements
   {
     Set<String> result = new TreeSet<>();
 
-    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    for (SCorpusGraph corpusGraphs : p.getCorpusGraphs())
     {
-      for (SDocument doc : corpusGraphs.getSDocuments())
+      for (SDocument doc : corpusGraphs.getDocuments())
       {
-        SDocumentGraph g = doc.getSDocumentGraph();
+        SDocumentGraph g = doc.getDocumentGraph();
         if (g != null)
         {
           // collect the start nodes of a segmentation chain of length 1
-          for (SNode n : g.getSNodes())
+          for (SNode n : g.getNodes())
           {
             SFeature feat
-              = n.getSFeature(AnnisConstants.ANNIS_NS,
+              = n.getFeature(AnnisConstants.ANNIS_NS,
                 AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
-            if (feat != null && feat.getSValueSTEXT() != null)
+            if (feat != null && feat.getValue_STEXT() != null)
             {
-              result.add(feat.getSValueSTEXT());
+              result.add(feat.getValue_STEXT());
             }
           }
         } // end if graph not null
@@ -481,14 +459,14 @@ public class ResultViewPanel extends VerticalLayout implements
     public void menuSelected(MenuItem selectedItem)
     {
       // remember old value
-      String oldSegmentationLayer = selectedSegmentationLayer;
+      String oldSegmentationLayer = sui.getQueryState().getVisibleBaseText().getValue();
 
       // set the new selected item
-      selectedSegmentationLayer = selectedItem.getText();
+      String newSegmentationLayer = selectedItem.getText();
 
-      if (NULL_SEGMENTATION_VALUE.equals(selectedSegmentationLayer))
+      if (NULL_SEGMENTATION_VALUE.equals(newSegmentationLayer))
       {
-        selectedSegmentationLayer = null;
+        newSegmentationLayer = null;
       }
       for (MenuItem mi : miSegmentation.getChildren())
       {
@@ -497,23 +475,20 @@ public class ResultViewPanel extends VerticalLayout implements
 
       if (oldSegmentationLayer != null)
       {
-        if (!oldSegmentationLayer.equals(selectedSegmentationLayer))
+        if (!oldSegmentationLayer.equals(newSegmentationLayer))
         {
-          setSegmentationLayer(selectedSegmentationLayer);
+          setSegmentationLayer(newSegmentationLayer);
         }
       }
-      else if (selectedSegmentationLayer != null)
+      else if (newSegmentationLayer != null)
       {
         // oldSegmentation is null, but selected is not
-        setSegmentationLayer(selectedSegmentationLayer);
+        setSegmentationLayer(newSegmentationLayer);
       }
 
       //update URL with newly selected segmentation layer
-      PagedResultQuery q = initialQuery.clone();
-      //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
-      q.setSegmentation(selectedSegmentationLayer);
-
-      sui.updateFragment(q);
+      sui.getQueryState().getVisibleBaseText().setValue(newSegmentationLayer);
+      sui.getSearchView().updateFragment(sui.getQueryController().getSearchQuery());
     }
   }
 
@@ -555,6 +530,7 @@ public class ResultViewPanel extends VerticalLayout implements
        * Check if a segmentation item must set checked. If no segmentation layer
        * is selected, set the default layer as selected.
        */
+      final String selectedSegmentationLayer = sui.getQueryState().getVisibleBaseText().getValue();
       if ((selectedSegmentationLayer == null && "".equals(s))
         || s.equals(selectedSegmentationLayer))
       {

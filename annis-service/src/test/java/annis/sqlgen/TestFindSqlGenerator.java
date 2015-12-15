@@ -1,21 +1,17 @@
 package annis.sqlgen;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.util.ArrayList;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.util.ArrayList;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.startsWith;
 import org.junit.Assert;
-import org.mockito.Matchers;
+import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import static org.mockito.BDDMockito.given;
+import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class TestFindSqlGenerator
 {

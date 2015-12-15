@@ -15,21 +15,19 @@
  */
 package annis.sqlgen;
 
+import annis.model.AnnisNode;
+import annis.service.objects.AnnisAttribute;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
-
-import annis.model.AnnisNode;
-import annis.service.objects.AnnisAttribute;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 public class ListAnnotationsSqlHelper implements ResultSetExtractor
 {

@@ -18,7 +18,6 @@ package annis.gui.flatquerybuilder;
 import annis.libgui.Helper;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.OptionGroup;
-import com.vaadin.data.Item;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;

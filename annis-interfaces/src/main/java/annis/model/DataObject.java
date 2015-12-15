@@ -23,7 +23,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;

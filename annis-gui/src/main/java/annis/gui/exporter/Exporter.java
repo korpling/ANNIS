@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public interface Exporter
 {
-  public boolean convertText(String queryAnnisQL, int contextLeft, int contextRight, 
+  public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight, 
    Set<String> corpora, List<String> keys, String args, 
    WebResource annisResource, Writer out, EventBus eventBus);
   

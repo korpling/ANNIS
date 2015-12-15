@@ -22,7 +22,7 @@
   <!-- AnnisAdminRunner -->
   <bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner" lazy-init="true">
     <property name="corpusAdministration" ref="corpusAdministration" />
-    <property name="annisDao" ref="annisDao" />
+    <property name="queryDao" ref="queryDao" />
     <property name="queriesGenerator" ref="queriesGenerator"/>
   </bean>
 

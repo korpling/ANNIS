@@ -16,10 +16,10 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.between;
-import static annis.sqlgen.SqlConstraints.isNull;
-import static annis.sqlgen.SqlConstraints.isTrue;
 import static annis.sqlgen.SqlConstraints.isFalse;
 import static annis.sqlgen.SqlConstraints.isNotNull;
+import static annis.sqlgen.SqlConstraints.isNull;
+import static annis.sqlgen.SqlConstraints.isTrue;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
@@ -28,7 +28,6 @@ import static annis.test.TestUtils.uniqueString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-
 import org.junit.Before;
 import org.junit.Test;
 

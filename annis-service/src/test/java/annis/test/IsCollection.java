@@ -16,7 +16,6 @@
 package annis.test;
 
 import java.util.Collection;
-
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 

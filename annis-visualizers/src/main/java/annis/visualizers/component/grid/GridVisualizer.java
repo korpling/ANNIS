@@ -17,9 +17,9 @@ package annis.visualizers.component.grid;
 
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
+import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.libgui.media.PDFController;
 import com.vaadin.server.VaadinSession;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * <b>hide_tok:true</b> switches the line with the token value off.
  * </li>
  * <li>
- * <b>show_ns:true</b> always show the namespace of the annotations.
+ * <b>show_ns</b> If set to "true" always show the namespace of the annotations. Alternativly a comma-separated list of fully qualified annotation names (e.g. {@code myns::lemma}) or regular expressions enclosed in slashes (e.g. {@code /my.*::lem.+/} for which the namespace should be shown can be given.
  * </li>
  * <li>
  * <b>pdf_page_key</b>: name of the annotation that contains the pdf page number

@@ -30,21 +30,9 @@ import com.hp.gagawa.java.elements.Table;
 import com.hp.gagawa.java.elements.Td;
 import com.hp.gagawa.java.elements.Text;
 import com.hp.gagawa.java.elements.Tr;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import java.io.IOException;
-import java.io.Writer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructuredNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Serializable;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -53,7 +41,16 @@ import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.EList;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SPointingRelation;
+import org.corpus_tools.salt.common.SStructuredNode;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -138,8 +135,8 @@ public class CorefVisualizer extends WriterVisualizer
     
     public SerializableAnnotation(SAnnotation orig)
     {
-      this.name = orig.getSName();
-      this.value = orig.getSValueSTEXT();
+      this.name = orig.getName();
+      this.value = orig.getValue_STEXT();
     }
 
     public String getName()
@@ -220,19 +217,25 @@ public class CorefVisualizer extends WriterVisualizer
       }
       fonts.add("serif");
 
-      Link linkTooltip = new Link();
-      linkTooltip.setHref(input.getResourcePath("coref/jquery.tooltip.css"));
-      linkTooltip.setRel("stylesheet");
-      linkTooltip.setType("text/css");
-      head.appendChild(linkTooltip);
+      Link linkJQueryUI = new Link();
+      linkJQueryUI.setHref(input.getResourcePath("coref/jquery-ui-1.11.4.custom/jquery-ui.min.css"));
+      linkJQueryUI.setRel("stylesheet");
+      linkJQueryUI.setType("text/css");
+      head.appendChild(linkJQueryUI);
+      
+      Link linkJQueryUIStructure = new Link();
+      linkJQueryUIStructure.setHref(input.getResourcePath("coref/jquery-ui-1.11.4.custom/jquery-ui.structure.min.css"));
+      linkJQueryUIStructure.setRel("stylesheet");
+      linkJQueryUIStructure.setType("text/css");
+      head.appendChild(linkJQueryUIStructure);
       
       Script scriptJquery = new Script("text/javascript");
-      scriptJquery.setSrc(input.getResourcePath("coref/jquery-1.6.2.min.js"));
+      scriptJquery.setSrc(input.getResourcePath("coref/jquery-2.1.4.min.js"));
       head.appendChild(scriptJquery);
       
-      Script scriptTooltip = new Script("text/javascript");
-      scriptTooltip.setSrc(input.getResourcePath("coref/jquery.tooltip.min.js"));
-      head.appendChild(scriptTooltip);
+      Script scriptUI = new Script("text/javascript");
+      scriptUI.setSrc(input.getResourcePath("coref/jquery-ui-1.11.4.custom/jquery-ui.min.js"));
+      head.appendChild(scriptUI);
       
       Link linkCoref = new Link();
       linkCoref.setHref(input.getResourcePath("coref/coref.css"));
@@ -256,13 +259,13 @@ public class CorefVisualizer extends WriterVisualizer
       componenttype = new LinkedList<TComponenttype>();
       SDocument saltDoc = input.getDocument();
      
-      SDocumentGraph saltGraph = saltDoc.getSDocumentGraph();
+      SDocumentGraph saltGraph = saltDoc.getDocumentGraph();
       if (saltGraph == null)
       {
         body.setText("An Error occured: Could not get Graph of Result (Graph == null).");
         return;
       }
-      List<SRelation> edgeList = saltGraph.getSRelations();
+      List<SRelation<SNode,SNode>> edgeList = saltGraph.getRelations();
       if (edgeList == null)
       {
         return;
@@ -285,7 +288,7 @@ public class CorefVisualizer extends WriterVisualizer
             if (componenttype.get(componentnr) != null && componenttype.get(componentnr).type != null 
               && componenttype.get(componentnr).nodeList != null
               && componenttype.get(componentnr).type.equals(relType) 
-              && componenttype.get(componentnr).nodeList.contains(rel.getSStructuredSource().getSId()))
+              && componenttype.get(componentnr).nodeList.contains(rel.getSource().getId()))
             {
               gotIt = true;
               break;
@@ -308,22 +311,22 @@ public class CorefVisualizer extends WriterVisualizer
             currentComponent.type = relType;
             currentComponent.tokenList = new LinkedList<String>();
             komponent.add(currentComponent);
-            currentComponenttype.nodeList.add(rel.getSStructuredSource().getSId());
+            currentComponenttype.nodeList.add(rel.getSource().getId());
           }
           TReferent ref = new TReferent();
           ref.annotations = new HashSet<SerializableAnnotation>();
-          for(SAnnotation anno : rel.getSAnnotations())
+          for(SAnnotation anno : rel.getAnnotations())
           {
             ref.annotations.add(new SerializableAnnotation(anno));
           }
           ref.component = componentnr;
           referentList.add(ref);
 
-          List<String> currentTokens = getAllTokens(rel.getSStructuredSource(), componentNameForRelation(rel), 
+          List<String> currentTokens = getAllTokens(rel.getSource(), componentNameForRelation(rel), 
             currentComponenttype, componentnr, input.getNamespace());
 
-          setReferent(rel.getSStructuredTarget(), globalIndex, 0);//neu
-          setReferent(rel.getSStructuredSource(), globalIndex, 1);//neu
+          setReferent(rel.getTarget(), globalIndex, 0);//neu
+          setReferent(rel.getSource(), globalIndex, 1);//neu
 
           for (String s : currentTokens)
           {
@@ -344,17 +347,15 @@ public class CorefVisualizer extends WriterVisualizer
       List<List<Node>> nodesPerText = new LinkedList<List<Node>>();
       
       // write output for each text separatly
-      EList<STextualDS> texts = saltGraph.getSTextualDSs();
+      List<STextualDS> texts = saltGraph.getTextualDSs();
       if(texts != null && !texts.isEmpty())
       {
         
         for(STextualDS t : texts)
         {
-          SDataSourceSequence sequence= SaltFactory.eINSTANCE.createSDataSourceSequence();
-          sequence.setSSequentialDS(t);
-          sequence.setSStart(0);
-          sequence.setSEnd((t.getSText()!= null) ? t.getSText().length():0);
-          EList<SToken> token = saltGraph.getSTokensBySequence(sequence);
+          DataSourceSequence sequence= new DataSourceSequence(t, 0,
+            (t.getText()!= null) ? t.getText().length():0);
+          List<SToken> token = saltGraph.getSortedTokenByText(saltGraph.getTokensBySequence(sequence));
 
           if(token != null)
           {
@@ -370,8 +371,8 @@ public class CorefVisualizer extends WriterVisualizer
                  * (according to the resolver trigger) conntected to 
                  * this token was found.
                  */
-                if(referentOfToken.get(tok.getSId()) != null 
-                  && !referentOfToken.get(tok.getSId()).isEmpty())
+                if(referentOfToken.get(tok.getId()) != null 
+                  && !referentOfToken.get(tok.getId()).isEmpty())
                 {
                   validText = true;
                   break;
@@ -440,7 +441,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
   
-  private List<Node> outputSingleText(EList<SToken> token, VisualizerInput input)
+  private List<Node> outputSingleText(List<SToken> token, VisualizerInput input)
     throws IOException
   {
     List<Node> result = new LinkedList<Node>();
@@ -610,7 +611,7 @@ public class CorefVisualizer extends WriterVisualizer
                 Td tdTok = new Td();
                 trTok.appendChild(tdTok);
                 
-                tdTok.setId("tok_" + prepareID(tok.getSId()));
+                tdTok.setId("tok_" + prepareID(tok.getId()));
                 tdTok.setTitle(tooltip);
                 tdTok.setStyle(style);
                 tdTok.setAttribute("onclick", onclick);
@@ -629,7 +630,7 @@ public class CorefVisualizer extends WriterVisualizer
                 
                 Td tdTok = new Td();
                 trTok.appendChild(tdTok);
-                tdTok.setId("tok_" + prepareID(tok.getSId()));
+                tdTok.setId("tok_" + prepareID(tok.getId()));
                 tdTok.setTitle(tooltip);
                 tdTok.setStyle(style);
                 tdTok.setAttribute("onclick", onclick);
@@ -738,7 +739,7 @@ public class CorefVisualizer extends WriterVisualizer
         Td tdTok = new Td();
         trTok.appendChild(tdTok);
         
-        tdTok.setId("tok_" + prepareID(tok.getSId()));
+        tdTok.setId("tok_" + prepareID(tok.getId()));
         tdTok.setStyle(style);
         
         Text textTok = new Text("&nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp;");
@@ -778,13 +779,13 @@ public class CorefVisualizer extends WriterVisualizer
   private List<String> getAllTokens(SStructuredNode n, String name, TComponenttype c, long cnr, String namespace)
   {
     List<String> result = null;
-    if (!visitedNodes.contains(n.getSId()))
+    if (!visitedNodes.contains(n.getId()))
     {
       result = new LinkedList<String>();
-      visitedNodes.add(n.getSId());
-      if (tokensOfNode.containsKey(n.getSId()))
+      visitedNodes.add(n.getId());
+      if (tokensOfNode.containsKey(n.getId()))
       {
-        for (String t : tokensOfNode.get(n.getSId()))
+        for (String t : tokensOfNode.get(n.getId()))
         {
           result.add(t);
           if (componentOfToken.get(t) == null)
@@ -807,23 +808,23 @@ public class CorefVisualizer extends WriterVisualizer
         result = searchTokens(n, cnr);
         if (result != null)
         {
-          tokensOfNode.put(n.getSId(), result);
+          tokensOfNode.put(n.getId(), result);
         }
       }
       //get "P"-Edges!
-      EList<Edge> outEdges = n.getSGraph().getOutEdges(n.getSId());
+      List<SRelation<SNode,SNode>> outEdges = n.getGraph().getOutRelations(n.getId());
       if(outEdges != null)
       {
-        for (Edge e : outEdges)
+        for (SRelation<? extends SNode,? extends SNode> e : outEdges)
         {
           if(includeEdge(e, namespace))
           {
             SPointingRelation rel = (SPointingRelation) e;
             if (name.equals(componentNameForRelation(rel))
-              && !visitedNodes.contains(rel.getSStructuredTarget().getSId()))
+              && !visitedNodes.contains(rel.getTarget().getId()))
             {
-              c.nodeList.add(rel.getSStructuredTarget().getSId());
-              List<String> Med = getAllTokens(rel.getSStructuredTarget(), 
+              c.nodeList.add(rel.getTarget().getId());
+              List<String> Med = getAllTokens(rel.getTarget(), 
                 name, c, cnr, namespace);
               for (String l : Med)
               {
@@ -836,19 +837,19 @@ public class CorefVisualizer extends WriterVisualizer
           }
         }
       }
-      EList<Edge> inEdges = n.getSGraph().getInEdges(n.getSId());
+      List<SRelation<SNode,SNode>> inEdges = n.getGraph().getInRelations(n.getId());
       if(inEdges != null)
       {
-        for (Edge e : inEdges)
+        for (SRelation<? extends SNode,? extends SNode> e : inEdges)
         {
           if(includeEdge(e, namespace))
           {
             SPointingRelation rel = (SPointingRelation) e;
             if (name.equals(componentNameForRelation(rel))
-              && !visitedNodes.contains(rel.getSStructuredSource().getSId()))
+              && !visitedNodes.contains(rel.getSource().getId()))
             {
-              c.nodeList.add(rel.getSStructuredSource().getSId());
-              List<String> Med = getAllTokens(rel.getSStructuredSource(), name, c, cnr, namespace);
+              c.nodeList.add(rel.getSource().getId());
+              List<String> Med = getAllTokens(rel.getSource(), name, c, cnr, namespace);
               for (String s : Med)
               {
                 if (result != null && !result.contains(s))
@@ -870,29 +871,28 @@ public class CorefVisualizer extends WriterVisualizer
    * @param index index of the Referent
    * @param value determines wheather the refered P-Edge is incoming (1) or outgoing (0)
    */
-  private void setReferent(
-    de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node n, long index, int value)
+  private void setReferent(SNode n, long index, int value)
   {
     if (n instanceof SToken)
     {
       SToken tok = (SToken) n;
-      if (!referentOfToken.containsKey(tok.getSId()))
+      if (!referentOfToken.containsKey(tok.getId()))
       {
         HashMap<Long, Integer> newlist = new HashMap<Long, Integer>();
         newlist.put(index, value);//globalindex?
-        referentOfToken.put(tok.getSId(), newlist);
+        referentOfToken.put(tok.getId(), newlist);
       }
       else
       {
-        referentOfToken.get(tok.getSId()).put(globalIndex, value);
+        referentOfToken.get(tok.getId()).put(globalIndex, value);
       }
     }
     else
     {
-      EList<Edge> outEdges = n.getGraph().getOutEdges(n.getId());
+      List<SRelation<SNode,SNode>> outEdges = n.getGraph().getOutRelations(n.getId());
       if(outEdges != null)
       {
-        for (Edge edge : outEdges)
+        for (SRelation<? extends SNode,? extends SNode> edge : outEdges)
         {
           if(!(edge instanceof SPointingRelation))
           {
@@ -917,16 +917,16 @@ public class CorefVisualizer extends WriterVisualizer
     List<String> result = new LinkedList<String>();
     if (n instanceof SToken)
     {
-      result.add(n.getSId());
-      if (componentOfToken.get(n.getSId()) == null)
+      result.add(n.getId());
+      if (componentOfToken.get(n.getId()) == null)
       {
         List<Long> newlist = new LinkedList<Long>();
         newlist.add(cnr);
-        componentOfToken.put(n.getSId(), newlist);
+        componentOfToken.put(n.getId(), newlist);
       }
       else
       {
-        List<Long> newlist = componentOfToken.get(n.getSId());
+        List<Long> newlist = componentOfToken.get(n.getId());
         if (!newlist.contains(cnr))
         {
           newlist.add(cnr);
@@ -935,10 +935,10 @@ public class CorefVisualizer extends WriterVisualizer
     }
     else
     {
-      EList<Edge> outgoing = n.getSGraph().getOutEdges(n.getSId());
+      List<SRelation<SNode, SNode>> outgoing = n.getGraph().getOutRelations(n.getId());
       if(outgoing != null)
       {
-        for (Edge e : outgoing)
+        for (SRelation<? extends SNode,? extends SNode> e : outgoing)
         {
           if(!(e instanceof SPointingRelation) && e.getSource() instanceof SNode && e.getTarget() instanceof SNode)
           {
@@ -1123,13 +1123,13 @@ public class CorefVisualizer extends WriterVisualizer
     return (r * 65536 + g * 256 + b);
   }
 
-  private boolean includeEdge(Edge e, String namespace)
+  private boolean includeEdge(SRelation<? extends SNode, ? extends SNode> e, String namespace)
   {
     if(e instanceof SPointingRelation)
     {
       SPointingRelation rel = (SPointingRelation) e;
-      if(componentNameForRelation(rel) != null && rel.getSSource() != null && rel.getSTarget() != null
-        && rel.getSLayers() != null && !rel.getSLayers().isEmpty() && namespace.equals(rel.getSLayers().get(0).getSName()))
+      if(componentNameForRelation(rel) != null && rel.getSource() != null && rel.getTarget() != null
+        && rel.getLayers() != null && !rel.getLayers().isEmpty() && namespace.equals(rel.getLayers().iterator().next().getName()))
       {
         return true;
       }
@@ -1153,7 +1153,7 @@ public class CorefVisualizer extends WriterVisualizer
   
   private static String componentNameForRelation(SRelation rel)
   {
-    return (rel.getSTypes() != null && rel.getSTypes().size() > 0)
-      ? rel.getSTypes().get(0) : null;
+    return (rel.getType() != null && !rel.getType().isEmpty())
+      ? rel.getType() : null;
   }
 }

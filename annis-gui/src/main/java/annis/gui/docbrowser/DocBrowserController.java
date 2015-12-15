@@ -15,10 +15,10 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
+import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
-import annis.libgui.PollControl;
 import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
@@ -42,14 +42,14 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,7 @@ public class DocBrowserController implements Serializable
   private final Logger log = LoggerFactory.getLogger(DocBrowserController.class);
 
   // holds the complete state of the gui
-  private final SearchUI ui;
+  private final AnnisUI ui;
 
   // track the already initiated doc browsers
   private final Map<String, Component> initedDocBrowsers;
@@ -81,7 +81,7 @@ public class DocBrowserController implements Serializable
   
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
-  public DocBrowserController(SearchUI ui)
+  public DocBrowserController(AnnisUI ui)
   {
     this.ui = ui;
     this.initedDocBrowsers = new HashMap<>();
@@ -99,7 +99,7 @@ public class DocBrowserController implements Serializable
     if (visibleVisHolder.containsKey(canonicalTitle))
     {
       Panel visHolder = visibleVisHolder.get(canonicalTitle);
-      ui.getTabSheet().setSelectedTab(visHolder);
+      ui.getSearchView().getTabSheet().setSelectedTab(visHolder);
       return;
     }
 
@@ -124,17 +124,16 @@ public class DocBrowserController implements Serializable
     
     visHolder.setContent(layoutProgress);
     
-    Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
+    Tab visTab = ui.getSearchView().getTabSheet().addTab(visHolder, tabCaption);
     visTab.setDescription(canonicalTitle);
     visTab.setIcon(EYE_ICON);
     visTab.setClosable(true);
-    ui.getTabSheet().setSelectedTab(visTab);
+    ui.getSearchView().getTabSheet().setSelectedTab(visTab);
 
     // register visible visHolder
     this.visibleVisHolder.put(canonicalTitle, visHolder);
 
-    PollControl.runInBackground(100, ui,
-      new DocVisualizerFetcher(corpus, doc, canonicalTitle,
+    Background.run(new DocVisualizerFetcher(corpus, doc, canonicalTitle,
         visConfig.getType(), visHolder, visConfig, btn, UI.getCurrent())
     );
   }
@@ -150,11 +149,11 @@ public class DocBrowserController implements Serializable
     }
 
     // init tab and put to front
-    TabSheet.Tab tab = ui.getTabSheet().addTab(initedDocBrowsers.get(corpus),
+    TabSheet.Tab tab = ui.getSearchView().getTabSheet().addTab(initedDocBrowsers.get(corpus),
       corpus);
     tab.setIcon(DOC_ICON);
     tab.setClosable(true);
-    ui.getTabSheet().setSelectedTab(tab);
+    ui.getSearchView().getTabSheet().setSelectedTab(tab);
   }
 
   /**
@@ -208,7 +207,7 @@ public class DocBrowserController implements Serializable
 
       if (txt != null)
       {
-        SDocument sDoc = txt.getSCorpusGraphs().get(0).getSDocuments().get(0);
+        SDocument sDoc = txt.getCorpusGraphs().get(0).getDocuments().get(0);
         input.setResult(sDoc);
       }
     }

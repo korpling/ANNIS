@@ -17,7 +17,6 @@ package annis.test;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
 import org.junit.experimental.theories.ParametersSuppliedBy;
 
 

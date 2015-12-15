@@ -4,10 +4,15 @@
  */
 package annis.sqlgen;
 
+import annis.dao.DocumentNameMapRow;
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.model.AnnotationGraph;
+import annis.model.Edge;
+import annis.model.Edge.EdgeType;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,25 +23,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-
-
-import org.apache.commons.lang3.Validate;
-import org.springframework.dao.DataAccessException;
-
-import annis.dao.DocumentNameMapRow;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.AnnotationGraph;
-import annis.model.Edge;
-import annis.model.Edge.EdgeType;
-import java.util.HashSet;
-
-import org.springframework.jdbc.core.ResultSetExtractor;
-
 import java.util.Map.Entry;
-import java.util.Set;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
  *

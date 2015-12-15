@@ -16,27 +16,16 @@
 package annis.visualizers.component.rst;
 
 import annis.CommonHelper;
-import annis.libgui.MatchedNodeColors;
 import annis.gui.components.CssRenderInfo;
-import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import annis.gui.widgets.gwt.client.ui.VJITWrapper;
-import static annis.model.AnnisConstants.*;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.visualizers.VisualizerInput;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
+import annis.model.Edge;
 import annis.model.RelannisNodeFeature;
 import com.vaadin.ui.Panel;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructure;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,10 +35,22 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 import java.util.UUID;
-import org.eclipse.emf.common.util.BasicEList;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SStructure;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.GraphTraverseHandler;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SProcessingAnnotation;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.eclipse.emf.common.util.EList;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -108,7 +109,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class RSTImpl extends Panel implements SGraphTraverseHandler {
+public class RSTImpl extends Panel implements GraphTraverseHandler {
 
   // implements the AbstractComponent and talks to the VJITWrapperWidget
   private final JITWrapper jit;
@@ -161,22 +162,22 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   private TreeSet<SStructure> sentences = new TreeSet<SStructure>(
           new Comparator<SStructure>() {
     private int getStartPosition(SStructure s) {
-      EList<Edge> out = s.getSGraph().getOutEdges(s.getSId());
+      List<SRelation<SNode,SNode>> out = s.getGraph().getOutRelations(s.getId());
 
-      for (Edge e : out) {
+      for (SRelation e : out) {
         if (e instanceof SRelation
                 && ((SRelation) e).getTarget() instanceof SToken) {
           SToken tok = ((SToken) ((SRelation) e).getTarget());
           
           RelannisNodeFeature feat = 
-            (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            (RelannisNodeFeature) tok.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
           
           return (int) feat.getLeftToken();
         }
       }
       
       RelannisNodeFeature feat = 
-        (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        (RelannisNodeFeature) s.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
      
       return (int) feat.getLeftToken();
     }
@@ -234,9 +235,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   }
 
   private String transformSaltToJSON(VisualizerInput visInput) {
-    graph = visInput.getSResult().getSDocumentGraph();
-    EList<SNode> rootSNodes = graph.getSRoots();
-    EList<SNode> rstRoots = new BasicEList<SNode>();
+    graph = visInput.getSResult().getDocumentGraph();
+    List<SNode> rootSNodes = graph.getRoots();
+    List<SNode> rstRoots = new ArrayList<SNode>();
 
 
     for (SNode sNode : rootSNodes) {
@@ -250,7 +251,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
       // collect all sentence and sort them.
       graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-              "getSentences", new SGraphTraverseHandler() {
+              "getSentences", new GraphTraverseHandler() {
         @Override
         public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
                 String traversalId, SNode currNode, SRelation sRelation,
@@ -284,7 +285,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       //decorate segments with sentence number
       int i = 1;
       for (SStructure sentence : sentences) {
-        sentence.createSProcessingAnnotation(
+        sentence.createProcessingAnnotation(
                 SENTENCE_INDEX, SENTENCE_INDEX, Integer.toString(i));
         i++;
       }
@@ -308,26 +309,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
     StringBuilder sb = new StringBuilder();
     // use a hash set so we don't get any duplicate entries
     LinkedHashSet<SToken> token = new LinkedHashSet<>();
-    EList<Edge> edges;
+    List<SRelation<SNode, SNode>> edges;
 
     if (currNode instanceof SStructure) {
 
-      edges = currNode.getSGraph().getOutEdges(currNode.getSId());
+      edges = currNode.getGraph().getOutRelations(currNode.getId());
 
       // get all tokens directly dominated tokens and build a string
-      for (Edge e : edges) {
-        SRelation sedge;
-
-        if (e instanceof SRelation) {
-          sedge = (SRelation) e;
-        } else {
-          log.error("wrong type of edge for {}", e);
-          continue;
-        }
-
-        if (sedge.getSTarget() instanceof SToken) 
+      for (SRelation<SNode, SNode> sedge : edges) {
+        if (sedge.getTarget() instanceof SToken) 
         {
-          token.add((SToken) sedge.getSTarget());
+          token.add((SToken) sedge.getTarget());
         }
       }
 
@@ -358,7 +350,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
     try {
       // build unique id, cause is used for an unique html element id.
       jsonData.put("id", getUniStrId(currNode));
-      jsonData.put("name", currNode.getSName());
+      jsonData.put("name", currNode.getName());
 
       /**
        * additional data oject for edge labels and rendering sentences
@@ -379,9 +371,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
       if (currNode instanceof SStructure && isSegment(currNode)) {
         SProcessingAnnotation sentence_idx = currNode.
-                getSProcessingAnnotation(SENTENCE_INDEX + "::" + SENTENCE_INDEX);
+                getProcessingAnnotation(SENTENCE_INDEX + "::" + SENTENCE_INDEX);
         int index = sentence_idx == null ? -1 : Integer.parseInt(sentence_idx.
-                getSValueSTEXT());
+                getValue_STEXT());
 
         data.put(SENTENCE_LEFT, index);
         data.put(SENTENCE_RIGHT, index);
@@ -401,12 +393,12 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       // is set to true, when currNode is reached by an rst edge
       boolean isAppendedToParent = false;
 
-      EList<Edge> in = currSnode.getSGraph().getInEdges(currSnode.getSId());
+      List<SRelation<SNode, SNode>> in = currSnode.getGraph().getInRelations(currSnode.getId());
 
       if (in != null) {
 
-        for (Edge e : in) {
-          if (e instanceof SRelation && hasRSTType((SRelation) e)) {
+        for (SRelation<SNode, SNode> e : in) {
+          if (hasRSTType(e)) {
             JSONObject tmp;
 
 
@@ -499,10 +491,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    * one STEXT is overlapped by this node
    */
   private String getText(SToken currNode) {
-    EList<STYPE_NAME> relationTypes = new BasicEList<STYPE_NAME>();
-    relationTypes.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-    EList<SDataSourceSequence> sSequences = currNode.getSDocumentGraph().
-            getOverlappedDSSequences(currNode, relationTypes);
+
+    List<DataSourceSequence> sSequences = currNode.getGraph().
+            getOverlappedDataSourceSequence(currNode, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
 
     // only support one text for spanns
     if (sSequences == null || sSequences.size() != 1) {
@@ -517,18 +508,18 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
      * chapter "5.8 More specific nodes and relations" the start and end point
      * of a range of token is stored in superordinate node of type SSequentialDS
      */
-    if (sSequences.get(0).getSSequentialDS() instanceof STextualDS) {
-      STextualDS text = ((STextualDS) sSequences.get(0).getSSequentialDS());
-      int start = sSequences.get(0).getSStart();
-      int end = sSequences.get(0).getSEnd();
-      return text.getSText().substring(start, end);
+    if (sSequences.get(0).getDataSource() instanceof STextualDS) {
+      STextualDS text = ((STextualDS) sSequences.get(0).getDataSource());
+      int start = sSequences.get(0).getStart().intValue();
+      int end = sSequences.get(0).getEnd().intValue();
+      return text.getText().substring(start, end);
 
 
     }
 
     // something fundamentally goes wrong
     log.error("{} instead of {}",
-            sSequences.get(0).getSSequentialDS().getClass().getName(),
+            sSequences.get(0).getDataSource().getClass().getName(),
             STextualDS.class
             .getName());
 
@@ -538,9 +529,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
   private JSONArray getOutGoingEdgeTypeAnnotation(SNode node) throws
           JSONException {
-    EList<Edge> out = node.getSGraph().getOutEdges(node.getId());
-    EList<String> sTypes;
-    EList<SAnnotation> annos;
+    List<SRelation<SNode, SNode>> out = node.getGraph().getOutRelations(node.getId());
+    String type;
+    Set<SAnnotation> annos;
     JSONArray edgeData = new JSONArray();
 
 
@@ -549,16 +540,16 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       return edgeData;
     }
 
-    for (Edge edge : out) {
+    for (SRelation<SNode, SNode> edge : out) {
       if (!(edge instanceof SRelation) || edge.getTarget() instanceof SToken) {
         continue;
       }
 
-      sTypes = ((SRelation) edge).getSTypes();
+      type = ((SRelation) edge).getType();
       String sTypeAsString = "edge";
-      if(sTypes != null && !sTypes.isEmpty())
+      if(type != null && !type.isEmpty())
       {
-        sTypeAsString = sTypes.get(0);
+        sTypeAsString = type;
       }
 
       JSONObject jsonEdge = new JSONObject();
@@ -584,11 +575,11 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
         throw new JSONException("could not cast to SNode");
       }
 
-      annos = ((SRelation) edge).getSAnnotations();
+      annos = edge.getAnnotations();
 
       if (annos != null) {
         for (SAnnotation anno : annos) {
-          getOrCreateArray(jsonEdge, "annotation").put(anno.getSValueSTEXT());
+          getOrCreateArray(jsonEdge, "annotation").put(anno.getValue_STEXT());
         }
       }
 
@@ -601,7 +592,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    * Build a unique HTML id.
    */
   private String getUniStrId(SNode node) {
-    return visId + "_" + node.getSId();
+    return visId + "_" + node.getId();
   }
 
   /**
@@ -632,10 +623,10 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    */
   private boolean isSegment(SNode currNode) {
 
-    EList<Edge> edges = currNode.getSGraph().getOutEdges(currNode.getSId());
+    List<SRelation<SNode, SNode>> edges = currNode.getGraph().getOutRelations(currNode.getId());
 
     if (edges != null && edges.size() > 0) {
-      for (Edge edge : edges) {
+      for (SRelation<SNode, SNode> edge : edges) {
         if (edge.getTarget() instanceof SToken) {
           return true;
         }
@@ -732,20 +723,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   }
 
   private boolean hasRSTType(SRelation e) {
-    EList<String> sTypes = e.getSTypes();
+    String type = e.getType();
 
-    if(e.getSTarget() instanceof SToken && e.getSTypes() == null)
+    if(e.getTarget() instanceof SToken && e.getType() == null)
     {
       return true;
     }
-    else if (sTypes != null)
+    else if (type != null)
     {
-      for (String sType : sTypes)
+      if (getRSTType().equalsIgnoreCase(type))
       {
-        if (getRSTType().equalsIgnoreCase(sType))
-        {
-          return true;
-        }
+        return true;
       }
     }
     return false;

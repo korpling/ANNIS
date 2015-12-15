@@ -23,10 +23,6 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -35,6 +31,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.core.SLayer;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,22 +70,22 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable
 
     Set<String> nodeLayers = new HashSet<String>();
 
-    for (SNode n : doc.getSDocumentGraph().getSNodes())
+    for (SNode n : doc.getDocumentGraph().getNodes())
     {
-      for (SLayer layer : n.getSLayers())
+      for (SLayer layer : n.getLayers())
       {
-        nodeLayers.add(layer.getSName());
+        nodeLayers.add(layer.getName());
       }
     }
 
     Set<String> edgeLayers = new HashSet<String>();
-    for (SRelation e : doc.getSDocumentGraph().getSRelations())
+    for (SRelation<SNode, SNode> e : doc.getDocumentGraph().getRelations())
     {
-      for (SLayer layer : e.getSLayers())
+      for (SLayer layer : e.getLayers())
       {
         try
         {
-          edgeLayers.add(layer.getSName());
+          edgeLayers.add(layer.getName());
         }
         catch (NullPointerException ex)
         {
@@ -98,13 +98,13 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable
 
     for (String ns : nodeLayers)
     {
-      resolverRequests.add(new SingleResolverRequest(doc.getSCorpusGraph().
-        getSRootCorpus().get(0).getSName(), ns, ResolverEntry.ElementType.node));
+      resolverRequests.add(new SingleResolverRequest(doc.getGraph().
+        getRoots().get(0).getName(), ns, ResolverEntry.ElementType.node));
     }
     for (String ns : edgeLayers)
     {
-      resolverRequests.add(new SingleResolverRequest(doc.getSCorpusGraph().
-        getSRootCorpus().get(0).getSName(), ns, ResolverEntry.ElementType.edge));
+      resolverRequests.add(new SingleResolverRequest(doc.getGraph().
+        getRoots().get(0).getName(), ns, ResolverEntry.ElementType.edge));
     }
 
     // query with this resolver request and make sure it is unique

@@ -64,6 +64,8 @@ public class DocBrowserTable extends Table
   private final DocBrowserPanel docBrowserPanel;
 
   private static final Resource INFO_ICON = FontAwesome.INFO_CIRCLE;
+  
+  public static final String PROP_DOC_NAME = "document name";
 
   /**
    * Represents the config of the doc visualizer. If there are meta data names
@@ -87,7 +89,7 @@ public class DocBrowserTable extends Table
 
     container = new IndexedContainer();
 
-    container.addContainerProperty("document name", String.class, "n/a");
+    container.addContainerProperty(PROP_DOC_NAME, String.class, "n/a");
     MetaColumns metaCols = generateMetaColumns();
 
     for (MetaDataCol metaDatum : metaCols.visibleColumns)
@@ -125,7 +127,7 @@ public class DocBrowserTable extends Table
       Item row = container.addItem(path);
       if(row != null)
       {
-        row.getItemProperty("document name").setValue(doc);
+        row.getItemProperty(PROP_DOC_NAME).setValue(doc);
 
         // add the metadata columns.
         for (MetaDataCol metaDataCol : metaCols.visibleColumns)
@@ -149,7 +151,6 @@ public class DocBrowserTable extends Table
         row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
       }
     }
-
     setContainerDataSource(container);
     Object[] metaDataColNames = new Object[metaCols.visibleColumns.size()];
 
@@ -305,7 +306,7 @@ public class DocBrowserTable extends Table
     {
       sort(new Object[]
       {
-        "document name"
+        PROP_DOC_NAME
       }, new boolean[]
       {
         true
@@ -359,6 +360,12 @@ public class DocBrowserTable extends Table
 
     p.setContent(l);
     return p;
+  }
+  
+  public void setContainerFilter(Filter filter)
+  {
+    container.removeAllContainerFilters();
+    container.addContainerFilter(filter);
   }
 
   public static DocBrowserTable getDocBrowserTable(DocBrowserPanel parent)

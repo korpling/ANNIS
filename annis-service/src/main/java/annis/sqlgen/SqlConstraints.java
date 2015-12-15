@@ -15,12 +15,9 @@
  */
 package annis.sqlgen;
 
-import java.util.Collection;
-
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import annis.model.QueryNode.TextMatching;
+import java.util.Collection;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * TODO: write documentation for BaseSqlClauseGenerator, fix name

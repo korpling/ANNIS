@@ -10,8 +10,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xverify:none -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version} -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>-Xverify:none -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=false -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version} -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <exec.executable>java</exec.executable>
+                <skipTests>true</skipTests>
             </properties>
         </action>
         <action>
@@ -24,7 +25,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xverify:none -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version} -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xverify:none -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=false -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version} -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
             </properties>
@@ -39,8 +40,30 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xverify:none -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version} -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>-Xverify:none -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=false -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version} -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
+        </action>
+        <action>
+            <actionName>build</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>install</goal>
+            </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
+        </action>
+        <action>
+            <actionName>rebuild</actionName>
+            <packagings>
+                <packaging>*</packaging>
+            </packagings>
+            <goals>
+                <goal>clean</goal>
+                <goal>install</goal>
+            </goals>
         </action>
     </actions>

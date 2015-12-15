@@ -16,15 +16,16 @@
 package annis.gui.components;
 
 import annis.gui.frequency.FrequencyResultPanel;
+import static annis.libgui.Helper.encodeGeneric;
 import annis.service.objects.FrequencyTable;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
+import elemental.json.JsonArray;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
@@ -66,9 +67,9 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
     addFunction("selectRow", new JavaScriptFunction() {
 
       @Override
-      public void call(JSONArray arguments) throws JSONException
+      public void call(JsonArray arguments) throws JSONException
       {
-        freqPanel.selectRow(arguments.getInt(0));
+        freqPanel.selectRow((int) arguments.getNumber(0));
       }
     });
     
@@ -83,7 +84,8 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
     super.beforeClientResponse(initial);
     if(labels != null && values != null && lastScale != null && lastFont != null)
     {
-      callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
+      callFunction("showData", encodeGeneric(labels), encodeGeneric(values), 
+        lastScale.desc, lastFont, lastFontSize);
     }
   }
   
@@ -114,7 +116,8 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
   {
     if(labels != null && values != null && lastScale != null && lastFont != null)
     {
-      callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
+      callFunction("showData", encodeGeneric(labels), encodeGeneric(values), 
+        lastScale.desc, lastFont, lastFontSize);
     }
     return true;
   }

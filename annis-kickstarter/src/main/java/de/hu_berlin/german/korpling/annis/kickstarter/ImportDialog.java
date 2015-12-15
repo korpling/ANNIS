@@ -15,17 +15,22 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.administration.StatementController;
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
+import annis.administration.StatementController;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
+import com.google.common.io.Files;
+import com.google.common.io.PatternFilenameFilter;
 import java.awt.HeadlessException;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
@@ -36,6 +41,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,7 +278,7 @@ public class ImportDialog extends javax.swing.JDialog
   {
     super(parent, modal);
     initTransients();
-
+    
     this.corpusAdministration = corpusAdmin;
     this.importStatus =  this.corpusAdministration.getAdministrationDao()
       .initImportStatus();
@@ -300,6 +307,10 @@ public class ImportDialog extends javax.swing.JDialog
     }
 
     initComponents();
+    
+    this.fileChooser.setFileFilter(new FileNameExtensionFilter("ZIP file (*.zip) or directory", "zip"));
+
+
 
     loadProperties();
 
@@ -421,7 +432,7 @@ public class ImportDialog extends javax.swing.JDialog
     lblCurrentCorpus = new javax.swing.JLabel();
     jCheckBox1 = new javax.swing.JCheckBox();
 
-    fileChooser.setFileSelectionMode(javax.swing.JFileChooser.DIRECTORIES_ONLY);
+    fileChooser.setFileSelectionMode(javax.swing.JFileChooser.FILES_AND_DIRECTORIES);
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Import - ANNIS Kickstarter");
@@ -556,10 +567,10 @@ public class ImportDialog extends javax.swing.JDialog
 
       if (!"".equals(txtInputDir.getText()))
       {
-        File dir = new File(txtInputDir.getText());
-        if (dir.exists() && dir.isDirectory())
+        File f = new File(txtInputDir.getText());
+        if (f.exists() && (f.isDirectory() || "zip".equals(Files.getFileExtension(f.getName()))))
         {
-          fileChooser.setSelectedFile(dir);
+          fileChooser.setSelectedFile(f);
         }
       }
 

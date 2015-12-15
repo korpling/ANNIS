@@ -16,14 +16,21 @@
 package annis.gui;
 
 import annis.VersionInfo;
-import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Version;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -34,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AboutWindow extends Window
 {
@@ -50,6 +57,7 @@ public class AboutWindow extends Window
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
+    layout.setMargin(true);
  
     HorizontalLayout hLayout = new HorizontalLayout();
     
@@ -78,8 +86,8 @@ public class AboutWindow extends Window
     layout.addComponent(new Label("ANNIS is a project of the "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
     layout.addComponent(new Label("Homepage: "
-      + "<a href=\"http://annis-tools.org/\">"
-      + "http://annis-tools.org/</a>.", Label.CONTENT_XHTML));
+      + "<a href=\"http://corpus-tools.org/annis/\">"
+      + "http://corpus-tools.org/annis/</a>.", Label.CONTENT_XHTML));
     layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
     layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
     
@@ -114,18 +122,18 @@ public class AboutWindow extends Window
     
     txtThirdParty.setValue(sb.toString());
     txtThirdParty.setReadOnly(true);
-    txtThirdParty.addStyleName("license");
+    txtThirdParty.addStyleName("shared-text");
     txtThirdParty.setWordwrap(false);
     
     layout.addComponent(txtThirdParty);
     
-    Button btOK = new Button("OK");
+    Button btClose = new Button("Close");
     final AboutWindow finalThis = this;
-    btOK.addClickListener(new OkClickListener(finalThis));
-    layout.addComponent(btOK);
+    btClose.addClickListener(new OkClickListener(finalThis));
+    layout.addComponent(btClose);
     
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
-    layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
+    layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(txtThirdParty, 1.0f);
     
   }

@@ -15,16 +15,18 @@
  */
 package annis.gui;
 
-import annis.gui.controller.ExportBackgroundJob;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.controller.CountCallback;
+import annis.gui.controller.ExportBackgroundJob;
 import annis.gui.controller.FrequencyBackgroundJob;
 import annis.gui.controller.SpecificPagingCallback;
-import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.ExportQuery;
 import annis.gui.objects.FrequencyQuery;
 import annis.gui.objects.PagedResultQuery;
@@ -35,11 +37,13 @@ import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
+import annis.libgui.Background;
 import annis.libgui.Helper;
-import annis.libgui.PollControl;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.model.AqlParseError;
+import annis.model.QueryNode;
+import annis.service.objects.CorpusConfig;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.FrequencyTableQuery;
@@ -47,11 +51,11 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import com.google.common.base.Joiner;
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.uri.UriComponent;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.server.FontAwesome;
@@ -64,11 +68,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,14 +92,16 @@ public class QueryController implements Serializable
   private static final Logger log = LoggerFactory.getLogger(
     QueryController.class);
 
-  private final SearchUI ui;
+  private final SearchView searchView;
+  private final AnnisUI ui;
 
   private final QueryUIState state;
 
   private final Map<String, Exporter> exporterMap = new HashMap<>();
 
-  public QueryController(SearchUI ui)
+  public QueryController(SearchView searchView, AnnisUI ui)
   {
+    this.searchView = searchView;
     this.ui = ui;
     this.state = ui.getQueryState();
 
@@ -101,23 +112,40 @@ public class QueryController implements Serializable
         @Override
         public void valueChange(Property.ValueChangeEvent event)
         {
-          validateQuery(QueryController.this.state.getAql().getValue());
+          validateQuery();
         }
       });
 
-    for (Exporter e : SearchUI.EXPORTER)
+    for (Exporter e : SearchView.EXPORTER)
     {
       String name = e.getClass().getSimpleName();
       exporterMap.put(name, e);
     }
+    
+    this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
+    {
+
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        // TODO: check if the corpus is actually available to the user
+      }
+    });
   }
 
-  public void validateQuery(String query)
+  public void validateQuery()
   {
-    QueryPanel qp = ui.getControlPanel().getQueryPanel();
+    QueryPanel qp = searchView.getControlPanel().getQueryPanel();
+
+    // reset status
+    qp.setErrors(null);
+    qp.setNodes(null);
+
+    String query = state.getAql().getValue();
     if (query == null || query.isEmpty())
     {
       qp.setStatus("Empty query");
+
     }
     else
     {
@@ -125,33 +153,32 @@ public class QueryController implements Serializable
       try
       {
         AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
-        Future<String> future = annisResource.path("query").path("check").
-          queryParam("q", Helper.encodeJersey(query))
-          .get(String.class);
+        Future<List<QueryNode>> future = annisResource.path("query").path(
+          "parse/nodes")
+          .queryParam("q", Helper.encodeJersey(query))
+          .get(new GenericType<List<QueryNode>>()
+          {
+          });
 
         // wait for maximal one seconds
         try
         {
-          String result = future.get(1, TimeUnit.SECONDS);
+          List<QueryNode> nodes = future.get(1, TimeUnit.SECONDS);
 
-          if ("ok".equalsIgnoreCase(result))
+          qp.setNodes(nodes);
+
+          if (state.getSelectedCorpora().getValue() == null
+            || state.getSelectedCorpora().getValue().isEmpty())
           {
-            if (state.getSelectedCorpora().getValue() == null
-              || state.getSelectedCorpora().getValue().isEmpty())
-            {
-              qp.setStatus(
-                "Please select a corpus from the list below, then click on \"Search\".");
-            }
-            else
-            {
-              qp.setStatus(
-                "Valid query, click on \"Search\" to start searching.");
-            }
+            qp.setStatus(
+              "Please select a corpus from the list below, then click on \"Search\".");
           }
           else
           {
-            qp.setStatus(result);
+            qp.setStatus(
+              "Valid query, click on \"Search\" to start searching.");
           }
+
         }
         catch (InterruptedException ex)
         {
@@ -161,21 +188,13 @@ public class QueryController implements Serializable
         {
           if (ex.getCause() instanceof UniformInterfaceException)
           {
-            UniformInterfaceException cause = (UniformInterfaceException) ex.
-              getCause();
-            if (cause.getResponse().getStatus() == 400)
-            {
-              List<AqlParseError> errors = 
-                cause.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
-              qp.setStatus(Joiner.on("\n").join(errors));
-            }
-            else
-            {
-              log.error(
-                "Exception when communicating with service", ex);
-              ExceptionDialog.show(ex,
-                "Exception when communicating with service.");
-            }
+            reportServiceException((UniformInterfaceException) ex.getCause(),
+              false);
+          }
+          else
+          {
+            // something unknown, report
+            ExceptionDialog.show(ex);
           }
         }
         catch (TimeoutException ex)
@@ -193,48 +212,138 @@ public class QueryController implements Serializable
     }
   }
 
-  public void setQuery(Query q)
+  /**
+   * Show errors that occured during the execution of a query to the user.
+   *
+   * @param ex The exception to report in the user interface
+   * @param showNotification If true a notification is shown instead of only
+   * displaying the error in the status label.
+   */
+  public void reportServiceException(UniformInterfaceException ex,
+    boolean showNotification)
   {
-    state.getAql().setValue(q.getQuery());
-    state.getSelectedCorpora().setValue(q.getCorpora());
-    if (q instanceof ContextualizedQuery)
+    QueryPanel qp = searchView.getControlPanel().getQueryPanel();
+
+    String caption = null;
+    String description = null;
+
+    if (ex.getResponse().getStatus() == 400)
     {
-      state.getLeftContext().
-        setValue(((ContextualizedQuery) q).getLeftContext());
-      state.getRightContext().setValue(((ContextualizedQuery) q).getRightContext());
-      state.getBaseText().setValue(((ContextualizedQuery) q).getSegmentation());
+      List<AqlParseError> errors
+        = ex.getResponse().getEntity(
+          new GenericType<List<AqlParseError>>()
+          {
+          });
+      caption = "Parsing error";
+      description = Joiner.on("\n").join(errors);
+      qp.setStatus(description);
+      qp.setErrors(errors);
     }
-    if (q instanceof PagedResultQuery)
+    else if (ex.getResponse().getStatus() == 504)
     {
-      state.getOffset().setValue(((PagedResultQuery) q).getOffset());
-      state.getLimit().setValue(((PagedResultQuery) q).getLimit());
-      state.getOrder().setValue(((PagedResultQuery) q).getOrder());
+      caption = "Timeout";
+      description = "Query execution took too long.";
+      qp.setStatus(caption + ": " + description);
     }
-    if (q instanceof ExportQuery)
+    else if (ex.getResponse().getStatus() == 403)
     {
-      state.getExporterName().setValue(((ExportQuery) q).getExporterName());
-      state.getExportAnnotationKeys().setValue(((ExportQuery) q).
-        getAnnotationKeys());
-      state.getExportParameters().setValue(((ExportQuery) q).getParameters());
+      
+      if(Helper.getUser() == null)
+      {
+        // not logged in
+        qp.setStatus("You don't have the access rights to query this corpus. " 
+        + "You might want to login to access more corpora.");
+        searchView.getMainToolbar().showLoginWindow(true);
+      }
+      else
+      {
+        // logged in but wrong user
+        caption = "You don't have the access rights to query this corpus. " 
+        + "You might want to login as another user to access more corpora.";
+        qp.setStatus(caption);
+      }
+    }
+    else
+    {
+      log.error(
+        "Exception when communicating with service", ex);
+      qp.setStatus("Unexpected exception:  " + ex.getMessage());
+      ExceptionDialog.show(ex,
+        "Exception when communicating with service.");
+    }
+
+    if (showNotification && caption != null)
+    {
+      Notification.show(caption, description, Notification.Type.WARNING_MESSAGE);
+    }
+
+  }
+  
+  /**
+   * Only changes the value of the property if it is not equals to the old one.
+   * @param <T>
+   * @param prop
+   * @param newValue 
+   */
+  private static <T> void  setIfNew(Property<T> prop, T newValue)
+  {
+    if(!Objects.equals(prop.getValue(), newValue))
+    {
+      prop.setValue(newValue);
     }
   }
 
+  public void setQuery(Query q)
+  {
+    // only change the values if actually changed (the value change listeners should not be triggered if not necessary)
+    setIfNew(state.getAql(), q.getQuery());
+    setIfNew(state.getSelectedCorpora(), q.getCorpora());
+   
+    if (q instanceof ContextualizedQuery)
+    {
+      setIfNew(state.getLeftContext(), ((ContextualizedQuery) q).getLeftContext());
+      setIfNew(state.getRightContext(), ((ContextualizedQuery) q).getRightContext());
+      setIfNew(state.getContextSegmentation(), ((ContextualizedQuery) q).getSegmentation());
+    }
+    if (q instanceof PagedResultQuery)
+    {
+      setIfNew(state.getOffset(), ((PagedResultQuery) q).getOffset());
+      setIfNew(state.getLimit(), ((PagedResultQuery) q).getLimit());
+      setIfNew(state.getOrder(), ((PagedResultQuery) q).getOrder());
+    }
+    if(q instanceof DisplayedResultQuery)
+    {
+      setIfNew(state.getSelectedMatches(), ((DisplayedResultQuery) q).getSelectedMatches());
+      setIfNew(state.getVisibleBaseText(), ((DisplayedResultQuery) q).getBaseText());
+    }
+    if (q instanceof ExportQuery)
+    {
+      setIfNew(state.getExporterName(), ((ExportQuery) q).getExporterName());
+      setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).
+        getAnnotationKeys());
+      setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
+    }
+  }
+  
+
   /**
-   * Get the current query as it is defined by the UI controls.
+   * Get the current query as it is defined by the current {@link QueryUIState}.
    *
    * @return
    */
-  public PagedResultQuery getSearchQuery()
+  public DisplayedResultQuery getSearchQuery()
   {
-    return QueryGenerator.paged()
+    return QueryGenerator.displayed()
       .query(state.getAql().getValue())
       .corpora(state.getSelectedCorpora().getValue())
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
-      .segmentation(state.getBaseText().getValue())
+      .segmentation(state.getContextSegmentation().getValue())
+      .baseText(state.getVisibleBaseText().getValue())
       .limit(state.getLimit().getValue())
       .offset(state.getOffset().getValue())
       .order(state.getOrder().getValue())
+      .selectedMatches(state.getSelectedMatches().getValue())
       .build();
   }
 
@@ -250,23 +359,45 @@ public class QueryController implements Serializable
       .corpora(state.getSelectedCorpora().getValue())
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
-      .segmentation(state.getBaseText().getValue())
+      .segmentation(state.getVisibleBaseText().getValue())
       .exporter(state.getExporterName().getValue())
       .annotations(state.getExportAnnotationKeys().getValue())
       .param(state.getExportParameters().getValue())
       .build();
   }
 
-  public void executeSearch(boolean replaceOldTab, boolean startFromFirstPage)
+  /**
+   * Executes a query.
+   * @param replaceOldTab
+   * @param freshQuery If true the offset and the selected matches are reset before executing the query. 
+   */
+  public void executeSearch(boolean replaceOldTab, boolean freshQuery)
   {
-    if(startFromFirstPage)
+    if (freshQuery)
     {
-      getState().getOffset().setValue(0);
+      getState().getOffset().setValue(0l);
+      getState().getSelectedMatches().setValue(new TreeSet<Long>());
+      // get the value for the visible segmentation from the configured context
+      Set<String> selectedCorpora = getState().getSelectedCorpora().getValue();
+      CorpusConfig config = new CorpusConfig();
+      if(selectedCorpora != null && !selectedCorpora.isEmpty())
+      {
+        config = ui.getCorpusConfigWithCache(selectedCorpora.iterator().next());
+      }
+
+      if(config.containsKey(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
+      {
+        getState().getVisibleBaseText().setValue(config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
+      }
+      else
+      {
+        getState().getVisibleBaseText().setValue(getState().getContextSegmentation().getValue());
+      }
     }
     // construct a query from the current properties
-    PagedResultQuery pagedQuery = getSearchQuery();
+    DisplayedResultQuery displayedQuery = getSearchQuery();
 
-    ui.getControlPanel().getQueryPanel().setStatus("Searching...");
+    searchView.getControlPanel().getQueryPanel().setStatus("Searching...");
 
     cancelSearch();
 
@@ -278,39 +409,40 @@ public class QueryController implements Serializable
       session.getAttribute(MediaController.class).clearMediaPlayers();
     }
 
-    ui.updateFragment(pagedQuery);
+    searchView.updateFragment(displayedQuery);
 
-    addHistoryEntry(pagedQuery);
 
-    if (pagedQuery.getCorpora() == null || pagedQuery.getCorpora().
+    if (displayedQuery.getCorpora() == null || displayedQuery.getCorpora().
       isEmpty())
     {
       Notification.show("Please select a corpus",
         Notification.Type.WARNING_MESSAGE);
       return;
     }
-    if ("".equals(pagedQuery.getQuery()))
+    if ("".equals(displayedQuery.getQuery()))
     {
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
       return;
     }
+    
+    addHistoryEntry(displayedQuery);
 
     AsyncWebResource res = Helper.getAnnisAsyncWebResource();
 
     //
     // begin execute match fetching
     //
-    ResultViewPanel oldPanel = ui.getLastSelectedResultView();
+    ResultViewPanel oldPanel = searchView.getLastSelectedResultView();
     if (replaceOldTab)
     {
       // remove old panel from view
-      ui.closeTab(oldPanel);
+      searchView.closeTab(oldPanel);
     }
 
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
-      ui.getInstanceConfig(), pagedQuery);
-    newResultView.getPaging().addCallback(new SpecificPagingCallback(pagedQuery,
-      ui, newResultView));
+      ui.getInstanceConfig(), displayedQuery);
+    newResultView.getPaging().addCallback(new SpecificPagingCallback(
+      ui, searchView, newResultView, displayedQuery));
 
     TabSheet.Tab newTab;
 
@@ -318,14 +450,14 @@ public class QueryController implements Serializable
     String caption = existingResultPanels.isEmpty()
       ? "Query Result" : "Query Result #" + (existingResultPanels.size() + 1);
 
-    newTab = ui.getMainTab().addTab(newResultView, caption);
+    newTab = searchView.getMainTab().addTab(newResultView, caption);
     newTab.setClosable(true);
     newTab.setIcon(FontAwesome.SEARCH);
 
-    ui.getMainTab().setSelectedTab(newResultView);
-    ui.notifiyQueryStarted();
+    searchView.getMainTab().setSelectedTab(newResultView);
+    searchView.notifiyQueryStarted();
 
-    PollControl.runInBackground(500, 250, ui, new ResultFetchJob(pagedQuery,
+    Background.run(new ResultFetchJob(displayedQuery,
       newResultView, ui));
 
     //
@@ -335,17 +467,17 @@ public class QueryController implements Serializable
     // begin execute count
     //
     // start count query
-    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
+    searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
 
-    Future<MatchAndDocumentCount> futureCount = res.path("query").path("search").
+    AsyncWebResource countRes = res.path("query").path("search").
       path("count").
-      queryParam("q", Helper.encodeJersey(pagedQuery.getQuery()))
-      .queryParam("corpora", StringUtils.join(pagedQuery.getCorpora(), ",")).get(
+      queryParam("q", Helper.encodeJersey(displayedQuery.getQuery()))
+      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")));
+    Future<MatchAndDocumentCount> futureCount = countRes.get(
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 
-    PollControl.runInBackground(500, ui,
-      new CountCallback(newResultView, pagedQuery.getLimit(), ui));
+    Background.run(new CountCallback(newResultView, displayedQuery.getLimit(), ui));
 
     //
     // end execute count
@@ -354,6 +486,7 @@ public class QueryController implements Serializable
 
   public void executeExport(ExportPanel panel, EventBus eventBus)
   {
+
     Future exportFuture = state.getExecutedTasks().get(
       QueryUIState.QueryType.EXPORT);
     if (exportFuture != null && !exportFuture.isDone())
@@ -365,9 +498,8 @@ public class QueryController implements Serializable
 
     addHistoryEntry(query);
 
-    exportFuture = PollControl.callInBackground(1000, null,
-      new ExportBackgroundJob(query,
-        getExporterByName(query.getExporterName()), ui, eventBus, panel));
+    exportFuture = Background.call(new ExportBackgroundJob(query,
+      getExporterByName(query.getExporterName()), ui, eventBus, panel));
     state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
   }
 
@@ -393,7 +525,7 @@ public class QueryController implements Serializable
     {
       freqFuture.cancel(true);
     }
-    
+
     if ("".equals(state.getAql().getValue()))
     {
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
@@ -402,7 +534,8 @@ public class QueryController implements Serializable
     }
     else if (state.getSelectedCorpora().getValue().isEmpty())
     {
-      Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
+      Notification.show("Please select a corpus",
+        Notification.Type.WARNING_MESSAGE);
       panel.showQueryDefinitionPanel();
       return;
     }
@@ -435,7 +568,7 @@ public class QueryController implements Serializable
 
     FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, query, panel);
 
-    freqFuture = PollControl.callInBackground(1000, ui, job);
+    freqFuture = Background.call(job);
     state.getExecutedTasks().put(QueryUIState.QueryType.FREQUENCY, freqFuture);
   }
 
@@ -447,9 +580,9 @@ public class QueryController implements Serializable
   private List<ResultViewPanel> getResultPanels()
   {
     ArrayList<ResultViewPanel> result = new ArrayList<>();
-    for (int i = 0; i < ui.getMainTab().getComponentCount(); i++)
+    for (int i = 0; i < searchView.getMainTab().getComponentCount(); i++)
     {
-      Component c = ui.getMainTab().getTab(i).getComponent();
+      Component c = searchView.getMainTab().getTab(i).getComponent();
       if (c instanceof ResultViewPanel)
       {
         result.add((ResultViewPanel) c);
@@ -467,7 +600,7 @@ public class QueryController implements Serializable
   private void cancelSearch()
   {
     // don't spin forever when canceled
-    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+    searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
 
     Map<QueryUIState.QueryType, Future<?>> exec = state.getExecutedTasks();
     // abort last tasks if running
@@ -496,49 +629,74 @@ public class QueryController implements Serializable
    */
   public void addHistoryEntry(Query q)
   {
-    // remove it first in order to let it appear on the beginning of the list
-    state.getHistory().removeItem(q);
-    state.getHistory().addItemAt(0, q);
-    ui.getControlPanel().getQueryPanel().updateShortHistory();
+    try
+    {
+      Query queryCopy = q.clone();
+      // remove it first in order to let it appear on the beginning of the list
+      state.getHistory().removeItem(queryCopy);
+      state.getHistory().addItemAt(0, queryCopy);
+      searchView.getControlPanel().getQueryPanel().updateShortHistory();
+    }
+    catch(CloneNotSupportedException ex)
+    {
+      log.error("Can't clone the query", ex);
+    }
   }
-
 
   public void changeContext(PagedResultQuery originalQuery,
     Match match,
-    int offset, int newContext,
-    VisualizerContextChanger visCtxChange, boolean left)
+    long offset, int newContext,
+    final VisualizerContextChanger visCtxChange, boolean left)
   {
 
-    PagedResultQuery newQuery = originalQuery.clone();
-    if (left)
+    try
     {
-      newQuery.setLeftContext(newContext);
+    final PagedResultQuery newQuery = (PagedResultQuery) originalQuery.clone();
+      if (left)
+      {
+        newQuery.setLeftContext(newContext);
+      }
+      else
+      {
+        newQuery.setRightContext(newContext);
+      }
+
+      newQuery.setOffset(offset);
+
+
+      Background.runWithCallback(new SingleResultFetchJob(match, newQuery), 
+        new FutureCallback<SaltProject>()
+        {
+
+        @Override
+        public void onSuccess(SaltProject result)
+        {
+          visCtxChange.updateResult(result, newQuery);
+        }
+
+        @Override
+        public void onFailure(Throwable t)
+        {
+          ExceptionDialog.show(t, "Could not extend context.");
+        }
+      });
     }
-    else
+    catch(CloneNotSupportedException ex)
     {
-      newQuery.setRightContext(newContext);
+      log.error("Can't clone the query", ex);
     }
-
-    newQuery.setOffset(offset);
-
-    PollControl.runInBackground(500, ui,
-      new SingleResultFetchJob(match, newQuery,
-        visCtxChange));
-
   }
-  
+
   public void corpusSelectionChangedInBackground()
   {
-    ui.getControlPanel().getSearchOptions()
-      .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora().getValue(), ui);
+    searchView.getControlPanel().getSearchOptions()
+      .updateSearchPanelConfigurationInBackground(getState().
+        getSelectedCorpora().getValue(), ui);
   }
-  
+
   public QueryUIState getState()
   {
     return ui.getQueryState();
   }
-
-
-
 
 }

@@ -34,6 +34,8 @@ public interface GroupListView
   
   public void addAvailableCorpusNames(Collection<String> corpusNames);
   
+  public void setLoadingAnimation(boolean show);
+  
   public interface Listener
   {
     public void groupUpdated(Group user);

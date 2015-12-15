@@ -27,7 +27,14 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Files;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
@@ -61,6 +68,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.WritableResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -96,7 +104,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    */
   private void analyzeTextTable(String toplevelCorpusName)
   {
-    List<String> rawTexts = getAnnisDao().getRawText(toplevelCorpusName);
+    List<String> rawTexts = getQueryDao().getRawText(toplevelCorpusName);
 
     // pattern for checking the token layer
     final Pattern WHITESPACE_MATCHER = Pattern.compile("^\\s+$");
@@ -107,13 +115,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
       if (s != null && WHITESPACE_MATCHER.matcher(s).matches())
       {
         // deactivate doc browsing if no document browser configuration is exists
-        if (getAnnisDao().getDocBrowserConfiguration(toplevelCorpusName) == null)
+        if (getQueryDao().getDocBrowserConfiguration(toplevelCorpusName) == null)
         {
           // should exists anyway
           Properties corpusConf;
           try
           {
-            corpusConf = getAnnisDao().
+            corpusConf = getQueryDao().
               getCorpusConfiguration(toplevelCorpusName);
           }
           catch (FileNotFoundException ex)
@@ -134,7 +142,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
           {
             log.info("disable document browser");
             corpusConf.put("browse-documents", "false");
-            getAnnisDao().setCorpusConfiguration(toplevelCorpusName, corpusConf);
+            getQueryDao().setCorpusConfiguration(toplevelCorpusName, corpusConf);
           }
 
           // once disabled don't search in further texts
@@ -585,10 +593,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
 
     // create empty corpus properties file
-    if (getAnnisDao().getCorpusConfigurationSave(toplevelCorpusName) == null)
+    if (getQueryDao().getCorpusConfigurationSave(toplevelCorpusName) == null)
     {
       log.info("creating new corpus.properties file");
-      getAnnisDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
+      getQueryDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
     }
 
     analyzeFacts(corpusID);
@@ -675,10 +683,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
 
     // create empty corpus properties file
-    if (getAnnisDao().getCorpusConfigurationSave(toplevelCorpusName) == null)
+    if (getQueryDao().getCorpusConfigurationSave(toplevelCorpusName) == null)
     {
       log.info("creating new corpus.properties file");
-      getAnnisDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
+      getQueryDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
     }
 
     analyzeFacts(corpusID);
@@ -1547,6 +1555,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
       log.error("Cannot serialize user config JSON for database.", ex);
     }
   }
+  
+  @Transactional(readOnly = false)
+  public void deleteUserConfig(String userName)
+  {
+    getJdbcTemplate().update("DELETE FROM user_config WHERE id=?", userName);
+  }
 
   public void addCorpusAlias(long corpusID, String alias)
   {
@@ -1603,8 +1617,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     log.debug("bulk-loading data from '" + resource.getFilename()
       + "' into table '" + table + "'");
-    String sql = "COPY " + table
-      + " FROM STDIN WITH DELIMITER E'\t' NULL AS 'NULL'";
+    String sql = "COPY \"" + table
+      + "\" FROM STDIN WITH DELIMITER E'\t' NULL AS 'NULL'";
 
     try
     {
@@ -1623,6 +1637,52 @@ public class AdministrationDao extends AbstractAdminstrationDao
       // Postgres JDBC4 8.4 driver now supports the copy API
       PGConnection pgCon = (PGConnection) con;
       pgCon.getCopyAPI().copyIn(sql, resource.getInputStream());
+
+      DataSourceUtils.releaseConnection(originalCon, getDataSource());
+
+    }
+    catch (SQLException e)
+    {
+      throw new DatabaseAccessException(e);
+    }
+    catch (IOException e)
+    {
+      throw new FileAccessException(e);
+    }
+  }
+  
+  @Transactional(readOnly = false)
+  public void restoreTableFromResource(String table, Resource resource)
+  {
+    // this is only a public wrapper function providing the transaction
+    bulkloadTableFromResource(table, resource);
+  }
+  
+  @Transactional(readOnly = true)
+  public void dumpTableToResource(String table, WritableResource resource)
+  {
+    log.debug("dumping data to '" + resource.getFilename()
+      + "' from table '" + table + "'");
+    String sql = "COPY \"" + table
+      + "\" TO STDOUT WITH DELIMITER E'\t' NULL AS 'NULL'";
+
+    try
+    {
+      // retrieve the currently open connection if running inside a transaction
+      Connection originalCon = DataSourceUtils.getConnection(getDataSource());
+      Connection con = originalCon;
+      if (con instanceof DelegatingConnection)
+      {
+        DelegatingConnection<?> delCon = (DelegatingConnection<?>) con;
+        con = delCon.getInnermostDelegate();
+      }
+
+      Preconditions.checkState(con instanceof PGConnection,
+        "bulk-loading only works with a PostgreSQL JDBC connection");
+
+      // Postgres JDBC4 8.4 driver now supports the copy API
+      PGConnection pgCon = (PGConnection) con;
+      pgCon.getCopyAPI().copyOut(sql, resource.getOutputStream());
 
       DataSourceUtils.releaseConnection(originalCon, getDataSource());
 
@@ -2016,7 +2076,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     for (ExampleQuery eQ : exampleQueries)
     {
 
-      QueryData query = getAnnisDao().parseAQL(eQ.getExampleQuery(), null);
+      QueryData query = getQueryDao().parseAQL(eQ.getExampleQuery(), null);
 
       int count = 0;
       for (List<QueryNode> qNodes : query.getAlternatives())

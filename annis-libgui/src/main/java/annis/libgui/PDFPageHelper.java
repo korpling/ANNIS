@@ -15,19 +15,22 @@
  */
 package annis.libgui;
 
-import annis.model.AnnisConstants;
 import annis.libgui.visualizers.VisualizerInput;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import static annis.model.AnnisConstants.*;
+import annis.model.AnnisConstants;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import org.eclipse.emf.common.util.EList;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SLayer;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.util.SaltUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +67,7 @@ public class PDFPageHelper {
 
   public PDFPageHelper(VisualizerInput visInput) {
     this.input = visInput;
-    getAllSSpanWithPageNumber(visInput.getDocument().getSDocumentGraph());
+    getAllSSpanWithPageNumber(visInput.getDocument().getDocumentGraph());
   }
 
   /**
@@ -116,23 +119,26 @@ public class PDFPageHelper {
    *
    */
   public String getPageFromAnnotation(SNode node) {
-    if (node != null && node.getSAnnotations() != null) {
+    if (node != null && node.getAnnotations() != null) {
 
-      EList<SLayer> layers = node.getSLayers();
+      Set<SLayer> layers = node.getLayers();
       String nodeNamespace = null;
 
-      for (SLayer l : layers) {
-        nodeNamespace = l.getSName();
-      }
+      if(layers != null)
+      {
+        for (SLayer l : layers) {
+          nodeNamespace = l.getName();
+        }
 
-      for (SAnnotation anno : node.getSAnnotations()) {
+        for (SAnnotation anno : node.getAnnotations()) {
 
-        if ((nodeNamespace == null || input.getNamespace() == null)
-                && getPDFPageAnnotationName().equals(anno.getName())) {
-          return anno.getSValueSTEXT();
-        } else if (nodeNamespace.equals(input.getNamespace())
-                && getPDFPageAnnotationName().equals(anno.getName())) {
-          return anno.getSValueSTEXT();
+          if ((nodeNamespace == null || input.getNamespace() == null)
+                  && getPDFPageAnnotationName().equals(anno.getName())) {
+            return anno.getValue_STEXT();
+          } else if (nodeNamespace.equals(input.getNamespace())
+                  && getPDFPageAnnotationName().equals(anno.getName())) {
+            return anno.getValue_STEXT();
+          }
         }
       }
     }
@@ -147,11 +153,11 @@ public class PDFPageHelper {
       return;
     }
 
-    EList<SSpan> sSpans = graph.getSSpans();
+    List<SSpan> sSpans = graph.getSpans();
 
     if (sSpans != null) {
       for (SSpan s : sSpans) {
-        EList<SAnnotation> sAnnotations = s.getSAnnotations();
+        Set<SAnnotation> sAnnotations = s.getAnnotations();
         if (sAnnotations != null) {
           for (SAnnotation anno : sAnnotations) {
             // TODO support mappings of resolver vis map
@@ -183,7 +189,7 @@ public class PDFPageHelper {
   {
     
     RelannisNodeFeature feat = 
-      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+      (RelannisNodeFeature) s.getFeature(SaltUtil.createQName(ANNIS_NS, FEAT_RELANNIS_NODE)).getValue();
     return (int) feat.getLeftToken();
   }
 
@@ -195,7 +201,8 @@ public class PDFPageHelper {
   {
     
     RelannisNodeFeature feat =
-      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+      (RelannisNodeFeature) s.getFeature(SaltUtil.createQName(ANNIS_NS,
+          FEAT_RELANNIS_NODE)).getValue_SOBJECT();
     return (int) feat.getRightToken();
   }
 

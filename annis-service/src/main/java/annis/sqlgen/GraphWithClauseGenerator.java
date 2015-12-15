@@ -15,26 +15,26 @@
  */
 package annis.sqlgen;
 
-import annis.service.objects.MatchGroup;
 import annis.CommonHelper;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.Match;
-import java.net.URI;
-import java.util.List;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.StringUtils;
-
+import annis.service.objects.MatchGroup;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-
-import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
+import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Generates a WITH clause sql statement for a list of salt ids.
@@ -51,6 +51,9 @@ import java.util.LinkedList;
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
+  
+  private static final Escaper ARRAY_ELEM_ESC = 
+      Escapers.builder().addEscape(',', "\\,").build();
     
   private String selectForNode(
     TableAccessStrategy tas, AnnotateQueryData annotateQueryData,
@@ -210,8 +213,14 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     List<String> path = CommonHelper.getCorpusPath(uri);
     Collections.reverse(path);
 
+    List<String> escapedPath = new LinkedList<>();
+    for (String p : path)
+    {
+      escapedPath.add(ARRAY_ELEM_ESC.escape(p));
+    }
+
     sb.append("{");
-    sb.append(StringUtils.join(path, ", "));
+    Joiner.on(", ").appendTo(sb, escapedPath);
     sb.append("}");
     
     return  sqlString(sb.toString());

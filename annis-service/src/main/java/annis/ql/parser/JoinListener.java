@@ -16,7 +16,8 @@
 
 package annis.ql.parser;
 
-import annis.exceptions.AnnisQLSyntaxException;
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.model.Join;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlParser;
@@ -26,7 +27,6 @@ import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
-import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
@@ -95,8 +95,10 @@ public class JoinListener extends AqlParserBaseListener
       alternativeNodes[i] = Maps.newHashMap();
       for(QueryNode n : alternative)
       {
-        Preconditions.checkArgument(!alternativeNodes[i].containsKey(n.getVariable()), 
-          "A node variable name is only allowed once per normalized alternative");
+        if(alternativeNodes[i].containsKey(n.getVariable()))
+        {
+          throw new AnnisQLSemanticsException(n, "A node variable name is only allowed once per normalized alternative");
+        }
         alternativeNodes[i].put(n.getVariable(), n);
       }
       i++;
@@ -136,7 +138,8 @@ public class JoinListener extends AqlParserBaseListener
       QueryNode n = node(ctx.refOrNode(i));
       if(n == null)
       {
-        throw new IllegalArgumentException(
+        throw new AnnisQLSemanticsException(
+          AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()), 
           "invalid reference to '" + ctx.refOrNode(i).getText() + "'");
       }
       relationChain.add(i, n);
@@ -186,7 +189,7 @@ public class JoinListener extends AqlParserBaseListener
     {
       segmentationName=ctx.NAMED_PRECEDENCE().getText().substring(1);
     }
-    left.addOutgoingJoin(new Precedence(right, 1, segmentationName));
+    left.addOutgoingJoin(addParsedLocation(ctx, new Precedence(right, 1, segmentationName)));
     
   }
   
@@ -200,7 +203,7 @@ public class JoinListener extends AqlParserBaseListener
 
     
     String segmentationName = getLayerName(ctx.NAMED_NEAR());
-    left.addOutgoingJoin(new Near(right, 1, segmentationName));
+    left.addOutgoingJoin(addParsedLocation(ctx, new Near(right, 1, segmentationName)));
     
   }
   
@@ -210,16 +213,16 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
     
-    left.addOutgoingJoin(new EqualValue(right));
+    left.addOutgoingJoin(addParsedLocation(ctx, new EqualValue(right)));
   }
 
   @Override
-  public void enterNotequalvalue(annis.ql.AqlParser.NotequalvalueContext arg0)
+  public void enterNotequalvalue(annis.ql.AqlParser.NotequalvalueContext ctx)
   {
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
     
-    left.addOutgoingJoin(new NotEqualValue(right));
+    left.addOutgoingJoin(addParsedLocation(ctx, new NotEqualValue(right)));
   }
   
   
@@ -237,11 +240,11 @@ public class JoinListener extends AqlParserBaseListener
     if (precedenceBound > 0)
     {
       left.addOutgoingJoin(
-        new Precedence(right, 1, precedenceBound, segmentationName));
+        addParsedLocation(ctx, new Precedence(right, 1, precedenceBound, segmentationName)));
     }
     else
     {
-      left.addOutgoingJoin(new Precedence(right, segmentationName));
+      left.addOutgoingJoin(addParsedLocation(ctx, new Precedence(right, segmentationName)));
     }
   }
 
@@ -258,11 +261,11 @@ public class JoinListener extends AqlParserBaseListener
     if (precedenceBound > 0)
     {
       left.addOutgoingJoin(
-        new Near(right, 1, precedenceBound, segmentationName));
+        addParsedLocation(ctx, new Near(right, 1, precedenceBound, segmentationName)));
     }
     else
     {
-      left.addOutgoingJoin(new Near(right, segmentationName));
+      left.addOutgoingJoin(addParsedLocation(ctx, new Near(right, segmentationName)));
     }
   }
   
@@ -275,16 +278,25 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     if(range.getMin() == 0 || range.getMax() == 0)
     {
-       throw new AnnisQLSyntaxException("Distance can't be 0");
+       throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Distance can't be 0");
+    }
+    else if(range.getMin() > range.getMax())
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Minimal distance can't be larger than maximal distance");
     }
     else
     {
       String segmentationName = getLayerName(ctx.NAMED_PRECEDENCE());
       
       left.addOutgoingJoin(
-            new Precedence(right, range.getMin(), range.getMax(),
-            segmentationName));
-      
+        addParsedLocation(ctx,
+          new Precedence(right, range.getMin(), range.getMax(),
+            segmentationName)));
+
     }
   }
 
@@ -297,15 +309,23 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     if(range.getMin() == 0 || range.getMax() == 0)
     {
-       throw new AnnisQLSyntaxException("Distance can't be 0");
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Distance can't be 0");
+    }
+    else if(range.getMin() > range.getMax())
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Minimal distance can't be larger than maximal distance");
     }
     else
     {
       String segmentationName = getLayerName(ctx.NAMED_NEAR());
       
       left.addOutgoingJoin(
-            new Near(right, range.getMin(), range.getMax(),
-            segmentationName));
+        addParsedLocation(ctx, new Near(right, range.getMin(), range.getMax(),
+            segmentationName)));
       
     }
   }
@@ -375,10 +395,10 @@ public class JoinListener extends AqlParserBaseListener
     {
       j = new Dominance(right, layer, 1);
     }
-    left.addOutgoingJoin(j);
+    left.addOutgoingJoin(addParsedLocation(ctx, j));
     if(ctx.anno != null)
     {
-      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
+      LinkedList<QueryAnnotation> annotations = fromRelationAnnotation(ctx.anno);
       for (QueryAnnotation a : annotations)
       {
         j.addEdgeAnnotation(a);
@@ -395,7 +415,7 @@ public class JoinListener extends AqlParserBaseListener
 
     String layer = getLayerName(ctx.NAMED_DOMINANCE());
    
-    left.addOutgoingJoin(new Dominance(right, layer));
+    left.addOutgoingJoin(addParsedLocation(ctx, new Dominance(right, layer)));
   }
 
   @Override
@@ -407,10 +427,20 @@ public class JoinListener extends AqlParserBaseListener
     String layer = getLayerName(ctx.NAMED_DOMINANCE());
    
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
-    Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
-    Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
+    if(range.getMin() == 0 || range.getMax() == 0)
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Distance can't be 0");
+    }
+    else if(range.getMin() > range.getMax())
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Minimal distance can't be larger than maximal distance");
+    }
     
-    left.addOutgoingJoin(new Dominance(right, layer, range.getMin(), range.getMax()));
+    left.addOutgoingJoin(addParsedLocation(ctx, new Dominance(right, layer, range.getMin(), range.getMax())));
   }
 
   @Override
@@ -424,14 +454,14 @@ public class JoinListener extends AqlParserBaseListener
     Join j = new PointingRelation(right, label, 1);
     if (ctx.anno != null)
     {
-      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
+      LinkedList<QueryAnnotation> annotations = fromRelationAnnotation(ctx.anno);
       for (QueryAnnotation a : annotations)
       {
         j.addEdgeAnnotation(a);
       }
     }
 
-    left.addOutgoingJoin(j);
+    left.addOutgoingJoin(addParsedLocation(ctx, j));
 
   }
 
@@ -443,7 +473,7 @@ public class JoinListener extends AqlParserBaseListener
     
     String label = getLayerName(ctx.POINTING(), 2);
    
-    left.addOutgoingJoin(new PointingRelation(right, label));
+    left.addOutgoingJoin(addParsedLocation(ctx, new PointingRelation(right, label)));
     
   }
 
@@ -456,10 +486,20 @@ public class JoinListener extends AqlParserBaseListener
     String label = getLayerName(ctx.POINTING(), 2);
    
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
-    Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
-    Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
+    if(range.getMin() == 0 || range.getMax() == 0)
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Distance can't be 0");
+    }
+    else if(range.getMin() > range.getMax())
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Minimal distance can't be larger than maximal distance");
+    }
     
-    left.addOutgoingJoin(new PointingRelation(right, label, range.getMin(), range.getMax()));
+    left.addOutgoingJoin(addParsedLocation(ctx, new PointingRelation(right, label, range.getMin(), range.getMax())));
   }
 
   @Override
@@ -470,8 +510,7 @@ public class JoinListener extends AqlParserBaseListener
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
-    left.addOutgoingJoin(new Sibling(right, label));
-    left.addOutgoingJoin(new Sibling(right, label));
+    left.addOutgoingJoin(addParsedLocation(ctx, new Sibling(right, label)));
   }
 
   @Override
@@ -482,7 +521,7 @@ public class JoinListener extends AqlParserBaseListener
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
-    left.addOutgoingJoin(new CommonAncestor(right, label));
+    left.addOutgoingJoin(addParsedLocation(ctx, new CommonAncestor(right, label)));
   }
   
   @Override
@@ -496,6 +535,8 @@ public class JoinListener extends AqlParserBaseListener
    *
    * This will automatically get the left and right hand refs
    * and will construct a new join specified by the type using reflection.
+   * 
+   * It will also add an parsed location to the join.
    *
    * @node
    * @type00
@@ -509,7 +550,8 @@ public class JoinListener extends AqlParserBaseListener
     {
       Constructor<? extends Join> c = type.getConstructor(QueryNode.class);
       Join newJoin = c.newInstance(right);
-      left.addOutgoingJoin(newJoin);
+      left.addOutgoingJoin(addParsedLocation(ctx, newJoin));
+      
     }
     catch (NoSuchMethodException ex)
     {
@@ -530,6 +572,12 @@ public class JoinListener extends AqlParserBaseListener
 
   }
   
+  private Join addParsedLocation(ParserRuleContext ctx, Join j)
+  {
+    j.setParseLocation(AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()));
+    return j;
+  }
+  
   
   private QueryNode.Range annisRangeFromARangeSpec(
     AqlParser.RangeSpecContext spec)
@@ -546,7 +594,7 @@ public class JoinListener extends AqlParserBaseListener
     }
   }
   
-  private LinkedList<QueryAnnotation> fromEdgeAnnotation(
+  private LinkedList<QueryAnnotation> fromRelationAnnotation(
     AqlParser.EdgeSpecContext ctx)
   {
     LinkedList<QueryAnnotation> annos = new LinkedList<>();

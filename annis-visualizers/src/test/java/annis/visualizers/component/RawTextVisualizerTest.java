@@ -15,12 +15,10 @@
  */
 package annis.visualizers.component;
 
-import annis.libgui.VisualizationToggle;
-import annis.libgui.visualizers.VisualizerInput;
-import com.vaadin.ui.Panel;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
+import org.junit.Test;
 
 /**
  *

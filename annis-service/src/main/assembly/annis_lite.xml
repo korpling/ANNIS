@@ -13,13 +13,21 @@
       <excludes>
         <exclude>bin/</exclude>
         <exclude>log/*.log</exclude>
+        <exclude>conf/shiro.ini</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory></outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/distribution/bin/</directory>
       <outputDirectory>bin/</outputDirectory>
-      <fileMode>0774</fileMode>
+      <fileMode>0744</fileMode>
     </fileSet>
   </fileSets>
+  <files>
+     <file>
+      <source>src/main/distribution/conf/shiro.ini</source>
+      <outputDirectory>conf/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+  </files>
 </assembly>

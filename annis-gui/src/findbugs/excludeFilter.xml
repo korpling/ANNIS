@@ -4,6 +4,30 @@
 
 <FindBugsFilter>
   <Match>
-     <Bug pattern="SE_NO_SERIALVERSIONID" />
+    <Bug pattern="SE_NO_SERIALVERSIONID" />
   </Match>
+  
+  <!-- we know that vaadin is reading the fields but findbugs does not detect this -->
+  <Match>
+    <And>
+      <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+      <Class name="annis.gui.components.codemirror.AqlCodeEditorState"/>
+    </And>
+  </Match>
+  
+  <!-- Vaadin will fill the fields -->
+  <Match>
+    <And>
+      <Or>
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+        <Bug pattern="NP_UNWRITTEN_FIELD" />
+      </Or>
+      <Or>
+        <Class name="annis.gui.admin.EditSingleGroup"/>
+        <Class name="annis.gui.admin.EditSingleUser"/>  
+      </Or>
+      
+    </And>
+  </Match>
+  
 </FindBugsFilter>

@@ -16,22 +16,10 @@
 
 package annis;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.samples.SampleGenerator;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -64,35 +52,4 @@ public class CommonHelperTest
   {
   }
 
-  @Test
-  public void testEmbeddedSerializationOfSDocument() throws IOException, ClassNotFoundException
-  {
-    SaltProject project = SampleGenerator.createSaltProject();
-    SDocument doc = project.getSCorpusGraphs().get(0).getSDocuments().get(0);
-    
-    
-    File tmpFile = File.createTempFile("testSingeResultPanel", ".salt");
-    FileOutputStream fOut = new FileOutputStream(tmpFile);
-    ObjectOutputStream oOut = new ObjectOutputStream(fOut);
-    
-    int firstObject = 567;
-    int lastObject = 1234;
-    
-    oOut.writeInt(firstObject);
-    CommonHelper.writeSDocument(doc, oOut);
-    oOut.writeInt(lastObject);
-    oOut.close();
-    
-    FileInputStream fIn = new FileInputStream(tmpFile);
-    ObjectInputStream oIn = new ObjectInputStream(fIn);
-    
-    Assert.assertEquals(firstObject, oIn.readInt());
-    SDocument restored = CommonHelper.readSDocument(oIn);
-    
-    Assert.assertTrue(doc.equals(restored));
-    
-    Assert.assertEquals(lastObject, oIn.readInt());
-  }
-  
-  
 }

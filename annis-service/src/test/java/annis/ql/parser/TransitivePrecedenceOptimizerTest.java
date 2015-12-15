@@ -15,16 +15,18 @@
  */
 package annis.ql.parser;
 
-import annis.model.QueryNode;
+import annis.AnnisXmlContextLoader;
 import annis.model.Join;
+import annis.model.QueryNode;
 import annis.sqlgen.model.Precedence;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -35,8 +37,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath:annis/ql/parser/AnnisParser-context.xml", 
-  "classpath:annis/AutowiredContext.xml"})
+@ContextConfiguration(locations={
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml",
+  "classpath:annis/ql/parser/AnnisParser-context.xml", 
+  "classpath:annis/AutowiredContext.xml"},
+  loader = AnnisXmlContextLoader.class)
 public class TransitivePrecedenceOptimizerTest
 {
   private boolean postProcessorExists = false;

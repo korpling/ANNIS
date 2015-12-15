@@ -16,10 +16,12 @@
 
 package annis.security;
 
+import annis.CaseSensitiveOrder;
 import com.google.common.base.Splitter;
+import java.io.Serializable;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -28,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
-public class Group
+public class Group implements Serializable
 {
   
   public static final String WILDCARD = "*";
@@ -36,7 +38,7 @@ public class Group
   public static final String DEFAULT_USER_ROLE = "user";
   
   private String name;
-  private Set<String> corpora = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+  private TreeSet<String> corpora = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
 
   public Group()
   {
@@ -48,7 +50,7 @@ public class Group
     this.name = name;
   }
   
-  public Group(String name, Set<String> corpora)
+  public Group(String name, TreeSet<String> corpora)
   {
     this.name = name;
     this.corpora = corpora;
@@ -72,12 +74,13 @@ public class Group
     this.name = name;
   }
 
-  public Set<String> getCorpora()
+  @XmlElement(name="corpora")
+  public TreeSet<String> getCorpora()
   {
     return corpora;
   }
 
-  public void setCorpora(Set<String> corpora)
+  public void setCorpora(TreeSet<String> corpora)
   {
     this.corpora = corpora;
   }

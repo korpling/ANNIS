@@ -15,15 +15,14 @@
  */
 package annis.service.objects;
 
+import annis.service.ifaces.AnnisResult;
+import annis.service.ifaces.AnnisResultSet;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-
-import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
 
 public class AnnisResultSetImpl extends TreeSet<AnnisResult> implements AnnisResultSet {
 

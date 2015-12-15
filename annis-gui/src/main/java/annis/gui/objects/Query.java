@@ -17,6 +17,7 @@ package annis.gui.objects;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ import java.util.Set;
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class Query implements Serializable
+public class Query implements Serializable, Cloneable
 {
   private String query;
   private Set<String> corpora;
@@ -41,8 +42,8 @@ public class Query implements Serializable
   public Query(String query,
     Set<String> corpora)
   {
-    this.query = query;
-    this.corpora = corpora;
+    this.query = query == null ? "" : query;
+    this.corpora = corpora == null ?  new LinkedHashSet<String>() : corpora;
   }
 
   
@@ -53,7 +54,7 @@ public class Query implements Serializable
 
   public void setQuery(String query)
   {
-    this.query = query;
+    this.query = query == null ? "" : query;
   }
 
   public Set<String> getCorpora()
@@ -63,7 +64,7 @@ public class Query implements Serializable
 
   public void setCorpora(Set<String> corpora)
   {
-    this.corpora = corpora;
+    this.corpora = corpora == null ? new LinkedHashSet<String>() : corpora;
   }
 
   @Override
@@ -90,8 +91,11 @@ public class Query implements Serializable
       && Objects.equals(this.corpora, other.corpora);
   }
 
-  
-  
-  
+  @Override
+  public Query clone() throws CloneNotSupportedException
+  {
+    return (Query) super.clone();
+  }
+
   
 }

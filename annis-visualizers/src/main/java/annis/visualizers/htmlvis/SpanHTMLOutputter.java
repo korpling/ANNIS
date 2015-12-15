@@ -20,16 +20,15 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
 import com.google.common.html.HtmlEscapers;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SNode;
 
 /**
  *
@@ -48,14 +47,18 @@ public class SpanHTMLOutputter
   private String constant;
   private String metaname;
   private HashMap<String, String> hshMeta = new HashMap<>();
+  private String tokenColor;
   
   private final static Escaper htmlEscaper = HtmlEscapers.htmlEscaper();
   
   
   public void outputHTML(SNode node, String matchedQName,
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
+    SortedMap<Long, SortedSet<OutputItem>> outputEndTags, String tokenColor)
   {
+      
+    this.tokenColor = tokenColor;
+    
     if(node instanceof SToken && "tok".equals(matchedQName))
     {
         SToken tok = (SToken) node;
@@ -79,18 +82,18 @@ public class SpanHTMLOutputter
     long right;
     
         RelannisNodeFeature feat = 
-        (RelannisNodeFeature) span.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        (RelannisNodeFeature) span.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
         left = feat.getLeftToken();
         right = feat.getRightToken();
   
     SAnnotation matchedAnnotation;
     if (type == Type.META_NAME){
-        matchedAnnotation = span.getSAnnotation("meta::" + constant); //constant property is used to store metadata names, see VisParser.java
+        matchedAnnotation = span.getAnnotation("meta::" + constant); //constant property is used to store metadata names, see VisParser.java
     }
     else
     {
-        matchedAnnotation = span.getSAnnotation(matchedQName);
+        matchedAnnotation = span.getAnnotation(matchedQName);
     }
     
     String value;
@@ -101,16 +104,16 @@ public class SpanHTMLOutputter
         value = constant;
         break;
       case VALUE:
-        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSValueSTEXT();
+        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
         break;
       case ESCAPED_VALUE:
-        value = htmlEscaper.escape(matchedAnnotation == null ? "NULL" : matchedAnnotation.getSValueSTEXT());
+        value = htmlEscaper.escape(matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT());
         break;
       case ANNO_NAME:
-        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
+        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getName();
         break;
       case META_NAME:
-        value = matchedAnnotation.getSValue() == null ? "NULL" : matchedAnnotation.getSValue().toString();
+        value = matchedAnnotation.getValue() == null ? "NULL" : matchedAnnotation.getValue().toString();
         matchedQName = "meta::" + metaname;
         break;
       default:
@@ -126,7 +129,7 @@ public class SpanHTMLOutputter
   {
 
     RelannisNodeFeature feat = 
-      (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+      (RelannisNodeFeature) tok.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
     
     long index = feat.getTokenIndex();
     
@@ -154,7 +157,7 @@ public class SpanHTMLOutputter
   }
   
   public void outputAny(long left, long right, String matchedQName,
-    String value, 
+    String value,
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
@@ -170,6 +173,8 @@ public class SpanHTMLOutputter
       else
       {
         startTag += " class=\"" + style + "\" ";
+        String colorStyle= " style=\" color:" + tokenColor + "\" ";
+        startTag += colorStyle;
       }
     }
     String inner = "";

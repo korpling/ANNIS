@@ -17,8 +17,6 @@
 package annis.service.internal;
 
 import annis.VersionInfo;
-import java.io.IOException;
-import java.util.Properties;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import org.slf4j.Logger;

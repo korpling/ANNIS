@@ -18,6 +18,7 @@ package annis.ql.parser;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.AqlParseError;
+import annis.model.ParsedEntityLocation;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
 import annis.ql.RawAqlPreParser;
@@ -47,7 +48,7 @@ public class AnnisParserAntlr
   private static final Logger log = LoggerFactory.getLogger(AnnisParserAntlr.class);
   private int precedenceBound;
   private List<QueryDataTransformer> postProcessors;
-
+  
   public QueryData parse(String aql, List<Long> corpusList)
   {
     final List<AqlParseError> errors = new LinkedList<>();
@@ -118,7 +119,7 @@ public class AnnisParserAntlr
         {
           data = transformer.transform(data);
         }
-      }
+      }      
       return data;
 
     }
@@ -156,7 +157,7 @@ public class AnnisParserAntlr
       throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
   }
-  
+
   public int getPrecedenceBound()
   {
     return precedenceBound;
@@ -217,7 +218,9 @@ public class AnnisParserAntlr
     {
       if(errors != null)
       {
-        errors.add(new AqlParseError(line, charPositionInLine, line, charPositionInLine, msg));
+        ParsedEntityLocation loc = 
+          new ParsedEntityLocation(line, charPositionInLine, line, charPositionInLine);
+        errors.add(new AqlParseError(loc, msg));
       }
     }
     
@@ -239,18 +242,39 @@ public class AnnisParserAntlr
     {
       if(errors != null)
       {
-        int startColumn = charPositionInLine;
-        int endColumn = offendingSymbol.getStopIndex();
-        if(endColumn < startColumn)
-        {
-          // the token might be on a differnt line
-          endColumn = startColumn;
-        }
-        
-        errors.add(new AqlParseError(line, startColumn, line, endColumn, msg));
+        Token t = offendingSymbol;
+        errors.add(new AqlParseError(getLocation(t, t), msg));
       }
     }
+  }
+  
+  
+  
+  public static ParsedEntityLocation getLocation(Token start, Token stop)
+  {
+    if(start == null)
+    {
+      return new ParsedEntityLocation();
+    }
+    if(stop == null)
+    {
+      stop = start;
+    }
     
+    int startLine = start.getLine();
+    int endLine = stop.getLine();
+    
+    int startColumn = start.getCharPositionInLine();
+    // We assume a token can be only one line (newline character is whitespace and a separator).
+    // Thus the end column of a token is the start position plus its actual text length;
+    String stopTokenText = stop.getText();    
+    int endColumn = stop.getCharPositionInLine();
+    if(stopTokenText != null && !stopTokenText.isEmpty())
+    {
+      endColumn += stopTokenText.length()-1;
+    }
+    
+    return new ParsedEntityLocation(startLine, startColumn, endLine, endColumn);
   }
   
 }

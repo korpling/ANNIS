@@ -16,7 +16,7 @@
 package annis.dao.autogenqueries;
 
 import annis.GraphHelper;
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisCorpus;
@@ -24,12 +24,12 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,7 +49,7 @@ public class QueriesGenerator
   private final Logger log = LoggerFactory.getLogger(QueriesGenerator.class);
 
   // for executing AQL queries
-  private AnnisDao annisDao;
+  private QueryDao queryDao;
 
   // only contains one element: the top level corpus id of the imported corpus
   private List<Long> corpusIds;
@@ -144,7 +144,7 @@ public class QueriesGenerator
     }
     else
     {
-      List<Long> ids = annisDao.mapCorpusNamesToIds(corpusNames);
+      List<Long> ids = queryDao.mapCorpusNamesToIds(corpusNames);
       for (Long id : ids)
       {
         delExampleQueries(id);
@@ -182,7 +182,7 @@ public class QueriesGenerator
   {
     corpusIds = new ArrayList<>();
     corpusIds.add(corpusId);
-    List<String> corpusNames = getAnnisDao().mapCorpusIdsToNames(corpusIds);
+    List<String> corpusNames = getQueryDao().mapCorpusIdsToNames(corpusIds);
     if(!corpusNames.isEmpty())
     {
       corpusName = corpusNames.get(0);
@@ -208,7 +208,7 @@ public class QueriesGenerator
   {
     List<String> names = new ArrayList<>();
     names.add(name);
-    List<Long> ids = annisDao.mapCorpusNamesToIds(names);
+    List<Long> ids = queryDao.mapCorpusNamesToIds(names);
     if (!ids.isEmpty())
     {
       generateQueries(ids.get(0), delete);
@@ -226,7 +226,7 @@ public class QueriesGenerator
    */
   public void generateQueries(Boolean overwrite)
   {
-    List<AnnisCorpus> corpora = annisDao.listCorpora();
+    List<AnnisCorpus> corpora = queryDao.listCorpora();
     for (AnnisCorpus annisCorpus : corpora)
     {
       generateQueries(annisCorpus.getId(), overwrite);
@@ -242,21 +242,21 @@ public class QueriesGenerator
       String aql = queryBuilder.getAQL();
 
       // set some necessary extensions for generating complete sql
-      QueryData queryData = getAnnisDao().parseAQL(aql, this.corpusIds);
+      QueryData queryData = getQueryDao().parseAQL(aql, this.corpusIds);
       queryData.addExtension(queryBuilder.getLimitOffsetQueryData());
       
       // retrieve the salt project to analyze
-      List<Match> matches = getAnnisDao().find(queryData);
+      List<Match> matches = getQueryDao().find(queryData);
       
       if(matches.isEmpty())
       {
         return;
       }
       
-      QueryData matchQueryData = GraphHelper.createQueryData(new MatchGroup(matches), annisDao);
+      QueryData matchQueryData = GraphHelper.createQueryData(new MatchGroup(matches), queryDao);
       matchQueryData.addExtension(queryBuilder.getAnnotateQueryData());
       
-      SaltProject saltProject = getAnnisDao().graph(matchQueryData);
+      SaltProject saltProject = getQueryDao().graph(matchQueryData);
       queryBuilder.analyzingQuery(saltProject);
 
       // set the corpus name
@@ -345,19 +345,19 @@ public class QueriesGenerator
   }
 
   /**
-   * @return the annisDao
+   * @return the queryDao
    */
-  public AnnisDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
   /**
-   * @param annisDao the annisDao to set
+   * @param queryDao the queryDao to set
    */
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
 
   /**

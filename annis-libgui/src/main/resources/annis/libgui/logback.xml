@@ -3,11 +3,11 @@
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <!-- encoders are assigned the type
-         ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
     <encoder>
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
-     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>INFO</level>
     </filter>
   </appender>
@@ -26,9 +26,10 @@
       <!-- keep 1 days' worth of history -->
       <MaxHistory>1</MaxHistory>
 
-      <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
         <MaxFileSize>1MB</MaxFileSize>
-      </TimeBasedFileNamingAndTriggeringPolicy>
+      </timeBasedFileNamingAndTriggeringPolicy>
 
     </rollingPolicy>
     

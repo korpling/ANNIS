@@ -21,7 +21,7 @@
     annotations is also required.
   </description>
 
-  <url>http://annis-tools.org/</url>
+  <url>http://corpus-tools.org/annis/</url>
   
    <developers>
     <developer>
@@ -64,12 +64,28 @@
     <repository>
       <id>korpling</id>
       <url>http://korpling.german.hu-berlin.de/maven2/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>oss-snapshot</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
     </repository>
   </repositories>
   
   <properties>
-    <servlet.version>2.5</servlet.version>
-    <vaadin.version>7.3.10</vaadin.version>
+    <servlet.version>3.0.1</servlet.version>
+    <vaadin.version>7.5.10</vaadin.version>
   </properties>
 
   <build>
@@ -147,7 +163,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.3</version>
         <executions>
           <execution>
             <phase>validate</phase>
@@ -159,9 +175,11 @@
         <configuration>
           <doCheck>false</doCheck>
           <doUpdate>false</doUpdate>
+          <timestampFormat>{0, time, yyyy-MM-dd_HH-mm-ss}</timestampFormat>
+          <shortRevisionLength>10</shortRevisionLength>
         </configuration>
       </plugin>
-      <!--
+      
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -173,7 +191,7 @@
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
-      -->
+      
     </plugins>
     <extensions>
       <extension>
@@ -244,6 +262,7 @@
     <module>annis-widgets</module>
     <module>annis-visualizers</module>
     <module>annis-libgui</module>
+    <module>doc</module>
   </modules>
 
 </project>

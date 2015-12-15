@@ -271,4 +271,18 @@ public class HelpButton<T> extends CustomComponent implements Field<T>,
     field.focus();
   }
 
+  @Override
+  public void clear()
+  {
+    field.clear();
+  }
+
+  @Override
+  public boolean isEmpty()
+  {
+    return field.isEmpty();
+  }
+  
+  
+
 }

@@ -15,13 +15,18 @@
  */
 package annis.libgui;
 
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.Annotation;
+import annis.model.RelannisNodeFeature;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
+import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
@@ -31,28 +36,32 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import com.vaadin.server.JsonCodec;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import elemental.json.JsonValue;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
@@ -60,6 +69,18 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.GraphTraverseHandler;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.eclipse.emf.common.util.BasicEList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -101,15 +122,16 @@ public class Helper
 
   private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_BODY
     = "<div><p>Maybe there is a syntax error in the json file.</p></div>";
-  
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-  
+
+  private final static Escaper urlPathEscape = UrlEscapers.
+    urlPathSegmentEscaper();
+
   private final static Escaper jerseyExtraEscape = Escapers.builder()
     .addEscape('{', "%7B")
     .addEscape('}', "%7D")
     .addEscape('%', "%25")
     .build();
-  
+
   /**
    * Creates an authentificiated REST client
    *
@@ -208,7 +230,22 @@ public class Helper
 
     if (user != null)
     {
-      return user.getClient().resource(uri);
+      try
+      {
+        return user.getClient().resource(uri);
+      }
+      catch (LoginDataLostException ex)
+      {
+        log.error(
+          "Could not restore the login-data from session, user will invalidated",
+          ex);
+        setUser(null);
+        UI ui = UI.getCurrent();
+        if (ui instanceof AnnisBaseUI)
+        {
+          ((AnnisBaseUI) ui).getLoginDataLostBus().post(ex);
+        }
+      }
     }
 
     // use the anonymous client
@@ -234,7 +271,22 @@ public class Helper
 
     if (user != null)
     {
-      return user.getClient().asyncResource(uri);
+      try
+      {
+        return user.getClient().asyncResource(uri);
+      }
+      catch (LoginDataLostException ex)
+      {
+        log.error(
+          "Could not restore the login-data from session, user will invalidated",
+          ex);
+        setUser(null);
+        UI ui = UI.getCurrent();
+        if (ui instanceof AnnisBaseUI)
+        {
+          ((AnnisBaseUI) ui).getLoginDataLostBus().post(ex);
+        }
+      }
     }
 
     // use the anonymous client
@@ -326,20 +378,12 @@ public class Helper
     }
     return "";
   }
-  
-  public static List<String> citationFragment(String aql,
-    Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation,
-    int start, int limit)
-  {
-    return citationFragment(aql, corpora, contextLeft, contextRight,
-      segmentation, start, limit, OrderType.ascending);
-  }
 
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation,
-    int start, int limit, OrderType order)
+    String segmentation, String visibleBaseText,
+    long start, int limit, OrderType order,
+    Set<Long> selectedMatches)
   {
     List<String> result = new ArrayList<>();
     try
@@ -360,9 +404,19 @@ public class Helper
         result.add("_seg="
           + encodeBase64URL(segmentation));
       }
-      if(order != OrderType.ascending)
+      // only output "bt" if it is not the same as the context segmentation
+      if (!Objects.equals(visibleBaseText, segmentation))
+      {
+        result.add("_bt=" + (visibleBaseText == null ? "" : encodeBase64URL(
+          visibleBaseText)));
+      }
+      if (order != OrderType.ascending && order != null)
       {
         result.add("o=" + order.toString());
+      }
+      if (selectedMatches != null && !selectedMatches.isEmpty())
+      {
+        result.add("m=" + Joiner.on(',').join(selectedMatches));
       }
     }
     catch (UnsupportedEncodingException ex)
@@ -373,10 +427,11 @@ public class Helper
     return result;
   }
 
-  public static String generateCitation(String aql,
+  public static URI generateCitation(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
-    String segmentation,
-    int start, int limit)
+    String segmentation, String visibleBaseText,
+    long start, int limit, OrderType order,
+    Set<Long> selectedMatches)
   {
     try
     {
@@ -385,15 +440,16 @@ public class Helper
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
         appURI.getPath(), null,
-        StringUtils.join(citationFragment(aql, corpora,
-            contextLeft, contextRight, segmentation, start, limit), "&"))
-        .toASCIIString();
+        StringUtils.join(citationFragment(
+            aql, corpora, contextLeft, contextRight, segmentation,
+            visibleBaseText, start, limit, order, selectedMatches
+          ), "&"));
     }
     catch (URISyntaxException ex)
     {
       log.error(null, ex);
     }
-    return "ERROR";
+    return null;
   }
 
   public static String generateCorpusLink(Set<String> corpora)
@@ -543,7 +599,8 @@ public class Helper
   {
     try
     {
-      DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource().path("query")
+      DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource().
+        path("query")
         .path("corpora").path("doc_browser_config")
         .path(urlPathEscape.escape(corpus))
         .get(DocumentBrowserConfig.class);
@@ -595,13 +652,7 @@ public class Helper
         .path("corpora").path(urlPathEscape.escape(corpus))
         .path("config").get(CorpusConfig.class);
     }
-    catch (UniformInterfaceException ex)
-    {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
-    }
-    catch (ClientHandlerException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
       new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
         ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
@@ -656,17 +707,19 @@ public class Helper
       corpusConfigurations = Helper.getAnnisWebResource().path(
         "query").path("corpora").path("config").get(CorpusConfigMap.class);
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
-    }
-    catch (ClientHandlerException ex)
-    {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
+      UI.getCurrent().access(new Runnable()
+      {
+
+        @Override
+        public void run()
+        {
+          new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+            ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true).
+            show(Page.getCurrent());
+        }
+      });
     }
 
     if (corpusConfigurations == null)
@@ -795,53 +848,80 @@ public class Helper
 
     return texts;
   }
-  
+
   /**
    * Get the qualified name seperated by a single ":" when a namespace exists.
+   *
    * @param anno
-   * @return 
+   * @return
    */
   public static String getQualifiedName(SAnnotation anno)
   {
-    if(anno != null)
+    if (anno != null)
     {
-      if(anno.getSNS() == null || anno.getSNS().isEmpty())
+      if (anno.getNamespace() == null || anno.getNamespace().isEmpty())
       {
-        return anno.getSName();
+        return anno.getName();
       }
       else
       {
-        return anno.getSNS() + ":" + anno.getSName();
+        return anno.getNamespace()+ ":" + anno.getName();
       }
     }
     return "";
   }
-  
+
   /**
    * Returns true if the right-to-left heuristic should be disabled.
-   * @return 
+   *
+   * @return
    */
   public static boolean isRTLDisabled()
   {
     String disableRtl = (String) VaadinSession.getCurrent().getAttribute(
       "disable-rtl");
     return "true".equalsIgnoreCase(
-        disableRtl);
+      disableRtl);
   }
-  
+
   /**
-   * This will percent encode Jersey template argument braces (enclosed in "{...}") and
-   * the percent character.
-   * Both would not be esccaped by jersey and/or would cause an error when
-   * this is not a valid template.
+   * This will percent encode Jersey template argument braces (enclosed in
+   * "{...}") and the percent character. Both would not be esccaped by jersey
+   * and/or would cause an error when this is not a valid template.
+   *
    * @param v
-   * @return 
+   * @return
    */
   public static String encodeJersey(String v)
   {
     String encoded = jerseyExtraEscape.escape(v);
     return encoded;
   }
+
+  /**
+   * Encodes a String so it can be used as path param.
+   *
+   * @param v
+   * @return
+   */
+  public static String encodePath(String v)
+  {
+    String encoded = urlPathEscape.escape(v);
+    return encoded;
+  }
+
+  /**
+   * Encodes a String so it can be used as query param.
+   *
+   * @param v
+   * @return
+   */
+  public static String encodeQueryParam(String v)
+  {
+    String encoded = UrlEscapers.urlFormParameterEscaper().escape(v);
+    return encoded;
+  }
+
   /**
    * Casts a list of Annotations to the Type <code>List<Annotation></code>
    */
@@ -850,6 +930,305 @@ public class Helper
 
     public AnnotationListType()
     {
+    }
+  }
+
+  public static <T> JsonValue encodeGeneric(Object v)
+  {
+    return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).
+      getEncodedValue();
+  }
+
+  public static Map<String, String> calculateColorsForMarkedExact(
+    SDocument result)
+  {
+    Map<String, String> markedExactMap = new HashMap<>();
+    if (result != null)
+    {
+      SDocumentGraph g = result.getDocumentGraph();
+      if (g != null)
+      {
+        for (SNode n : result.getDocumentGraph().getNodes())
+        {
+
+          SFeature featMatched = n.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          Long matchNum = featMatched == null ? null : featMatched.
+            getValue_SNUMERIC();
+
+          if (matchNum != null)
+          {
+            int color = Math.max(0, Math.min((int) matchNum.longValue() - 1,
+              MatchedNodeColors.values().length - 1));
+            RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
+            if (feat != null)
+            {
+              markedExactMap.put("" + feat.getInternalID(),
+                MatchedNodeColors.values()[color].name());
+            }
+          }
+
+        }
+      } // end if g not null
+    } // end if result not null
+    return markedExactMap;
+  }
+
+  public static void calulcateColorsForMarkedAndCovered(SDocument result,
+    Map<String, Long> markedAndCovered, Map<String, String> markedCoveredMap)
+  {
+    if (markedAndCovered != null)
+    {
+      for (Map.Entry<String, Long> markedEntry : markedAndCovered.entrySet())
+      {
+        int color = Math.max(0, Math.min((int) markedEntry.getValue().
+          longValue()
+          - 1,
+          MatchedNodeColors.values().length - 1));
+        SNode n = result.getDocumentGraph().getNode(markedEntry.getKey());
+        RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
+
+        if (feat != null)
+        {
+          markedCoveredMap.put("" + feat.getInternalID(),
+            MatchedNodeColors.values()[color].name());
+        }
+      } // end for each entry in markedAndCoverd
+    } // end if markedAndCovered not null
+  }
+
+  public static Map<String, Long> calculateMarkedAndCoveredIDs(
+    SDocument doc, List<SNode> segNodes, String segmentationName)
+  {
+    Map<String, Long> initialCovered = new HashMap<>();
+
+    // add all covered nodes
+    for (SNode n : doc.getDocumentGraph().getNodes())
+    {
+      SFeature featMatched = n.getFeature(ANNIS_NS,
+        FEAT_MATCHEDNODE);
+      Long match = featMatched == null ? null : featMatched.getValue_SNUMERIC();
+
+      if (match != null)
+      {
+        initialCovered.put(n.getId(), match);
+      }
+    }
+
+    // calculate covered nodes
+    CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(
+      doc.
+      getDocumentGraph(), initialCovered);
+    Map<String, Long> covered = cmc.getMatchedAndCovered();
+
+    if (segmentationName != null)
+    {
+      // filter token
+      Map<SToken, Long> coveredToken = new HashMap<>();
+      for (Map.Entry<String, Long> e : covered.entrySet())
+      {
+        SNode n = doc.getDocumentGraph().getNode(e.getKey());
+        if (n instanceof SToken)
+        {
+          coveredToken.put((SToken) n, e.getValue());
+        }
+      }
+
+      for (SNode segNode : segNodes)
+      {
+        RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.
+          getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+        if (!covered.containsKey(segNode.getId()))
+        {
+          long leftTok = featSegNode.getLeftToken();
+          long rightTok = featSegNode.getRightToken();
+
+          // check for each covered token if this segment is covering it
+          for (Map.Entry<SToken, Long> e : coveredToken.entrySet())
+          {
+            RelannisNodeFeature featTok = (RelannisNodeFeature) e.getKey().
+              getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            long entryTokenIndex = featTok.getTokenIndex();
+            if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
+            {
+              // add this segmentation node to the covered set
+              covered.put(segNode.getId(), e.getValue());
+              break;
+            }
+          } // end for each covered token
+        } // end if not already contained
+      } // end for each segmentation node
+    }
+
+    return covered;
+  }
+
+  /**
+   * Marks all nodes which are dominated by already marked nodes.
+   *
+   * 1. Sort ascending all initial marked nodes by the size of the intervall
+   * between left and right token index.
+   *
+   * 2. Traverse the salt document graph with the sorted list of step 1. as root
+   * nodes and mark all children with the same match position. Already marked
+   * nodes are omitted.
+   *
+   * Note: The algorithm prevents nested marked nodes to be overwritten. Nested
+   * nodes must have a smaller intervall from left to right by default, so this
+   * should always work.
+   *
+   */
+  public static class CoveredMatchesCalculator implements GraphTraverseHandler
+  {
+
+    private Map<String, Long> matchedAndCovered;
+
+    private long currentMatchPos;
+
+    public CoveredMatchesCalculator(SDocumentGraph graph,
+      Map<String, Long> initialMatches)
+    {
+      this.matchedAndCovered = initialMatches;
+
+      Map<SNode, Long> sortedByOverlappedTokenIntervall = new TreeMap<>(
+        new Comparator<SNode>()
+        {
+          @Override
+          public int compare(SNode o1, SNode o2)
+          {
+            RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getFeature(
+              ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getFeature(
+              ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+            long leftTokIdxO1 = feat1.getLeftToken();
+            long rightTokIdxO1 = feat1.getRightToken();
+            long leftTokIdxO2 = feat2.getLeftToken();
+            long rightTokIdxO2 = feat2.getRightToken();
+
+            int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
+            int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);
+
+            if (intervallO1 - intervallO2 != 0)
+            {
+              return intervallO1 - intervallO2;
+            }
+            else if (feat1.getLeftToken() - feat2.getRightToken() != 0)
+            {
+              return (int) (feat1.getLeftToken() - feat2.getRightToken());
+            }
+            else if (feat1.getRightToken() - feat2.getRightToken() != 0)
+            {
+              return (int) (feat1.getRightToken() - feat2.getRightToken());
+            }
+            else
+            {
+              return (int) (feat1.getInternalID() - feat2.getInternalID());
+            }
+          }
+        });
+
+      for (Map.Entry<String, Long> entry : initialMatches.entrySet())
+      {
+        SNode n = graph.getNode(entry.getKey());
+        sortedByOverlappedTokenIntervall.put(n, entry.getValue());
+      }
+
+      currentMatchPos = 1;
+      if (initialMatches.size() > 0)
+      {
+        graph.traverse(new BasicEList<>(sortedByOverlappedTokenIntervall.
+          keySet()),
+          GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
+          (GraphTraverseHandler) this, true);
+      }
+    }
+
+    @Override
+    public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
+      String traversalId, SNode currNode, SRelation edge, SNode fromNode,
+      long order)
+    {
+      if (fromNode != null
+        && matchedAndCovered.containsKey(fromNode.getId())
+        && currNode != null
+        && !matchedAndCovered.containsKey(currNode.getId()))
+      {
+        currentMatchPos = matchedAndCovered.get(fromNode.getId());
+        matchedAndCovered.put(currNode.getId(), currentMatchPos);
+      }
+
+    }
+
+    @Override
+    public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+      SNode currNode, SRelation edge, SNode fromNode, long order)
+    {
+    }
+
+    @Override
+    public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
+      String traversalId, SRelation edge, SNode currNode, long order)
+    {
+      if (edge == null || edge instanceof SDominanceRelation
+        || edge instanceof SSpanningRelation)
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    public Map<String, Long> getMatchedAndCovered()
+    {
+      return matchedAndCovered;
+    }
+  }
+
+  public static String shortenURL(URI original)
+  {
+    WebResource res = Helper.getAnnisWebResource().path("shortener");
+    String appContext = Helper.getContext();
+
+    String path = original.getRawPath();
+    if (path.startsWith(appContext))
+    {
+      path = path.substring(appContext.length());
+    }
+
+    String localURL = path;
+    if (original.getRawQuery() != null)
+    {
+      localURL = localURL + "?" + original.getRawQuery();
+    }
+    if (original.getRawFragment() != null)
+    {
+      localURL = localURL + "#" + original.getRawFragment();
+    }
+
+    String shortID = res.post(String.class, localURL);
+
+    return UriBuilder.fromUri(original).replacePath(appContext + "/").
+      replaceQuery(
+        "").fragment("").queryParam("id",
+        shortID).build().toASCIIString();
+
+  }
+
+  public static boolean isKickstarter(VaadinSession session)
+  {
+    if(session != null)
+    {
+      return Boolean.parseBoolean(
+        session.getConfiguration().getInitParameters()
+        .getProperty("kickstarterEnvironment",
+          "false"));
+    }
+    else
+    {
+      return false;
     }
   }
 }

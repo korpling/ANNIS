@@ -15,16 +15,14 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
-
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
 import org.springframework.util.Assert;
 
 /**

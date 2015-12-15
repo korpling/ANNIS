@@ -49,7 +49,7 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
       rootDiv.append(mediaElement);
 
       mediaElement.attr("controls", "controls");
-      mediaElement.attr("preload", "metadata");
+      mediaElement.attr("preload", "auto");
 
       var mediaElementSrc = $(document.createElement("source"));
       mediaElement.append(mediaElementSrc);

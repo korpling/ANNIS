@@ -21,7 +21,7 @@ import annis.AnnisRunnerException;
 public class FileAccessException extends AnnisRunnerException {
 
 	public FileAccessException() {
-		super();
+		super(6);
 	}
 
 	public FileAccessException(String message, Throwable cause) {
@@ -29,11 +29,11 @@ public class FileAccessException extends AnnisRunnerException {
 	}
 
 	public FileAccessException(String message) {
-		super(message);
+		super(message, 6);
 	}
 
 	public FileAccessException(Throwable cause) {
-		super(cause);
+		super(cause, 6);
 	}
 
 }

@@ -15,6 +15,11 @@
  */
 package annis.sqlgen;
 
+import annis.model.Join;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.model.QueryNode.TextMatching;
+import annis.ql.parser.QueryData;
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.betweenMirror;
 import static annis.sqlgen.SqlConstraints.in;
@@ -27,24 +32,14 @@ import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.numberMirrorJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
-import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
-import annis.model.QueryNode.TextMatching;
-import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
-import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
@@ -60,6 +55,8 @@ import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
 import com.google.common.base.Joiner;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
@@ -72,7 +69,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   // generate two-sided boundaries for both left and right text borders
   // for the inclusion operators
   private boolean optimizeInclusion;
-  // where to attach component constraints for edge operators
+  // where to attach component constraints for relation operators
   // (lhs, rhs or both)
   private String componentPredicates;
   // use dedicated is_token column
@@ -200,10 +197,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
   
   private void addComponentPredicates(List<String> conditions, QueryNode node,
-    final String edgeType, String componentName)
+    final String relationType, String componentName)
   {
     conditions.add(join("=", tables(node).aliasedColumn(COMPONENT_TABLE, "type"),
-      sqlString(edgeType)));
+      sqlString(relationType)));
     if (componentName == null)
     {
       conditions.add(isNull(tables(node).aliasedColumn(COMPONENT_TABLE, "name")));
@@ -217,7 +214,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   }
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
-    QueryNode target, String componentName, String edgeType)
+    QueryNode target, String componentName, String relationType)
   {
     conditions.add(join("=", 
       tables(node).aliasedColumn(COMPONENT_TABLE, "id"), 
@@ -225,11 +222,11 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     
     if ("lhs".equals(componentPredicates) || "both".equals(componentPredicates))
     {
-      addComponentPredicates(conditions, node, edgeType, componentName);
+      addComponentPredicates(conditions, node, relationType, componentName);
     }
     if ("rhs".equals(componentPredicates) || "both".equals(componentPredicates))
     {
-      addComponentPredicates(conditions, target, edgeType, componentName);
+      addComponentPredicates(conditions, target, relationType, componentName);
     }
   }
 
@@ -238,14 +235,14 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryNode node, QueryNode target, PointingRelation join,
     QueryData queryData)
   {
-    addSingleEdgeCondition(node, target, conditions, join, "p");
+    addSingleRelationCondition(node, target, conditions, join, "p");
   }
 
   @Override
   protected void addDominanceConditions(List<String> conditions,
     QueryNode node, QueryNode target, Dominance join, QueryData queryData)
   {
-    addSingleEdgeCondition(node, target, conditions, join, "d");
+    addSingleRelationCondition(node, target, conditions, join, "d");
   }
 
   @Override
@@ -264,7 +261,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       "left_token");
   }
 
-  // FIXME: why not in addSingleEdgeConditions() ?
+  // FIXME: why not in addSingleRelationConditions() ?
   protected void addLeftOrRightDominance(List<String> conditions, QueryNode node,
     QueryNode target, QueryData queryData, RankTableJoin join,
     String aggregationFunction, String tokenBoarder)
@@ -273,15 +270,11 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String componentName = rankTableJoin.getName();
     addComponentPredicates(conditions, node, target, componentName, "d");
 
-    TableAccessStrategy tas = tables(null);
-
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "id"),
       tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
     List<Long> corpusList = queryData.getCorpusList();
     
-    
-    boolean doJoin = !tas.isMaterialized(NODE_TABLE, RANK_TABLE);
     
     String innerSelect = 
        "SELECT "
@@ -289,18 +282,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       + "(lrsub."
       + tokenBoarder
       + ") FROM ";
-    if(doJoin)
-    {
-      innerSelect +=
-          tas.tableName(NODE_TABLE) + " AS lrsub, "
-        + tas.tableName(RANK_TABLE) + " AS lrsub_rank ";
-    }
-    else
-    {
-      innerSelect += 
-        tas.tableName(RANK_TABLE)
-        + " as lrsub ";
-    }
+    
+    innerSelect += SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, "")
+      + " AS lrsub ";
+
     
     innerSelect +=
         "WHERE parent="
@@ -312,15 +297,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       + " AND lrsub.toplevel_corpus IN("
       + (corpusList == null || corpusList.isEmpty() ? "NULL"
       : StringUtils.join(corpusList, ",")) + ")";
-    
-    if(doJoin)
-    {
-      innerSelect +=
-        " AND lrsub_rank.toplevel_corpus IN("
-        + (corpusList == null || corpusList.isEmpty() ? "NULL"
-        : StringUtils.join(corpusList, ",")) + ")"
-        + " AND lrsub_rank.node_ref = lrsub.id";
-    }
     
     conditions.add(in(
       tables(target).aliasedColumn(NODE_TABLE, tokenBoarder), innerSelect));
@@ -541,27 +517,26 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "left_token", "left_token");
     
-    TableAccessStrategy tasSource = tables(node);
-    TableAccessStrategy tasTarget = tables(target);
-    
-    String spanLengthSource = 
-      "("
-      + tasSource.aliasedColumn(NODE_TABLE, "right_token") 
-      + " - " 
-      + tasSource.aliasedColumn(NODE_TABLE, "left_token")
-      + ")";
-    
-    String spanLengthTarget = 
-      "("
-      + tasTarget.aliasedColumn(NODE_TABLE, "right_token") 
-      + " - " 
-      + tasTarget.aliasedColumn(NODE_TABLE, "left_token")
-      + ")";
-    
-    conditions.add(spanLengthSource + " = " + spanLengthTarget);
-    
     notReflexive(conditions, node, target);
-    //joinOnNode(conditions, node, target, "=", "right_token", "right_token");
+    
+    /* HACK: 
+    We can't just join on both left_token and right_token since
+    PostgreSQL will multiply the selectivity of both operations and this
+    is not how the data works. left_token is not independent of right_token
+    (the latter one is always larger) which is something the planner won't recognize.
+    The actual solution would be to use the range data type for the token coverage
+    and hope that PostgreSQL has proper statistics support (at the time of writing
+    it hasn't). To minimize the effect of the join selectivy multiplication
+    we replace the right_token = right_token join with an arithmetic expression
+    which does mean the same, but which the query planner of PostgreSQL does
+    not recognize and optimize to and equal join. Unfortunally PostgreSQL
+    becomes more and more clever in each release, thus this hack might need
+    adjustments from time to time.
+    */
+    //joinOnNode(conditions, node, target, "=", "right_token", "right_token"); // --> confuses planner
+    joinOnNode(conditions, node, target, "<=", "right_token", "right_token");
+    joinOnNode(conditions, node, target, ">=", "right_token", "right_token");
+    
   }
 
   @Override
@@ -651,7 +626,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     conditions.add(sb.toString());
   }
 
-  // FIXME: Why not in addSingleEdgeCondition
+  // FIXME: Why not in addSingleRelationCondition
   @Override
   protected void addSiblingConditions(List<String> conditions, QueryNode node,
     QueryNode target, Sibling join, QueryData queryData)
@@ -670,12 +645,12 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   }
 
   @Override
-  protected void addSingleEdgeCondition(QueryNode node, QueryNode target,
-    List<String> conditions, Join join, final String edgeType)
+  protected void addSingleRelationCondition(QueryNode node, QueryNode target,
+    List<String> conditions, Join join, final String relationType)
   {
     RankTableJoin rankTableJoin = (RankTableJoin) join;
     String componentName = rankTableJoin.getName();
-    addComponentPredicates(conditions, node, target, componentName, edgeType);
+    addComponentPredicates(conditions, node, target, componentName, relationType);
 
     int min = rankTableJoin.getMinDistance();
     int max = rankTableJoin.getMaxDistance();

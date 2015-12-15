@@ -15,6 +15,11 @@
  */
 package annis.sqlgen;
 
+import annis.model.Join;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.model.QueryNode.TextMatching;
+import annis.ql.parser.QueryData;
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.isNotNull;
 import static annis.sqlgen.SqlConstraints.isNull;
@@ -26,38 +31,10 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-import static annis.test.TestUtils.size;
-import static annis.test.TestUtils.uniqueInt;
-import static annis.test.TestUtils.uniqueLong;
-import static annis.test.TestUtils.uniqueString;
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.hasItem;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-
-import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
-import annis.model.QueryNode.TextMatching;
-import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
-import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
@@ -69,6 +46,26 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
+import static annis.test.TestUtils.size;
+import static annis.test.TestUtils.uniqueInt;
+import static annis.test.TestUtils.uniqueLong;
+import static annis.test.TestUtils.uniqueString;
+import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import java.util.List;
+import java.util.Set;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import static org.junit.matchers.JUnitMatchers.hasItem;
+import org.junit.runner.RunWith;
+import static org.mockito.BDDMockito.given;
+import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 /*
  * FIXME: refactor tests, so they use the same condition constants everywhere
@@ -292,15 +289,21 @@ public class TestDefaultWhereClauseGenerator
   {
     // given
     node23.addOutgoingJoin(new LeftDominance(node42));
+    
+    long corpusId = uniqueLong();
+    given(queryData.getCorpusList()).willReturn(asList(corpusId));
+    
     // then
     checkEdgeConditions(
-        componentPredicate,
-        "d",
-        null,
-        join("=", "_rank23.id", "_rank42.parent"),
-        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.id AND "
-      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
-      + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
+      componentPredicate,
+      "d",
+      null,
+      join("=", "_rank23.id", "_rank42.parent"),
+      "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts_"
+      + corpusId
+      + " AS lrsub WHERE parent=_rank23.id AND "
+      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(" + corpusId + ")"
+      + ")");
   }
 
   /**
@@ -312,15 +315,19 @@ public class TestDefaultWhereClauseGenerator
   {
     // given
     node23.addOutgoingJoin(new RightDominance(node42));
+    
+    long corpusId = uniqueLong();
+    given(queryData.getCorpusList()).willReturn(asList(corpusId));
+    
     // then
     checkEdgeConditions(
         componentPredicate,
         "d",
         null,
         join("=", "_rank23.id", "_rank42.parent"),
-        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.id AND "
-      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
-      + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
+        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts_" + corpusId + " AS lrsub WHERE parent=_rank23.id AND "
+      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN("  + corpusId + ")"
+      + ")");
   }
 
   /**
@@ -722,7 +729,8 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new SameSpan(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.left_token", "_node42.left_token"),
-        join("=", "(_node23.right_token - _node23.left_token)", "(_node42.right_token - _node42.left_token)"),
+        join(">=", "_node23.right_token", "_node42.right_token"),
+        join("<=", "_node23.right_token", "_node42.right_token"),
         join("<>", "_node23.id", "_node42.id")
     );
   }

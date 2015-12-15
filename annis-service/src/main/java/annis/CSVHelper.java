@@ -19,7 +19,6 @@ import annis.dao.objects.AnnotatedMatch;
 import annis.dao.objects.AnnotatedSpan;
 import annis.model.Annotation;
 import au.com.bytecode.opencsv.CSVWriter;
-import com.google.common.collect.Collections2;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;

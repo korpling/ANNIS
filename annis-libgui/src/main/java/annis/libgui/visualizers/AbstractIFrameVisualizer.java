@@ -15,8 +15,8 @@
  */
 package annis.libgui.visualizers;
 
-import annis.libgui.VisualizationToggle;
 import annis.gui.widgets.AutoHeightIFrame;
+import annis.libgui.VisualizationToggle;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;

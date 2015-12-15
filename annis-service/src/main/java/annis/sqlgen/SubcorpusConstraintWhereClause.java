@@ -15,18 +15,16 @@
  */
 package annis.sqlgen;
 
+import annis.model.Join;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-
+import annis.sqlgen.model.RankTableJoin;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
-import annis.model.Join;
-import annis.sqlgen.model.RankTableJoin;
 
 /**
  * Adds the constraint that all nodes are always inside one document as WHERE

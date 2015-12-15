@@ -28,7 +28,6 @@ import com.vaadin.client.ConnectorMap;
 import com.vaadin.client.Paintable;
 import com.vaadin.client.Util;
 import com.vaadin.client.ui.VCustomComponent;
-import com.vaadin.client.ui.VPanel;
 import com.vaadin.client.ui.dd.VDragAndDropManager;
 import com.vaadin.client.ui.dd.VDragEvent;
 import com.vaadin.client.ui.dd.VTransferable;

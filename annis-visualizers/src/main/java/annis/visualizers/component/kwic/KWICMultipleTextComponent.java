@@ -16,18 +16,15 @@
 
 package annis.visualizers.component.kwic;
 
-import annis.visualizers.component.*;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import com.vaadin.ui.CssLayout;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.eclipse.emf.common.util.EList;
+import org.corpus_tools.salt.common.STextualDS;
 
 /**
  * Implementation that can display several texts but has slower rendering due
@@ -43,8 +40,8 @@ public class KWICMultipleTextComponent extends CssLayout implements KWICInterfac
     this.kwicPanels = new LinkedList<KWICInterface>();
     if (visInput != null)
     {
-      EList<STextualDS> texts
-        = visInput.getDocument().getSDocumentGraph().getSTextualDSs();
+      List<STextualDS> texts
+        = visInput.getDocument().getDocumentGraph().getTextualDSs();
       for (STextualDS t : texts)
       {
         KWICComponent kwic

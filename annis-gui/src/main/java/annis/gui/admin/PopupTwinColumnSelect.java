@@ -15,6 +15,7 @@
  */
 package annis.gui.admin;
 
+import annis.CaseSensitiveOrder;
 import annis.gui.converter.CommaSeperatedStringConverterSet;
 import annis.gui.converter.TreeSetConverter;
 import com.vaadin.data.Container;
@@ -22,6 +23,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.ItemSorter;
 import com.vaadin.data.util.converter.Converter;
+import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
@@ -41,27 +43,21 @@ public class PopupTwinColumnSelect extends CustomField<Set>
 
   private final HorizontalLayout layout;
 
-  private final TextField txtValue;
+  private final AbstractTextField txtValue;
 
   private final TwinColSelect selector;
 
-  private final IndexedContainer selectableContainer;
+  private IndexedContainer selectableContainer = new IndexedContainer();
  
-  public PopupTwinColumnSelect(IndexedContainer selectableContainer)
+  public PopupTwinColumnSelect()
   {
-    if(selectableContainer == null)
-    {
-      selectableContainer = new IndexedContainer();
-    }
-    this.selectableContainer = selectableContainer;
     
-    selectableContainer.setItemSorter(new StringItemSorter());
-    selectableContainer.sort(null, null);
-    
-    txtValue = new TextField();
+    txtValue = createTextField();
     txtValue.setConverter(new CommaSeperatedStringConverterSet());
     txtValue.setWidth("100%");
-
+    txtValue.setPropertyDataSource(PopupTwinColumnSelect.this);
+   
+    
     selector = new TwinColSelect();
     selector.setConverter(new TreeSetConverter());
     selector.setNewItemsAllowed(false);
@@ -69,6 +65,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     selector.setRightColumnCaption("Selected");
     selector.setContainerDataSource(selectableContainer);
     selector.setWidth("44em");
+    selector.setPropertyDataSource(PopupTwinColumnSelect.this);
     
     PopupView popup = new PopupView("Select", selector);
 
@@ -80,6 +77,11 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     
     addValueChangeListener(new UpdateContainerListener());
   }
+  
+  protected AbstractTextField createTextField()
+  {
+    return new TextField();
+  }
 
   @Override
   public void setCaption(String caption)
@@ -87,7 +89,21 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     super.setCaption(caption);
     selector.setCaption(caption);
   }
-  
+
+  public IndexedContainer getSelectableContainer()
+  {
+    return selectableContainer;
+  }
+
+  public void setSelectableContainer(IndexedContainer selectableContainer)
+  {
+    this.selectableContainer = selectableContainer;
+    
+    this.selectableContainer.setItemSorter(new StringItemSorter());
+    this.selectableContainer.sort(new Object[0], new boolean[0]);
+    
+     this.selector.setContainerDataSource(this.selectableContainer);
+  }
   
 
   @Override
@@ -96,13 +112,6 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     return layout;
   }
 
-  @Override
-  public void setPropertyDataSource(Property newDataSource)
-  {
-    super.setPropertyDataSource(newDataSource);
-    txtValue.setPropertyDataSource(getPropertyDataSource());
-    selector.setPropertyDataSource(getPropertyDataSource());    
-  }
 
   @Override
   public void setValue(Set newFieldValue) throws ReadOnlyException, Converter.ConversionException
@@ -111,7 +120,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     if (newFieldValue != null
       && !(newFieldValue instanceof TreeSet))
     {
-      TreeSet sortedSet = new TreeSet(String.CASE_INSENSITIVE_ORDER);
+      TreeSet sortedSet = new TreeSet(CaseSensitiveOrder.INSTANCE);
       sortedSet.addAll((Collection) newFieldValue);
       newFieldValue = sortedSet;
     }
@@ -139,7 +148,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     {
       if(itemId1 instanceof String && itemId2 instanceof String)
       {
-        return String.CASE_INSENSITIVE_ORDER.compare((String) itemId1, (String) itemId2);
+        return CaseSensitiveOrder.INSTANCE.compare((String) itemId1, (String) itemId2);
       }
       else
       {
@@ -166,7 +175,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
       {
         selectableContainer.addItem(val);
       }
-      selectableContainer.sort(null, null);
+      selectableContainer.sort(new Object[0], new boolean[0]);
     }
   }
   

@@ -23,10 +23,12 @@ public abstract class Join extends DataObject {
 
 	protected QueryNode target;
   private Set<QueryAnnotation> edgeAnnotations;
+  
+  private ParsedEntityLocation parseLocation;
 
 	public Join(QueryNode target) {
 		this.target = target;
-    this.edgeAnnotations = new TreeSet<QueryAnnotation>();
+    this.edgeAnnotations = new TreeSet<>();
 	}
 
 	public QueryNode getTarget() {
@@ -57,5 +59,17 @@ public abstract class Join extends DataObject {
   {
     return "X";
   }
+
+  public ParsedEntityLocation getParseLocation()
+  {
+    return parseLocation;
+  }
+
+  public void setParseLocation(ParsedEntityLocation parseLocation)
+  {
+    this.parseLocation = parseLocation;
+  }
+  
+  
   
 }

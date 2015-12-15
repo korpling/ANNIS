@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -102,9 +101,9 @@ public class AnnotationGraph implements Serializable
 		return nodes.add(node);
 	}
 
-	public boolean addEdge(Edge edge)
+	public boolean addEdge(Edge relation)
 	{
-		return edges.add(edge);
+		return edges.add(relation);
 	}
 
 	public AnnisNode getToken(long tokenIndex)

@@ -15,26 +15,6 @@
  */
 package annis;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
-import jline.console.ConsoleReader;
-import jline.console.completer.StringsCompleter;
-import jline.console.history.FileHistory;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.springframework.context.support.GenericXmlApplicationContext;
-
 import annis.exceptions.AnnisQLSyntaxException;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.filter.ThresholdFilter;
@@ -48,7 +28,24 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.spi.FilterReply;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import jline.console.ConsoleReader;
+import jline.console.completer.StringsCompleter;
+import jline.console.history.FileHistory;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.springframework.context.support.GenericXmlApplicationContext;
 
 public abstract class AnnisBaseRunner
 {
@@ -97,39 +94,27 @@ public abstract class AnnisBaseRunner
     return ctx.getBean(beanName);
   }
 
-  public void run(String[] args)
+  public void run(String[] args) throws IOException
   {
-    try
+  
+    // run interactive if no argument is given
+    if (args.length == 0)
     {
-      // run interactive if no argument is given
-      if (args.length == 0)
-      {
-        runInteractive();
-        return;
+      runInteractive();
+      return;
 
-        // else, every argument is a command
-      }
-      else
+      // else, every argument is a command
+    }
+    else
+    {
+      for (String cmd : args)
       {
-        for (String cmd : args)
-        {
-          // split into command name and arguments
-          String[] split = cmd.split("\\s+", 2);
+        // split into command name and arguments
+        String[] split = cmd.split("\\s+", 2);
 
-          System.out.println("running command '" + cmd + "'");
-          runCommand(split[0], split.length >= 2 ? split[1] : "");
-        }
+        System.out.println("running command '" + cmd + "'");
+        runCommand(split[0], split.length >= 2 ? split[1] : "");
       }
-    }
-    catch (AnnisRunnerException e)
-    {
-      log.error("Uncaught exception", e);
-      error("Uncaught exception: " + e.getMessage());
-    }
-    catch (Throwable e)
-    {
-      log.warn("Uncaught exception", e);
-      error(e);
     }
   }
 
@@ -318,16 +303,14 @@ public abstract class AnnisBaseRunner
     annisHomePath = System.getProperty("annis.home");
     if (annisHomePath == null)
     {
-      System.out.println(
-        "Please set the annis.home property to the Annis distribution directory.");
-      System.exit(1);
+      throw new AnnisRunnerException(
+        "Please set the annis.home property to the ANNIS distribution directory.", 2);
     }
     File file = new File(annisHomePath);
     if (!file.exists() || !file.isDirectory())
     {
-      System.out.println("The directory '" + annisHomePath
-        + "' does not exist or is not a directory.");
-      System.exit(2);
+      throw new AnnisRunnerException("The directory '" + annisHomePath
+        + "' does not exist or is not a directory.", 3);
     }
   }
 

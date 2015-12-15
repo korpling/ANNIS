@@ -17,12 +17,12 @@ package annis.visualizers.component.graph;
 
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.AbstractDotVisualizer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.resources.dot.Salt2DOT;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.io.FileUtils;
+import org.corpus_tools.salt.util.SaltUtil;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,9 +44,7 @@ public class DebugVisualizer extends AbstractDotVisualizer implements Serializab
     {
       File tmpFile = File.createTempFile("annisdebugvis", ".dot");
       tmpFile.deleteOnExit();
-      Salt2DOT converter = new Salt2DOT();
-      converter.salt2Dot(input.getDocument().getSDocumentGraph(), 
-        URI.createFileURI(tmpFile.getCanonicalPath()));
+      SaltUtil.save_DOT(input.getDocument().getDocumentGraph(), URI.createFileURI(tmpFile.getCanonicalPath()));
       
       sb.append(FileUtils.readFileToString(tmpFile));
       
