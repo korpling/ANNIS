@@ -25,8 +25,7 @@ import org.corpus_tools.salt.core.SNode;
  */
 public class PseudoRegionMatcher implements SpanMatcher
 {
-  private String annotationName;
-  
+
   enum PseudoRegion
   {
 
@@ -48,13 +47,6 @@ public class PseudoRegionMatcher implements SpanMatcher
   {
 
     this.psdRegion = psdRegion;
-    if (psdRegion == PseudoRegion.BEGIN){
-        this.annotationName = "annis_BEGIN";
-    }
-    else{
-        this.annotationName = "annis_END";
-    }
-        
   }
 
   public PseudoRegion getPsdRegion()
@@ -68,11 +60,5 @@ public class PseudoRegionMatcher implements SpanMatcher
     // we don't need any annotation, so return empty list
     return new LinkedList<>();
   }
-  
-    public String getAnnotationName()
-  {
-    return annotationName;
-  }
-
 
 }
