@@ -9,16 +9,16 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 
 @PluginImplementation
-public class VisJsVisualizer extends AbstractVisualizer<VisJsComponentTest>{
+public class VisJsFull extends AbstractVisualizer<VisJsComponentTest>{
 
 	
-	//TODO change VisJsComponentTest to VisJsComponent after implementation
+	//TODO exchange VisJsComponentTest to VisJsComponent after implementation
 	private static final long serialVersionUID = 1L;
 
 	@Override
 	public String getShortName() 
 	{
-		return "visjs";
+		return "visjsdoc";
 	}
 
 	@Override
@@ -27,5 +27,11 @@ public class VisJsVisualizer extends AbstractVisualizer<VisJsComponentTest>{
 	{
 		return new VisJsComponentTest(visInput);
 	}
+	
+	@Override
+  public boolean isUsingText()
+  {
+    return true;
+  }
 
 }
