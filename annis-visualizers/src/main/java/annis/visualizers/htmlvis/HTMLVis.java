@@ -392,11 +392,25 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         psdRegionType = ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
         if (psdRegionType == PseudoRegionMatcher.PseudoRegion.BEGIN)
         {
-          position = outputEndTags.firstKey().intValue() - 1;
+          if(outputEndTags.isEmpty())
+          {
+            position = 0;
+          }
+          else
+          {
+            position = outputEndTags.firstKey().intValue() - 1;
+          }
         }
         else //END region
         {
-          position = outputEndTags.lastKey().intValue() + 1;
+          if(outputEndTags.isEmpty())
+          {
+            position = 0;
+          }
+          else
+          {
+            position = outputEndTags.lastKey().intValue() + 1;
+          }
         }
         instruction_priorities.put(((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), def_priority);
         switch (vis.getOutputter().getType())
