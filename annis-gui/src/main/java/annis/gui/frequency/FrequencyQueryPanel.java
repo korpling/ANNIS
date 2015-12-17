@@ -51,6 +51,7 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -88,7 +89,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
-  private final WeakHashMap<Field,Serializable> field2ItemID = new WeakHashMap<>();
+  private transient WeakHashMap<Field,Object> field2ItemID;
   
   private final ProgressBar pbQuery = new ProgressBar();
   
@@ -96,7 +97,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
 
   
   public FrequencyQueryPanel(final QueryController controller, QueryUIState state)
-  {
+  {    
     this.controller = controller;
     this.state = state;
     
@@ -371,7 +372,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         Component c = event.getClickedComponent();
         if(c instanceof Field)
         {
-          Object itemID = field2ItemID.get((Field) c);
+          Object itemID = getField2ItemID().get((Field) c);
           if(itemID != null)
           {
             if(!event.isCtrlKey() && !event.isShiftKey())
@@ -661,9 +662,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         TextField txt = new TextField(container.getContainerProperty(itemId,
           propertyId));
         txt.setWidth("100%");
-        if(itemId instanceof Serializable)
+        if(itemId != null)
         {
-          field2ItemID.put(txt, (Serializable) itemId);
+          getField2ItemID().put(txt, itemId);
         }
         return txt;
       }
@@ -677,5 +678,16 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     
   }
+
+  private WeakHashMap<Field, Object> getField2ItemID()
+  {
+    if(field2ItemID == null)
+    {
+      field2ItemID = new WeakHashMap<>();
+    }
+    return field2ItemID;
+  }
+  
+  
   
 }
