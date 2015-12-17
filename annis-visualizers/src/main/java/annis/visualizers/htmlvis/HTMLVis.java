@@ -401,6 +401,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
             {
                 position = outputEndTags.lastKey().intValue()+1;
             }
+            instruction_priorities.put(((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), def_priority);                          
             switch (vis.getOutputter().getType())
             {
                 case META_NAME:
@@ -411,11 +412,11 @@ public class HTMLVis extends AbstractVisualizer<Panel>
                     }
                     else
                     {
-                        vis.getOutputter().outputAny(position, position, vis.getOutputter().getMetaname(), strMetaVal, outputStartTags, outputEndTags);                    
+                        vis.getOutputter().outputAny(position, position, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), strMetaVal, outputStartTags, outputEndTags);                    
                     }                           
                     break;
                 case CONSTANT:
-                    vis.getOutputter().outputAny(position, position, vis.getOutputter().getConstant(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);                    
+                    vis.getOutputter().outputAny(position, position, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);                    
                     break;
                 case ANNO_NAME:
                     break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
