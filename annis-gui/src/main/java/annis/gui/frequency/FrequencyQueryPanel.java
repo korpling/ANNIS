@@ -32,7 +32,6 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Container;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.IndexedContainer;
@@ -55,12 +54,10 @@ import com.vaadin.ui.VerticalLayout;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.WeakHashMap;
@@ -91,7 +88,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
-  private final WeakHashMap<Field,Object> field2ItemID = new WeakHashMap<>();
+  private final WeakHashMap<Field,Serializable> field2ItemID = new WeakHashMap<>();
   
   private final ProgressBar pbQuery = new ProgressBar();
   
@@ -664,7 +661,10 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         TextField txt = new TextField(container.getContainerProperty(itemId,
           propertyId));
         txt.setWidth("100%");
-        field2ItemID.put(txt, itemId);
+        if(itemId instanceof Serializable)
+        {
+          field2ItemID.put(txt, (Serializable) itemId);
+        }
         return txt;
       }
       else if("comment".equals(propertyId))
