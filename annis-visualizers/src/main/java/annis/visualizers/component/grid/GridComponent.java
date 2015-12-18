@@ -24,6 +24,8 @@ import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import annis.model.RelannisNodeFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -46,6 +48,7 @@ import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -266,7 +269,8 @@ public class GridComponent extends Panel
           = new GridEvent(t.getId(), (int) idxLeft, (int) idxRight, text);
         event.setTextID(tokenText.getId());
         // check if the token is a matched node
-        Long match = markCoveredTokens(input.getMarkedAndCovered(), t);
+        Long match = isCoveredTokenMarked() ? 
+          markCoveredTokens(input.getMarkedAndCovered(), t) : tokenMatch(t);
         event.setMatch(match);
         tokenRow.addEvent(event);
       }
@@ -399,6 +403,11 @@ public class GridComponent extends Panel
     return false;
   }
   
+  protected boolean isCoveredTokenMarked()
+  {
+    return false;
+  }
+  
   protected String getMainStyle()
   {
     return "partitur_table";
@@ -421,6 +430,21 @@ public class GridComponent extends Panel
       return markedAndCovered.get(tok);
     }
     return f != null ? f.getMatchedNode() : null;
+  }
+  
+  /**
+   * Checks if a token is a marked match
+   *
+   * @param tok the checked token.
+   * @return Returns null, if token is not marked.
+   */
+  private Long tokenMatch(SNode tok)
+  {
+    // check if the span is a matched node
+    SFeature featMatched = tok.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+    Long matchRaw = featMatched == null ? null : featMatched.
+      getValue_SNUMERIC();
+    return matchRaw;
   }
 
   public VisualizerInput getInput()
