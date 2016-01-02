@@ -746,22 +746,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   }
 
   @Override
-  protected void addNodeNameCondition(List<String> conditions,
-    QueryData queryData, QueryNode node)
-  {
-    conditions.add(join("=", tables(node).aliasedColumn(NODE_TABLE, "name"),
-      sqlString(node.getName())));
-  }
-
-  @Override
-  protected void addNodeNamespaceConditions(List<String> conditions,
-    QueryData queryData, QueryNode node)
-  {
-    conditions.add(join("=", tables(node).aliasedColumn(NODE_TABLE, "namespace"),
-      sqlString(node.getNamespace())));
-  }
-
-  @Override
   protected void addIsRootConditions(List<String> conditions,
     QueryData queryData, QueryNode node)
   {

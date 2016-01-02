@@ -594,22 +594,6 @@ public class TestDefaultWhereClauseGenerator
     checkWhereConditions("_rank23.root IS TRUE");
   }
 
-  // WHERE condition for namespace
-  @Test
-  public void whereClauseForNodeNamespace()
-  {
-    node23.setNamespace("namespace");
-    checkWhereConditions(join("=", "_node23.namespace", "'namespace'"));
-  }
-
-  // WHERE condition for name
-  @Test
-  public void whereClauseForNodeName()
-  {
-    node23.setName("name");
-    checkWhereConditions(join("=", "_node23.name", "'name'"));
-  }
-
   // WHERE condition for spanned text (string)
   @Test
   public void whereClauseForNodeSpanString()

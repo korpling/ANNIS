@@ -55,14 +55,6 @@ public abstract class AbstractWhereClauseGenerator extends
       {
         addIsRootConditions(conditions, queryData, node);
       }
-      if (node.getNamespace() != null)
-      {
-        addNodeNamespaceConditions(conditions, queryData, node);
-      }
-      if (node.getName() != null)
-      {
-        addNodeNameCondition(conditions, queryData, node);
-      }
       if (node.getArity() != null)
       {
         addNodeArityConditions(conditions, queryData, node);
@@ -178,12 +170,6 @@ public abstract class AbstractWhereClauseGenerator extends
       QueryData queryData, QueryNode node);
 
   protected abstract void addIsRootConditions(List<String> conditions,
-      QueryData queryData, QueryNode node);
-
-  protected abstract void addNodeNamespaceConditions(List<String> conditions,
-      QueryData queryData, QueryNode node);
-
-  protected abstract void addNodeNameCondition(List<String> conditions,
       QueryData queryData, QueryNode node);
 
   protected abstract void addNodeArityConditions(List<String> conditions,
