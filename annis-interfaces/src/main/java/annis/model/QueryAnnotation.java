@@ -36,7 +36,7 @@ public class QueryAnnotation implements Comparable<QueryAnnotation>, Serializabl
   
 	public QueryAnnotation(String namespace, String name)
 	{
-		this(namespace, name, null);
+		this(namespace, name, (String) null, (TextMatching) null);
 	}
 
 	public QueryAnnotation(String namespace, String name, String value)
