@@ -25,7 +25,7 @@ public class VisJs extends AbstractVisualizer<VisJsComponent>{
 	public VisJsComponent createComponent(VisualizerInput visInput,
 			VisualizationToggle visToggle) 
 	{
-		return new VisJsComponent("Hello!");
+		return new VisJsComponent();
 	}
 	
 	@Override

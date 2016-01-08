@@ -21,8 +21,7 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 @JavaScript(
 		  {"VisJs_Connector.js",
 		    "vaadin://jquery.js",
-		    "vis.min.js",
-		    "mylibrary.js"		    
+		    "vis.min.js"	    
 		  })
 @StyleSheet(
   {
@@ -30,10 +29,11 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
   })
 
 
+
 public class VisJsComponent extends AbstractJavaScriptComponent {	
 	
-	public VisJsComponent(String value){		
-		 getState().value = value;
+	public VisJsComponent(){		
+	//	 getState().value = value;
 	
 	}
 		  
