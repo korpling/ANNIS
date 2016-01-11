@@ -28,6 +28,7 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
+import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.OrderType;
 import annis.service.objects.SubgraphFilter;
@@ -52,10 +53,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.io.output.FileWriterWithEncoding;
@@ -188,7 +189,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     private int errors;
     
-    private int count;
+    private Integer count;
 
     private final List<Long> values = Collections.synchronizedList(
       new ArrayList<Long>());
@@ -694,7 +695,7 @@ public class AnnisRunner extends AnnisBaseRunner
     try
     {
       File outputDir = new File("annis_benchmark_results");
-      if(outputDir.mkdirs())
+      if(outputDir.isDirectory() || outputDir.mkdirs())
       {
         int i=1;
         for(AnnisRunner.Benchmark b : benchmarks)
@@ -713,7 +714,10 @@ public class AnnisRunner extends AnnisBaseRunner
           if(b.name != null)
           {
             Files.write("" + b.avgTimeInMilliseconds, new File(outputDir, b.name + ".time"), StandardCharsets.UTF_8);
-//            Files.write("" + b., new File(outputDir, b.name + ".count"), StandardCharsets.UTF_8);
+            if(b.count != null)
+            {
+              Files.write("" + b.count, new File(outputDir, b.name + ".count"), StandardCharsets.UTF_8);
+            }
           }
         }
       }
@@ -1062,7 +1066,13 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCount(String annisQuery)
   {
-    out.println(queryDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count")));
+    MatchAndDocumentCount count = queryDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count"));
+    if(!benchmarks.isEmpty())
+    {
+      Benchmark lastBench = benchmarks.get(benchmarks.size()-1);
+      lastBench.count = count.getMatchCount();
+    }
+    out.println(count);
   }
 
   public void doMatrix(String annisQuery)
