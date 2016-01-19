@@ -42,7 +42,7 @@ launch() {
 			;;
 		2)
 			stop
-			start
+			launch
 			;;
 	esac
 }
