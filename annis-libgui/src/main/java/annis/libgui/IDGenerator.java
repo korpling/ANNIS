@@ -17,27 +17,83 @@ package annis.libgui;
 
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HasComponents;
+import java.lang.reflect.Field;
 import java.util.Iterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class to generate unique IDs for components.
  * 
  * Each component will have the ID of it's parent component as prefix in the ID.
  * Thus assigning an ID to an component will always assign an ID to all it's
- * ancestors as well.
+ * ancestors as well. Additionally it is checked that the siblings of a
+ * component don't have the same ID when it is assigned.
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class IDGenerator
 {
+  private static Logger log = LoggerFactory.getLogger(IDGenerator.class);
+  
   public static String assignID(Component c)
   {
-    String fieldName = "child";
+    String fieldName = "c";
     if(c != null)
     {
       fieldName = c.getClass().getSimpleName();
     }
     return assignID(c, fieldName);
+  }
+  
+  public static String assignIDForField(HasComponents parent, Component c)
+  {
+    String fieldName = "c";
+    if(parent != null && c != null)
+    {
+      // iterate over each field of the parent
+      for(Field f : parent.getClass().getDeclaredFields())
+      {
+        if(Component.class.isAssignableFrom(f.getType()))
+        {
+          try
+          {
+            f.setAccessible(true);
+            Component fieldComponent = (Component) f.get(parent);
+            if(fieldComponent == c)
+            {
+              fieldName = f.getName();
+            }
+          }
+          catch (IllegalArgumentException | IllegalAccessException | SecurityException ex)
+          {
+            log.warn("Could not automatically get field name for assigning ID", ex);
+          }
+        }
+      }
+    }
+    return assignID(c, fieldName);
+  }
+  
+  public static void assignIDForFields(HasComponents parent, Component... components)
+  {
+    for(Component c : components)
+    {
+      assignIDForField(parent, c);
+    }
+  }
+  
+  public static void assignIDForEachField(HasComponents parent)
+  {
+    if(parent != null)
+    {
+      Iterator<Component> itComponents = parent.iterator();
+      while(itComponents.hasNext())
+      {
+        Component c = itComponents.next();
+        assignIDForField(parent, c);
+      }
+    }
   }
   
   public static String assignID(Component c, String fieldName)

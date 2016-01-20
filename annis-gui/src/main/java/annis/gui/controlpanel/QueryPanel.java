@@ -305,9 +305,7 @@ public class QueryPanel extends GridLayout implements
     
     //setComponentAlignment(btShowQueryBuilder, Alignment.BOTTOM_CENTER);
     
-    IDGenerator.assignID(btShowResult);
-    IDGenerator.assignID(btMoreActions);
-    IDGenerator.assignID(btShowMoreHistory);
+    IDGenerator.assignIDForFields(this, btShowResult, btMoreActions, btShowQueryBuilder, btShowMoreHistory);
     
     
   }
