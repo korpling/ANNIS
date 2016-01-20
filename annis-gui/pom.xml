@@ -219,24 +219,6 @@
       <scope>test</scope>
     </dependency>
  
-    <dependency>
-      <groupId>org.vaadin</groupId>
-      <artifactId>tb-tools</artifactId>
-      <version>1.1</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>2.49.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-htmlunit-driver</artifactId>
-      <version>2.49.0</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <name>annis-gui</name>
 </project>
