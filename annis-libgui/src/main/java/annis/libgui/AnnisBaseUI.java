@@ -34,6 +34,8 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,6 +44,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -49,9 +53,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -106,6 +112,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
   
   private transient EventBus loginDataLostBus;
+  
+  private transient WeakHashMap<AbstractComponent, String> componentToID;
   
   @Override
   protected void init(VaadinRequest request)
@@ -482,6 +490,76 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       loginDataLostBus = new EventBus();
     }
     return loginDataLostBus;
+  }
+  
+  /**
+   * Generates an unique debug ID for each child component that does not have one yet.
+   * @param parent The parent object. Only the children will get an ID, not the parent object.
+   */
+  public void generateDebugIDs(AbstractComponent parent)
+  {
+    if(this.componentToID == null)
+    {
+      this.componentToID = new WeakHashMap<>();
+    }
+    // check if the component already has an ID and use this as prefix
+    String prefix = this.componentToID.get(parent);
+    if(prefix == null)
+    {
+      prefix = "autoid";
+    }
+    generateDebugIDs(prefix, this);
+  }
+  
+  private void generateDebugIDs(String prefix, AbstractComponent parent)
+  {
+    if(parent != null)
+    {
+      Class c = parent.getClass();
+      for(Field f : c.getDeclaredFields())
+      {
+        if(AbstractComponent.class.isAssignableFrom(f.getType()))
+        {
+          f.setAccessible(true);
+          try
+          {
+            AbstractComponent child = (AbstractComponent) f.get(parent);
+            if(child != null && child.getId() == null)
+            {
+              String id = prefix + "." + f.getName();
+              if(insertComponentID(child, id))
+              {
+                // component was unknown yet, also add it's children
+                generateDebugIDs(id, child);
+              }
+            }
+          }
+          catch (IllegalArgumentException | IllegalAccessException ex)
+          {
+            log.error(null, ex);
+          }
+        }
+      }
+    }
+  }
+  
+  private boolean insertComponentID(AbstractComponent c, String id)
+  {
+    if(this.componentToID == null)
+    {
+      this.componentToID = new WeakHashMap<>();
+    }
+    
+    if(this.componentToID.containsKey(c))
+    {
+      return false;
+    }
+    else
+    {
+      c.setId(id);
+      this.componentToID.put(c, id);
+      return true;
+    }
   }
   
   

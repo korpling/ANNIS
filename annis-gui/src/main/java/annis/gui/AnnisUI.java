@@ -19,12 +19,8 @@ import annis.gui.components.ExceptionDialog;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
-import annis.gui.servlets.ResourceServlet;
 import annis.libgui.Helper;
-import static annis.libgui.Helper.CORPUS_FONT;
-import static annis.libgui.Helper.CORPUS_FONT_FORCE;
 import static annis.libgui.Helper.DEFAULT_CONFIG;
-import annis.libgui.InstanceConfig;
 import annis.service.objects.CorpusConfig;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -36,7 +32,6 @@ import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import java.io.IOException;
-import java.util.Map;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.slf4j.LoggerFactory;
@@ -113,6 +108,8 @@ public class AnnisUI extends CommonUI
     addExtension(toolbar.getScreenshotExtension());
     
     loadInstanceFonts();
+    
+    super.generateDebugIDs(this);
   }
 
   @Override
