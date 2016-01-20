@@ -108,8 +108,6 @@ public class AnnisUI extends CommonUI
     addExtension(toolbar.getScreenshotExtension());
     
     loadInstanceFonts();
-    
-    super.generateDebugIDs(this);
   }
 
   @Override
