@@ -1,3 +1,21 @@
+Version 3.4.0-preview10
+=======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview10+is%3Aclosed
+
+[Fixed Bugs]
+ #483 fix wrong command: start needs to be launch
+ #479 color highlighting differs in KWIC
+ #478 htmlvis: can't use only "annis:BEGIN" or "annis:END"
+ #474 BEGIN and END instructions not working in htmlvis
+ #473 frequency definition: can't select more than one
+
+[Enhancements]
+ #482 Better statistics for span and annotation columns
+ #481 update to Vaadin 7.6.x
+ #475 mapping properties contain "+" instead of spaces in embedded visualizer
+
 Version 3.4.0-preview9
 ======================
 
