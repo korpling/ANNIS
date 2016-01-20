@@ -15,9 +15,11 @@
  */
 package annis.gui;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -28,13 +30,19 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 public class AcceptanceTest
 {
   
+  @Before
+  public void setup()
+  {
+    
+  }
+  
   @Test
   public void testSimple() throws Exception
   {
     // Create a new instance of the Firefox driver
     // Notice that the remainder of the code relies on the interface, 
     // not the implementation.
-    WebDriver driver = new FirefoxDriver();
+    WebDriver driver = new HtmlUnitDriver(BrowserVersion.FIREFOX_38);
 
     // And now use this to visit NetBeans
     driver.get("http://www.netbeans.org");
