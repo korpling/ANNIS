@@ -12,6 +12,7 @@ https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview10+is%3Aclos
  #473 frequency definition: can't select more than one
 
 [Enhancements]
+ #484 update to jquery 2.2
  #482 Better statistics for span and annotation columns
  #481 update to Vaadin 7.6.x
  #475 mapping properties contain "+" instead of spaces in embedded visualizer
