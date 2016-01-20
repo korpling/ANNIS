@@ -462,7 +462,6 @@ var hierarchy =
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
     ] ],
-    [ "annis.model.QueryNode.Type", "classannis_1_1model_1_1_query_node.html#enumannis_1_1model_1_1_query_node_1_1_type", null ],
     [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
     [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
     [ "UriFragmentChangedListener", null, [
@@ -606,6 +605,9 @@ var hierarchy =
       [ "annis.gui.admin.PopupTwinColumnSelect", "classannis_1_1gui_1_1admin_1_1_popup_twin_column_select.html", [
         [ "annis.gui.admin.PopupTwinColumnSelectMultiline", "classannis_1_1gui_1_1admin_1_1_popup_twin_column_select_multiline.html", null ]
       ] ]
+    ] ],
+    [ "DefaultFieldFactory", null, [
+      [ "annis.gui.frequency.FrequencyQueryPanel.FieldFactory", "classannis_1_1gui_1_1frequency_1_1_frequency_query_panel_1_1_field_factory.html", null ]
     ] ],
     [ "DefaultItemSorter", null, [
       [ "annis.gui.controlpanel.CorpusSorter", "classannis_1_1gui_1_1controlpanel_1_1_corpus_sorter.html", null ]

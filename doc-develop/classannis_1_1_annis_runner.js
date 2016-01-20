@@ -10,6 +10,7 @@ var classannis_1_1_annis_runner =
     [ "doAnnotations", "classannis_1_1_annis_runner.html#a6adb1e86ca9330cf1dab59bd2339ab67", null ],
     [ "doBenchmark", "classannis_1_1_annis_runner.html#af7534f44f00b62a90ddf24c4c433e9b0", null ],
     [ "doBenchmarkFile", "classannis_1_1_annis_runner.html#a744af8699b4cc3a1e376be02544d366b", null ],
+    [ "doBenchmarkName", "classannis_1_1_annis_runner.html#a7f06da887bc65001c7c69ca9fb0767da", null ],
     [ "doClearExampleQueries", "classannis_1_1_annis_runner.html#a8af2e4ddf72f94b4ce722a42f2bf3a1e", null ],
     [ "doCorpus", "classannis_1_1_annis_runner.html#a9af816f180b0a7061e76305c36889391", null ],
     [ "doCount", "classannis_1_1_annis_runner.html#a8bc264de22b2bb9b16f9e647acd462cf", null ],

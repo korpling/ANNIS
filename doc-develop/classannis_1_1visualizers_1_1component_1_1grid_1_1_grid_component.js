@@ -13,6 +13,7 @@ var classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component =
     [ "getInput", "classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component.html#a0db7e977e3e56d14934b081bd3b0fe5a", null ],
     [ "getMainStyle", "classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component.html#aaa1baf673e811ee742e72b9bc40e7d85", null ],
     [ "isAddingPlaybackRow", "classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component.html#ad03808be542c5eef76456f6f84f6ab1b", null ],
+    [ "isCoveredTokenMarked", "classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component.html#a7f55305c214297b40fc867a61b9069d7", null ],
     [ "isFilteringMediaLayer", "classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component.html#a97bb16de1323f6a1f7c42912b175efba", null ],
     [ "isHidingToken", "classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component.html#abb7ac89bb096a0d9706a21b736a9f436", null ],
     [ "isShowingSpanAnnotations", "classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component.html#a0a3fecf92768287709b5ce9e58644d62", null ],

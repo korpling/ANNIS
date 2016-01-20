@@ -13,8 +13,6 @@ var classannis_1_1sqlgen_1_1_abstract_where_clause_generator =
     [ "addLeftOverlapConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a2147de6889a92b7de71968af42281891", null ],
     [ "addNearConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a9a36ec36bc392ef8c31249499aa72a48", null ],
     [ "addNodeArityConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a215a3312d12356580b4dd4e6de6c20eb", null ],
-    [ "addNodeNameCondition", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#ad4620d47a407b17e3c7cbfbba6555454", null ],
-    [ "addNodeNamespaceConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#aa7cb8bab75afd67768efd95e8949b331", null ],
     [ "addNotEqualValueConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a255fb8499959b2553632f5a6151bdeb3", null ],
     [ "addOverlapConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a3bea091b14605c633feef55b92a9b685", null ],
     [ "addPointingRelationConditions", "classannis_1_1sqlgen_1_1_abstract_where_clause_generator.html#a3b03d7649b243b19d16aef06afda0ac4", null ],

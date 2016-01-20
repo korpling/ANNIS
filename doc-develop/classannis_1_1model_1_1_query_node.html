@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview9</span>
+   &#160;<span id="projectnumber">3.4.0-preview10</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -124,8 +124,6 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumannis_1_1model_1_1_query_node_1_1_text_matching.html">TextMatching</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:enumannis_1_1model_1_1_query_node_1_1_type"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_query_node.html#enumannis_1_1model_1_1_query_node_1_1_type">Type</a></td></tr>
-<tr class="separator:enumannis_1_1model_1_1_query_node_1_1_type"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -138,9 +136,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aebed76fa75ca1a38bccf42a840a6273e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_query_node.html#aebed76fa75ca1a38bccf42a840a6273e">QueryNode</a> (long newId, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> other, boolean copyOutgoingJoins)</td></tr>
 <tr class="memdesc:aebed76fa75ca1a38bccf42a840a6273e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor that allows to change the ID.  <a href="#aebed76fa75ca1a38bccf42a840a6273e">More...</a><br /></td></tr>
 <tr class="separator:aebed76fa75ca1a38bccf42a840a6273e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a919237156ed5782421b7d7116f0f9251"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a919237156ed5782421b7d7116f0f9251"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>QueryNode</b> (long id, long corpusRef, long textRef, long left, long right, String namespace, String name, long tokenIndex, String span, long leftToken, long rightToken)</td></tr>
-<tr class="separator:a919237156ed5782421b7d7116f0f9251"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba58de19a4303b9088973f760c05374a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba58de19a4303b9088973f760c05374a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setSpannedText</b> (String span)</td></tr>
 <tr class="separator:aba58de19a4303b9088973f760c05374a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,9 +163,6 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><b>addOutgoingJoin</b
 <tr class="memitem:a825303df4b5cf49a25f3b9359c50194a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a825303df4b5cf49a25f3b9359c50194a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setThisNodeAsTarget</b> (<a class="el" href="classannis_1_1model_1_1_join.html">Join</a> j)</td></tr>
 <tr class="separator:a825303df4b5cf49a25f3b9359c50194a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac91e04bea68ee8e38c643f22564ebef7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac91e04bea68ee8e38c643f22564ebef7"></a>
-String&#160;</td><td class="memItemRight" valign="bottom"><b>getQualifiedName</b> ()</td></tr>
-<tr class="separator:ac91e04bea68ee8e38c643f22564ebef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0eab253b33ac13b4b53d7146d3be074"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0eab253b33ac13b4b53d7146d3be074"></a>
 boolean&#160;</td><td class="memItemRight" valign="bottom"><b>equals</b> (Object obj)</td></tr>
 <tr class="separator:aa0eab253b33ac13b4b53d7146d3be074"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -189,18 +181,6 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isRoot</b> ()</td>
 <tr class="memitem:af8b14248b748f76a36f78693510489f9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af8b14248b748f76a36f78693510489f9"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setRoot</b> (boolean root)</td></tr>
 <tr class="separator:af8b14248b748f76a36f78693510489f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed0f6f8f6a0565062794567b41f67d80"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aed0f6f8f6a0565062794567b41f67d80"></a>
-String&#160;</td><td class="memItemRight" valign="bottom"><b>getName</b> ()</td></tr>
-<tr class="separator:aed0f6f8f6a0565062794567b41f67d80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12fceb51c86764bd0626fa1a7d9325f2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a12fceb51c86764bd0626fa1a7d9325f2"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setName</b> (String name)</td></tr>
-<tr class="separator:a12fceb51c86764bd0626fa1a7d9325f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e83785057a2e90f7a1c1984c538c3c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8e83785057a2e90f7a1c1984c538c3c7"></a>
-String&#160;</td><td class="memItemRight" valign="bottom"><b>getNamespace</b> ()</td></tr>
-<tr class="separator:a8e83785057a2e90f7a1c1984c538c3c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afc6d72a7bbc47a8369c5de310b2f0a7a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afc6d72a7bbc47a8369c5de310b2f0a7a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setNamespace</b> (String namespace)</td></tr>
-<tr class="separator:afc6d72a7bbc47a8369c5de310b2f0a7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa138a9d9e56750a57290f4f1aa8db742"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa138a9d9e56750a57290f4f1aa8db742"></a>
 String&#160;</td><td class="memItemRight" valign="bottom"><b>getSpannedText</b> ()</td></tr>
 <tr class="separator:aa138a9d9e56750a57290f4f1aa8db742"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -243,48 +223,6 @@ boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isPartOfEdge</b> (
 <tr class="memitem:adc6e0d8a8359af8bb52d6d11707a7cc5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc6e0d8a8359af8bb52d6d11707a7cc5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setPartOfEdge</b> (boolean partOfEdge)</td></tr>
 <tr class="separator:adc6e0d8a8359af8bb52d6d11707a7cc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d7482cf332dc218daf1c679039a7a4e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8d7482cf332dc218daf1c679039a7a4e"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><b>getCorpus</b> ()</td></tr>
-<tr class="separator:a8d7482cf332dc218daf1c679039a7a4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b7353f7f17753993d51cbc856facbe7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7b7353f7f17753993d51cbc856facbe7"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setCorpus</b> (long corpus)</td></tr>
-<tr class="separator:a7b7353f7f17753993d51cbc856facbe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade43e943cc98f05f75326ce048662720"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade43e943cc98f05f75326ce048662720"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><b>getTextId</b> ()</td></tr>
-<tr class="separator:ade43e943cc98f05f75326ce048662720"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3012e2fe1a383e43cac1b4e2ad93e00f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3012e2fe1a383e43cac1b4e2ad93e00f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setTextId</b> (long textIndex)</td></tr>
-<tr class="separator:a3012e2fe1a383e43cac1b4e2ad93e00f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5310000aa8a5bee8a81509675d66e36b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5310000aa8a5bee8a81509675d66e36b"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><b>getLeft</b> ()</td></tr>
-<tr class="separator:a5310000aa8a5bee8a81509675d66e36b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a27265fbae4d8a45c3bc31b78ebff68"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1a27265fbae4d8a45c3bc31b78ebff68"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setLeft</b> (long left)</td></tr>
-<tr class="separator:a1a27265fbae4d8a45c3bc31b78ebff68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a824e64617c0b2fd979b57292a39ff3f1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a824e64617c0b2fd979b57292a39ff3f1"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><b>getRight</b> ()</td></tr>
-<tr class="separator:a824e64617c0b2fd979b57292a39ff3f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba3e09e1bf3035f8da84498f8d6725de"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba3e09e1bf3035f8da84498f8d6725de"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setRight</b> (long right)</td></tr>
-<tr class="separator:aba3e09e1bf3035f8da84498f8d6725de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d56d953a286a2b07215d59e3462de2b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d56d953a286a2b07215d59e3462de2b"></a>
-Long&#160;</td><td class="memItemRight" valign="bottom"><b>getTokenIndex</b> ()</td></tr>
-<tr class="separator:a5d56d953a286a2b07215d59e3462de2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06cdf9e3948089ef1fb6ef69e456db6e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06cdf9e3948089ef1fb6ef69e456db6e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setTokenIndex</b> (Long tokenIndex)</td></tr>
-<tr class="separator:a06cdf9e3948089ef1fb6ef69e456db6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f5b09db1266ad58d68d02217665c181"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f5b09db1266ad58d68d02217665c181"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><b>getLeftToken</b> ()</td></tr>
-<tr class="separator:a0f5b09db1266ad58d68d02217665c181"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4dd767c7177e32a1942775bd584d684"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac4dd767c7177e32a1942775bd584d684"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setLeftToken</b> (long leftToken)</td></tr>
-<tr class="separator:ac4dd767c7177e32a1942775bd584d684"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2bd2e951a942b927a2368c6169aeeee5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2bd2e951a942b927a2368c6169aeeee5"></a>
-long&#160;</td><td class="memItemRight" valign="bottom"><b>getRightToken</b> ()</td></tr>
-<tr class="separator:a2bd2e951a942b927a2368c6169aeeee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae01c4408853be1f6cffe906ad40352a4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae01c4408853be1f6cffe906ad40352a4"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setRightToken</b> (long rightToken)</td></tr>
-<tr class="separator:ae01c4408853be1f6cffe906ad40352a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a624be74116d284909ab75e987f8f97dd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a624be74116d284909ab75e987f8f97dd"></a>
 Range&#160;</td><td class="memItemRight" valign="bottom"><b>getArity</b> ()</td></tr>
 <tr class="separator:a624be74116d284909ab75e987f8f97dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -322,40 +260,6 @@ Static Public Member Functions</h2></td></tr>
 static String&#160;</td><td class="memItemRight" valign="bottom"><b>qName</b> (String namespace, String name)</td></tr>
 <tr class="separator:a211550cdb2c2d6595ecb5d3bc8bd0689"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<hr/><h2 class="groupheader">Class Documentation</h2>
-<a name="enumannis_1_1model_1_1_query_node_1_1_type" id="enumannis_1_1model_1_1_query_node_1_1_type"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">enum annis::model::QueryNode::Type</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<table class="fieldtable">
-<tr><th colspan="3">Class Members</th></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="ab13b7720d3baf053a3c5754623c5ad0f"></a></td>
-<td class="fieldname">
-AND</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a68dd506139091b07c2060b934fc6b2f6"></a></td>
-<td class="fieldname">
-NODE</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a19b584a010e6aa6f4cf02b86b9c12e73"></a></td>
-<td class="fieldname">
-OR</td>
-<td class="fielddoc">
-</td></tr>
-</table>
-
-</div>
-</div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aecba8c1198784a28f7f380e30c306032"></a>
 <div class="memitem">
@@ -477,7 +381,7 @@ OR</td>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>model</b></li><li class="navelem"><a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a></li>
-    <li class="footer">Generated on Sat Dec 12 2015 15:13:20 for ANNIS by
+    <li class="footer">Generated on Wed Jan 20 2016 11:54:40 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

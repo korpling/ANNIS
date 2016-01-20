@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['fieldfactory',['FieldFactory',['../classannis_1_1gui_1_1frequency_1_1_frequency_query_panel_1_1_field_factory.html',1,'annis::gui::frequency::FrequencyQueryPanel']]],
   ['fileaccessexception',['FileAccessException',['../classannis_1_1administration_1_1_file_access_exception.html',1,'annis::administration']]],
   ['filteringvisualizerplugin',['FilteringVisualizerPlugin',['../interfaceannis_1_1libgui_1_1visualizers_1_1_filtering_visualizer_plugin.html',1,'annis::libgui::visualizers']]],
   ['findsqlgenerator',['FindSqlGenerator',['../classannis_1_1sqlgen_1_1_find_sql_generator.html',1,'annis::sqlgen']]],

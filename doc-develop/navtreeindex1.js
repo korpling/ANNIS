@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"classannis_1_1administration_1_1_administration_dao.html#a34245108dd68ec3d8968ec2536bf8bf9":[4,0,0,1,1,13],
 "classannis_1_1administration_1_1_administration_dao.html#a356825bb971e4c38a867c4c98d437a54":[4,0,0,1,1,27],
 "classannis_1_1administration_1_1_administration_dao.html#a3a0b56769f6eb9d4201db53bb99b83f8":[4,0,0,1,1,42],
 "classannis_1_1administration_1_1_administration_dao.html#a3a3ea1aa4b7bdc094adebd23bf21f231":[4,0,0,1,1,33],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "classannis_1_1dao_1_1_shortener_dao.html":[4,0,0,3,11],
 "classannis_1_1dao_1_1_shortener_dao.html#a07fa7acdb53c9991461d733ac490204e":[4,0,0,3,11,1],
 "classannis_1_1dao_1_1_shortener_dao.html#a784b9240903d91c815781ce9c183e273":[4,0,0,3,11,0],
-"classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html":[4,0,0,3,0,0],
-"classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a03cf38570e91542c395ac61f6bdbf1d3":[4,0,0,3,0,0,6]
+"classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html":[4,0,0,3,0,0]
 };

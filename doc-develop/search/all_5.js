@@ -7,6 +7,7 @@ var searchData=
   ['feat_5fmatchednode',['FEAT_MATCHEDNODE',['../classannis_1_1model_1_1_annis_constants.html#a339eab973c2a8640e0a9de3d068d1373',1,'annis::model::AnnisConstants']]],
   ['feat_5frelannis_5fedge',['FEAT_RELANNIS_EDGE',['../classannis_1_1model_1_1_annis_constants.html#ade1b46ead43a0898ec7b6b6fbfd3c281',1,'annis::model::AnnisConstants']]],
   ['feat_5frelannis_5fnode',['FEAT_RELANNIS_NODE',['../classannis_1_1model_1_1_annis_constants.html#aca6d753cba177956251f577c17a02df0',1,'annis::model::AnnisConstants']]],
+  ['fieldfactory',['FieldFactory',['../classannis_1_1gui_1_1frequency_1_1_frequency_query_panel_1_1_field_factory.html',1,'annis::gui::frequency::FrequencyQueryPanel']]],
   ['fileaccessexception',['FileAccessException',['../classannis_1_1administration_1_1_file_access_exception.html',1,'annis::administration']]],
   ['filteringvisualizerplugin',['FilteringVisualizerPlugin',['../interfaceannis_1_1libgui_1_1visualizers_1_1_filtering_visualizer_plugin.html',1,'annis::libgui::visualizers']]],
   ['find',['find',['../interfaceannis_1_1service_1_1_query_service.html#a7aded983819fdc6f0cc143cdded8918a',1,'annis::service::QueryService']]],
