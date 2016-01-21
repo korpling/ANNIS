@@ -32,6 +32,16 @@ public class KickstartRunner
   private AnnisServiceRunner runner;
   private int oldTimeout;
 
+  private final int port;
+  
+  public KickstartRunner()
+  {
+    this(8080);
+  }
+  public KickstartRunner(int port)
+  {
+    this.port = port;
+  }
   
   protected void resetRunner()
   {
@@ -50,7 +60,7 @@ public class KickstartRunner
   {
     // disable jetty logging
     Log.setLog(new JettyNoLogger());
-    Server jetty = new Server(8080);
+    Server jetty = new Server(port);
     // add context for our bundled webapp
     String annisHome = System.getProperty("annis.home");
     if(annisHome == null || annisHome.isEmpty())

@@ -46,13 +46,14 @@ public class AcceptanceTest
   
   private WebDriverWait wait;
   
+  private final static int PORT = 8086;
   
   @BeforeClass
   public static void runKickstarter()
   {
     try
     {
-      runner = new KickstartRunner();
+      runner = new KickstartRunner(PORT);
       
       runner.startService();
       runner.startJetty();
@@ -73,7 +74,7 @@ public class AcceptanceTest
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     wait = new WebDriverWait(driver, 10);
     
-    driver.get("http://localhost:8080/annis-gui/");
+    driver.get("http://localhost:" + PORT +  "/annis-gui/");
     
     // initial wait for the title (can be longer than implicit wait time)
     wait.until(ExpectedConditions.titleContains("(ANNIS Corpus Search)"));
@@ -90,7 +91,7 @@ public class AcceptanceTest
   public void testOpenSourceWindow()
   {
     driver.findElement(By.id("MainToolbar:btOpenSource")).click();
-    driver.findElement(By.id("AnnisUI:AboutWinodw:btClose")).isDisplayed();
+    driver.findElement(By.id("AnnisUI:AboutWindow:btClose")).isDisplayed();
   }
   
   @AfterClass
