@@ -100,6 +100,8 @@ public class MainToolbar extends HorizontalLayout
   private final Button btBugReport;
   
   private final Button btAboutAnnis;
+  
+  private final Button btOpenSource;
 
   private final Label lblUserName;
 
@@ -232,7 +234,7 @@ public class MainToolbar extends HorizontalLayout
     btLogout.setStyleName(ValoTheme.BUTTON_SMALL);
     btLogout.setIcon(FontAwesome.USER);
 
-    Button btOpenSource = new Button("Help us to make ANNIS better!");
+    btOpenSource = new Button("Help us to make ANNIS better!");
     btOpenSource.setStyleName(BaseTheme.BUTTON_LINK);
     btOpenSource.addClickListener(new Button.ClickListener()
     {
@@ -247,6 +249,7 @@ public class MainToolbar extends HorizontalLayout
         w.setHeight("500px");
         UI.getCurrent().addWindow(w);
         w.center();
+        IDGenerator.assignIDForEachField(w);
       }
     });
 
@@ -334,7 +337,7 @@ public class MainToolbar extends HorizontalLayout
     updateSidebarState();
     MainToolbar.this.updateUserInformation();
     
-    IDGenerator.assignIDForFields(MainToolbar.this , btAboutAnnis);
+    IDGenerator.assignIDForFields(MainToolbar.this , btAboutAnnis, btOpenSource);
   }
 
   @Override

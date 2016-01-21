@@ -42,6 +42,8 @@ public class HelpUsWindow extends Window
 
   private VerticalLayout layout;
 
+  private final Button btClose;
+  
   public HelpUsWindow()
   {
     setSizeFull();
@@ -96,7 +98,7 @@ public class HelpUsWindow extends Window
 
     final HelpUsWindow finalThis = this;
 
-    Button btClose = new Button("Close");
+    btClose = new Button("Close");
     btClose.addClickListener(new OkClickListener(finalThis));
     layout.addComponent(btClose);
 
