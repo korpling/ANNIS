@@ -91,7 +91,7 @@ public class AcceptanceTest
   public void testOpenSourceWindow()
   {
     driver.findElement(By.id("MainToolbar:btOpenSource")).click();
-    driver.findElement(By.id("AnnisUI:AboutWindow:btClose")).isDisplayed();
+    driver.findElement(By.id("AnnisUI:HelpUsWindow:btClose")).isDisplayed();
   }
   
   @AfterClass
