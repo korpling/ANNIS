@@ -46,7 +46,7 @@ public class IDGenerator
     return assignID(c, fieldName);
   }
   
-  public static String assignIDForField(HasComponents parent, Component c)
+  protected static String assignIDForField(HasComponents parent, Component c)
   {
     String fieldName = "c";
     if(parent != null && c != null)

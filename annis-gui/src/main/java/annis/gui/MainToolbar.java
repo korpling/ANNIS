@@ -26,12 +26,12 @@ import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
 import annis.libgui.Background;
 import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
 import annis.libgui.LoginDataLostException;
 import annis.security.User;
 import com.google.common.eventbus.Subscribe;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.validator.EmailValidator;
-import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
@@ -98,6 +98,8 @@ public class MainToolbar extends HorizontalLayout
   private final Button btLogout;
 
   private final Button btBugReport;
+  
+  private final Button btAboutAnnis;
 
   private final Label lblUserName;
 
@@ -151,7 +153,7 @@ public class MainToolbar extends HorizontalLayout
     addStyleName("toolbar");
     addStyleName("border-layout");
 
-    Button btAboutAnnis = new Button("About ANNIS");
+    btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ValoTheme.BUTTON_SMALL);
     btAboutAnnis.setIcon(new ThemeResource("images/annis_16.png"));
     btAboutAnnis.addClickListener(new AboutClickListener());
@@ -331,6 +333,8 @@ public class MainToolbar extends HorizontalLayout
 
     updateSidebarState();
     MainToolbar.this.updateUserInformation();
+    
+    IDGenerator.assignIDForFields(MainToolbar.this , btAboutAnnis);
   }
 
   @Override
@@ -632,6 +636,8 @@ public class MainToolbar extends HorizontalLayout
       w.setWidth("500px");
       w.setHeight("500px");
       UI.getCurrent().addWindow(w);
+      IDGenerator.assignIDForEachField(w);
+      
     }
   }
 

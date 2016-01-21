@@ -52,10 +52,15 @@ public class KickstartRunner
     Log.setLog(new JettyNoLogger());
     Server jetty = new Server(8080);
     // add context for our bundled webapp
-    WebAppContext context = new WebAppContext("./webapp/", "/annis-gui");
+    String annisHome = System.getProperty("annis.home");
+    if(annisHome == null || annisHome.isEmpty())
+    {
+      annisHome = ".";
+    }
+    WebAppContext context = new WebAppContext(annisHome +  "/webapp/", "/annis-gui");
     context.setInitParameter("managerClassName",
       "annis.security.TestSecurityManager");
-    String webxmlOverrride = System.getProperty("annis.home") + "/conf/override-web.xml"; //ClassLoader.getSystemResource("webxmloverride.xml").toString();
+    String webxmlOverrride = annisHome + "/conf/override-web.xml"; //ClassLoader.getSystemResource("webxmloverride.xml").toString();
     List<String> listWebXMLOverride = new LinkedList<String>();
     listWebXMLOverride.add(webxmlOverrride);
     context.setOverrideDescriptors(listWebXMLOverride);
