@@ -249,7 +249,6 @@ public class MainToolbar extends HorizontalLayout
         w.setHeight("500px");
         UI.getCurrent().addWindow(w);
         w.center();
-        IDGenerator.assignIDForEachField(w);
       }
     });
 
@@ -639,7 +638,6 @@ public class MainToolbar extends HorizontalLayout
       w.setWidth("500px");
       w.setHeight("500px");
       UI.getCurrent().addWindow(w);
-      IDGenerator.assignIDForEachField(w);
       
     }
   }

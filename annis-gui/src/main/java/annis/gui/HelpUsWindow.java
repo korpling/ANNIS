@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.libgui.IDGenerator;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -106,6 +107,9 @@ public class HelpUsWindow extends Window
     layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(hLayout, 1.0f);
 
+    
+    IDGenerator.assignIDForFields(HelpUsWindow.this, btClose);
+    
   }
 
   private static class OkClickListener implements Button.ClickListener

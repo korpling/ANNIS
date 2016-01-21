@@ -15,19 +15,18 @@
  */
 package annis.gui;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
 import de.hu_berlin.german.korpling.annis.kickstarter.KickstartRunner;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -84,14 +83,16 @@ public class AcceptanceTest
   public void testAboutWindow()
   {
     driver.findElement(By.id("MainToolbar:btAboutAnnis")).click();
-    driver.findElement(By.id("AnnisUI:AboutWindow")).isDisplayed();
+    Assert.assertTrue(driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).isDisplayed());
+    driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).click();
   }
   
   @Test
   public void testOpenSourceWindow()
   {
     driver.findElement(By.id("MainToolbar:btOpenSource")).click();
-    driver.findElement(By.id("AnnisUI:HelpUsWindow:btClose")).isDisplayed();
+    Assert.assertTrue(driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).isDisplayed());
+    driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).click();    
   }
   
   @AfterClass
