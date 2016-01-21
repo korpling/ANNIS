@@ -1297,7 +1297,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     we replace set the number of distinct values to its square root.
     */
     
-    log.info("Adjusting statistical information for left_token and right_token columns");
+    log.info("adjusting statistical information for left_token and right_token columns");
     int countLeft = getJdbcTemplate().queryForObject("SELECT count(distinct left_token) FROM _node", Integer.class);
     int countRight = getJdbcTemplate().queryForObject("SELECT count(distinct right_token) FROM _node", Integer.class);
     
