@@ -224,6 +224,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
   private QueriesGenerator queriesGenerator;
+  
+  private boolean hackDistinctLeftRightToken;
 
   /**
    * Called when Spring configuration finished
@@ -587,6 +589,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
     // create the new facts table partition
     createFacts(corpusID, version, offsets);
 
+    if(hackDistinctLeftRightToken)
+    {
+      adjustDistinctLeftRightToken(corpusID);
+    }
+    
     if (temporaryStagingArea)
     {
       dropStagingArea();
@@ -677,6 +684,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
     // create the new facts table partition
     createFacts(corpusID, version, offsets);
 
+    if(hackDistinctLeftRightToken)
+    {
+      adjustDistinctLeftRightToken(corpusID);
+    }
+    
     if (temporaryStagingArea)
     {
       dropStagingArea();
@@ -1270,6 +1282,30 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.
       info("creating annotation category table for corpus with ID " + corpusID);
     executeSqlFromScript("annotation_category.sql", args);
+  }
+  
+  void adjustDistinctLeftRightToken(long corpusID)
+  {
+    /* HACK: 
+    When joining on both left_token and right_token 
+    PostgreSQL will multiply the selectivity of both operations and this
+    is not how the data works. left_token is not independent of right_token
+    (the latter one is always larger) which is something the planner won't recognize.
+    The actual solution would be to use the range data type for the token coverage
+    and hope that PostgreSQL has proper statistics support (at the time of writing
+    it hasn't). To minimize the effect of the join selectivy multiplication
+    we replace set the number of distinct values to its square root.
+    */
+    
+    log.info("Adjusting statistical information for left_token and right_token columns");
+    int countLeft = getJdbcTemplate().queryForObject("SELECT count(distinct left_token) FROM _node", Integer.class);
+    int countRight = getJdbcTemplate().queryForObject("SELECT count(distinct right_token) FROM _node", Integer.class);
+    
+    int adjustedLeft = (int) Math.ceil(Math.sqrt(countLeft));
+    int adjustedRight = (int) Math.ceil(Math.sqrt(countRight));
+    
+    getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN left_token SET (n_distinct=" + adjustedLeft + ")");
+    getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN right_token SET (n_distinct=" + adjustedRight + ")");
   }
 
   void analyzeFacts(long corpusID)
@@ -2165,6 +2201,18 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     this.deleteCorpusDao = deleteCorpusDao;
   }
+
+  public boolean isHackDistinctLeftRightToken()
+  {
+    return hackDistinctLeftRightToken;
+  }
+
+  public void setHackDistinctLeftRightToken(boolean hackDistinctLeftRightToken)
+  {
+    this.hackDistinctLeftRightToken = hackDistinctLeftRightToken;
+  }
+  
+  
 
   /**
    * Checks, if a already exists a corpus with the same name of the top level

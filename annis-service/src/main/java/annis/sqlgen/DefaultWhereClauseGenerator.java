@@ -516,27 +516,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "left_token", "left_token");
-    
+    joinOnNode(conditions, node, target, "=", "right_token", "right_token");
     notReflexive(conditions, node, target);
-    
-    /* HACK: 
-    We can't just join on both left_token and right_token since
-    PostgreSQL will multiply the selectivity of both operations and this
-    is not how the data works. left_token is not independent of right_token
-    (the latter one is always larger) which is something the planner won't recognize.
-    The actual solution would be to use the range data type for the token coverage
-    and hope that PostgreSQL has proper statistics support (at the time of writing
-    it hasn't). To minimize the effect of the join selectivy multiplication
-    we replace the right_token = right_token join with an arithmetic expression
-    which does mean the same, but which the query planner of PostgreSQL does
-    not recognize and optimize to and equal join. Unfortunally PostgreSQL
-    becomes more and more clever in each release, thus this hack might need
-    adjustments from time to time.
-    */
-    //joinOnNode(conditions, node, target, "=", "right_token", "right_token"); // --> confuses planner
-    joinOnNode(conditions, node, target, "<=", "right_token", "right_token");
-    joinOnNode(conditions, node, target, ">=", "right_token", "right_token");
-    
   }
 
   @Override
