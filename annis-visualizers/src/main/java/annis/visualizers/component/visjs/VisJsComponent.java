@@ -1,23 +1,24 @@
 package annis.visualizers.component.visjs;
 
 
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.UUID;
 
 import annis.libgui.visualizers.VisualizerInput;
 
-
-
-
-
-
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.util.VisJsVisualizer;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+
+
 
 
 @SuppressWarnings("serial")
@@ -35,30 +36,41 @@ import com.google.gson.GsonBuilder;
 
 public class VisJsComponent extends AbstractJavaScriptComponent {	
 	
-	public VisJsComponent(){		
-	//	 getState().value = value;
-		List<TestNode> nodes = new ArrayList<TestNode>();
-		TestNode node = new TestNode();
-		node.id = "id_1";
-		node.label = "test";
-		node.x = 100;
-		node.level = 1;
+	String strNodes;
+	String strEdges;
+	
+	public VisJsComponent(VisualizerInput visInput){		
+
+			SDocument doc =  visInput.getDocument();
+			VisJsVisualizer VisJsVisualizer = new VisJsVisualizer(doc);
+			 
+			OutputStream osNodes = new ByteArrayOutputStream();
+			OutputStream osEdges = new ByteArrayOutputStream();
+			
+			
+			VisJsVisualizer.setNodeWriter(osNodes);
+			VisJsVisualizer.setEdgeWriter(osEdges);
+			VisJsVisualizer.buildJSON();				
+			BufferedWriter bw;
+			try {
+				bw = VisJsVisualizer.getNodeWriter();
+				bw.flush();	
+				
+				bw = VisJsVisualizer.getEdgeWriter();	
+				bw.flush();		
 		
-		TestNode node2 = new TestNode();
-		node2.id = "id_2";
-		node2.label = "test2";
-		node2.x = 200;
-		node2.level = 1;
-		nodes.add(node2);
-		
-		nodes.add(node);
-		
-		GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-        String strNode = gson.toJson(nodes);
-        
-        callFunction("init", strNode);
-        
+				
+				strNodes = osNodes.toString();
+				strEdges = osEdges.toString();
+				
+				bw.close();
+				this.setId(UUID.randomUUID().toString());
+		        callFunction("init", strNodes, strEdges);
+		       
+	      
+			}catch(IOException e){
+				System.out.println(e.getStackTrace());
+			}     
 		
 	
 	}
@@ -74,18 +86,19 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 	        listeners.add(listener);
 	    }
 	    
-	    public void setValue(String value) {
-	        getState().value = value;
-	    }
-	    
-	    public String getValue() {
-	        return getState().value;
-	    }
-
 	    @Override
 	    protected VisJsState getState() {
 	        return (VisJsState) super.getState();
 	    }
 	
+	    @Override
+	    public void attach() {
+	      super.attach();
+
+	      // set the state
+	      getState().strNodes = strNodes;
+	      getState().strEdges = strEdges;
+	     
+	    }
 	
 }
