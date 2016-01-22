@@ -1,5 +1,7 @@
 package annis.visualizers.component.visjs;
 
+import java.io.IOException;
+
 import com.vaadin.ui.Component;
 
 import annis.libgui.VisualizationToggle;
@@ -25,7 +27,7 @@ public class VisJs extends AbstractVisualizer<VisJsComponent>{
 	public VisJsComponent createComponent(VisualizerInput visInput,
 			VisualizationToggle visToggle) 
 	{
-		return new VisJsComponent();
+		return new VisJsComponent(visInput);
 	}
 	
 	@Override
