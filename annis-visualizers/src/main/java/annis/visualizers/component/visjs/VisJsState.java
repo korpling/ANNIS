@@ -4,6 +4,7 @@ import com.vaadin.shared.ui.JavaScriptComponentState;
 
 public class VisJsState extends JavaScriptComponentState 
 {
-	 public String value;
+	 public String strNodes;
+	 public String strEdges;
 
 }
