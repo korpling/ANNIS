@@ -249,3 +249,16 @@ CREATE TABLE example_queries
   "used_ops" TEXT[] COLLATE "C" NOT NULL,
   "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
 );
+
+
+-- HACK: add a custom operator which is the same as "=" for integers but always
+-- returns 0.995 as join selectivity. See the description
+-- of "annis.hack_operator_same_span" in conf/develop.properties for details.
+DROP OPERATOR IF EXISTS ^=^ (integer, integer);
+CREATE OPERATOR ^=^ (
+ PROCEDURE= int4eq,
+ LEFTARG = integer,
+ RIGHTARG = integer,
+ JOIN = 'nlikejoinsel',
+ HASHES, MERGES
+);

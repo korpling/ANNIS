@@ -79,6 +79,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   // use predicate on component_ref before and in EXISTS subquery for common ancestor operator
   private boolean useComponentRefPredicateInCommonAncestorSubquery;
   
+  private boolean hackOperatorSameSpan;
+  
   private AnnotationConditionProvider annoCondition;
   
   
@@ -844,5 +846,14 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     this.annoCondition = annoCondition;
   }
   
+  public boolean isHackOperatorSameSpan()
+  {
+    return hackOperatorSameSpan;
+  }
+
+  public void setHackOperatorSameSpan(boolean hackOperatorSameSpan)
+  {
+    this.hackOperatorSameSpan = hackOperatorSameSpan;
+  }
   
 }
