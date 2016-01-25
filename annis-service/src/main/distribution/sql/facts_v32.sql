@@ -14,6 +14,10 @@ CREATE TABLE facts_:id
 )
 INHERITS (facts);
 
+ALTER TABLE facts_:id ALTER COLUMN span SET STATISTICS :stat_target;
+ALTER TABLE facts_:id ALTER COLUMN node_annotext SET STATISTICS :stat_target;
+ALTER TABLE facts_:id ALTER COLUMN node_qannotext SET STATISTICS :stat_target;
+
 INSERT INTO facts_:id
 (
   id,
