@@ -253,7 +253,9 @@ CREATE TABLE example_queries
 
 -- HACK: add a custom operator which is the same as "=" for integers but always
 -- returns 0.995 as join selectivity. See the description
--- of "annis.hack_operator_same_span" in conf/develop.properties for details.
+-- of "annis.hack_operator_same_span" in conf/develop.properties or the
+-- comments in DefaultWhereClauseGenerator#addSameSpanConditions(...)
+ for details.
 DROP OPERATOR IF EXISTS ^=^ (integer, integer);
 CREATE OPERATOR ^=^ (
  PROCEDURE= int4eq,

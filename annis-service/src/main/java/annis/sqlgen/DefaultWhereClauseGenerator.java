@@ -518,7 +518,26 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "left_token", "left_token");
-    joinOnNode(conditions, node, target, "=", "right_token", "right_token");
+    if(hackOperatorSameSpan)
+    {
+      /* HACK: 
+      When joining on both left_token and right_token 
+      PostgreSQL will multiply the selectivity of both operations and this
+      is not how the data works. left_token is not independent of right_token
+      (the latter one is always larger) which is something the planner won't recognize.
+      The actual solution would be to use the range data type for the token coverage
+      and hope that PostgreSQL has proper statistics support (at the time of writing
+      it hasn't). We use the custom ^=^ operator which is the same as the "="
+      operator but has a constant join selectivity of 0.995. At least as long
+      as PostgreSQL doesn't change the
+      */
+      joinOnNode(conditions, node, target, "^=^", "right_token", "right_token");
+    }
+    else
+    {
+      joinOnNode(conditions, node, target, "=", "right_token", "right_token");
+    }
+    
     notReflexive(conditions, node, target);
   }
 
