@@ -1295,8 +1295,30 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     MapSqlParameterSource args = offsets.makeArgs()
       .addValue(":id", corpusID);
-
+    
     log.info("creating materialized facts table for corpus with ID " + corpusID);
+    
+    String defaultStatTargetRaw = 
+      getJdbcTemplate().queryForObject("SHOW default_statistics_target", String.class);
+    
+    // this is the minimal value
+    int selectedStatTarget = 250;
+    
+    if(defaultStatTargetRaw != null)
+    {
+      try
+      {
+        int defaultStatTargetConfig = Integer.parseInt(defaultStatTargetRaw);
+        // make sure the sample size is not less than the default one
+        selectedStatTarget = Math.max(selectedStatTarget, defaultStatTargetConfig);
+      }
+      catch(NumberFormatException ex)
+      {
+        log.warn("Could not parse the \"default_statistics_target\" PostgreSQL parameter.");
+      }
+    }
+    args.addValue(":stat_target", selectedStatTarget);
+    
     if (version == ANNISFormatVersion.V3_3)
     {
       executeSqlFromScript("facts.sql", args);
