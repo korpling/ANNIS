@@ -255,12 +255,12 @@ CREATE TABLE example_queries
 -- returns 0.995 as join selectivity. See the description
 -- of "annis.hack_operator_same_span" in conf/develop.properties or the
 -- comments in DefaultWhereClauseGenerator#addSameSpanConditions(...)
- for details.
+-- for details.
 DROP OPERATOR IF EXISTS ^=^ (integer, integer);
 CREATE OPERATOR ^=^ (
  PROCEDURE= int4eq,
  LEFTARG = integer,
  RIGHTARG = integer,
  JOIN = 'nlikejoinsel',
- HASHES, MERGES
+ MERGES
 );
