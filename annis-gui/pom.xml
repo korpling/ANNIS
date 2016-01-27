@@ -99,7 +99,7 @@
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
-        <version>9.0.4.v20130625</version>
+        <version>9.3.7.v20160115</version>
         <configuration>
           <webApp>
             <contextPath>/annis-gui</contextPath>
@@ -112,7 +112,7 @@
           <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-continuation</artifactId>
-            <version>9.0.4.v20130625</version>
+            <version>9.3.7.v20160115</version>
           </dependency>
         </dependencies>
       </plugin>

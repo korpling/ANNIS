@@ -35,6 +35,7 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 import java.io.IOException;
 import java.util.Map;
 import net.xeoh.plugins.base.PluginManager;
@@ -47,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis")
-@Push(value = PushMode.AUTOMATIC)
+@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
 public class AnnisUI extends CommonUI
   implements ErrorHandler, ViewChangeListener
 {
