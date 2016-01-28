@@ -92,6 +92,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private boolean temporaryStagingArea;
 
   private DeleteCorpusDao deleteCorpusDao;
+  
+  private boolean hackDistinctLeftRightToken;
+
 
   /**
    * Searches for textes which are empty or only contains whitespaces. If that
@@ -587,6 +590,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
     // create the new facts table partition
     createFacts(corpusID, version, offsets);
     
+    if(hackDistinctLeftRightToken)
+    {
+      adjustDistinctLeftRightToken(corpusID);
+    }
+    
     if (temporaryStagingArea)
     {
       dropStagingArea();
@@ -676,6 +684,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     // create the new facts table partition
     createFacts(corpusID, version, offsets);
+    
+    if(hackDistinctLeftRightToken)
+    {
+      adjustDistinctLeftRightToken(corpusID);
+    }
     
     if (temporaryStagingArea)
     {
@@ -1289,6 +1302,27 @@ public class AdministrationDao extends AbstractAdminstrationDao
     // from the import process we have to set it manually.
     getJdbcTemplate().update("SET statement_timeout TO 0");
     getJdbcTemplate().execute("ANALYZE facts");
+  }
+  
+  void adjustDistinctLeftRightToken(long corpusID)
+  {
+    /* HACK: 
+     adjust the left/right_token value to the average maximal left/right_token
+     value per corpus/text on import to enhance the planner selectivity estimations.
+    */
+    
+    log.info("adjusting statistical information for left_token and right_token columns");
+    
+    double countLeft = getJdbcTemplate().queryForObject("SELECT avg(maxleft)\n" 
+      + "FROM\n" +"( SELECT max(left_token) maxleft FROM _node GROUP BY corpus_ref, text_ref ) AS m", Double.class);
+    double countRight = getJdbcTemplate().queryForObject("SELECT avg(maxright)\n" 
+      + "FROM\n" +"( SELECT max(right_token) maxright FROM _node GROUP BY corpus_ref, text_ref ) AS m", Double.class);
+    
+    int adjustedLeft = (int) Math.ceil(Math.sqrt(countLeft));
+    int adjustedRight = (int) Math.ceil(Math.sqrt(countRight));
+    
+    getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN left_token SET (n_distinct=" + adjustedLeft + ")");
+    getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN right_token SET (n_distinct=" + adjustedRight + ")");
   }
 
   void createFacts(long corpusID, ANNISFormatVersion version, Offsets offsets)
@@ -2187,6 +2221,18 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     this.deleteCorpusDao = deleteCorpusDao;
   }
+
+  public boolean isHackDistinctLeftRightToken()
+  {
+    return hackDistinctLeftRightToken;
+  }
+
+  public void setHackDistinctLeftRightToken(boolean hackDistinctLeftRightToken)
+  {
+    this.hackDistinctLeftRightToken = hackDistinctLeftRightToken;
+  }
+  
+  
 
   /**
    * Checks, if a already exists a corpus with the same name of the top level
