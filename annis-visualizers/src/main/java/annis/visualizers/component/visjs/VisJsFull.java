@@ -9,11 +9,9 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 
 @PluginImplementation
-public class VisJsFull extends AbstractVisualizer<VisJsComponentTest>{
+public class VisJsFull extends AbstractVisualizer<VisJsComponent>{
 
-	
-	//TODO exchange VisJsComponentTest to VisJsComponent after implementation
-	private static final long serialVersionUID = 1L;
+
 
 	@Override
 	public String getShortName() 
@@ -22,10 +20,10 @@ public class VisJsFull extends AbstractVisualizer<VisJsComponentTest>{
 	}
 
 	@Override
-	public VisJsComponentTest createComponent(VisualizerInput visInput,
+	public VisJsComponent createComponent(VisualizerInput visInput,
 			VisualizationToggle visToggle) 
 	{
-		return new VisJsComponentTest(visInput);
+		return new VisJsComponent(visInput);
 	}
 	
 	@Override

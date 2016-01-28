@@ -10,18 +10,22 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import annis.libgui.visualizers.VisualizerInput;
+import annis.visualizers.component.kwic.KWICVisualizer;
 
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.util.VisJsVisualizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
+import com.vaadin.server.Sizeable;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 
 
 
 
-@SuppressWarnings("serial")
+
 @JavaScript(
 		  {"VisJs_Connector.js",
 		    "vaadin://jquery.js",
@@ -36,10 +40,14 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 
 public class VisJsComponent extends AbstractJavaScriptComponent {	
 	
-	String strNodes;
-	String strEdges;
+	private String strNodes;
+	private String strEdges;
 	
-	public VisJsComponent(VisualizerInput visInput){		
+	private String visId;
+	private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
+	
+	public VisJsComponent(VisualizerInput visInput){	
+		
 
 			SDocument doc =  visInput.getDocument();
 			VisJsVisualizer VisJsVisualizer = new VisJsVisualizer(doc);
@@ -64,8 +72,10 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 				strEdges = osEdges.toString();
 				
 				bw.close();
-				this.setId(UUID.randomUUID().toString());
-		        callFunction("init", strNodes, strEdges);
+				visId = "vis-" + UUID.randomUUID().toString();
+				setId(visId);
+				addStyleName("visjs-component");
+		        callFunction("init", visId, strNodes, strEdges);
 		       
 	      
 			}catch(IOException e){
@@ -76,16 +86,6 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 	}
 		  
 	  
-	  public interface ValueChangeListener extends Serializable {
-	        void valueChange();
-	    }
-	    ArrayList<ValueChangeListener> listeners =
-	            new ArrayList<ValueChangeListener>();
-	    public void addValueChangeListener(
-	                   ValueChangeListener listener) {
-	        listeners.add(listener);
-	    }
-	    
 	    @Override
 	    protected VisJsState getState() {
 	        return (VisJsState) super.getState();
@@ -94,11 +94,16 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 	    @Override
 	    public void attach() {
 	      super.attach();
+	      setSizeUndefined();
 
 	      // set the state
+	      getState().visId = getVisId();
 	      getState().strNodes = strNodes;
 	      getState().strEdges = strEdges;
 	     
 	    }
-	
+	    
+	    public String getVisId() {
+	        return visId;
+	    }
 }

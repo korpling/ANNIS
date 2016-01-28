@@ -1,8 +1,5 @@
 package annis.visualizers.component.visjs;
 
-import java.io.IOException;
-
-import com.vaadin.ui.Component;
 
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
@@ -14,8 +11,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 public class VisJs extends AbstractVisualizer<VisJsComponent>{
 
 	
-	//TODO change VisJsComponentTest to VisJsComponent after implementation
-	private static final long serialVersionUID = 1L;
+//	private static final long serialVersionUID = 1L;
 
 	@Override
 	public String getShortName() 
