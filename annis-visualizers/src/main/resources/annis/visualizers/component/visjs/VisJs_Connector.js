@@ -4,7 +4,7 @@ window.annis_visualizers_component_visjs_VisJsComponent = function() {
 this.init = function(visId, strNodes, strEdges){
 
 var e = this.getElement();
-e.innerHTML = "<div id=visId>container</div>";
+//e.innerHTML = "<div id=visId>container</div>";
 var container = document.getElementById(visId);
 //var container = e;
 container.style.border = "thin solid green";
@@ -59,8 +59,18 @@ var visjscomponent = new vis.Network(container, data, options);
 
 // Handle changes from the server-side
 this.onStateChange = function(){
-	
+		
 	var visId = this.getState().visId;
+	// cleanup old canvas elements
+    if (document.getElementById(visId) !== undefined)
+    {
+      var wrapper = document.getElementById(visId);
+      while (wrapper.hasChildNodes())
+      {
+        wrapper.removeChild(wrapper.lastChild);
+      }
+    }
+	
     var nodes = this.getState().strNodes;
     var edges = this.getState().strEdges;
     this.init(visId, nodes, edges);

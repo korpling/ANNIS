@@ -72,7 +72,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 				strEdges = osEdges.toString();
 				
 				bw.close();
-				visId = "vis-" + UUID.randomUUID().toString();
+				visId = "visjs-" + UUID.randomUUID().toString();
 				setId(visId);
 				addStyleName("visjs-component");
 		        callFunction("init", visId, strNodes, strEdges);
