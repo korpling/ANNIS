@@ -124,5 +124,5 @@ FROM
       AND annotation_category.toplevel_corpus = :id
     )
 ) as tmp
-ORDER BY n_sample, corpus_ref, is_token
+ORDER BY corpus_ref, n_sample, is_token
 ;
