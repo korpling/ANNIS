@@ -1313,13 +1313,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
     
     log.info("adjusting statistical information for left_token and right_token columns");
     
-    double countLeft = getJdbcTemplate().queryForObject("SELECT avg(maxleft)\n" 
-      + "FROM\n" +"( SELECT max(left_token) maxleft FROM _node GROUP BY corpus_ref, text_ref ) AS m", Double.class);
-    double countRight = getJdbcTemplate().queryForObject("SELECT avg(maxright)\n" 
-      + "FROM\n" +"( SELECT max(right_token) maxright FROM _node GROUP BY corpus_ref, text_ref ) AS m", Double.class);
-    
-    int adjustedLeft = (int) Math.ceil(Math.sqrt(countLeft));
-    int adjustedRight = (int) Math.ceil(Math.sqrt(countRight));
+    int adjustedLeft = getJdbcTemplate().queryForObject("SELECT avg(maxleft)::integer\n" 
+      + "FROM\n" +"( SELECT max(left_token) maxleft FROM _node GROUP BY corpus_ref, text_ref ) AS m", Integer.class);
+    int adjustedRight = getJdbcTemplate().queryForObject("SELECT avg(maxright)::integer\n" 
+      + "FROM\n" +"( SELECT max(right_token) maxright FROM _node GROUP BY corpus_ref, text_ref ) AS m", Integer.class);
     
     getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN left_token SET (n_distinct=" + adjustedLeft + ")");
     getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN right_token SET (n_distinct=" + adjustedRight + ")");
