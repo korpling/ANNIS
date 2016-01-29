@@ -217,6 +217,7 @@
     <property name="temporaryStagingArea" value="$dev{annis.import.temporary-staging-area}" />
     <property name="generateExampleQueries" value="${annis.import.example-queries}" />
     <property name="deleteCorpusDao" ref="deleteCorpusDao" />
+    <property name="hackDistinctLeftRightToken" value="$dev{annis.hack_distinct_left_right_token}" />
     
     <property name="mimeTypeMapping">
       <util:map>
@@ -235,7 +236,7 @@
     <property name="tableInsertFrom" ref="tableInsertFrom" />
     <property name="tableInsertSelect" ref="tableInsertSelect" />
     <property name="queriesGenerator" ref="queriesGenerator" />
-    <property name="schemaVersion" value="3.4.2"/>
+    <property name="schemaVersion" value="3.4.3"/>
   </bean>
   
   <bean id="schemeFixer" class="annis.administration.SchemeFixer" parent="schemeFixerBase" lazy-init="true">
