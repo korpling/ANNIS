@@ -236,7 +236,7 @@
     <property name="tableInsertFrom" ref="tableInsertFrom" />
     <property name="tableInsertSelect" ref="tableInsertSelect" />
     <property name="queriesGenerator" ref="queriesGenerator" />
-    <property name="schemaVersion" value="3.4.2"/>
+    <property name="schemaVersion" value="3.4.3"/>
   </bean>
   
   <bean id="schemeFixer" class="annis.administration.SchemeFixer" parent="schemeFixerBase" lazy-init="true">
