@@ -1,17 +1,34 @@
 //Connector
 window.annis_visualizers_component_visjs_VisJsComponent = function() {
 
-this.init = function(visId, strNodes, strEdges){
+var thisElement = this.getElement(); 
+var container = thisElement;
 
-var e = this.getElement();
-//e.innerHTML = "<div id=visId>container</div>";
-var container = document.getElementById(visId);
-//var container = e;
+var theThis = this;
+var strNodes = null;
+var strEdges = null;
+var visjscomponent = null;
+
+// Handle changes from the server-side
+this.onStateChange = function(){
+		
+	// cleanup old graph
+    if(typeof visjscomponent !== 'undefined' && visjscomponent != null){
+    	visjscomponent.destroy();
+    }
+	
+    strNodes = this.getState().strNodes;
+    strEdges = this.getState().strEdges;
+    this.init(strNodes, strEdges);
+    };
+
+
+this.init = function(strNodes, strEdges){
 container.style.border = "thin solid green";
 
 var nodes = JSON.parse(strNodes);
 var edges = JSON.parse(strEdges);
-var visjscomponent = null;
+
 
 var data = {
 nodes: nodes,
@@ -51,30 +68,14 @@ iterations: 800
 }
 }
 ;
+$(container).remove("canvas");
+visjscomponent = new vis.Network(container, data, options); 
 
-var visjscomponent = new vis.Network(container, data, options); 
+};
 
-}
-
-
-// Handle changes from the server-side
-this.onStateChange = function(){
-		
-	var visId = this.getState().visId;
-	// cleanup old canvas elements
-    if (document.getElementById(visId) !== undefined)
-    {
-      var wrapper = document.getElementById(visId);
-      while (wrapper.hasChildNodes())
-      {
-        wrapper.removeChild(wrapper.lastChild);
-      }
-    }
-	
-    var nodes = this.getState().strNodes;
-    var edges = this.getState().strEdges;
-    this.init(visId, nodes, edges);
-    }
    
+/*$(window).resize(function() {
+    theThis.init(strNodes, strEdges);
+  });*/
   
 };

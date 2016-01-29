@@ -43,7 +43,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 	private String strNodes;
 	private String strEdges;
 	
-	private String visId;
+	//private String visId;
 	private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
 	
 	public VisJsComponent(VisualizerInput visInput){	
@@ -72,10 +72,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 				strEdges = osEdges.toString();
 				
 				bw.close();
-				visId = "visjs-" + UUID.randomUUID().toString();
-				setId(visId);
-				addStyleName("visjs-component");
-		        callFunction("init", visId, strNodes, strEdges);
+			
+		       // callFunction("init", strNodes, strEdges);
 		       
 	      
 			}catch(IOException e){
@@ -94,16 +92,16 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 	    @Override
 	    public void attach() {
 	      super.attach();
-	      setSizeUndefined();
+	    //  setSizeUndefined();
 
 	      // set the state
-	      getState().visId = getVisId();
+	     // getState().visId = getVisId();
 	      getState().strNodes = strNodes;
 	      getState().strEdges = strEdges;
 	     
 	    }
 	    
-	    public String getVisId() {
+	  /*  public String getVisId() {
 	        return visId;
-	    }
+	    }*/
 }
