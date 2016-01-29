@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.service.objects.AnnisCorpus;
 import de.hu_berlin.german.korpling.annis.kickstarter.KickstartRunner;
 import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
@@ -25,12 +26,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.util.Set;
+import java.util.LinkedHashSet;
 
 /**
  *
@@ -47,6 +49,8 @@ public class AcceptanceTest
   
   private final static int PORT = 8086;
   
+  private static final Set<String> corpora = new LinkedHashSet<>();
+  
   @BeforeClass
   public static void runKickstarter()
   {
@@ -56,6 +60,12 @@ public class AcceptanceTest
       
       runner.startService();
       runner.startJetty();
+      
+      // get all installed corpora
+      for(AnnisCorpus c : runner.getCorpora())
+      {
+        corpora.add(c.getName());
+      }
       
       driver = new FirefoxDriver();
     }
@@ -93,6 +103,14 @@ public class AcceptanceTest
     driver.findElement(By.id("MainToolbar:btOpenSource")).click();
     Assert.assertTrue(driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).isDisplayed());
     driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).click();    
+  }
+  
+  @Test
+  public void testTokenSearchPcc2()
+  {
+    // only execute this test if pcc2 corpus is imported
+    Assume.assumeTrue(corpora.contains("pcc2"));
+    
   }
   
   @AfterClass

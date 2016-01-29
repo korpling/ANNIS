@@ -21,6 +21,7 @@ import annis.AnnisXmlContextHelper;
 import annis.dao.QueryDao;
 import annis.exceptions.AnnisException;
 import annis.security.MultipleIniWebEnvironment;
+import annis.service.objects.AnnisCorpus;
 import annis.utils.Utils;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -43,6 +44,8 @@ import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import java.util.List;
+import java.util.LinkedList;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
@@ -365,5 +368,18 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       }
     }
     return -1;
+  }
+  
+  public List<AnnisCorpus> getCorpora()
+  {
+    if(ctx != null)
+    {
+      QueryDao dao = (QueryDao) ctx.getBean("queryDao");
+      if(dao != null)
+      {
+        return dao.listCorpora();
+      }
+    }
+    return new LinkedList<>();
   }
 }

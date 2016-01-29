@@ -23,6 +23,7 @@ import annis.gui.filter.SetFilter;
 import annis.libgui.Background;
 import annis.libgui.CorpusSet;
 import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
 import annis.libgui.InstanceConfig;
 import annis.security.UserConfig;
 import annis.service.objects.AnnisCorpus;
@@ -296,6 +297,8 @@ public class CorpusListPanel extends VerticalLayout implements
     setExpandRatio(tblCorpora, 1.0f);
 
     updateCorpusSetList(true, true);
+    
+    IDGenerator.assignIDForFields(this, tblCorpora);
   }
 
   public void updateCorpusSetList(boolean scrollToSelected)

@@ -16,6 +16,7 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.service.internal.AnnisServiceRunner;
+import annis.service.objects.AnnisCorpus;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.jetty.server.Server;
@@ -103,6 +104,15 @@ public class KickstartRunner
         runner.setTimeout(oldTimeout);
       }
     }
+  }
+  
+  public List<AnnisCorpus> getCorpora()
+  {
+    if(runner != null)
+    {
+      return runner.getCorpora();
+    }
+    return new LinkedList<>();
   }
   
   
