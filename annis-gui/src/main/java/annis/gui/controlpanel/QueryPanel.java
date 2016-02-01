@@ -304,11 +304,17 @@ public class QueryPanel extends GridLayout implements
     setColumnExpandRatio(3, 0.0f);
     
     //setComponentAlignment(btShowQueryBuilder, Alignment.BOTTOM_CENTER);
-    
-    IDGenerator.assignIDForFields(QueryPanel.this, btShowResult, btMoreActions, btShowQueryBuilder, btShowMoreHistory);
-    
+  }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(QueryPanel.this, btShowResult, btMoreActions);
     
   }
+  
+  
 
   public void updateShortHistory()
   {

@@ -15,6 +15,7 @@
  */
 package annis.libgui;
 
+import com.google.common.base.Preconditions;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HasComponents;
 import java.lang.reflect.Field;
@@ -101,6 +102,7 @@ public class IDGenerator
     String id = null;
     if(c != null && fieldName != null && !fieldName.isEmpty())
     {
+      Preconditions.checkArgument(c.isAttached(), "Component " + c.toString() + " must be attached before it can get an automatic ID.");
       id = c.getId();
       if(id == null)
       {

@@ -298,8 +298,16 @@ public class CorpusListPanel extends VerticalLayout implements
 
     updateCorpusSetList(true, true);
     
+  }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora);
   }
+  
+  
 
   public void updateCorpusSetList(boolean scrollToSelected)
   {

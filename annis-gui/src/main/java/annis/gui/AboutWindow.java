@@ -139,10 +139,16 @@ public class AboutWindow extends Window
     layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(txtThirdParty, 1.0f);
     
-    
-      IDGenerator.assignIDForFields(AboutWindow.this, btClose);
-    
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(AboutWindow.this, btClose);
+  }
+  
+  
 
   private static class OkClickListener implements Button.ClickListener
   {

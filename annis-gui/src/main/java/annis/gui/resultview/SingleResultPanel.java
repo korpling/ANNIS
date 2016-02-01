@@ -20,18 +20,15 @@ import annis.gui.AnnisUI;
 import annis.gui.ShareSingleMatchGenerator;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
-import annis.gui.SearchView;
 import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
-import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
 import static annis.libgui.Helper.calculateMarkedAndCoveredIDs;
+import annis.libgui.IDGenerator;
 import annis.libgui.InstanceConfig;
-import annis.libgui.MatchedNodeColors;
 import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProvider;
 import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
@@ -47,7 +44,6 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
@@ -311,6 +307,7 @@ public class SingleResultPanel extends CssLayout implements
     addComponent(infoBar);
     initVisualizer();
   }
+  
 
   private void showShareSingleMatchGenerator()
   {
@@ -493,6 +490,7 @@ public class SingleResultPanel extends CssLayout implements
     {
       btLink.setVisible(false);
     }
+    IDGenerator.assignIDForFields(SingleResultPanel.this, btInfo);
   }
   
   

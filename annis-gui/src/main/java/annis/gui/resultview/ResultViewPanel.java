@@ -24,6 +24,7 @@ import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProviderImpl;
@@ -172,6 +173,16 @@ public class ResultViewPanel extends VerticalLayout implements
     setComponentAlignment(paging, Alignment.TOP_CENTER);
     setExpandRatio(paging, 0.0f);
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(ResultViewPanel.this, resultLayout);
+    IDGenerator.assignIDForEachField(paging);
+  }
+  
+  
 
   /**
    * Informs the user about the searching process.

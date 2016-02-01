@@ -106,11 +106,16 @@ public class HelpUsWindow extends Window
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(hLayout, 1.0f);
-
-    
-    IDGenerator.assignIDForFields(HelpUsWindow.this, btClose);
-    
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(HelpUsWindow.this, btClose);
+  }
+  
+  
 
   private static class OkClickListener implements Button.ClickListener
   {

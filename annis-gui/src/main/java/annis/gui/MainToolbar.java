@@ -335,8 +335,6 @@ public class MainToolbar extends HorizontalLayout
 
     updateSidebarState();
     MainToolbar.this.updateUserInformation();
-    
-    IDGenerator.assignIDForFields(MainToolbar.this , btAboutAnnis, btOpenSource);
   }
 
   @Override
@@ -349,6 +347,8 @@ public class MainToolbar extends HorizontalLayout
     {
       ((AnnisBaseUI) ui).getLoginDataLostBus().register(this);
     }
+    
+    IDGenerator.assignIDForFields(MainToolbar.this , btAboutAnnis, btOpenSource);
   }
 
   @Override
