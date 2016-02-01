@@ -71,15 +71,6 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     boolean nosecurity = Boolean.parseBoolean(System.getProperty(
       "annis.nosecurity", "false"));
     this.useAuthentification = !nosecurity;
-    if (this.useAuthentification)
-    {
-      log.info("Using authentification");
-    }
-    else
-    {
-      log.warn(
-        "*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
-    }
   }
 
   public static void main(String[] args) throws Exception
@@ -234,12 +225,14 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
       if (useAuthentification)
       {
+        log.info("Using authentification");
         context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
           "file:" + System.getProperty("annis.home") + "/conf/shiro.ini,"
           + "file:" + System.getProperty("annis.home") + "/conf/develop_shiro.ini");
       }
       else
       {
+        log.warn("*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
         context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
           "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
       }
