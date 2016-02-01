@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.LinkedHashSet;
+import org.openqa.selenium.WebElement;
 
 /**
  *
@@ -47,7 +48,8 @@ public class AcceptanceTest
   
   private WebDriverWait wait;
   
-  private final static int PORT = 8086;
+  private final static int WEB_PORT = 8086;
+  private final static int SERVICE_PORT = 5722;
   
   private static final Set<String> corpora = new LinkedHashSet<>();
   
@@ -56,7 +58,7 @@ public class AcceptanceTest
   {
     try
     {
-      runner = new KickstartRunner(PORT);
+      runner = new KickstartRunner(WEB_PORT, SERVICE_PORT);
       
       runner.startService();
       runner.startJetty();
@@ -83,7 +85,7 @@ public class AcceptanceTest
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     wait = new WebDriverWait(driver, 10);
     
-    driver.get("http://localhost:" + PORT +  "/annis-gui/");
+    driver.get("http://localhost:" + WEB_PORT +  "/annis-gui/");
     
     // initial wait for the title (can be longer than implicit wait time)
     wait.until(ExpectedConditions.titleContains("(ANNIS Corpus Search)"));
@@ -110,6 +112,15 @@ public class AcceptanceTest
   {
     // only execute this test if pcc2 corpus is imported
     Assume.assumeTrue(corpora.contains("pcc2"));
+    
+    // execute a "tok" search on pcc2
+    driver.findElement(By.xpath("//div[@id=\"QueryPanel\"]//textarea")).sendKeys("tok");
+    WebElement tdPcc = driver.findElement(By.xpath("//div[@id=\"CorpusListPanel:tblCorpora\"]//tr[0]/td[0]/div"));
+    Assert.assertNotNull(tdPcc);
+    Assert.assertEquals("pcc2", tdPcc.getText());
+    tdPcc.click();
+    
+    driver.findElement(By.id("QueryPanel:btShowResult")).click();
     
   }
   

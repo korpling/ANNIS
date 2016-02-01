@@ -33,15 +33,17 @@ public class KickstartRunner
   private AnnisServiceRunner runner;
   private int oldTimeout;
 
-  private final int port;
+  private final int webServerPort;
+  private final Integer servicePort;
   
   public KickstartRunner()
   {
-    this(8080);
+    this(8080, null);
   }
-  public KickstartRunner(int port)
+  public KickstartRunner(int webServerPort, Integer servicePort)
   {
-    this.port = port;
+    this.webServerPort = webServerPort;
+    this.servicePort = servicePort;
   }
   
   protected void resetRunner()
@@ -52,7 +54,7 @@ public class KickstartRunner
   public void startService() throws Exception
   {
     // starts RMI service at bean creation
-    runner = new AnnisServiceRunner();
+    runner = new AnnisServiceRunner(servicePort);
     runner.setUseAuthentification(false);
     runner.start(true);
   }
@@ -61,7 +63,7 @@ public class KickstartRunner
   {
     // disable jetty logging
     Log.setLog(new JettyNoLogger());
-    Server jetty = new Server(port);
+    Server jetty = new Server(webServerPort);
     // add context for our bundled webapp
     String annisHome = System.getProperty("annis.home");
     if(annisHome == null || annisHome.isEmpty())

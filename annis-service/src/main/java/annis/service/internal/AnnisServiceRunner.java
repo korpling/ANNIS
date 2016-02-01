@@ -63,11 +63,18 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private Server server;
 
   private boolean useAuthentification = true;
+  private Integer overridePort = null;
   
   private GenericXmlApplicationContext ctx;
 
   public AnnisServiceRunner()
   {
+    this(null);
+  }
+  
+  public AnnisServiceRunner(Integer port)
+  {
+    this.overridePort = port;
     boolean nosecurity = Boolean.parseBoolean(System.getProperty(
       "annis.nosecurity", "false"));
     this.useAuthentification = !nosecurity;
@@ -192,7 +199,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     final IoCComponentProviderFactory factory = new SpringComponentProviderFactory(
       rc, ctx);
 
-    int port = ctx.getBean(QueryServiceImpl.class).getPort();
+    int port = overridePort == null ? ctx.getBean(QueryServiceImpl.class).getPort() : overridePort;
     try
     {
       // only allow connections from localhost
