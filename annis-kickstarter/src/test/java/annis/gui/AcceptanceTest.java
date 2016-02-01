@@ -115,16 +115,16 @@ public class AcceptanceTest
     Assume.assumeTrue(corpora.contains("pcc2"));
     
     // execute a "tok" search on pcc2
-    WebElement codeMirror = driver.findElement(By.xpath("//div[@id='QueryPanel']//div[contains(@class,'CodeMirror')]"));
+    WebElement codeMirror = driver.findElement(By.xpath("//div[@id='SearchView:ControlPanel:QueryPanel']//div[contains(@class,'CodeMirror')]"));
     JavascriptExecutor js = (JavascriptExecutor) driver;
     js.executeScript("arguments[0].CodeMirror.setValue('tok');", codeMirror);
  
-    WebElement tdPcc = driver.findElement(By.xpath("//div[@id='CorpusListPanel:tblCorpora']//table[contains(@class, 'v-table-table')]//tr[1]/td[1]/div"));
+    WebElement tdPcc = driver.findElement(By.xpath("//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']//table[contains(@class, 'v-table-table')]//tr[1]/td[1]/div"));
     Assert.assertNotNull(tdPcc);
     Assert.assertEquals("pcc2", tdPcc.getText());
     tdPcc.click();
     
-    driver.findElement(By.id("QueryPanel:btShowResult")).click();
+    driver.findElement(By.id("SearchView:ControlPanel:QueryPanel:btShowResult")).click();
     
   }
   

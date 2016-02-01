@@ -18,6 +18,7 @@ package annis.libgui;
 import com.google.common.base.Preconditions;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HasComponents;
+import com.vaadin.ui.UI;
 import java.lang.reflect.Field;
 import java.util.Iterator;
 import org.slf4j.Logger;
@@ -108,7 +109,7 @@ public class IDGenerator
       {
         // try to get the parent ID
         HasComponents parent = c.getParent();
-        if(parent == null)
+        if(parent == null || parent instanceof UI)
         {
           // use class name as ID
           id = fieldName;
