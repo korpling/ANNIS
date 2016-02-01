@@ -95,7 +95,7 @@ public class AcceptanceTest
   @Test
   public void testAboutWindow()
   {
-    driver.findElement(By.id("MainToolbar:btAboutAnnis")).click();
+    driver.findElement(By.id("SearchView:MainToolbar:btAboutAnnis")).click();
     Assert.assertTrue(driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).isDisplayed());
     driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).click();
   }
@@ -103,7 +103,7 @@ public class AcceptanceTest
   @Test
   public void testOpenSourceWindow()
   {
-    driver.findElement(By.id("MainToolbar:btOpenSource")).click();
+    driver.findElement(By.id("SearchView:MainToolbar:btOpenSource")).click();
     Assert.assertTrue(driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).isDisplayed());
     driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).click();    
   }
