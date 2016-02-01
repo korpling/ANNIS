@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.LinkedHashSet;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
 /**
@@ -114,8 +115,11 @@ public class AcceptanceTest
     Assume.assumeTrue(corpora.contains("pcc2"));
     
     // execute a "tok" search on pcc2
-    driver.findElement(By.xpath("//div[@id=\"QueryPanel\"]//textarea")).sendKeys("tok");
-    WebElement tdPcc = driver.findElement(By.xpath("//div[@id=\"CorpusListPanel:tblCorpora\"]//tr[0]/td[0]/div"));
+    WebElement codeMirror = driver.findElement(By.xpath("//div[@id='QueryPanel']//div[contains(@class,'CodeMirror')]"));
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+    js.executeScript("arguments[0].CodeMirror.setValue('tok');", codeMirror);
+ 
+    WebElement tdPcc = driver.findElement(By.xpath("//div[@id='CorpusListPanel:tblCorpora']//table[contains(@class, 'v-table-table')]//tr[1]/td[1]/div"));
     Assert.assertNotNull(tdPcc);
     Assert.assertEquals("pcc2", tdPcc.getText());
     tdPcc.click();
