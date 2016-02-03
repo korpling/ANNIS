@@ -20,6 +20,7 @@ import annis.service.objects.AnnisCorpus;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -73,8 +74,12 @@ public class KickstartRunner
     WebAppContext context = new WebAppContext(annisHome +  "/webapp/", "/annis-gui");
     context.setInitParameter("managerClassName",
       "annis.security.TestSecurityManager");
+    if(servicePort != null)
+    {
+      context.setInitParameter("AnnisWebService.URL", "http://localhost:" + servicePort + "/annis");
+    }
     String webxmlOverrride = annisHome + "/conf/override-web.xml"; //ClassLoader.getSystemResource("webxmloverride.xml").toString();
-    List<String> listWebXMLOverride = new LinkedList<String>();
+    List<String> listWebXMLOverride = new LinkedList<>();
     listWebXMLOverride.add(webxmlOverrride);
     context.setOverrideDescriptors(listWebXMLOverride);
     // Exclude some jersey classes explicitly from the web application classpath.
@@ -86,6 +91,7 @@ public class KickstartRunner
     context.addServerClass("com.sun.jersey.json.");
     context.addServerClass("com.sun.jersey.server.");
     jetty.setHandler(context);
+    
     // start
     jetty.start();
   }
