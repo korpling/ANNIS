@@ -120,7 +120,7 @@ public class AcceptanceTest
     // execute a "tok" search on pcc2
     WebElement codeMirror = driver.findElement(By.xpath("//div[@id='SearchView:ControlPanel:QueryPanel']//div[contains(@class,'CodeMirror')]"));
     
-    // activate the code mirror field
+    // activate the code mirror field (so we can leave it later)
     codeMirror.click();
     // set text by javascript
     js.executeScript("arguments[0].CodeMirror.setValue('tok');", codeMirror);
