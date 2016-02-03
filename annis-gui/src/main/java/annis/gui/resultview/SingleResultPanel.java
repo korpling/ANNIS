@@ -490,7 +490,7 @@ public class SingleResultPanel extends CssLayout implements
     {
       btLink.setVisible(false);
     }
-    IDGenerator.assignIDForFields(SingleResultPanel.this, btInfo);
+    IDGenerator.assignIDForFields(SingleResultPanel.this, infoBar, btInfo);
   }
   
   
