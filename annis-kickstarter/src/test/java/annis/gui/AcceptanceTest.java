@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.util.Set;
 import java.util.LinkedHashSet;
+import java.util.List;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 
@@ -111,21 +112,46 @@ public class AcceptanceTest
   @Test
   public void testTokenSearchPcc2()
   {
+    JavascriptExecutor js = (JavascriptExecutor) driver;
+
     // only execute this test if pcc2 corpus is imported
     Assume.assumeTrue(corpora.contains("pcc2"));
     
     // execute a "tok" search on pcc2
     WebElement codeMirror = driver.findElement(By.xpath("//div[@id='SearchView:ControlPanel:QueryPanel']//div[contains(@class,'CodeMirror')]"));
-    JavascriptExecutor js = (JavascriptExecutor) driver;
+    
+    // activate the code mirror field
+    codeMirror.click();
+    // set text by javascript
     js.executeScript("arguments[0].CodeMirror.setValue('tok');", codeMirror);
- 
-    WebElement tdPcc = driver.findElement(By.xpath("//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']//table[contains(@class, 'v-table-table')]//tr[1]/td[1]/div"));
+    
+    List<WebElement> corpusTableElements = driver.findElements(By.xpath("//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']//table[contains(@class, 'v-table-table')]//tr"));
+    WebElement tdPcc = null;
+    for(WebElement elem : corpusTableElements)
+    {
+      // get div
+      WebElement div = elem.findElement(By.tagName("div"));
+      if(div != null && "pcc2".equals(div.getText()))
+      {
+        tdPcc = elem;
+      }
+    }
+    
     Assert.assertNotNull(tdPcc);
-    Assert.assertEquals("pcc2", tdPcc.getText());
     tdPcc.click();
     
     driver.findElement(By.id("SearchView:ControlPanel:QueryPanel:btShowResult")).click();
     
+    WebElement gridTable = driver.findElement(By.xpath("//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]//table"));
+    List<WebElement> firstRow = gridTable.findElements(By.xpath(".//tr[1]/td"));
+    Assert.assertEquals(7, firstRow.size());
+    Assert.assertEquals("Feigenblatt", firstRow.get(0).getText());
+    Assert.assertEquals("Die", firstRow.get(1).getText());
+    Assert.assertEquals("Jugendlichen", firstRow.get(2).getText());
+    Assert.assertEquals("in", firstRow.get(3).getText());
+    Assert.assertEquals("Zossen", firstRow.get(4).getText());
+    Assert.assertEquals("wollen", firstRow.get(5).getText());
+    Assert.assertEquals("ein", firstRow.get(6).getText());
   }
   
   @AfterClass
