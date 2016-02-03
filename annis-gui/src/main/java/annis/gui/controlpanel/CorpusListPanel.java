@@ -918,6 +918,10 @@ public class CorpusListPanel extends VerticalLayout implements
           }
         });
       }
+      catch(Throwable ex)
+      {
+        log.warn("Could not get corpus list", ex);
+      }
       finally
       {
         ui.access(new Runnable()
