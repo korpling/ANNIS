@@ -52,7 +52,6 @@ public class MainFrame extends javax.swing.JFrame
     MainFrame.class);
 
   private class MainFrameWorker extends SwingWorker<String, String>
-    implements Serializable
   {
     
     private final KickstartRunner delegate = new KickstartRunner();
