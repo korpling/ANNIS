@@ -244,7 +244,8 @@ public class LegacyGraphConverter
       RelannisEdgeFeature featRelation = RelannisEdgeFeature.extract(rel);
       if (featRelation != null)
       {
-        addRelation(rel, featRelation.getPre(), featRelation.getComponentID(),
+        addRelation(rel, rel.getLayers(), 
+          featRelation.getPre(), featRelation.getComponentID(),
           allNodes, annoGraph);
       }
     }
@@ -261,16 +262,13 @@ public class LegacyGraphConverter
         SDominanceRelation newRel = SaltFactory.createSDominanceRelation();
         newRel.setSource(rel.getSource());
         newRel.setTarget(rel.getTarget());
-        for(SLayer layer : rel.getLayers())
-        {
-          layer.addRelation(newRel);
-        }
+
         for(SAnnotation anno : rel.getAnnotations())
         {
-          newRel.addAnnotation(anno);
+          newRel.createAnnotation(anno.getNamespace(), anno.getName(), anno.getValue());
         }
         
-        addRelation(newRel, featEdge.getArtificialDominancePre(), 
+        addRelation(newRel, rel.getLayers(), featEdge.getArtificialDominancePre(), 
           featEdge.getArtificialDominanceComponent(), allNodes, annoGraph);
 
       }
@@ -279,7 +277,9 @@ public class LegacyGraphConverter
     return annoGraph;
   }
   
-  private static void addRelation(SRelation<? extends SNode, ? extends SNode> rel, long pre, long componentID, 
+  private static void addRelation(SRelation<? extends SNode, ? extends SNode> rel,
+    Set<SLayer> relLayers,
+    long pre, long componentID, 
     Map<SNode, AnnisNode> allNodes, AnnotationGraph annoGraph)
   {
     Edge aEdge = new Edge();
@@ -291,7 +291,6 @@ public class LegacyGraphConverter
     aEdge.setPre(pre);
     aEdge.setComponentID(componentID);
 
-    Set<SLayer> relLayers = rel.getLayers();
     if(!relLayers.isEmpty())
     {
        aEdge.setNamespace(relLayers.iterator().next().getName());
