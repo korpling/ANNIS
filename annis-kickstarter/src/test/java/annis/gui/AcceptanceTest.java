@@ -85,7 +85,7 @@ public class AcceptanceTest
   {
     Assume.assumeNotNull(driver);
     driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-    wait = new WebDriverWait(driver, 10);
+    wait = new WebDriverWait(driver, 15);
     
     driver.get("http://localhost:" + WEB_PORT +  "/annis-gui/");
     
@@ -142,7 +142,11 @@ public class AcceptanceTest
     
     driver.findElement(By.id("SearchView:ControlPanel:QueryPanel:btShowResult")).click();
     
-    WebElement gridTable = driver.findElement(By.xpath("//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]//table"));
+    // wait until the result is loaded
+    By byGridTable = By.xpath("//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]//table");
+    wait.until(ExpectedConditions.visibilityOfElementLocated(byGridTable));
+    
+    WebElement gridTable = driver.findElement(byGridTable);
     List<WebElement> firstRow = gridTable.findElements(By.xpath(".//tr[1]/td"));
     Assert.assertEquals(7, firstRow.size());
     Assert.assertEquals("Feigenblatt", firstRow.get(0).getText());
