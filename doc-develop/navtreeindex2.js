@@ -1,5 +1,7 @@
 var NAVTREEINDEX2 =
 {
+"classannis_1_1dao_1_1_shortener_dao.html#a784b9240903d91c815781ce9c183e273":[4,0,0,3,11,0],
+"classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html":[4,0,0,3,0,0],
 "classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a03cf38570e91542c395ac61f6bdbf1d3":[4,0,0,3,0,0,6],
 "classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a51f5d744f9b97f8d483984afacdbb25c":[4,0,0,3,0,0,4],
 "classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a595424ae68926b52050ba2c1ce4d21ac":[4,0,0,3,0,0,3],
@@ -96,6 +98,7 @@ var NAVTREEINDEX2 =
 "classannis_1_1exceptions_1_1_annis_q_l_syntax_exception.html#a5fef970486df7d343af88d0f693a14e7":[4,0,0,5,4,2],
 "classannis_1_1exceptions_1_1_annis_q_l_syntax_exception.html#a63faba17f4cf116ca73dcfe5567e37a3":[4,0,0,5,4,3],
 "classannis_1_1gui_1_1_about_window.html":[4,0,0,6,21],
+"classannis_1_1gui_1_1_about_window.html#a26459f9a7950450ebc981513c140461b":[4,0,0,6,21,1],
 "classannis_1_1gui_1_1_about_window.html#aa35c89d9d5775c180005f2baa5312274":[4,0,0,6,21,0],
 "classannis_1_1gui_1_1_admin_view.html":[4,0,0,6,22],
 "classannis_1_1gui_1_1_admin_view.html#a1f220d271c7be031d3d760be036385da":[4,0,0,6,22,10],
@@ -176,6 +179,7 @@ var NAVTREEINDEX2 =
 "classannis_1_1gui_1_1_help_panel.html#acc3c8b2ff85f3126612744f16238a35a":[4,0,0,6,33,0],
 "classannis_1_1gui_1_1_help_us_window.html":[4,0,0,6,34],
 "classannis_1_1gui_1_1_help_us_window.html#a96aa2198fba7e9abde835329934e3cbb":[4,0,0,6,34,0],
+"classannis_1_1gui_1_1_help_us_window.html#a9f896e9df1afce0301afcaa4d29d9136":[4,0,0,6,34,1],
 "classannis_1_1gui_1_1_history_panel.html":[4,0,0,6,35],
 "classannis_1_1gui_1_1_history_panel.html#a411082e4f1257504abc431f04061aed0":[4,0,0,6,35,0],
 "classannis_1_1gui_1_1_history_panel.html#ac40a42f6ffbf5b7aa55d94f076f8dbe9":[4,0,0,6,35,2],
@@ -245,9 +249,5 @@ var NAVTREEINDEX2 =
 "classannis_1_1gui_1_1_search_view.html#a775cdd776b91ebc7bacebb16ce24343c":[4,0,0,6,42,18],
 "classannis_1_1gui_1_1_search_view.html#a78b736d37b588ef457e9a18f2aa192d7":[4,0,0,6,42,17],
 "classannis_1_1gui_1_1_search_view.html#a7a880763e1de100181c2367879ca17a9":[4,0,0,6,42,19],
-"classannis_1_1gui_1_1_search_view.html#a7d4234d9836699bc7d892a2e10ed2e7b":[4,0,0,6,42,2],
-"classannis_1_1gui_1_1_search_view.html#a80949160d34c777f8053e630be72c416":[4,0,0,6,42,14],
-"classannis_1_1gui_1_1_search_view.html#a8bf0a62bdb164c350532914633d057da":[4,0,0,6,42,7],
-"classannis_1_1gui_1_1_search_view.html#aafdad4ff039546278b67e117ddc4baef":[4,0,0,6,42,10],
-"classannis_1_1gui_1_1_search_view.html#ab2d73a2bc8b369daa5d9efd0a2e3fee8":[4,0,0,6,42,3]
+"classannis_1_1gui_1_1_search_view.html#a7d4234d9836699bc7d892a2e10ed2e7b":[4,0,0,6,42,2]
 };

@@ -1,6 +1,8 @@
 var classannis_1_1service_1_1internal_1_1_annis_service_runner =
 [
     [ "AnnisServiceRunner", "classannis_1_1service_1_1internal_1_1_annis_service_runner.html#a441e41c0cdce308c1144ca15ac75deeb", null ],
+    [ "AnnisServiceRunner", "classannis_1_1service_1_1internal_1_1_annis_service_runner.html#a20a88ecadaf75e7b330175ceaed4c129", null ],
+    [ "getCorpora", "classannis_1_1service_1_1internal_1_1_annis_service_runner.html#a94fdb941270de31db8d094a08493422d", null ],
     [ "getTimeout", "classannis_1_1service_1_1internal_1_1_annis_service_runner.html#a406753a972da5bf9863d505fa273b9d2", null ],
     [ "isUseAuthentification", "classannis_1_1service_1_1internal_1_1_annis_service_runner.html#a0616b24b559d5702a9e248b98ec9af72", null ],
     [ "setTimeout", "classannis_1_1service_1_1internal_1_1_annis_service_runner.html#ae36c85809a2ef77a1b8a5126f78f4b89", null ],

@@ -305,6 +305,7 @@ var annotated =
         [ "Background", "classannis_1_1libgui_1_1_background.html", null ],
         [ "CorpusSet", "classannis_1_1libgui_1_1_corpus_set.html", "classannis_1_1libgui_1_1_corpus_set" ],
         [ "Helper", "classannis_1_1libgui_1_1_helper.html", null ],
+        [ "IDGenerator", "classannis_1_1libgui_1_1_i_d_generator.html", null ],
         [ "ImagePanel", "classannis_1_1libgui_1_1_image_panel.html", "classannis_1_1libgui_1_1_image_panel" ],
         [ "InstanceConfig", "classannis_1_1libgui_1_1_instance_config.html", "classannis_1_1libgui_1_1_instance_config" ],
         [ "LoginDataLostException", "classannis_1_1libgui_1_1_login_data_lost_exception.html", null ],
@@ -648,6 +649,7 @@ var annotated =
                 [ "ImportDialog", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_import_dialog.html", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_import_dialog" ],
                 [ "InitDialog", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_init_dialog.html", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_init_dialog" ],
                 [ "JettyNoLogger", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_jetty_no_logger.html", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_jetty_no_logger" ],
+                [ "KickstartRunner", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_kickstart_runner.html", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_kickstart_runner" ],
                 [ "ListDialog", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_list_dialog.html", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_list_dialog" ],
                 [ "MainFrame", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_main_frame.html", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_main_frame" ]
               ] ]

@@ -1,5 +1,13 @@
 var NAVTREEINDEX7 =
 {
+"classannis_1_1model_1_1_annis_node.html#a1ba9a3e27635c2d163ffef4f2ec28a51":[4,0,0,8,1,22],
+"classannis_1_1model_1_1_annis_node.html#a1eb7eecb379093cf6704a2d2e5bbf707":[4,0,0,8,1,3],
+"classannis_1_1model_1_1_annis_node.html#a1f29e8af2fabbc0db4b31179cc290d96":[4,0,0,8,1,16],
+"classannis_1_1model_1_1_annis_node.html#a2236dd6a2174155d0547481f303ed373":[4,0,0,8,1,30],
+"classannis_1_1model_1_1_annis_node.html#a312fbf4f1db089bd73d3eb30748db6aa":[4,0,0,8,1,38],
+"classannis_1_1model_1_1_annis_node.html#a3c1de0a545e3eaa33654d0b326c8c8bd":[4,0,0,8,1,41],
+"classannis_1_1model_1_1_annis_node.html#a3ce4ae711603e76a721fda2f315f4f71":[4,0,0,8,1,34],
+"classannis_1_1model_1_1_annis_node.html#a41c01233d7afd4e8aa50658d8107c71b":[4,0,0,8,1,42],
 "classannis_1_1model_1_1_annis_node.html#a426cd01ff1736396a0e5ee26725410b6":[4,0,0,8,1,20],
 "classannis_1_1model_1_1_annis_node.html#a44fb2265fee6d1c671e6991d4b666a17":[4,0,0,8,1,31],
 "classannis_1_1model_1_1_annis_node.html#a538496c4a5268ed2bbb28d709a2ff672":[4,0,0,8,1,32],
@@ -241,13 +249,5 @@ var NAVTREEINDEX7 =
 "classannis_1_1provider_1_1_annis_corpus_access_mapper.html#a93d46459d9bbbc1c150205f10344b457":[4,0,0,9,0,0],
 "classannis_1_1provider_1_1_annis_q_l_semantics_mapper.html":[4,0,0,9,1],
 "classannis_1_1provider_1_1_annis_q_l_semantics_mapper.html#abf2cfb20afe312b334c3149fa15625fa":[4,0,0,9,1,0],
-"classannis_1_1provider_1_1_annis_q_l_syntax_mapper.html":[4,0,0,9,2],
-"classannis_1_1provider_1_1_annis_q_l_syntax_mapper.html#a6227a4f6fb630e0635558ff05ff8554f":[4,0,0,9,2,0],
-"classannis_1_1provider_1_1_graph_m_l_provider.html":[4,0,0,9,3],
-"classannis_1_1provider_1_1_graph_m_l_provider.html#a46165582cc4492d2df5c4dd4dc50a5aa":[4,0,0,9,3,2],
-"classannis_1_1provider_1_1_graph_m_l_provider.html#aa6dd19ecf7ffc737b1777db1071d68d7":[4,0,0,9,3,1],
-"classannis_1_1provider_1_1_graph_m_l_provider.html#af851ae294c3498de2352e5ec45987199":[4,0,0,9,3,0],
-"classannis_1_1provider_1_1_plain_text_match_group_provider.html":[4,0,0,9,4],
-"classannis_1_1provider_1_1_plain_text_match_group_provider.html#a3d7b5f261a2e427dbb62ab0c57140afd":[4,0,0,9,4,3],
-"classannis_1_1provider_1_1_plain_text_match_group_provider.html#a494f9162472e1bbebf2c9e7bed0b42d7":[4,0,0,9,4,4]
+"classannis_1_1provider_1_1_annis_q_l_syntax_mapper.html":[4,0,0,9,2]
 };

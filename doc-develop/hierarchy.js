@@ -219,6 +219,7 @@ var hierarchy =
     [ "HTMLVisConfigBaseListener", null, [
       [ "annis.visualizers.htmlvis.VisParser", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html", null ]
     ] ],
+    [ "annis.libgui.IDGenerator", "classannis_1_1libgui_1_1_i_d_generator.html", null ],
     [ "annis.service.objects.ImportJob", "classannis_1_1service_1_1objects_1_1_import_job.html", null ],
     [ "annis.sqlgen.IslandsPolicy.IslandPolicies", "classannis_1_1sqlgen_1_1_islands_policy.html#enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies", null ],
     [ "annis.sqlgen.IslandsPolicy", "classannis_1_1sqlgen_1_1_islands_policy.html", null ],
@@ -231,6 +232,7 @@ var hierarchy =
     [ "JFrame", null, [
       [ "de.hu_berlin.german.korpling.annis.kickstarter.MainFrame", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_main_frame.html", null ]
     ] ],
+    [ "de.hu_berlin.german.korpling.annis.kickstarter.KickstartRunner", "classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_kickstart_runner.html", null ],
     [ "annis.visualizers.component.tree.LayoutOptions", "classannis_1_1visualizers_1_1component_1_1tree_1_1_layout_options.html", null ],
     [ "annis.utils.LegacyGraphConverter", "classannis_1_1utils_1_1_legacy_graph_converter.html", null ],
     [ "annis.sqlgen.LimitOffsetClauseSqlGenerator< T >", "interfaceannis_1_1sqlgen_1_1_limit_offset_clause_sql_generator.html", null ],
@@ -456,14 +458,14 @@ var hierarchy =
     [ "Thread", null, [
       [ "annis.service.internal.ImportWorker", "classannis_1_1service_1_1internal_1_1_import_worker.html", null ]
     ] ],
-    [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
     [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
+    [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
     [ "annis.visualizers.component.tree.TreeElementLabeler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_labeler.html", null ],
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
     ] ],
-    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
     [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
+    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
     [ "UriFragmentChangedListener", null, [
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
     ] ],
