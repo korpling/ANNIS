@@ -1,3 +1,17 @@
+Version 3.4.0-rc1
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc1+is%3Aclosed
+
+[Fixed Bugs]
+ #485 Reference links for single matches fail when annotation namespace has a space character
+
+[Enhancements]
+ #488 allow to test the UI with Selenium
+ #487 re-order the physical layout of the fact tables so that columns that are more likely to be used in a (Merge) join are at the beginning
+ #486 better PostgreSQL planner estimations for "same span" operator
+
 Version 3.4.0-preview10
 =======================
 
