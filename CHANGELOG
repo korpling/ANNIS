@@ -5,6 +5,7 @@ Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc1+is%3Aclosed
 
 [Fixed Bugs]
+ #489 query builder won't work with "tok != "value"
  #485 Reference links for single matches fail when annotation namespace has a space character
 
 [Enhancements]
