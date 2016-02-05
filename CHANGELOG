@@ -1,3 +1,12 @@
+Version 3.4.0-rc2
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc2+is%3Aclosed
+
+[Fixed Bugs]
+ #490 LegacyGraphConverter modifies original Salt graph
+
 Version 3.4.0-rc1
 =================
 
