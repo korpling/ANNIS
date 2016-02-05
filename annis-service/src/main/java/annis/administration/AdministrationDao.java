@@ -92,6 +92,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private boolean temporaryStagingArea;
 
   private DeleteCorpusDao deleteCorpusDao;
+  
+  private boolean hackDistinctLeftRightToken;
+
 
   /**
    * Searches for textes which are empty or only contains whitespaces. If that
@@ -224,7 +227,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
   private QueriesGenerator queriesGenerator;
-
+  
   /**
    * Called when Spring configuration finished
    */
@@ -586,7 +589,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     // create the new facts table partition
     createFacts(corpusID, version, offsets);
-
+    
+    if(hackDistinctLeftRightToken)
+    {
+      adjustDistinctLeftRightToken(corpusID);
+    }
+    
     if (temporaryStagingArea)
     {
       dropStagingArea();
@@ -676,7 +684,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     // create the new facts table partition
     createFacts(corpusID, version, offsets);
-
+    
+    if(hackDistinctLeftRightToken)
+    {
+      adjustDistinctLeftRightToken(corpusID);
+    }
+    
     if (temporaryStagingArea)
     {
       dropStagingArea();
@@ -1271,7 +1284,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       info("creating annotation category table for corpus with ID " + corpusID);
     executeSqlFromScript("annotation_category.sql", args);
   }
-
+  
   void analyzeFacts(long corpusID)
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
@@ -1290,13 +1303,53 @@ public class AdministrationDao extends AbstractAdminstrationDao
     getJdbcTemplate().update("SET statement_timeout TO 0");
     getJdbcTemplate().execute("ANALYZE facts");
   }
+  
+  void adjustDistinctLeftRightToken(long corpusID)
+  {
+    /* HACK: 
+     adjust the left/right_token value to the average maximal left/right_token
+     value per corpus/text on import to enhance the planner selectivity estimations.
+    */
+    
+    log.info("adjusting statistical information for left_token and right_token columns");
+    
+    int adjustedLeft = getJdbcTemplate().queryForObject("SELECT avg(maxleft)::integer\n" 
+      + "FROM\n" +"( SELECT max(left_token) maxleft FROM _node GROUP BY corpus_ref, text_ref ) AS m", Integer.class);
+    int adjustedRight = getJdbcTemplate().queryForObject("SELECT avg(maxright)::integer\n" 
+      + "FROM\n" +"( SELECT max(right_token) maxright FROM _node GROUP BY corpus_ref, text_ref ) AS m", Integer.class);
+    
+    getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN left_token SET (n_distinct=" + adjustedLeft + ")");
+    getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN right_token SET (n_distinct=" + adjustedRight + ")");
+  }
 
   void createFacts(long corpusID, ANNISFormatVersion version, Offsets offsets)
   {
     MapSqlParameterSource args = offsets.makeArgs()
       .addValue(":id", corpusID);
-
+    
     log.info("creating materialized facts table for corpus with ID " + corpusID);
+    
+    String defaultStatTargetRaw = 
+      getJdbcTemplate().queryForObject("SHOW default_statistics_target", String.class);
+    
+    // this is the minimal value
+    int selectedStatTarget = 250;
+    
+    if(defaultStatTargetRaw != null)
+    {
+      try
+      {
+        int defaultStatTargetConfig = Integer.parseInt(defaultStatTargetRaw);
+        // make sure the sample size is not less than the default one
+        selectedStatTarget = Math.max(selectedStatTarget, defaultStatTargetConfig);
+      }
+      catch(NumberFormatException ex)
+      {
+        log.warn("Could not parse the \"default_statistics_target\" PostgreSQL parameter.");
+      }
+    }
+    args.addValue(":stat_target", selectedStatTarget);
+    
     if (version == ANNISFormatVersion.V3_3)
     {
       executeSqlFromScript("facts.sql", args);
@@ -2165,6 +2218,18 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     this.deleteCorpusDao = deleteCorpusDao;
   }
+
+  public boolean isHackDistinctLeftRightToken()
+  {
+    return hackDistinctLeftRightToken;
+  }
+
+  public void setHackDistinctLeftRightToken(boolean hackDistinctLeftRightToken)
+  {
+    this.hackDistinctLeftRightToken = hackDistinctLeftRightToken;
+  }
+  
+  
 
   /**
    * Checks, if a already exists a corpus with the same name of the top level

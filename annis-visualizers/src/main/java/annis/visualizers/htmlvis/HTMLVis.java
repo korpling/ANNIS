@@ -63,7 +63,8 @@ import org.slf4j.LoggerFactory;
  * <strong>Mappings:</strong><br />
  * <ul>
  * <li>config - path of the visualization configuration file</li>
- * <li>hitmark - if "true" (which is the default) hit are marked in their corresponding colors</li>
+ * <li>hitmark - if "true" (which is the default) hit are marked in their
+ * corresponding colors</li>
  * </ul>
  * </p>
  *
@@ -74,18 +75,16 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 {
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVis.class);
- 
+
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-  
+
   private HashMap<String, Integer> instruction_priorities = new HashMap<>();
-  
+
   private Map<SNode, Long> mc;
-  
-  private String tokenColor = "";  
-  
-  private boolean hitMark = true;    
-  
-  
+
+  private String tokenColor = "";
+
+  private boolean hitMark = true;
 
   @Override
   public String getShortName()
@@ -111,26 +110,22 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       getGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     corpusName = urlPathEscape.escape(corpusName);
-    
+
     String wrapperClassName = "annis-wrapped-htmlvis-"
       + corpusName.replaceAll("[^0-9A-Za-z-]", "_");
 
     scrollPanel.addStyleName(wrapperClassName);
 
-  
     String visConfigName = vi.getMappings().getProperty("config");
-    String hitMarkConfig = vi.getMappings().getProperty("hitmark","true");
+    String hitMarkConfig = vi.getMappings().getProperty("hitmark", "true");
     hitMark = Boolean.parseBoolean(hitMarkConfig);
     mc = vi.getMarkedAndCovered();
-    
-    
+
     VisualizationDefinition[] definitions = parseDefinitions(corpusName, vi.getMappings());
 
     if (definitions != null)
     {
 
-
-        
       lblResult.setValue(createHTML(vi.getSResult().getDocumentGraph(),
         definitions));
 
@@ -156,7 +151,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
       if (inStreamCSSRaw != null)
       {
-        try(InputStream inStreamCSS = inStreamCSSRaw)
+        try (InputStream inStreamCSS = inStreamCSSRaw)
         {
           String cssContent = IOUtils.toString(inStreamCSS);
           UI currentUI = UI.getCurrent();
@@ -167,14 +162,14 @@ public class HTMLVis extends AbstractVisualizer<Panel>
               wrapperClassName);
           }
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
           log.error("Could not parse the HTML visualizer CSS file",
-          ex);
-        Notification.show(
-          "Could not parse the HTML visualizer CSS file", ex.
-          getMessage(),
-          Notification.Type.ERROR_MESSAGE);
+            ex);
+          Notification.show(
+            "Could not parse the HTML visualizer CSS file", ex.
+            getMessage(),
+            Notification.Type.ERROR_MESSAGE);
         }
       }
 
@@ -196,20 +191,20 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   }
 
   @Override
-  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, 
+  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
     String documentName, Properties mappings)
   {
     Set<String> result = null;
-    
+
     VisualizationDefinition[] definitions = parseDefinitions(toplevelCorpusName,
       mappings);
 
-    if(definitions != null)
+    if (definitions != null)
     {
       for (VisualizationDefinition def : definitions)
       {
         List<String> sub = def.getMatcher().getRequiredAnnotationNames();
-        if(sub == null)
+        if (sub == null)
         {
           // a rule requires all annotations, abort
           result = null;
@@ -217,7 +212,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         }
         else
         {
-          if(result == null)
+          if (result == null)
           {
             result = new LinkedHashSet<>();
           }
@@ -225,8 +220,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         }
       }
     }
-    
-    if(result == null)
+
+    if (result == null)
     {
       return null;
     }
@@ -235,12 +230,12 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       return new LinkedList<>(result);
     }
   }
-  
+
   public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
     Properties mappings)
   {
     InputStream inStreamConfigRaw = null;
-    
+
     String visConfigName = mappings.getProperty("config");
 
     if (visConfigName == null)
@@ -269,7 +264,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     else
     {
 
-      try(InputStream inStreamConfig = inStreamConfigRaw)
+      try (InputStream inStreamConfig = inStreamConfigRaw)
       {
 
         VisParser p = new VisParser(inStreamConfig);
@@ -287,8 +282,6 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     return null;
   }
-  
-  
 
   public String createHTML(SDocumentGraph graph,
     VisualizationDefinition[] definitions)
@@ -304,53 +297,58 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     //Get metadata for visualizer if stylesheet requires it
     //First check the stylesheet
     Boolean bolMetaTypeFound = false;
-    
-    HashMap<String, String> meta = new  HashMap<>();
-    int def_priority=0;
-    for (VisualizationDefinition vis : definitions) {
-        if (vis.getOutputter().getType() == SpanHTMLOutputter.Type.META_NAME)
-        { 
-            bolMetaTypeFound = true;
-        }
-        else //not a meta-annotation, remember order in config file to set priority
+
+    HashMap<String, String> meta = new HashMap<>();
+    int def_priority = 0;
+    for (VisualizationDefinition vis : definitions)
+    {
+      if (vis.getOutputter().getType() == SpanHTMLOutputter.Type.META_NAME)
+      {
+        bolMetaTypeFound = true;
+      }
+      else //not a meta-annotation, remember order in config file to set priority
+      {
+        if (vis.getMatcher() instanceof AnnotationNameMatcher)
         {
-            if (vis.getMatcher() instanceof AnnotationNameMatcher)
-            {
-                instruction_priorities.put(((AnnotationNameMatcher) vis.getMatcher()).getAnnotationName(), def_priority);              
-            }
-            else if(vis.getMatcher() instanceof AnnotationNameAndValueMatcher){
-                instruction_priorities.put(((AnnotationNameAndValueMatcher) vis.getMatcher()).getNameMatcher().getAnnotationName(), def_priority);
-            }
-            else if(vis.getMatcher() instanceof TokenMatcher){
-                instruction_priorities.put("tok", def_priority);
-            }
-            def_priority--;        
+          instruction_priorities.put(((AnnotationNameMatcher) vis.getMatcher()).getAnnotationName(), def_priority);
         }
-        vis.getOutputter().setMeta(meta);
-        
+        else if (vis.getMatcher() instanceof AnnotationNameAndValueMatcher)
+        {
+          instruction_priorities.put(((AnnotationNameAndValueMatcher) vis.getMatcher()).getNameMatcher().getAnnotationName(), def_priority);
+        }
+        else if (vis.getMatcher() instanceof TokenMatcher)
+        {
+          instruction_priorities.put("tok", def_priority);
+        }
+        def_priority--;
+      }
+      vis.getOutputter().setMeta(meta);
+
     }
     if (bolMetaTypeFound == true)        //Metadata is required, get corpus and document name
     {
-        //Get corpus and document name
-        String strDocName = "";
-        String strCorpName = "";    
-        strDocName = graph.getDocument().getName();
-        List<String> corpusPath = CommonHelper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
-        strCorpName = corpusPath.get(corpusPath.size() - 1);
-        
-        //Get metadata and put in hashmap
-        List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName,strDocName);
-        for (Annotation metaDatum : metaData) {
-            meta.put(metaDatum.getName(), metaDatum.getValue());
-        }
+      //Get corpus and document name
+      String strDocName = "";
+      String strCorpName = "";
+      strDocName = graph.getDocument().getName();
+      List<String> corpusPath = CommonHelper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
+      strCorpName = corpusPath.get(corpusPath.size() - 1);
+
+      //Get metadata and put in hashmap
+      List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName, strDocName);
+      for (Annotation metaDatum : metaData)
+      {
+        meta.put(metaDatum.getName(), metaDatum.getValue());
+      }
     }
-    
+
     for (SToken t : token)
     {
-      tokenColor="";
-      if (mc.containsKey(t) && hitMark){
-          tokenColor = MatchedNodeColors
-                  .getHTMLColorByMatch(mc.get(t));
+      tokenColor = "";
+      if (mc.containsKey(t) && hitMark)
+      {
+        tokenColor = MatchedNodeColors
+          .getHTMLColorByMatch(mc.get(t));
       }
       for (VisualizationDefinition vis : definitions)
       {
@@ -358,7 +356,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(t, matched, outputStartTags,
-            outputEndTags,tokenColor);
+            outputEndTags, tokenColor);
         }
       }
     }
@@ -366,82 +364,94 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     List<SSpan> spans = graph.getSpans();
     for (VisualizationDefinition vis : definitions)
     {
-      
-     
+
       for (SSpan span : spans)
       {
-        tokenColor="";  
-        if (mc.containsKey(span) && hitMark){
+        tokenColor = "";
+        if (mc.containsKey(span) && hitMark)
+        {
           tokenColor = MatchedNodeColors
-                  .getHTMLColorByMatch(mc.get(span));
-        }  
+            .getHTMLColorByMatch(mc.get(span));
+        }
         String matched = vis.getMatcher().matchedAnnotation(span);
         if (matched != null)
         {
           vis.getOutputter().outputHTML(span, matched, outputStartTags,
-            outputEndTags,tokenColor);
+            outputEndTags, tokenColor);
         }
       }
     }
 
-  
-
     //Find BEGIN and END instructions if available
     for (VisualizationDefinition vis : definitions)
     {
-        PseudoRegionMatcher.PseudoRegion psdRegionType;
-        if (vis.getMatcher() instanceof PseudoRegionMatcher)
+      PseudoRegionMatcher.PseudoRegion psdRegionType;
+      if (vis.getMatcher() instanceof PseudoRegionMatcher)
+      {
+        int position;
+        psdRegionType = ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
+        if (psdRegionType == PseudoRegionMatcher.PseudoRegion.BEGIN)
         {
-            int position;
-            psdRegionType = ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
-            if (psdRegionType == PseudoRegionMatcher.PseudoRegion.BEGIN) {
-                position = outputEndTags.firstKey().intValue()-1;
-            }
-            else //END region
-            {
-                position = outputEndTags.lastKey().intValue()+1;
-            }
-            switch (vis.getOutputter().getType())
-            {
-                case META_NAME:
-                    String strMetaVal = meta.get(vis.getOutputter().getMetaname().trim());;
-                    if (strMetaVal == null)
-                    { 
-                        throw new NullPointerException("no such metadata name in document: '" + vis.getOutputter().getMetaname().trim() + "'");
-                    }
-                    else
-                    {
-                        vis.getOutputter().outputAny(position, position, vis.getOutputter().getMetaname(), strMetaVal, outputStartTags, outputEndTags);                    
-                    }                           
-                    break;
-                case CONSTANT:
-                    vis.getOutputter().outputAny(position, position, vis.getOutputter().getConstant(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);                    
-                    break;
-                case ANNO_NAME:
-                    break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
-                case VALUE:
-                    break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
-                case ESCAPED_VALUE:
-                    break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
-                default:
-            }
-
+          if(outputEndTags.isEmpty())
+          {
+            position = 0;
+          }
+          else
+          {
+            position = outputEndTags.firstKey().intValue() - 1;
+          }
         }
-        
+        else //END region
+        {
+          if(outputEndTags.isEmpty())
+          {
+            position = 0;
+          }
+          else
+          {
+            position = outputEndTags.lastKey().intValue() + 1;
+          }
+        }
+        instruction_priorities.put(((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), def_priority);
+        switch (vis.getOutputter().getType())
+        {
+          case META_NAME:
+            String strMetaVal = meta.get(vis.getOutputter().getMetaname().trim());
+            if (strMetaVal == null)
+            {
+              throw new NullPointerException("no such metadata name in document: '" + vis.getOutputter().getMetaname().trim() + "'");
+            }
+            else
+            {
+              vis.getOutputter().outputAny(position, position, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), strMetaVal, outputStartTags, outputEndTags);
+            }
+            break;
+          case CONSTANT:
+            vis.getOutputter().outputAny(position, position, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);
+            break;
+          case ANNO_NAME:
+            break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+          case VALUE:
+            break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+          case ESCAPED_VALUE:
+            break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+          default:
+        }
+
+      }
+
     }
 
-    
     // get all used indexes
     Set<Long> indexes = new TreeSet<Long>();
     indexes.addAll(outputStartTags.keySet());
     indexes.addAll(outputEndTags.keySet());
-    
+
     for (Long i : indexes)
     {
       // output all strings belonging to this token position
       // first the start tags for this position
 
-        
       // add priorities from instruction_priorities for sorting length ties
       SortedSet<OutputItem> unsortedStart = outputStartTags.get(i);
       SortedSet<OutputItem> itemsStart = new TreeSet();
@@ -452,7 +462,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         {
           OutputItem s = it.next();
           s.setPriority(instruction_priorities.get(s.getAnnoName()));
-          itemsStart.add(s);          
+          itemsStart.add(s);
         }
       }
       if (itemsStart != null)

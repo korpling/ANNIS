@@ -18,6 +18,9 @@ package annis.service.objects;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
+import com.google.common.net.PercentEscaper;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -48,6 +51,10 @@ public class Match implements Serializable
   private final static Splitter matchSplitter = Splitter.on(" ").trimResults().omitEmptyStrings();
   private final static Splitter annoIDSplitter = Splitter.on("::").trimResults().limit(3);
  
+  private static final Escaper spaceEscaper = Escapers.builder()
+          .addEscape(' ', "%20")
+          .addEscape('%', "%25") // also encode the percent itself
+          .build();
   
   private List<URI> saltIDs;
   private List<String> annos;
@@ -166,6 +173,9 @@ public class Match implements Serializable
     {
       URI uri;
       
+      // undo any escaping
+      singleMatch = singleMatch.replace("%20", " ").replace("%25", "%");
+      
       String id = "";
       String anno = null;
       if(singleMatch.startsWith("salt:/"))
@@ -270,7 +280,7 @@ public class Match implements Serializable
       String v = uri.toASCIIString();
       if(anno != null && !anno.isEmpty())
       {
-        v = anno + "::" + uri;
+        v = spaceEscaper.escape(anno) + "::" + uri;
       }
       return v;
     }

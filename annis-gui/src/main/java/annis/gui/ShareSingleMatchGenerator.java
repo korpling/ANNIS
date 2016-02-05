@@ -287,7 +287,7 @@ public class ShareSingleMatchGenerator extends Window implements
     {
       if(!key.startsWith(EmbeddedVisUI.KEY_PREFIX))
       {
-        String value = Helper.encodeQueryParam(entry.getMappings().getProperty(key));
+        String value = Helper.encodeJersey(entry.getMappings().getProperty(key));
         result = result.queryParam(key, value);
       }
     }

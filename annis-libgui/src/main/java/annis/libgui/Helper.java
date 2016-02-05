@@ -60,6 +60,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import javax.ws.rs.core.UriBuilder;
 import org.apache.commons.codec.binary.Base64;
@@ -1090,7 +1091,7 @@ public class Helper
     {
       this.matchedAndCovered = initialMatches;
 
-      Map<SNode, Long> sortedByOverlappedTokenIntervall = new TreeMap<>(
+      Map<SNode, Long> sortedMatchedNodes = new TreeMap<>(
         new Comparator<SNode>()
         {
           @Override
@@ -1131,13 +1132,13 @@ public class Helper
       for (Map.Entry<String, Long> entry : initialMatches.entrySet())
       {
         SNode n = graph.getNode(entry.getKey());
-        sortedByOverlappedTokenIntervall.put(n, entry.getValue());
+        sortedMatchedNodes.put(n, entry.getValue());
       }
 
       currentMatchPos = 1;
       if (initialMatches.size() > 0)
       {
-        graph.traverse(new BasicEList<>(sortedByOverlappedTokenIntervall.
+        graph.traverse(new BasicEList<>(sortedMatchedNodes.
           keySet()),
           GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
           (GraphTraverseHandler) this, true);
@@ -1151,11 +1152,16 @@ public class Helper
     {
       if (fromNode != null
         && matchedAndCovered.containsKey(fromNode.getId())
-        && currNode != null
-        && !matchedAndCovered.containsKey(currNode.getId()))
+        && currNode != null)
       {
         currentMatchPos = matchedAndCovered.get(fromNode.getId());
-        matchedAndCovered.put(currNode.getId(), currentMatchPos);
+        
+        // only update the map when there is no entry yet or if the new index/position is smaller
+        Long oldMatchPos = matchedAndCovered.get(currNode.getId());
+        if(oldMatchPos == null || currentMatchPos < oldMatchPos)
+        {          
+          matchedAndCovered.put(currNode.getId(), currentMatchPos);
+        }
       }
 
     }
