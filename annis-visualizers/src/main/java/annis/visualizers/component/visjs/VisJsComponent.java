@@ -70,6 +70,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 				
 				strNodes = osNodes.toString();
 				strEdges = osEdges.toString();
+			//	System.out.println(strNodes +"\n" + strEdges);
 				
 				bw.close();
 			
@@ -92,7 +93,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 	    @Override
 	    public void attach() {
 	      super.attach();
-	    //  setSizeUndefined();
+	      setWidth("100%");
+	      setHeight("400px");
 
 	      // set the state
 	     // getState().visId = getVisId();

@@ -1,13 +1,14 @@
 //Connector
 window.annis_visualizers_component_visjs_VisJsComponent = function() {
 
-var thisElement = this.getElement(); 
-var container = thisElement;
+var div = this.getElement(); 
+var container = div;
 
-var theThis = this;
-var strNodes = null;
-var strEdges = null;
+var self = this;
+var strNodes =  this.getState().strNodes;
+var strEdges = this.getState().strEdges;
 var visjscomponent = null;
+
 
 // Handle changes from the server-side
 this.onStateChange = function(){
@@ -26,13 +27,12 @@ this.onStateChange = function(){
 this.init = function(strNodes, strEdges){
 container.style.border = "thin solid green";
 
-var nodes = JSON.parse(strNodes);
-var edges = JSON.parse(strEdges);
-
+var json_nodes = JSON.parse(strNodes);
+var json_edges = JSON.parse(strEdges);
 
 var data = {
-nodes: nodes,
-edges: edges
+nodes: json_nodes,
+edges: json_edges
 };
 var options = {
 nodes:{
@@ -75,7 +75,7 @@ visjscomponent = new vis.Network(container, data, options);
 
    
 /*$(window).resize(function() {
-    theThis.init(strNodes, strEdges);
+    self.init(strNodes, strEdges);
   });*/
   
 };
