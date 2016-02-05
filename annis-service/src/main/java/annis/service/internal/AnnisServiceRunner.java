@@ -21,6 +21,7 @@ import annis.AnnisXmlContextHelper;
 import annis.dao.QueryDao;
 import annis.exceptions.AnnisException;
 import annis.security.MultipleIniWebEnvironment;
+import annis.service.objects.AnnisCorpus;
 import annis.utils.Utils;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -43,6 +44,8 @@ import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
+import java.util.List;
+import java.util.LinkedList;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
@@ -60,23 +63,21 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private Server server;
 
   private boolean useAuthentification = true;
+  private Integer overridePort = null;
   
   private GenericXmlApplicationContext ctx;
 
   public AnnisServiceRunner()
   {
+    this(null);
+  }
+  
+  public AnnisServiceRunner(Integer port)
+  {
+    this.overridePort = port;
     boolean nosecurity = Boolean.parseBoolean(System.getProperty(
       "annis.nosecurity", "false"));
     this.useAuthentification = !nosecurity;
-    if (this.useAuthentification)
-    {
-      log.info("Using authentification");
-    }
-    else
-    {
-      log.warn(
-        "*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
-    }
   }
 
   public static void main(String[] args) throws Exception
@@ -198,7 +199,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     final IoCComponentProviderFactory factory = new SpringComponentProviderFactory(
       rc, ctx);
 
-    int port = ctx.getBean(QueryServiceImpl.class).getPort();
+    int port = overridePort == null ? ctx.getBean(QueryServiceImpl.class).getPort() : overridePort;
     try
     {
       // only allow connections from localhost
@@ -231,12 +232,14 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
       if (useAuthentification)
       {
+        log.info("Using authentification");
         context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
           "file:" + System.getProperty("annis.home") + "/conf/shiro.ini,"
           + "file:" + System.getProperty("annis.home") + "/conf/develop_shiro.ini");
       }
       else
       {
+        log.warn("*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
         context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
           "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
       }
@@ -365,5 +368,18 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       }
     }
     return -1;
+  }
+  
+  public List<AnnisCorpus> getCorpora()
+  {
+    if(ctx != null)
+    {
+      QueryDao dao = (QueryDao) ctx.getBean("queryDao");
+      if(dao != null)
+      {
+        return dao.listCorpora();
+      }
+    }
+    return new LinkedList<>();
   }
 }

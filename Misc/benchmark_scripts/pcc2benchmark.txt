@@ -1,0 +1,11 @@
+set clear-caches to false
+record
+corpus pcc2
+
+benchmarkName TEST
+count cat="NP" & cat="NP" & #1 >[func="AG"] #2
+count cat="NP" & node & #1 >[func="AG"] #2
+benchmarkName CS
+count cat="CS" & cat="S" & #1 > #2
+
+benchmark 20

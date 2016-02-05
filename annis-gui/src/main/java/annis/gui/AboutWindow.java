@@ -16,6 +16,7 @@
 package annis.gui;
 
 import annis.VersionInfo;
+import annis.libgui.IDGenerator;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
@@ -49,6 +50,8 @@ public class AboutWindow extends Window
   private static final Logger log = LoggerFactory.getLogger(AboutWindow.class);
     
   private VerticalLayout layout;
+  
+  private Button btClose;
   
   public AboutWindow()
   {
@@ -127,7 +130,7 @@ public class AboutWindow extends Window
     
     layout.addComponent(txtThirdParty);
     
-    Button btClose = new Button("Close");
+    btClose = new Button("Close");
     final AboutWindow finalThis = this;
     btClose.addClickListener(new OkClickListener(finalThis));
     layout.addComponent(btClose);
@@ -137,6 +140,15 @@ public class AboutWindow extends Window
     layout.setExpandRatio(txtThirdParty, 1.0f);
     
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(AboutWindow.this, btClose);
+  }
+  
+  
 
   private static class OkClickListener implements Button.ClickListener
   {

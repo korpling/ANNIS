@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.libgui.IDGenerator;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -42,6 +43,8 @@ public class HelpUsWindow extends Window
 
   private VerticalLayout layout;
 
+  private final Button btClose;
+  
   public HelpUsWindow()
   {
     setSizeFull();
@@ -96,15 +99,23 @@ public class HelpUsWindow extends Window
 
     final HelpUsWindow finalThis = this;
 
-    Button btClose = new Button("Close");
+    btClose = new Button("Close");
     btClose.addClickListener(new OkClickListener(finalThis));
     layout.addComponent(btClose);
 
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(hLayout, 1.0f);
-
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(HelpUsWindow.this, btClose);
+  }
+  
+  
 
   private static class OkClickListener implements Button.ClickListener
   {

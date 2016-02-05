@@ -25,6 +25,7 @@ import annis.gui.objects.Query;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
 import annis.model.AqlParseError;
 import annis.model.QueryNode;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -303,8 +304,17 @@ public class QueryPanel extends GridLayout implements
     setColumnExpandRatio(3, 0.0f);
     
     //setComponentAlignment(btShowQueryBuilder, Alignment.BOTTOM_CENTER);
+  }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(QueryPanel.this, btShowResult, btMoreActions);
     
   }
+  
+  
 
   public void updateShortHistory()
   {

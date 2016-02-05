@@ -424,8 +424,14 @@ public class TigerQueryBuilderCanvas extends Panel
           {
             if (operator.equals("!="))
             {
-              prefix = "tok" + c.getName()
-                + operator;
+              if(c.getName().trim().isEmpty())
+              {
+                prefix = "tok" + c.getName() + operator;
+              }
+              else
+              {
+                prefix = c.getName() + operator;
+              }
             }
           }
           else

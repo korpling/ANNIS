@@ -306,6 +306,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
       
       cbOperator = new ComboBox();
       cbOperator.setNewItemsAllowed(false);
+      cbOperator.setNullSelectionAllowed(false);
       cbOperator.setImmediate(true);
       for(String o : NODE_OPERATORS)
       {

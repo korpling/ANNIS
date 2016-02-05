@@ -96,6 +96,14 @@ public class KWICComponent extends GridComponent implements KWICInterface
   {
     return true;
   }
+
+  @Override
+  protected
+  boolean isCoveredTokenMarked()
+  {
+    return true;
+  }
+  
   
   
 
