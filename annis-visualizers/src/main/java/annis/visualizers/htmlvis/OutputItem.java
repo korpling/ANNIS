@@ -73,9 +73,11 @@ public class OutputItem implements Comparable<OutputItem> //Comparator<OutputIte
     }
     
     return ComparisonChain.start()
+      // inverse order for length and priority
       .compare(o.getLength(), length)
       .compare(o.getPriority(), priority)
       .compare(qName, o.getqName())
+      .compare(outputString, o.getOutputString())
       .result();
   }
 
@@ -92,7 +94,7 @@ public class OutputItem implements Comparable<OutputItem> //Comparator<OutputIte
   @Override
   public int hashCode()
   {
-    return Objects.hashCode(length, qName);
+    return Objects.hashCode(length, priority, qName, outputString);
   }
 
   @Override

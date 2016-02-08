@@ -286,10 +286,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   public String createHTML(SDocumentGraph graph,
     VisualizationDefinition[] definitions)
   {
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags
-      = new TreeMap<Long, SortedSet<OutputItem>>();
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags
-      = new TreeMap<Long, SortedSet<OutputItem>>();
+    SortedMap<Long, List<OutputItem>> outputStartTags
+      = new TreeMap<>();
+    SortedMap<Long, List<OutputItem>> outputEndTags
+      = new TreeMap<>();
     StringBuilder sb = new StringBuilder();
 
     List<SToken> token = graph.getSortedTokenByText();
@@ -443,7 +443,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
 
     // get all used indexes
-    Set<Long> indexes = new TreeSet<Long>();
+    Set<Long> indexes = new TreeSet<>();
     indexes.addAll(outputStartTags.keySet());
     indexes.addAll(outputEndTags.keySet());
 
@@ -453,7 +453,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       // first the start tags for this position
 
       // add priorities from instruction_priorities for sorting length ties
-      SortedSet<OutputItem> unsortedStart = outputStartTags.get(i);
+      List<OutputItem> unsortedStart = outputStartTags.get(i);
       SortedSet<OutputItem> itemsStart = new TreeSet();
       if (unsortedStart != null)
       {
@@ -465,7 +465,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
           itemsStart.add(s);
         }
       }
-      if (itemsStart != null)
+     
       {
         Iterator<OutputItem> it = itemsStart.iterator();
         boolean first = true;
@@ -485,7 +485,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         }
       }
       // then the end tags for this position, but inverse their order
-      SortedSet<OutputItem> unsortedEnd = outputEndTags.get(i);
+      List<OutputItem> unsortedEnd = outputEndTags.get(i);
       SortedSet<OutputItem> itemsEnd = new TreeSet();
       if (unsortedEnd != null)
       {
@@ -497,9 +497,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
           itemsEnd.add(s);
         }
       }
-      if (itemsEnd != null)
+      
       {
-        List<OutputItem> itemsEndReverse = new LinkedList<OutputItem>(itemsEnd);
+        List<OutputItem> itemsEndReverse = new LinkedList<>(itemsEnd);
         Collections.reverse(itemsEndReverse);
         for (OutputItem s : itemsEndReverse)
         {
