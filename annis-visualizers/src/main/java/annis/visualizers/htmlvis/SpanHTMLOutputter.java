@@ -225,6 +225,7 @@ public class SpanHTMLOutputter
     itemStart.setOutputString(startTag);
     itemStart.setLength(right-left);
     itemStart.setqName(matchedQName);
+    itemStart.setPriority(priority);
     
     OutputItem itemEnd = new OutputItem();
     if(endTag.isEmpty())
@@ -237,6 +238,7 @@ public class SpanHTMLOutputter
     }
     itemEnd.setLength(right-left);
     itemEnd.setqName(matchedQName);
+    itemEnd.setPriority(priority);
     
     outputStartTags.get(left).add(itemStart);
     outputEndTags.get(right).add(itemEnd);
