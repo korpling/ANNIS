@@ -76,7 +76,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVis.class);
 
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  private final static Escaper urlPathEscape = UrlEscapers.
+    urlPathSegmentEscaper();
 
   private Map<SNode, Long> mc;
 
@@ -119,7 +120,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     hitMark = Boolean.parseBoolean(hitMarkConfig);
     mc = vi.getMarkedAndCovered();
 
-    VisualizationDefinition[] definitions = parseDefinitions(corpusName, vi.getMappings());
+    VisualizationDefinition[] definitions = parseDefinitions(corpusName, vi.
+      getMappings());
 
     if (definitions != null)
     {
@@ -285,7 +287,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     VisualizationDefinition[] definitions)
   {
     HashMap<VisualizationDefinition, Integer> instruction_priorities = new HashMap<>();
-    
+
     SortedMap<Long, List<OutputItem>> outputStartTags
       = new TreeMap<>();
     SortedMap<Long, List<OutputItem>> outputEndTags
@@ -331,7 +333,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       String strDocName = "";
       String strCorpName = "";
       strDocName = graph.getDocument().getName();
-      List<String> corpusPath = CommonHelper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
+      List<String> corpusPath = CommonHelper.getCorpusPath(graph.getDocument().
+        getGraph(), graph.getDocument());
       strCorpName = corpusPath.get(corpusPath.size() - 1);
 
       //Get metadata and put in hashmap
@@ -356,7 +359,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(t, matched, outputStartTags,
-            outputEndTags, tokenColor, instruction_priorities.getOrDefault(vis, 0));
+            outputEndTags, tokenColor, instruction_priorities.getOrDefault(vis,
+              0));
         }
       }
     }
@@ -377,77 +381,85 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(span, matched, outputStartTags,
-            outputEndTags, tokenColor, instruction_priorities.getOrDefault(vis, 0));
+            outputEndTags, tokenColor, instruction_priorities.getOrDefault(vis,
+              0));
         }
       }
     }
 
+    int minStartTagPos = outputStartTags.firstKey().intValue();
+    int maxEndTagPos = outputEndTags.lastKey().intValue();
+
     //Find BEGIN and END instructions if available
     for (VisualizationDefinition vis : definitions)
     {
-      
+
       if (vis.getMatcher() instanceof PseudoRegionMatcher)
       {
-        PseudoRegionMatcher.PseudoRegion psdRegionType = ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
+        PseudoRegionMatcher.PseudoRegion psdRegionType = ((PseudoRegionMatcher) vis.
+          getMatcher()).getPsdRegion();
         int positionStart = 0;
         int positionEnd = 0;
-        
-        if(!outputEndTags.isEmpty() && !outputStartTags.isEmpty() && psdRegionType != null)
+
+        if (!outputEndTags.isEmpty() && !outputStartTags.isEmpty() && psdRegionType != null)
         {
           switch (psdRegionType)
           {
             case BEGIN:
-              positionStart = outputStartTags.firstKey().intValue() - 1;
-              positionEnd = outputStartTags.firstKey().intValue() - 1;
+              positionStart = positionEnd = Integer.MIN_VALUE;
 
               // def_priority is now lower than all normal annotation
               instruction_priorities.put(vis, def_priority);
               break;
             case END:
-              positionStart = outputEndTags.lastKey().intValue() + 1;
-              positionEnd = outputEndTags.lastKey().intValue() + 1;
+              positionStart = positionEnd = Integer.MAX_VALUE;
 
               // def_priority is now lower than all normal annotation
               instruction_priorities.put(vis, def_priority);
               break;
             case ALL:
-              positionStart = outputStartTags.firstKey().intValue() - 1;
-              positionEnd = outputEndTags.lastKey().intValue() + 1;
-              
-              // The ALL pseudo-range must enclose everything, thus it get the lowest priority
-              // value (and will enclose any other annotation.
-              instruction_priorities.put(vis, Integer.MIN_VALUE);
+              // use same position as last and first key
+              positionStart = minStartTagPos;
+              positionEnd = maxEndTagPos;
+
+              // The ALL pseudo-range must enclose everything, thus it get the
+              // priority which is one lower than the smallest non BEGIN/END
+              // priority.
+              instruction_priorities.put(vis, def_priority);
               break;
             default:
               break;
           }
         }
-        
+
         switch (vis.getOutputter().getType())
         {
           case META_NAME:
-            String strMetaVal = meta.get(vis.getOutputter().getMetaname().trim());
+            String strMetaVal = meta.
+              get(vis.getOutputter().getMetaname().trim());
             if (strMetaVal == null)
             {
-              throw new NullPointerException("no such metadata name in document: '" + vis.getOutputter().getMetaname().trim() + "'");
+              throw new NullPointerException(
+                "no such metadata name in document: '" + vis.getOutputter().
+                getMetaname().trim() + "'");
             }
             else
             {
-              vis.getOutputter().outputAny(positionStart, positionEnd, 
-                ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), 
+              vis.getOutputter().outputAny(positionStart, positionEnd,
+                ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
                 strMetaVal, outputStartTags, outputEndTags,
                 instruction_priorities.getOrDefault(vis, 0));
             }
             break;
           case CONSTANT:
-            vis.getOutputter().outputAny(positionStart, positionEnd, 
-              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), 
+            vis.getOutputter().outputAny(positionStart, positionEnd,
+              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
               vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
               instruction_priorities.getOrDefault(vis, 0));
             break;
           case EMPTY:
-            vis.getOutputter().outputAny(positionStart, positionEnd, 
-              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), 
+            vis.getOutputter().outputAny(positionStart, positionEnd,
+              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
               "", outputStartTags, outputEndTags,
               instruction_priorities.getOrDefault(vis, 0));
             break;
@@ -486,7 +498,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
           itemsStart.add(s);
         }
       }
-     
+
       {
         Iterator<OutputItem> it = itemsStart.iterator();
         boolean first = true;
@@ -517,7 +529,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
           itemsEnd.add(s);
         }
       }
-      
+
       {
         List<OutputItem> itemsEndReverse = new LinkedList<>(itemsEnd);
         Collections.reverse(itemsEndReverse);
