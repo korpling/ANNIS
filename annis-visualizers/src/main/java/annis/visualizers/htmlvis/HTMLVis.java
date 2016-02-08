@@ -385,33 +385,34 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     //Find BEGIN and END instructions if available
     for (VisualizationDefinition vis : definitions)
     {
-      PseudoRegionMatcher.PseudoRegion psdRegionType;
+      
       if (vis.getMatcher() instanceof PseudoRegionMatcher)
       {
-        int position;
-        psdRegionType = ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
-        if (psdRegionType == PseudoRegionMatcher.PseudoRegion.BEGIN)
+        PseudoRegionMatcher.PseudoRegion psdRegionType = ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
+        int positionStart = 0;
+        int positionEnd = 0;
+        
+        if(!outputEndTags.isEmpty() && psdRegionType != null)
         {
-          if(outputEndTags.isEmpty())
+          switch (psdRegionType)
           {
-            position = 0;
-          }
-          else
-          {
-            position = outputEndTags.firstKey().intValue() - 1;
+            case BEGIN:
+              positionStart = outputEndTags.firstKey().intValue() - 1;
+              positionEnd = outputEndTags.firstKey().intValue() - 1;
+              break;
+            case END:
+              positionStart = outputEndTags.lastKey().intValue() + 1;
+              positionEnd = outputEndTags.lastKey().intValue() + 1;
+              break;
+            case ALL:
+              positionStart = outputEndTags.firstKey().intValue() - 1;
+              positionEnd = outputEndTags.lastKey().intValue() + 1;
+              break;
+            default:
+              break;
           }
         }
-        else //END region
-        {
-          if(outputEndTags.isEmpty())
-          {
-            position = 0;
-          }
-          else
-          {
-            position = outputEndTags.lastKey().intValue() + 1;
-          }
-        }
+        
         instruction_priorities.put(((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), def_priority);
         switch (vis.getOutputter().getType())
         {
@@ -423,11 +424,11 @@ public class HTMLVis extends AbstractVisualizer<Panel>
             }
             else
             {
-              vis.getOutputter().outputAny(position, position, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), strMetaVal, outputStartTags, outputEndTags);
+              vis.getOutputter().outputAny(positionStart, positionEnd, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), strMetaVal, outputStartTags, outputEndTags);
             }
             break;
           case CONSTANT:
-            vis.getOutputter().outputAny(position, position, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);
+            vis.getOutputter().outputAny(positionStart, positionEnd, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);
             break;
           case ANNO_NAME:
             break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
