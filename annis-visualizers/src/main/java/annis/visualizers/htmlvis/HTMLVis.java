@@ -78,8 +78,6 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
-  private HashMap<String, Integer> instruction_priorities = new HashMap<>();
-
   private Map<SNode, Long> mc;
 
   private String tokenColor = "";
@@ -286,6 +284,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   public String createHTML(SDocumentGraph graph,
     VisualizationDefinition[] definitions)
   {
+    HashMap<VisualizationDefinition, Integer> instruction_priorities = new HashMap<>();
+    
     SortedMap<Long, List<OutputItem>> outputStartTags
       = new TreeMap<>();
     SortedMap<Long, List<OutputItem>> outputEndTags
@@ -310,15 +310,15 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       {
         if (vis.getMatcher() instanceof AnnotationNameMatcher)
         {
-          instruction_priorities.put(((AnnotationNameMatcher) vis.getMatcher()).getAnnotationName(), def_priority);
+          instruction_priorities.put(vis, def_priority);
         }
         else if (vis.getMatcher() instanceof AnnotationNameAndValueMatcher)
         {
-          instruction_priorities.put(((AnnotationNameAndValueMatcher) vis.getMatcher()).getNameMatcher().getAnnotationName(), def_priority);
+          instruction_priorities.put(vis, def_priority);
         }
         else if (vis.getMatcher() instanceof TokenMatcher)
         {
-          instruction_priorities.put("tok", def_priority);
+          instruction_priorities.put(vis, def_priority);
         }
         def_priority--;
       }
@@ -356,7 +356,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(t, matched, outputStartTags,
-            outputEndTags, tokenColor);
+            outputEndTags, tokenColor, instruction_priorities.getOrDefault(vis, 0));
         }
       }
     }
@@ -377,7 +377,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(span, matched, outputStartTags,
-            outputEndTags, tokenColor);
+            outputEndTags, tokenColor, instruction_priorities.getOrDefault(vis, 0));
         }
       }
     }
@@ -392,28 +392,37 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         int positionStart = 0;
         int positionEnd = 0;
         
-        if(!outputEndTags.isEmpty() && psdRegionType != null)
+        if(!outputEndTags.isEmpty() && !outputStartTags.isEmpty() && psdRegionType != null)
         {
           switch (psdRegionType)
           {
             case BEGIN:
-              positionStart = outputEndTags.firstKey().intValue() - 1;
-              positionEnd = outputEndTags.firstKey().intValue() - 1;
+              positionStart = outputStartTags.firstKey().intValue() - 1;
+              positionEnd = outputStartTags.firstKey().intValue() - 1;
+
+              // def_priority is now lower than all normal annotation
+              instruction_priorities.put(vis, def_priority);
               break;
             case END:
               positionStart = outputEndTags.lastKey().intValue() + 1;
               positionEnd = outputEndTags.lastKey().intValue() + 1;
+
+              // def_priority is now lower than all normal annotation
+              instruction_priorities.put(vis, def_priority);
               break;
             case ALL:
-              positionStart = outputEndTags.firstKey().intValue() - 1;
+              positionStart = outputStartTags.firstKey().intValue() - 1;
               positionEnd = outputEndTags.lastKey().intValue() + 1;
+              
+              // The ALL pseudo-range must enclose everything, thus it get the lowest priority
+              // value (and will enclose any other annotation.
+              instruction_priorities.put(vis, Integer.MIN_VALUE);
               break;
             default:
               break;
           }
         }
         
-        instruction_priorities.put(((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), def_priority);
         switch (vis.getOutputter().getType())
         {
           case META_NAME:
@@ -424,11 +433,23 @@ public class HTMLVis extends AbstractVisualizer<Panel>
             }
             else
             {
-              vis.getOutputter().outputAny(positionStart, positionEnd, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), strMetaVal, outputStartTags, outputEndTags);
+              vis.getOutputter().outputAny(positionStart, positionEnd, 
+                ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), 
+                strMetaVal, outputStartTags, outputEndTags,
+                instruction_priorities.getOrDefault(vis, 0));
             }
             break;
           case CONSTANT:
-            vis.getOutputter().outputAny(positionStart, positionEnd, ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);
+            vis.getOutputter().outputAny(positionStart, positionEnd, 
+              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), 
+              vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
+              instruction_priorities.getOrDefault(vis, 0));
+            break;
+          case EMPTY:
+            vis.getOutputter().outputAny(positionStart, positionEnd, 
+              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), 
+              "", outputStartTags, outputEndTags,
+              instruction_priorities.getOrDefault(vis, 0));
             break;
           case ANNO_NAME:
             break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
@@ -462,7 +483,6 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         while (it.hasNext())
         {
           OutputItem s = it.next();
-          s.setPriority(instruction_priorities.get(s.getAnnoName()));
           itemsStart.add(s);
         }
       }
@@ -494,7 +514,6 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         while (it.hasNext())
         {
           OutputItem s = it.next();
-          s.setPriority(instruction_priorities.get(s.getAnnoName()));
           itemsEnd.add(s);
         }
       }
