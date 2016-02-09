@@ -1,5 +1,6 @@
 var NAVTREEINDEX14 =
 {
+"dev-release.html#dev-release-preview-finish":[2,3,3,2],
 "dev-release.html#dev-release-preview-init":[2,3,3,0],
 "dev-release.html#dev-release-preview-process":[2,3,3],
 "dev-release.html#dev-release-preview-test":[2,3,3,1],
@@ -118,15 +119,15 @@ var NAVTREEINDEX14 =
 "enumannis_1_1visualizers_1_1component_1_1tree_1_1_vertical_orientation.html#a0630bc0bd32b698b29a7136fb6576638":[4,0,0,17,0,7,13,0],
 "enumannis_1_1visualizers_1_1component_1_1tree_1_1_vertical_orientation.html#a820ec4ec0f84eb5e5873635784d3ec96":[4,0,0,17,0,7,13,1],
 "enumannis_1_1visualizers_1_1component_1_1tree_1_1_vertical_orientation.html#ab7df7df05c8852f1bc599f0a698e307f":[4,0,0,17,0,7,13,2],
-"functions.html":[4,2,0,0],
 "functions.html":[4,2,0],
+"functions.html":[4,2,0,0],
 "functions_b.html":[4,2,0,1],
 "functions_c.html":[4,2,0,2],
 "functions_d.html":[4,2,0,3],
 "functions_e.html":[4,2,0,4],
 "functions_f.html":[4,2,0,5],
-"functions_func.html":[4,2,1,0],
 "functions_func.html":[4,2,1],
+"functions_func.html":[4,2,1,0],
 "functions_func_b.html":[4,2,1,1],
 "functions_func_c.html":[4,2,1,2],
 "functions_func_d.html":[4,2,1,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX14 =
 "interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html#ab4f5a33727fdab4536dfc003f0e49434":[4,0,0,6,0,1,3,0],
 "interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html#ad4cee40b27f8cf49bae7004ccbfe608a":[4,0,0,6,0,1,3,1],
 "interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html":[4,0,0,6,0,2,0],
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html#a8ce7a20fb783a78f4dbd6478f5d7f0ab":[4,0,0,6,0,2,0,2],
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html#abb5a6dd2eb7c873d9f713ff8a0ab9c6b":[4,0,0,6,0,2,0,1]
+"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html#a8ce7a20fb783a78f4dbd6478f5d7f0ab":[4,0,0,6,0,2,0,2]
 };
