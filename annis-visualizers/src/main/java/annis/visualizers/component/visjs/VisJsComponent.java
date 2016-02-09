@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
+import com.vaadin.server.Scrollable;
 import com.vaadin.server.Sizeable;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 
@@ -38,10 +39,11 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 
 
 
-public class VisJsComponent extends AbstractJavaScriptComponent {	
+public class VisJsComponent extends AbstractJavaScriptComponent{	
 	
 	private String strNodes;
 	private String strEdges;
+	
 	
 	//private String visId;
 	private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
@@ -70,11 +72,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 				
 				strNodes = osNodes.toString();
 				strEdges = osEdges.toString();
-			//	System.out.println(strNodes +"\n" + strEdges);
 				
-				bw.close();
-			
-		       // callFunction("init", strNodes, strEdges);
+				bw.close();			
 		       
 	      
 			}catch(IOException e){
@@ -93,17 +92,11 @@ public class VisJsComponent extends AbstractJavaScriptComponent {
 	    @Override
 	    public void attach() {
 	      super.attach();
-	      setWidth("100%");
 	      setHeight("400px");
-
-	      // set the state
-	     // getState().visId = getVisId();
+	      setWidth("1000px");
 	      getState().strNodes = strNodes;
 	      getState().strEdges = strEdges;
 	     
 	    }
-	    
-	  /*  public String getVisId() {
-	        return visId;
-	    }*/
+
 }
