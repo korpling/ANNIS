@@ -387,7 +387,12 @@ public class QueryController implements Serializable
 
       if(config.containsKey(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
       {
-        getState().getVisibleBaseText().setValue(config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
+        String configVal = config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
+        if("".equals(configVal) || "tok".equals(configVal))
+        {
+          configVal = null;
+        }
+        getState().getVisibleBaseText().setValue(configVal);
       }
       else
       {

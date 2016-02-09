@@ -121,6 +121,12 @@ public class VisParser extends HTMLVisConfigBaseListener
   {
     currentMatcher = new PseudoRegionMatcher(PseudoRegionMatcher.PseudoRegion.END);
   }
+  
+  @Override
+  public void enterConditionAll(HTMLVisConfigParser.ConditionAllContext ctx)
+  {
+    currentMatcher = new PseudoRegionMatcher(PseudoRegionMatcher.PseudoRegion.ALL);
+  }
 
   @Override
   public void enterConditionNameAndValue(

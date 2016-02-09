@@ -32,7 +32,8 @@ public class PseudoRegionMatcher implements SpanMatcher
   {
 
     BEGIN,
-    END;
+    END,
+    ALL;
   }
 
   final private PseudoRegion psdRegion;
@@ -49,13 +50,22 @@ public class PseudoRegionMatcher implements SpanMatcher
   {
 
     this.psdRegion = psdRegion;
-    if (psdRegion == PseudoRegion.BEGIN)
+    if (null != psdRegion)
     {
-      this.annotationName = "annis_BEGIN";
-    }
-    else
-    {
-      this.annotationName = "annis_END";
+      switch (psdRegion)
+      {
+        case BEGIN:
+          this.annotationName = "annis_BEGIN";
+          break;
+        case END:
+          this.annotationName = "annis_END";
+          break;
+        case ALL:
+          this.annotationName = "annis_ALL";
+          break;
+        default:
+          break;
+      }
     }
 
   }

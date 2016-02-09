@@ -1,3 +1,16 @@
+Version 3.4.0-rc3
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc3+is%3Aclosed
+
+[Fixed Bugs]
+ #493 can't set "default-base-text-segmentation" property to token
+ #491 htmlvis won't output spans which have the same annotation name and the same token span
+
+[Enhancements]
+ #492 htmlvis should support a pseudoregion that covers all token
+
 Version 3.4.0-rc2
 =================
 

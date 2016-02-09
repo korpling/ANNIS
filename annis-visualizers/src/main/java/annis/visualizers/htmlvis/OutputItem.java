@@ -74,7 +74,9 @@ public class OutputItem implements Comparable<OutputItem> //Comparator<OutputIte
     
     return ComparisonChain.start()
       // inverse order for length and priority
+      // greater length --> smaller than the other item
       .compare(o.getLength(), length)
+      // greater priority value --> smaller than the other item
       .compare(o.getPriority(), priority)
       .compare(qName, o.getqName())
       .compare(outputString, o.getOutputString())
