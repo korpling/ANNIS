@@ -14,8 +14,11 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 //public class VisJs extends AbstractVisualizer<VisJsComponent>{
 public class VisJs extends AbstractVisualizer<Panel>{
 
-	
-//	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	@Override
 	public String getShortName() 
@@ -28,16 +31,13 @@ public class VisJs extends AbstractVisualizer<Panel>{
 			VisualizationToggle visToggle) 
 	{
 			
-		Panel panel = new Panel();		
+		/*Panel panel = new Panel();		
 		panel.setHeight("300px");
 		panel.setWidth("100%");
-		panel.setScrollLeft(10);
-		
-		VisJsComponent visjsComponent = new VisJsComponent(visInput);		
-	//	System.out.println("componentWidth: " +visjsComponent.getWidth());
-	//	System.out.println("panelWidth: " + panel.getWidth());
-		
-		panel.setContent(visjsComponent);		
+		panel.setScrollLeft(10);*/
+	//	VisJsComponent visjsComponent = new VisJsComponent(visInput);		
+		//panel.setContent(visjsComponent);		
+		VisJsPanel panel = new VisJsPanel(visInput);
 		return panel;
 	}
 	

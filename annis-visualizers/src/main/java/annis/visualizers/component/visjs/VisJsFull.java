@@ -1,6 +1,7 @@
 package annis.visualizers.component.visjs;
 
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Panel;
 
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
@@ -9,7 +10,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 
 @PluginImplementation
-public class VisJsFull extends AbstractVisualizer<VisJsComponent>{
+public class VisJsFull extends AbstractVisualizer<Panel>{
 
 
 
@@ -20,10 +21,12 @@ public class VisJsFull extends AbstractVisualizer<VisJsComponent>{
 	}
 
 	@Override
-	public VisJsComponent createComponent(VisualizerInput visInput,
+	public Panel createComponent(VisualizerInput visInput,
 			VisualizationToggle visToggle) 
 	{
-		return new VisJsComponent(visInput);
+		VisJsPanel panel = new VisJsPanel(visInput);
+		return panel;
+		//return new VisJsComponent(visInput);
 	}
 	
 	@Override
