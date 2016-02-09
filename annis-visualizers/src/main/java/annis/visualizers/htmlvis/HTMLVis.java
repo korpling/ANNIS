@@ -180,6 +180,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       Label lblDebug = new Label(lblResult.getValue(), ContentMode.PREFORMATTED);
       Label sep = new Label("<hr/>", ContentMode.HTML);
       VerticalLayout layout = new VerticalLayout(lblDebug, sep, lblResult);
+      layout.setSizeUndefined();
       scrollPanel.setContent(layout);
     }
     else
