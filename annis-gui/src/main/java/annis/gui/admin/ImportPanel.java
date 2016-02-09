@@ -107,6 +107,7 @@ public class ImportPanel extends Panel
     
     upload = new Upload("", this);
     upload.setButtonCaption("Upload ZIP file with relANNIS corpus and start import");
+    upload.setImmediate(true);
     upload.addStartedListener(this);
     upload.addFinishedListener(this);
     upload.setEnabled(true);
