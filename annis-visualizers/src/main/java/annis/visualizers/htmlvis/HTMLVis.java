@@ -31,6 +31,7 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.io.IOException;
@@ -177,9 +178,12 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
     if (vi.getMappings().containsKey("debug"))
     {
-      Label lblDebug = new Label(lblResult.getValue(), ContentMode.PREFORMATTED);
+      TextArea txtDebug = new TextArea();
+      txtDebug.setValue(lblResult.getValue());
+      txtDebug.setReadOnly(true);
+      txtDebug.setWidth("100%");
       Label sep = new Label("<hr/>", ContentMode.HTML);
-      VerticalLayout layout = new VerticalLayout(lblDebug, sep, lblResult);
+      VerticalLayout layout = new VerticalLayout(txtDebug, sep, lblResult);
       layout.setSizeUndefined();
       scrollPanel.setContent(layout);
     }
