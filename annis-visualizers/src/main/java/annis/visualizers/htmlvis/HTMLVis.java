@@ -25,6 +25,7 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.model.Annotation;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
+import com.google.gwt.thirdparty.guava.common.base.Objects;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -364,8 +365,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(t, matched, outputStartTags,
-            outputEndTags, tokenColor, instruction_priorities.getOrDefault(vis,
-              0));
+            outputEndTags, tokenColor, Objects.firstNonNull(instruction_priorities.get(vis), 0));
         }
       }
     }
@@ -386,8 +386,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(span, matched, outputStartTags,
-            outputEndTags, tokenColor, instruction_priorities.getOrDefault(vis,
-              0));
+            outputEndTags, tokenColor, Objects.firstNonNull(instruction_priorities.get(vis), 0));
         }
       }
     }
@@ -453,20 +452,20 @@ public class HTMLVis extends AbstractVisualizer<Panel>
               vis.getOutputter().outputAny(positionStart, positionEnd,
                 ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
                 strMetaVal, outputStartTags, outputEndTags,
-                instruction_priorities.getOrDefault(vis, 0));
+                Objects.firstNonNull(instruction_priorities.get(vis), 0));
             }
             break;
           case CONSTANT:
             vis.getOutputter().outputAny(positionStart, positionEnd,
               ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
               vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
-              instruction_priorities.getOrDefault(vis, 0));
+              Objects.firstNonNull(instruction_priorities.get(vis), 0));
             break;
           case EMPTY:
             vis.getOutputter().outputAny(positionStart, positionEnd,
               ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
               "", outputStartTags, outputEndTags,
-              instruction_priorities.getOrDefault(vis, 0));
+              Objects.firstNonNull(instruction_priorities.get(vis), 0));
             break;
           case ANNO_NAME:
             break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
