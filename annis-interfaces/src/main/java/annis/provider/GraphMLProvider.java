@@ -15,7 +15,6 @@
  */
 package annis.provider;
 
-import annis.utils.GraphMLConverter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -30,6 +29,7 @@ import javax.ws.rs.ext.Provider;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.util.internal.persistence.GraphMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +86,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
         }
       }
     }
-    GraphMLConverter.convertFromSalt(entityStream, docs);
+    GraphMLWriter.writeDocuments(entityStream, docs);
   }
   
   
