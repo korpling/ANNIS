@@ -187,10 +187,9 @@ public class AnnisParserAntlr
     {
       this.errors = errors;
     }
-    
-     @Override
-    public void syntaxError(Recognizer recognizer, Token offendingSymbol,
-      int line, int charPositionInLine, String msg, RecognitionException e)
+
+    @Override
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
     {
       if(errors != null)
       {
@@ -199,7 +198,7 @@ public class AnnisParserAntlr
     }
   }
   
-  public static class AqlLexerErrorListener implements ANTLRErrorListener<Integer>
+  public static class AqlLexerErrorListener extends BaseErrorListener
   {
 
     private final List<AqlParseError> errors;
@@ -208,13 +207,9 @@ public class AnnisParserAntlr
     {
       this.errors = errors;
     }
-    
-    
-    
+
     @Override
-    public <T extends Integer> void syntaxError(
-      Recognizer<T, ?> recognizer, T offendingSymbol, int line,
-      int charPositionInLine, String msg, RecognitionException e)
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
     {
       if(errors != null)
       {
@@ -236,16 +231,15 @@ public class AnnisParserAntlr
     }
 
     @Override
-    public <T extends Token> void syntaxError(
-      Recognizer<T, ?> recognizer, T offendingSymbol, int line,
-      int charPositionInLine, String msg, RecognitionException e)
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
     {
-      if(errors != null)
+      if(errors != null && offendingSymbol instanceof Token)
       {
-        Token t = offendingSymbol;
+        Token t = (Token) offendingSymbol;
         errors.add(new AqlParseError(getLocation(t, t), msg));
       }
     }
+    
   }
   
   
