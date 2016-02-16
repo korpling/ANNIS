@@ -517,7 +517,6 @@ var annotated =
       [ "utils", null, [
         [ "ANNISFormatHelper", "classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html", null ],
         [ "DynamicDataSource", "classannis_1_1utils_1_1_dynamic_data_source.html", "classannis_1_1utils_1_1_dynamic_data_source" ],
-        [ "GraphMLConverter", "classannis_1_1utils_1_1_graph_m_l_converter.html", null ],
         [ "LegacyGraphConverter", "classannis_1_1utils_1_1_legacy_graph_converter.html", null ],
         [ "Utils", "classannis_1_1utils_1_1_utils.html", null ]
       ] ],

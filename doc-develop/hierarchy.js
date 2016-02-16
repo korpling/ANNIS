@@ -198,7 +198,6 @@ var hierarchy =
         [ "annis.visualizers.component.tree.backends.staticimg.LabelItem", "classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_label_item.html", null ]
       ] ]
     ] ],
-    [ "annis.utils.GraphMLConverter", "classannis_1_1utils_1_1_graph_m_l_converter.html", null ],
     [ "annis.sqlgen.GroupByClauseSqlGenerator< T >", "interfaceannis_1_1sqlgen_1_1_group_by_clause_sql_generator.html", null ],
     [ "annis.sqlgen.GroupByClauseSqlGenerator< annis.ql.parser.QueryData >", "interfaceannis_1_1sqlgen_1_1_group_by_clause_sql_generator.html", null ],
     [ "annis.sqlgen.GroupByClauseSqlGenerator< QueryData >", "interfaceannis_1_1sqlgen_1_1_group_by_clause_sql_generator.html", [
@@ -458,8 +457,8 @@ var hierarchy =
     [ "Thread", null, [
       [ "annis.service.internal.ImportWorker", "classannis_1_1service_1_1internal_1_1_import_worker.html", null ]
     ] ],
-    [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
     [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
+    [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
     [ "annis.visualizers.component.tree.TreeElementLabeler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_labeler.html", null ],
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]

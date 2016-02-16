@@ -1,5 +1,6 @@
 var NAVTREEINDEX12 =
 {
+"classannis_1_1sqlgen_1_1model_1_1_left_dominance.html#adebe1e9dac52f4465865f317d2247aad":[4,0,0,15,1,7,3],
 "classannis_1_1sqlgen_1_1model_1_1_left_overlap.html":[4,0,0,15,1,8],
 "classannis_1_1sqlgen_1_1model_1_1_left_overlap.html#a02038e70fd634e883bd40d94b063e9ba":[4,0,0,15,1,8,1],
 "classannis_1_1sqlgen_1_1model_1_1_left_overlap.html#a0ae7bbb1b2cd7993fe2201dc48e05832":[4,0,0,15,1,8,0],
@@ -82,9 +83,8 @@ var NAVTREEINDEX12 =
 "classannis_1_1utils_1_1_dynamic_data_source.html#a163fcdddc1ed239ada4304a10252a721":[4,0,0,16,1,1],
 "classannis_1_1utils_1_1_dynamic_data_source.html#a5cb68e91fc8c2523ed1d98185d7b8c5e":[4,0,0,16,1,3],
 "classannis_1_1utils_1_1_dynamic_data_source.html#aad8ecb8803dc4dfd6c53377b731393f8":[4,0,0,16,1,2],
-"classannis_1_1utils_1_1_graph_m_l_converter.html":[4,0,0,16,2],
-"classannis_1_1utils_1_1_legacy_graph_converter.html":[4,0,0,16,3],
-"classannis_1_1utils_1_1_utils.html":[4,0,0,16,4],
+"classannis_1_1utils_1_1_legacy_graph_converter.html":[4,0,0,16,2],
+"classannis_1_1utils_1_1_utils.html":[4,0,0,16,3],
 "classannis_1_1visualizers_1_1component_1_1_abstract_dot_visualizer.html":[4,0,0,17,0,8],
 "classannis_1_1visualizers_1_1component_1_1_abstract_dot_visualizer.html#ab87f447b325d2fd466f07bb3ea15c76d":[4,0,0,17,0,8,1],
 "classannis_1_1visualizers_1_1component_1_1_abstract_dot_visualizer.html#ac70db98d99b11c56955d20ec6c57bf08":[4,0,0,17,0,8,0],

@@ -7,7 +7,6 @@ var searchData=
   ['graphicsbackend_3c_20t_20_3e',['GraphicsBackend&lt; T &gt;',['../interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_graphics_backend.html',1,'annis::visualizers::component::tree']]],
   ['graphicsitem',['GraphicsItem',['../interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_graphics_item.html',1,'annis::visualizers::component::tree']]],
   ['graphicsitemgroup',['GraphicsItemGroup',['../classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_graphics_item_group.html',1,'annis::visualizers::component::tree::backends::staticimg']]],
-  ['graphmlconverter',['GraphMLConverter',['../classannis_1_1utils_1_1_graph_m_l_converter.html',1,'annis::utils']]],
   ['graphmlprovider',['GraphMLProvider',['../classannis_1_1provider_1_1_graph_m_l_provider.html',1,'annis::provider']]],
   ['graphwithclausegenerator',['GraphWithClauseGenerator',['../classannis_1_1sqlgen_1_1_graph_with_clause_generator.html',1,'annis::sqlgen']]],
   ['gridcomponent',['GridComponent',['../classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component.html',1,'annis::visualizers::component::grid']]],
