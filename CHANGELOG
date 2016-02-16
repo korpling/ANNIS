@@ -1,3 +1,14 @@
+Version 3.4.0-rc4
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc4+is%3Aclosed
+
+[Fixed Bugs]
+ #496 speaker icon in grid does nothing when visualization is embedded
+ #495 invalid GraphML
+ #494 fails to parse tok!="..." when used in the  AQL short form
+
 Version 3.4.0-rc3
 =================
 
