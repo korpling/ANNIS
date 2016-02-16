@@ -34,6 +34,7 @@ import annis.visualizers.htmlvis.HTMLVis;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
@@ -321,6 +322,15 @@ public class EmbeddedVisUI extends CommonUI
       {
         displayMessage("Service error", ex.getMessage());
       }
+    }
+    catch(ClientHandlerException ex)
+    {
+      displayMessage("Could not generate the visualization because the ANNIS service reported an error.", ex.getMessage());
+    }
+    catch(Throwable ex)
+    {
+      displayMessage("Could not generate the visualization.", ex.getMessage() == null ? ("An unknown error of type " 
+        + ex.getClass().getSimpleName()) + " occured." : ex.getMessage());
     }
   }
   
