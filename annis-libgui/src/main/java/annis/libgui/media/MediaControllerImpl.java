@@ -16,7 +16,10 @@
 package annis.libgui.media;
 
 import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.MediaPlayer;
 import annis.visualizers.LoadableVisualizer;
+import com.vaadin.ui.Notification;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -86,8 +89,8 @@ public class MediaControllerImpl implements MediaController, Serializable
   @Override
   public void play(String resultID, double startTime)
   {
-//    pauseAll();
-
+    boolean foundPlayer = false;
+    
     lock.readLock().lock();
     try
     {
@@ -100,6 +103,7 @@ public class MediaControllerImpl implements MediaController, Serializable
         VisualizationToggle t = visToggle.get(player);
         if (t != null)
         {
+          foundPlayer = true;
           t.toggleVisualizer(true, new CallbackImpl(player, startTime, null));
         }
 
@@ -109,13 +113,17 @@ public class MediaControllerImpl implements MediaController, Serializable
     {
       lock.readLock().unlock();
     }
+    if(!foundPlayer)
+    {
+      Notification.show("Could not play media.", "If this is a match reference open the actual search interface by following the \"Show in ANNIS search interface\" link.", Notification.Type.WARNING_MESSAGE);
+    }
   }
 
   @Override
   public void play(String resultID, double startTime, double endTime)
   {
-//    pauseAll();
 
+    boolean foundPlayer = false;
     lock.readLock().lock();
     try
     {
@@ -128,6 +136,7 @@ public class MediaControllerImpl implements MediaController, Serializable
         VisualizationToggle t = visToggle.get(player);
         if (t != null)
         {
+          foundPlayer = true;
           t.toggleVisualizer(true, new CallbackImpl(player, startTime, endTime));
         }
       }
@@ -135,6 +144,10 @@ public class MediaControllerImpl implements MediaController, Serializable
     finally
     {
       lock.readLock().unlock();
+    }
+    if(!foundPlayer)
+    {
+      Notification.show("Could not play media.", "If this is a match reference open the actual search interface by following the \"Show in ANNIS search interface\" link.", Notification.Type.WARNING_MESSAGE);
     }
   }
 

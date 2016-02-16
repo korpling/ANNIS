@@ -110,6 +110,7 @@ notequalvalue
   : NEQ 
   ;
 
+
 operator
   : precedence
   | near
@@ -119,13 +120,17 @@ operator
   | commonparent
   | commonancestor
   | identity
-  | equalvalue
-  | notequalvalue
   ;
 
+/* Addtional operators that are do not bind two variables. */
+nonbinding_operator
+ : equalvalue
+ | notequalvalue
+ ;
 
 n_ary_linguistic_term
-  :  refOrNode (operator refOrNode)+ # Relation
+  :  refOrNode (operator refOrNode)+ # BindingRelation
+  | REF (nonbinding_operator REF)+ # NonBindingRelation
   ;
 
 	

@@ -86,7 +86,9 @@
     <value><![CDATA[( (tok))]]></value>
     <value><![CDATA[node _ident_ node _ident_ pos="NN"]]></value>
     <value><![CDATA[pos . lemma . pos & #1 == #2]]></value>
-     <value><![CDATA[pos . lemma . pos & #1 != #2]]></value>
+    <value><![CDATA[pos . lemma . pos & #1 != #2]]></value>
+    <!-- issue #494 -->
+    <value><![CDATA[ZH1Diff="INS" . tok!=""]]></value>
     <!-- corner cases of OR -->
     <value><![CDATA["das" | "die" | "der"]]></value>
     <value><![CDATA["das" | ("die" & pos="NN" & #2 . #3) | "der"]]></value>
