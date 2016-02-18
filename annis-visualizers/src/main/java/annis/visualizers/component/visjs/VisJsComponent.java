@@ -7,12 +7,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import annis.libgui.visualizers.VisualizerInput;
+import annis.visualizers.component.grid.EventExtractor;
 import annis.visualizers.component.kwic.KWICVisualizer;
 
+import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.ExportFilter;
 import org.corpus_tools.salt.util.VisJsVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +46,7 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 
 
 
-public class VisJsComponent extends AbstractJavaScriptComponent{	
+public class VisJsComponent extends AbstractJavaScriptComponent implements ExportFilter{	
 	
 	private String strNodes;
 	private String strEdges;
@@ -52,7 +59,18 @@ public class VisJsComponent extends AbstractJavaScriptComponent{
 		
 
 			SDocument doc =  visInput.getDocument();
-			VisJsVisualizer VisJsVisualizer = new VisJsVisualizer(doc);
+			List<String> annotations = EventExtractor.computeDisplayAnnotations(visInput, SSpan.class);
+			System.out.println("annotSize: " + annotations.size());
+			
+			
+			for(String annotation: annotations){
+				System.out.println(annotation);
+				
+			}
+			System.out.println("\n");
+			
+			
+			VisJsVisualizer VisJsVisualizer = new VisJsVisualizer(doc, this);
 			 
 			OutputStream osNodes = new ByteArrayOutputStream();
 			OutputStream osEdges = new ByteArrayOutputStream();
@@ -100,5 +118,18 @@ public class VisJsComponent extends AbstractJavaScriptComponent{
 	      getState().strEdges = strEdges;
 	     
 	    }
+
+
+		@Override
+		public boolean excludeNode(SNode node) {
+			return false;
+		}
+
+
+		@Override
+		public boolean excludeRelation(SRelation relation) {
+			// TODO Auto-generated method stub
+			return false;
+		}
 
 }
