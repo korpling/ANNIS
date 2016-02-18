@@ -92,6 +92,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent{
 	    @Override
 	    public void attach() {
 	      super.attach();
+	      //set an initial size
+	      //it will be adjust to the size of panel by VisJs_Connector.js
 	      setHeight("400px");
 	      setWidth("1000px");
 	      getState().strNodes = strNodes;
