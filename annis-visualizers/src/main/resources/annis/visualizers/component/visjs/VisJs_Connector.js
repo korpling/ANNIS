@@ -2,9 +2,12 @@
 window.annis_visualizers_component_visjs_VisJsComponent = function() {
 
 var div = this.getElement(); 
-var container = div;
 
-var self = this;
+var containerWidth = $(div).parent().width();
+var containerHeight =  $(div).parent().height();
+var container = div;
+$(container).css("width", containerWidth, "height", containerHeight);
+
 var strNodes =  this.getState().strNodes;
 var strEdges = this.getState().strEdges;
 var visjscomponent = null;
@@ -25,10 +28,23 @@ this.onStateChange = function(){
 
 
 this.init = function(strNodes, strEdges){
-container.style.border = "thin solid green";
 
 var json_nodes = JSON.parse(strNodes);
 var json_edges = JSON.parse(strEdges);
+
+
+var nodeDist;
+var nNodes = json_nodes.length;
+if (nNodes < 20){
+	nodeDist = 100;
+} else if (nNodes >=20 && nNodes < 100){
+	nodeDist = 150
+} else if (nNodes >= 100 && nNodes < 400) {
+	nodeDist = 200
+} else {
+	nodeDist = 400
+};
+
 
 var data = {
 nodes: json_nodes,
@@ -48,7 +64,6 @@ enabled: true
 },
 layout: {
 hierarchical:{
-//direction: directionInput.value
 }
 },
 physics: {
@@ -56,7 +71,7 @@ hierarchicalRepulsion: {
 centralGravity: 0.05,
 springLength: 100,
 springConstant: 0.0007,
-nodeDistance: 200,
+nodeDistance: nodeDist,
 damping: 0.04
 },
 maxVelocity: 27,
@@ -68,14 +83,22 @@ iterations: 800
 }
 }
 ;
-$(container).remove("canvas");
+$(container).remove("#canvas");
+
 visjscomponent = new vis.Network(container, data, options); 
+//var canvasWindth = $(".vis-network canvas:first-child").width();
+//window.alert(canvasWindth);
+
 
 };
 
-   
-/*$(window).resize(function() {
-    self.init(strNodes, strEdges);
-  });*/
-  
+window.addEventListener("resize", function(){
+ 	containerWidth = $(div).parent().width();
+	containerHeight =  $(div).parent().height();
+	$(container).css("width", containerWidth, "height", containerHeight);
+
+	
+}); 
+
+
 };
