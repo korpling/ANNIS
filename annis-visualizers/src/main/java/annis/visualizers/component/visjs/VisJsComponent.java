@@ -1,6 +1,9 @@
 package annis.visualizers.component.visjs;
 
 
+import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
+import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
+
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -9,19 +12,32 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.UUID;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.EventExtractor;
 import annis.visualizers.component.kwic.KWICVisualizer;
 
+import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SPointingRelation;
 import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.STextualRelation;
+import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.ExportFilter;
@@ -55,6 +71,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	
 	private String strNodes;
 	private String strEdges;
+	public static final String MAPPING_EDGES = "edges";
 	// a HashMap for storage of filter annotations with associated namespaces
 	
 	private Map<String, Set<String>> filterAnnotations;
@@ -66,11 +83,11 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	public VisJsComponent(VisualizerInput visInput){	
 		
 			filterAnnotations = new HashMap<String, Set<String>>();
-			System.out.println("hashMap initial:" + filterAnnotations);
+		//	System.out.println("hashMap initial:" + filterAnnotations);
 			
 			SDocument doc =  visInput.getDocument();
 			List<String> annotations = EventExtractor.computeDisplayAnnotations(visInput, SNode.class);
-			System.out.println("annotSize: " + annotations.size());
+		//	System.out.println("annotSize: " + annotations.size());
 			
 			
 			for(String annotation: annotations)
@@ -115,12 +132,12 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 				
 				filterAnnotations.put(anno, namespaces);
 				
-				System.out.println(annotation);
+			//	System.out.println(annotation);
 				
 			}
-			System.out.println("\n");
+			//System.out.println("\n");
 			
-			System.out.println("hashMap fertig:" + filterAnnotations);
+			//System.out.println("hashMap fertig:" + filterAnnotations);
 			
 			
 			
@@ -176,6 +193,11 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 
 		@Override
 		public boolean excludeNode(SNode node) {
+			
+			if (node instanceof SToken) 
+			{
+				return false;
+			}
 					
 			Set<SAnnotation> nodeAnnotations =  node.getAnnotations();
 			
@@ -201,6 +223,63 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			
 			return true;
 		}
+
+		
+		
+		
+		
+		 /**
+		   * Get the qualified name of all annotations belonging to relations having a
+		   * specific namespace.
+		   *
+		   * @param graph The graph.
+		   * @param namespace The namespace of the relation (not the annotation) to search
+		   * for.
+		   * @param type Which type of relation to include
+		   * @return
+		   *
+		   */
+		
+		// TODO test
+		  private static Set<String> getEdgeLevelSet(SDocumentGraph graph,
+		          String namespace, Class<? extends SRelation> type) {
+		    Set<String> result = new TreeSet<>();
+		    
+
+		    if (graph != null) {
+		      List<? extends SRelation> edges;
+		      // catch most common cases directly
+		      if (type == SDominanceRelation.class) {
+		        edges = graph.getDominanceRelations();
+		      } else if (type == SPointingRelation.class){
+		    	  edges = graph.getPointingRelations();
+		      } else if (type == SSpanningRelation.class){
+		    	  edges = graph.getSpanningRelations();
+		      }
+		      //TODO not really necessary, since VisJsVisualiser output just  the first three relation types
+		      else {		    	
+		        edges = graph.getRelations();
+		      }
+		      if (edges != null) {
+		        for (SRelation e : edges) {
+		          if (type.isAssignableFrom(e.getClass())) {
+		        	  Set <SLayer> layers = e.getLayers();
+		            for (SLayer layer : layers) {
+		              if (namespace == null || namespace.equals(layer.getName())) {
+		                for (SAnnotation anno : e.getAnnotations()) {
+		                  result.add(anno.getQName());
+		                }
+		                // we got all annotations of this node, jump to next node
+		                break;
+		              } // end if namespace equals layer name
+		            } // end for each layer
+		          }
+		        } // end for each node
+		      }
+		    }
+
+		    return result;
+		  }
 
 
 		@Override
