@@ -205,7 +205,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			{
 				String nodeAnno = nodeAnnotation.getName();
 				String nodeNs = nodeAnnotation.getNamespace();
-				System.out.println(nodeNs +  "::" + nodeAnno);
+				//System.out.println(nodeNs +  "::" + nodeAnno);
 				
 				if (filterAnnotations.containsKey(nodeAnno))
 				{
@@ -223,6 +223,67 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			
 			return true;
 		}
+		
+		
+		
+		/**
+		   * Returns the annotations to display according to the mappings configuration.
+		   *
+		   * This will check the "annos" and "annos_regex" paramters for determining.
+		   * the annotations to display. It also iterates over all nodes of the graph
+		   * matching the type.
+		   *
+		   * @param input The input for the visualizer.
+		   * @param type Which type of nodes to include
+		   * @return
+		   */
+		  public static List<String> computeDisplayedEdgeAnnotations(VisualizerInput input,  Class<? extends SRelation> type) {
+		    if (input == null) {
+		      return new LinkedList<>();
+		    }
+
+		    SDocumentGraph graph = input.getDocument().getDocumentGraph();
+
+		    Set<String> annoPool = getEdgeLevelSet(graph, input.getNamespace(), type);
+		    List<String> annos = new LinkedList<>(annoPool);
+
+		    String annosConfiguration = input.getMappings().getProperty(MAPPING_EDGES);
+		    
+		    System.out.println("annosConf: " + annosConfiguration);
+		    
+		    if (annosConfiguration != null && annosConfiguration.trim().length() > 0) {
+		      String[] split = annosConfiguration.split(",");
+		      annos.clear();
+		      for (String s : split) {
+		        s = s.trim();
+		        // is regular expression?
+		        if (s.startsWith("/") && s.endsWith("/")) {
+		          // go over all remaining items in our pool of all annotations and
+		          // check if they match
+		          Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
+		          
+		          System.out.println(s);
+
+		          LinkedList<String> matchingAnnos = new LinkedList<>();
+		          for (String a : annoPool) {
+		            if (regex.matcher(a).matches()) {
+		              matchingAnnos.add(a);
+		            }
+		          }
+
+		          annos.addAll(matchingAnnos);
+		       //   annoPool.removeAll(matchingAnnos);
+
+		        } else {
+		          annos.add(s);
+		        //  annoPool.remove(s);
+		        }
+		      }
+		    }
+
+		    
+		    return annos;
+		  }
 
 		
 		
@@ -241,13 +302,13 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		   */
 		
 		// TODO test
-		  private static Set<String> getEdgeLevelSet(SDocumentGraph graph,
+		  public static Set<String> getEdgeLevelSet(SDocumentGraph graph,
 		          String namespace, Class<? extends SRelation> type) {
 		    Set<String> result = new TreeSet<>();
 		    
 
 		    if (graph != null) {
-		      List<? extends SRelation> edges;
+		      List<? extends SRelation> edges = null;
 		      // catch most common cases directly
 		      if (type == SDominanceRelation.class) {
 		        edges = graph.getDominanceRelations();
@@ -256,24 +317,20 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		      } else if (type == SSpanningRelation.class){
 		    	  edges = graph.getSpanningRelations();
 		      }
-		      //TODO not really necessary, since VisJsVisualiser output just  the first three relation types
-		      else {		    	
-		        edges = graph.getRelations();
-		      }
+		      
+		      
 		      if (edges != null) {
-		        for (SRelation e : edges) {
-		          if (type.isAssignableFrom(e.getClass())) {
-		        	  Set <SLayer> layers = e.getLayers();
+		        for (SRelation<?, ?> edge : edges) {
+		        	  Set <SLayer> layers = edge.getLayers();
 		            for (SLayer layer : layers) {
 		              if (namespace == null || namespace.equals(layer.getName())) {
-		                for (SAnnotation anno : e.getAnnotations()) {
+		                for (SAnnotation anno : edge.getAnnotations()) {
 		                  result.add(anno.getQName());
 		                }
 		                // we got all annotations of this node, jump to next node
 		                break;
 		              } // end if namespace equals layer name
 		            } // end for each layer
-		          }
 		        } // end for each node
 		      }
 		    }
