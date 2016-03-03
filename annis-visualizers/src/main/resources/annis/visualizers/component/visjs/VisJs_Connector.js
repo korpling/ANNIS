@@ -83,12 +83,11 @@ iterations: 800
 }
 }
 ;
-$(container).remove("#canvas");
+$(container).remove("canvas");
 
 visjscomponent = new vis.Network(container, data, options); 
 //var canvasWindth = $(".vis-network canvas:first-child").width();
 //window.alert(canvasWindth);
-
 
 };
 
