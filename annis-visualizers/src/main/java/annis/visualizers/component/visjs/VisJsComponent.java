@@ -72,74 +72,20 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	private String strNodes;
 	private String strEdges;
 	public static final String MAPPING_EDGES = "edges";
-	// a HashMap for storage of filter annotations with associated namespaces
 	
-	private Map<String, Set<String>> filterAnnotations;
+	// a HashMap for storage of filter annotations with associated namespaces	
+	private Map<String, Set<String>> filterNodeAnnotations = new HashMap<String, Set<String>>();
+	private Map<String, Set<String>> filterEdgeAnnotations = new HashMap<String, Set<String>>();
 	
 	
-	//private String visId;
+	
 	private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
 	
 	public VisJsComponent(VisualizerInput visInput){	
-		
-			filterAnnotations = new HashMap<String, Set<String>>();
-		//	System.out.println("hashMap initial:" + filterAnnotations);
+			fillFilterAnnotations(visInput, 0);
+			fillFilterAnnotations(visInput, 1);
 			
 			SDocument doc =  visInput.getDocument();
-			List<String> annotations = EventExtractor.computeDisplayAnnotations(visInput, SNode.class);
-		//	System.out.println("annotSize: " + annotations.size());
-			
-			
-			for(String annotation: annotations)
-			{ 	String anno = null;
-				String ns = null;
-				Set<String> namespaces = null;
-			
-				if (annotation.contains("::"))
-				{
-					String [] annotationParts = annotation.split("::");
-					if (annotationParts.length == 2)
-					{
-						anno = annotationParts[1];
-						ns = annotationParts[0];
-						
-					}
-					else
-					{
-						//TODO
-					}
-					
-				}
-				else
-				{
-				anno = annotation;	
-				}
-				
-				if (filterAnnotations.containsKey(anno))
-				{
-					 namespaces = filterAnnotations.get(anno);
-				}
-				else
-				{
-					namespaces = new HashSet<String>();
-				}
-				
-				
-				if (ns != null)
-				{
-					namespaces.add(ns);
-				}
-				
-				filterAnnotations.put(anno, namespaces);
-				
-			//	System.out.println(annotation);
-				
-			}
-			//System.out.println("\n");
-			
-			//System.out.println("hashMap fertig:" + filterAnnotations);
-			
-			
 			
 			VisJsVisualizer VisJsVisualizer = new VisJsVisualizer(doc, this);
 			 
@@ -171,6 +117,66 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		
 	
 	}
+	
+	private void fillFilterAnnotations(VisualizerInput visInput, int type){
+		Map<String, Set<String>> myFilterAnnotations;
+		List<String> annotations;
+		if(type == 0) {
+			annotations = EventExtractor.computeDisplayAnnotations(visInput, SNode.class);	
+			myFilterAnnotations = filterNodeAnnotations;
+		}
+		else{
+			annotations = computeDisplayedEdgeAnnotations(visInput, SRelation.class);	
+			myFilterAnnotations = filterEdgeAnnotations;
+		}
+		
+			
+			for(String annotation: annotations)
+			{ 	String anno = null;
+				String ns = null;
+				Set<String> namespaces = null;
+			
+				if (annotation.contains("::"))
+				{
+					String [] annotationParts = annotation.split("::");
+					if (annotationParts.length == 2)
+					{
+						anno = annotationParts[1];
+						ns = annotationParts[0];
+						
+					}
+					else
+					{
+						//TODO Error?
+					}
+					
+				}
+				else
+				{
+				anno = annotation;	
+				}
+				
+				
+				if (myFilterAnnotations.containsKey(anno))
+				{
+					 namespaces = myFilterAnnotations.get(anno);
+				}
+				else
+				{
+					namespaces = new HashSet<String>();
+				}
+				
+				
+				if (ns != null)
+				{
+					namespaces.add(ns);
+				}
+				
+				myFilterAnnotations.put(anno, namespaces);
+				
+			}
+	}
+
 		  
 	  
 	    @Override
@@ -207,13 +213,13 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 				String nodeNs = nodeAnnotation.getNamespace();
 				//System.out.println(nodeNs +  "::" + nodeAnno);
 				
-				if (filterAnnotations.containsKey(nodeAnno))
+				if (filterNodeAnnotations.containsKey(nodeAnno))
 				{
-					if (filterAnnotations.get(nodeAnno).isEmpty())
+					if (filterNodeAnnotations.get(nodeAnno).isEmpty())
 					{
 						return false;
 					}
-					else if (filterAnnotations.get(nodeAnno).contains(nodeNs))
+					else if (filterNodeAnnotations.get(nodeAnno).contains(nodeNs))
 					{
 						return false;
 					}
@@ -234,7 +240,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		   * matching the type.
 		   *
 		   * @param input The input for the visualizer.
-		   * @param type Which type of nodes to include
+		   * @param type Which type of relations to include
 		   * @return
 		   */
 		  public static List<String> computeDisplayedEdgeAnnotations(VisualizerInput input,  Class<? extends SRelation> type) {
@@ -341,8 +347,29 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 
 		@Override
 		public boolean excludeRelation(SRelation relation) {
-			// TODO Auto-generated method stub
-			return false;
+			Set<SAnnotation> nodeAnnotations =  relation.getAnnotations();
+			
+			for (SAnnotation nodeAnnotation : nodeAnnotations)
+			{
+				String nodeAnno = nodeAnnotation.getName();
+				String nodeNs = nodeAnnotation.getNamespace();
+				System.out.println(nodeNs +  "::" + nodeAnno);
+				
+				if (filterEdgeAnnotations.containsKey(nodeAnno))
+				{
+					if (filterEdgeAnnotations.get(nodeAnno).isEmpty())
+					{
+						return false;
+					}
+					else if (filterEdgeAnnotations.get(nodeAnno).contains(nodeNs))
+					{
+						return false;
+					}
+				}
+				
+			}
+			//TODO set to true
+			return true;
 		}
 
 }
