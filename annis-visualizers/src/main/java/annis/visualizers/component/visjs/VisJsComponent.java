@@ -77,11 +77,19 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	private Map<String, Set<String>> filterNodeAnnotations = new HashMap<String, Set<String>>();
 	private Map<String, Set<String>> filterEdgeAnnotations = new HashMap<String, Set<String>>();
 	
+	private static String nodeAnnosConfiguration;
+	private static String nodeAnnosRegexConfiguration;
+	private static String edgeAnnosConfiguration;
+	
+	
 	
 	
 	private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
 	
-	public VisJsComponent(VisualizerInput visInput){	
+	public VisJsComponent(VisualizerInput visInput){
+			nodeAnnosConfiguration = visInput.getMappings().getProperty(MAPPING_ANNOS_KEY);
+			nodeAnnosRegexConfiguration = visInput.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
+			edgeAnnosConfiguration = visInput.getMappings().getProperty(MAPPING_EDGES);
 			fillFilterAnnotations(visInput, 0);
 			fillFilterAnnotations(visInput, 1);
 			
@@ -197,46 +205,14 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	    }
 
 
-		@Override
-		public boolean excludeNode(SNode node) {
-			
-			if (node instanceof SToken) 
-			{
-				return false;
-			}
-					
-			Set<SAnnotation> nodeAnnotations =  node.getAnnotations();
-			
-			for (SAnnotation nodeAnnotation : nodeAnnotations)
-			{
-				String nodeAnno = nodeAnnotation.getName();
-				String nodeNs = nodeAnnotation.getNamespace();
-				//System.out.println(nodeNs +  "::" + nodeAnno);
-				
-				if (filterNodeAnnotations.containsKey(nodeAnno))
-				{
-					if (filterNodeAnnotations.get(nodeAnno).isEmpty())
-					{
-						return false;
-					}
-					else if (filterNodeAnnotations.get(nodeAnno).contains(nodeNs))
-					{
-						return false;
-					}
-				}
-				
-			}
-			
-			return true;
-		}
 		
 		
 		
 		/**
 		   * Returns the annotations to display according to the mappings configuration.
 		   *
-		   * This will check the "annos" and "annos_regex" paramters for determining.
-		   * the annotations to display. It also iterates over all nodes of the graph
+		   * This will check the "edge" parameter for determining the annotations to display. 
+		   * It also iterates over all nodes of the graph
 		   * matching the type.
 		   *
 		   * @param input The input for the visualizer.
@@ -250,45 +226,38 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 
 		    SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
-		    Set<String> annoPool = getEdgeLevelSet(graph, input.getNamespace(), type);
-		    List<String> annos = new LinkedList<>(annoPool);
-
-		    String annosConfiguration = input.getMappings().getProperty(MAPPING_EDGES);
+		    Set<String> annotationPool = getEdgeLevelSet(graph, null, type);
+		    List<String> confAnnotations = new LinkedList<>(annotationPool);
+		  
 		    
-		    System.out.println("annosConf: " + annosConfiguration);
-		    
-		    if (annosConfiguration != null && annosConfiguration.trim().length() > 0) {
-		      String[] split = annosConfiguration.split(",");
-		      annos.clear();
-		      for (String s : split) {
-		        s = s.trim();
+		    if (edgeAnnosConfiguration != null && edgeAnnosConfiguration.trim().length() > 0) {
+		      String[] confSplit = edgeAnnosConfiguration.split(",");
+		      confAnnotations.clear();
+		      for (String entry : confSplit) {
+		        entry = entry.trim();
 		        // is regular expression?
-		        if (s.startsWith("/") && s.endsWith("/")) {
+		        if (entry.startsWith("/") && entry.endsWith("/")) {
 		          // go over all remaining items in our pool of all annotations and
 		          // check if they match
-		          Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
-		          
-		          System.out.println(s);
+		          Pattern regex = Pattern.compile(StringUtils.strip(entry, "/"));
 
-		          LinkedList<String> matchingAnnos = new LinkedList<>();
-		          for (String a : annoPool) {
-		            if (regex.matcher(a).matches()) {
-		              matchingAnnos.add(a);
+		          LinkedList<String> matchingAnnotations = new LinkedList<>();
+		          for (String anno : annotationPool) {
+		            if (regex.matcher(anno).matches()) {
+		              matchingAnnotations.add(anno);
+		            
 		            }
 		          }
-
-		          annos.addAll(matchingAnnos);
-		       //   annoPool.removeAll(matchingAnnos);
+		          confAnnotations.addAll(matchingAnnotations);
+		          annotationPool.removeAll(matchingAnnotations);
 
 		        } else {
-		          annos.add(s);
-		        //  annoPool.remove(s);
+		        	confAnnotations.add(entry);
+		        	annotationPool.remove(entry);
 		        }
 		      }
-		    }
-
-		    
-		    return annos;
+		    }		    
+		    return confAnnotations;
 		  }
 
 		
@@ -323,6 +292,9 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		      } else if (type == SSpanningRelation.class){
 		    	  edges = graph.getSpanningRelations();
 		      }
+		      else {
+		    	  edges = graph.getRelations();
+		      }
 		      
 		      
 		      if (edges != null) {
@@ -333,7 +305,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		                for (SAnnotation anno : edge.getAnnotations()) {
 		                  result.add(anno.getQName());
 		                }
-		                // we got all annotations of this node, jump to next node
+		                // we got all annotations of this edge, jump to next edge
 		                break;
 		              } // end if namespace equals layer name
 		            } // end for each layer
@@ -343,32 +315,68 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 
 		    return result;
 		  }
-
-
-		@Override
-		public boolean excludeRelation(SRelation relation) {
-			Set<SAnnotation> nodeAnnotations =  relation.getAnnotations();
+		  
+	  @Override
+		public boolean excludeNode(SNode node) {
+			// if node is a token or no configuration set, output the node
+			if (node instanceof SToken || (nodeAnnosConfiguration == null && nodeAnnosRegexConfiguration == null))
+			{
+				return false;
+			}
+					
+			Set<SAnnotation> nodeAnnotations =  node.getAnnotations();
 			
 			for (SAnnotation nodeAnnotation : nodeAnnotations)
 			{
 				String nodeAnno = nodeAnnotation.getName();
 				String nodeNs = nodeAnnotation.getNamespace();
-				System.out.println(nodeNs +  "::" + nodeAnno);
 				
-				if (filterEdgeAnnotations.containsKey(nodeAnno))
+				if (filterNodeAnnotations.containsKey(nodeAnno))
 				{
-					if (filterEdgeAnnotations.get(nodeAnno).isEmpty())
+					if (filterNodeAnnotations.get(nodeAnno).isEmpty())
 					{
 						return false;
 					}
-					else if (filterEdgeAnnotations.get(nodeAnno).contains(nodeNs))
+					else if (filterNodeAnnotations.get(nodeAnno).contains(nodeNs))
 					{
 						return false;
 					}
 				}
 				
 			}
-			//TODO set to true
+			
+			return true;
+		}
+		
+
+
+		@Override
+		public boolean excludeRelation(SRelation relation) {
+			// if no configuration set, output the relation
+			if (edgeAnnosConfiguration == null){
+				return false;
+			}
+			
+			Set<SAnnotation> edgeAnnotations =  relation.getAnnotations();
+			
+			for (SAnnotation edgeAnnotation : edgeAnnotations)
+			{
+				String edgeAnno = edgeAnnotation.getName();
+				String edgeNs = edgeAnnotation.getNamespace();
+				
+				if (filterEdgeAnnotations.containsKey(edgeAnno))
+				{
+					if (filterEdgeAnnotations.get(edgeAnno).isEmpty())
+					{
+						return false;
+					}
+					else if (filterEdgeAnnotations.get(edgeAnno).contains(edgeNs))
+					{
+						return false;
+					}
+				}
+				
+			}
 			return true;
 		}
 
