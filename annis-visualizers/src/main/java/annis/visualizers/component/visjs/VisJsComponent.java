@@ -8,33 +8,24 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.EventExtractor;
-import annis.visualizers.component.kwic.KWICVisualizer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SPointingRelation;
-import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SSpanningRelation;
-import org.corpus_tools.salt.common.STextualRelation;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SLayer;
@@ -47,8 +38,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
-import com.vaadin.server.Scrollable;
-import com.vaadin.server.Sizeable;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 
 
@@ -66,6 +55,11 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
   })
 
 
+/**
+ * 
+ * @author irina
+ *
+ */
 
 public class VisJsComponent extends AbstractJavaScriptComponent implements ExportFilter{	
 	
@@ -73,10 +67,12 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	private String strEdges;
 	public static final String MAPPING_EDGES = "edges";
 	
-	// a HashMap for storage of filter annotations with associated namespaces	
+	// a HashMap for storage node annotations for export filter with associated namespaces	
 	private Map<String, Set<String>> filterNodeAnnotations = new HashMap<String, Set<String>>();
+	// a HashMap for storage edge annotations for export filter with associated namespaces	
 	private Map<String, Set<String>> filterEdgeAnnotations = new HashMap<String, Set<String>>();
 	
+
 	private static String nodeAnnosConfiguration;
 	private static String nodeAnnosRegexConfiguration;
 	private static String edgeAnnosConfiguration;
@@ -86,6 +82,11 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	
 	private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
 	
+	/**
+	 * Creates a new VisJsComponent instance.
+	 * 
+	 * @param visInput The input for the visualizer.
+	 */	
 	public VisJsComponent(VisualizerInput visInput){
 			nodeAnnosConfiguration = visInput.getMappings().getProperty(MAPPING_ANNOS_KEY);
 			nodeAnnosRegexConfiguration = visInput.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
@@ -126,6 +127,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	
 	}
 	
+	// fills export filter annotations for the specified type (0 -> nodes; 1 -> edges)
 	private void fillFilterAnnotations(VisualizerInput visInput, int type){
 		Map<String, Set<String>> myFilterAnnotations;
 		List<String> annotations;
@@ -155,7 +157,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 					}
 					else
 					{
-						//TODO Error?
+						throw new IllegalArgumentException();
 					}
 					
 				}
@@ -269,8 +271,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		   * specific namespace.
 		   *
 		   * @param graph The graph.
-		   * @param namespace The namespace of the relation (not the annotation) to search
-		   * for.
+		   * @param namespace The namespace of the relation (not the annotation) to search 
+		   * for. If namespace is null all namespaces will be considered.
 		   * @param type Which type of relation to include
 		   * @return
 		   *
