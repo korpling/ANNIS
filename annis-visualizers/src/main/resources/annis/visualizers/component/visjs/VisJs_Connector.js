@@ -6,6 +6,9 @@ var div = this.getElement();
 var containerWidth = $(div).parent().width();
 var containerHeight =  $(div).parent().height();
 var container = div;
+var minHeight = containerHeight;
+//window.alert(minHeight);
+
 $(container).css("width", containerWidth, "height", containerHeight);
 
 var strNodes =  this.getState().strNodes;
@@ -86,15 +89,51 @@ iterations: 800
 $(container).remove("canvas");
 
 visjscomponent = new vis.Network(container, data, options); 
-//var canvasWindth = $(".vis-network canvas:first-child").width();
-//window.alert(canvasWindth);
+/*var canvasWidth = $(".vis-network canvas:first-child").width();
+window.alert(canvasWidth);
+var networkWidth = $(".vis-network").width();
+window.alert(networkWidth);*/
+
+
+visjscomponent.on("zoom", function (params) {
+		var canvasWidth = $(".vis-network canvas:first-child").width();
+		var canvasHeight = $(".vis-network canvas:first-child").height();
+		var minContainerWidth = $(div).parent().width();
+
+       var zoomParams = JSON.stringify(params, null, 4);
+      // window.alert(zoomParams);
+
+       var zoomValues = JSON.parse(zoomParams);
+
+       var direction = zoomValues.direction;
+       var scale = zoomValues.scale;
+       if (direction === '+') {
+       	 visjscomponent.setSize(canvasWidth*(1+scale), canvasHeight*(1+scale));
+       }
+       else if  (direction === '-'){
+       	 visjscomponent.setSize(canvasWidth*(1-scale), canvasHeight*(1-scale));
+ 
+       }
+       
+		
+		var newCanvasWidth = $(".vis-network canvas:first-child").width();
+		var newCanvasHeight = $(".vis-network canvas:first-child").height();
+		//window.alert(newCanvasHeight);
+
+		$(container).css({"width":Math.max(newCanvasWidth, minContainerWidth), "height": Math.max(newCanvasHeight, minHeight)});
+
+
+    });
 
 };
 
+
+
 window.addEventListener("resize", function(){
  	containerWidth = $(div).parent().width();
-	containerHeight =  $(div).parent().height();
-	$(container).css("width", containerWidth, "height", containerHeight);
+ 	minContainerWidth = containerWidth;
+	//containerHeight =  $(div).parent().height();
+	$(container).css("width", containerWidth);
 
 	
 }); 
