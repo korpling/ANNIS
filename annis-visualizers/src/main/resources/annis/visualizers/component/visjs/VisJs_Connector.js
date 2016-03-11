@@ -96,8 +96,13 @@ $(container).remove("canvas");
 
 visjscomponent = new vis.Network(container, data, options); 
 
+var initCanvasWidth = $(".vis-network canvas:first-child").width();
+var initCanvasHeight = $(".vis-network canvas:first-child").height();
+
 
 visjscomponent.on("zoom", function (params) {
+		//window.alert(JSON.stringify(visjscomponent.getScale(), null, 4));
+	
 		var canvasWidth = $(".vis-network canvas:first-child").width();
 		var canvasHeight = $(".vis-network canvas:first-child").height();
 		var minContainerWidth = $(div).parent().width();
@@ -105,21 +110,26 @@ visjscomponent.on("zoom", function (params) {
        var zoomParams = JSON.stringify(params, null, 4);
       // window.alert(zoomParams);
 
+
        var zoomValues = JSON.parse(zoomParams);
 
        var direction = zoomValues.direction;
        var scale = zoomValues.scale;
-       if (direction === '+') {
+       if (direction === '+' && scale <= 1) {
        	 visjscomponent.setSize(canvasWidth*(1+scale), canvasHeight*(1+scale));
+       //	 visjscomponent.setSize(initCanvasWidth*(scale*10), initCanvasHeight*(scale*10));
        }
        else if  (direction === '-'){
 	       	if (canvasWidth*(1-scale) < minContainerWidth ||  canvasHeight*(1-scale) < minHeight){
+	       	//if (initCanvasWidth*(scale*10) < minContainerWidth ||  initCanvasHeight*(scale*10) < minHeight){
+	       			       	
 	       		//prevent zoom out of graph to the size smaller then the container size 
 	       		visjscomponent.setSize(minContainerWidth, minHeight);
 	       		
 	       	}
 	       	else{
 	       		visjscomponent.setSize(canvasWidth*(1-scale), canvasHeight*(1-scale));
+	       		//visjscomponent.setSize(initCanvasWidth*(scale*10), initCanvasHeight*(scale*10));
 	       	}     	 
  
  
@@ -130,6 +140,9 @@ visjscomponent.on("zoom", function (params) {
 		
 		$(container).css({"width": Math.max(newCanvasWidth, minContainerWidth), "height": Math.max(newCanvasHeight, minHeight)});
 		visjscomponent.fit();
+		/*visjscomponent.moveTo({
+					  position: {x:100, y:100}
+					  });*/
 
     });
 
