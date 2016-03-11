@@ -5,11 +5,17 @@ var div = this.getElement();
 
 var containerWidth = $(div).parent().width();
 var containerHeight =  $(div).parent().height();
+
+var parentWidthOld = containerWidth;
+var parentHeightOld = containerHeight;
+var parentWidthNew = parentWidthOld;
+var parentHeightNew = parentHeightOld;
+
+
 var container = div;
 var minHeight = containerHeight;
-//window.alert(minHeight);
 
-$(container).css("width", containerWidth, "height", containerHeight);
+$(container).css({"width": containerWidth, "height": containerHeight});
 
 var strNodes =  this.getState().strNodes;
 var strEdges = this.getState().strEdges;
@@ -89,10 +95,6 @@ iterations: 800
 $(container).remove("canvas");
 
 visjscomponent = new vis.Network(container, data, options); 
-/*var canvasWidth = $(".vis-network canvas:first-child").width();
-window.alert(canvasWidth);
-var networkWidth = $(".vis-network").width();
-window.alert(networkWidth);*/
 
 
 visjscomponent.on("zoom", function (params) {
@@ -111,17 +113,23 @@ visjscomponent.on("zoom", function (params) {
        	 visjscomponent.setSize(canvasWidth*(1+scale), canvasHeight*(1+scale));
        }
        else if  (direction === '-'){
-       	 visjscomponent.setSize(canvasWidth*(1-scale), canvasHeight*(1-scale));
+	       	if (canvasWidth*(1-scale) < minContainerWidth ||  canvasHeight*(1-scale) < minHeight){
+	       		//prevent zoom out of graph to the size smaller then the container size 
+	       		visjscomponent.setSize(minContainerWidth, minHeight);
+	       		
+	       	}
+	       	else{
+	       		visjscomponent.setSize(canvasWidth*(1-scale), canvasHeight*(1-scale));
+	       	}     	 
+ 
  
        }
-       
-		
+       		
 		var newCanvasWidth = $(".vis-network canvas:first-child").width();
 		var newCanvasHeight = $(".vis-network canvas:first-child").height();
-		//window.alert(newCanvasHeight);
-
-		$(container).css({"width":Math.max(newCanvasWidth, minContainerWidth), "height": Math.max(newCanvasHeight, minHeight)});
-
+		
+		$(container).css({"width": Math.max(newCanvasWidth, minContainerWidth), "height": Math.max(newCanvasHeight, minHeight)});
+		visjscomponent.fit();
 
     });
 
@@ -130,12 +138,27 @@ visjscomponent.on("zoom", function (params) {
 
 
 window.addEventListener("resize", function(){
- 	containerWidth = $(div).parent().width();
- 	minContainerWidth = containerWidth;
-	//containerHeight =  $(div).parent().height();
-	$(container).css("width", containerWidth);
+	parentWidthNew = $(div).parent().width();
+	parentHeightNew = $(div).parent().height();
+
+	if (parentWidthNew > parentWidthOld || parentHeightNew > parentWidthOld){
+		containerWidth = Math.max(parentWidthNew, $(container).width());
+		containerHeight =  Math.max(parentHeightNew, $(container).height());
+	}
+	else{
+		containerWidth = Math.min(parentWidthNew, $(container).width());
+		containerHeight =  Math.min(parentHeightNew, $(container).height());
+	}
+
+ 	minContainerWidth = containerWidth;	
+
+	$(container).css({"width": containerWidth, "height": containerHeight});
+	visjscomponent.setSize(containerWidth, containerHeight);
+	visjscomponent.fit();
 
 	
+	parentWidthOld = parentWidthNew;
+	parentHeightOld = parentHeightNew;
 }); 
 
 
