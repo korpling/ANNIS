@@ -1,6 +1,5 @@
 var classannis_1_1model_1_1_relannis_node_feature =
 [
-    [ "extract", "classannis_1_1model_1_1_relannis_node_feature.html#ad55665937e75a82b351fe69b389e1efa", null ],
     [ "getCorpusRef", "classannis_1_1model_1_1_relannis_node_feature.html#ab76311533e1b2a4ea72dfff637d60ff1", null ],
     [ "getInternalID", "classannis_1_1model_1_1_relannis_node_feature.html#a4f774ab0b9fa5587fd0817c567837af5", null ],
     [ "getLeft", "classannis_1_1model_1_1_relannis_node_feature.html#ac1edcd1c64ef5ab63281fdd7f42baea0", null ],
@@ -23,18 +22,5 @@ var classannis_1_1model_1_1_relannis_node_feature =
     [ "setSegName", "classannis_1_1model_1_1_relannis_node_feature.html#af921a73f09db6740cefb3438500fd8f8", null ],
     [ "setTextRef", "classannis_1_1model_1_1_relannis_node_feature.html#a8f307b0603b6e1a05a492b8bdfe35fba", null ],
     [ "setTokenIndex", "classannis_1_1model_1_1_relannis_node_feature.html#ad1f174df90583074c3c8f08a4d63d54f", null ],
-    [ "toString", "classannis_1_1model_1_1_relannis_node_feature.html#a3a95e0ebe358c6e8226e77af1c90ebbb", null ],
-    [ "continuous", "classannis_1_1model_1_1_relannis_node_feature.html#aa95ec5006de62d08b8c3d6fe85917f8b", null ],
-    [ "corpusRef", "classannis_1_1model_1_1_relannis_node_feature.html#a84bf919615f04810c1b8653f62673784", null ],
-    [ "internalID", "classannis_1_1model_1_1_relannis_node_feature.html#ab16dc406ba4d023ff7050f889246e17b", null ],
-    [ "left", "classannis_1_1model_1_1_relannis_node_feature.html#a17191bc73591496f7c4196b2a7219216", null ],
-    [ "leftToken", "classannis_1_1model_1_1_relannis_node_feature.html#aca75a129c72ae3d1bbe8bac5968debf2", null ],
-    [ "matchedNode", "classannis_1_1model_1_1_relannis_node_feature.html#aadad8a9718e9bb2f6e1b3f76f965f4be", null ],
-    [ "right", "classannis_1_1model_1_1_relannis_node_feature.html#a9cbe8d547bcc0a0d6d713329994698a4", null ],
-    [ "rightToken", "classannis_1_1model_1_1_relannis_node_feature.html#a1fa2a2daf47dc05296ac19cad33cadd1", null ],
-    [ "segIndex", "classannis_1_1model_1_1_relannis_node_feature.html#ad70fa2e0802f5ed6b8993e844906b003", null ],
-    [ "segName", "classannis_1_1model_1_1_relannis_node_feature.html#a4e24e353d3805d104869559683435e24", null ],
-    [ "serialVersionUID", "classannis_1_1model_1_1_relannis_node_feature.html#aea620f583860eb810d9306f546778697", null ],
-    [ "textRef", "classannis_1_1model_1_1_relannis_node_feature.html#a873c46e07525a440e89ffdeaac403921", null ],
-    [ "tokenIndex", "classannis_1_1model_1_1_relannis_node_feature.html#a8af493fe22fda6e7c96d944a5c387b02", null ]
+    [ "toString", "classannis_1_1model_1_1_relannis_node_feature.html#a3a95e0ebe358c6e8226e77af1c90ebbb", null ]
 ];

@@ -94,4 +94,3 @@ function toggleInherit(id)
     $(img).attr('src',src.substring(0,src.length-10)+'open.png');
   }
 }
-

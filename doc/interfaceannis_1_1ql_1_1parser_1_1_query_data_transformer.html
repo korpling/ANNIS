@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -119,17 +116,8 @@ $(document).ready(function(){initNavTree('interfaceannis_1_1ql_1_1parser_1_1_que
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Transformer or optimizer for <a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.ql.parser.QueryDataTransformer:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.png" usemap="#annis.ql.parser.QueryDataTransformer_map" alt=""/>
-  <map id="annis.ql.parser.QueryDataTransformer_map" name="annis.ql.parser.QueryDataTransformer_map">
-<area href="classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html" title="Fix queries where a node is contained in two linguistic relations that could query different componen..." alt="annis.ql.parser.ComponentSearchRelationNormalizer" shape="rect" coords="0,56,310,80"/>
-<area href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html" title="Performs semantic checks on the parsed query. " alt="annis.ql.parser.SemanticValidator" shape="rect" coords="320,56,630,80"/>
-<area href="classannis_1_1ql_1_1parser_1_1_transitive_precedence_optimizer.html" title="Extends precedence relations to other nodes that are only transitivly connected. " alt="annis.ql.parser.TransitivePrecedenceOptimizer" shape="rect" coords="640,56,950,80"/>
-</map>
- </div></div>
+</div>
+<p>Inherited by <a class="el" href="classannis_1_1ql_1_1parser_1_1_annotation_existence_validator.html">annis.ql.parser.AnnotationExistenceValidator</a>, <a class="el" href="classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html">annis.ql.parser.ComponentSearchRelationNormalizer</a>, <a class="el" href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html">annis.ql.parser.SemanticValidator</a>, and <a class="el" href="classannis_1_1ql_1_1parser_1_1_transitive_precedence_optimizer.html">annis.ql.parser.TransitivePrecedenceOptimizer</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -161,20 +149,17 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The (possably new object) with the transformation applied. </dd></dl>
 
-<p>Implemented in <a class="el" href="classannis_1_1ql_1_1parser_1_1_transitive_precedence_optimizer.html#a9956e8bfac0b84a5e3d05e27ff5915f7">annis.ql.parser.TransitivePrecedenceOptimizer</a>, <a class="el" href="classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html#a8d3cb6ddfffa572e63aee6b3dda4938e">annis.ql.parser.ComponentSearchRelationNormalizer</a>, and <a class="el" href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html#a3ee3a931b3cf99d7dae723b30671ab91">annis.ql.parser.SemanticValidator</a>.</p>
+<p>Implemented in <a class="el" href="classannis_1_1ql_1_1parser_1_1_transitive_precedence_optimizer.html#a9956e8bfac0b84a5e3d05e27ff5915f7">annis.ql.parser.TransitivePrecedenceOptimizer</a>, <a class="el" href="classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html#a8d3cb6ddfffa572e63aee6b3dda4938e">annis.ql.parser.ComponentSearchRelationNormalizer</a>, <a class="el" href="classannis_1_1ql_1_1parser_1_1_annotation_existence_validator.html#af6fa14e09daa938c27f20bd6b123e331">annis.ql.parser.AnnotationExistenceValidator</a>, and <a class="el" href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html#a3ee3a931b3cf99d7dae723b30671ab91">annis.ql.parser.SemanticValidator</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this interface was generated from the following file:<ul>
-<li><a class="el" href="_query_data_transformer_8java.html">QueryDataTransformer.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1ql.html">ql</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1ql_1_1parser.html">parser</a></li><li class="navelem"><a class="el" href="interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.html">QueryDataTransformer</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>ql</b></li><li class="navelem"><b>parser</b></li><li class="navelem"><a class="el" href="interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.html">QueryDataTransformer</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

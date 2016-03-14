@@ -1,6 +1,5 @@
 var classannis_1_1sqlgen_1_1_matrix_sql_generator =
 [
-    [ "addAnnoSelectionCondition", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#afa5e8734589001cc309fedb34a3a1082", null ],
     [ "addFromOuterJoins", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#afc48bc3977a3bfeff1ccb2bc6dd578fe", null ],
     [ "createSolutionKey", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#aa8e4930d85094949530fb6d97bfa8c6a", null ],
     [ "extractData", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#ab86b8d3c8e2e72d1d22cb6057226cdaf", null ],
@@ -19,9 +18,5 @@ var classannis_1_1sqlgen_1_1_matrix_sql_generator =
     [ "setMatchedNodesViewName", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#a19e46f12844bd2eccf397737e4e7373d", null ],
     [ "setSolutionSqlGenerator", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#a808cf3878dee9c3eba87538cb50227bf", null ],
     [ "setSpanExtractor", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#a0b18db37f98e90c886b3252bc1995eed", null ],
-    [ "whereConditions", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#a67354bc7961d6f777b6565527afa9409", null ],
-    [ "log", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#ae01045f11b8376c6f37904506c66accc", null ],
-    [ "matchedNodesViewName", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#af1a31984617ab5fe7d637f9c7c5c7a98", null ],
-    [ "solutionSqlGenerator", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#aad8944ba1ac0be6fadfca29e8db9aa98", null ],
-    [ "spanExtractor", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#a9f1e3e0e38fbc2a8346178c3de60b138", null ]
+    [ "whereConditions", "classannis_1_1sqlgen_1_1_matrix_sql_generator.html#a67354bc7961d6f777b6565527afa9409", null ]
 ];

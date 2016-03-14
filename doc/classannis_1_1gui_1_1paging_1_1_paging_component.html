@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -113,9 +110,6 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1paging_1_1_paging
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1gui_1_1paging_1_1_paging_component-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.gui.paging.PagingComponent Class Reference</div>  </div>
@@ -123,47 +117,46 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1paging_1_1_paging
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>thomas </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.gui.paging.PagingComponent:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1gui_1_1paging_1_1_paging_component.png" usemap="#annis.gui.paging.PagingComponent_map" alt=""/>
-  <map id="annis.gui.paging.PagingComponent_map" name="annis.gui.paging.PagingComponent_map">
-</map>
- </div></div>
+</div>
+<p>Inherits Panel, and ClickListener.</p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component_1_1_enter_handler.html">EnterHandler</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component_1_1_page_validator.html">PageValidator</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a62d4f7bbfd65a578ee9330471b611974"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a62d4f7bbfd65a578ee9330471b611974">PagingComponent</a> ()</td></tr>
-<tr class="separator:a62d4f7bbfd65a578ee9330471b611974"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8d341012a10f7b25e300e396d6638f7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#ad8d341012a10f7b25e300e396d6638f7">PagingComponent</a> (int <a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a5d489675417c6b70ca70f68139927412">count</a>, int <a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#aa73c0ce26246b8c95d7fe16b6f01eac8">pageSize</a>)</td></tr>
+<tr class="memitem:ad8d341012a10f7b25e300e396d6638f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad8d341012a10f7b25e300e396d6638f7"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>PagingComponent</b> (int count, int pageSize)</td></tr>
 <tr class="separator:ad8d341012a10f7b25e300e396d6638f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af969b1bc0b020cadced2d061673cfbdb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#af969b1bc0b020cadced2d061673cfbdb">addCallback</a> (<a class="el" href="interfaceannis_1_1gui_1_1paging_1_1_paging_callback.html">PagingCallback</a> callback)</td></tr>
+<tr class="memitem:a2e9f4f88fda5ac5b2b312df93db4a87e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e9f4f88fda5ac5b2b312df93db4a87e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>attach</b> ()</td></tr>
+<tr class="separator:a2e9f4f88fda5ac5b2b312df93db4a87e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af969b1bc0b020cadced2d061673cfbdb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af969b1bc0b020cadced2d061673cfbdb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addCallback</b> (<a class="el" href="interfaceannis_1_1gui_1_1paging_1_1_paging_callback.html">PagingCallback</a> callback)</td></tr>
 <tr class="separator:af969b1bc0b020cadced2d061673cfbdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f3e814f8e9af74b87f07716750ddca8"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a4f3e814f8e9af74b87f07716750ddca8">removeCallback</a> (<a class="el" href="interfaceannis_1_1gui_1_1paging_1_1_paging_callback.html">PagingCallback</a> callback)</td></tr>
+<tr class="memitem:a4f3e814f8e9af74b87f07716750ddca8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4f3e814f8e9af74b87f07716750ddca8"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>removeCallback</b> (<a class="el" href="interfaceannis_1_1gui_1_1paging_1_1_paging_callback.html">PagingCallback</a> callback)</td></tr>
 <tr class="separator:a4f3e814f8e9af74b87f07716750ddca8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af159e11ed51a50d4a3d677c78b24cbe5"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#af159e11ed51a50d4a3d677c78b24cbe5">getMaxPage</a> ()</td></tr>
+<tr class="memitem:af159e11ed51a50d4a3d677c78b24cbe5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af159e11ed51a50d4a3d677c78b24cbe5"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getMaxPage</b> ()</td></tr>
 <tr class="separator:af159e11ed51a50d4a3d677c78b24cbe5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1eebccbce7f47599105c9d39908cc06"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#ae1eebccbce7f47599105c9d39908cc06">getStartNumber</a> ()</td></tr>
-<tr class="separator:ae1eebccbce7f47599105c9d39908cc06"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad58ee7dce25989dd747e2fbaafac05f9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#ad58ee7dce25989dd747e2fbaafac05f9">setStartNumber</a> (int startNumber)</td></tr>
-<tr class="separator:ad58ee7dce25989dd747e2fbaafac05f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2afc18ad70e7de142d93a0e4b53ba647"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a2afc18ad70e7de142d93a0e4b53ba647">getCount</a> ()</td></tr>
+<tr class="memitem:afe768c75195838bed9d5f27a59dfe1f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe768c75195838bed9d5f27a59dfe1f5"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>getStartNumber</b> ()</td></tr>
+<tr class="separator:afe768c75195838bed9d5f27a59dfe1f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c8247700a2807506c2a86ef42c1f7ea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c8247700a2807506c2a86ef42c1f7ea"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setStartNumber</b> (long startNumber)</td></tr>
+<tr class="separator:a5c8247700a2807506c2a86ef42c1f7ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2afc18ad70e7de142d93a0e4b53ba647"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2afc18ad70e7de142d93a0e4b53ba647"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getCount</b> ()</td></tr>
 <tr class="separator:a2afc18ad70e7de142d93a0e4b53ba647"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a232d1f26c01a0eb7d1b5b8b675fb66f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a232d1f26c01a0eb7d1b5b8b675fb66f2">setCount</a> (int <a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a5d489675417c6b70ca70f68139927412">count</a>, boolean <a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a886fb921c5294c01db8cf8192eb20bf2">update</a>)</td></tr>
+<tr class="memitem:a232d1f26c01a0eb7d1b5b8b675fb66f2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a232d1f26c01a0eb7d1b5b8b675fb66f2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setCount</b> (int count, boolean update)</td></tr>
 <tr class="separator:a232d1f26c01a0eb7d1b5b8b675fb66f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9623f80502176db6bac300dbbeab8c0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#ac9623f80502176db6bac300dbbeab8c0">getPageSize</a> ()</td></tr>
+<tr class="memitem:ac9623f80502176db6bac300dbbeab8c0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac9623f80502176db6bac300dbbeab8c0"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getPageSize</b> ()</td></tr>
 <tr class="separator:ac9623f80502176db6bac300dbbeab8c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a8c82aa97505e6463aba143b4f65948"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a4a8c82aa97505e6463aba143b4f65948">setPageSize</a> (int <a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#aa73c0ce26246b8c95d7fe16b6f01eac8">pageSize</a>, boolean informCallback)</td></tr>
+<tr class="memitem:a4a8c82aa97505e6463aba143b4f65948"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4a8c82aa97505e6463aba143b4f65948"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setPageSize</b> (int pageSize, boolean informCallback)</td></tr>
 <tr class="separator:a4a8c82aa97505e6463aba143b4f65948"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1fd85f308d7f0dd86d102aa2a799d345"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a1fd85f308d7f0dd86d102aa2a799d345">buttonClick</a> (ClickEvent event)</td></tr>
+<tr class="memitem:a1fd85f308d7f0dd86d102aa2a799d345"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1fd85f308d7f0dd86d102aa2a799d345"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>buttonClick</b> (ClickEvent event)</td></tr>
 <tr class="separator:a1fd85f308d7f0dd86d102aa2a799d345"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee0619d6df839ee3eaaf13cf29220c55"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#aee0619d6df839ee3eaaf13cf29220c55">setInfo</a> (String text)</td></tr>
 <tr class="memdesc:aee0619d6df839ee3eaaf13cf29220c55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cuts off long queries.  <a href="#aee0619d6df839ee3eaaf13cf29220c55">More...</a><br /></td></tr>
@@ -171,257 +164,20 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:addc610c08a6218cf8a00544aad53fed7"><td class="memItemLeft" align="right" valign="top">static final Resource&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#addc610c08a6218cf8a00544aad53fed7">LEFT_ARROW</a> = ANNISFontIcon.LEFT_ARROW</td></tr>
+<tr class="memitem:addc610c08a6218cf8a00544aad53fed7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="addc610c08a6218cf8a00544aad53fed7"></a>
+static final Resource&#160;</td><td class="memItemRight" valign="bottom"><b>LEFT_ARROW</b> = ANNISFontIcon.LEFT_ARROW</td></tr>
 <tr class="separator:addc610c08a6218cf8a00544aad53fed7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace289e568f472f5d48268ff55c2efa4e"><td class="memItemLeft" align="right" valign="top">static final Resource&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#ace289e568f472f5d48268ff55c2efa4e">RIGHT_ARROW</a> = ANNISFontIcon.RIGHT_ARROW</td></tr>
+<tr class="memitem:ace289e568f472f5d48268ff55c2efa4e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ace289e568f472f5d48268ff55c2efa4e"></a>
+static final Resource&#160;</td><td class="memItemRight" valign="bottom"><b>RIGHT_ARROW</b> = ANNISFontIcon.RIGHT_ARROW</td></tr>
 <tr class="separator:ace289e568f472f5d48268ff55c2efa4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8c62f479afae871757d8c3c4f8926d4"><td class="memItemLeft" align="right" valign="top">static final Resource&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#ae8c62f479afae871757d8c3c4f8926d4">FIRST</a> = ANNISFontIcon.FIRST</td></tr>
+<tr class="memitem:ae8c62f479afae871757d8c3c4f8926d4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8c62f479afae871757d8c3c4f8926d4"></a>
+static final Resource&#160;</td><td class="memItemRight" valign="bottom"><b>FIRST</b> = ANNISFontIcon.FIRST</td></tr>
 <tr class="separator:ae8c62f479afae871757d8c3c4f8926d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b2d163437ae424aa5e7dbc4b54edd72"><td class="memItemLeft" align="right" valign="top">static final Resource&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a8b2d163437ae424aa5e7dbc4b54edd72">LAST</a> = ANNISFontIcon.LAST</td></tr>
+<tr class="memitem:a8b2d163437ae424aa5e7dbc4b54edd72"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8b2d163437ae424aa5e7dbc4b54edd72"></a>
+static final Resource&#160;</td><td class="memItemRight" valign="bottom"><b>LAST</b> = ANNISFontIcon.LAST</td></tr>
 <tr class="separator:a8b2d163437ae424aa5e7dbc4b54edd72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:a886fb921c5294c01db8cf8192eb20bf2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a886fb921c5294c01db8cf8192eb20bf2">update</a> (boolean informCallbacks)</td></tr>
-<tr class="separator:a886fb921c5294c01db8cf8192eb20bf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f8e51d3c7ca2a2511d66953b91b5ffc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a2f8e51d3c7ca2a2511d66953b91b5ffc">sanitizePage</a> (int page)</td></tr>
-<tr class="separator:a2f8e51d3c7ca2a2511d66953b91b5ffc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a63082df74b239be15b1929e7d69463c7"><td class="memItemLeft" align="right" valign="top">HorizontalLayout&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a63082df74b239be15b1929e7d69463c7">layout</a></td></tr>
-<tr class="separator:a63082df74b239be15b1929e7d69463c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c70cc6a594c5e2bab817a0f86cb8737"><td class="memItemLeft" align="right" valign="top">Button&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a6c70cc6a594c5e2bab817a0f86cb8737">btFirst</a></td></tr>
-<tr class="separator:a6c70cc6a594c5e2bab817a0f86cb8737"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9c97a2cae9ac37963080abd8b0f5b632"><td class="memItemLeft" align="right" valign="top">Button&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a9c97a2cae9ac37963080abd8b0f5b632">btLast</a></td></tr>
-<tr class="separator:a9c97a2cae9ac37963080abd8b0f5b632"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13d53cd3c47f554267de3d7f0e56befa"><td class="memItemLeft" align="right" valign="top">Button&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a13d53cd3c47f554267de3d7f0e56befa">btNext</a></td></tr>
-<tr class="separator:a13d53cd3c47f554267de3d7f0e56befa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acfb71be0ad3c4e2dd54119c039d79225"><td class="memItemLeft" align="right" valign="top">Button&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#acfb71be0ad3c4e2dd54119c039d79225">btPrevious</a></td></tr>
-<tr class="separator:acfb71be0ad3c4e2dd54119c039d79225"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae83457b8020301b262b4da90a05f58ba"><td class="memItemLeft" align="right" valign="top">TextField&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#ae83457b8020301b262b4da90a05f58ba">txtPage</a></td></tr>
-<tr class="separator:ae83457b8020301b262b4da90a05f58ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1c1018d21a9b1b5f7a7c8569dc2bcb9"><td class="memItemLeft" align="right" valign="top">Label&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#ab1c1018d21a9b1b5f7a7c8569dc2bcb9">lblMaxPages</a></td></tr>
-<tr class="separator:ab1c1018d21a9b1b5f7a7c8569dc2bcb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af25b988c4b49b8a38729baa545116f8c"><td class="memItemLeft" align="right" valign="top">Label&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#af25b988c4b49b8a38729baa545116f8c">lblStatus</a></td></tr>
-<tr class="separator:af25b988c4b49b8a38729baa545116f8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34f77c566aab8fca4d900489a083a71c"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="interfaceannis_1_1gui_1_1paging_1_1_paging_callback.html">PagingCallback</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a34f77c566aab8fca4d900489a083a71c">callbacks</a></td></tr>
-<tr class="separator:a34f77c566aab8fca4d900489a083a71c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d489675417c6b70ca70f68139927412"><td class="memItemLeft" align="right" valign="top">AtomicInteger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a5d489675417c6b70ca70f68139927412">count</a></td></tr>
-<tr class="separator:a5d489675417c6b70ca70f68139927412"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa73c0ce26246b8c95d7fe16b6f01eac8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#aa73c0ce26246b8c95d7fe16b6f01eac8">pageSize</a></td></tr>
-<tr class="separator:aa73c0ce26246b8c95d7fe16b6f01eac8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5739d0fea3e2ed37af9994ed10eea0c9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a5739d0fea3e2ed37af9994ed10eea0c9">currentPage</a></td></tr>
-<tr class="separator:a5739d0fea3e2ed37af9994ed10eea0c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38b58ce71417fa8d76240c682daa14b0"><td class="memItemLeft" align="right" valign="top">Label&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a38b58ce71417fa8d76240c682daa14b0">lblInfo</a></td></tr>
-<tr class="separator:a38b58ce71417fa8d76240c682daa14b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a32fdae54477afb2574d10241633e856b"><td class="memItemLeft" align="right" valign="top">static final org.slf4j.Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a32fdae54477afb2574d10241633e856b">log</a></td></tr>
-<tr class="separator:a32fdae54477afb2574d10241633e856b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a62d4f7bbfd65a578ee9330471b611974"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.gui.paging.PagingComponent.PagingComponent </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad8d341012a10f7b25e300e396d6638f7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.gui.paging.PagingComponent.PagingComponent </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>count</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>pageSize</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="af969b1bc0b020cadced2d061673cfbdb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.paging.PagingComponent.addCallback </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="interfaceannis_1_1gui_1_1paging_1_1_paging_callback.html">PagingCallback</a>&#160;</td>
-          <td class="paramname"><em>callback</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1fd85f308d7f0dd86d102aa2a799d345"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.paging.PagingComponent.buttonClick </td>
-          <td>(</td>
-          <td class="paramtype">ClickEvent&#160;</td>
-          <td class="paramname"><em>event</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2afc18ad70e7de142d93a0e4b53ba647"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.gui.paging.PagingComponent.getCount </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af159e11ed51a50d4a3d677c78b24cbe5"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.gui.paging.PagingComponent.getMaxPage </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac9623f80502176db6bac300dbbeab8c0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.gui.paging.PagingComponent.getPageSize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae1eebccbce7f47599105c9d39908cc06"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.gui.paging.PagingComponent.getStartNumber </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4f3e814f8e9af74b87f07716750ddca8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.gui.paging.PagingComponent.removeCallback </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="interfaceannis_1_1gui_1_1paging_1_1_paging_callback.html">PagingCallback</a>&#160;</td>
-          <td class="paramname"><em>callback</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2f8e51d3c7ca2a2511d66953b91b5ffc"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.gui.paging.PagingComponent.sanitizePage </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>page</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a232d1f26c01a0eb7d1b5b8b675fb66f2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.paging.PagingComponent.setCount </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>count</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>update</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="aee0619d6df839ee3eaaf13cf29220c55"></a>
 <div class="memitem">
 <div class="memproto">
@@ -447,445 +203,13 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4a8c82aa97505e6463aba143b4f65948"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.paging.PagingComponent.setPageSize </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>pageSize</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>informCallback</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad58ee7dce25989dd747e2fbaafac05f9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.paging.PagingComponent.setStartNumber </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>startNumber</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a886fb921c5294c01db8cf8192eb20bf2"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.paging.PagingComponent.update </td>
-          <td>(</td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>informCallbacks</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a6c70cc6a594c5e2bab817a0f86cb8737"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Button annis.gui.paging.PagingComponent.btFirst</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9c97a2cae9ac37963080abd8b0f5b632"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Button annis.gui.paging.PagingComponent.btLast</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a13d53cd3c47f554267de3d7f0e56befa"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Button annis.gui.paging.PagingComponent.btNext</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="acfb71be0ad3c4e2dd54119c039d79225"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Button annis.gui.paging.PagingComponent.btPrevious</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a34f77c566aab8fca4d900489a083a71c"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;<a class="el" href="interfaceannis_1_1gui_1_1paging_1_1_paging_callback.html">PagingCallback</a>&gt; annis.gui.paging.PagingComponent.callbacks</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5d489675417c6b70ca70f68139927412"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">AtomicInteger annis.gui.paging.PagingComponent.count</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5739d0fea3e2ed37af9994ed10eea0c9"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.gui.paging.PagingComponent.currentPage</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae8c62f479afae871757d8c3c4f8926d4"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Resource annis.gui.paging.PagingComponent.FIRST = ANNISFontIcon.FIRST</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8b2d163437ae424aa5e7dbc4b54edd72"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Resource annis.gui.paging.PagingComponent.LAST = ANNISFontIcon.LAST</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a63082df74b239be15b1929e7d69463c7"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">HorizontalLayout annis.gui.paging.PagingComponent.layout</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a38b58ce71417fa8d76240c682daa14b0"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Label annis.gui.paging.PagingComponent.lblInfo</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab1c1018d21a9b1b5f7a7c8569dc2bcb9"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Label annis.gui.paging.PagingComponent.lblMaxPages</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af25b988c4b49b8a38729baa545116f8c"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Label annis.gui.paging.PagingComponent.lblStatus</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="addc610c08a6218cf8a00544aad53fed7"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Resource annis.gui.paging.PagingComponent.LEFT_ARROW = ANNISFontIcon.LEFT_ARROW</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a32fdae54477afb2574d10241633e856b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final org.slf4j.Logger annis.gui.paging.PagingComponent.log</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= LoggerFactory.getLogger(</div>
-<div class="line">    <a class="code" href="classannis_1_1gui_1_1paging_1_1_paging_component.html#a62d4f7bbfd65a578ee9330471b611974">PagingComponent</a>.class)</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="aa73c0ce26246b8c95d7fe16b6f01eac8"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.gui.paging.PagingComponent.pageSize</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ace289e568f472f5d48268ff55c2efa4e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Resource annis.gui.paging.PagingComponent.RIGHT_ARROW = ANNISFontIcon.RIGHT_ARROW</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae83457b8020301b262b4da90a05f58ba"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">TextField annis.gui.paging.PagingComponent.txtPage</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_paging_component_8java.html">PagingComponent.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui.html">gui</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1paging.html">paging</a></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html">PagingComponent</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>paging</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1paging_1_1_paging_component.html">PagingComponent</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

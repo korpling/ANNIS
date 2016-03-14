@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['_5fthis',['_this',['../classannis_1_1model_1_1_data_object_1_1_field_call_back_equals_impl.html#a444e65de1118270077aaadd7772d6dc6',1,'annis.model.DataObject.FieldCallBackEqualsImpl._this()'],['../classannis_1_1model_1_1_data_object_1_1_field_call_back_hash_impl.html#a3713e338567895e971a5f6a8021a54e3',1,'annis.model.DataObject.FieldCallBackHashImpl._this()']]]
+  ['classname',['CLASSNAME',['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_v_annotation_grid.html#a9c4048b64d0ace90574382bcb3cf2ced',1,'annis.gui.widgets.gwt.client.ui.VAnnotationGrid.CLASSNAME()'],['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_v_auto_height_i_frame.html#ab60816b9fbb5a925043722726350b844',1,'annis.gui.widgets.gwt.client.ui.VAutoHeightIFrame.CLASSNAME()'],['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_v_grip_drag_component.html#ae154c460e12b6b2876985229216718f1',1,'annis.gui.widgets.gwt.client.ui.VGripDragComponent.CLASSNAME()'],['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_v_simple_canvas.html#a3aeecdf049975a1145677d691e1632f4',1,'annis.gui.widgets.gwt.client.ui.VSimpleCanvas.CLASSNAME()']]],
+  ['context',['context',['../classannis_1_1sqlgen_1_1_islands_policy.html#a77851076e482310671bcb80822d4299b',1,'annis::sqlgen::IslandsPolicy::IslandPolicies']]]
 ];

@@ -22,11 +22,5 @@ var classannis_1_1sqlgen_1_1_annotate_sql_generator =
     [ "setMatchedNodesViewName", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#acbed27e93ace100df0a9966577a9076c", null ],
     [ "setOuterQueryTableAccessStrategy", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#a3bb1463396c33846bfd1123f9df83739", null ],
     [ "setResultExtractor", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#a7f547918d1b9c0a0407656d0adec06a4", null ],
-    [ "whereConditions", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#aa87b684edad30d463575402046452b23", null ],
-    [ "corpusPathExtractor", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#a44d36445332d500a433a095e89dda2e0", null ],
-    [ "includeDocumentNameInAnnotateQuery", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#a1c57dac1da53e8a3c00f0158ba57af13", null ],
-    [ "includeIsTokenColumn", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#af4aeeffad2991bc3f4d8b228b718df84", null ],
-    [ "matchedNodesViewName", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#a14ac29efc69fc56a3d2e5f6197aa4737", null ],
-    [ "outerQueryTableAccessStrategy", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#a72745fe0dd0810ff160e5c85b241d1c6", null ],
-    [ "resultExtractor", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#ac0e8eb12f13c33e43bc2a394618e5819", null ]
+    [ "whereConditions", "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#aa87b684edad30d463575402046452b23", null ]
 ];

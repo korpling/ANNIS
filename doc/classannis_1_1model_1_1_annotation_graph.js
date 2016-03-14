@@ -1,9 +1,8 @@
 var classannis_1_1model_1_1_annotation_graph =
 [
-    [ "NodeComparator", "classannis_1_1model_1_1_annotation_graph_1_1_node_comparator.html", "classannis_1_1model_1_1_annotation_graph_1_1_node_comparator" ],
     [ "AnnotationGraph", "classannis_1_1model_1_1_annotation_graph.html#a32be385db091fd4f8affad7e4f593bdd", null ],
     [ "AnnotationGraph", "classannis_1_1model_1_1_annotation_graph.html#a20a37bcace4d3ee3a862787a6a4f14b2", null ],
-    [ "addEdge", "classannis_1_1model_1_1_annotation_graph.html#a59906c991161b16b0c7db172524e68d8", null ],
+    [ "addEdge", "classannis_1_1model_1_1_annotation_graph.html#a33718953a52075933baf66a0a35752e7", null ],
     [ "addMatchedNodeId", "classannis_1_1model_1_1_annotation_graph.html#ae7fcb9e28294ef0d5ff3f60d83104170", null ],
     [ "addNode", "classannis_1_1model_1_1_annotation_graph.html#ae081620f0794e84dc3fc7cf82102600b", null ],
     [ "equals", "classannis_1_1model_1_1_annotation_graph.html#a18268a7b0c84ecfcea37f47d9befcca9", null ],
@@ -17,11 +16,5 @@ var classannis_1_1model_1_1_annotation_graph =
     [ "hashCode", "classannis_1_1model_1_1_annotation_graph.html#a9b6770cf8aca3adde036722ce007070a", null ],
     [ "setDocumentName", "classannis_1_1model_1_1_annotation_graph.html#a343dfcaa6f931dc34bccf76ca1980e92", null ],
     [ "setPath", "classannis_1_1model_1_1_annotation_graph.html#a871a039edaec0c4e4d3ce08b908df5a4", null ],
-    [ "toString", "classannis_1_1model_1_1_annotation_graph.html#a94ac8841b9dd97e7b10a4caad0459064", null ],
-    [ "documentName", "classannis_1_1model_1_1_annotation_graph.html#a098783ed579d842ad7fdbacfc0bc175c", null ],
-    [ "edges", "classannis_1_1model_1_1_annotation_graph.html#a3a8184ceb6273dd84894ff0386ca83d5", null ],
-    [ "matchedNodeIds", "classannis_1_1model_1_1_annotation_graph.html#acf1bfbc6237ea17e94a9089ee64b100b", null ],
-    [ "nodes", "classannis_1_1model_1_1_annotation_graph.html#adc9bbe8ca9d3db407d4182c62d052419", null ],
-    [ "path", "classannis_1_1model_1_1_annotation_graph.html#a08d016fff23f086f2af4ef7dff695f1c", null ],
-    [ "tokenByIndex", "classannis_1_1model_1_1_annotation_graph.html#a6dbbda745b115176f02da54a4412edb7", null ]
+    [ "toString", "classannis_1_1model_1_1_annotation_graph.html#a94ac8841b9dd97e7b10a4caad0459064", null ]
 ];

@@ -1,12 +1,7 @@
 var enumannis_1_1libgui_1_1_matched_node_colors =
 [
-    [ "MatchedNodeColors", "enumannis_1_1libgui_1_1_matched_node_colors.html#af7c2b68ffd70bd698011aec48ea9a049", null ],
-    [ "colorClassByMatch", "enumannis_1_1libgui_1_1_matched_node_colors.html#aca1c89f40dfd143e4e921dc1e6fc5df4", null ],
     [ "getColor", "enumannis_1_1libgui_1_1_matched_node_colors.html#a58f9aceedf6d383820e421ceab587b5d", null ],
     [ "getHTMLColor", "enumannis_1_1libgui_1_1_matched_node_colors.html#ad37957a5b745736609c44a754ad90319", null ],
-    [ "getHTMLColorByMatch", "enumannis_1_1libgui_1_1_matched_node_colors.html#a9411c4a732ecf9893c1a272e85ef6ca5", null ],
-    [ "twoDigitHex", "enumannis_1_1libgui_1_1_matched_node_colors.html#a20100e0c2ba5c659b712aa85cf308c86", null ],
-    [ "color", "enumannis_1_1libgui_1_1_matched_node_colors.html#a9c1fc7a30728ba7cd407b21912add130", null ],
     [ "DarkRed", "enumannis_1_1libgui_1_1_matched_node_colors.html#a940a2a00d4e823b24b1fca3cfb0e7483", null ],
     [ "DodgerBlue", "enumannis_1_1libgui_1_1_matched_node_colors.html#ad129c27afaa39bd89065092cd13f9453", null ],
     [ "Gold", "enumannis_1_1libgui_1_1_matched_node_colors.html#a374651a12de5f3fa24636c53bf1ef5fa", null ],

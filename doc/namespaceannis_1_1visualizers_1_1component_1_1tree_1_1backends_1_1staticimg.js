@@ -1,7 +1,0 @@
-var namespaceannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg =
-[
-    [ "AbstractImageGraphicsItem", "classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_abstract_image_graphics_item.html", "classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_abstract_image_graphics_item" ],
-    [ "GraphicsItemGroup", "classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_graphics_item_group.html", "classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_graphics_item_group" ],
-    [ "Java2dBackend", "classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_java2d_backend.html", "classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_java2d_backend" ],
-    [ "LabelItem", "classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_label_item.html", "classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_label_item" ]
-];

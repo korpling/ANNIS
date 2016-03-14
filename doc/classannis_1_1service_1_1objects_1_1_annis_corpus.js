@@ -15,10 +15,5 @@ var classannis_1_1service_1_1objects_1_1_annis_corpus =
     [ "setSourcePath", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#a76301cc9e11834a63a444f2169a483ef", null ],
     [ "setTextCount", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#ab842a4226740ba2c7fb25de12622735d", null ],
     [ "setTokenCount", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#a0e170a09e80995981575fc6c89300344", null ],
-    [ "toString", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#a8594f1cb4ccd8b152c9464d7c049a14a", null ],
-    [ "id", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#a7c34fd08ccd7047a2a3a0633318ac36a", null ],
-    [ "name", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#a70c627d1850167a2d819207ba5033293", null ],
-    [ "sourcePath", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#ac9d58722fe010297885c00b8469f0bb2", null ],
-    [ "textCount", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#ad6e289dc24bee2e9045d3f3790744f73", null ],
-    [ "tokenCount", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#a2e17b80ce6e8f1fdbc5b5015f7bd077f", null ]
+    [ "toString", "classannis_1_1service_1_1objects_1_1_annis_corpus.html#a8594f1cb4ccd8b152c9464d7c049a14a", null ]
 ];

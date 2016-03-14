@@ -10,7 +10,6 @@ var classannis_1_1ql_1_1parser_1_1_query_data =
     [ "getCorpusList", "classannis_1_1ql_1_1parser_1_1_query_data.html#ab6ca65b4ed8a4e49be2e720978ed15a2", null ],
     [ "getDocuments", "classannis_1_1ql_1_1parser_1_1_query_data.html#aaab0de67440582418ef59c8d7dd48cd9", null ],
     [ "getExtensions", "classannis_1_1ql_1_1parser_1_1_query_data.html#abbea3d9bfd403c5b4de7c0b6113e4e4e", null ],
-    [ "getExtensions", "classannis_1_1ql_1_1parser_1_1_query_data.html#ac4ffdd3820a9aed941fd10b4bf03d4a4", null ],
     [ "getMaxWidth", "classannis_1_1ql_1_1parser_1_1_query_data.html#addad8b9b0ff001f702455ca30a7a780e", null ],
     [ "getMetaData", "classannis_1_1ql_1_1parser_1_1_query_data.html#ab1d380b6539bcd33692f488a14e9afcd", null ],
     [ "setAlternatives", "classannis_1_1ql_1_1parser_1_1_query_data.html#a363628c87cd1688dd1a14bce040fd531", null ],
@@ -19,15 +18,6 @@ var classannis_1_1ql_1_1parser_1_1_query_data =
     [ "setDocuments", "classannis_1_1ql_1_1parser_1_1_query_data.html#a41f5c0f866d7d5d59b4dc5302f9e049f", null ],
     [ "setMaxWidth", "classannis_1_1ql_1_1parser_1_1_query_data.html#af13aff06eae2ec588c585054bb3fcc5b", null ],
     [ "setMetaData", "classannis_1_1ql_1_1parser_1_1_query_data.html#a93f7e94077bf131a416fa1d13b385034", null ],
-    [ "toAQL", "classannis_1_1ql_1_1parser_1_1_query_data.html#a7f6f2c997a7dbac77d03ab2ecc5e5d97", null ],
     [ "toAQL", "classannis_1_1ql_1_1parser_1_1_query_data.html#a32c9ac545ffa4325b66cf363386e9e03", null ],
-    [ "toString", "classannis_1_1ql_1_1parser_1_1_query_data.html#adcbbb104cd079ef45d80f75928746b93", null ],
-    [ "alternatives", "classannis_1_1ql_1_1parser_1_1_query_data.html#a5481a363e25e779b46472865a54842b7", null ],
-    [ "corpusConfiguration", "classannis_1_1ql_1_1parser_1_1_query_data.html#ac534f5a23acf42a861818f285bc280ca", null ],
-    [ "corpusList", "classannis_1_1ql_1_1parser_1_1_query_data.html#a3f2b9267f48372b6165b45f4885ea646", null ],
-    [ "documents", "classannis_1_1ql_1_1parser_1_1_query_data.html#a3a1eeeb1ce0caf0fa97ea22ac56af4f9", null ],
-    [ "extensions", "classannis_1_1ql_1_1parser_1_1_query_data.html#ae16710e5cbfe0cf632742ce6028cd483", null ],
-    [ "log", "classannis_1_1ql_1_1parser_1_1_query_data.html#a29be44796014bd74f4b9ed922470062e", null ],
-    [ "maxWidth", "classannis_1_1ql_1_1parser_1_1_query_data.html#a4ad0bf0afc675716333206c738515232", null ],
-    [ "metaData", "classannis_1_1ql_1_1parser_1_1_query_data.html#a1ca23e77722d325dc1cf5e8e5c0186ff", null ]
+    [ "toString", "classannis_1_1ql_1_1parser_1_1_query_data.html#adcbbb104cd079ef45d80f75928746b93", null ]
 ];

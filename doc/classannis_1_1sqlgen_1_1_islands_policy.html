@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -112,7 +109,6 @@ $(document).ready(function(){initNavTree('classannis_1_1sqlgen_1_1_islands_polic
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classannis_1_1sqlgen_1_1_islands_policy-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.sqlgen.IslandsPolicy Class Reference</div>  </div>
@@ -124,113 +120,57 @@ $(document).ready(function(){initNavTree('classannis_1_1sqlgen_1_1_islands_polic
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies.html">IslandPolicies</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define behavior for matched nodes that are too far away.  <a href="enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_islands_policy.html#enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies">IslandPolicies</a></td></tr>
+<tr class="memdesc:enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define behavior for matched nodes that are too far away.  <a href="classannis_1_1sqlgen_1_1_islands_policy.html#enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies">More...</a><br /></td></tr>
+<tr class="separator:enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2678fb093b892514a87feb94da2afad8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies.html">IslandPolicies</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_islands_policy.html#a2678fb093b892514a87feb94da2afad8">getMostRestrictivePolicy</a> (List&lt; Long &gt; corpora, Map&lt; Long, Properties &gt; props)</td></tr>
+<tr class="memitem:a2678fb093b892514a87feb94da2afad8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2678fb093b892514a87feb94da2afad8"></a>
+<a class="el" href="classannis_1_1sqlgen_1_1_islands_policy.html#enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies">IslandPolicies</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getMostRestrictivePolicy</b> (List&lt; Long &gt; corpora, Map&lt; Long, Properties &gt; props)</td></tr>
 <tr class="separator:a2678fb093b892514a87feb94da2afad8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee862c55ab6f54a9a66081b8b2890f86"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_islands_policy.html#aee862c55ab6f54a9a66081b8b2890f86">getDefaultIslandsPolicy</a> ()</td></tr>
+<tr class="memitem:aee862c55ab6f54a9a66081b8b2890f86"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aee862c55ab6f54a9a66081b8b2890f86"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getDefaultIslandsPolicy</b> ()</td></tr>
 <tr class="separator:aee862c55ab6f54a9a66081b8b2890f86"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3020ad7077d85712461b034c381357c3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_islands_policy.html#a3020ad7077d85712461b034c381357c3">setDefaultIslandsPolicy</a> (String <a class="el" href="classannis_1_1sqlgen_1_1_islands_policy.html#a8d16e1c74ffcacd0f8567ba5d7f93db4">defaultIslandsPolicy</a>)</td></tr>
+<tr class="memitem:a3020ad7077d85712461b034c381357c3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3020ad7077d85712461b034c381357c3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setDefaultIslandsPolicy</b> (String defaultIslandsPolicy)</td></tr>
 <tr class="separator:a3020ad7077d85712461b034c381357c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a8d16e1c74ffcacd0f8567ba5d7f93db4"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_islands_policy.html#a8d16e1c74ffcacd0f8567ba5d7f93db4">defaultIslandsPolicy</a></td></tr>
-<tr class="separator:a8d16e1c74ffcacd0f8567ba5d7f93db4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aee862c55ab6f54a9a66081b8b2890f86"></a>
+<hr/><h2 class="groupheader">Class Documentation</h2>
+<a name="enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies" id="enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">String annis.sqlgen.IslandsPolicy.getDefaultIslandsPolicy </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td class="memname">enum annis::sqlgen::IslandsPolicy::IslandPolicies</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2678fb093b892514a87feb94da2afad8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies.html">IslandPolicies</a> annis.sqlgen.IslandsPolicy.getMostRestrictivePolicy </td>
-          <td>(</td>
-          <td class="paramtype">List&lt; Long &gt;&#160;</td>
-          <td class="paramname"><em>corpora</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Map&lt; Long, Properties &gt;&#160;</td>
-          <td class="paramname"><em>props</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3020ad7077d85712461b034c381357c3"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.sqlgen.IslandsPolicy.setDefaultIslandsPolicy </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>defaultIslandsPolicy</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a8d16e1c74ffcacd0f8567ba5d7f93db4"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.sqlgen.IslandsPolicy.defaultIslandsPolicy</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
+<table class="fieldtable">
+<tr><th colspan="3">Class Members</th></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a77851076e482310671bcb80822d4299b"></a></td>
+<td class="fieldname">
+context</td>
+<td class="fielddoc">
+Use the context as the base to determine how far a node can be away from a matched node in order to be included in the result. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ae959ab26f9ebc9adb73a91e4a822eb60"></a></td>
+<td class="fieldname">
+none</td>
+<td class="fielddoc">
+Never produce islands, always include all nodes between the matched nodes. </td></tr>
 </table>
-</div><div class="memdoc">
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_islands_policy_8java.html">IslandsPolicy.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1sqlgen.html">sqlgen</a></li><li class="navelem"><a class="el" href="classannis_1_1sqlgen_1_1_islands_policy.html">IslandsPolicy</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>sqlgen</b></li><li class="navelem"><a class="el" href="classannis_1_1sqlgen_1_1_islands_policy.html">IslandsPolicy</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

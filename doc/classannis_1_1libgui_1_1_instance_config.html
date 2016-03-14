@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,7 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1libgui_1_1_instance_conf
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classannis_1_1libgui_1_1_instance_config-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.libgui.InstanceConfig Class Reference</div>  </div>
@@ -121,95 +117,57 @@ $(document).ready(function(){initNavTree('classannis_1_1libgui_1_1_instance_conf
 <div class="textblock"><p>Hold information about the configuration of a specific (sub-) instance of ANNIS. </p>
 <p>Each physical installation (speak deployment) of ANNIS is able to have several instances which behave differently. This is meant to provide a more specialized presentation for different projects while still using only one ANNIS installation.</p>
 <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.libgui.InstanceConfig:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1libgui_1_1_instance_config.png" usemap="#annis.libgui.InstanceConfig_map" alt=""/>
-  <map id="annis.libgui.InstanceConfig_map" name="annis.libgui.InstanceConfig_map">
-</map>
- </div></div>
+</div>
+<p>Inherits Serializable.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad53353b0f5ed70214638137fac318fdb"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#ad53353b0f5ed70214638137fac318fdb">InstanceConfig</a> ()</td></tr>
-<tr class="separator:ad53353b0f5ed70214638137fac318fdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f34eb7d60117c8f45bc5b90abfeb2e8"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a6f34eb7d60117c8f45bc5b90abfeb2e8">getInstanceName</a> ()</td></tr>
 <tr class="memdesc:a6f34eb7d60117c8f45bc5b90abfeb2e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the internal short name of this instance.  <a href="#a6f34eb7d60117c8f45bc5b90abfeb2e8">More...</a><br /></td></tr>
 <tr class="separator:a6f34eb7d60117c8f45bc5b90abfeb2e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d758116d1da304e7eaf5d284c4d523a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a7d758116d1da304e7eaf5d284c4d523a">setInstanceName</a> (String <a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a89738041cff868cf60ae57c1c5e7ec33">instanceName</a>)</td></tr>
+<tr class="memitem:a7d758116d1da304e7eaf5d284c4d523a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a7d758116d1da304e7eaf5d284c4d523a">setInstanceName</a> (String instanceName)</td></tr>
 <tr class="separator:a7d758116d1da304e7eaf5d284c4d523a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3151cfac33aecf7122471e91e337481c"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a3151cfac33aecf7122471e91e337481c">getInstanceDisplayName</a> ()</td></tr>
 <tr class="memdesc:a3151cfac33aecf7122471e91e337481c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the external display name (used e.g.  <a href="#a3151cfac33aecf7122471e91e337481c">More...</a><br /></td></tr>
 <tr class="separator:a3151cfac33aecf7122471e91e337481c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b029aa612869341e79f737b35cc0f2e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a7b029aa612869341e79f737b35cc0f2e">setInstanceDisplayName</a> (String <a class="el" href="classannis_1_1libgui_1_1_instance_config.html#ad24577a36d5572d00c12994b643d59c3">instanceDisplayName</a>)</td></tr>
+<tr class="memitem:a7b029aa612869341e79f737b35cc0f2e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a7b029aa612869341e79f737b35cc0f2e">setInstanceDisplayName</a> (String instanceDisplayName)</td></tr>
 <tr class="separator:a7b029aa612869341e79f737b35cc0f2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9c2975b67180bed8697de22972ddc90c"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a9c2975b67180bed8697de22972ddc90c">getDefaultQueryBuilder</a> ()</td></tr>
 <tr class="memdesc:a9c2975b67180bed8697de22972ddc90c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the short name of the query builder that should be selected by default.  <a href="#a9c2975b67180bed8697de22972ddc90c">More...</a><br /></td></tr>
 <tr class="separator:a9c2975b67180bed8697de22972ddc90c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5c2fecf1ecc727fb68b5850730e6300"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#af5c2fecf1ecc727fb68b5850730e6300">setDefaultQueryBuilder</a> (String <a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a7454176cc1132ac4799b8cfe8d7f5f72">defaultQueryBuilder</a>)</td></tr>
+<tr class="memitem:af5c2fecf1ecc727fb68b5850730e6300"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#af5c2fecf1ecc727fb68b5850730e6300">setDefaultQueryBuilder</a> (String defaultQueryBuilder)</td></tr>
 <tr class="separator:af5c2fecf1ecc727fb68b5850730e6300"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc6812b723100669619046debfb27dac"><td class="memItemLeft" align="right" valign="top">List&lt; <a class="el" href="classannis_1_1libgui_1_1_corpus_set.html">CorpusSet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#abc6812b723100669619046debfb27dac">getCorpusSets</a> ()</td></tr>
 <tr class="memdesc:abc6812b723100669619046debfb27dac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the corpus sets that are pre-defined by the instance.  <a href="#abc6812b723100669619046debfb27dac">More...</a><br /></td></tr>
 <tr class="separator:abc6812b723100669619046debfb27dac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b008ce91ce66cee0d55ac2223141017"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a4b008ce91ce66cee0d55ac2223141017">setCorpusSets</a> (List&lt; <a class="el" href="classannis_1_1libgui_1_1_corpus_set.html">CorpusSet</a> &gt; <a class="el" href="classannis_1_1libgui_1_1_instance_config.html#aee82c5ea4ca195ffb6709ac262dcfb97">corpusSets</a>)</td></tr>
+<tr class="memitem:a4b008ce91ce66cee0d55ac2223141017"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a4b008ce91ce66cee0d55ac2223141017">setCorpusSets</a> (List&lt; <a class="el" href="classannis_1_1libgui_1_1_corpus_set.html">CorpusSet</a> &gt; corpusSets)</td></tr>
 <tr class="separator:a4b008ce91ce66cee0d55ac2223141017"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ef600bc7fc11c251fd21334af856f08"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a5ef600bc7fc11c251fd21334af856f08">getDefaultCorpusSet</a> ()</td></tr>
 <tr class="memdesc:a5ef600bc7fc11c251fd21334af856f08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the name of the corpus set that should be activated by default.  <a href="#a5ef600bc7fc11c251fd21334af856f08">More...</a><br /></td></tr>
 <tr class="separator:a5ef600bc7fc11c251fd21334af856f08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac328ef7262d6929169a0319690b81300"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#ac328ef7262d6929169a0319690b81300">setDefaultCorpusSet</a> (String <a class="el" href="classannis_1_1libgui_1_1_instance_config.html#ae28d4897076f79011efc8f5f2daec719">defaultCorpusSet</a>)</td></tr>
+<tr class="memitem:ac328ef7262d6929169a0319690b81300"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#ac328ef7262d6929169a0319690b81300">setDefaultCorpusSet</a> (String defaultCorpusSet)</td></tr>
 <tr class="separator:ac328ef7262d6929169a0319690b81300"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8006d58c607ebc21a71ef29f451ded26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a8006d58c607ebc21a71ef29f451ded26">getFont</a> ()</td></tr>
 <tr class="memdesc:a8006d58c607ebc21a71ef29f451ded26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the special font used by this instance.  <a href="#a8006d58c607ebc21a71ef29f451ded26">More...</a><br /></td></tr>
 <tr class="separator:a8006d58c607ebc21a71ef29f451ded26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c4737014a45c9e0b7cc2fe102ad6430"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a4c4737014a45c9e0b7cc2fe102ad6430">setFont</a> (<a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a> <a class="el" href="classannis_1_1libgui_1_1_instance_config.html#aa97ca8277cf0f9c55955e46cebc288c0">font</a>)</td></tr>
+<tr class="memitem:a4c4737014a45c9e0b7cc2fe102ad6430"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a4c4737014a45c9e0b7cc2fe102ad6430">setFont</a> (<a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a> font)</td></tr>
 <tr class="separator:a4c4737014a45c9e0b7cc2fe102ad6430"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a27cf79955ff4f89751657c760908e6c5"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a27cf79955ff4f89751657c760908e6c5">getKeyboardLayout</a> ()</td></tr>
 <tr class="memdesc:a27cf79955ff4f89751657c760908e6c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default keyboard layout used for the virtual keyboard.  <a href="#a27cf79955ff4f89751657c760908e6c5">More...</a><br /></td></tr>
 <tr class="separator:a27cf79955ff4f89751657c760908e6c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa675a221c92b0a3b02bee75839e15d03"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#aa675a221c92b0a3b02bee75839e15d03">setKeyboardLayout</a> (String <a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a8cc1e8a77b6c1e987e1586d7ee0b99cd">keyboardLayout</a>)</td></tr>
+<tr class="memitem:aa675a221c92b0a3b02bee75839e15d03"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#aa675a221c92b0a3b02bee75839e15d03">setKeyboardLayout</a> (String keyboardLayout)</td></tr>
 <tr class="separator:aa675a221c92b0a3b02bee75839e15d03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adaebe21c246ab91d1ddd237ecec2d683"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#adaebe21c246ab91d1ddd237ecec2d683">getFrequencyFont</a> ()</td></tr>
 <tr class="memdesc:adaebe21c246ab91d1ddd237ecec2d683"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a special font config that should be used in the frequency chart.  <a href="#adaebe21c246ab91d1ddd237ecec2d683">More...</a><br /></td></tr>
 <tr class="separator:adaebe21c246ab91d1ddd237ecec2d683"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a67a8598a9d3506a1002ec40b0381b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a8a67a8598a9d3506a1002ec40b0381b3">setFrequencyFont</a> (<a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a> <a class="el" href="classannis_1_1libgui_1_1_instance_config.html#abcd27d7f4662abe0858d92624887e6d0">frequencyFont</a>)</td></tr>
+<tr class="memitem:a8a67a8598a9d3506a1002ec40b0381b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a8a67a8598a9d3506a1002ec40b0381b3">setFrequencyFont</a> (<a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a> frequencyFont)</td></tr>
 <tr class="separator:a8a67a8598a9d3506a1002ec40b0381b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a89738041cff868cf60ae57c1c5e7ec33"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a89738041cff868cf60ae57c1c5e7ec33">instanceName</a></td></tr>
-<tr class="separator:a89738041cff868cf60ae57c1c5e7ec33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad24577a36d5572d00c12994b643d59c3"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#ad24577a36d5572d00c12994b643d59c3">instanceDisplayName</a></td></tr>
-<tr class="separator:ad24577a36d5572d00c12994b643d59c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7454176cc1132ac4799b8cfe8d7f5f72"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a7454176cc1132ac4799b8cfe8d7f5f72">defaultQueryBuilder</a></td></tr>
-<tr class="separator:a7454176cc1132ac4799b8cfe8d7f5f72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee82c5ea4ca195ffb6709ac262dcfb97"><td class="memItemLeft" align="right" valign="top">List&lt; <a class="el" href="classannis_1_1libgui_1_1_corpus_set.html">CorpusSet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#aee82c5ea4ca195ffb6709ac262dcfb97">corpusSets</a></td></tr>
-<tr class="separator:aee82c5ea4ca195ffb6709ac262dcfb97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae28d4897076f79011efc8f5f2daec719"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#ae28d4897076f79011efc8f5f2daec719">defaultCorpusSet</a></td></tr>
-<tr class="separator:ae28d4897076f79011efc8f5f2daec719"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa97ca8277cf0f9c55955e46cebc288c0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#aa97ca8277cf0f9c55955e46cebc288c0">font</a></td></tr>
-<tr class="separator:aa97ca8277cf0f9c55955e46cebc288c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abcd27d7f4662abe0858d92624887e6d0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#abcd27d7f4662abe0858d92624887e6d0">frequencyFont</a></td></tr>
-<tr class="separator:abcd27d7f4662abe0858d92624887e6d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8cc1e8a77b6c1e987e1586d7ee0b99cd"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a8cc1e8a77b6c1e987e1586d7ee0b99cd">keyboardLayout</a></td></tr>
-<tr class="separator:a8cc1e8a77b6c1e987e1586d7ee0b99cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c256d8f8116ba202973db9a41f87e99"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a2c256d8f8116ba202973db9a41f87e99">isLoginOnStart</a> ()</td></tr>
+<tr class="memdesc:a2c256d8f8116ba202973db9a41f87e99"><td class="mdescLeft">&#160;</td><td class="mdescRight">If true the login window is shown at each startup automatically.  <a href="#a2c256d8f8116ba202973db9a41f87e99">More...</a><br /></td></tr>
+<tr class="separator:a2c256d8f8116ba202973db9a41f87e99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb667e8fccf59c3db17e4864489bd620"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#acb667e8fccf59c3db17e4864489bd620">setLoginOnStart</a> (boolean loginOnStart)</td></tr>
+<tr class="separator:acb667e8fccf59c3db17e4864489bd620"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ad53353b0f5ed70214638137fac318fdb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.libgui.InstanceConfig.InstanceConfig </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="abc6812b723100669619046debfb27dac"></a>
 <div class="memitem">
@@ -316,7 +274,7 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the external display name (used e.g. </p>
-<p>in the user interface) of this instance. </p>
+<p>in the user interface) of this instance. </p><dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
 </div>
 </div>
@@ -357,6 +315,24 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a2c256d8f8116ba202973db9a41f87e99"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean annis.libgui.InstanceConfig.isLoginOnStart </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>If true the login window is shown at each startup automatically. </p>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a4b008ce91ce66cee0d55ac2223141017"></a>
 <div class="memitem">
 <div class="memproto">
@@ -370,6 +346,12 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">corpusSets</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#abc6812b723100669619046debfb27dac" title="Get the corpus sets that are pre-defined by the instance. ">getCorpusSets()</a> </dd></dl>
 
 </div>
@@ -387,6 +369,12 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">defaultCorpusSet</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a5ef600bc7fc11c251fd21334af856f08" title="Get the name of the corpus set that should be activated by default. ">getDefaultCorpusSet()</a> </dd></dl>
 
 </div>
@@ -404,6 +392,12 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">defaultQueryBuilder</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a9c2975b67180bed8697de22972ddc90c" title="Get the short name of the query builder that should be selected by default. ">getDefaultQueryBuilder()</a> </dd></dl>
 
 </div>
@@ -467,6 +461,12 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">instanceDisplayName</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a3151cfac33aecf7122471e91e337481c" title="Get the external display name (used e.g. ">getInstanceDisplayName()</a> </dd></dl>
 
 </div>
@@ -484,6 +484,12 @@ Private Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">instanceName</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a6f34eb7d60117c8f45bc5b90abfeb2e8" title="Get the internal short name of this instance. ">getInstanceName()</a> </dd></dl>
 
 </div>
@@ -511,177 +517,36 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="aee82c5ea4ca195ffb6709ac262dcfb97"></a>
+<a class="anchor" id="acb667e8fccf59c3db17e4864489bd620"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">List&lt;<a class="el" href="classannis_1_1libgui_1_1_corpus_set.html">CorpusSet</a>&gt; annis.libgui.InstanceConfig.corpusSets</td>
+          <td class="memname">void annis.libgui.InstanceConfig.setLoginOnStart </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>loginOnStart</em></td><td>)</td>
+          <td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a2c256d8f8116ba202973db9a41f87e99" title="If true the login window is shown at each startup automatically. ">isLoginOnStart()</a> </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">loginOnStart</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="ae28d4897076f79011efc8f5f2daec719"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.libgui.InstanceConfig.defaultCorpusSet</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7454176cc1132ac4799b8cfe8d7f5f72"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.libgui.InstanceConfig.defaultQueryBuilder</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa97ca8277cf0f9c55955e46cebc288c0"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a> annis.libgui.InstanceConfig.font</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="abcd27d7f4662abe0858d92624887e6d0"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a> annis.libgui.InstanceConfig.frequencyFont</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad24577a36d5572d00c12994b643d59c3"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.libgui.InstanceConfig.instanceDisplayName</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a89738041cff868cf60ae57c1c5e7ec33"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.libgui.InstanceConfig.instanceName</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8cc1e8a77b6c1e987e1586d7ee0b99cd"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.libgui.InstanceConfig.keyboardLayout</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_instance_config_8java.html">InstanceConfig.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1libgui.html">libgui</a></li><li class="navelem"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>libgui</b></li><li class="navelem"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

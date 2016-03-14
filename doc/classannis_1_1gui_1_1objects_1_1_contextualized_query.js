@@ -8,8 +8,5 @@ var classannis_1_1gui_1_1objects_1_1_contextualized_query =
     [ "hashCode", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html#a6eefc02a1554ca8f8ef05fa18c2a27ef", null ],
     [ "setLeftContext", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html#acd1dff7d74f70dae5d1a11ec9a8783b1", null ],
     [ "setRightContext", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html#a971acdb6f3d29c3e6fafb32c3d28e7b1", null ],
-    [ "setSegmentation", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html#a1c8f646d553dd12cfcb7ab22842b6220", null ],
-    [ "leftContext", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html#a7650cc0ba6d8b394de5319a8e954bc92", null ],
-    [ "rightContext", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html#a7af04f19cfed277ab1c5f2235aabd964", null ],
-    [ "segmentation", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html#a0878caf76cda78e4197a9d6dc0fc7aaf", null ]
+    [ "setSegmentation", "classannis_1_1gui_1_1objects_1_1_contextualized_query.html#a1c8f646d553dd12cfcb7ab22842b6220", null ]
 ];

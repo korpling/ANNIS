@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -112,8 +109,6 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1_embedded_vis_u_i
   <div class="summary">
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1gui_1_1_embedded_vis_u_i-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.gui.EmbeddedVisUI Class Reference</div>  </div>
@@ -121,78 +116,109 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1_embedded_vis_u_i
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.gui.EmbeddedVisUI:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1gui_1_1_embedded_vis_u_i.png" usemap="#annis.gui.EmbeddedVisUI_map" alt=""/>
-  <map id="annis.gui.EmbeddedVisUI_map" name="annis.gui.EmbeddedVisUI_map">
-<area href="classannis_1_1gui_1_1_common_u_i.html" alt="annis.gui.CommonUI" shape="rect" coords="165,168,320,192"/>
-<area href="classannis_1_1libgui_1_1_annis_base_u_i.html" title="Basic UI functionality. " alt="annis.libgui.AnnisBaseUI" shape="rect" coords="165,112,320,136"/>
-<area href="interfaceannis_1_1libgui_1_1_plugin_system.html" title="ANNIS plugin system interface for getting plugins or specific visualizers. " alt="annis.libgui.PluginSystem" shape="rect" coords="165,56,320,80"/>
-</map>
- </div></div>
+</div>
+<p>Inherits <a class="el" href="classannis_1_1gui_1_1_common_u_i.html">annis.gui.CommonUI</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a3ea087f193bae3b79ef70df07be54c49"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1_embedded_vis_u_i.html#a3ea087f193bae3b79ef70df07be54c49">PREFIX</a> = &quot;/embeddedvis&quot;</td></tr>
-<tr class="separator:a3ea087f193bae3b79ef70df07be54c49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae393ae3a85d4b723d457c7ba16770981"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae393ae3a85d4b723d457c7ba16770981"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>URL_PREFIX</b> = &quot;/embeddedvis&quot;</td></tr>
+<tr class="separator:ae393ae3a85d4b723d457c7ba16770981"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8982bfda7d1c8ecf042966d6c8f9f286"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8982bfda7d1c8ecf042966d6c8f9f286"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>KEY_PREFIX</b> = &quot;embedded_&quot;</td></tr>
+<tr class="separator:a8982bfda7d1c8ecf042966d6c8f9f286"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab48537124342462aade6d5ef015b381e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab48537124342462aade6d5ef015b381e"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>KEY_SALT</b> = KEY_PREFIX + &quot;salt&quot;</td></tr>
+<tr class="separator:ab48537124342462aade6d5ef015b381e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc69628fdcefc0c1bdfbe187058c8365"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc69628fdcefc0c1bdfbe187058c8365"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>KEY_NAMESPACE</b> = KEY_PREFIX + &quot;ns&quot;</td></tr>
+<tr class="separator:adc69628fdcefc0c1bdfbe187058c8365"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee8b585fb0d200f1922cb27aa5fcd430"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aee8b585fb0d200f1922cb27aa5fcd430"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>KEY_SEARCH_INTERFACE</b> = KEY_PREFIX + &quot;interface&quot;</td></tr>
+<tr class="separator:aee8b585fb0d200f1922cb27aa5fcd430"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecd0e43a52d386a3ae662f20f29f9b24"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aecd0e43a52d386a3ae662f20f29f9b24"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>KEY_BASE_TEXT</b> = KEY_PREFIX + &quot;base&quot;</td></tr>
+<tr class="separator:aecd0e43a52d386a3ae662f20f29f9b24"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16ce026e6e5b99cbac1c52c70ca48307"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a16ce026e6e5b99cbac1c52c70ca48307"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>KEY_MATCH</b> = KEY_PREFIX + &quot;match&quot;</td></tr>
+<tr class="separator:a16ce026e6e5b99cbac1c52c70ca48307"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97bdd9121a704bf917358c2386e1b0db"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a97bdd9121a704bf917358c2386e1b0db"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>KEY_INSTANCE</b> = KEY_PREFIX + &quot;instance&quot;</td></tr>
+<tr class="separator:a97bdd9121a704bf917358c2386e1b0db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html">annis.libgui.AnnisBaseUI</a></td></tr>
-<tr class="memitem:a017ef2a9307566f3f2e89c2db5546643 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a017ef2a9307566f3f2e89c2db5546643">USER_KEY</a> = &quot;annis.gui.AnnisBaseUI:USER_KEY&quot;</td></tr>
+<tr class="memitem:a017ef2a9307566f3f2e89c2db5546643 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a017ef2a9307566f3f2e89c2db5546643"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>USER_KEY</b> = &quot;annis.gui.AnnisBaseUI:USER_KEY&quot;</td></tr>
 <tr class="separator:a017ef2a9307566f3f2e89c2db5546643 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af206478b2afb49ffd4922db21de1f458 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#af206478b2afb49ffd4922db21de1f458">USER_LOGIN_ERROR</a> = &quot;annis.gui.AnnisBaseUI:USER_LOGIN_ERROR&quot;</td></tr>
+<tr class="memitem:af206478b2afb49ffd4922db21de1f458 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af206478b2afb49ffd4922db21de1f458"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>USER_LOGIN_ERROR</b> = &quot;annis.gui.AnnisBaseUI:USER_LOGIN_ERROR&quot;</td></tr>
 <tr class="separator:af206478b2afb49ffd4922db21de1f458 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58cf59b5676221a62f117e118e172b18 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a58cf59b5676221a62f117e118e172b18">CONTEXT_PATH</a> = &quot;annis.gui.AnnisBaseUI:CONTEXT_PATH&quot;</td></tr>
+<tr class="memitem:a58cf59b5676221a62f117e118e172b18 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58cf59b5676221a62f117e118e172b18"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>CONTEXT_PATH</b> = &quot;annis.gui.AnnisBaseUI:CONTEXT_PATH&quot;</td></tr>
 <tr class="separator:a58cf59b5676221a62f117e118e172b18 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5767613f5418b4bd7e0703cfb8b18685 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a5767613f5418b4bd7e0703cfb8b18685">WEBSERVICEURL_KEY</a> = &quot;annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY&quot;</td></tr>
+<tr class="memitem:a5767613f5418b4bd7e0703cfb8b18685 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5767613f5418b4bd7e0703cfb8b18685"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>WEBSERVICEURL_KEY</b> = &quot;annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY&quot;</td></tr>
 <tr class="separator:a5767613f5418b4bd7e0703cfb8b18685 inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a309bafae2b66df809e3135443537123b inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a309bafae2b66df809e3135443537123b">CITATION_KEY</a> = &quot;annis.gui.AnnisBaseUI:CITATION_KEY&quot;</td></tr>
+<tr class="memitem:a309bafae2b66df809e3135443537123b inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a309bafae2b66df809e3135443537123b"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>CITATION_KEY</b> = &quot;annis.gui.AnnisBaseUI:CITATION_KEY&quot;</td></tr>
 <tr class="separator:a309bafae2b66df809e3135443537123b inherit pub_static_attribs_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_attribs_interfaceannis_1_1libgui_1_1_plugin_system"><td colspan="2" onclick="javascript:toggleInherit('pub_static_attribs_interfaceannis_1_1libgui_1_1_plugin_system')"><img src="closed.png" alt="-"/>&#160;Static Public Attributes inherited from <a class="el" href="interfaceannis_1_1libgui_1_1_plugin_system.html">annis.libgui.PluginSystem</a></td></tr>
-<tr class="memitem:a7a4fcb7800cfe645c1266fbf02fcb652 inherit pub_static_attribs_interfaceannis_1_1libgui_1_1_plugin_system"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1libgui_1_1_plugin_system.html#a7a4fcb7800cfe645c1266fbf02fcb652">DEFAULT_VISUALIZER</a> = &quot;grid&quot;</td></tr>
+<tr class="memitem:a7a4fcb7800cfe645c1266fbf02fcb652 inherit pub_static_attribs_interfaceannis_1_1libgui_1_1_plugin_system"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7a4fcb7800cfe645c1266fbf02fcb652"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>DEFAULT_VISUALIZER</b> = &quot;grid&quot;</td></tr>
 <tr class="separator:a7a4fcb7800cfe645c1266fbf02fcb652 inherit pub_static_attribs_interfaceannis_1_1libgui_1_1_plugin_system"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:af22dfdb215a8db31f13aa32ab3838e25"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1_embedded_vis_u_i.html#af22dfdb215a8db31f13aa32ab3838e25">init</a> (VaadinRequest request)</td></tr>
+<tr class="memitem:af22dfdb215a8db31f13aa32ab3838e25"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af22dfdb215a8db31f13aa32ab3838e25"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (VaadinRequest request)</td></tr>
 <tr class="separator:af22dfdb215a8db31f13aa32ab3838e25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classannis_1_1gui_1_1_common_u_i"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classannis_1_1gui_1_1_common_u_i')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classannis_1_1gui_1_1_common_u_i.html">annis.gui.CommonUI</a></td></tr>
-<tr class="memitem:a09e200ef5943eb69b0e382b2d5620323 inherit pro_methods_classannis_1_1gui_1_1_common_u_i"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1_common_u_i.html#a09e200ef5943eb69b0e382b2d5620323">init</a> (VaadinRequest request)</td></tr>
+<tr class="memitem:a09e200ef5943eb69b0e382b2d5620323 inherit pro_methods_classannis_1_1gui_1_1_common_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a09e200ef5943eb69b0e382b2d5620323"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (VaadinRequest request)</td></tr>
 <tr class="separator:a09e200ef5943eb69b0e382b2d5620323 inherit pro_methods_classannis_1_1gui_1_1_common_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26f88258aaaffb694e501839f7770efe inherit pro_methods_classannis_1_1gui_1_1_common_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a26f88258aaaffb694e501839f7770efe"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addCustomUIPlugins</b> (PluginManager pluginManager)</td></tr>
+<tr class="separator:a26f88258aaaffb694e501839f7770efe inherit pro_methods_classannis_1_1gui_1_1_common_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53ed1ed2e669c1d9a91164351928ae58 inherit pro_methods_classannis_1_1gui_1_1_common_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a53ed1ed2e669c1d9a91164351928ae58"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>loadInstanceFonts</b> ()</td></tr>
+<tr class="separator:a53ed1ed2e669c1d9a91164351928ae58 inherit pro_methods_classannis_1_1gui_1_1_common_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classannis_1_1libgui_1_1_annis_base_u_i')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html">annis.libgui.AnnisBaseUI</a></td></tr>
-<tr class="memitem:a14e77d4f4985129054c41c8f84aa0912 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a14e77d4f4985129054c41c8f84aa0912">init</a> (VaadinRequest request)</td></tr>
+<tr class="memitem:a14e77d4f4985129054c41c8f84aa0912 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a14e77d4f4985129054c41c8f84aa0912"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>init</b> (VaadinRequest request)</td></tr>
 <tr class="separator:a14e77d4f4985129054c41c8f84aa0912 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77ab166f7b26bd230b95f84396762908 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">List&lt; File &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a77ab166f7b26bd230b95f84396762908">getAllConfigLocations</a> (String configFile)</td></tr>
-<tr class="memdesc:a77ab166f7b26bd230b95f84396762908 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an configuration file name (might include directory) this function returns all locations for this file in the "ANNIS configuration system".  <a href="#a77ab166f7b26bd230b95f84396762908">More...</a><br /></td></tr>
-<tr class="separator:a77ab166f7b26bd230b95f84396762908 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af90865a625858cff76bf196e8579e9a7 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#af90865a625858cff76bf196e8579e9a7">loadApplicationProperties</a> (String configFile)</td></tr>
-<tr class="separator:af90865a625858cff76bf196e8579e9a7 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af506f488092dc69257b602a9beeff135 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">Map&lt; String, <a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#af506f488092dc69257b602a9beeff135">loadInstanceConfig</a> ()</td></tr>
+<tr class="memitem:af506f488092dc69257b602a9beeff135 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af506f488092dc69257b602a9beeff135"></a>
+Map&lt; String, <a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>loadInstanceConfig</b> ()</td></tr>
 <tr class="separator:af506f488092dc69257b602a9beeff135 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac51775a5a675e55ad5905813f2f4ab88 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">final void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#ac51775a5a675e55ad5905813f2f4ab88">initLogging</a> ()</td></tr>
+<tr class="memitem:ac51775a5a675e55ad5905813f2f4ab88 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac51775a5a675e55ad5905813f2f4ab88"></a>
+final void&#160;</td><td class="memItemRight" valign="bottom"><b>initLogging</b> ()</td></tr>
 <tr class="separator:ac51775a5a675e55ad5905813f2f4ab88 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f8e9b91176327c2522a01e384a563c2 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a2f8e9b91176327c2522a01e384a563c2">addCustomUIPlugins</a> (PluginManager <a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a7f6e2edad285af3ac13ba7308274722b">pluginManager</a>)</td></tr>
+<tr class="memitem:a2f8e9b91176327c2522a01e384a563c2 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a2f8e9b91176327c2522a01e384a563c2">addCustomUIPlugins</a> (PluginManager pluginManager)</td></tr>
 <tr class="memdesc:a2f8e9b91176327c2522a01e384a563c2 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="mdescLeft">&#160;</td><td class="mdescRight">Override this method to append additional plugins to the internal <a class="el" href="">PluginManager</a>.  <a href="#a2f8e9b91176327c2522a01e384a563c2">More...</a><br /></td></tr>
 <tr class="separator:a2f8e9b91176327c2522a01e384a563c2 inherit pro_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:a969042f20e93b953c3d03bb3e8b65d81"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1_embedded_vis_u_i.html#a969042f20e93b953c3d03bb3e8b65d81">displayGeneralHelp</a> ()</td></tr>
-<tr class="separator:a969042f20e93b953c3d03bb3e8b65d81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0cb661df54c83edf6f3e7ff8432740a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1_embedded_vis_u_i.html#ab0cb661df54c83edf6f3e7ff8432740a">showHtmlDoc</a> (String corpus, String doc, Map&lt; String, String[]&gt; args)</td></tr>
-<tr class="separator:ab0cb661df54c83edf6f3e7ff8432740a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a5ade0ba83b27d0435523ffb80f952779"><td class="memItemLeft" align="right" valign="top">static final Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1_embedded_vis_u_i.html#a5ade0ba83b27d0435523ffb80f952779">log</a> = LoggerFactory.getLogger(EmbeddedVisUI.class)</td></tr>
-<tr class="separator:a5ade0ba83b27d0435523ffb80f952779"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_methods_classannis_1_1gui_1_1_common_u_i"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classannis_1_1gui_1_1_common_u_i')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classannis_1_1gui_1_1_common_u_i.html">annis.gui.CommonUI</a></td></tr>
+<tr class="memitem:ae2148345d5f35e0cdaa89ccd35af0ec5 inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae2148345d5f35e0cdaa89ccd35af0ec5"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>CommonUI</b> (String urlPrefix)</td></tr>
+<tr class="separator:ae2148345d5f35e0cdaa89ccd35af0ec5 inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01349e3a09ab73735e236875153c0306 inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a01349e3a09ab73735e236875153c0306"></a>
+<a class="el" href="classannis_1_1gui_1_1components_1_1_settings_storage.html">SettingsStorage</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getSettings</b> ()</td></tr>
+<tr class="separator:a01349e3a09ab73735e236875153c0306 inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3efecd4119cdd58351c688562137ffc6 inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3efecd4119cdd58351c688562137ffc6"></a>
+<a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getInstanceFont</b> ()</td></tr>
+<tr class="separator:a3efecd4119cdd58351c688562137ffc6 inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf5127ade7749eae5731c6830f1cd1b6 inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adf5127ade7749eae5731c6830f1cd1b6"></a>
+<a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getInstanceConfig</b> ()</td></tr>
+<tr class="separator:adf5127ade7749eae5731c6830f1cd1b6 inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17f654ed87b09ea2b0acf7fc3d59b65d inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17f654ed87b09ea2b0acf7fc3d59b65d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setInstanceConfig</b> (<a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> instanceConfig)</td></tr>
+<tr class="separator:a17f654ed87b09ea2b0acf7fc3d59b65d inherit pub_methods_classannis_1_1gui_1_1_common_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classannis_1_1libgui_1_1_annis_base_u_i')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html">annis.libgui.AnnisBaseUI</a></td></tr>
-<tr class="memitem:aeb742c9bc96c7d3370ab22ed0b3c355d inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#aeb742c9bc96c7d3370ab22ed0b3c355d">attach</a> ()</td></tr>
+<tr class="memitem:aeb742c9bc96c7d3370ab22ed0b3c355d inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeb742c9bc96c7d3370ab22ed0b3c355d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>attach</b> ()</td></tr>
 <tr class="separator:aeb742c9bc96c7d3370ab22ed0b3c355d inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4db21fea3beac1eda312b1980e72c355 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a4db21fea3beac1eda312b1980e72c355">close</a> ()</td></tr>
+<tr class="memitem:a4db21fea3beac1eda312b1980e72c355 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4db21fea3beac1eda312b1980e72c355"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> ()</td></tr>
 <tr class="separator:a4db21fea3beac1eda312b1980e72c355 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a931f99dd04548e266104052f730a44bd inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a931f99dd04548e266104052f730a44bd">injectUniqueCSS</a> (String cssContent)</td></tr>
 <tr class="memdesc:a931f99dd04548e266104052f730a44bd inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inject CSS into the UI.  <a href="#a931f99dd04548e266104052f730a44bd">More...</a><br /></td></tr>
@@ -200,157 +226,32 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:aca3c7bb46c493bb904b20325c180ac7f inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#aca3c7bb46c493bb904b20325c180ac7f">injectUniqueCSS</a> (String cssContent, String wrapperClass)</td></tr>
 <tr class="memdesc:aca3c7bb46c493bb904b20325c180ac7f inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inject CSS into the UI.  <a href="#aca3c7bb46c493bb904b20325c180ac7f">More...</a><br /></td></tr>
 <tr class="separator:aca3c7bb46c493bb904b20325c180ac7f inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ea9708e16ebbbe97bae42efafc879b8 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">PluginManager&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a8ea9708e16ebbbe97bae42efafc879b8">getPluginManager</a> ()</td></tr>
-<tr class="memdesc:a8ea9708e16ebbbe97bae42efafc879b8 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the JSPF Plugin Manager.  <a href="#a8ea9708e16ebbbe97bae42efafc879b8">More...</a><br /></td></tr>
+<tr class="memitem:a8ea9708e16ebbbe97bae42efafc879b8 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ea9708e16ebbbe97bae42efafc879b8"></a>
+PluginManager&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a8ea9708e16ebbbe97bae42efafc879b8">getPluginManager</a> ()</td></tr>
+<tr class="memdesc:a8ea9708e16ebbbe97bae42efafc879b8 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the JSPF Plugin Manager. <br /></td></tr>
 <tr class="separator:a8ea9708e16ebbbe97bae42efafc879b8 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40b42ab458fa9172e39fb52caa795860 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="el" href="interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin.html">VisualizerPlugin</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a40b42ab458fa9172e39fb52caa795860">getVisualizer</a> (String shortName)</td></tr>
-<tr class="memdesc:a40b42ab458fa9172e39fb52caa795860 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a visualizer by its short name.  <a href="#a40b42ab458fa9172e39fb52caa795860">More...</a><br /></td></tr>
+<tr class="memitem:a40b42ab458fa9172e39fb52caa795860 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40b42ab458fa9172e39fb52caa795860"></a>
+<a class="el" href="interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin.html">VisualizerPlugin</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a40b42ab458fa9172e39fb52caa795860">getVisualizer</a> (String shortName)</td></tr>
+<tr class="memdesc:a40b42ab458fa9172e39fb52caa795860 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets a visualizer by its short name. <br /></td></tr>
 <tr class="separator:a40b42ab458fa9172e39fb52caa795860 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bd34eb147b2421b97c8b7eb40ac71b8 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">ObjectMapper&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a6bd34eb147b2421b97c8b7eb40ac71b8">getJsonMapper</a> ()</td></tr>
+<tr class="memitem:a6bd34eb147b2421b97c8b7eb40ac71b8 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6bd34eb147b2421b97c8b7eb40ac71b8"></a>
+ObjectMapper&#160;</td><td class="memItemRight" valign="bottom"><b>getJsonMapper</b> ()</td></tr>
 <tr class="separator:a6bd34eb147b2421b97c8b7eb40ac71b8 inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pac_static_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td colspan="2" onclick="javascript:toggleInherit('pac_static_methods_classannis_1_1libgui_1_1_annis_base_u_i')"><img src="closed.png" alt="-"/>&#160;Static Package Functions inherited from <a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html">annis.libgui.AnnisBaseUI</a></td></tr>
-<tr class="memitem:ac224bd93c9bfeb8da9a2d8a342ab2d13 inherit pac_static_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#ac224bd93c9bfeb8da9a2d8a342ab2d13">[static initializer]</a></td></tr>
-<tr class="separator:ac224bd93c9bfeb8da9a2d8a342ab2d13 inherit pac_static_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79e13f92c344a80ebfd32be79199eccd inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a79e13f92c344a80ebfd32be79199eccd"></a>
+EventBus&#160;</td><td class="memItemRight" valign="bottom"><b>getLoginDataLostBus</b> ()</td></tr>
+<tr class="separator:a79e13f92c344a80ebfd32be79199eccd inherit pub_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classannis_1_1libgui_1_1_annis_base_u_i')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html">annis.libgui.AnnisBaseUI</a></td></tr>
+<tr class="memitem:a7e2b58ee28225b72a777b467caac79ca inherit pub_static_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memItemLeft" align="right" valign="top">static List&lt; File &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_annis_base_u_i.html#a7e2b58ee28225b72a777b467caac79ca">getAllConfigLocations</a> (String configFile)</td></tr>
+<tr class="memdesc:a7e2b58ee28225b72a777b467caac79ca inherit pub_static_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an configuration file name (might include directory) this function returns all locations for this file in the "ANNIS configuration system".  <a href="#a7e2b58ee28225b72a777b467caac79ca">More...</a><br /></td></tr>
+<tr class="separator:a7e2b58ee28225b72a777b467caac79ca inherit pub_static_methods_classannis_1_1libgui_1_1_annis_base_u_i"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a969042f20e93b953c3d03bb3e8b65d81"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.EmbeddedVisUI.displayGeneralHelp </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af22dfdb215a8db31f13aa32ab3838e25"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.EmbeddedVisUI.init </td>
-          <td>(</td>
-          <td class="paramtype">VaadinRequest&#160;</td>
-          <td class="paramname"><em>request</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab0cb661df54c83edf6f3e7ff8432740a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.EmbeddedVisUI.showHtmlDoc </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>corpus</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>doc</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Map&lt; String, String[]&gt;&#160;</td>
-          <td class="paramname"><em>args</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a5ade0ba83b27d0435523ffb80f952779"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Logger annis.gui.EmbeddedVisUI.log = LoggerFactory.getLogger(EmbeddedVisUI.class)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3ea087f193bae3b79ef70df07be54c49"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final String annis.gui.EmbeddedVisUI.PREFIX = &quot;/embeddedvis&quot;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_embedded_vis_u_i_8java.html">EmbeddedVisUI.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui.html">gui</a></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1_embedded_vis_u_i.html">EmbeddedVisUI</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:07 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1_embedded_vis_u_i.html">EmbeddedVisUI</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

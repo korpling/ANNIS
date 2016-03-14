@@ -16,9 +16,5 @@ var classannis_1_1ql_1_1parser_1_1_logic_clause =
     [ "removeChild", "classannis_1_1ql_1_1parser_1_1_logic_clause.html#a81d58da6f5f888980dc6d3f8b9fff63c", null ],
     [ "setContent", "classannis_1_1ql_1_1parser_1_1_logic_clause.html#abb2037f6b85c4bcd5716bc4c0a497b0d", null ],
     [ "setOp", "classannis_1_1ql_1_1parser_1_1_logic_clause.html#afe096e747549d6f825b92929d140d93b", null ],
-    [ "toString", "classannis_1_1ql_1_1parser_1_1_logic_clause.html#a2e686be192a4f89a62250cdbdc96e730", null ],
-    [ "children", "classannis_1_1ql_1_1parser_1_1_logic_clause.html#a146a3ee98ddc702abc943cffd4f8fc93", null ],
-    [ "content", "classannis_1_1ql_1_1parser_1_1_logic_clause.html#a3357fd0e62687ef4da379eeff8de38b7", null ],
-    [ "op", "classannis_1_1ql_1_1parser_1_1_logic_clause.html#a4d630edd5eab23b18116e5772a29ceb3", null ],
-    [ "parent", "classannis_1_1ql_1_1parser_1_1_logic_clause.html#af9d49b04beed6bc6e61d4717b4014ac7", null ]
+    [ "toString", "classannis_1_1ql_1_1parser_1_1_logic_clause.html#a2e686be192a4f89a62250cdbdc96e730", null ]
 ];

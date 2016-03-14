@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,8 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1admin_1_1controll
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.gui.admin.controller.GroupController Class Reference</div>  </div>
@@ -120,408 +115,37 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1admin_1_1controll
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.gui.admin.controller.GroupController:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.png" usemap="#annis.gui.admin.controller.GroupController_map" alt=""/>
-  <map id="annis.gui.admin.controller.GroupController_map" name="annis.gui.admin.controller.GroupController_map">
-<area href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view_1_1_listener.html" alt="annis.gui.admin.view.GroupListView.Listener" shape="rect" coords="0,0,265,24"/>
-<area href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view_1_1_listener.html" alt="annis.gui.admin.view.UIView.Listener" shape="rect" coords="275,0,540,24"/>
-</map>
- </div></div>
+</div>
+<p>Inherits <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view_1_1_listener.html">annis.gui.admin.view.GroupListView.Listener</a>, <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view_1_1_listener.html">annis.gui.admin.view.UIView.Listener</a>, and Serializable.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae233fc82082ef00224a5ea15bccf488e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#ae233fc82082ef00224a5ea15bccf488e">GroupController</a> (<a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_group_management.html">GroupManagement</a> <a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#a0594d5376f766ad3b0495413090e3eef">model</a>, <a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_corpus_management.html">CorpusManagement</a> <a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#a7540f153e43f4e8c7384a1a79825e376">corpusModel</a>, <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html">GroupListView</a> <a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#ac5506c8f85f1bb1d99a06a3f4dc59c70">view</a>, <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html">UIView</a> <a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#af3992a175430ecad1a78e582f1fc4f84">uiView</a>, <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_user_list_view.html">UserListView</a> <a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#ad09560218570307c8c68dd8ffb851edb">userView</a>, boolean <a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#a6bee01cfee12dd733755c5be2e6be93c">isLoggedIn</a>)</td></tr>
+<tr class="memitem:ae233fc82082ef00224a5ea15bccf488e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae233fc82082ef00224a5ea15bccf488e"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>GroupController</b> (<a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_group_management.html">GroupManagement</a> model, <a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_corpus_management.html">CorpusManagement</a> corpusModel, <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html">GroupListView</a> view, <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html">UIView</a> uiView, <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_user_list_view.html">UserListView</a> userView, boolean isLoggedIn)</td></tr>
 <tr class="separator:ae233fc82082ef00224a5ea15bccf488e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa68101cdd4036d7f8f01f1cbe67bc23a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#aa68101cdd4036d7f8f01f1cbe67bc23a">loginChanged</a> (WebResource annisRootResource, boolean <a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#a6bee01cfee12dd733755c5be2e6be93c">isLoggedIn</a>)</td></tr>
-<tr class="separator:aa68101cdd4036d7f8f01f1cbe67bc23a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade32de4d39b415b04b7a7d79d01a2bdf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#ade32de4d39b415b04b7a7d79d01a2bdf">groupUpdated</a> (<a class="el" href="classannis_1_1security_1_1_group.html">Group</a> user)</td></tr>
+<tr class="memitem:aa98754b545bbf03eeec2cced6671b3ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa98754b545bbf03eeec2cced6671b3ce"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>loginChanged</b> (boolean isLoggedIn)</td></tr>
+<tr class="separator:aa98754b545bbf03eeec2cced6671b3ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade32de4d39b415b04b7a7d79d01a2bdf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade32de4d39b415b04b7a7d79d01a2bdf"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>groupUpdated</b> (<a class="el" href="classannis_1_1security_1_1_group.html">Group</a> user)</td></tr>
 <tr class="separator:ade32de4d39b415b04b7a7d79d01a2bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa53452102d3411b94e3c86f1122f651b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#aa53452102d3411b94e3c86f1122f651b">addNewGroup</a> (String groupName)</td></tr>
+<tr class="memitem:aa53452102d3411b94e3c86f1122f651b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa53452102d3411b94e3c86f1122f651b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addNewGroup</b> (String groupName)</td></tr>
 <tr class="separator:aa53452102d3411b94e3c86f1122f651b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa242fdd80832eaf64402c8df9b3c19f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#aaa242fdd80832eaf64402c8df9b3c19f">deleteGroups</a> (Set&lt; String &gt; groupName)</td></tr>
+<tr class="memitem:aaa242fdd80832eaf64402c8df9b3c19f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa242fdd80832eaf64402c8df9b3c19f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>deleteGroups</b> (Set&lt; String &gt; groupName)</td></tr>
 <tr class="separator:aaa242fdd80832eaf64402c8df9b3c19f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1512ca6bbd22462b26a30dbfce250af9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#a1512ca6bbd22462b26a30dbfce250af9">selectedTabChanged</a> (Object selectedTab)</td></tr>
-<tr class="separator:a1512ca6bbd22462b26a30dbfce250af9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:ac227f738ea2fd6e43a88aab0c596869b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#ac227f738ea2fd6e43a88aab0c596869b">clearModel</a> ()</td></tr>
-<tr class="separator:ac227f738ea2fd6e43a88aab0c596869b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad31d70c7aab91f2f019c4b2f822fd9b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#aad31d70c7aab91f2f019c4b2f822fd9b">fetchDataFromService</a> ()</td></tr>
-<tr class="separator:aad31d70c7aab91f2f019c4b2f822fd9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a728636e4c9eeb808b0ef9aa70adc3bad"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#a728636e4c9eeb808b0ef9aa70adc3bad">updateUserUI</a> ()</td></tr>
-<tr class="separator:a728636e4c9eeb808b0ef9aa70adc3bad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a0594d5376f766ad3b0495413090e3eef"><td class="memItemLeft" align="right" valign="top">final <a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_group_management.html">GroupManagement</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#a0594d5376f766ad3b0495413090e3eef">model</a></td></tr>
-<tr class="separator:a0594d5376f766ad3b0495413090e3eef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7540f153e43f4e8c7384a1a79825e376"><td class="memItemLeft" align="right" valign="top">final <a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_corpus_management.html">CorpusManagement</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#a7540f153e43f4e8c7384a1a79825e376">corpusModel</a></td></tr>
-<tr class="separator:a7540f153e43f4e8c7384a1a79825e376"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5506c8f85f1bb1d99a06a3f4dc59c70"><td class="memItemLeft" align="right" valign="top">final <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html">GroupListView</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#ac5506c8f85f1bb1d99a06a3f4dc59c70">view</a></td></tr>
-<tr class="separator:ac5506c8f85f1bb1d99a06a3f4dc59c70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3992a175430ecad1a78e582f1fc4f84"><td class="memItemLeft" align="right" valign="top">final <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html">UIView</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#af3992a175430ecad1a78e582f1fc4f84">uiView</a></td></tr>
-<tr class="separator:af3992a175430ecad1a78e582f1fc4f84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad09560218570307c8c68dd8ffb851edb"><td class="memItemLeft" align="right" valign="top">final <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_user_list_view.html">UserListView</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#ad09560218570307c8c68dd8ffb851edb">userView</a></td></tr>
-<tr class="separator:ad09560218570307c8c68dd8ffb851edb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bee01cfee12dd733755c5be2e6be93c"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html#a6bee01cfee12dd733755c5be2e6be93c">isLoggedIn</a> = false</td></tr>
-<tr class="separator:a6bee01cfee12dd733755c5be2e6be93c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3549482a9bd70aa6f7357f29e8af341b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3549482a9bd70aa6f7357f29e8af341b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>loadedTab</b> (Object selectedTab)</td></tr>
+<tr class="separator:a3549482a9bd70aa6f7357f29e8af341b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ae233fc82082ef00224a5ea15bccf488e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.gui.admin.controller.GroupController.GroupController </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_group_management.html">GroupManagement</a>&#160;</td>
-          <td class="paramname"><em>model</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_corpus_management.html">CorpusManagement</a>&#160;</td>
-          <td class="paramname"><em>corpusModel</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html">GroupListView</a>&#160;</td>
-          <td class="paramname"><em>view</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html">UIView</a>&#160;</td>
-          <td class="paramname"><em>uiView</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_user_list_view.html">UserListView</a>&#160;</td>
-          <td class="paramname"><em>userView</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>isLoggedIn</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aa53452102d3411b94e3c86f1122f651b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.controller.GroupController.addNewGroup </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>groupName</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view_1_1_listener.html#a93b4b2cbcae1ae21adfaab961afa3a82">annis.gui.admin.view.GroupListView.Listener</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ac227f738ea2fd6e43a88aab0c596869b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.controller.GroupController.clearModel </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aaa242fdd80832eaf64402c8df9b3c19f"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.controller.GroupController.deleteGroups </td>
-          <td>(</td>
-          <td class="paramtype">Set&lt; String &gt;&#160;</td>
-          <td class="paramname"><em>groupName</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view_1_1_listener.html#a501238e3b40e18474c50bdf64168aa5b">annis.gui.admin.view.GroupListView.Listener</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aad31d70c7aab91f2f019c4b2f822fd9b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.controller.GroupController.fetchDataFromService </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ade32de4d39b415b04b7a7d79d01a2bdf"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.controller.GroupController.groupUpdated </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1security_1_1_group.html">Group</a>&#160;</td>
-          <td class="paramname"><em>user</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view_1_1_listener.html#add028fd51f9693e1af9ee3e2a5a20658">annis.gui.admin.view.GroupListView.Listener</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="aa68101cdd4036d7f8f01f1cbe67bc23a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.controller.GroupController.loginChanged </td>
-          <td>(</td>
-          <td class="paramtype">WebResource&#160;</td>
-          <td class="paramname"><em>annisRootResource</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>isLoggedIn</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view_1_1_listener.html#a946713d58fd8e9373408322d5b7516d1">annis.gui.admin.view.UIView.Listener</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a1512ca6bbd22462b26a30dbfce250af9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.controller.GroupController.selectedTabChanged </td>
-          <td>(</td>
-          <td class="paramtype">Object&#160;</td>
-          <td class="paramname"><em>selectedTab</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view_1_1_listener.html#a3baa9adae67a2d1e5596d4cd993211dd">annis.gui.admin.view.UIView.Listener</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a728636e4c9eeb808b0ef9aa70adc3bad"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.controller.GroupController.updateUserUI </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a7540f153e43f4e8c7384a1a79825e376"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final <a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_corpus_management.html">CorpusManagement</a> annis.gui.admin.controller.GroupController.corpusModel</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a6bee01cfee12dd733755c5be2e6be93c"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.gui.admin.controller.GroupController.isLoggedIn = false</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0594d5376f766ad3b0495413090e3eef"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final <a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_group_management.html">GroupManagement</a> annis.gui.admin.controller.GroupController.model</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af3992a175430ecad1a78e582f1fc4f84"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html">UIView</a> annis.gui.admin.controller.GroupController.uiView</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad09560218570307c8c68dd8ffb851edb"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_user_list_view.html">UserListView</a> annis.gui.admin.controller.GroupController.userView</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac5506c8f85f1bb1d99a06a3f4dc59c70"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final <a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html">GroupListView</a> annis.gui.admin.controller.GroupController.view</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_group_controller_8java.html">GroupController.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui.html">gui</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1admin.html">admin</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1admin_1_1controller.html">controller</a></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html">GroupController</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:07 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>admin</b></li><li class="navelem"><b>controller</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html">GroupController</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

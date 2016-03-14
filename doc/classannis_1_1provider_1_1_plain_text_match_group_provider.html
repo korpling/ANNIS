@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,7 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1provider_1_1_plain_text_
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1provider_1_1_plain_text_match_group_provider-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.provider.PlainTextMatchGroupProvider Class Reference</div>  </div>
@@ -119,293 +115,34 @@ $(document).ready(function(){initNavTree('classannis_1_1provider_1_1_plain_text_
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.provider.PlainTextMatchGroupProvider:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1provider_1_1_plain_text_match_group_provider.png" usemap="#annis.provider.PlainTextMatchGroupProvider_map" alt=""/>
-  <map id="annis.provider.PlainTextMatchGroupProvider_map" name="annis.provider.PlainTextMatchGroupProvider_map">
-</map>
- </div></div>
+</div>
+<p>Inherits MessageBodyWriter&lt; MatchGroup &gt;, and MessageBodyReader&lt; MatchGroup &gt;.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a67993cfbeaabfb8b9ec01e1b224075e0"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1provider_1_1_plain_text_match_group_provider.html#a67993cfbeaabfb8b9ec01e1b224075e0">isWriteable</a> (Class&lt;?&gt; type, Type genericType, Annotation[] annotations, MediaType mediaType)</td></tr>
+<tr class="memitem:a67993cfbeaabfb8b9ec01e1b224075e0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67993cfbeaabfb8b9ec01e1b224075e0"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isWriteable</b> (Class&lt;?&gt; type, Type genericType, Annotation[] annotations, MediaType mediaType)</td></tr>
 <tr class="separator:a67993cfbeaabfb8b9ec01e1b224075e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c95427304bfe6b8ff89b1fd775a8525"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1provider_1_1_plain_text_match_group_provider.html#a6c95427304bfe6b8ff89b1fd775a8525">getSize</a> (<a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a> t, Class&lt;?&gt; type, Type genericType, Annotation[] annotations, MediaType mediaType)</td></tr>
+<tr class="memitem:a6c95427304bfe6b8ff89b1fd775a8525"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6c95427304bfe6b8ff89b1fd775a8525"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>getSize</b> (<a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a> t, Class&lt;?&gt; type, Type genericType, Annotation[] annotations, MediaType mediaType)</td></tr>
 <tr class="separator:a6c95427304bfe6b8ff89b1fd775a8525"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a494f9162472e1bbebf2c9e7bed0b42d7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1provider_1_1_plain_text_match_group_provider.html#a494f9162472e1bbebf2c9e7bed0b42d7">writeTo</a> (<a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a> match, Class&lt;?&gt; type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap&lt; String, Object &gt; httpHeaders, OutputStream entityStream)  throws IOException, WebApplicationException   </td></tr>
+<tr class="memitem:a494f9162472e1bbebf2c9e7bed0b42d7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a494f9162472e1bbebf2c9e7bed0b42d7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>writeTo</b> (<a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a> match, Class&lt;?&gt; type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap&lt; String, Object &gt; httpHeaders, OutputStream entityStream)  throws IOException, WebApplicationException   </td></tr>
 <tr class="separator:a494f9162472e1bbebf2c9e7bed0b42d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed764c23da3aa77e27ac80e7c85551b1"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1provider_1_1_plain_text_match_group_provider.html#aed764c23da3aa77e27ac80e7c85551b1">isReadable</a> (Class&lt;?&gt; type, Type genericType, Annotation[] annotations, MediaType mediaType)</td></tr>
+<tr class="memitem:aed764c23da3aa77e27ac80e7c85551b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aed764c23da3aa77e27ac80e7c85551b1"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isReadable</b> (Class&lt;?&gt; type, Type genericType, Annotation[] annotations, MediaType mediaType)</td></tr>
 <tr class="separator:aed764c23da3aa77e27ac80e7c85551b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d7b5f261a2e427dbb62ab0c57140afd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1provider_1_1_plain_text_match_group_provider.html#a3d7b5f261a2e427dbb62ab0c57140afd">readFrom</a> (Class&lt; <a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a> &gt; type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap&lt; String, String &gt; httpHeaders, InputStream entityStream)  throws IOException,     WebApplicationException   </td></tr>
+<tr class="memitem:a3d7b5f261a2e427dbb62ab0c57140afd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d7b5f261a2e427dbb62ab0c57140afd"></a>
+<a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a>&#160;</td><td class="memItemRight" valign="bottom"><b>readFrom</b> (Class&lt; <a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a> &gt; type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap&lt; String, String &gt; httpHeaders, InputStream entityStream)  throws IOException,     WebApplicationException   </td></tr>
 <tr class="separator:a3d7b5f261a2e427dbb62ab0c57140afd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:aeab1ed7599d462b1eecb72a2e7347ed0"><td class="memItemLeft" align="right" valign="top">static final org.slf4j.Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1provider_1_1_plain_text_match_group_provider.html#aeab1ed7599d462b1eecb72a2e7347ed0">log</a></td></tr>
-<tr class="separator:aeab1ed7599d462b1eecb72a2e7347ed0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a6c95427304bfe6b8ff89b1fd775a8525"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.provider.PlainTextMatchGroupProvider.getSize </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a>&#160;</td>
-          <td class="paramname"><em>t</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Class&lt;?&gt;&#160;</td>
-          <td class="paramname"><em>type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Type&#160;</td>
-          <td class="paramname"><em>genericType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Annotation[]&#160;</td>
-          <td class="paramname"><em>annotations</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MediaType&#160;</td>
-          <td class="paramname"><em>mediaType</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aed764c23da3aa77e27ac80e7c85551b1"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.provider.PlainTextMatchGroupProvider.isReadable </td>
-          <td>(</td>
-          <td class="paramtype">Class&lt;?&gt;&#160;</td>
-          <td class="paramname"><em>type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Type&#160;</td>
-          <td class="paramname"><em>genericType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Annotation[]&#160;</td>
-          <td class="paramname"><em>annotations</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MediaType&#160;</td>
-          <td class="paramname"><em>mediaType</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a67993cfbeaabfb8b9ec01e1b224075e0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.provider.PlainTextMatchGroupProvider.isWriteable </td>
-          <td>(</td>
-          <td class="paramtype">Class&lt;?&gt;&#160;</td>
-          <td class="paramname"><em>type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Type&#160;</td>
-          <td class="paramname"><em>genericType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Annotation[]&#160;</td>
-          <td class="paramname"><em>annotations</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MediaType&#160;</td>
-          <td class="paramname"><em>mediaType</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3d7b5f261a2e427dbb62ab0c57140afd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a> annis.provider.PlainTextMatchGroupProvider.readFrom </td>
-          <td>(</td>
-          <td class="paramtype">Class&lt; <a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a> &gt;&#160;</td>
-          <td class="paramname"><em>type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Type&#160;</td>
-          <td class="paramname"><em>genericType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Annotation[]&#160;</td>
-          <td class="paramname"><em>annotations</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MediaType&#160;</td>
-          <td class="paramname"><em>mediaType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MultivaluedMap&lt; String, String &gt;&#160;</td>
-          <td class="paramname"><em>httpHeaders</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">InputStream&#160;</td>
-          <td class="paramname"><em>entityStream</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> throws IOException,     WebApplicationException</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a494f9162472e1bbebf2c9e7bed0b42d7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.provider.PlainTextMatchGroupProvider.writeTo </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1service_1_1objects_1_1_match_group.html">MatchGroup</a>&#160;</td>
-          <td class="paramname"><em>match</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Class&lt;?&gt;&#160;</td>
-          <td class="paramname"><em>type</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Type&#160;</td>
-          <td class="paramname"><em>genericType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Annotation[]&#160;</td>
-          <td class="paramname"><em>annotations</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MediaType&#160;</td>
-          <td class="paramname"><em>mediaType</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">MultivaluedMap&lt; String, Object &gt;&#160;</td>
-          <td class="paramname"><em>httpHeaders</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">OutputStream&#160;</td>
-          <td class="paramname"><em>entityStream</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> throws IOException, WebApplicationException</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="aeab1ed7599d462b1eecb72a2e7347ed0"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final org.slf4j.Logger annis.provider.PlainTextMatchGroupProvider.log</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= LoggerFactory.getLogger(</div>
-<div class="line">    PlainTextMatchGroupProvider.class)</div>
-</div><!-- fragment -->
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_plain_text_match_group_provider_8java.html">PlainTextMatchGroupProvider.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1provider.html">provider</a></li><li class="navelem"><a class="el" href="classannis_1_1provider_1_1_plain_text_match_group_provider.html">PlainTextMatchGroupProvider</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>provider</b></li><li class="navelem"><a class="el" href="classannis_1_1provider_1_1_plain_text_match_group_provider.html">PlainTextMatchGroupProvider</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

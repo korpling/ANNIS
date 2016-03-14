@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -119,20 +116,10 @@ $(document).ready(function(){initNavTree('interfaceannis_1_1libgui_1_1visualizer
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Base interface for all plugins that have resources in their package. </p>
 <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.libgui.visualizers.ResourcePlugin:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="interfaceannis_1_1libgui_1_1visualizers_1_1_resource_plugin.png" usemap="#annis.libgui.visualizers.ResourcePlugin_map" alt=""/>
-  <map id="annis.libgui.visualizers.ResourcePlugin_map" name="annis.libgui.visualizers.ResourcePlugin_map">
-<area href="classannis_1_1libgui_1_1visualizers_1_1_abstract_i_frame_visualizer.html" title="Base class for all iframe visualizer plugins. " alt="annis.libgui.visualizers.AbstractIFrameVisualizer" shape="rect" coords="389,112,768,136"/>
-<area href="classannis_1_1visualizers_1_1iframe_1_1_writer_visualizer.html" title="Implentation of Visualizer which uses Writers instead of OutputStream. " alt="annis.visualizers.iframe.WriterVisualizer" shape="rect" coords="389,168,768,192"/>
-<area href="classannis_1_1visualizers_1_1iframe_1_1_coref_visualizer.html" title="A view of the entire text of a document, possibly with interactive coreference links. " alt="annis.visualizers.iframe.CorefVisualizer" shape="rect" coords="0,224,379,248"/>
-<area href="classannis_1_1visualizers_1_1iframe_1_1dependency_1_1_vakyartha_dependency_tree.html" title="Provides a dependence visualization based on vakyartha visualization, which was developed by Kim Gerd..." alt="annis.visualizers.iframe.dependency.VakyarthaDependencyTree" shape="rect" coords="389,224,768,248"/>
-<area href="classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_partitur_visualizer.html" alt="annis.visualizers.iframe.partitur.PartiturVisualizer" shape="rect" coords="778,224,1157,248"/>
-<area href="classannis_1_1visualizers_1_1iframe_1_1_match_coref_visualizer.html" title="A CorefVisualizer that is only using the match (not the document). " alt="annis.visualizers.iframe.MatchCorefVisualizer" shape="rect" coords="0,280,379,304"/>
-</map>
- </div></div>
+</div>
+<p>Inherits Plugin.</p>
+
+<p>Inherited by <a class="el" href="classannis_1_1libgui_1_1visualizers_1_1_abstract_i_frame_visualizer.html">annis.libgui.visualizers.AbstractIFrameVisualizer</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -161,16 +148,13 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<hr/>The documentation for this interface was generated from the following file:<ul>
-<li><a class="el" href="_resource_plugin_8java.html">ResourcePlugin.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1libgui.html">libgui</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1libgui_1_1visualizers.html">visualizers</a></li><li class="navelem"><a class="el" href="interfaceannis_1_1libgui_1_1visualizers_1_1_resource_plugin.html">ResourcePlugin</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>libgui</b></li><li class="navelem"><b>visualizers</b></li><li class="navelem"><a class="el" href="interfaceannis_1_1libgui_1_1visualizers_1_1_resource_plugin.html">ResourcePlugin</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -113,9 +110,6 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1flatquerybuilder_
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.gui.flatquerybuilder.ValueField Class Reference</div>  </div>
@@ -123,574 +117,85 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1flatquerybuilder_
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>Martin </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.gui.flatquerybuilder.ValueField:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.png" usemap="#annis.gui.flatquerybuilder.ValueField_map" alt=""/>
-  <map id="annis.gui.flatquerybuilder.ValueField_map" name="annis.gui.flatquerybuilder.ValueField_map">
-</map>
- </div></div>
+</div>
+<p>Inherits Panel, TextChangeListener, and ClickListener.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode.html">ValueMode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode">ValueMode</a></td></tr>
+<tr class="separator:enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a12fe2c423fa6d864f6658657b8dc52ed"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a12fe2c423fa6d864f6658657b8dc52ed">ValueField</a> (<a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder.html">FlatQueryBuilder</a> <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ada7b477dac2ffa5d0c3912a2b588d1ad">sq</a>, <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_search_box.html">SearchBox</a> <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#acd16747365eb8212737742cb6c7edbcd">sb</a>, String <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ab7b10e58501ddd9460d506325d6a3f13">level</a>)</td></tr>
+<tr class="memitem:a12fe2c423fa6d864f6658657b8dc52ed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a12fe2c423fa6d864f6658657b8dc52ed"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>ValueField</b> (<a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder.html">FlatQueryBuilder</a> sq, <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_search_box.html">SearchBox</a> sb, String level)</td></tr>
 <tr class="separator:a12fe2c423fa6d864f6658657b8dc52ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9f97f1f2e6d685d15e1cedada64702f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#aa9f97f1f2e6d685d15e1cedada64702f">ValueField</a> (<a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder.html">FlatQueryBuilder</a> <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ada7b477dac2ffa5d0c3912a2b588d1ad">sq</a>, <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_search_box.html">SearchBox</a> <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#acd16747365eb8212737742cb6c7edbcd">sb</a>, String <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ab7b10e58501ddd9460d506325d6a3f13">level</a>, String value)</td></tr>
+<tr class="memitem:aa9f97f1f2e6d685d15e1cedada64702f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa9f97f1f2e6d685d15e1cedada64702f"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>ValueField</b> (<a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder.html">FlatQueryBuilder</a> sq, <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_search_box.html">SearchBox</a> sb, String level, String value)</td></tr>
 <tr class="separator:aa9f97f1f2e6d685d15e1cedada64702f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5899f2bb779cd721010c93bce5f2b406"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a5899f2bb779cd721010c93bce5f2b406">buttonClick</a> (Button.ClickEvent event)</td></tr>
+<tr class="memitem:a5899f2bb779cd721010c93bce5f2b406"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5899f2bb779cd721010c93bce5f2b406"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>buttonClick</b> (Button.ClickEvent event)</td></tr>
 <tr class="separator:a5899f2bb779cd721010c93bce5f2b406"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9713ec9007d06526c89ab4cd633bbfa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ad9713ec9007d06526c89ab4cd633bbfa">textChange</a> (TextChangeEvent event)</td></tr>
+<tr class="memitem:ad9713ec9007d06526c89ab4cd633bbfa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9713ec9007d06526c89ab4cd633bbfa"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>textChange</b> (TextChangeEvent event)</td></tr>
 <tr class="separator:ad9713ec9007d06526c89ab4cd633bbfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7c725701d25e37a266e8b69f0742ee30"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a7c725701d25e37a266e8b69f0742ee30">getValue</a> ()</td></tr>
+<tr class="memitem:a7c725701d25e37a266e8b69f0742ee30"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7c725701d25e37a266e8b69f0742ee30"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getValue</b> ()</td></tr>
 <tr class="separator:a7c725701d25e37a266e8b69f0742ee30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24c8fe22e1ff4e48901d21d4c70a54b2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a24c8fe22e1ff4e48901d21d4c70a54b2">setValue</a> (String value)</td></tr>
+<tr class="memitem:a24c8fe22e1ff4e48901d21d4c70a54b2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a24c8fe22e1ff4e48901d21d4c70a54b2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setValue</b> (String value)</td></tr>
 <tr class="separator:a24c8fe22e1ff4e48901d21d4c70a54b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae30bd5daeaea1589b8d57f52fd5cecf0"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ae30bd5daeaea1589b8d57f52fd5cecf0">isRegex</a> ()</td></tr>
+<tr class="memitem:ae30bd5daeaea1589b8d57f52fd5cecf0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae30bd5daeaea1589b8d57f52fd5cecf0"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isRegex</b> ()</td></tr>
 <tr class="separator:ae30bd5daeaea1589b8d57f52fd5cecf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbb66921591da29ab2e770453557326c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#afbb66921591da29ab2e770453557326c">setValueMode</a> (<a class="el" href="enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode.html">ValueMode</a> <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ae4e445b472d68ed031ad9534bb87bc5e">vm</a>)</td></tr>
+<tr class="memitem:afbb66921591da29ab2e770453557326c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afbb66921591da29ab2e770453557326c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setValueMode</b> (<a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode">ValueMode</a> vm)</td></tr>
 <tr class="separator:afbb66921591da29ab2e770453557326c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb7b72227a14e71535a28267b110e756"><td class="memItemLeft" align="right" valign="top">Button&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#abb7b72227a14e71535a28267b110e756">getButton</a> ()</td></tr>
+<tr class="memitem:abb7b72227a14e71535a28267b110e756"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb7b72227a14e71535a28267b110e756"></a>
+Button&#160;</td><td class="memItemRight" valign="bottom"><b>getButton</b> ()</td></tr>
 <tr class="separator:abb7b72227a14e71535a28267b110e756"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff9f2211ce1bc37fc7b37f6f35285a40"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_sensitive_combo_box.html">SensitiveComboBox</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#aff9f2211ce1bc37fc7b37f6f35285a40">getSCB</a> ()</td></tr>
+<tr class="memitem:aff9f2211ce1bc37fc7b37f6f35285a40"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aff9f2211ce1bc37fc7b37f6f35285a40"></a>
+<a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_sensitive_combo_box.html">SensitiveComboBox</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getSCB</b> ()</td></tr>
 <tr class="separator:aff9f2211ce1bc37fc7b37f6f35285a40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b078c9343060e5268e3a7ce5dcc81bb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a8b078c9343060e5268e3a7ce5dcc81bb">setProtected</a> (boolean p)</td></tr>
+<tr class="memitem:a8b078c9343060e5268e3a7ce5dcc81bb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8b078c9343060e5268e3a7ce5dcc81bb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setProtected</b> (boolean p)</td></tr>
 <tr class="separator:a8b078c9343060e5268e3a7ce5dcc81bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a563aef7e2ee99a549e8ab771d71a6358"><td class="memItemLeft" align="right" valign="top">static String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a563aef7e2ee99a549e8ab771d71a6358">removeAccents</a> (String text)</td></tr>
+<tr class="memitem:a563aef7e2ee99a549e8ab771d71a6358"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a563aef7e2ee99a549e8ab771d71a6358"></a>
+static String&#160;</td><td class="memItemRight" valign="bottom"><b>removeAccents</b> (String text)</td></tr>
 <tr class="separator:a563aef7e2ee99a549e8ab771d71a6358"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:aff1d0109a6acf9721344e856c415ac9f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#aff1d0109a6acf9721344e856c415ac9f">buildValues</a> (<a class="el" href="enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode.html">ValueMode</a> <a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ae4e445b472d68ed031ad9534bb87bc5e">vm</a>)</td></tr>
-<tr class="separator:aff1d0109a6acf9721344e856c415ac9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a61fb071dc9c9ff277b7860c05638b246"><td class="memItemLeft" align="right" valign="top">HorizontalLayout&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a61fb071dc9c9ff277b7860c05638b246">frame</a></td></tr>
-<tr class="separator:a61fb071dc9c9ff277b7860c05638b246"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e20f38da90f75dc48b2e0f7c195b5c4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_sensitive_combo_box.html">SensitiveComboBox</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a1e20f38da90f75dc48b2e0f7c195b5c4">scb</a></td></tr>
-<tr class="separator:a1e20f38da90f75dc48b2e0f7c195b5c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a576949d6d7acd2eea25fec06c1c62060"><td class="memItemLeft" align="right" valign="top">Button&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a576949d6d7acd2eea25fec06c1c62060">bt</a></td></tr>
-<tr class="separator:a576949d6d7acd2eea25fec06c1c62060"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada7b477dac2ffa5d0c3912a2b588d1ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder.html">FlatQueryBuilder</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ada7b477dac2ffa5d0c3912a2b588d1ad">sq</a></td></tr>
-<tr class="separator:ada7b477dac2ffa5d0c3912a2b588d1ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab7b10e58501ddd9460d506325d6a3f13"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ab7b10e58501ddd9460d506325d6a3f13">level</a></td></tr>
-<tr class="separator:ab7b10e58501ddd9460d506325d6a3f13"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd16747365eb8212737742cb6c7edbcd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_search_box.html">SearchBox</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#acd16747365eb8212737742cb6c7edbcd">sb</a></td></tr>
-<tr class="separator:acd16747365eb8212737742cb6c7edbcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf1a022dc09b0b95576458fa0ebb6dc5"><td class="memItemLeft" align="right" valign="top">ConcurrentSkipListMap&lt; String, String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#aaf1a022dc09b0b95576458fa0ebb6dc5">values</a></td></tr>
-<tr class="separator:aaf1a022dc09b0b95576458fa0ebb6dc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae4e445b472d68ed031ad9534bb87bc5e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode.html">ValueMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#ae4e445b472d68ed031ad9534bb87bc5e">vm</a></td></tr>
-<tr class="separator:ae4e445b472d68ed031ad9534bb87bc5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a064ecb07bb4383309600a9b9da49274a"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a064ecb07bb4383309600a9b9da49274a">BUTTON_LABEL_REMOVE</a> = &quot;X&quot;</td></tr>
-<tr class="separator:a064ecb07bb4383309600a9b9da49274a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d067193bdbbc33e9c41dbb1d4bd2709"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a8d067193bdbbc33e9c41dbb1d4bd2709">SCB_STYLE_NAME</a> = <a class="el" href="classannis_1_1libgui_1_1_helper.html#a5960dcec7daa2699e3dd27d1235f76d8">Helper.CORPUS_FONT_FORCE</a></td></tr>
-<tr class="separator:a8d067193bdbbc33e9c41dbb1d4bd2709"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4eae948f4b845ed80135c65423ab372f"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a4eae948f4b845ed80135c65423ab372f">SCB_WIDTH</a> = &quot;130px&quot;</td></tr>
-<tr class="separator:a4eae948f4b845ed80135c65423ab372f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a12fe2c423fa6d864f6658657b8dc52ed"></a>
+<hr/><h2 class="groupheader">Class Documentation</h2>
+<a name="enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode" id="enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">annis.gui.flatquerybuilder.ValueField.ValueField </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder.html">FlatQueryBuilder</a>&#160;</td>
-          <td class="paramname"><em>sq</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_search_box.html">SearchBox</a>&#160;</td>
-          <td class="paramname"><em>sb</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>level</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="memname">enum annis::gui::flatquerybuilder::ValueField::ValueMode</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa9f97f1f2e6d685d15e1cedada64702f"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.gui.flatquerybuilder.ValueField.ValueField </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder.html">FlatQueryBuilder</a>&#160;</td>
-          <td class="paramname"><em>sq</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_search_box.html">SearchBox</a>&#160;</td>
-          <td class="paramname"><em>sb</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>level</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aff1d0109a6acf9721344e856c415ac9f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.flatquerybuilder.ValueField.buildValues </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode.html">ValueMode</a>&#160;</td>
-          <td class="paramname"><em>vm</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
+<table class="fieldtable">
+<tr><th colspan="3">Class Members</th></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="af3454bbd5a040cf993076d4db22f4fe6"></a></td>
+<td class="fieldname">
+NORMAL</td>
+<td class="fielddoc">
+</td></tr>
 </table>
-</div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="a5899f2bb779cd721010c93bce5f2b406"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.flatquerybuilder.ValueField.buttonClick </td>
-          <td>(</td>
-          <td class="paramtype">Button.ClickEvent&#160;</td>
-          <td class="paramname"><em>event</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="abb7b72227a14e71535a28267b110e756"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Button annis.gui.flatquerybuilder.ValueField.getButton </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aff9f2211ce1bc37fc7b37f6f35285a40"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_sensitive_combo_box.html">SensitiveComboBox</a> annis.gui.flatquerybuilder.ValueField.getSCB </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7c725701d25e37a266e8b69f0742ee30"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.gui.flatquerybuilder.ValueField.getValue </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae30bd5daeaea1589b8d57f52fd5cecf0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.gui.flatquerybuilder.ValueField.isRegex </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a563aef7e2ee99a549e8ab771d71a6358"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static String annis.gui.flatquerybuilder.ValueField.removeAccents </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>text</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8b078c9343060e5268e3a7ce5dcc81bb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.flatquerybuilder.ValueField.setProtected </td>
-          <td>(</td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>p</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a24c8fe22e1ff4e48901d21d4c70a54b2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.flatquerybuilder.ValueField.setValue </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>value</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="afbb66921591da29ab2e770453557326c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.flatquerybuilder.ValueField.setValueMode </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode.html">ValueMode</a>&#160;</td>
-          <td class="paramname"><em>vm</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad9713ec9007d06526c89ab4cd633bbfa"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.flatquerybuilder.ValueField.textChange </td>
-          <td>(</td>
-          <td class="paramtype">TextChangeEvent&#160;</td>
-          <td class="paramname"><em>event</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a576949d6d7acd2eea25fec06c1c62060"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Button annis.gui.flatquerybuilder.ValueField.bt</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a064ecb07bb4383309600a9b9da49274a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final String annis.gui.flatquerybuilder.ValueField.BUTTON_LABEL_REMOVE = &quot;X&quot;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a61fb071dc9c9ff277b7860c05638b246"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">HorizontalLayout annis.gui.flatquerybuilder.ValueField.frame</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab7b10e58501ddd9460d506325d6a3f13"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.gui.flatquerybuilder.ValueField.level</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="acd16747365eb8212737742cb6c7edbcd"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_search_box.html">SearchBox</a> annis.gui.flatquerybuilder.ValueField.sb</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1e20f38da90f75dc48b2e0f7c195b5c4"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_sensitive_combo_box.html">SensitiveComboBox</a> annis.gui.flatquerybuilder.ValueField.scb</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8d067193bdbbc33e9c41dbb1d4bd2709"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final String annis.gui.flatquerybuilder.ValueField.SCB_STYLE_NAME = <a class="el" href="classannis_1_1libgui_1_1_helper.html#a5960dcec7daa2699e3dd27d1235f76d8">Helper.CORPUS_FONT_FORCE</a></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4eae948f4b845ed80135c65423ab372f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final String annis.gui.flatquerybuilder.ValueField.SCB_WIDTH = &quot;130px&quot;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ada7b477dac2ffa5d0c3912a2b588d1ad"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder.html">FlatQueryBuilder</a> annis.gui.flatquerybuilder.ValueField.sq</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aaf1a022dc09b0b95576458fa0ebb6dc5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ConcurrentSkipListMap&lt;String, String&gt; annis.gui.flatquerybuilder.ValueField.values</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae4e445b472d68ed031ad9534bb87bc5e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode.html">ValueMode</a> annis.gui.flatquerybuilder.ValueField.vm</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_value_field_8java.html">ValueField.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui.html">gui</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1flatquerybuilder.html">flatquerybuilder</a></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html">ValueField</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:07 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>flatquerybuilder</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html">ValueField</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

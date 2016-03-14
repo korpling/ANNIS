@@ -7,7 +7,5 @@ var classannis_1_1security_1_1_serializable_byte_source =
     [ "getDelegate", "classannis_1_1security_1_1_serializable_byte_source.html#a86e4524cbd96308dd4d15d37dc095944", null ],
     [ "isEmpty", "classannis_1_1security_1_1_serializable_byte_source.html#a352d425e9ccea081c5b7140239b91320", null ],
     [ "toBase64", "classannis_1_1security_1_1_serializable_byte_source.html#a9ebfd9cf3146a9f7d2b2a47602c11901", null ],
-    [ "toHex", "classannis_1_1security_1_1_serializable_byte_source.html#ad8017972a0fa189de66c490a3756a88f", null ],
-    [ "bytes", "classannis_1_1security_1_1_serializable_byte_source.html#a7aaa51c21673d01aa24bd4e55b7a4f03", null ],
-    [ "delegate", "classannis_1_1security_1_1_serializable_byte_source.html#aa5d07d19440912a4dfaaf8b266251d19", null ]
+    [ "toHex", "classannis_1_1security_1_1_serializable_byte_source.html#ad8017972a0fa189de66c490a3756a88f", null ]
 ];

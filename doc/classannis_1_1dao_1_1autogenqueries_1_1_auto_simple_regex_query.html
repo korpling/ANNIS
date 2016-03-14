@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,7 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1dao_1_1autogenqueries_1_
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.dao.autogenqueries.AutoSimpleRegexQuery Class Reference</div>  </div>
@@ -123,16 +119,8 @@ $(document).ready(function(){initNavTree('classannis_1_1dao_1_1autogenqueries_1_
 <p>Query: <code>/[Ss]ie/</code></p>
 <p>Description: <code>Search for the "sie" with upper or lower-case 's' (regular expression)</code></p>
 <dl class="section author"><dt>Author</dt><dd>Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+'eld'+'ra'+'ma@'+'gm'+'ail'+'.c'+'om'; return false;">b.pix<span style="display: none;">.nosp@m.</span>eldr<span style="display: none;">.nosp@m.</span>ama@g<span style="display: none;">.nosp@m.</span>mail<span style="display: none;">.nosp@m.</span>.com</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.dao.autogenqueries.AutoSimpleRegexQuery:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.png" usemap="#annis.dao.autogenqueries.AutoSimpleRegexQuery_map" alt=""/>
-  <map id="annis.dao.autogenqueries.AutoSimpleRegexQuery_map" name="annis.dao.autogenqueries.AutoSimpleRegexQuery_map">
-<area href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html" title="Implements the initializing of the ExampleQuery class, which might be convenient for several auto gen..." alt="annis.dao.autogenqueries.AbstractAutoQuery" shape="rect" coords="0,56,343,80"/>
-<area href="interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html" title="All automatic generated queries must implement this interface. " alt="annis.dao.autogenqueries.QueriesGenerator.QueryBuilder" shape="rect" coords="0,0,343,24"/>
-</map>
- </div></div>
+</div>
+<p>Inherits <a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html">annis.dao.autogenqueries.AbstractAutoQuery</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -142,22 +130,28 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a2b2761a39f3bad83eec4f9dca45a794d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#a2b2761a39f3bad83eec4f9dca45a794d">analyzingQuery</a> (SaltProject saltProject)</td></tr>
 <tr class="memdesc:a2b2761a39f3bad83eec4f9dca45a794d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Analyzes the resut of the <a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#a06ee4558d411f5e7bbf7e44c8425515e">getAQL()</a>.  <a href="#a2b2761a39f3bad83eec4f9dca45a794d">More...</a><br /></td></tr>
 <tr class="separator:a2b2761a39f3bad83eec4f9dca45a794d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa8e8ec2df463d10e3982763f61a2984a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#aa8e8ec2df463d10e3982763f61a2984a">getNodes</a> ()</td></tr>
+<tr class="memitem:aa8e8ec2df463d10e3982763f61a2984a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa8e8ec2df463d10e3982763f61a2984a"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getNodes</b> ()</td></tr>
 <tr class="separator:aa8e8ec2df463d10e3982763f61a2984a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a304a0bafda9d48d092010aae5e0fc88d"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#a304a0bafda9d48d092010aae5e0fc88d">getFinalAQLQuery</a> ()</td></tr>
+<tr class="memitem:a304a0bafda9d48d092010aae5e0fc88d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a304a0bafda9d48d092010aae5e0fc88d"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getFinalAQLQuery</b> ()</td></tr>
 <tr class="separator:a304a0bafda9d48d092010aae5e0fc88d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb61748aceebdffb208a5e9aadb792a4"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#afb61748aceebdffb208a5e9aadb792a4">getDescription</a> ()</td></tr>
+<tr class="memitem:afb61748aceebdffb208a5e9aadb792a4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afb61748aceebdffb208a5e9aadb792a4"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getDescription</b> ()</td></tr>
 <tr class="separator:afb61748aceebdffb208a5e9aadb792a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html">annis.dao.autogenqueries.AbstractAutoQuery</a></td></tr>
 <tr class="memitem:a93f589c2839d6fe390124864bedf2e18 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top">abstract int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a93f589c2839d6fe390124864bedf2e18">getNodes</a> ()</td></tr>
 <tr class="memdesc:a93f589c2839d6fe390124864bedf2e18 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the amount of nodes, which are contained by the <a class="el" href="interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html#ac6bb978e428dea5d1f15ab1df1a7e88e">getAQL()</a> query.  <a href="#a93f589c2839d6fe390124864bedf2e18">More...</a><br /></td></tr>
 <tr class="separator:a93f589c2839d6fe390124864bedf2e18 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a595424ae68926b52050ba2c1ce4d21ac inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top">abstract String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a595424ae68926b52050ba2c1ce4d21ac">getFinalAQLQuery</a> ()</td></tr>
+<tr class="memitem:a595424ae68926b52050ba2c1ce4d21ac inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a595424ae68926b52050ba2c1ce4d21ac"></a>
+abstract String&#160;</td><td class="memItemRight" valign="bottom"><b>getFinalAQLQuery</b> ()</td></tr>
 <tr class="separator:a595424ae68926b52050ba2c1ce4d21ac inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abde3742f120e0a6427a520240e650f05 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top">abstract String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#abde3742f120e0a6427a520240e650f05">getDescription</a> ()</td></tr>
+<tr class="memitem:abde3742f120e0a6427a520240e650f05 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abde3742f120e0a6427a520240e650f05"></a>
+abstract String&#160;</td><td class="memItemRight" valign="bottom"><b>getDescription</b> ()</td></tr>
 <tr class="separator:abde3742f120e0a6427a520240e650f05 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acc6cf706cee3da8a5a25fb6727a99b87 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#acc6cf706cee3da8a5a25fb6727a99b87">getType</a> ()</td></tr>
-<tr class="memdesc:acc6cf706cee3da8a5a25fb6727a99b87 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO define types.  <a href="#acc6cf706cee3da8a5a25fb6727a99b87">More...</a><br /></td></tr>
+<tr class="memitem:acc6cf706cee3da8a5a25fb6727a99b87 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acc6cf706cee3da8a5a25fb6727a99b87"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#acc6cf706cee3da8a5a25fb6727a99b87">getType</a> ()</td></tr>
+<tr class="memdesc:acc6cf706cee3da8a5a25fb6727a99b87 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO define types. <br /></td></tr>
 <tr class="separator:acc6cf706cee3da8a5a25fb6727a99b87 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a51f5d744f9b97f8d483984afacdbb25c inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1sqlgen_1_1extensions_1_1_limit_offset_query_data.html">LimitOffsetQueryData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a51f5d744f9b97f8d483984afacdbb25c">getLimitOffsetQueryData</a> ()</td></tr>
 <tr class="memdesc:a51f5d744f9b97f8d483984afacdbb25c inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifies the size of the result set.  <a href="#a51f5d744f9b97f8d483984afacdbb25c">More...</a><br /></td></tr>
@@ -165,19 +159,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a892d3d921a57c3c698758c05d625e7c8 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html">AnnotateQueryData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a892d3d921a57c3c698758c05d625e7c8">getAnnotateQueryData</a> ()</td></tr>
 <tr class="memdesc:a892d3d921a57c3c698758c05d625e7c8 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifies the left and right context of the query from <a class="el" href="interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html#ac6bb978e428dea5d1f15ab1df1a7e88e">getAQL()</a>.  <a href="#a892d3d921a57c3c698758c05d625e7c8">More...</a><br /></td></tr>
 <tr class="separator:a892d3d921a57c3c698758c05d625e7c8 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03cf38570e91542c395ac61f6bdbf1d3 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a03cf38570e91542c395ac61f6bdbf1d3">getOperators</a> ()</td></tr>
-<tr class="memdesc:a03cf38570e91542c395ac61f6bdbf1d3 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO restricted operators for type safeness.  <a href="#a03cf38570e91542c395ac61f6bdbf1d3">More...</a><br /></td></tr>
+<tr class="memitem:a03cf38570e91542c395ac61f6bdbf1d3 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03cf38570e91542c395ac61f6bdbf1d3"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#a03cf38570e91542c395ac61f6bdbf1d3">getOperators</a> ()</td></tr>
+<tr class="memdesc:a03cf38570e91542c395ac61f6bdbf1d3 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO restricted operators for type safeness. <br /></td></tr>
 <tr class="separator:a03cf38570e91542c395ac61f6bdbf1d3 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab566502076ee4bd1845697a4d1943f12 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1examplequeries_1_1_example_query.html">ExampleQuery</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query.html#ab566502076ee4bd1845697a4d1943f12">getExampleQuery</a> ()</td></tr>
 <tr class="memdesc:ab566502076ee4bd1845697a4d1943f12 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides the final example query.  <a href="#ab566502076ee4bd1845697a4d1943f12">More...</a><br /></td></tr>
 <tr class="separator:ab566502076ee4bd1845697a4d1943f12 inherit pub_methods_classannis_1_1dao_1_1autogenqueries_1_1_abstract_auto_query"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a7b5ff56eba953dc600a4aec4cb0d81ba"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#a7b5ff56eba953dc600a4aec4cb0d81ba">finalAQL</a></td></tr>
-<tr class="separator:a7b5ff56eba953dc600a4aec4cb0d81ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0638af6cea6fbdc554ef53f0021157e"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#ab0638af6cea6fbdc554ef53f0021157e">text</a></td></tr>
-<tr class="separator:ab0638af6cea6fbdc554ef53f0021157e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a2b2761a39f3bad83eec4f9dca45a794d"></a>
@@ -227,102 +215,13 @@ Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="afb61748aceebdffb208a5e9aadb792a4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.dao.autogenqueries.AutoSimpleRegexQuery.getDescription </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a304a0bafda9d48d092010aae5e0fc88d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.dao.autogenqueries.AutoSimpleRegexQuery.getFinalAQLQuery </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa8e8ec2df463d10e3982763f61a2984a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.dao.autogenqueries.AutoSimpleRegexQuery.getNodes </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a7b5ff56eba953dc600a4aec4cb0d81ba"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.dao.autogenqueries.AutoSimpleRegexQuery.finalAQL</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab0638af6cea6fbdc554ef53f0021157e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.dao.autogenqueries.AutoSimpleRegexQuery.text</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_auto_simple_regex_query_8java.html">AutoSimpleRegexQuery.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1dao.html">dao</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1dao_1_1autogenqueries.html">autogenqueries</a></li><li class="navelem"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html">AutoSimpleRegexQuery</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:07 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>dao</b></li><li class="navelem"><b>autogenqueries</b></li><li class="navelem"><a class="el" href="classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html">AutoSimpleRegexQuery</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['waitforfinishrunner',['WaitForFinishRunner',['../classannis_1_1gui_1_1admin_1_1_import_panel_1_1_wait_for_finish_runner.html',1,'annis::gui::admin::ImportPanel']]],
+  ['webresourceprovider',['WebResourceProvider',['../interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html',1,'annis::gui::admin::model']]],
   ['wekaexporter',['WekaExporter',['../classannis_1_1gui_1_1exporter_1_1_weka_exporter.html',1,'annis::gui::exporter']]],
   ['wekahelper',['WekaHelper',['../classannis_1_1_weka_helper.html',1,'annis']]],
   ['whereclausesqlgenerator',['WhereClauseSqlGenerator',['../interfaceannis_1_1sqlgen_1_1_where_clause_sql_generator.html',1,'annis::sqlgen']]],

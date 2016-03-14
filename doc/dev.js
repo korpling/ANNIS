@@ -9,10 +9,15 @@ var dev =
         [ "Updating the version ", "dev-release.html#dev-release-version-update", null ],
         [ "Creating a changelog entry ", "dev-release.html#dev-release-changelog", null ]
       ] ],
-      [ "Release Process ", "dev-release.html#dev-release-process", [
+      [ "Stable Release Process ", "dev-release.html#dev-release-process", [
         [ "Initialization phase ", "dev-release.html#dev-release-init", null ],
         [ "Testing cycle ", "dev-release.html#dev-release-test", null ],
         [ "Finish phase ", "dev-release.html#dev-release-finish", null ]
+      ] ],
+      [ "Preview Release Process ", "dev-release.html#dev-release-preview-process", [
+        [ "Initialization phase ", "dev-release.html#dev-release-preview-init", null ],
+        [ "Testing cycle ", "dev-release.html#dev-release-preview-test", null ],
+        [ "Finish phase ", "dev-release.html#dev-release-preview-finish", null ]
       ] ]
     ] ],
     [ "Front-end", "dev-frontend.html", null ],

@@ -15,17 +15,5 @@ var classannis_1_1ql_1_1parser_1_1_query_node_listener =
     [ "exitAndExpr", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a63a2ddbe78c15219f19ba43dd09bca39", null ],
     [ "getMetaData", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#af335d71848522dc260a218f928671c73", null ],
     [ "getQueryData", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a950219645a730acff3ff5cf4815fcae6", null ],
-    [ "getTokenPositions", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a7c0789b4ea867ff37562f1a82675cd94", null ],
-    [ "newNode", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a67fbf481b5c8cb13d352afdb55d294a1", null ],
-    [ "textFromSpec", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a3cb3ee0838fc861043abb839a38ab622", null ],
-    [ "textMatchingFromSpec", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a1b55a7c4063810eec17231016dfe7f67", null ],
-    [ "currentAlternative", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#aced26f1b0647a33978d7b55e5eb9c198", null ],
-    [ "currentTokenPosition", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a802d321251933d223ed4491e1d7ecd13", null ],
-    [ "data", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a84d1aba3c5d8e30c5361767d6f9bd5d9", null ],
-    [ "lastVariableDefinition", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a35e8d3da0c84c46fb3315d39c95b5496", null ],
-    [ "localNodes", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a41f2f0a9bb3c54df33a6c8c6101b495d", null ],
-    [ "log", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a213a929da62f77a504fb1134073f42d5", null ],
-    [ "metaData", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a4f22763af8ccc5f23d874bf50fad220b", null ],
-    [ "nodeIntervalToID", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#aa86b2d25a37e23ba21e237c4a67934d1", null ],
-    [ "tokenPositions", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a2c88c6373f0ddee19d3a9f336cae57a7", null ]
+    [ "getTokenPositions", "classannis_1_1ql_1_1parser_1_1_query_node_listener.html#a7c0789b4ea867ff37562f1a82675cd94", null ]
 ];

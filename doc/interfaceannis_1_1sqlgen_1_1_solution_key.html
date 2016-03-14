@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -137,13 +134,16 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a47fdc16d4d4246f05cce1382661145e6"><td class="memItemLeft" align="right" valign="top">abstract List&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html#a47fdc16d4d4246f05cce1382661145e6">getKeyColumns</a> (int size)</td></tr>
 <tr class="memdesc:a47fdc16d4d4246f05cce1382661145e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of the key columns.  <a href="#a47fdc16d4d4246f05cce1382661145e6">More...</a><br /></td></tr>
 <tr class="separator:a47fdc16d4d4246f05cce1382661145e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a825090eaf727958043837f707bd6b465"><td class="memItemLeft" align="right" valign="top">abstract Object&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html#a825090eaf727958043837f707bd6b465">getNodeId</a> (ResultSet resultSet, <a class="el" href="classannis_1_1sqlgen_1_1_table_access_strategy.html">TableAccessStrategy</a> tableAccessStrategy)</td></tr>
-<tr class="memdesc:a825090eaf727958043837f707bd6b465"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the node ID of the current row in a result set.  <a href="#a825090eaf727958043837f707bd6b465">More...</a><br /></td></tr>
+<tr class="memitem:a825090eaf727958043837f707bd6b465"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a825090eaf727958043837f707bd6b465"></a>
+abstract Object&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html#a825090eaf727958043837f707bd6b465">getNodeId</a> (ResultSet resultSet, <a class="el" href="classannis_1_1sqlgen_1_1_table_access_strategy.html">TableAccessStrategy</a> tableAccessStrategy)</td></tr>
+<tr class="memdesc:a825090eaf727958043837f707bd6b465"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the node ID of the current row in a result set. <br /></td></tr>
 <tr class="separator:a825090eaf727958043837f707bd6b465"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a337cae58bdf81f2dbf447f8c89bed597"><td class="memItemLeft" align="right" valign="top">abstract int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html#a337cae58bdf81f2dbf447f8c89bed597">getKeySize</a> ()</td></tr>
+<tr class="memitem:a337cae58bdf81f2dbf447f8c89bed597"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a337cae58bdf81f2dbf447f8c89bed597"></a>
+abstract int&#160;</td><td class="memItemRight" valign="bottom"><b>getKeySize</b> ()</td></tr>
 <tr class="separator:a337cae58bdf81f2dbf447f8c89bed597"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6836785b16111d7a30961e32b984aa88"><td class="memItemLeft" align="right" valign="top">abstract String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html#a6836785b16111d7a30961e32b984aa88">getCurrentKeyAsString</a> ()</td></tr>
-<tr class="memdesc:a6836785b16111d7a30961e32b984aa88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the String representation of the key that can be used in the Salt model for the <a class="el" href="">annis.model.AnnisConstants.FEAT_MACHTEDIDS</a> property.  <a href="#a6836785b16111d7a30961e32b984aa88">More...</a><br /></td></tr>
+<tr class="memitem:a6836785b16111d7a30961e32b984aa88"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6836785b16111d7a30961e32b984aa88"></a>
+abstract String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html#a6836785b16111d7a30961e32b984aa88">getCurrentKeyAsString</a> ()</td></tr>
+<tr class="memdesc:a6836785b16111d7a30961e32b984aa88"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the String representation of the key that can be used in the Salt model for the <a class="el" href="">annis.model.AnnisConstants.FEAT_MACHTEDIDS</a> property. <br /></td></tr>
 <tr class="separator:a6836785b16111d7a30961e32b984aa88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -235,31 +235,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a6836785b16111d7a30961e32b984aa88"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">abstract String <a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html">annis.sqlgen.SolutionKey</a>&lt; KeyType &gt;.getCurrentKeyAsString </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">abstract</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns the String representation of the key that can be used in the Salt model for the <a class="el" href="">annis.model.AnnisConstants.FEAT_MACHTEDIDS</a> property. </p>
-
-</div>
-</div>
 <a class="anchor" id="a47fdc16d4d4246f05cce1382661145e6"></a>
 <div class="memitem">
 <div class="memproto">
@@ -289,29 +264,6 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a class="anchor" id="a337cae58bdf81f2dbf447f8c89bed597"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">abstract int <a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html">annis.sqlgen.SolutionKey</a>&lt; KeyType &gt;.getKeySize </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">abstract</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
 
 </div>
 </div>
@@ -347,42 +299,6 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The index of the search term for which the node is a match (starting with 1) or<div class="fragment"><div class="line">null </div>
 </div><!-- fragment --> if the node is not a match. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a825090eaf727958043837f707bd6b465"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">abstract Object <a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html">annis.sqlgen.SolutionKey</a>&lt; KeyType &gt;.getNodeId </td>
-          <td>(</td>
-          <td class="paramtype">ResultSet&#160;</td>
-          <td class="paramname"><em>resultSet</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classannis_1_1sqlgen_1_1_table_access_strategy.html">TableAccessStrategy</a>&#160;</td>
-          <td class="paramname"><em>tableAccessStrategy</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">abstract</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Returns the node ID of the current row in a result set. </p>
 
 </div>
 </div>
@@ -444,16 +360,13 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<hr/>The documentation for this interface was generated from the following file:<ul>
-<li><a class="el" href="_solution_key_8java.html">SolutionKey.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1sqlgen.html">sqlgen</a></li><li class="navelem"><a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html">SolutionKey</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:09 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>sqlgen</b></li><li class="navelem"><a class="el" href="interfaceannis_1_1sqlgen_1_1_solution_key.html">SolutionKey</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

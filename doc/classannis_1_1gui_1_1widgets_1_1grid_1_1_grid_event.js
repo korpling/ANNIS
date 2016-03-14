@@ -27,18 +27,5 @@ var classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event =
     [ "setTextID", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#ae5530ac4c48451bd420884c001ed4788", null ],
     [ "setTooltip", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#abbe9e932694ce83c6c16c1327ed38dce", null ],
     [ "setValue", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a71336d054900ebfc020903d353cfb210", null ],
-    [ "toString", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a0c7666b9af559d45d68310a9163e4a08", null ],
-    [ "coveredIDs", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a3f0d97b8b0c01b2c740fb7b9c23643a4", null ],
-    [ "endTime", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#af85de3837be0a37246bb02c95514d428", null ],
-    [ "gap", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#ac849796f0dfc3a044931896011d6d3a0", null ],
-    [ "id", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a05bd530edb0bf8164c9f30f8bf87c473", null ],
-    [ "left", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a4c4892f1ef96fb8d4897d47610964be8", null ],
-    [ "match", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a838bd947599a4034df53a38ee2f0a8b0", null ],
-    [ "pageNumber", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a59e825864432e4309421d57e56a26016", null ],
-    [ "right", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a319ada07bdd33f99791da864945f61ba", null ],
-    [ "space", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#aa13156d6083132a2dbece8d781117a2c", null ],
-    [ "startTime", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a0365b1eb98af2675db4982ca90669485", null ],
-    [ "textID", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a60db51bf3e40909fcf5a27abb8794fc0", null ],
-    [ "tooltip", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#ab2a256a969a8f719e51898590701b531", null ],
-    [ "value", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a58d061e0bdea64a85fcabd80853b711e", null ]
+    [ "toString", "classannis_1_1gui_1_1widgets_1_1grid_1_1_grid_event.html#a0c7666b9af559d45d68310a9163e4a08", null ]
 ];

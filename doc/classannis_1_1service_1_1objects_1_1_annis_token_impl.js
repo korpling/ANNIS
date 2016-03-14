@@ -13,11 +13,5 @@ var classannis_1_1service_1_1objects_1_1_annis_token_impl =
     [ "setCorpusId", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#ae1329b9b922fb2ced819d6ee091c6011", null ],
     [ "setId", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a628b9d6509c6106a13ecc718f46ad369", null ],
     [ "setText", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#ab3f90f3db797eafb5521f0b9485fbd4a", null ],
-    [ "toString", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a18eb746a1bfb80a262a1782efb4894ea", null ],
-    [ "corpusId", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a53433c6ec6f2474ab8f5c0b352ee11e3", null ],
-    [ "id", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a40bf5b180f9dcb95984116c7d93b9f09", null ],
-    [ "left", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a07dd2b9726da0bea0c2ddcd740d80c63", null ],
-    [ "right", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#ad0bf23354cfd5844b4ba8b108ec0d676", null ],
-    [ "text", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#abb7113498d93e35960a661c6086014b7", null ],
-    [ "tokenIndex", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a952ffcd2750b0a6a80253446d7f73971", null ]
+    [ "toString", "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a18eb746a1bfb80a262a1782efb4894ea", null ]
 ];

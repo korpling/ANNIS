@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -113,1501 +110,188 @@ $(document).ready(function(){initNavTree('classannis_1_1model_1_1_annis_node.htm
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classannis_1_1model_1_1_annis_node-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.model.AnnisNode Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="dynheader">
-Inheritance diagram for annis.model.AnnisNode:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1model_1_1_annis_node.png" usemap="#annis.model.AnnisNode_map" alt=""/>
-  <map id="annis.model.AnnisNode_map" name="annis.model.AnnisNode_map">
-</map>
- </div></div>
+
+<p>Inherits Serializable.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node_1_1_range.html">Range</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>Range</b></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad60066d05e090f877bb811e136f0979e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ad60066d05e090f877bb811e136f0979e">AnnisNode</a> ()</td></tr>
-<tr class="separator:ad60066d05e090f877bb811e136f0979e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5184b2474c804741d0e7e16fe416144"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ab5184b2474c804741d0e7e16fe416144">AnnisNode</a> (long <a class="el" href="classannis_1_1model_1_1_annis_node.html#a534396a86d8ecf5614526080b62ea364">id</a>)</td></tr>
+<tr class="memitem:ab5184b2474c804741d0e7e16fe416144"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab5184b2474c804741d0e7e16fe416144"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>AnnisNode</b> (long id)</td></tr>
 <tr class="separator:ab5184b2474c804741d0e7e16fe416144"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab80fc4680be498d6fbc1f65d6cac584d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ab80fc4680be498d6fbc1f65d6cac584d">AnnisNode</a> (long <a class="el" href="classannis_1_1model_1_1_annis_node.html#a534396a86d8ecf5614526080b62ea364">id</a>, long corpusRef, long textRef, long <a class="el" href="classannis_1_1model_1_1_annis_node.html#a715bb6e10774e93dcd863097fd76c883">left</a>, long <a class="el" href="classannis_1_1model_1_1_annis_node.html#a3e7c9d51f5b70ecfb3540370250eaa8f">right</a>, String namespace, String <a class="el" href="classannis_1_1model_1_1_annis_node.html#a9b988546f4186a60fa22b2aba187471b">name</a>, long <a class="el" href="classannis_1_1model_1_1_annis_node.html#a1674d8dfab0cfe3f1a0fca94f2803969">tokenIndex</a>, String span, long <a class="el" href="classannis_1_1model_1_1_annis_node.html#aa0a233e18fb8734ce1681a2dffa51c35">leftToken</a>, long <a class="el" href="classannis_1_1model_1_1_annis_node.html#ae710babe86009ef48972f11dec32d77d">rightToken</a>)</td></tr>
+<tr class="memitem:ab80fc4680be498d6fbc1f65d6cac584d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab80fc4680be498d6fbc1f65d6cac584d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>AnnisNode</b> (long id, long corpusRef, long textRef, long left, long right, String namespace, String name, long tokenIndex, String span, long leftToken, long rightToken)</td></tr>
 <tr class="separator:ab80fc4680be498d6fbc1f65d6cac584d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a53d7777ec30ae637ee171d21cacbc46e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a53d7777ec30ae637ee171d21cacbc46e">setSpannedText</a> (String <a class="el" href="classannis_1_1model_1_1_annis_node.html#a0980323b53270957cd620a98334c9fb9">spannedText</a>)</td></tr>
+<tr class="memitem:a53d7777ec30ae637ee171d21cacbc46e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a53d7777ec30ae637ee171d21cacbc46e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setSpannedText</b> (String spannedText)</td></tr>
 <tr class="separator:a53d7777ec30ae637ee171d21cacbc46e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d53800874e4b53145259f237ad0827a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a9d53800874e4b53145259f237ad0827a">clearSpannedText</a> ()</td></tr>
+<tr class="memitem:a9d53800874e4b53145259f237ad0827a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d53800874e4b53145259f237ad0827a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clearSpannedText</b> ()</td></tr>
 <tr class="separator:a9d53800874e4b53145259f237ad0827a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79efb0dbdf8cede2c01a80d1386a5644"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a79efb0dbdf8cede2c01a80d1386a5644">toString</a> ()</td></tr>
+<tr class="memitem:a79efb0dbdf8cede2c01a80d1386a5644"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a79efb0dbdf8cede2c01a80d1386a5644"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>toString</b> ()</td></tr>
 <tr class="separator:a79efb0dbdf8cede2c01a80d1386a5644"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afea59e0c9aa6380cd143ae00af84afcd"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#afea59e0c9aa6380cd143ae00af84afcd">addIncomingEdge</a> (<a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> edge)</td></tr>
+<tr class="memitem:afea59e0c9aa6380cd143ae00af84afcd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afea59e0c9aa6380cd143ae00af84afcd"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>addIncomingEdge</b> (<a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> edge)</td></tr>
 <tr class="separator:afea59e0c9aa6380cd143ae00af84afcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14732b17ca0074d8dcd44b88c3fbccae"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a14732b17ca0074d8dcd44b88c3fbccae">addOutgoingEdge</a> (<a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> edge)</td></tr>
+<tr class="memitem:a14732b17ca0074d8dcd44b88c3fbccae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a14732b17ca0074d8dcd44b88c3fbccae"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>addOutgoingEdge</b> (<a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> edge)</td></tr>
 <tr class="separator:a14732b17ca0074d8dcd44b88c3fbccae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1eb7eecb379093cf6704a2d2e5bbf707"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a1eb7eecb379093cf6704a2d2e5bbf707">addEdgeAnnotation</a> (<a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> annotation)</td></tr>
+<tr class="memitem:a1eb7eecb379093cf6704a2d2e5bbf707"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1eb7eecb379093cf6704a2d2e5bbf707"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>addEdgeAnnotation</b> (<a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> annotation)</td></tr>
 <tr class="separator:a1eb7eecb379093cf6704a2d2e5bbf707"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afad3e89e5fae3bfbccbcad401752df47"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#afad3e89e5fae3bfbccbcad401752df47">addNodeAnnotation</a> (<a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> annotation)</td></tr>
+<tr class="memitem:afad3e89e5fae3bfbccbcad401752df47"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afad3e89e5fae3bfbccbcad401752df47"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>addNodeAnnotation</b> (<a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> annotation)</td></tr>
 <tr class="separator:afad3e89e5fae3bfbccbcad401752df47"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b4d9fc61d621ea27e33be59e721a993"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a8b4d9fc61d621ea27e33be59e721a993">getQualifiedName</a> ()</td></tr>
+<tr class="memitem:a8b4d9fc61d621ea27e33be59e721a993"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8b4d9fc61d621ea27e33be59e721a993"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getQualifiedName</b> ()</td></tr>
 <tr class="separator:a8b4d9fc61d621ea27e33be59e721a993"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa223d9c79fb874ae7e85da2a8ac6f3ea"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#aa223d9c79fb874ae7e85da2a8ac6f3ea">equals</a> (Object obj)</td></tr>
+<tr class="memitem:aa223d9c79fb874ae7e85da2a8ac6f3ea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa223d9c79fb874ae7e85da2a8ac6f3ea"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>equals</b> (Object obj)</td></tr>
 <tr class="separator:aa223d9c79fb874ae7e85da2a8ac6f3ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8c4db558e2c8c7e29f4bfe2e5f78a31"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ac8c4db558e2c8c7e29f4bfe2e5f78a31">hashCode</a> ()</td></tr>
+<tr class="memitem:ac8c4db558e2c8c7e29f4bfe2e5f78a31"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8c4db558e2c8c7e29f4bfe2e5f78a31"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>hashCode</b> ()</td></tr>
 <tr class="separator:ac8c4db558e2c8c7e29f4bfe2e5f78a31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af26442d4816bece92a275b2214a9cbad"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#af26442d4816bece92a275b2214a9cbad">getEdgeAnnotations</a> ()</td></tr>
+<tr class="memitem:af26442d4816bece92a275b2214a9cbad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af26442d4816bece92a275b2214a9cbad"></a>
+Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getEdgeAnnotations</b> ()</td></tr>
 <tr class="separator:af26442d4816bece92a275b2214a9cbad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a538496c4a5268ed2bbb28d709a2ff672"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a538496c4a5268ed2bbb28d709a2ff672">setEdgeAnnotations</a> (Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt; <a class="el" href="classannis_1_1model_1_1_annis_node.html#a7ddcd3cac4548b3f9f4ef8c405f5bbd4">edgeAnnotations</a>)</td></tr>
+<tr class="memitem:a538496c4a5268ed2bbb28d709a2ff672"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a538496c4a5268ed2bbb28d709a2ff672"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setEdgeAnnotations</b> (Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt; edgeAnnotations)</td></tr>
 <tr class="separator:a538496c4a5268ed2bbb28d709a2ff672"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af569b4e9ba7d9449b4cb7a66750d1d0d"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#af569b4e9ba7d9449b4cb7a66750d1d0d">isRoot</a> ()</td></tr>
+<tr class="memitem:af569b4e9ba7d9449b4cb7a66750d1d0d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af569b4e9ba7d9449b4cb7a66750d1d0d"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isRoot</b> ()</td></tr>
 <tr class="separator:af569b4e9ba7d9449b4cb7a66750d1d0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d5c39e563dd225d07dd64ae06c5cae6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a9d5c39e563dd225d07dd64ae06c5cae6">setRoot</a> (boolean <a class="el" href="classannis_1_1model_1_1_annis_node.html#ad889cfd738f4838fd0a8f6ad4db1cf26">root</a>)</td></tr>
+<tr class="memitem:a9d5c39e563dd225d07dd64ae06c5cae6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d5c39e563dd225d07dd64ae06c5cae6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setRoot</b> (boolean root)</td></tr>
 <tr class="separator:a9d5c39e563dd225d07dd64ae06c5cae6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d89a3166251885e8a93ede32ecedc19"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a9d89a3166251885e8a93ede32ecedc19">getName</a> ()</td></tr>
+<tr class="memitem:a9d89a3166251885e8a93ede32ecedc19"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d89a3166251885e8a93ede32ecedc19"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getName</b> ()</td></tr>
 <tr class="separator:a9d89a3166251885e8a93ede32ecedc19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a312fbf4f1db089bd73d3eb30748db6aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a312fbf4f1db089bd73d3eb30748db6aa">setName</a> (String <a class="el" href="classannis_1_1model_1_1_annis_node.html#a9b988546f4186a60fa22b2aba187471b">name</a>)</td></tr>
+<tr class="memitem:a312fbf4f1db089bd73d3eb30748db6aa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a312fbf4f1db089bd73d3eb30748db6aa"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setName</b> (String name)</td></tr>
 <tr class="separator:a312fbf4f1db089bd73d3eb30748db6aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a640b5564f7add89f78cd314a97ab6124"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a640b5564f7add89f78cd314a97ab6124">getNamespace</a> ()</td></tr>
+<tr class="memitem:a640b5564f7add89f78cd314a97ab6124"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a640b5564f7add89f78cd314a97ab6124"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getNamespace</b> ()</td></tr>
 <tr class="separator:a640b5564f7add89f78cd314a97ab6124"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a192eed946af2d7a6c3742da44104a369"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a192eed946af2d7a6c3742da44104a369">setNamespace</a> (String namespace)</td></tr>
+<tr class="memitem:a192eed946af2d7a6c3742da44104a369"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a192eed946af2d7a6c3742da44104a369"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setNamespace</b> (String namespace)</td></tr>
 <tr class="separator:a192eed946af2d7a6c3742da44104a369"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad89d8b5681bfa68be47b89a6bc1b6f6a"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ad89d8b5681bfa68be47b89a6bc1b6f6a">getSpannedText</a> ()</td></tr>
+<tr class="memitem:ad89d8b5681bfa68be47b89a6bc1b6f6a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad89d8b5681bfa68be47b89a6bc1b6f6a"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getSpannedText</b> ()</td></tr>
 <tr class="separator:ad89d8b5681bfa68be47b89a6bc1b6f6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aae03dfe83d4b501766439a2456becd17"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#aae03dfe83d4b501766439a2456becd17">getNodeAnnotations</a> ()</td></tr>
+<tr class="memitem:aae03dfe83d4b501766439a2456becd17"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aae03dfe83d4b501766439a2456becd17"></a>
+Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getNodeAnnotations</b> ()</td></tr>
 <tr class="separator:aae03dfe83d4b501766439a2456becd17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86ccc3a4a25ad97d53c809778dc2cda8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a86ccc3a4a25ad97d53c809778dc2cda8">setNodeAnnotations</a> (Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt; <a class="el" href="classannis_1_1model_1_1_annis_node.html#aa6e3bd3dd685c01b9204ffa3f35c2559">nodeAnnotations</a>)</td></tr>
+<tr class="memitem:a86ccc3a4a25ad97d53c809778dc2cda8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a86ccc3a4a25ad97d53c809778dc2cda8"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setNodeAnnotations</b> (Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt; nodeAnnotations)</td></tr>
 <tr class="separator:a86ccc3a4a25ad97d53c809778dc2cda8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0923c3d7410be3840b2d5cc43c00c407"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a0923c3d7410be3840b2d5cc43c00c407">getId</a> ()</td></tr>
+<tr class="memitem:a0923c3d7410be3840b2d5cc43c00c407"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0923c3d7410be3840b2d5cc43c00c407"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>getId</b> ()</td></tr>
 <tr class="separator:a0923c3d7410be3840b2d5cc43c00c407"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2236dd6a2174155d0547481f303ed373"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a2236dd6a2174155d0547481f303ed373">isToken</a> ()</td></tr>
+<tr class="memitem:a2236dd6a2174155d0547481f303ed373"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2236dd6a2174155d0547481f303ed373"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isToken</b> ()</td></tr>
 <tr class="separator:a2236dd6a2174155d0547481f303ed373"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e87a4c72ddca036a2dde16be2ca9308"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a8e87a4c72ddca036a2dde16be2ca9308">setToken</a> (boolean <a class="el" href="classannis_1_1model_1_1_annis_node.html#a0780f0e1e9a7be3df6dec8fdaf6daedf">token</a>)</td></tr>
+<tr class="memitem:a8e87a4c72ddca036a2dde16be2ca9308"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8e87a4c72ddca036a2dde16be2ca9308"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setToken</b> (boolean token)</td></tr>
 <tr class="separator:a8e87a4c72ddca036a2dde16be2ca9308"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adcb76127d08d619dfde4bc8778ae6eb4"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#adcb76127d08d619dfde4bc8778ae6eb4">isPartOfEdge</a> ()</td></tr>
+<tr class="memitem:adcb76127d08d619dfde4bc8778ae6eb4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adcb76127d08d619dfde4bc8778ae6eb4"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>isPartOfEdge</b> ()</td></tr>
 <tr class="separator:adcb76127d08d619dfde4bc8778ae6eb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a41c01233d7afd4e8aa50658d8107c71b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a41c01233d7afd4e8aa50658d8107c71b">setPartOfEdge</a> (boolean <a class="el" href="classannis_1_1model_1_1_annis_node.html#a69631b354073ef9f7205ff23ccc29f2b">partOfEdge</a>)</td></tr>
+<tr class="memitem:a41c01233d7afd4e8aa50658d8107c71b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a41c01233d7afd4e8aa50658d8107c71b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setPartOfEdge</b> (boolean partOfEdge)</td></tr>
 <tr class="separator:a41c01233d7afd4e8aa50658d8107c71b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc812a8e75c21ac069bc246adad30299"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#abc812a8e75c21ac069bc246adad30299">getCorpus</a> ()</td></tr>
+<tr class="memitem:abc812a8e75c21ac069bc246adad30299"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc812a8e75c21ac069bc246adad30299"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>getCorpus</b> ()</td></tr>
 <tr class="separator:abc812a8e75c21ac069bc246adad30299"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a44fb2265fee6d1c671e6991d4b666a17"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a44fb2265fee6d1c671e6991d4b666a17">setCorpus</a> (long <a class="el" href="classannis_1_1model_1_1_annis_node.html#ae04a679da6663d10b1683bc7c1573e67">corpus</a>)</td></tr>
+<tr class="memitem:a44fb2265fee6d1c671e6991d4b666a17"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a44fb2265fee6d1c671e6991d4b666a17"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setCorpus</b> (long corpus)</td></tr>
 <tr class="separator:a44fb2265fee6d1c671e6991d4b666a17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a106866cd87459e011d673b056fe43456"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a106866cd87459e011d673b056fe43456">getTextId</a> ()</td></tr>
+<tr class="memitem:a106866cd87459e011d673b056fe43456"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a106866cd87459e011d673b056fe43456"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>getTextId</b> ()</td></tr>
 <tr class="separator:a106866cd87459e011d673b056fe43456"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0bba1c0a7ca7f9fcebc426c4bb36937"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ad0bba1c0a7ca7f9fcebc426c4bb36937">setTextId</a> (long textIndex)</td></tr>
+<tr class="memitem:ad0bba1c0a7ca7f9fcebc426c4bb36937"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad0bba1c0a7ca7f9fcebc426c4bb36937"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setTextId</b> (long textIndex)</td></tr>
 <tr class="separator:ad0bba1c0a7ca7f9fcebc426c4bb36937"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0b145ba895296c8021fe8cd5bce95b7"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ac0b145ba895296c8021fe8cd5bce95b7">getLeft</a> ()</td></tr>
+<tr class="memitem:ac0b145ba895296c8021fe8cd5bce95b7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac0b145ba895296c8021fe8cd5bce95b7"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>getLeft</b> ()</td></tr>
 <tr class="separator:ac0b145ba895296c8021fe8cd5bce95b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a048421473f5ee9898d54c679a87d8433"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a048421473f5ee9898d54c679a87d8433">setLeft</a> (long <a class="el" href="classannis_1_1model_1_1_annis_node.html#a715bb6e10774e93dcd863097fd76c883">left</a>)</td></tr>
+<tr class="memitem:a048421473f5ee9898d54c679a87d8433"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a048421473f5ee9898d54c679a87d8433"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setLeft</b> (long left)</td></tr>
 <tr class="separator:a048421473f5ee9898d54c679a87d8433"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ba9a3e27635c2d163ffef4f2ec28a51"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a1ba9a3e27635c2d163ffef4f2ec28a51">getRight</a> ()</td></tr>
+<tr class="memitem:a1ba9a3e27635c2d163ffef4f2ec28a51"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ba9a3e27635c2d163ffef4f2ec28a51"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>getRight</b> ()</td></tr>
 <tr class="separator:a1ba9a3e27635c2d163ffef4f2ec28a51"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05a3e05df947dba2ad4a4b402cfd075e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a05a3e05df947dba2ad4a4b402cfd075e">setRight</a> (long <a class="el" href="classannis_1_1model_1_1_annis_node.html#a3e7c9d51f5b70ecfb3540370250eaa8f">right</a>)</td></tr>
+<tr class="memitem:a05a3e05df947dba2ad4a4b402cfd075e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05a3e05df947dba2ad4a4b402cfd075e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setRight</b> (long right)</td></tr>
 <tr class="separator:a05a3e05df947dba2ad4a4b402cfd075e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a498e8d747f2235e8cd6932ffff82df"><td class="memItemLeft" align="right" valign="top">Long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a1a498e8d747f2235e8cd6932ffff82df">getTokenIndex</a> ()</td></tr>
+<tr class="memitem:a1a498e8d747f2235e8cd6932ffff82df"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1a498e8d747f2235e8cd6932ffff82df"></a>
+Long&#160;</td><td class="memItemRight" valign="bottom"><b>getTokenIndex</b> ()</td></tr>
 <tr class="separator:a1a498e8d747f2235e8cd6932ffff82df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b0d551c3f7b0c9c5786caaea414cf10"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a1b0d551c3f7b0c9c5786caaea414cf10">setTokenIndex</a> (Long <a class="el" href="classannis_1_1model_1_1_annis_node.html#a1674d8dfab0cfe3f1a0fca94f2803969">tokenIndex</a>)</td></tr>
+<tr class="memitem:a1b0d551c3f7b0c9c5786caaea414cf10"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1b0d551c3f7b0c9c5786caaea414cf10"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setTokenIndex</b> (Long tokenIndex)</td></tr>
 <tr class="separator:a1b0d551c3f7b0c9c5786caaea414cf10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f84a202ab9c1948d013c6ae54dcf31c"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a7f84a202ab9c1948d013c6ae54dcf31c">getLeftToken</a> ()</td></tr>
+<tr class="memitem:a7f84a202ab9c1948d013c6ae54dcf31c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7f84a202ab9c1948d013c6ae54dcf31c"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>getLeftToken</b> ()</td></tr>
 <tr class="separator:a7f84a202ab9c1948d013c6ae54dcf31c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab923f76a15d33343a4ba0a92da7b3389"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ab923f76a15d33343a4ba0a92da7b3389">setLeftToken</a> (long <a class="el" href="classannis_1_1model_1_1_annis_node.html#aa0a233e18fb8734ce1681a2dffa51c35">leftToken</a>)</td></tr>
+<tr class="memitem:ab923f76a15d33343a4ba0a92da7b3389"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab923f76a15d33343a4ba0a92da7b3389"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setLeftToken</b> (long leftToken)</td></tr>
 <tr class="separator:ab923f76a15d33343a4ba0a92da7b3389"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac2cce85ec09d4e000d2d303decf99c03"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ac2cce85ec09d4e000d2d303decf99c03">getRightToken</a> ()</td></tr>
+<tr class="memitem:ac2cce85ec09d4e000d2d303decf99c03"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac2cce85ec09d4e000d2d303decf99c03"></a>
+long&#160;</td><td class="memItemRight" valign="bottom"><b>getRightToken</b> ()</td></tr>
 <tr class="separator:ac2cce85ec09d4e000d2d303decf99c03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a596ae01b2fa9dff600fbf4e4c6a35c89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a596ae01b2fa9dff600fbf4e4c6a35c89">setRightToken</a> (long <a class="el" href="classannis_1_1model_1_1_annis_node.html#ae710babe86009ef48972f11dec32d77d">rightToken</a>)</td></tr>
+<tr class="memitem:a596ae01b2fa9dff600fbf4e4c6a35c89"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a596ae01b2fa9dff600fbf4e4c6a35c89"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setRightToken</b> (long rightToken)</td></tr>
 <tr class="separator:a596ae01b2fa9dff600fbf4e4c6a35c89"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac02fbb5d9984ba0b81cab515e7502220"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ac02fbb5d9984ba0b81cab515e7502220">getIncomingEdges</a> ()</td></tr>
+<tr class="memitem:ac02fbb5d9984ba0b81cab515e7502220"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac02fbb5d9984ba0b81cab515e7502220"></a>
+Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getIncomingEdges</b> ()</td></tr>
 <tr class="separator:ac02fbb5d9984ba0b81cab515e7502220"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ce4ae711603e76a721fda2f315f4f71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a3ce4ae711603e76a721fda2f315f4f71">setIncomingEdges</a> (Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt; <a class="el" href="classannis_1_1model_1_1_annis_node.html#a4b2a863c1b4f7973e497816b61a5ad49">incomingEdges</a>)</td></tr>
+<tr class="memitem:a3ce4ae711603e76a721fda2f315f4f71"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3ce4ae711603e76a721fda2f315f4f71"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setIncomingEdges</b> (Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt; incomingEdges)</td></tr>
 <tr class="separator:a3ce4ae711603e76a721fda2f315f4f71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a426cd01ff1736396a0e5ee26725410b6"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a426cd01ff1736396a0e5ee26725410b6">getOutgoingEdges</a> ()</td></tr>
+<tr class="memitem:a426cd01ff1736396a0e5ee26725410b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a426cd01ff1736396a0e5ee26725410b6"></a>
+Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getOutgoingEdges</b> ()</td></tr>
 <tr class="separator:a426cd01ff1736396a0e5ee26725410b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c1de0a545e3eaa33654d0b326c8c8bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a3c1de0a545e3eaa33654d0b326c8c8bd">setOutgoingEdges</a> (Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt; <a class="el" href="classannis_1_1model_1_1_annis_node.html#ae627aa091d327b5acf15546d8b41e98c">outgoingEdges</a>)</td></tr>
+<tr class="memitem:a3c1de0a545e3eaa33654d0b326c8c8bd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3c1de0a545e3eaa33654d0b326c8c8bd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setOutgoingEdges</b> (Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt; outgoingEdges)</td></tr>
 <tr class="separator:a3c1de0a545e3eaa33654d0b326c8c8bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a737366fb4c4e5c43a95f9fc81fb490fe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1model_1_1_annotation_graph.html">AnnotationGraph</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a737366fb4c4e5c43a95f9fc81fb490fe">getGraph</a> ()</td></tr>
+<tr class="memitem:a737366fb4c4e5c43a95f9fc81fb490fe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a737366fb4c4e5c43a95f9fc81fb490fe"></a>
+<a class="el" href="classannis_1_1model_1_1_annotation_graph.html">AnnotationGraph</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getGraph</b> ()</td></tr>
 <tr class="separator:a737366fb4c4e5c43a95f9fc81fb490fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6ab06bdb1d69afb76d4ccbe8d0cf93d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#af6ab06bdb1d69afb76d4ccbe8d0cf93d">setGraph</a> (<a class="el" href="classannis_1_1model_1_1_annotation_graph.html">AnnotationGraph</a> <a class="el" href="classannis_1_1model_1_1_annis_node.html#aaf10d3e4e95cb53b2fb7c90cbd3cd6c2">graph</a>)</td></tr>
+<tr class="memitem:af6ab06bdb1d69afb76d4ccbe8d0cf93d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af6ab06bdb1d69afb76d4ccbe8d0cf93d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setGraph</b> (<a class="el" href="classannis_1_1model_1_1_annotation_graph.html">AnnotationGraph</a> graph)</td></tr>
 <tr class="separator:af6ab06bdb1d69afb76d4ccbe8d0cf93d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f29e8af2fabbc0db4b31179cc290d96"><td class="memItemLeft" align="right" valign="top">Long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a1f29e8af2fabbc0db4b31179cc290d96">getMatchedNodeInQuery</a> ()</td></tr>
+<tr class="memitem:a1f29e8af2fabbc0db4b31179cc290d96"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1f29e8af2fabbc0db4b31179cc290d96"></a>
+Long&#160;</td><td class="memItemRight" valign="bottom"><b>getMatchedNodeInQuery</b> ()</td></tr>
 <tr class="separator:a1f29e8af2fabbc0db4b31179cc290d96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b8442574e7b114519b9c981910ffddd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a9b8442574e7b114519b9c981910ffddd">setMatchedNodeInQuery</a> (Long <a class="el" href="classannis_1_1model_1_1_annis_node.html#a594dc93dae49bf3f8f974280b2b5e845">matchedNodeInQuery</a>)</td></tr>
+<tr class="memitem:a9b8442574e7b114519b9c981910ffddd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9b8442574e7b114519b9c981910ffddd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setMatchedNodeInQuery</b> (Long matchedNodeInQuery)</td></tr>
 <tr class="separator:a9b8442574e7b114519b9c981910ffddd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a411fca8bd0d89991cc7df18bd45b4f8f"><td class="memItemLeft" align="right" valign="top">static String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a411fca8bd0d89991cc7df18bd45b4f8f">qName</a> (String namespace, String <a class="el" href="classannis_1_1model_1_1_annis_node.html#a9b988546f4186a60fa22b2aba187471b">name</a>)</td></tr>
+<tr class="memitem:a411fca8bd0d89991cc7df18bd45b4f8f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a411fca8bd0d89991cc7df18bd45b4f8f"></a>
+static String&#160;</td><td class="memItemRight" valign="bottom"><b>qName</b> (String namespace, String name)</td></tr>
 <tr class="separator:a411fca8bd0d89991cc7df18bd45b4f8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77f8efa61a8072ab65f164484c59b3bc"><td class="memItemLeft" align="right" valign="top">static String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a77f8efa61a8072ab65f164484c59b3bc">qName</a> (String namespace, String <a class="el" href="classannis_1_1model_1_1_annis_node.html#a9b988546f4186a60fa22b2aba187471b">name</a>, String seperator)</td></tr>
+<tr class="memitem:a77f8efa61a8072ab65f164484c59b3bc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a77f8efa61a8072ab65f164484c59b3bc"></a>
+static String&#160;</td><td class="memItemRight" valign="bottom"><b>qName</b> (String namespace, String name, String seperator)</td></tr>
 <tr class="separator:a77f8efa61a8072ab65f164484c59b3bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a534396a86d8ecf5614526080b62ea364"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a534396a86d8ecf5614526080b62ea364">id</a></td></tr>
-<tr class="separator:a534396a86d8ecf5614526080b62ea364"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae04a679da6663d10b1683bc7c1573e67"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ae04a679da6663d10b1683bc7c1573e67">corpus</a></td></tr>
-<tr class="separator:ae04a679da6663d10b1683bc7c1573e67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af95bf2326a3b3698b50d71edc19b6b37"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#af95bf2326a3b3698b50d71edc19b6b37">textId</a></td></tr>
-<tr class="separator:af95bf2326a3b3698b50d71edc19b6b37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a715bb6e10774e93dcd863097fd76c883"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a715bb6e10774e93dcd863097fd76c883">left</a></td></tr>
-<tr class="separator:a715bb6e10774e93dcd863097fd76c883"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e7c9d51f5b70ecfb3540370250eaa8f"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a3e7c9d51f5b70ecfb3540370250eaa8f">right</a></td></tr>
-<tr class="separator:a3e7c9d51f5b70ecfb3540370250eaa8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0980323b53270957cd620a98334c9fb9"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a0980323b53270957cd620a98334c9fb9">spannedText</a></td></tr>
-<tr class="separator:a0980323b53270957cd620a98334c9fb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1674d8dfab0cfe3f1a0fca94f2803969"><td class="memItemLeft" align="right" valign="top">Long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a1674d8dfab0cfe3f1a0fca94f2803969">tokenIndex</a></td></tr>
-<tr class="separator:a1674d8dfab0cfe3f1a0fca94f2803969"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0a233e18fb8734ce1681a2dffa51c35"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#aa0a233e18fb8734ce1681a2dffa51c35">leftToken</a></td></tr>
-<tr class="separator:aa0a233e18fb8734ce1681a2dffa51c35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae710babe86009ef48972f11dec32d77d"><td class="memItemLeft" align="right" valign="top">long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ae710babe86009ef48972f11dec32d77d">rightToken</a></td></tr>
-<tr class="separator:ae710babe86009ef48972f11dec32d77d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa6e3bd3dd685c01b9204ffa3f35c2559"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#aa6e3bd3dd685c01b9204ffa3f35c2559">nodeAnnotations</a></td></tr>
-<tr class="separator:aa6e3bd3dd685c01b9204ffa3f35c2559"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf10d3e4e95cb53b2fb7c90cbd3cd6c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1model_1_1_annotation_graph.html">AnnotationGraph</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#aaf10d3e4e95cb53b2fb7c90cbd3cd6c2">graph</a></td></tr>
-<tr class="separator:aaf10d3e4e95cb53b2fb7c90cbd3cd6c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b2a863c1b4f7973e497816b61a5ad49"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a4b2a863c1b4f7973e497816b61a5ad49">incomingEdges</a></td></tr>
-<tr class="separator:a4b2a863c1b4f7973e497816b61a5ad49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae627aa091d327b5acf15546d8b41e98c"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ae627aa091d327b5acf15546d8b41e98c">outgoingEdges</a></td></tr>
-<tr class="separator:ae627aa091d327b5acf15546d8b41e98c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b988546f4186a60fa22b2aba187471b"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a9b988546f4186a60fa22b2aba187471b">name</a></td></tr>
-<tr class="separator:a9b988546f4186a60fa22b2aba187471b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69631b354073ef9f7205ff23ccc29f2b"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a69631b354073ef9f7205ff23ccc29f2b">partOfEdge</a></td></tr>
-<tr class="separator:a69631b354073ef9f7205ff23ccc29f2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad889cfd738f4838fd0a8f6ad4db1cf26"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#ad889cfd738f4838fd0a8f6ad4db1cf26">root</a></td></tr>
-<tr class="separator:ad889cfd738f4838fd0a8f6ad4db1cf26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0780f0e1e9a7be3df6dec8fdaf6daedf"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a0780f0e1e9a7be3df6dec8fdaf6daedf">token</a></td></tr>
-<tr class="separator:a0780f0e1e9a7be3df6dec8fdaf6daedf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ddcd3cac4548b3f9f4ef8c405f5bbd4"><td class="memItemLeft" align="right" valign="top">Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a7ddcd3cac4548b3f9f4ef8c405f5bbd4">edgeAnnotations</a></td></tr>
-<tr class="separator:a7ddcd3cac4548b3f9f4ef8c405f5bbd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a594dc93dae49bf3f8f974280b2b5e845"><td class="memItemLeft" align="right" valign="top">Long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1model_1_1_annis_node.html#a594dc93dae49bf3f8f974280b2b5e845">matchedNodeInQuery</a></td></tr>
-<tr class="separator:a594dc93dae49bf3f8f974280b2b5e845"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="ad60066d05e090f877bb811e136f0979e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.model.AnnisNode.AnnisNode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab5184b2474c804741d0e7e16fe416144"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.model.AnnisNode.AnnisNode </td>
-          <td>(</td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>id</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab80fc4680be498d6fbc1f65d6cac584d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.model.AnnisNode.AnnisNode </td>
-          <td>(</td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>corpusRef</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>textRef</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>left</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>right</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>namespace</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>tokenIndex</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>span</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>leftToken</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>rightToken</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a1eb7eecb379093cf6704a2d2e5bbf707"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.addEdgeAnnotation </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a>&#160;</td>
-          <td class="paramname"><em>annotation</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="afea59e0c9aa6380cd143ae00af84afcd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.addIncomingEdge </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a>&#160;</td>
-          <td class="paramname"><em>edge</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="afad3e89e5fae3bfbccbcad401752df47"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.addNodeAnnotation </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a>&#160;</td>
-          <td class="paramname"><em>annotation</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a14732b17ca0074d8dcd44b88c3fbccae"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.addOutgoingEdge </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a>&#160;</td>
-          <td class="paramname"><em>edge</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9d53800874e4b53145259f237ad0827a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.clearSpannedText </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa223d9c79fb874ae7e85da2a8ac6f3ea"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.equals </td>
-          <td>(</td>
-          <td class="paramtype">Object&#160;</td>
-          <td class="paramname"><em>obj</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="abc812a8e75c21ac069bc246adad30299"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.getCorpus </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af26442d4816bece92a275b2214a9cbad"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;<a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a>&gt; annis.model.AnnisNode.getEdgeAnnotations </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a737366fb4c4e5c43a95f9fc81fb490fe"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1model_1_1_annotation_graph.html">AnnotationGraph</a> annis.model.AnnisNode.getGraph </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0923c3d7410be3840b2d5cc43c00c407"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.getId </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac02fbb5d9984ba0b81cab515e7502220"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;<a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a>&gt; annis.model.AnnisNode.getIncomingEdges </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac0b145ba895296c8021fe8cd5bce95b7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.getLeft </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7f84a202ab9c1948d013c6ae54dcf31c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.getLeftToken </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1f29e8af2fabbc0db4b31179cc290d96"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Long annis.model.AnnisNode.getMatchedNodeInQuery </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9d89a3166251885e8a93ede32ecedc19"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.model.AnnisNode.getName </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a640b5564f7add89f78cd314a97ab6124"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.model.AnnisNode.getNamespace </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aae03dfe83d4b501766439a2456becd17"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;<a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a>&gt; annis.model.AnnisNode.getNodeAnnotations </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a426cd01ff1736396a0e5ee26725410b6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;<a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a>&gt; annis.model.AnnisNode.getOutgoingEdges </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8b4d9fc61d621ea27e33be59e721a993"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.model.AnnisNode.getQualifiedName </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1ba9a3e27635c2d163ffef4f2ec28a51"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.getRight </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac2cce85ec09d4e000d2d303decf99c03"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.getRightToken </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad89d8b5681bfa68be47b89a6bc1b6f6a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.model.AnnisNode.getSpannedText </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a106866cd87459e011d673b056fe43456"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.getTextId </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1a498e8d747f2235e8cd6932ffff82df"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Long annis.model.AnnisNode.getTokenIndex </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac8c4db558e2c8c7e29f4bfe2e5f78a31"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.model.AnnisNode.hashCode </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="adcb76127d08d619dfde4bc8778ae6eb4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.isPartOfEdge </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af569b4e9ba7d9449b4cb7a66750d1d0d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.isRoot </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2236dd6a2174155d0547481f303ed373"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.isToken </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a411fca8bd0d89991cc7df18bd45b4f8f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static String annis.model.AnnisNode.qName </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>namespace</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>name</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a77f8efa61a8072ab65f164484c59b3bc"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static String annis.model.AnnisNode.qName </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>namespace</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>seperator</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a44fb2265fee6d1c671e6991d4b666a17"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setCorpus </td>
-          <td>(</td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>corpus</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a538496c4a5268ed2bbb28d709a2ff672"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setEdgeAnnotations </td>
-          <td>(</td>
-          <td class="paramtype">Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt;&#160;</td>
-          <td class="paramname"><em>edgeAnnotations</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af6ab06bdb1d69afb76d4ccbe8d0cf93d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setGraph </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1model_1_1_annotation_graph.html">AnnotationGraph</a>&#160;</td>
-          <td class="paramname"><em>graph</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3ce4ae711603e76a721fda2f315f4f71"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setIncomingEdges </td>
-          <td>(</td>
-          <td class="paramtype">Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt;&#160;</td>
-          <td class="paramname"><em>incomingEdges</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a048421473f5ee9898d54c679a87d8433"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setLeft </td>
-          <td>(</td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>left</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab923f76a15d33343a4ba0a92da7b3389"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setLeftToken </td>
-          <td>(</td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>leftToken</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9b8442574e7b114519b9c981910ffddd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setMatchedNodeInQuery </td>
-          <td>(</td>
-          <td class="paramtype">Long&#160;</td>
-          <td class="paramname"><em>matchedNodeInQuery</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a312fbf4f1db089bd73d3eb30748db6aa"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setName </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a192eed946af2d7a6c3742da44104a369"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setNamespace </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>namespace</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a86ccc3a4a25ad97d53c809778dc2cda8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setNodeAnnotations </td>
-          <td>(</td>
-          <td class="paramtype">Set&lt; <a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a> &gt;&#160;</td>
-          <td class="paramname"><em>nodeAnnotations</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3c1de0a545e3eaa33654d0b326c8c8bd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setOutgoingEdges </td>
-          <td>(</td>
-          <td class="paramtype">Set&lt; <a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a> &gt;&#160;</td>
-          <td class="paramname"><em>outgoingEdges</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a41c01233d7afd4e8aa50658d8107c71b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setPartOfEdge </td>
-          <td>(</td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>partOfEdge</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a05a3e05df947dba2ad4a4b402cfd075e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setRight </td>
-          <td>(</td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>right</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a596ae01b2fa9dff600fbf4e4c6a35c89"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setRightToken </td>
-          <td>(</td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>rightToken</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9d5c39e563dd225d07dd64ae06c5cae6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setRoot </td>
-          <td>(</td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>root</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a53d7777ec30ae637ee171d21cacbc46e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setSpannedText </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>spannedText</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad0bba1c0a7ca7f9fcebc426c4bb36937"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setTextId </td>
-          <td>(</td>
-          <td class="paramtype">long&#160;</td>
-          <td class="paramname"><em>textIndex</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8e87a4c72ddca036a2dde16be2ca9308"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setToken </td>
-          <td>(</td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>token</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1b0d551c3f7b0c9c5786caaea414cf10"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.model.AnnisNode.setTokenIndex </td>
-          <td>(</td>
-          <td class="paramtype">Long&#160;</td>
-          <td class="paramname"><em>tokenIndex</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a79efb0dbdf8cede2c01a80d1386a5644"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.model.AnnisNode.toString </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="ae04a679da6663d10b1683bc7c1573e67"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.corpus</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7ddcd3cac4548b3f9f4ef8c405f5bbd4"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;<a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a>&gt; annis.model.AnnisNode.edgeAnnotations</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aaf10d3e4e95cb53b2fb7c90cbd3cd6c2"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1model_1_1_annotation_graph.html">AnnotationGraph</a> annis.model.AnnisNode.graph</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a534396a86d8ecf5614526080b62ea364"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.id</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4b2a863c1b4f7973e497816b61a5ad49"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;<a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a>&gt; annis.model.AnnisNode.incomingEdges</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a715bb6e10774e93dcd863097fd76c883"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.left</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa0a233e18fb8734ce1681a2dffa51c35"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.leftToken</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a594dc93dae49bf3f8f974280b2b5e845"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Long annis.model.AnnisNode.matchedNodeInQuery</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9b988546f4186a60fa22b2aba187471b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.model.AnnisNode.name</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa6e3bd3dd685c01b9204ffa3f35c2559"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;<a class="el" href="classannis_1_1model_1_1_annotation.html">Annotation</a>&gt; annis.model.AnnisNode.nodeAnnotations</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae627aa091d327b5acf15546d8b41e98c"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;<a class="el" href="classannis_1_1model_1_1_edge.html">Edge</a>&gt; annis.model.AnnisNode.outgoingEdges</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a69631b354073ef9f7205ff23ccc29f2b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.partOfEdge</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3e7c9d51f5b70ecfb3540370250eaa8f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.right</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae710babe86009ef48972f11dec32d77d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.rightToken</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad889cfd738f4838fd0a8f6ad4db1cf26"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.root</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0980323b53270957cd620a98334c9fb9"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.model.AnnisNode.spannedText</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af95bf2326a3b3698b50d71edc19b6b37"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">long annis.model.AnnisNode.textId</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0780f0e1e9a7be3df6dec8fdaf6daedf"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.model.AnnisNode.token</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1674d8dfab0cfe3f1a0fca94f2803969"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Long annis.model.AnnisNode.tokenIndex</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_annis_node_8java.html">AnnisNode.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1model.html">model</a></li><li class="navelem"><a class="el" href="classannis_1_1model_1_1_annis_node.html">AnnisNode</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>model</b></li><li class="navelem"><a class="el" href="classannis_1_1model_1_1_annis_node.html">AnnisNode</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

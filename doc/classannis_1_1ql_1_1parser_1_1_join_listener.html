@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,9 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1ql_1_1parser_1_1_join_li
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1ql_1_1parser_1_1_join_listener-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.ql.parser.JoinListener Class Reference</div>  </div>
@@ -121,126 +115,110 @@ $(document).ready(function(){initNavTree('classannis_1_1ql_1_1parser_1_1_join_li
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.ql.parser.JoinListener:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1ql_1_1parser_1_1_join_listener.png" usemap="#annis.ql.parser.JoinListener_map" alt=""/>
-  <map id="annis.ql.parser.JoinListener_map" name="annis.ql.parser.JoinListener_map">
-</map>
- </div></div>
+</div>
+<p>Inherits AqlParserBaseListener.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a348891c83b51aae665cca2025a00cf8e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a348891c83b51aae665cca2025a00cf8e">JoinListener</a> (<a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a> data, int <a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a8d6f522a66a1e5049a664ec01203fbcb">precedenceBound</a>, List&lt; Map&lt; Interval, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt;&gt; tokenPositionToNode)</td></tr>
+<tr class="memitem:a348891c83b51aae665cca2025a00cf8e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a348891c83b51aae665cca2025a00cf8e">JoinListener</a> (<a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a> data, int precedenceBound, List&lt; Map&lt; Interval, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt;&gt; tokenPositionToNode)</td></tr>
 <tr class="memdesc:a348891c83b51aae665cca2025a00cf8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a348891c83b51aae665cca2025a00cf8e">More...</a><br /></td></tr>
 <tr class="separator:a348891c83b51aae665cca2025a00cf8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff872dcf2bc22c86c93cb9e43e6b0651"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#aff872dcf2bc22c86c93cb9e43e6b0651">enterAndExpr</a> (AqlParser.AndExprContext ctx)</td></tr>
+<tr class="memitem:aff872dcf2bc22c86c93cb9e43e6b0651"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aff872dcf2bc22c86c93cb9e43e6b0651"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterAndExpr</b> (AqlParser.AndExprContext ctx)</td></tr>
 <tr class="separator:aff872dcf2bc22c86c93cb9e43e6b0651"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04172d04a77d5bfd77de24f648621232"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a04172d04a77d5bfd77de24f648621232">exitAndExpr</a> (AqlParser.AndExprContext ctx)</td></tr>
+<tr class="memitem:a04172d04a77d5bfd77de24f648621232"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a04172d04a77d5bfd77de24f648621232"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>exitAndExpr</b> (AqlParser.AndExprContext ctx)</td></tr>
 <tr class="separator:a04172d04a77d5bfd77de24f648621232"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4908f0a5b79f4145ec0d0baddf472e4e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a4908f0a5b79f4145ec0d0baddf472e4e">exitOperator</a> (AqlParser.OperatorContext ctx)</td></tr>
+<tr class="memitem:a4908f0a5b79f4145ec0d0baddf472e4e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4908f0a5b79f4145ec0d0baddf472e4e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>exitOperator</b> (AqlParser.OperatorContext ctx)</td></tr>
 <tr class="separator:a4908f0a5b79f4145ec0d0baddf472e4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa12f0dcec7af6eb4f5497146a542c1bc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#aa12f0dcec7af6eb4f5497146a542c1bc">enterRelation</a> (AqlParser.RelationContext ctx)</td></tr>
-<tr class="separator:aa12f0dcec7af6eb4f5497146a542c1bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05c143d06a061d3ea1044fbe1b165951"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a05c143d06a061d3ea1044fbe1b165951">enterRootTerm</a> (AqlParser.RootTermContext ctx)</td></tr>
+<tr class="memitem:a3eb4ee8412785f39e7eff206d8367794"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3eb4ee8412785f39e7eff206d8367794"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterBindingRelation</b> (AqlParser.BindingRelationContext ctx)</td></tr>
+<tr class="separator:a3eb4ee8412785f39e7eff206d8367794"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13331f9e5207dfbbc0dec1b95fdc75b7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a13331f9e5207dfbbc0dec1b95fdc75b7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterNonBindingRelation</b> (AqlParser.NonBindingRelationContext ctx)</td></tr>
+<tr class="separator:a13331f9e5207dfbbc0dec1b95fdc75b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05c143d06a061d3ea1044fbe1b165951"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05c143d06a061d3ea1044fbe1b165951"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterRootTerm</b> (AqlParser.RootTermContext ctx)</td></tr>
 <tr class="separator:a05c143d06a061d3ea1044fbe1b165951"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d164831c9308725dfb8366cd8c45c71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a3d164831c9308725dfb8366cd8c45c71">enterArityTerm</a> (AqlParser.ArityTermContext ctx)</td></tr>
+<tr class="memitem:a3d164831c9308725dfb8366cd8c45c71"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d164831c9308725dfb8366cd8c45c71"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterArityTerm</b> (AqlParser.ArityTermContext ctx)</td></tr>
 <tr class="separator:a3d164831c9308725dfb8366cd8c45c71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e6e595ce3b308e6699e4d8ef03fc2ce"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a5e6e595ce3b308e6699e4d8ef03fc2ce">enterTokenArityTerm</a> (AqlParser.TokenArityTermContext ctx)</td></tr>
+<tr class="memitem:a5e6e595ce3b308e6699e4d8ef03fc2ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5e6e595ce3b308e6699e4d8ef03fc2ce"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterTokenArityTerm</b> (AqlParser.TokenArityTermContext ctx)</td></tr>
 <tr class="separator:a5e6e595ce3b308e6699e4d8ef03fc2ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0a3648f498a9bf3d9569a5e1857adb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#aa0a3648f498a9bf3d9569a5e1857adb0">enterDirectPrecedence</a> (AqlParser.DirectPrecedenceContext ctx)</td></tr>
+<tr class="memitem:aa0a3648f498a9bf3d9569a5e1857adb0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0a3648f498a9bf3d9569a5e1857adb0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterDirectPrecedence</b> (AqlParser.DirectPrecedenceContext ctx)</td></tr>
 <tr class="separator:aa0a3648f498a9bf3d9569a5e1857adb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a092b9b6f576a5f63411d2991354a574c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a092b9b6f576a5f63411d2991354a574c">enterDirectNear</a> (AqlParser.DirectNearContext ctx)</td></tr>
+<tr class="memitem:a092b9b6f576a5f63411d2991354a574c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a092b9b6f576a5f63411d2991354a574c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterDirectNear</b> (AqlParser.DirectNearContext ctx)</td></tr>
 <tr class="separator:a092b9b6f576a5f63411d2991354a574c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefc9e12b379448729f82d0a172a5f7ae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#aefc9e12b379448729f82d0a172a5f7ae">enterEqualvalue</a> (AqlParser.EqualvalueContext ctx)</td></tr>
+<tr class="memitem:aefc9e12b379448729f82d0a172a5f7ae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aefc9e12b379448729f82d0a172a5f7ae"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterEqualvalue</b> (AqlParser.EqualvalueContext ctx)</td></tr>
 <tr class="separator:aefc9e12b379448729f82d0a172a5f7ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af92405a7be076125d50df4bde5d99b45"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#af92405a7be076125d50df4bde5d99b45">enterNotequalvalue</a> (annis.ql.AqlParser.NotequalvalueContext arg0)</td></tr>
-<tr class="separator:af92405a7be076125d50df4bde5d99b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2976d539f563bab7ec102799b7ab9be4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a2976d539f563bab7ec102799b7ab9be4">enterIndirectPrecedence</a> (AqlParser.IndirectPrecedenceContext ctx)</td></tr>
+<tr class="memitem:a052532cfea97f7d6c4eaf130d67179df"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a052532cfea97f7d6c4eaf130d67179df"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterNotequalvalue</b> (annis.ql.AqlParser.NotequalvalueContext ctx)</td></tr>
+<tr class="separator:a052532cfea97f7d6c4eaf130d67179df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2976d539f563bab7ec102799b7ab9be4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2976d539f563bab7ec102799b7ab9be4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterIndirectPrecedence</b> (AqlParser.IndirectPrecedenceContext ctx)</td></tr>
 <tr class="separator:a2976d539f563bab7ec102799b7ab9be4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac027eaa19acc7f36ebd60726d8b9d3ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#ac027eaa19acc7f36ebd60726d8b9d3ec">enterIndirectNear</a> (AqlParser.IndirectNearContext ctx)</td></tr>
+<tr class="memitem:ac027eaa19acc7f36ebd60726d8b9d3ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac027eaa19acc7f36ebd60726d8b9d3ec"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterIndirectNear</b> (AqlParser.IndirectNearContext ctx)</td></tr>
 <tr class="separator:ac027eaa19acc7f36ebd60726d8b9d3ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3367f8c64369ab553b6d28fd1c352ff4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a3367f8c64369ab553b6d28fd1c352ff4">enterRangePrecedence</a> (AqlParser.RangePrecedenceContext ctx)</td></tr>
+<tr class="memitem:a3367f8c64369ab553b6d28fd1c352ff4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3367f8c64369ab553b6d28fd1c352ff4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterRangePrecedence</b> (AqlParser.RangePrecedenceContext ctx)</td></tr>
 <tr class="separator:a3367f8c64369ab553b6d28fd1c352ff4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11ce4e599be4010080c0c4f4ee66f9cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a11ce4e599be4010080c0c4f4ee66f9cc">enterRangeNear</a> (AqlParser.RangeNearContext ctx)</td></tr>
+<tr class="memitem:a11ce4e599be4010080c0c4f4ee66f9cc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a11ce4e599be4010080c0c4f4ee66f9cc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterRangeNear</b> (AqlParser.RangeNearContext ctx)</td></tr>
 <tr class="separator:a11ce4e599be4010080c0c4f4ee66f9cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac931735b8c69e42fbf54d53a604979c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#aac931735b8c69e42fbf54d53a604979c">enterIdenticalCoverage</a> (AqlParser.IdenticalCoverageContext ctx)</td></tr>
+<tr class="memitem:aac931735b8c69e42fbf54d53a604979c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac931735b8c69e42fbf54d53a604979c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterIdenticalCoverage</b> (AqlParser.IdenticalCoverageContext ctx)</td></tr>
 <tr class="separator:aac931735b8c69e42fbf54d53a604979c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9cd521480217914a4a16964d7bd123c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#af9cd521480217914a4a16964d7bd123c">enterLeftAlign</a> (AqlParser.LeftAlignContext ctx)</td></tr>
+<tr class="memitem:af9cd521480217914a4a16964d7bd123c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af9cd521480217914a4a16964d7bd123c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterLeftAlign</b> (AqlParser.LeftAlignContext ctx)</td></tr>
 <tr class="separator:af9cd521480217914a4a16964d7bd123c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5d3cd0e6c6d0f9a6c062aa5731d1237"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#aa5d3cd0e6c6d0f9a6c062aa5731d1237">enterRightAlign</a> (AqlParser.RightAlignContext ctx)</td></tr>
+<tr class="memitem:aa5d3cd0e6c6d0f9a6c062aa5731d1237"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa5d3cd0e6c6d0f9a6c062aa5731d1237"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterRightAlign</b> (AqlParser.RightAlignContext ctx)</td></tr>
 <tr class="separator:aa5d3cd0e6c6d0f9a6c062aa5731d1237"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a42e6155ce1412b2bc69f70abb9e7e1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a7a42e6155ce1412b2bc69f70abb9e7e1">enterInclusion</a> (AqlParser.InclusionContext ctx)</td></tr>
+<tr class="memitem:a7a42e6155ce1412b2bc69f70abb9e7e1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7a42e6155ce1412b2bc69f70abb9e7e1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterInclusion</b> (AqlParser.InclusionContext ctx)</td></tr>
 <tr class="separator:a7a42e6155ce1412b2bc69f70abb9e7e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3b98adbcd976ea9baa9beea072a15cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#ae3b98adbcd976ea9baa9beea072a15cb">enterOverlap</a> (AqlParser.OverlapContext ctx)</td></tr>
+<tr class="memitem:ae3b98adbcd976ea9baa9beea072a15cb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae3b98adbcd976ea9baa9beea072a15cb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterOverlap</b> (AqlParser.OverlapContext ctx)</td></tr>
 <tr class="separator:ae3b98adbcd976ea9baa9beea072a15cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d3cf6130bdd26a60ea48b7a04b453ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a2d3cf6130bdd26a60ea48b7a04b453ba">enterRightOverlap</a> (AqlParser.RightOverlapContext ctx)</td></tr>
+<tr class="memitem:a2d3cf6130bdd26a60ea48b7a04b453ba"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2d3cf6130bdd26a60ea48b7a04b453ba"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterRightOverlap</b> (AqlParser.RightOverlapContext ctx)</td></tr>
 <tr class="separator:a2d3cf6130bdd26a60ea48b7a04b453ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f96a864f5d662c5e94c6262d2949bc7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a5f96a864f5d662c5e94c6262d2949bc7">enterLeftOverlap</a> (AqlParser.LeftOverlapContext ctx)</td></tr>
+<tr class="memitem:a5f96a864f5d662c5e94c6262d2949bc7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f96a864f5d662c5e94c6262d2949bc7"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterLeftOverlap</b> (AqlParser.LeftOverlapContext ctx)</td></tr>
 <tr class="separator:a5f96a864f5d662c5e94c6262d2949bc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a553e2b01041e1c631dea380f6d8ef759"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a553e2b01041e1c631dea380f6d8ef759">enterDirectDominance</a> (AqlParser.DirectDominanceContext ctx)</td></tr>
+<tr class="memitem:a553e2b01041e1c631dea380f6d8ef759"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a553e2b01041e1c631dea380f6d8ef759"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterDirectDominance</b> (AqlParser.DirectDominanceContext ctx)</td></tr>
 <tr class="separator:a553e2b01041e1c631dea380f6d8ef759"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaad9e697c68c906c7e416d667da7444c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#aaad9e697c68c906c7e416d667da7444c">enterIndirectDominance</a> (AqlParser.IndirectDominanceContext ctx)</td></tr>
+<tr class="memitem:aaad9e697c68c906c7e416d667da7444c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaad9e697c68c906c7e416d667da7444c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterIndirectDominance</b> (AqlParser.IndirectDominanceContext ctx)</td></tr>
 <tr class="separator:aaad9e697c68c906c7e416d667da7444c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d069d601e374c611658150ae492a524"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a1d069d601e374c611658150ae492a524">enterRangeDominance</a> (AqlParser.RangeDominanceContext ctx)</td></tr>
+<tr class="memitem:a1d069d601e374c611658150ae492a524"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d069d601e374c611658150ae492a524"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterRangeDominance</b> (AqlParser.RangeDominanceContext ctx)</td></tr>
 <tr class="separator:a1d069d601e374c611658150ae492a524"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f9634431d35814859a2dd20fc13144e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a5f9634431d35814859a2dd20fc13144e">enterDirectPointing</a> (AqlParser.DirectPointingContext ctx)</td></tr>
+<tr class="memitem:a5f9634431d35814859a2dd20fc13144e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f9634431d35814859a2dd20fc13144e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterDirectPointing</b> (AqlParser.DirectPointingContext ctx)</td></tr>
 <tr class="separator:a5f9634431d35814859a2dd20fc13144e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac22e9f55da583b2846f757e49669103"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#aac22e9f55da583b2846f757e49669103">enterIndirectPointing</a> (AqlParser.IndirectPointingContext ctx)</td></tr>
+<tr class="memitem:aac22e9f55da583b2846f757e49669103"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac22e9f55da583b2846f757e49669103"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterIndirectPointing</b> (AqlParser.IndirectPointingContext ctx)</td></tr>
 <tr class="separator:aac22e9f55da583b2846f757e49669103"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a02ea381132321b2785116aebdbe61fd6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a02ea381132321b2785116aebdbe61fd6">enterRangePointing</a> (AqlParser.RangePointingContext ctx)</td></tr>
+<tr class="memitem:a02ea381132321b2785116aebdbe61fd6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a02ea381132321b2785116aebdbe61fd6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterRangePointing</b> (AqlParser.RangePointingContext ctx)</td></tr>
 <tr class="separator:a02ea381132321b2785116aebdbe61fd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2a751db40d71641b5d08f9f96f7a97d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#ab2a751db40d71641b5d08f9f96f7a97d">enterCommonparent</a> (AqlParser.CommonparentContext ctx)</td></tr>
+<tr class="memitem:ab2a751db40d71641b5d08f9f96f7a97d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab2a751db40d71641b5d08f9f96f7a97d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterCommonparent</b> (AqlParser.CommonparentContext ctx)</td></tr>
 <tr class="separator:ab2a751db40d71641b5d08f9f96f7a97d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58c384332873139457f2fc27cca43541"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a58c384332873139457f2fc27cca43541">enterCommonancestor</a> (AqlParser.CommonancestorContext ctx)</td></tr>
+<tr class="memitem:a58c384332873139457f2fc27cca43541"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58c384332873139457f2fc27cca43541"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterCommonancestor</b> (AqlParser.CommonancestorContext ctx)</td></tr>
 <tr class="separator:a58c384332873139457f2fc27cca43541"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0007422f7dac486bf29f70c2becfc755"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a0007422f7dac486bf29f70c2becfc755">enterIdentity</a> (AqlParser.IdentityContext ctx)</td></tr>
+<tr class="memitem:a0007422f7dac486bf29f70c2becfc755"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0007422f7dac486bf29f70c2becfc755"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>enterIdentity</b> (AqlParser.IdentityContext ctx)</td></tr>
 <tr class="separator:a0007422f7dac486bf29f70c2becfc755"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:a0a8c37bba17ff7591c6c06ab12e952c1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a0a8c37bba17ff7591c6c06ab12e952c1">join</a> (ParserRuleContext ctx, Class&lt;?extends <a class="el" href="classannis_1_1model_1_1_join.html">Join</a> &gt; type)</td></tr>
-<tr class="memdesc:a0a8c37bba17ff7591c6c06ab12e952c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Automatically create a join from a node and a join class.  <a href="#a0a8c37bba17ff7591c6c06ab12e952c1">More...</a><br /></td></tr>
-<tr class="separator:a0a8c37bba17ff7591c6c06ab12e952c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee000a3a9ab76af59e6c61d057afda26"><td class="memItemLeft" align="right" valign="top">QueryNode.Range&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#aee000a3a9ab76af59e6c61d057afda26">annisRangeFromARangeSpec</a> (AqlParser.RangeSpecContext spec)</td></tr>
-<tr class="separator:aee000a3a9ab76af59e6c61d057afda26"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3336b65493aa9db555d4075afb134900"><td class="memItemLeft" align="right" valign="top">LinkedList&lt; <a class="el" href="classannis_1_1model_1_1_query_annotation.html">QueryAnnotation</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a3336b65493aa9db555d4075afb134900">fromEdgeAnnotation</a> (AqlParser.EdgeSpecContext ctx)</td></tr>
-<tr class="separator:a3336b65493aa9db555d4075afb134900"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d73ef805728ae58e661f7732c2b8a07"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a7d73ef805728ae58e661f7732c2b8a07">getLayerName</a> (TerminalNode <a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a284e1649388b0e42393d11c226a88659">node</a>)</td></tr>
-<tr class="separator:a7d73ef805728ae58e661f7732c2b8a07"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03a79f05cc1d90843a2bc383072f2dd4"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a03a79f05cc1d90843a2bc383072f2dd4">getLayerName</a> (TerminalNode <a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a284e1649388b0e42393d11c226a88659">node</a>, int lengthOfOperator)</td></tr>
-<tr class="separator:a03a79f05cc1d90843a2bc383072f2dd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a284e1649388b0e42393d11c226a88659"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a284e1649388b0e42393d11c226a88659">node</a> (AqlParser.RefOrNodeContext ctx)</td></tr>
-<tr class="separator:a284e1649388b0e42393d11c226a88659"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f4286a27d1295487ef1afa5f4e198cd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a3f4286a27d1295487ef1afa5f4e198cd">nodeByDef</a> (AqlParser.ReferenceNodeContext ctx)</td></tr>
-<tr class="separator:a3f4286a27d1295487ef1afa5f4e198cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fc38b51c066b90bd025486b2823da92"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a0fc38b51c066b90bd025486b2823da92">nodeByRef</a> (Token ref)</td></tr>
-<tr class="separator:a0fc38b51c066b90bd025486b2823da92"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a471e0aeca586d3ef076cf57347e0216a"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a471e0aeca586d3ef076cf57347e0216a">errorLHS</a> (String function)</td></tr>
-<tr class="separator:a471e0aeca586d3ef076cf57347e0216a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a8d6f522a66a1e5049a664ec01203fbcb"><td class="memItemLeft" align="right" valign="top">final int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a8d6f522a66a1e5049a664ec01203fbcb">precedenceBound</a></td></tr>
-<tr class="separator:a8d6f522a66a1e5049a664ec01203fbcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0156d4ac9248e971e4a2223c0694908"><td class="memItemLeft" align="right" valign="top">final Map&lt; String, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt;[]&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#af0156d4ac9248e971e4a2223c0694908">alternativeNodes</a></td></tr>
-<tr class="memdesc:af0156d4ac9248e971e4a2223c0694908"><td class="mdescLeft">&#160;</td><td class="mdescRight">An array which has an entry for each alternative.  <a href="#af0156d4ac9248e971e4a2223c0694908">More...</a><br /></td></tr>
-<tr class="separator:af0156d4ac9248e971e4a2223c0694908"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a66a95898114ea3207028ca0b6fa3fd18"><td class="memItemLeft" align="right" valign="top">final List&lt; Map&lt; Interval, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a66a95898114ea3207028ca0b6fa3fd18">tokenPositions</a></td></tr>
-<tr class="memdesc:a66a95898114ea3207028ca0b6fa3fd18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maps a token interval to a query nodes.  <a href="#a66a95898114ea3207028ca0b6fa3fd18">More...</a><br /></td></tr>
-<tr class="separator:a66a95898114ea3207028ca0b6fa3fd18"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d8a28f0397e04ea46bec4b2dc4a2f42"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a5d8a28f0397e04ea46bec4b2dc4a2f42">alternativeIndex</a></td></tr>
-<tr class="separator:a5d8a28f0397e04ea46bec4b2dc4a2f42"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6aea021134cbd74b927d62bd3ac8f31e"><td class="memItemLeft" align="right" valign="top">ArrayList&lt; <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a6aea021134cbd74b927d62bd3ac8f31e">relationChain</a> = new ArrayList&lt;&gt;()</td></tr>
-<tr class="separator:a6aea021134cbd74b927d62bd3ac8f31e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16820881e8aa2b33104b6ad271488b7c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a16820881e8aa2b33104b6ad271488b7c">relationIdx</a></td></tr>
-<tr class="separator:a16820881e8aa2b33104b6ad271488b7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a0b12fdf1128dbfa670c25619b33a9cf3"><td class="memItemLeft" align="right" valign="top">static final Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html#a0b12fdf1128dbfa670c25619b33a9cf3">log</a> = LoggerFactory.getLogger(JoinListener.class)</td></tr>
-<tr class="separator:a0b12fdf1128dbfa670c25619b33a9cf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a348891c83b51aae665cca2025a00cf8e"></a>
@@ -285,898 +263,13 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aee000a3a9ab76af59e6c61d057afda26"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">QueryNode.Range annis.ql.parser.JoinListener.annisRangeFromARangeSpec </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RangeSpecContext&#160;</td>
-          <td class="paramname"><em>spec</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aff872dcf2bc22c86c93cb9e43e6b0651"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterAndExpr </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.AndExprContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3d164831c9308725dfb8366cd8c45c71"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterArityTerm </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.ArityTermContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a58c384332873139457f2fc27cca43541"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterCommonancestor </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.CommonancestorContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab2a751db40d71641b5d08f9f96f7a97d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterCommonparent </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.CommonparentContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a553e2b01041e1c631dea380f6d8ef759"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterDirectDominance </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.DirectDominanceContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a092b9b6f576a5f63411d2991354a574c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterDirectNear </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.DirectNearContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5f9634431d35814859a2dd20fc13144e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterDirectPointing </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.DirectPointingContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa0a3648f498a9bf3d9569a5e1857adb0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterDirectPrecedence </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.DirectPrecedenceContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aefc9e12b379448729f82d0a172a5f7ae"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterEqualvalue </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.EqualvalueContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aac931735b8c69e42fbf54d53a604979c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterIdenticalCoverage </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.IdenticalCoverageContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0007422f7dac486bf29f70c2becfc755"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterIdentity </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.IdentityContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7a42e6155ce1412b2bc69f70abb9e7e1"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterInclusion </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.InclusionContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aaad9e697c68c906c7e416d667da7444c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterIndirectDominance </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.IndirectDominanceContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac027eaa19acc7f36ebd60726d8b9d3ec"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterIndirectNear </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.IndirectNearContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aac22e9f55da583b2846f757e49669103"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterIndirectPointing </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.IndirectPointingContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2976d539f563bab7ec102799b7ab9be4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterIndirectPrecedence </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.IndirectPrecedenceContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af9cd521480217914a4a16964d7bd123c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterLeftAlign </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.LeftAlignContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5f96a864f5d662c5e94c6262d2949bc7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterLeftOverlap </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.LeftOverlapContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af92405a7be076125d50df4bde5d99b45"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterNotequalvalue </td>
-          <td>(</td>
-          <td class="paramtype">annis.ql.AqlParser.NotequalvalueContext&#160;</td>
-          <td class="paramname"><em>arg0</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae3b98adbcd976ea9baa9beea072a15cb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterOverlap </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.OverlapContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1d069d601e374c611658150ae492a524"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterRangeDominance </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RangeDominanceContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a11ce4e599be4010080c0c4f4ee66f9cc"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterRangeNear </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RangeNearContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a02ea381132321b2785116aebdbe61fd6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterRangePointing </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RangePointingContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3367f8c64369ab553b6d28fd1c352ff4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterRangePrecedence </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RangePrecedenceContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa12f0dcec7af6eb4f5497146a542c1bc"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterRelation </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RelationContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa5d3cd0e6c6d0f9a6c062aa5731d1237"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterRightAlign </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RightAlignContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2d3cf6130bdd26a60ea48b7a04b453ba"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterRightOverlap </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RightOverlapContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a05c143d06a061d3ea1044fbe1b165951"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterRootTerm </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RootTermContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5e6e595ce3b308e6699e4d8ef03fc2ce"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.enterTokenArityTerm </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.TokenArityTermContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a471e0aeca586d3ef076cf57347e0216a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.ql.parser.JoinListener.errorLHS </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>function</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a04172d04a77d5bfd77de24f648621232"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.exitAndExpr </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.AndExprContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4908f0a5b79f4145ec0d0baddf472e4e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.exitOperator </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.OperatorContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3336b65493aa9db555d4075afb134900"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">LinkedList&lt;<a class="el" href="classannis_1_1model_1_1_query_annotation.html">QueryAnnotation</a>&gt; annis.ql.parser.JoinListener.fromEdgeAnnotation </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.EdgeSpecContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7d73ef805728ae58e661f7732c2b8a07"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.ql.parser.JoinListener.getLayerName </td>
-          <td>(</td>
-          <td class="paramtype">TerminalNode&#160;</td>
-          <td class="paramname"><em>node</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a03a79f05cc1d90843a2bc383072f2dd4"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.ql.parser.JoinListener.getLayerName </td>
-          <td>(</td>
-          <td class="paramtype">TerminalNode&#160;</td>
-          <td class="paramname"><em>node</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>lengthOfOperator</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0a8c37bba17ff7591c6c06ab12e952c1"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.JoinListener.join </td>
-          <td>(</td>
-          <td class="paramtype">ParserRuleContext&#160;</td>
-          <td class="paramname"><em>ctx</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Class&lt;?extends <a class="el" href="classannis_1_1model_1_1_join.html">Join</a> &gt;&#160;</td>
-          <td class="paramname"><em>type</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Automatically create a join from a node and a join class. </p>
-<p>This will automatically get the left and right hand refs and will construct a new join specified by the type using reflection.</p>
-
-</div>
-</div>
-<a class="anchor" id="a284e1649388b0e42393d11c226a88659"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> annis.ql.parser.JoinListener.node </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.RefOrNodeContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3f4286a27d1295487ef1afa5f4e198cd"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> annis.ql.parser.JoinListener.nodeByDef </td>
-          <td>(</td>
-          <td class="paramtype">AqlParser.ReferenceNodeContext&#160;</td>
-          <td class="paramname"><em>ctx</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0fc38b51c066b90bd025486b2823da92"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> annis.ql.parser.JoinListener.nodeByRef </td>
-          <td>(</td>
-          <td class="paramtype">Token&#160;</td>
-          <td class="paramname"><em>ref</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a5d8a28f0397e04ea46bec4b2dc4a2f42"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.ql.parser.JoinListener.alternativeIndex</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af0156d4ac9248e971e4a2223c0694908"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Map&lt;String, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a>&gt; [] annis.ql.parser.JoinListener.alternativeNodes</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>An array which has an entry for each alternative. </p>
-<p>Each entry maps node variables to a collection of query nodes. </p>
-
-</div>
-</div>
-<a class="anchor" id="a0b12fdf1128dbfa670c25619b33a9cf3"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Logger annis.ql.parser.JoinListener.log = LoggerFactory.getLogger(JoinListener.class)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8d6f522a66a1e5049a664ec01203fbcb"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final int annis.ql.parser.JoinListener.precedenceBound</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a6aea021134cbd74b927d62bd3ac8f31e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ArrayList&lt;<a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a>&gt; annis.ql.parser.JoinListener.relationChain = new ArrayList&lt;&gt;()</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a16820881e8aa2b33104b6ad271488b7c"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.ql.parser.JoinListener.relationIdx</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a66a95898114ea3207028ca0b6fa3fd18"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final List&lt;Map&lt;Interval, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a>&gt; &gt; annis.ql.parser.JoinListener.tokenPositions</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Maps a token interval to a query nodes. </p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_join_listener_8java.html">JoinListener.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1ql.html">ql</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1ql_1_1parser.html">parser</a></li><li class="navelem"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html">JoinListener</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>ql</b></li><li class="navelem"><b>parser</b></li><li class="navelem"><a class="el" href="classannis_1_1ql_1_1parser_1_1_join_listener.html">JoinListener</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

@@ -1,12 +1,12 @@
 var classannis_1_1administration_1_1_corpus_administration =
 [
-    [ "ImportStatsImpl", "classannis_1_1administration_1_1_corpus_administration_1_1_import_stats_impl.html", "classannis_1_1administration_1_1_corpus_administration_1_1_import_stats_impl" ],
     [ "CorpusAdministration", "classannis_1_1administration_1_1_corpus_administration.html#a37de7e281c2b0aea2a28b8b1f7ccdede", null ],
     [ "checkDatabaseSchemaVersion", "classannis_1_1administration_1_1_corpus_administration.html#a875f51a546795e05a33c94be88c6e194", null ],
     [ "cleanupData", "classannis_1_1administration_1_1_corpus_administration.html#a12b0e2baf4f7f85e7f8965f317a0db47", null ],
     [ "copyFromOtherInstance", "classannis_1_1administration_1_1_corpus_administration.html#a2837d6a901d2e62232e48b5bd4152cf6", null ],
     [ "createZIPOutputDir", "classannis_1_1administration_1_1_corpus_administration.html#a97d5ebbbbea5b98a2e471711268239dc", null ],
     [ "deleteCorpora", "classannis_1_1administration_1_1_corpus_administration.html#a9dd37c82371542f162efc52b72ea035c", null ],
+    [ "dumpTable", "classannis_1_1administration_1_1_corpus_administration.html#aab70271f855aaef55f7d251098dd227d", null ],
     [ "getAdministrationDao", "classannis_1_1administration_1_1_corpus_administration.html#a4184789b73153cd1537def279d48c2cf", null ],
     [ "getDeleteCorpusDao", "classannis_1_1administration_1_1_corpus_administration.html#a337d74fe136776d103ac4f4ad97e69f7", null ],
     [ "getSchemeFixer", "classannis_1_1administration_1_1_corpus_administration.html#aaa809a9d1e4eddfdcc8f38be3dac2239", null ],
@@ -18,17 +18,12 @@ var classannis_1_1administration_1_1_corpus_administration =
     [ "listCorpusStats", "classannis_1_1administration_1_1_corpus_administration.html#af9b553a37f70390a462877d352203d78", null ],
     [ "listUnusedIndexes", "classannis_1_1administration_1_1_corpus_administration.html#ae283f8259b894ecfd8c0ce1182021ebf", null ],
     [ "listUsedIndexes", "classannis_1_1administration_1_1_corpus_administration.html#a441b7c5e42f6370afbbaa2cb7359a361", null ],
+    [ "restoreTable", "classannis_1_1administration_1_1_corpus_administration.html#a1c2b02dc0f6165a62f187f484c9c71d5", null ],
     [ "sendCopyStatusMail", "classannis_1_1administration_1_1_corpus_administration.html#a703e75bef8ec96547c0e69a5979d344d", null ],
     [ "sendImportStatusMail", "classannis_1_1administration_1_1_corpus_administration.html#a107ee73b884a787acf16736b760b70ed", null ],
     [ "setAdministrationDao", "classannis_1_1administration_1_1_corpus_administration.html#a70415d30cefd42fa21ac03e50e5a1e28", null ],
     [ "setDeleteCorpusDao", "classannis_1_1administration_1_1_corpus_administration.html#af6684f10229db11e550c91e0050bf0b3", null ],
     [ "setSchemeFixer", "classannis_1_1administration_1_1_corpus_administration.html#a1395f454939b9fc439d69513d5021918", null ],
     [ "setStatusMailSender", "classannis_1_1administration_1_1_corpus_administration.html#acd25f5f0c39e6127ca232a16cf41c70a", null ],
-    [ "unzipCorpus", "classannis_1_1administration_1_1_corpus_administration.html#a7ce0999011a01f23a6ea145e457fe9d7", null ],
-    [ "writeDatabasePropertiesFile", "classannis_1_1administration_1_1_corpus_administration.html#afbfe237edff7a4659aa285e577dcd6fc", null ],
-    [ "administrationDao", "classannis_1_1administration_1_1_corpus_administration.html#a2e7a06d639aa81871e85b733142dd022", null ],
-    [ "deleteCorpusDao", "classannis_1_1administration_1_1_corpus_administration.html#ac7e49703ff239e6793e9919ef93f4791", null ],
-    [ "log", "classannis_1_1administration_1_1_corpus_administration.html#a049908332cfb85ad48b4aba838890de3", null ],
-    [ "schemeFixer", "classannis_1_1administration_1_1_corpus_administration.html#ab3557f5b4cdb2d3c876e93c381e84262", null ],
-    [ "statusMailSender", "classannis_1_1administration_1_1_corpus_administration.html#a0bc7da586c63d1599ad2d99dfaf52b99", null ]
+    [ "writeDatabasePropertiesFile", "classannis_1_1administration_1_1_corpus_administration.html#afbfe237edff7a4659aa285e577dcd6fc", null ]
 ];

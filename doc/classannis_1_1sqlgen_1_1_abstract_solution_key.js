@@ -11,9 +11,5 @@ var classannis_1_1sqlgen_1_1_abstract_solution_key =
     [ "isNewKey", "classannis_1_1sqlgen_1_1_abstract_solution_key.html#ab4967719c30a22d3030a0c83cf78c9fc", null ],
     [ "setCurrentKey", "classannis_1_1sqlgen_1_1_abstract_solution_key.html#ae74115cb3735a1f92019e8210ff291c1", null ],
     [ "setIdColumnName", "classannis_1_1sqlgen_1_1_abstract_solution_key.html#a7604228a53d7b65cb6d918419ef2d176", null ],
-    [ "setLastKey", "classannis_1_1sqlgen_1_1_abstract_solution_key.html#acbb78bbedca81d61be2fe5cecfa42968", null ],
-    [ "currentKey", "classannis_1_1sqlgen_1_1_abstract_solution_key.html#a431b6d58f67b4c8c956222f1c828e712", null ],
-    [ "idColumnName", "classannis_1_1sqlgen_1_1_abstract_solution_key.html#aed7b1335c6fa5dbe9038ddaa8e63b4f0", null ],
-    [ "lastKey", "classannis_1_1sqlgen_1_1_abstract_solution_key.html#afc1d9f164fc1cc226478372f87fe65d0", null ],
-    [ "log", "classannis_1_1sqlgen_1_1_abstract_solution_key.html#a78e56f4bdf946aefd3b0413a226d7e89", null ]
+    [ "setLastKey", "classannis_1_1sqlgen_1_1_abstract_solution_key.html#acbb78bbedca81d61be2fe5cecfa42968", null ]
 ];

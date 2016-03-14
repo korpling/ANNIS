@@ -23,13 +23,5 @@ var classannis_1_1model_1_1_edge =
     [ "setNamespace", "classannis_1_1model_1_1_edge.html#a9a865a7e547100a3fda1f19b18c5d8a0", null ],
     [ "setPre", "classannis_1_1model_1_1_edge.html#a3eb0d9029a56c8e814734b81d078cd4f", null ],
     [ "setSource", "classannis_1_1model_1_1_edge.html#ab7d89b553d3b0689a89db94e1fe18640", null ],
-    [ "toString", "classannis_1_1model_1_1_edge.html#a5d4954cc2ff85e53fb4cab2c8732a124", null ],
-    [ "annotations", "classannis_1_1model_1_1_edge.html#a16e7897a33727b88893673cc56268cb1", null ],
-    [ "componentID", "classannis_1_1model_1_1_edge.html#a33557dacf87054aa2cd7eedf76ec4fc7", null ],
-    [ "destination", "classannis_1_1model_1_1_edge.html#ac5bcfc3feb0b11c8e555d44f4e92bb05", null ],
-    [ "edgeType", "classannis_1_1model_1_1_edge.html#a9a34f063dcb5a2a0889adb211c57ee02", null ],
-    [ "id", "classannis_1_1model_1_1_edge.html#a6d29f9582e3180fdec7f39ca1ef442e2", null ],
-    [ "name", "classannis_1_1model_1_1_edge.html#a39d3b2045bb984e31dab4e7b3f19920c", null ],
-    [ "pre", "classannis_1_1model_1_1_edge.html#a8122e4f69c3991fd93317590656d25e9", null ],
-    [ "source", "classannis_1_1model_1_1_edge.html#a2e7b3929c25c6b9895020c0fc7a3397b", null ]
+    [ "toString", "classannis_1_1model_1_1_edge.html#a5d4954cc2ff85e53fb4cab2c8732a124", null ]
 ];

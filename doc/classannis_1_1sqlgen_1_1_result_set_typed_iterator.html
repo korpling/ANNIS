@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,8 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1sqlgen_1_1_result_set_ty
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1sqlgen_1_1_result_set_typed_iterator-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.sqlgen.ResultSetTypedIterator&lt; T &gt; Class Template Reference</div>  </div>
@@ -121,45 +116,27 @@ $(document).ready(function(){initNavTree('classannis_1_1sqlgen_1_1_result_set_ty
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A wrapper for a <a class="el" href="">ResultSet</a> and a <a class="el" href="">RowMapper</a> and combines them in order to provide the <a class="el" href="">Iterator</a> interface. </p>
 <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.sqlgen.ResultSetTypedIterator&lt; T &gt;:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1sqlgen_1_1_result_set_typed_iterator.png" usemap="#annis.sqlgen.ResultSetTypedIterator&lt; T &gt;_map" alt=""/>
-  <map id="annis.sqlgen.ResultSetTypedIterator&lt; T &gt;_map" name="annis.sqlgen.ResultSetTypedIterator&lt; T &gt;_map">
-</map>
- </div></div>
+</div>
+<p>Inherits Iterator&lt; T &gt;.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a023d207a2dc96ef658c2b59c04f2ec02"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a023d207a2dc96ef658c2b59c04f2ec02">ResultSetTypedIterator</a> (ResultSet <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a6610d3e1f654a64b0c0d44c6a549aebc">rs</a>, RowMapper&lt; T &gt; <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#afcd8cd2eb507165b62acb7fcd5750b71">mapper</a>)</td></tr>
+<tr class="memitem:a023d207a2dc96ef658c2b59c04f2ec02"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a023d207a2dc96ef658c2b59c04f2ec02">ResultSetTypedIterator</a> (ResultSet rs, RowMapper&lt; T &gt; mapper)</td></tr>
 <tr class="memdesc:a023d207a2dc96ef658c2b59c04f2ec02"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#a023d207a2dc96ef658c2b59c04f2ec02">More...</a><br /></td></tr>
 <tr class="separator:a023d207a2dc96ef658c2b59c04f2ec02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad410225369f56dc8f46c3796efd7a683"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#ad410225369f56dc8f46c3796efd7a683">reset</a> ()</td></tr>
-<tr class="memdesc:ad410225369f56dc8f46c3796efd7a683"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns to the beginning of the iteration.  <a href="#ad410225369f56dc8f46c3796efd7a683">More...</a><br /></td></tr>
+<tr class="memitem:ad410225369f56dc8f46c3796efd7a683"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad410225369f56dc8f46c3796efd7a683"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#ad410225369f56dc8f46c3796efd7a683">reset</a> ()</td></tr>
+<tr class="memdesc:ad410225369f56dc8f46c3796efd7a683"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns to the beginning of the iteration. <br /></td></tr>
 <tr class="separator:ad410225369f56dc8f46c3796efd7a683"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a826592471db1d17a816477d7b2ea8d7a"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a826592471db1d17a816477d7b2ea8d7a">hasNext</a> ()</td></tr>
+<tr class="memitem:a826592471db1d17a816477d7b2ea8d7a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a826592471db1d17a816477d7b2ea8d7a"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>hasNext</b> ()</td></tr>
 <tr class="separator:a826592471db1d17a816477d7b2ea8d7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe39d4c9db39d1bb0bd73426edc11ce7"><td class="memItemLeft" align="right" valign="top">T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#afe39d4c9db39d1bb0bd73426edc11ce7">next</a> ()</td></tr>
+<tr class="memitem:afe39d4c9db39d1bb0bd73426edc11ce7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afe39d4c9db39d1bb0bd73426edc11ce7"></a>
+T&#160;</td><td class="memItemRight" valign="bottom"><b>next</b> ()</td></tr>
 <tr class="separator:afe39d4c9db39d1bb0bd73426edc11ce7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1acf0a5e3bafb93358e969e51df175b2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a1acf0a5e3bafb93358e969e51df175b2">remove</a> ()</td></tr>
+<tr class="memitem:a1acf0a5e3bafb93358e969e51df175b2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1acf0a5e3bafb93358e969e51df175b2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>remove</b> ()</td></tr>
 <tr class="separator:a1acf0a5e3bafb93358e969e51df175b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a6610d3e1f654a64b0c0d44c6a549aebc"><td class="memItemLeft" align="right" valign="top">ResultSet&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a6610d3e1f654a64b0c0d44c6a549aebc">rs</a></td></tr>
-<tr class="separator:a6610d3e1f654a64b0c0d44c6a549aebc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afcd8cd2eb507165b62acb7fcd5750b71"><td class="memItemLeft" align="right" valign="top">RowMapper&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#afcd8cd2eb507165b62acb7fcd5750b71">mapper</a></td></tr>
-<tr class="separator:afcd8cd2eb507165b62acb7fcd5750b71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0435927816a6978350b07f3bba35c4a8"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a0435927816a6978350b07f3bba35c4a8">hasNext</a></td></tr>
-<tr class="separator:a0435927816a6978350b07f3bba35c4a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a260b862d5533d6ee03ad9ed0e46c7ea8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a260b862d5533d6ee03ad9ed0e46c7ea8">rowNum</a></td></tr>
-<tr class="separator:a260b862d5533d6ee03ad9ed0e46c7ea8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a3d837e317d3e82200ebff83e1675420e"><td class="memItemLeft" align="right" valign="top">static final Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a3d837e317d3e82200ebff83e1675420e">log</a> = LoggerFactory.getLogger(ResultSetTypedIterator.class)</td></tr>
-<tr class="separator:a3d837e317d3e82200ebff83e1675420e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a023d207a2dc96ef658c2b59c04f2ec02"></a>
@@ -197,180 +174,13 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a826592471db1d17a816477d7b2ea8d7a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">annis.sqlgen.ResultSetTypedIterator</a>&lt; T &gt;.hasNext </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="afe39d4c9db39d1bb0bd73426edc11ce7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">T <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">annis.sqlgen.ResultSetTypedIterator</a>&lt; T &gt;.next </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1acf0a5e3bafb93358e969e51df175b2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">annis.sqlgen.ResultSetTypedIterator</a>&lt; T &gt;.remove </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad410225369f56dc8f46c3796efd7a683"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">annis.sqlgen.ResultSetTypedIterator</a>&lt; T &gt;.reset </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns to the beginning of the iteration. </p>
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a0435927816a6978350b07f3bba35c4a8"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">annis.sqlgen.ResultSetTypedIterator</a>&lt; T &gt;.hasNext</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3d837e317d3e82200ebff83e1675420e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Logger <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">annis.sqlgen.ResultSetTypedIterator</a>&lt; T &gt;.log = LoggerFactory.getLogger(ResultSetTypedIterator.class)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="afcd8cd2eb507165b62acb7fcd5750b71"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">RowMapper&lt;T&gt; <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">annis.sqlgen.ResultSetTypedIterator</a>&lt; T &gt;.mapper</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a260b862d5533d6ee03ad9ed0e46c7ea8"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">annis.sqlgen.ResultSetTypedIterator</a>&lt; T &gt;.rowNum</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a6610d3e1f654a64b0c0d44c6a549aebc"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ResultSet <a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">annis.sqlgen.ResultSetTypedIterator</a>&lt; T &gt;.rs</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_result_set_typed_iterator_8java.html">ResultSetTypedIterator.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1sqlgen.html">sqlgen</a></li><li class="navelem"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">ResultSetTypedIterator</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:09 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>sqlgen</b></li><li class="navelem"><a class="el" href="classannis_1_1sqlgen_1_1_result_set_typed_iterator.html">ResultSetTypedIterator</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

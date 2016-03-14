@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,8 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1admin_1_1model_1_
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.gui.admin.model.UserManagement Class Reference</div>  </div>
@@ -121,326 +116,52 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1admin_1_1model_1_
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A model that manages users. </p>
 <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><table class="memberdecls">
+</div>
+<p>Inherits Serializable.</p>
+<table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a03a46ebb0db51d54d6d11c713a448865"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a03a46ebb0db51d54d6d11c713a448865">createOrUpdateUser</a> (<a class="el" href="classannis_1_1security_1_1_user.html">User</a> newUser)</td></tr>
+<tr class="memitem:a03a46ebb0db51d54d6d11c713a448865"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03a46ebb0db51d54d6d11c713a448865"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>createOrUpdateUser</b> (<a class="el" href="classannis_1_1security_1_1_user.html">User</a> newUser)</td></tr>
 <tr class="separator:a03a46ebb0db51d54d6d11c713a448865"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee00e061c5024d919b6c8481bb4918ae"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#aee00e061c5024d919b6c8481bb4918ae">deleteUser</a> (String userName)</td></tr>
+<tr class="memitem:aee00e061c5024d919b6c8481bb4918ae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aee00e061c5024d919b6c8481bb4918ae"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>deleteUser</b> (String userName)</td></tr>
 <tr class="separator:aee00e061c5024d919b6c8481bb4918ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40b1167d26acf354e76b9a9caeb3522c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1security_1_1_user.html">User</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a40b1167d26acf354e76b9a9caeb3522c">setPassword</a> (String userName, String newPassword)</td></tr>
+<tr class="memitem:a40b1167d26acf354e76b9a9caeb3522c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40b1167d26acf354e76b9a9caeb3522c"></a>
+<a class="el" href="classannis_1_1security_1_1_user.html">User</a>&#160;</td><td class="memItemRight" valign="bottom"><b>setPassword</b> (String userName, String newPassword)</td></tr>
 <tr class="separator:a40b1167d26acf354e76b9a9caeb3522c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98996a1454346a4e8fabdcc7c5b66dcd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a98996a1454346a4e8fabdcc7c5b66dcd">clear</a> ()</td></tr>
+<tr class="memitem:a98996a1454346a4e8fabdcc7c5b66dcd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a98996a1454346a4e8fabdcc7c5b66dcd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
 <tr class="separator:a98996a1454346a4e8fabdcc7c5b66dcd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a87ce7c002ac13b5e6c616c8656496a"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a9a87ce7c002ac13b5e6c616c8656496a">fetchFromService</a> ()</td></tr>
+<tr class="memitem:a9a87ce7c002ac13b5e6c616c8656496a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9a87ce7c002ac13b5e6c616c8656496a"></a>
+boolean&#160;</td><td class="memItemRight" valign="bottom"><b>fetchFromService</b> ()</td></tr>
 <tr class="separator:a9a87ce7c002ac13b5e6c616c8656496a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaee0d56b83c2c1c8903002ea71404d6d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1security_1_1_user.html">User</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#aaee0d56b83c2c1c8903002ea71404d6d">getUser</a> (String userName)</td></tr>
+<tr class="memitem:aaee0d56b83c2c1c8903002ea71404d6d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaee0d56b83c2c1c8903002ea71404d6d"></a>
+<a class="el" href="classannis_1_1security_1_1_user.html">User</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getUser</b> (String userName)</td></tr>
 <tr class="separator:aaee0d56b83c2c1c8903002ea71404d6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a132e3a15ab5a17c11b055432227eb869"><td class="memItemLeft" align="right" valign="top">Collection&lt; <a class="el" href="classannis_1_1security_1_1_user.html">User</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a132e3a15ab5a17c11b055432227eb869">getUsers</a> ()</td></tr>
+<tr class="memitem:a132e3a15ab5a17c11b055432227eb869"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a132e3a15ab5a17c11b055432227eb869"></a>
+Collection&lt; <a class="el" href="classannis_1_1security_1_1_user.html">User</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getUsers</b> ()</td></tr>
 <tr class="separator:a132e3a15ab5a17c11b055432227eb869"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a815f79290bb2857e652f0a03a6a87052"><td class="memItemLeft" align="right" valign="top">TreeSet&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a815f79290bb2857e652f0a03a6a87052">getUsedGroupNames</a> ()</td></tr>
+<tr class="memitem:a815f79290bb2857e652f0a03a6a87052"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a815f79290bb2857e652f0a03a6a87052"></a>
+TreeSet&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getUsedGroupNames</b> ()</td></tr>
 <tr class="separator:a815f79290bb2857e652f0a03a6a87052"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1df2b5b068340257bbf578158aecdbc"><td class="memItemLeft" align="right" valign="top">WebResource&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#ab1df2b5b068340257bbf578158aecdbc">getRootResource</a> ()</td></tr>
-<tr class="separator:ab1df2b5b068340257bbf578158aecdbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a6a7e2eff5b399c3440923401d8e987"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a5a6a7e2eff5b399c3440923401d8e987">setRootResource</a> (WebResource <a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#aafe58e53dc76239fcaea6d9882675d00">rootResource</a>)</td></tr>
-<tr class="separator:a5a6a7e2eff5b399c3440923401d8e987"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:ae1448b6881bec27f1cdda5076544b414"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#ae1448b6881bec27f1cdda5076544b414">updateUsedGroupNames</a> ()</td></tr>
-<tr class="separator:ae1448b6881bec27f1cdda5076544b414"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:aafe58e53dc76239fcaea6d9882675d00"><td class="memItemLeft" align="right" valign="top">WebResource&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#aafe58e53dc76239fcaea6d9882675d00">rootResource</a></td></tr>
-<tr class="separator:aafe58e53dc76239fcaea6d9882675d00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f3ac41dbc54a73bab701d5cba121f31"><td class="memItemLeft" align="right" valign="top">final Map&lt; String, <a class="el" href="classannis_1_1security_1_1_user.html">User</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a0f3ac41dbc54a73bab701d5cba121f31">users</a> = new TreeMap&lt;&gt;(<a class="el" href="classannis_1_1_case_sensitive_order.html#afc187cbcaa1065f038c63392a5a19835">CaseSensitiveOrder.INSTANCE</a>)</td></tr>
-<tr class="separator:a0f3ac41dbc54a73bab701d5cba121f31"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25af3bc0b43abd81ca6c246223d0d3af"><td class="memItemLeft" align="right" valign="top">final TreeSet&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a25af3bc0b43abd81ca6c246223d0d3af">usedGroupNames</a> = new TreeSet&lt;&gt;()</td></tr>
-<tr class="separator:a25af3bc0b43abd81ca6c246223d0d3af"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e6c526eb564fb1d120ffc8e73b24ce3"><td class="memItemLeft" align="right" valign="top">final Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html#a0e6c526eb564fb1d120ffc8e73b24ce3">log</a> = LoggerFactory.getLogger(UserManagement.class)</td></tr>
-<tr class="separator:a0e6c526eb564fb1d120ffc8e73b24ce3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a272e9d4769cb815024450590d4be6807"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a272e9d4769cb815024450590d4be6807"></a>
+TreeSet&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getUsedPermissions</b> ()</td></tr>
+<tr class="separator:a272e9d4769cb815024450590d4be6807"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7187bb5dd65a336f122bb09d6cab231e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7187bb5dd65a336f122bb09d6cab231e"></a>
+<a class="el" href="interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html">WebResourceProvider</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getWebResourceProvider</b> ()</td></tr>
+<tr class="separator:a7187bb5dd65a336f122bb09d6cab231e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad85a1d6df459c02ac7b8a08b41dc5321"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad85a1d6df459c02ac7b8a08b41dc5321"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setWebResourceProvider</b> (<a class="el" href="interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html">WebResourceProvider</a> webResourceProvider)</td></tr>
+<tr class="separator:ad85a1d6df459c02ac7b8a08b41dc5321"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a98996a1454346a4e8fabdcc7c5b66dcd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.model.UserManagement.clear </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a03a46ebb0db51d54d6d11c713a448865"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.gui.admin.model.UserManagement.createOrUpdateUser </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1security_1_1_user.html">User</a>&#160;</td>
-          <td class="paramname"><em>newUser</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aee00e061c5024d919b6c8481bb4918ae"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.model.UserManagement.deleteUser </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>userName</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a9a87ce7c002ac13b5e6c616c8656496a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.gui.admin.model.UserManagement.fetchFromService </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab1df2b5b068340257bbf578158aecdbc"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">WebResource annis.gui.admin.model.UserManagement.getRootResource </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a815f79290bb2857e652f0a03a6a87052"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">TreeSet&lt;String&gt; annis.gui.admin.model.UserManagement.getUsedGroupNames </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aaee0d56b83c2c1c8903002ea71404d6d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1security_1_1_user.html">User</a> annis.gui.admin.model.UserManagement.getUser </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>userName</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a132e3a15ab5a17c11b055432227eb869"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Collection&lt;<a class="el" href="classannis_1_1security_1_1_user.html">User</a>&gt; annis.gui.admin.model.UserManagement.getUsers </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a40b1167d26acf354e76b9a9caeb3522c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1security_1_1_user.html">User</a> annis.gui.admin.model.UserManagement.setPassword </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>userName</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>newPassword</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5a6a7e2eff5b399c3440923401d8e987"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.model.UserManagement.setRootResource </td>
-          <td>(</td>
-          <td class="paramtype">WebResource&#160;</td>
-          <td class="paramname"><em>rootResource</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae1448b6881bec27f1cdda5076544b414"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.model.UserManagement.updateUsedGroupNames </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a0e6c526eb564fb1d120ffc8e73b24ce3"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Logger annis.gui.admin.model.UserManagement.log = LoggerFactory.getLogger(UserManagement.class)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aafe58e53dc76239fcaea6d9882675d00"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">WebResource annis.gui.admin.model.UserManagement.rootResource</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a25af3bc0b43abd81ca6c246223d0d3af"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final TreeSet&lt;String&gt; annis.gui.admin.model.UserManagement.usedGroupNames = new TreeSet&lt;&gt;()</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a0f3ac41dbc54a73bab701d5cba121f31"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Map&lt;String, <a class="el" href="classannis_1_1security_1_1_user.html">User</a>&gt; annis.gui.admin.model.UserManagement.users = new TreeMap&lt;&gt;(<a class="el" href="classannis_1_1_case_sensitive_order.html#afc187cbcaa1065f038c63392a5a19835">CaseSensitiveOrder.INSTANCE</a>)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_user_management_8java.html">UserManagement.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui.html">gui</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1admin.html">admin</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1admin_1_1model.html">model</a></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html">UserManagement</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:07 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>admin</b></li><li class="navelem"><b>model</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html">UserManagement</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

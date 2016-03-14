@@ -12,10 +12,5 @@ var classannis_1_1dao_1_1objects_1_1_annotated_span =
     [ "setCoveredText", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#abcb8ac612e1e6d6ee047f944090c4d73", null ],
     [ "setId", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#a68b43d85525146b17421a7d776d6d14f", null ],
     [ "setKey", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#a8b5db874f6725e7224378a359574766a", null ],
-    [ "setMetadata", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#a2180d6a72cb31c28ec27700701230163", null ],
-    [ "annotations", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#a711e81c96391a1d43fc1d8d2af47986d", null ],
-    [ "coveredText", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#aba06702443065513dd53cebdc9a586bf", null ],
-    [ "id", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#a2223b098235943742c39842505bd041a", null ],
-    [ "key", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#a7b37bdeddbfc3813513edc04a03bfb9d", null ],
-    [ "metadata", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#a40f3198b20ab8b357ee8ecb690a423cd", null ]
+    [ "setMetadata", "classannis_1_1dao_1_1objects_1_1_annotated_span.html#a2180d6a72cb31c28ec27700701230163", null ]
 ];

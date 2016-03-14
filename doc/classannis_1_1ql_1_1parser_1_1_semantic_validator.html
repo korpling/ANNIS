@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,7 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1ql_1_1parser_1_1_semanti
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="classannis_1_1ql_1_1parser_1_1_semantic_validator-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.ql.parser.SemanticValidator Class Reference</div>  </div>
@@ -130,128 +126,19 @@ checks if all nodes of an alternative are connected </li>
 every node variable name should be given only once in an alternative </li>
 </ul>
 <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.ql.parser.SemanticValidator:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1ql_1_1parser_1_1_semantic_validator.png" usemap="#annis.ql.parser.SemanticValidator_map" alt=""/>
-  <map id="annis.ql.parser.SemanticValidator_map" name="annis.ql.parser.SemanticValidator_map">
-<area href="interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.html" title="Transformer or optimizer for QueryData. " alt="annis.ql.parser.QueryDataTransformer" shape="rect" coords="0,0,231,24"/>
-</map>
- </div></div>
+</div>
+<p>Inherits <a class="el" href="interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.html">annis.ql.parser.QueryDataTransformer</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a3ee3a931b3cf99d7dae723b30671ab91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html#a3ee3a931b3cf99d7dae723b30671ab91">transform</a> (<a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a> data)</td></tr>
 <tr class="memdesc:a3ee3a931b3cf99d7dae723b30671ab91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Transforms or optimizes a specific <a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a>.  <a href="#a3ee3a931b3cf99d7dae723b30671ab91">More...</a><br /></td></tr>
 <tr class="separator:a3ee3a931b3cf99d7dae723b30671ab91"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a134039c099b8942a9e683e284c1641eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html#a134039c099b8942a9e683e284c1641eb">checkAlternative</a> (<a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a> data, List&lt; <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt; alternative, int alternativeIndex)</td></tr>
-<tr class="separator:a134039c099b8942a9e683e284c1641eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:aaa6b9ad7c38dd3e7dff1a7c4ad01d61a"><td class="memItemLeft" align="right" valign="top">Multimap&lt; Long, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html#aaa6b9ad7c38dd3e7dff1a7c4ad01d61a">calculateConnected</a> (List&lt; <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt; nodes)</td></tr>
-<tr class="separator:aaa6b9ad7c38dd3e7dff1a7c4ad01d61a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac046825816d7b1d3ff0467f2b815792a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html#ac046825816d7b1d3ff0467f2b815792a">createTransitiveHull</a> (<a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> n, final Multimap&lt; Long, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt; connected, Set&lt; Long &gt; transitiveHull)</td></tr>
-<tr class="separator:ac046825816d7b1d3ff0467f2b815792a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ee37ad2f63cd630d34010515a564d10"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ee37ad2f63cd630d34010515a564d10"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>checkAlternative</b> (<a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a> data, List&lt; <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt; alternative, int alternativeIndex, boolean queryWasNormalized)</td></tr>
+<tr class="separator:a8ee37ad2f63cd630d34010515a564d10"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aaa6b9ad7c38dd3e7dff1a7c4ad01d61a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Multimap&lt;Long, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a>&gt; annis.ql.parser.SemanticValidator.calculateConnected </td>
-          <td>(</td>
-          <td class="paramtype">List&lt; <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt;&#160;</td>
-          <td class="paramname"><em>nodes</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a134039c099b8942a9e683e284c1641eb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.SemanticValidator.checkAlternative </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1ql_1_1parser_1_1_query_data.html">QueryData</a>&#160;</td>
-          <td class="paramname"><em>data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">List&lt; <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt;&#160;</td>
-          <td class="paramname"><em>alternative</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>alternativeIndex</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac046825816d7b1d3ff0467f2b815792a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.ql.parser.SemanticValidator.createTransitiveHull </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a>&#160;</td>
-          <td class="paramname"><em>n</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">final Multimap&lt; Long, <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt;&#160;</td>
-          <td class="paramname"><em>connected</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Set&lt; Long &gt;&#160;</td>
-          <td class="paramname"><em>transitiveHull</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a3ee3a931b3cf99d7dae723b30671ab91"></a>
 <div class="memitem">
 <div class="memproto">
@@ -279,16 +166,13 @@ Private Member Functions</h2></td></tr>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_semantic_validator_8java.html">SemanticValidator.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1ql.html">ql</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1ql_1_1parser.html">parser</a></li><li class="navelem"><a class="el" href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html">SemanticValidator</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>ql</b></li><li class="navelem"><b>parser</b></li><li class="navelem"><a class="el" href="classannis_1_1ql_1_1parser_1_1_semantic_validator.html">SemanticValidator</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

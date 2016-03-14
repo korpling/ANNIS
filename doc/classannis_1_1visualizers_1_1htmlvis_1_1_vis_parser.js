@@ -1,6 +1,7 @@
 var classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser =
 [
     [ "VisParser", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a7fc4892cc55ec163283349e81e859df0", null ],
+    [ "enterConditionAll", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a14749d592b1f69a5be50a94503a20a5c", null ],
     [ "enterConditionBegin", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a281efe7c2c2e980df9c5aa2bcf9f9788", null ],
     [ "enterConditionEnd", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a3d2d1b73c5934258d00cb9cf0cbd29f5", null ],
     [ "enterConditionName", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a0d2f9e194c5e91384dfe7ac8e954be19", null ],
@@ -18,8 +19,5 @@ var classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser =
     [ "enterTypeValue", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a92094cc597fce79592a100acc2c7d7e0", null ],
     [ "enterVis", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a097c5531a28ef93eed8b8e4a81bcdf31", null ],
     [ "exitVis", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a55285bc2e37e46b34da2171b03f4b2c0", null ],
-    [ "getDefinitions", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a3c11c4d84781045c8842c3b3e52b124c", null ],
-    [ "currentMatcher", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#afded4ef1af42f0d6da3bb8ffbf57a028", null ],
-    [ "currentOutputter", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a4ea4444c0258c1007686ccae5aaaf62b", null ],
-    [ "definitions", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a354ef257e0a6faa70bdde3e76245a41d", null ]
+    [ "getDefinitions", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html#a3c11c4d84781045c8842c3b3e52b124c", null ]
 ];

@@ -1,6 +1,5 @@
 var classannis_1_1model_1_1_annis_node =
 [
-    [ "Range", "classannis_1_1model_1_1_annis_node_1_1_range.html", "classannis_1_1model_1_1_annis_node_1_1_range" ],
     [ "AnnisNode", "classannis_1_1model_1_1_annis_node.html#ad60066d05e090f877bb811e136f0979e", null ],
     [ "AnnisNode", "classannis_1_1model_1_1_annis_node.html#ab5184b2474c804741d0e7e16fe416144", null ],
     [ "AnnisNode", "classannis_1_1model_1_1_annis_node.html#ab80fc4680be498d6fbc1f65d6cac584d", null ],
@@ -32,8 +31,6 @@ var classannis_1_1model_1_1_annis_node =
     [ "isPartOfEdge", "classannis_1_1model_1_1_annis_node.html#adcb76127d08d619dfde4bc8778ae6eb4", null ],
     [ "isRoot", "classannis_1_1model_1_1_annis_node.html#af569b4e9ba7d9449b4cb7a66750d1d0d", null ],
     [ "isToken", "classannis_1_1model_1_1_annis_node.html#a2236dd6a2174155d0547481f303ed373", null ],
-    [ "qName", "classannis_1_1model_1_1_annis_node.html#a411fca8bd0d89991cc7df18bd45b4f8f", null ],
-    [ "qName", "classannis_1_1model_1_1_annis_node.html#a77f8efa61a8072ab65f164484c59b3bc", null ],
     [ "setCorpus", "classannis_1_1model_1_1_annis_node.html#a44fb2265fee6d1c671e6991d4b666a17", null ],
     [ "setEdgeAnnotations", "classannis_1_1model_1_1_annis_node.html#a538496c4a5268ed2bbb28d709a2ff672", null ],
     [ "setGraph", "classannis_1_1model_1_1_annis_node.html#af6ab06bdb1d69afb76d4ccbe8d0cf93d", null ],
@@ -53,24 +50,5 @@ var classannis_1_1model_1_1_annis_node =
     [ "setTextId", "classannis_1_1model_1_1_annis_node.html#ad0bba1c0a7ca7f9fcebc426c4bb36937", null ],
     [ "setToken", "classannis_1_1model_1_1_annis_node.html#a8e87a4c72ddca036a2dde16be2ca9308", null ],
     [ "setTokenIndex", "classannis_1_1model_1_1_annis_node.html#a1b0d551c3f7b0c9c5786caaea414cf10", null ],
-    [ "toString", "classannis_1_1model_1_1_annis_node.html#a79efb0dbdf8cede2c01a80d1386a5644", null ],
-    [ "corpus", "classannis_1_1model_1_1_annis_node.html#ae04a679da6663d10b1683bc7c1573e67", null ],
-    [ "edgeAnnotations", "classannis_1_1model_1_1_annis_node.html#a7ddcd3cac4548b3f9f4ef8c405f5bbd4", null ],
-    [ "graph", "classannis_1_1model_1_1_annis_node.html#aaf10d3e4e95cb53b2fb7c90cbd3cd6c2", null ],
-    [ "id", "classannis_1_1model_1_1_annis_node.html#a534396a86d8ecf5614526080b62ea364", null ],
-    [ "incomingEdges", "classannis_1_1model_1_1_annis_node.html#a4b2a863c1b4f7973e497816b61a5ad49", null ],
-    [ "left", "classannis_1_1model_1_1_annis_node.html#a715bb6e10774e93dcd863097fd76c883", null ],
-    [ "leftToken", "classannis_1_1model_1_1_annis_node.html#aa0a233e18fb8734ce1681a2dffa51c35", null ],
-    [ "matchedNodeInQuery", "classannis_1_1model_1_1_annis_node.html#a594dc93dae49bf3f8f974280b2b5e845", null ],
-    [ "name", "classannis_1_1model_1_1_annis_node.html#a9b988546f4186a60fa22b2aba187471b", null ],
-    [ "nodeAnnotations", "classannis_1_1model_1_1_annis_node.html#aa6e3bd3dd685c01b9204ffa3f35c2559", null ],
-    [ "outgoingEdges", "classannis_1_1model_1_1_annis_node.html#ae627aa091d327b5acf15546d8b41e98c", null ],
-    [ "partOfEdge", "classannis_1_1model_1_1_annis_node.html#a69631b354073ef9f7205ff23ccc29f2b", null ],
-    [ "right", "classannis_1_1model_1_1_annis_node.html#a3e7c9d51f5b70ecfb3540370250eaa8f", null ],
-    [ "rightToken", "classannis_1_1model_1_1_annis_node.html#ae710babe86009ef48972f11dec32d77d", null ],
-    [ "root", "classannis_1_1model_1_1_annis_node.html#ad889cfd738f4838fd0a8f6ad4db1cf26", null ],
-    [ "spannedText", "classannis_1_1model_1_1_annis_node.html#a0980323b53270957cd620a98334c9fb9", null ],
-    [ "textId", "classannis_1_1model_1_1_annis_node.html#af95bf2326a3b3698b50d71edc19b6b37", null ],
-    [ "token", "classannis_1_1model_1_1_annis_node.html#a0780f0e1e9a7be3df6dec8fdaf6daedf", null ],
-    [ "tokenIndex", "classannis_1_1model_1_1_annis_node.html#a1674d8dfab0cfe3f1a0fca94f2803969", null ]
+    [ "toString", "classannis_1_1model_1_1_annis_node.html#a79efb0dbdf8cede2c01a80d1386a5644", null ]
 ];

@@ -5,8 +5,11 @@ var admin =
       [ "Installing a local version (ANNIS Kickstarter)     ", "admin-install.html#admin-install-kickstarter", null ]
     ] ],
     [ "Upgrading an ANNIS installation", "admin-upgrade.html", [
-      [ "Upgrade for minor version updates ", "admin-upgrade.html#admin-upgrade-minor", null ],
-      [ "Full upgrade ", "admin-upgrade.html#admin-upgrade-full", null ]
+      [ "Automatic upgrade ", "admin-upgrade.html#admin-upgrade-automatic", null ],
+      [ "Manual upgrade ", "admin-upgrade.html#admin-upgrade-manual", [
+        [ "Upgrade for minor version updates ", "admin-upgrade.html#admin-upgrade-minor", null ],
+        [ "Full upgrade ", "admin-upgrade.html#admin-upgrade-full", null ]
+      ] ]
     ] ],
     [ "Configure back-end service", "admin-configure-service.html", [
       [ "User Configuration ", "admin-configure-service.html#admin-configure-user", [

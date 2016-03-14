@@ -1,20 +1,4 @@
 var searchData=
 [
-  ['h_5forientation',['h_orientation',['../classannis_1_1visualizers_1_1component_1_1tree_1_1_layout_options.html#a10951168b3f4820d9542150e399de9bc',1,'annis::visualizers::component::tree::LayoutOptions']]],
-  ['handler',['handler',['../classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_canvas.html#a409969712940ddc94b8488f9585a9986',1,'annis::gui::querybuilder::TigerQueryBuilderCanvas']]],
-  ['hasnext',['hasNext',['../classannis_1_1sqlgen_1_1_result_set_typed_iterator.html#a0435927816a6978350b07f3bba35c4a8',1,'annis::sqlgen::ResultSetTypedIterator']]],
-  ['height',['height',['../classannis_1_1visualizers_1_1component_1_1tree_1_1_node_structure_data.html#a7ed53034f5613065d3812da099a9d7f5',1,'annis.visualizers.component.tree.NodeStructureData.height()'],['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_v_j_i_t_wrapper.html#a5b53de17b023967aa146a5977f87667e',1,'annis.gui.widgets.gwt.client.ui.VJITWrapper.height()'],['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_v_simple_canvas.html#a6e0981073e9d12410f7621a09305cd6a',1,'annis.gui.widgets.gwt.client.ui.VSimpleCanvas.height()'],['../classannis_1_1gui_1_1querybuilder_1_1_node_window.html#a095f9ac34f61ec7871e4669e5761deb8',1,'annis.gui.querybuilder.NodeWindow.HEIGHT()']]],
-  ['height_5fstep',['HEIGHT_STEP',['../classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html#a9663e1c24697b223b77d1a2d5e7f5c0f',1,'annis::visualizers::component::tree::TigerTreeVisualizer::DefaultStyler']]],
-  ['heightwasset',['heightWasSet',['../classannis_1_1gui_1_1widgets_1_1_auto_height_i_frame.html#ac66b1466c98ce175112e15c49c0549fa',1,'annis::gui::widgets::AutoHeightIFrame']]],
-  ['hellomessage',['helloMessage',['../classannis_1_1_annis_base_runner.html#a3e7c659734f1003ffc317872effad453',1,'annis::AnnisBaseRunner']]],
-  ['help4exporter',['help4Exporter',['../classannis_1_1gui_1_1_export_panel.html#a2bee1770af75502791fe4a916d94f4fb',1,'annis::gui::ExportPanel']]],
-  ['hidden',['HIDDEN',['../classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html#a9a3f93f25da5914430cd29510915aabf',1,'annis.gui.resultview.VisualizerPanel.HIDDEN()'],['../enumannis_1_1gui_1_1_sidebar_state.html#a5b90920f217d79cb9d1b2c3716636c73',1,'annis.gui.SidebarState.HIDDEN()']]],
-  ['hide_5fkwic',['HIDE_KWIC',['../classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#ad1a68fe0246178edd5a6f41eb6deaed9',1,'annis::gui::resultview::SingleResultPanel']]],
-  ['highlighted',['highlighted',['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_v_annotation_grid.html#a0da0d90e371e4dcf1ea030b8befdcbaf',1,'annis::gui::widgets::gwt::client::ui::VAnnotationGrid']]],
-  ['history',['history',['../classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#aa56bb411989c577df480239c394864b5',1,'annis.gui.objects.QueryUIState.history()'],['../classannis_1_1_annis_base_runner.html#a1535e40cf2c8f8b8a1d3e3cad0da1d8c',1,'annis.AnnisBaseRunner.history()']]],
-  ['historycontainer',['historyContainer',['../classannis_1_1gui_1_1controlpanel_1_1_query_panel.html#a39b78351c47072f9ec37cd09ce5f9084',1,'annis::gui::controlpanel::QueryPanel']]],
-  ['historywindow',['historyWindow',['../classannis_1_1gui_1_1controlpanel_1_1_query_panel.html#a930bf0f970edff397291a5503cd86a16',1,'annis::gui::controlpanel::QueryPanel']]],
-  ['hshmeta',['hshMeta',['../classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#aba92b2fcf83e59479a753f13a1047983',1,'annis::visualizers::htmlvis::SpanHTMLOutputter']]],
-  ['htmlescaper',['htmlEscaper',['../classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#a97f420d2db78a1ada815273526c2b213',1,'annis::visualizers::htmlvis::SpanHTMLOutputter']]],
-  ['htmlid',['htmlID',['../classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html#a8ca4055be16394f5a587a4ead5b15aee',1,'annis::gui::resultview::VisualizerPanel']]]
+  ['text',['text',['../classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor_state.html#ade39c51ad7eaa6ae82af1b9197ef4c56',1,'annis::gui::components::codemirror::AqlCodeEditorState']]]
 ];

@@ -1,6 +1,11 @@
 var classannis_1_1service_1_1objects_1_1_import_job =
 [
-    [ "Status", "enumannis_1_1service_1_1objects_1_1_import_job_1_1_status.html", "enumannis_1_1service_1_1objects_1_1_import_job_1_1_status" ],
+    [ "Status", "classannis_1_1service_1_1objects_1_1_import_job.html#enumannis_1_1service_1_1objects_1_1_import_job_1_1_status", [
+      [ "ERROR", "classannis_1_1service_1_1objects_1_1_import_job.html#ae82c9bfc9778fc9ef201780dbb037621", null ],
+      [ "RUNNING", "classannis_1_1service_1_1objects_1_1_import_job.html#a8ce7df3042cde08ba6ece4124405b189", null ],
+      [ "SUCCESS", "classannis_1_1service_1_1objects_1_1_import_job.html#a4158a2468a44df56c88016af41a7eaf0", null ],
+      [ "WAITING", "classannis_1_1service_1_1objects_1_1_import_job.html#a0786aedace79f3b53028d53e065d1ddb", null ]
+    ] ],
     [ "getAlias", "classannis_1_1service_1_1objects_1_1_import_job.html#a369b07f11864f3cc9d09e9fa0a3b8ac8", null ],
     [ "getCaption", "classannis_1_1service_1_1objects_1_1_import_job.html#ac6dd178f3441894a1faf6eae44f210e8", null ],
     [ "getImportRootDirectory", "classannis_1_1service_1_1objects_1_1_import_job.html#ac7a26503657c42eb6b8bb4192dd99f61", null ],
@@ -15,13 +20,5 @@ var classannis_1_1service_1_1objects_1_1_import_job =
     [ "setOverwrite", "classannis_1_1service_1_1objects_1_1_import_job.html#a1701807d5255559acad28436c517d832", null ],
     [ "setStatus", "classannis_1_1service_1_1objects_1_1_import_job.html#a059722da2a43be1792cf1ec8b355de1f", null ],
     [ "setStatusEmail", "classannis_1_1service_1_1objects_1_1_import_job.html#aa758a94fe3251670622f76d552d6b6eb", null ],
-    [ "setUuid", "classannis_1_1service_1_1objects_1_1_import_job.html#a3e3ef007d964c68b1ae23963053b7f44", null ],
-    [ "alias", "classannis_1_1service_1_1objects_1_1_import_job.html#ab3803634aa6562635cf53e8826afca78", null ],
-    [ "caption", "classannis_1_1service_1_1objects_1_1_import_job.html#a9e12339dbfdebe40d5dc8930d05fb607", null ],
-    [ "importRootDirectory", "classannis_1_1service_1_1objects_1_1_import_job.html#a00a3aeaa3c3e7e922f3141d734df2353", null ],
-    [ "messages", "classannis_1_1service_1_1objects_1_1_import_job.html#abaa6e4450d062add86ba7a2cb973eba5", null ],
-    [ "overwrite", "classannis_1_1service_1_1objects_1_1_import_job.html#a2f4cf464bc0f42f842577d7e75259776", null ],
-    [ "status", "classannis_1_1service_1_1objects_1_1_import_job.html#a85cdf11d3de5676d1e1b4cb27dfc1a23", null ],
-    [ "statusEmail", "classannis_1_1service_1_1objects_1_1_import_job.html#a0178f8939edf9857ca4a4648470fa5e0", null ],
-    [ "uuid", "classannis_1_1service_1_1objects_1_1_import_job.html#a5366033a82e5717805e5e0f20bbdf63f", null ]
+    [ "setUuid", "classannis_1_1service_1_1objects_1_1_import_job.html#a3e3ef007d964c68b1ae23963053b7f44", null ]
 ];

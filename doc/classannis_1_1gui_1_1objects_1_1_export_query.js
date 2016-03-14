@@ -10,8 +10,5 @@ var classannis_1_1gui_1_1objects_1_1_export_query =
     [ "params", "classannis_1_1gui_1_1objects_1_1_export_query.html#a1c5d596f7d88c7347e6acd4bdbf975b2", null ],
     [ "setAnnotationKeys", "classannis_1_1gui_1_1objects_1_1_export_query.html#a383759461e6633437a3c24892fd57f1a", null ],
     [ "setExporterName", "classannis_1_1gui_1_1objects_1_1_export_query.html#a24e1301863baf29857213222fa1b0773", null ],
-    [ "setParameters", "classannis_1_1gui_1_1objects_1_1_export_query.html#a10974aa28f4fdc4fadd4c9793cece4b3", null ],
-    [ "annotationKeys", "classannis_1_1gui_1_1objects_1_1_export_query.html#ae6aa2339182bdc913df7996f9cea84a5", null ],
-    [ "exporterName", "classannis_1_1gui_1_1objects_1_1_export_query.html#a3dfe345b3f7b4d5c9d8ed2ac972329c0", null ],
-    [ "parameters", "classannis_1_1gui_1_1objects_1_1_export_query.html#a21f18a62fe7dc5d976756c08549681ed", null ]
+    [ "setParameters", "classannis_1_1gui_1_1objects_1_1_export_query.html#a10974aa28f4fdc4fadd4c9793cece4b3", null ]
 ];

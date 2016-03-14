@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,7 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1utils_1_1_a_n_n_i_s_form
 <div class="header">
   <div class="summary">
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1utils_1_1_a_n_n_i_s_format_helper-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.utils.ANNISFormatHelper Class Reference</div>  </div>
@@ -125,9 +121,11 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a3c5c38c4178aba35f83ab9b31c98b04e"><td class="memItemLeft" align="right" valign="top">static Map&lt; String, ZipEntry &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html#a3c5c38c4178aba35f83ab9b31c98b04e">corporaInZipfile</a> (ZipFile zip)  throws IOException   </td></tr>
 <tr class="memdesc:a3c5c38c4178aba35f83ab9b31c98b04e"><td class="mdescLeft">&#160;</td><td class="mdescRight">List all corpora of a ZIP file and their paths.  <a href="#a3c5c38c4178aba35f83ab9b31c98b04e">More...</a><br /></td></tr>
 <tr class="separator:a3c5c38c4178aba35f83ab9b31c98b04e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b2dd104cddb617f39d7922e22bef686"><td class="memItemLeft" align="right" valign="top">static Map&lt; String, ZipEntry &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html#a2b2dd104cddb617f39d7922e22bef686">corporaInZipfile</a> (File f)  throws IOException   </td></tr>
+<tr class="memitem:a2b2dd104cddb617f39d7922e22bef686"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2b2dd104cddb617f39d7922e22bef686"></a>
+static Map&lt; String, ZipEntry &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>corporaInZipfile</b> (File f)  throws IOException   </td></tr>
 <tr class="separator:a2b2dd104cddb617f39d7922e22bef686"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0d4ff4b9e3d5d052219c34fb44186cb"><td class="memItemLeft" align="right" valign="top">static Map&lt; String, File &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html#aa0d4ff4b9e3d5d052219c34fb44186cb">corporaInDirectory</a> (File d)  throws IOException   </td></tr>
+<tr class="memitem:aa0d4ff4b9e3d5d052219c34fb44186cb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0d4ff4b9e3d5d052219c34fb44186cb"></a>
+static Map&lt; String, File &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>corporaInDirectory</b> (File d)  throws IOException   </td></tr>
 <tr class="separator:aa0d4ff4b9e3d5d052219c34fb44186cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a277dd6655188fd815e57adbf3c07bbec"><td class="memItemLeft" align="right" valign="top">static String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html#a277dd6655188fd815e57adbf3c07bbec">extractToplevelCorpusNames</a> (InputStream corpusTabContent)</td></tr>
 <tr class="memdesc:a277dd6655188fd815e57adbf3c07bbec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the name of the toplevel corpus from the content of the corpus.tab file.  <a href="#a277dd6655188fd815e57adbf3c07bbec">More...</a><br /></td></tr>
@@ -135,37 +133,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:aa034c4bffc4dd8cfd08760a02c49d5db"><td class="memItemLeft" align="right" valign="top">static List&lt; ZipEntry &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html#aa034c4bffc4dd8cfd08760a02c49d5db">getANNISEntry</a> (ZipFile file, String table, String...fileEndings)</td></tr>
 <tr class="memdesc:aa034c4bffc4dd8cfd08760a02c49d5db"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the directories containing the real ANNIS tab files for a zip file.  <a href="#aa034c4bffc4dd8cfd08760a02c49d5db">More...</a><br /></td></tr>
 <tr class="separator:aa034c4bffc4dd8cfd08760a02c49d5db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a34c2665e60bb9bdb6c943cffd23daa5b"><td class="memItemLeft" align="right" valign="top">static final Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html#a34c2665e60bb9bdb6c943cffd23daa5b">log</a></td></tr>
-<tr class="separator:a34c2665e60bb9bdb6c943cffd23daa5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aa0d4ff4b9e3d5d052219c34fb44186cb"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static Map&lt;String, File&gt; annis.utils.ANNISFormatHelper.corporaInDirectory </td>
-          <td>(</td>
-          <td class="paramtype">File&#160;</td>
-          <td class="paramname"><em>d</em></td><td>)</td>
-          <td> throws IOException</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
 <a class="anchor" id="a3c5c38c4178aba35f83ab9b31c98b04e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -202,30 +171,6 @@ Static Private Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a class="anchor" id="a2b2dd104cddb617f39d7922e22bef686"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static Map&lt;String, ZipEntry&gt; annis.utils.ANNISFormatHelper.corporaInZipfile </td>
-          <td>(</td>
-          <td class="paramtype">File&#160;</td>
-          <td class="paramname"><em>f</em></td><td>)</td>
-          <td> throws IOException</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
 
 </div>
 </div>
@@ -313,39 +258,13 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a34c2665e60bb9bdb6c943cffd23daa5b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Logger annis.utils.ANNISFormatHelper.log</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= LoggerFactory.</div>
-<div class="line">    getLogger(ANNISFormatHelper.class)</div>
-</div><!-- fragment -->
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_a_n_n_i_s_format_helper_8java.html">ANNISFormatHelper.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1utils.html">utils</a></li><li class="navelem"><a class="el" href="classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html">ANNISFormatHelper</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:09 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>utils</b></li><li class="navelem"><a class="el" href="classannis_1_1utils_1_1_a_n_n_i_s_format_helper.html">ANNISFormatHelper</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

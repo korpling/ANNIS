@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -118,16 +115,12 @@ $(document).ready(function(){initNavTree('interfaceannis_1_1gui_1_1admin_1_1view
 </div><!--header-->
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.gui.admin.view.UIView:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.png" usemap="#annis.gui.admin.view.UIView_map" alt=""/>
-  <map id="annis.gui.admin.view.UIView_map" name="annis.gui.admin.view.UIView_map">
-<area href="classannis_1_1gui_1_1_admin_u_i.html" alt="annis.gui.AdminUI" shape="rect" coords="0,56,173,80"/>
-</map>
- </div></div>
+<div class="textblock"><p>An general interface for different toplevel ANNIS views. </p>
+<dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
+</div>
+<p>Inherits Serializable.</p>
+
+<p>Inherited by <a class="el" href="classannis_1_1gui_1_1_admin_view.html">annis.gui.AdminView</a>.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -136,49 +129,41 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a20bf6fd46e0a25ce15f9090d2fbb1e8b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html#a20bf6fd46e0a25ce15f9090d2fbb1e8b">addListener</a> (<a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view_1_1_listener.html">Listener</a> listener)</td></tr>
+<tr class="memitem:a20bf6fd46e0a25ce15f9090d2fbb1e8b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a20bf6fd46e0a25ce15f9090d2fbb1e8b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addListener</b> (<a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view_1_1_listener.html">Listener</a> listener)</td></tr>
 <tr class="separator:a20bf6fd46e0a25ce15f9090d2fbb1e8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fb555271f60be4472a560206e8307c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html#a9fb555271f60be4472a560206e8307c6">showInfo</a> (String info, String description)</td></tr>
+<tr class="memitem:a9fb555271f60be4472a560206e8307c6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9fb555271f60be4472a560206e8307c6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>showInfo</b> (String info, String description)</td></tr>
 <tr class="separator:a9fb555271f60be4472a560206e8307c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fd5f9097d4dc37592ae275aac2458e9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html#a8fd5f9097d4dc37592ae275aac2458e9">showBackgroundInfo</a> (String info, String description)</td></tr>
+<tr class="memitem:a8fd5f9097d4dc37592ae275aac2458e9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8fd5f9097d4dc37592ae275aac2458e9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>showBackgroundInfo</b> (String info, String description)</td></tr>
 <tr class="separator:a8fd5f9097d4dc37592ae275aac2458e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a750faa90fe7394403b3171e6d677efa6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html#a750faa90fe7394403b3171e6d677efa6">showWarning</a> (String warning, String description)</td></tr>
+<tr class="memitem:a750faa90fe7394403b3171e6d677efa6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a750faa90fe7394403b3171e6d677efa6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>showWarning</b> (String warning, String description)</td></tr>
 <tr class="separator:a750faa90fe7394403b3171e6d677efa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae77e43176e7e24064c4d182d04360d27"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html#ae77e43176e7e24064c4d182d04360d27">showError</a> (String error, String description)</td></tr>
+<tr class="memitem:ae77e43176e7e24064c4d182d04360d27"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae77e43176e7e24064c4d182d04360d27"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>showError</b> (String error, String description)</td></tr>
 <tr class="separator:ae77e43176e7e24064c4d182d04360d27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3199932be7783a5fb2c08d7c446c7eaa"><td class="memItemLeft" align="right" valign="top">public&lt; T &gt; void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html#a3199932be7783a5fb2c08d7c446c7eaa">runInBackground</a> (Callable&lt; T &gt; job, FutureCallback&lt; T &gt; callback)</td></tr>
+<tr class="memdesc:a3199932be7783a5fb2c08d7c446c7eaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute a job in the background and call the callback when finished.  <a href="#a3199932be7783a5fb2c08d7c446c7eaa">More...</a><br /></td></tr>
+<tr class="separator:a3199932be7783a5fb2c08d7c446c7eaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a20bf6fd46e0a25ce15f9090d2fbb1e8b"></a>
+<a class="anchor" id="a3199932be7783a5fb2c08d7c446c7eaa"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void annis.gui.admin.view.UIView.addListener </td>
+          <td class="memname">public&lt;T&gt; void annis.gui.admin.view.UIView.runInBackground </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view_1_1_listener.html">Listener</a>&#160;</td>
-          <td class="paramname"><em>listener</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8fd5f9097d4dc37592ae275aac2458e9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.view.UIView.showBackgroundInfo </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>info</em>, </td>
+          <td class="paramtype">Callable&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>job</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>description</em>&#160;</td>
+          <td class="paramtype">FutureCallback&lt; T &gt;&#160;</td>
+          <td class="paramname"><em>callback</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -188,104 +173,25 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Implemented in <a class="el" href="classannis_1_1gui_1_1_admin_u_i.html#aea0cc9c0792d0bda9cd00386ef1ba884">annis.gui.AdminUI</a>.</p>
+<p>Execute a job in the background and call the callback when finished. </p>
+<p>The callback must be executed in the same main UI thread. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">&lt;T&gt;</td><td></td></tr>
+    <tr><td class="paramname">job</td><td></td></tr>
+    <tr><td class="paramname">callback</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a class="anchor" id="ae77e43176e7e24064c4d182d04360d27"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.view.UIView.showError </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>error</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>description</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Implemented in <a class="el" href="classannis_1_1gui_1_1_admin_u_i.html#a1da385c20ba40452ab8a16a2f57c8132">annis.gui.AdminUI</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a9fb555271f60be4472a560206e8307c6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.view.UIView.showInfo </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>info</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>description</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Implemented in <a class="el" href="classannis_1_1gui_1_1_admin_u_i.html#a8ce248612717c65234f5ba1e27a3470c">annis.gui.AdminUI</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a750faa90fe7394403b3171e6d677efa6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.admin.view.UIView.showWarning </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>warning</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>description</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Implemented in <a class="el" href="classannis_1_1gui_1_1_admin_u_i.html#a6dd5b53140d1379197edc2f39d17453e">annis.gui.AdminUI</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this interface was generated from the following file:<ul>
-<li><a class="el" href="_u_i_view_8java.html">UIView.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui.html">gui</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1admin.html">admin</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1admin_1_1view.html">view</a></li><li class="navelem"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html">UIView</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:07 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>admin</b></li><li class="navelem"><b>view</b></li><li class="navelem"><a class="el" href="interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html">UIView</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

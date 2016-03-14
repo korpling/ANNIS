@@ -24,11 +24,5 @@ var classannis_1_1model_1_1_annotation =
     [ "setPre", "classannis_1_1model_1_1_annotation.html#ac51bf7e5bc1ce8ca51d209e9c46dd1dc", null ],
     [ "setType", "classannis_1_1model_1_1_annotation.html#a654e33f5659bac289e7ee163428856de", null ],
     [ "setValue", "classannis_1_1model_1_1_annotation.html#ae53e807f402e137976bb352d4e0f64e0", null ],
-    [ "toString", "classannis_1_1model_1_1_annotation.html#aa98a6c00c4e21a6d8af6725f432abf45", null ],
-    [ "annotationPath", "classannis_1_1model_1_1_annotation.html#a72123ef687d8d0ee838b60f1058d7864", null ],
-    [ "corpusName", "classannis_1_1model_1_1_annotation.html#a43d975285ad2ba800c400d8fddc5d647", null ],
-    [ "name", "classannis_1_1model_1_1_annotation.html#ab3cf8e88d37a690644154bf29786717e", null ],
-    [ "pre", "classannis_1_1model_1_1_annotation.html#a2ee0f81087675a518ffb740a951de82f", null ],
-    [ "type", "classannis_1_1model_1_1_annotation.html#a2a8f0cbaa30040d11cda28f7c81f3dc4", null ],
-    [ "value", "classannis_1_1model_1_1_annotation.html#ab298d40db0c36d375230d6e8ffcd8a99", null ]
+    [ "toString", "classannis_1_1model_1_1_annotation.html#aa98a6c00c4e21a6d8af6725f432abf45", null ]
 ];

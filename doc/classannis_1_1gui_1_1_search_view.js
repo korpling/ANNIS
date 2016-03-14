@@ -1,0 +1,26 @@
+var classannis_1_1gui_1_1_search_view =
+[
+    [ "SearchView", "classannis_1_1gui_1_1_search_view.html#a5436a648d955f5c724f38abbb25dbb20", null ],
+    [ "checkCitation", "classannis_1_1gui_1_1_search_view.html#a5ca6e587a72c5a54313fda92a7965f86", null ],
+    [ "closeTab", "classannis_1_1gui_1_1_search_view.html#a7d4234d9836699bc7d892a2e10ed2e7b", null ],
+    [ "enter", "classannis_1_1gui_1_1_search_view.html#ab2d73a2bc8b369daa5d9efd0a2e3fee8", null ],
+    [ "evaluateCitation", "classannis_1_1gui_1_1_search_view.html#ae77c73edf688a0532ed691f54a483525", null ],
+    [ "getControlPanel", "classannis_1_1gui_1_1_search_view.html#ae0f5ba1ba0c6bfbe344eb7c351f8bd93", null ],
+    [ "getDocBrowserController", "classannis_1_1gui_1_1_search_view.html#afe380cda0d1134f4fbae44ac7ce3dcd0", null ],
+    [ "getLastSelectedResultView", "classannis_1_1gui_1_1_search_view.html#a8bf0a62bdb164c350532914633d057da", null ],
+    [ "getMainTab", "classannis_1_1gui_1_1_search_view.html#a15924923964eb4a2f5ac27efc3795e06", null ],
+    [ "getMainToolbar", "classannis_1_1gui_1_1_search_view.html#ab3ff0f8058eb3713ea46c0bf41f7661f", null ],
+    [ "getTabSheet", "classannis_1_1gui_1_1_search_view.html#aafdad4ff039546278b67e117ddc4baef", null ],
+    [ "notifiyQueryStarted", "classannis_1_1gui_1_1_search_view.html#ab6948f96ebf50bd4341662f359e3a759", null ],
+    [ "notifyCannotPlayMimeType", "classannis_1_1gui_1_1_search_view.html#a53f44b171dfcb7f6b582f543f87e5650", null ],
+    [ "notifyMightNotPlayMimeType", "classannis_1_1gui_1_1_search_view.html#a1c92982452e9ec0b775415a2e770efd5", null ],
+    [ "onLogin", "classannis_1_1gui_1_1_search_view.html#a80949160d34c777f8053e630be72c416", null ],
+    [ "onLogout", "classannis_1_1gui_1_1_search_view.html#a3f4cc10691b9f8d4cdbeec88ef042079", null ],
+    [ "onTabClose", "classannis_1_1gui_1_1_search_view.html#a02678cf1594cfe2ea1f05c9c95f43d19", null ],
+    [ "selectedTabChange", "classannis_1_1gui_1_1_search_view.html#a78b736d37b588ef457e9a18f2aa192d7", null ],
+    [ "setToolbar", "classannis_1_1gui_1_1_search_view.html#a775cdd776b91ebc7bacebb16ce24343c", null ],
+    [ "updateFragementWithSelectedCorpus", "classannis_1_1gui_1_1_search_view.html#a7a880763e1de100181c2367879ca17a9", null ],
+    [ "updateFragment", "classannis_1_1gui_1_1_search_view.html#afc728dfb5c973fcba9e5f90c589046f9", null ],
+    [ "updateSidebarState", "classannis_1_1gui_1_1_search_view.html#abcf91feb44beb6b98b0f72f74e9afc71", null ],
+    [ "uriFragmentChanged", "classannis_1_1gui_1_1_search_view.html#a07f07c850320140f4c4682568282b911", null ]
+];

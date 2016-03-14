@@ -11,6 +11,5 @@ var classannis_1_1sqlgen_1_1model_1_1_near =
     [ "hashCode", "classannis_1_1sqlgen_1_1model_1_1_near.html#a398857bf6cd082ba426e9ffd17ae8af9", null ],
     [ "setSegmentationName", "classannis_1_1sqlgen_1_1model_1_1_near.html#a71a1260510d4ef6c5c139e19459628dd", null ],
     [ "toAqlOperator", "classannis_1_1sqlgen_1_1model_1_1_near.html#a4fe63393f009b730f2f72a53c6fd171a", null ],
-    [ "toString", "classannis_1_1sqlgen_1_1model_1_1_near.html#a1e09a1747be36a6fb0ef5d6c53dbed10", null ],
-    [ "segmentationName", "classannis_1_1sqlgen_1_1model_1_1_near.html#a4e5a47edda691be2a8f714b0e897c6dd", null ]
+    [ "toString", "classannis_1_1sqlgen_1_1model_1_1_near.html#a1e09a1747be36a6fb0ef5d6c53dbed10", null ]
 ];

@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -113,9 +110,6 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1controlpanel_1_1_
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.gui.controlpanel.CorpusListPanel Class Reference</div>  </div>
@@ -123,380 +117,90 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1controlpanel_1_1_
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>thomas </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.gui.controlpanel.CorpusListPanel:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.png" usemap="#annis.gui.controlpanel.CorpusListPanel_map" alt=""/>
-  <map id="annis.gui.controlpanel.CorpusListPanel_map" name="annis.gui.controlpanel.CorpusListPanel_map">
-</map>
- </div></div>
+</div>
+<p>Inherits VerticalLayout, NewItemHandler, and Handler.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_action_type.html">ActionType</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_add_remove_action.html">AddRemoveAction</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_annis_corpus_list_type.html">AnnisCorpusListType</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_corpus_table_changed_listener.html">CorpusTableChangedListener</a></td></tr>
+<tr class="memitem:enumannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_action_type"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#enumannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_action_type">ActionType</a></td></tr>
+<tr class="separator:enumannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_action_type"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>AddRemoveAction</b></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_doc_link_generator.html">DocLinkGenerator</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_info_generator.html">InfoGenerator</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_tooltip_generator.html">TooltipGenerator</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>TooltipGenerator</b></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6ebc1aa16bac7361607dfc75b275c327"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a6ebc1aa16bac7361607dfc75b275c327">CorpusListPanel</a> (final <a class="el" href="classannis_1_1gui_1_1_query_controller.html">QueryController</a> <a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ada3025bfe6f06c91f333ac91f97d3d77">controller</a>, <a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> <a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ac6bae31a0294a78c8ef5cf263aea2cf1">instanceConfig</a>, <a class="el" href="classannis_1_1gui_1_1_example_queries_panel.html">ExampleQueriesPanel</a> <a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ae048149aee10a608aeb8a084d1a2a1c0">autoGenQueries</a>, <a class="el" href="classannis_1_1gui_1_1_search_u_i.html">SearchUI</a> <a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a546c0feee72eedd07ed85f5c00cc23eb">ui</a>)</td></tr>
-<tr class="separator:a6ebc1aa16bac7361607dfc75b275c327"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a947615d970211a7beac55cbeb6cd7204"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a947615d970211a7beac55cbeb6cd7204">updateCorpusSetList</a> ()</td></tr>
-<tr class="separator:a947615d970211a7beac55cbeb6cd7204"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a564f5ea746ff298e2355c46b4076dc36"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a564f5ea746ff298e2355c46b4076dc36">addNewItem</a> (String newItemCaption)</td></tr>
+<tr class="memitem:a99935afcb02b1985a27d7717350e3b57"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a99935afcb02b1985a27d7717350e3b57"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>CorpusListPanel</b> (<a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> instanceConfig, <a class="el" href="classannis_1_1gui_1_1_example_queries_panel.html">ExampleQueriesPanel</a> autoGenQueries, final <a class="el" href="classannis_1_1gui_1_1_annis_u_i.html">AnnisUI</a> ui)</td></tr>
+<tr class="separator:a99935afcb02b1985a27d7717350e3b57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18dbdf74f516e052276984368eea1f1d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a18dbdf74f516e052276984368eea1f1d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>attach</b> ()</td></tr>
+<tr class="separator:a18dbdf74f516e052276984368eea1f1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a724195d0171c515da3b2eab52726f298"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a724195d0171c515da3b2eab52726f298"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>updateCorpusSetList</b> (boolean scrollToSelected)</td></tr>
+<tr class="separator:a724195d0171c515da3b2eab52726f298"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a564f5ea746ff298e2355c46b4076dc36"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a564f5ea746ff298e2355c46b4076dc36"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addNewItem</b> (String newItemCaption)</td></tr>
 <tr class="separator:a564f5ea746ff298e2355c46b4076dc36"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4507ab84fccdaf4da7e5c0b694bbc33c"><td class="memItemLeft" align="right" valign="top">Action[]&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a4507ab84fccdaf4da7e5c0b694bbc33c">getActions</a> (Object target, Object sender)</td></tr>
+<tr class="memitem:a4507ab84fccdaf4da7e5c0b694bbc33c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4507ab84fccdaf4da7e5c0b694bbc33c"></a>
+Action[]&#160;</td><td class="memItemRight" valign="bottom"><b>getActions</b> (Object target, Object sender)</td></tr>
 <tr class="separator:a4507ab84fccdaf4da7e5c0b694bbc33c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6549a4d51fccd9f631a4bd2dfaf74d5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ab6549a4d51fccd9f631a4bd2dfaf74d5">handleAction</a> (Action action, Object sender, Object target)</td></tr>
+<tr class="memitem:ab6549a4d51fccd9f631a4bd2dfaf74d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab6549a4d51fccd9f631a4bd2dfaf74d5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>handleAction</b> (Action action, Object sender, Object target)</td></tr>
 <tr class="separator:ab6549a4d51fccd9f631a4bd2dfaf74d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7dfc2ae4da97879305dcf79995b867fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a7dfc2ae4da97879305dcf79995b867fb">selectCorpora</a> (Set&lt; String &gt; corpora)</td></tr>
-<tr class="memdesc:a7dfc2ae4da97879305dcf79995b867fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Select the corpora.  <a href="#a7dfc2ae4da97879305dcf79995b867fb">More...</a><br /></td></tr>
-<tr class="separator:a7dfc2ae4da97879305dcf79995b867fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0f8b76a939b52c28c3c4cc5f15ddb67"><td class="memItemLeft" align="right" valign="top">Set&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ac0f8b76a939b52c28c3c4cc5f15ddb67">getSelectedCorpora</a> ()</td></tr>
-<tr class="memdesc:ac0f8b76a939b52c28c3c4cc5f15ddb67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the names of the corpora that are currently selected.  <a href="#ac0f8b76a939b52c28c3c4cc5f15ddb67">More...</a><br /></td></tr>
-<tr class="separator:ac0f8b76a939b52c28c3c4cc5f15ddb67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a22d0d9595dfa06ad9aa044871cdccc"><td class="memItemLeft" align="right" valign="top">Set&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a2a22d0d9595dfa06ad9aa044871cdccc">getVisibleCorpora</a> ()</td></tr>
-<tr class="memdesc:a2a22d0d9595dfa06ad9aa044871cdccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the names of the corpora that are currently visible and can be choosen by the user.  <a href="#a2a22d0d9595dfa06ad9aa044871cdccc">More...</a><br /></td></tr>
-<tr class="separator:a2a22d0d9595dfa06ad9aa044871cdccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15b8a4f0eafe0799f40742b4d58f916b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a15b8a4f0eafe0799f40742b4d58f916b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>scrollToSelectedCorpus</b> ()</td></tr>
+<tr class="separator:a15b8a4f0eafe0799f40742b4d58f916b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee168f68853acc9d3e9a297a428ac876"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#aee168f68853acc9d3e9a297a428ac876">setCorpusSet</a> (String corpusSet)</td></tr>
 <tr class="memdesc:aee168f68853acc9d3e9a297a428ac876"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the currently displayed corpus set.  <a href="#aee168f68853acc9d3e9a297a428ac876">More...</a><br /></td></tr>
 <tr class="separator:aee168f68853acc9d3e9a297a428ac876"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c88fc1c35bac44f9d4e66bcb0f9ce82"><td class="memItemLeft" align="right" valign="top">Table&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a1c88fc1c35bac44f9d4e66bcb0f9ce82">getTblCorpora</a> ()</td></tr>
+<tr class="memitem:a1c88fc1c35bac44f9d4e66bcb0f9ce82"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1c88fc1c35bac44f9d4e66bcb0f9ce82"></a>
+Table&#160;</td><td class="memItemRight" valign="bottom"><b>getTblCorpora</b> ()</td></tr>
 <tr class="separator:a1c88fc1c35bac44f9d4e66bcb0f9ce82"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54282444ee280a6b5fcec5f65e7e37a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a54282444ee280a6b5fcec5f65e7e37a0">initCorpusBrowser</a> (String topLevelCorpusName, final Button l)</td></tr>
+<tr class="memitem:a54282444ee280a6b5fcec5f65e7e37a0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a54282444ee280a6b5fcec5f65e7e37a0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>initCorpusBrowser</b> (String topLevelCorpusName, final Button l)</td></tr>
 <tr class="separator:a54282444ee280a6b5fcec5f65e7e37a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a1ecf48db734f58eb8fa215739dfe3efc"><td class="memItemLeft" align="right" valign="top">static final String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a1ecf48db734f58eb8fa215739dfe3efc">ALL_CORPORA</a> = &quot;All&quot;</td></tr>
+<tr class="memitem:a1ecf48db734f58eb8fa215739dfe3efc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ecf48db734f58eb8fa215739dfe3efc"></a>
+static final String&#160;</td><td class="memItemRight" valign="bottom"><b>ALL_CORPORA</b> = &quot;All&quot;</td></tr>
 <tr class="separator:a1ecf48db734f58eb8fa215739dfe3efc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:adf064ea3d748cd38f9dea11be098a96f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#adf064ea3d748cd38f9dea11be098a96f">updateCorpusSetList</a> (boolean showLoginMessage)</td></tr>
-<tr class="separator:adf064ea3d748cd38f9dea11be098a96f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abec509e7efc55f03283b8b6be5ba27d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#abec509e7efc55f03283b8b6be5ba27d8">updateCorpusTable</a> ()</td></tr>
-<tr class="separator:abec509e7efc55f03283b8b6be5ba27d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b85aaefe7009786ab770254589fd003"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a7b85aaefe7009786ab770254589fd003">updateAutoGeneratedQueriesPanel</a> ()</td></tr>
-<tr class="memdesc:a7b85aaefe7009786ab770254589fd003"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates or initializes the panel, which holds the automatic generated queries.  <a href="#a7b85aaefe7009786ab770254589fd003">More...</a><br /></td></tr>
-<tr class="separator:a7b85aaefe7009786ab770254589fd003"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e27d67515bbdf18e1d0ac1aee8141fc"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a6e27d67515bbdf18e1d0ac1aee8141fc">queryServerForCorpusList</a> ()</td></tr>
-<tr class="memdesc:a6e27d67515bbdf18e1d0ac1aee8141fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Queries the web service and sets the <a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a281644dda198f0f6e3d4995ac4aac811">allCorpora</a> and <a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ae3a2b25885e13d50979163438b4364d2">userConfig</a> members.  <a href="#a6e27d67515bbdf18e1d0ac1aee8141fc">More...</a><br /></td></tr>
-<tr class="separator:a6e27d67515bbdf18e1d0ac1aee8141fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03d0d09199417fce6ef2f89b5f45999a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a03d0d09199417fce6ef2f89b5f45999a">loadFromRemote</a> ()</td></tr>
-<tr class="separator:a03d0d09199417fce6ef2f89b5f45999a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb005a15e034d02cba53b9984c147995"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#abb005a15e034d02cba53b9984c147995">storeChangesRemote</a> ()</td></tr>
-<tr class="separator:abb005a15e034d02cba53b9984c147995"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:ae048149aee10a608aeb8a084d1a2a1c0"><td class="memItemLeft" align="right" valign="top">final <a class="el" href="classannis_1_1gui_1_1_example_queries_panel.html">ExampleQueriesPanel</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ae048149aee10a608aeb8a084d1a2a1c0">autoGenQueries</a></td></tr>
-<tr class="separator:ae048149aee10a608aeb8a084d1a2a1c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a546c0feee72eedd07ed85f5c00cc23eb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1_search_u_i.html">SearchUI</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a546c0feee72eedd07ed85f5c00cc23eb">ui</a></td></tr>
-<tr class="separator:a546c0feee72eedd07ed85f5c00cc23eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5794084f2f903cd2655a58176cdc9983"><td class="memItemLeft" align="right" valign="top">BeanContainer&lt; String, <a class="el" href="classannis_1_1service_1_1objects_1_1_annis_corpus.html">AnnisCorpus</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a5794084f2f903cd2655a58176cdc9983">corpusContainer</a></td></tr>
-<tr class="separator:a5794084f2f903cd2655a58176cdc9983"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07beed2aa8c3fc06c2424fe04b077414"><td class="memItemLeft" align="right" valign="top">Table&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a07beed2aa8c3fc06c2424fe04b077414">tblCorpora</a></td></tr>
-<tr class="separator:a07beed2aa8c3fc06c2424fe04b077414"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada3025bfe6f06c91f333ac91f97d3d77"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1_query_controller.html">QueryController</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ada3025bfe6f06c91f333ac91f97d3d77">controller</a></td></tr>
-<tr class="separator:ada3025bfe6f06c91f333ac91f97d3d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab1db798ba0d549db9fa2213a5087abc0"><td class="memItemLeft" align="right" valign="top">ComboBox&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ab1db798ba0d549db9fa2213a5087abc0">cbSelection</a></td></tr>
-<tr class="separator:ab1db798ba0d549db9fa2213a5087abc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae054e21a4cc6df58a2192370d6639194"><td class="memItemLeft" align="right" valign="top">TextField&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ae054e21a4cc6df58a2192370d6639194">txtFilter</a></td></tr>
-<tr class="separator:ae054e21a4cc6df58a2192370d6639194"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae3a2b25885e13d50979163438b4364d2"><td class="memItemLeft" align="right" valign="top">transient <a class="el" href="classannis_1_1security_1_1_user_config.html">UserConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ae3a2b25885e13d50979163438b4364d2">userConfig</a></td></tr>
-<tr class="separator:ae3a2b25885e13d50979163438b4364d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a281644dda198f0f6e3d4995ac4aac811"><td class="memItemLeft" align="right" valign="top">List&lt; <a class="el" href="classannis_1_1service_1_1objects_1_1_annis_corpus.html">AnnisCorpus</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a281644dda198f0f6e3d4995ac4aac811">allCorpora</a> = new LinkedList&lt;&gt;()</td></tr>
-<tr class="separator:a281644dda198f0f6e3d4995ac4aac811"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6bae31a0294a78c8ef5cf263aea2cf1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ac6bae31a0294a78c8ef5cf263aea2cf1">instanceConfig</a></td></tr>
-<tr class="separator:ac6bae31a0294a78c8ef5cf263aea2cf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:ab55f362e7f3dceb0c993b096cda5279e"><td class="memItemLeft" align="right" valign="top">static final org.slf4j.Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ab55f362e7f3dceb0c993b096cda5279e">log</a></td></tr>
-<tr class="separator:ab55f362e7f3dceb0c993b096cda5279e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab4bdf4e84ca23a4209968383e59f527e"><td class="memItemLeft" align="right" valign="top">static final Resource&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ab4bdf4e84ca23a4209968383e59f527e">INFO_ICON</a> = FontAwesome.INFO_CIRCLE</td></tr>
-<tr class="separator:ab4bdf4e84ca23a4209968383e59f527e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf134db950f752e82de39b4886d4b1dd"><td class="memItemLeft" align="right" valign="top">static final Resource&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#adf134db950f752e82de39b4886d4b1dd">DOC_ICON</a> = FontAwesome.FILE_TEXT_O</td></tr>
-<tr class="separator:adf134db950f752e82de39b4886d4b1dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a6ebc1aa16bac7361607dfc75b275c327"></a>
+<hr/><h2 class="groupheader">Class Documentation</h2>
+<a name="enumannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_action_type" id="enumannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_action_type"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">annis.gui.controlpanel.CorpusListPanel.CorpusListPanel </td>
-          <td>(</td>
-          <td class="paramtype">final <a class="el" href="classannis_1_1gui_1_1_query_controller.html">QueryController</a>&#160;</td>
-          <td class="paramname"><em>controller</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a>&#160;</td>
-          <td class="paramname"><em>instanceConfig</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1_example_queries_panel.html">ExampleQueriesPanel</a>&#160;</td>
-          <td class="paramname"><em>autoGenQueries</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classannis_1_1gui_1_1_search_u_i.html">SearchUI</a>&#160;</td>
-          <td class="paramname"><em>ui</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
+          <td class="memname">enum annis::gui::controlpanel::CorpusListPanel::ActionType</td>
         </tr>
       </table>
 </div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="3">Class Members</th></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a0ef087fc73d3cab477639b217b2db7df"></a></td>
+<td class="fieldname">
+Add</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ad0d43dd9585849956b64e960074aeef1"></a></td>
+<td class="fieldname">
+Remove</td>
+<td class="fielddoc">
+</td></tr>
+</table>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a564f5ea746ff298e2355c46b4076dc36"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.addNewItem </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>newItemCaption</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4507ab84fccdaf4da7e5c0b694bbc33c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Action [] annis.gui.controlpanel.CorpusListPanel.getActions </td>
-          <td>(</td>
-          <td class="paramtype">Object&#160;</td>
-          <td class="paramname"><em>target</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Object&#160;</td>
-          <td class="paramname"><em>sender</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac0f8b76a939b52c28c3c4cc5f15ddb67"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;String&gt; annis.gui.controlpanel.CorpusListPanel.getSelectedCorpora </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the names of the corpora that are currently selected. </p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a1c88fc1c35bac44f9d4e66bcb0f9ce82"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Table annis.gui.controlpanel.CorpusListPanel.getTblCorpora </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2a22d0d9595dfa06ad9aa044871cdccc"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;String&gt; annis.gui.controlpanel.CorpusListPanel.getVisibleCorpora </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the names of the corpora that are currently visible and can be choosen by the user. </p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ab6549a4d51fccd9f631a4bd2dfaf74d5"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.handleAction </td>
-          <td>(</td>
-          <td class="paramtype">Action&#160;</td>
-          <td class="paramname"><em>action</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Object&#160;</td>
-          <td class="paramname"><em>sender</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Object&#160;</td>
-          <td class="paramname"><em>target</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a54282444ee280a6b5fcec5f65e7e37a0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.initCorpusBrowser </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>topLevelCorpusName</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">final Button&#160;</td>
-          <td class="paramname"><em>l</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a03d0d09199417fce6ef2f89b5f45999a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.loadFromRemote </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a6e27d67515bbdf18e1d0ac1aee8141fc"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">boolean annis.gui.controlpanel.CorpusListPanel.queryServerForCorpusList </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Queries the web service and sets the <a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a281644dda198f0f6e3d4995ac4aac811">allCorpora</a> and <a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ae3a2b25885e13d50979163438b4364d2">userConfig</a> members. </p>
-<dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a7dfc2ae4da97879305dcf79995b867fb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.selectCorpora </td>
-          <td>(</td>
-          <td class="paramtype">Set&lt; String &gt;&#160;</td>
-          <td class="paramname"><em>corpora</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Select the corpora. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">corpora</td><td>Corpora to select </td></tr>
-    <tr><td class="paramname">delayScroll</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a class="anchor" id="aee168f68853acc9d3e9a297a428ac876"></a>
 <div class="memitem">
 <div class="memproto">
@@ -521,409 +225,13 @@ Static Private Attributes</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="abb005a15e034d02cba53b9984c147995"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.storeChangesRemote </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7b85aaefe7009786ab770254589fd003"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.updateAutoGeneratedQueriesPanel </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Updates or initializes the panel, which holds the automatic generated queries. </p>
-
-</div>
-</div>
-<a class="anchor" id="a947615d970211a7beac55cbeb6cd7204"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.updateCorpusSetList </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="adf064ea3d748cd38f9dea11be098a96f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.updateCorpusSetList </td>
-          <td>(</td>
-          <td class="paramtype">boolean&#160;</td>
-          <td class="paramname"><em>showLoginMessage</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="abec509e7efc55f03283b8b6be5ba27d8"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.updateCorpusTable </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a1ecf48db734f58eb8fa215739dfe3efc"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final String annis.gui.controlpanel.CorpusListPanel.ALL_CORPORA = &quot;All&quot;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a281644dda198f0f6e3d4995ac4aac811"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">List&lt;<a class="el" href="classannis_1_1service_1_1objects_1_1_annis_corpus.html">AnnisCorpus</a>&gt; annis.gui.controlpanel.CorpusListPanel.allCorpora = new LinkedList&lt;&gt;()</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae048149aee10a608aeb8a084d1a2a1c0"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final <a class="el" href="classannis_1_1gui_1_1_example_queries_panel.html">ExampleQueriesPanel</a> annis.gui.controlpanel.CorpusListPanel.autoGenQueries</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab1db798ba0d549db9fa2213a5087abc0"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">ComboBox annis.gui.controlpanel.CorpusListPanel.cbSelection</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ada3025bfe6f06c91f333ac91f97d3d77"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1gui_1_1_query_controller.html">QueryController</a> annis.gui.controlpanel.CorpusListPanel.controller</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5794084f2f903cd2655a58176cdc9983"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">BeanContainer&lt;String, <a class="el" href="classannis_1_1service_1_1objects_1_1_annis_corpus.html">AnnisCorpus</a>&gt; annis.gui.controlpanel.CorpusListPanel.corpusContainer</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="adf134db950f752e82de39b4886d4b1dd"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Resource annis.gui.controlpanel.CorpusListPanel.DOC_ICON = FontAwesome.FILE_TEXT_O</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab4bdf4e84ca23a4209968383e59f527e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Resource annis.gui.controlpanel.CorpusListPanel.INFO_ICON = FontAwesome.INFO_CIRCLE</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac6bae31a0294a78c8ef5cf263aea2cf1"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> annis.gui.controlpanel.CorpusListPanel.instanceConfig</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab55f362e7f3dceb0c993b096cda5279e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final org.slf4j.Logger annis.gui.controlpanel.CorpusListPanel.log</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= LoggerFactory.</div>
-<div class="line">    getLogger(<a class="code" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a6ebc1aa16bac7361607dfc75b275c327">CorpusListPanel</a>.class)</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a07beed2aa8c3fc06c2424fe04b077414"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Table annis.gui.controlpanel.CorpusListPanel.tblCorpora</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae054e21a4cc6df58a2192370d6639194"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">TextField annis.gui.controlpanel.CorpusListPanel.txtFilter</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a546c0feee72eedd07ed85f5c00cc23eb"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1gui_1_1_search_u_i.html">SearchUI</a> annis.gui.controlpanel.CorpusListPanel.ui</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ae3a2b25885e13d50979163438b4364d2"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">transient <a class="el" href="classannis_1_1security_1_1_user_config.html">UserConfig</a> annis.gui.controlpanel.CorpusListPanel.userConfig</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_corpus_list_panel_8java.html">CorpusListPanel.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui.html">gui</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1controlpanel.html">controlpanel</a></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html">CorpusListPanel</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:07 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>controlpanel</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html">CorpusListPanel</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

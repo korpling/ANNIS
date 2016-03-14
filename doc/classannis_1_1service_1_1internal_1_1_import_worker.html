@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -111,9 +108,6 @@ $(document).ready(function(){initNavTree('classannis_1_1service_1_1internal_1_1_
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1service_1_1internal_1_1_import_worker-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.service.internal.ImportWorker Class Reference</div>  </div>
@@ -121,324 +115,37 @@ $(document).ready(function(){initNavTree('classannis_1_1service_1_1internal_1_1_
 <div class="contents">
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.service.internal.ImportWorker:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1service_1_1internal_1_1_import_worker.png" usemap="#annis.service.internal.ImportWorker_map" alt=""/>
-  <map id="annis.service.internal.ImportWorker_map" name="annis.service.internal.ImportWorker_map">
-</map>
- </div></div>
+</div>
+<p>Inherits Thread.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa7d3d28dd3e799dd3abb9b9ab2617f2a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#aa7d3d28dd3e799dd3abb9b9ab2617f2a">ImportWorker</a> ()</td></tr>
-<tr class="separator:aa7d3d28dd3e799dd3abb9b9ab2617f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10751b8ec24972987f5be02571ac901f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#a10751b8ec24972987f5be02571ac901f">run</a> ()</td></tr>
+<tr class="memitem:a10751b8ec24972987f5be02571ac901f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a10751b8ec24972987f5be02571ac901f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> ()</td></tr>
 <tr class="separator:a10751b8ec24972987f5be02571ac901f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa46fe79cee338c3307ec44d7f7203fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#aaa46fe79cee338c3307ec44d7f7203fb">getFinishedJob</a> (String uuid)</td></tr>
+<tr class="memitem:aaa46fe79cee338c3307ec44d7f7203fb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa46fe79cee338c3307ec44d7f7203fb"></a>
+<a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getFinishedJob</b> (String uuid)</td></tr>
 <tr class="separator:aaa46fe79cee338c3307ec44d7f7203fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8231ccba5c8e10b524f5da26c9b6ffcc"><td class="memItemLeft" align="right" valign="top">BlockingQueue&lt; <a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#a8231ccba5c8e10b524f5da26c9b6ffcc">getImportQueue</a> ()</td></tr>
+<tr class="memitem:a8231ccba5c8e10b524f5da26c9b6ffcc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8231ccba5c8e10b524f5da26c9b6ffcc"></a>
+BlockingQueue&lt; <a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getImportQueue</b> ()</td></tr>
 <tr class="separator:a8231ccba5c8e10b524f5da26c9b6ffcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a55d102c554de653eb4f268c607803826"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#a55d102c554de653eb4f268c607803826">getCurrentJob</a> ()</td></tr>
+<tr class="memitem:a55d102c554de653eb4f268c607803826"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a55d102c554de653eb4f268c607803826"></a>
+<a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getCurrentJob</b> ()</td></tr>
 <tr class="separator:a55d102c554de653eb4f268c607803826"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb165aff428823a906db900f6ddee28e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1administration_1_1_corpus_administration.html">CorpusAdministration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#abb165aff428823a906db900f6ddee28e">getCorpusAdmin</a> ()</td></tr>
+<tr class="memitem:abb165aff428823a906db900f6ddee28e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb165aff428823a906db900f6ddee28e"></a>
+<a class="el" href="classannis_1_1administration_1_1_corpus_administration.html">CorpusAdministration</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getCorpusAdmin</b> ()</td></tr>
 <tr class="separator:abb165aff428823a906db900f6ddee28e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f39a3628723b07a1cb37c0efd528710"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#a5f39a3628723b07a1cb37c0efd528710">setCorpusAdmin</a> (<a class="el" href="classannis_1_1administration_1_1_corpus_administration.html">CorpusAdministration</a> <a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#ad914f1447d32eb1b7a7189e2953a683e">corpusAdmin</a>)</td></tr>
+<tr class="memitem:a5f39a3628723b07a1cb37c0efd528710"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f39a3628723b07a1cb37c0efd528710"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setCorpusAdmin</b> (<a class="el" href="classannis_1_1administration_1_1_corpus_administration.html">CorpusAdministration</a> corpusAdmin)</td></tr>
 <tr class="separator:a5f39a3628723b07a1cb37c0efd528710"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:aaec9231f6f367b03085f695ed321ab0f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#aaec9231f6f367b03085f695ed321ab0f">addAppender</a> ()</td></tr>
-<tr class="separator:aaec9231f6f367b03085f695ed321ab0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb2a56a229f6d0b07c332d1325afb6b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#abb2a56a229f6d0b07c332d1325afb6b0">importSingleCorpusFile</a> (<a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a> job)</td></tr>
-<tr class="separator:abb2a56a229f6d0b07c332d1325afb6b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:ad914f1447d32eb1b7a7189e2953a683e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1administration_1_1_corpus_administration.html">CorpusAdministration</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#ad914f1447d32eb1b7a7189e2953a683e">corpusAdmin</a></td></tr>
-<tr class="separator:ad914f1447d32eb1b7a7189e2953a683e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf655b2ae5d614eb7bbfff9bd13ea8d4"><td class="memItemLeft" align="right" valign="top">final BlockingQueue&lt; <a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#abf655b2ae5d614eb7bbfff9bd13ea8d4">importQueue</a> = Queues.newLinkedBlockingDeque()</td></tr>
-<tr class="separator:abf655b2ae5d614eb7bbfff9bd13ea8d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0990d8c3d49dde5dd37b7e26d2daf3f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#ac0990d8c3d49dde5dd37b7e26d2daf3f">currentJob</a></td></tr>
-<tr class="separator:ac0990d8c3d49dde5dd37b7e26d2daf3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6f3188e7cbdb94da7d112da28fdfbd44"><td class="memItemLeft" align="right" valign="top">final Cache&lt; String, <a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#a6f3188e7cbdb94da7d112da28fdfbd44">finishedJobs</a></td></tr>
-<tr class="separator:a6f3188e7cbdb94da7d112da28fdfbd44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:ac38f3b18143d88ab6b2a74e775c7833e"><td class="memItemLeft" align="right" valign="top">static final Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html#ac38f3b18143d88ab6b2a74e775c7833e">log</a> = LoggerFactory.getLogger(ImportWorker.class)</td></tr>
-<tr class="separator:ac38f3b18143d88ab6b2a74e775c7833e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aa7d3d28dd3e799dd3abb9b9ab2617f2a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.service.internal.ImportWorker.ImportWorker </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="aaec9231f6f367b03085f695ed321ab0f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.service.internal.ImportWorker.addAppender </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="abb165aff428823a906db900f6ddee28e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1administration_1_1_corpus_administration.html">CorpusAdministration</a> annis.service.internal.ImportWorker.getCorpusAdmin </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a55d102c554de653eb4f268c607803826"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a> annis.service.internal.ImportWorker.getCurrentJob </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aaa46fe79cee338c3307ec44d7f7203fb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a> annis.service.internal.ImportWorker.getFinishedJob </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>uuid</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a8231ccba5c8e10b524f5da26c9b6ffcc"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">BlockingQueue&lt;<a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a>&gt; annis.service.internal.ImportWorker.getImportQueue </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="abb2a56a229f6d0b07c332d1325afb6b0"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.service.internal.ImportWorker.importSingleCorpusFile </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a>&#160;</td>
-          <td class="paramname"><em>job</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a10751b8ec24972987f5be02571ac901f"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.service.internal.ImportWorker.run </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a5f39a3628723b07a1cb37c0efd528710"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.service.internal.ImportWorker.setCorpusAdmin </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classannis_1_1administration_1_1_corpus_administration.html">CorpusAdministration</a>&#160;</td>
-          <td class="paramname"><em>corpusAdmin</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="ad914f1447d32eb1b7a7189e2953a683e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1administration_1_1_corpus_administration.html">CorpusAdministration</a> annis.service.internal.ImportWorker.corpusAdmin</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac0990d8c3d49dde5dd37b7e26d2daf3f"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a> annis.service.internal.ImportWorker.currentJob</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a6f3188e7cbdb94da7d112da28fdfbd44"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Cache&lt;String, <a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a>&gt; annis.service.internal.ImportWorker.finishedJobs</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= CacheBuilder.newBuilder().</div>
-<div class="line">    maximumSize(100).build()</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="abf655b2ae5d614eb7bbfff9bd13ea8d4"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final BlockingQueue&lt;<a class="el" href="classannis_1_1service_1_1objects_1_1_import_job.html">ImportJob</a>&gt; annis.service.internal.ImportWorker.importQueue = Queues.newLinkedBlockingDeque()</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac38f3b18143d88ab6b2a74e775c7833e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Logger annis.service.internal.ImportWorker.log = LoggerFactory.getLogger(ImportWorker.class)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_import_worker_8java.html">ImportWorker.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1service.html">service</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1service_1_1internal.html">internal</a></li><li class="navelem"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html">ImportWorker</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>service</b></li><li class="navelem"><b>internal</b></li><li class="navelem"><a class="el" href="classannis_1_1service_1_1internal_1_1_import_worker.html">ImportWorker</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

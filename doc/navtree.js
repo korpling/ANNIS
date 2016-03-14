@@ -520,4 +520,3 @@ function initNavTree(toroot,relpath)
      }
   })
 }
-

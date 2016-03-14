@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -113,9 +110,6 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1components_1_1cod
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
-<a href="#pri-static-attribs">Static Private Attributes</a> &#124;
 <a href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.gui.components.codemirror.AqlCodeEditor Class Reference</div>  </div>
@@ -124,474 +118,73 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1components_1_1cod
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A code editor component for the ANNIQ Query Language. </p>
 <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.gui.components.codemirror.AqlCodeEditor:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.png" usemap="#annis.gui.components.codemirror.AqlCodeEditor_map" alt=""/>
-  <map id="annis.gui.components.codemirror.AqlCodeEditor_map" name="annis.gui.components.codemirror.AqlCodeEditor_map">
-</map>
- </div></div>
+</div>
+<p>Inherits AbstractJavaScriptComponent, TextChangeNotifier, Viewer, and ValueChangeListener.</p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor_1_1_text_changed_function.html">TextChangedFunction</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aeedf25478c27c4d9d761c792f1ca22e3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#aeedf25478c27c4d9d761c792f1ca22e3">AqlCodeEditor</a> ()</td></tr>
-<tr class="separator:aeedf25478c27c4d9d761c792f1ca22e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0899e8ce14d15cb7b42a7252d4cecc2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#aa0899e8ce14d15cb7b42a7252d4cecc2">setPropertyDataSource</a> (Property newDataSource)</td></tr>
+<tr class="memitem:aa0899e8ce14d15cb7b42a7252d4cecc2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0899e8ce14d15cb7b42a7252d4cecc2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setPropertyDataSource</b> (Property newDataSource)</td></tr>
 <tr class="separator:aa0899e8ce14d15cb7b42a7252d4cecc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff430bbfe8ef5c44239056fb0ceca555"><td class="memItemLeft" align="right" valign="top">Property&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#aff430bbfe8ef5c44239056fb0ceca555">getPropertyDataSource</a> ()</td></tr>
+<tr class="memitem:aff430bbfe8ef5c44239056fb0ceca555"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aff430bbfe8ef5c44239056fb0ceca555"></a>
+Property&#160;</td><td class="memItemRight" valign="bottom"><b>getPropertyDataSource</b> ()</td></tr>
 <tr class="separator:aff430bbfe8ef5c44239056fb0ceca555"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac184ce2a636c3c8c8ed1a777be1b4888"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#ac184ce2a636c3c8c8ed1a777be1b4888">valueChange</a> (Property.ValueChangeEvent event)</td></tr>
+<tr class="memitem:ac184ce2a636c3c8c8ed1a777be1b4888"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac184ce2a636c3c8c8ed1a777be1b4888"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>valueChange</b> (Property.ValueChangeEvent event)</td></tr>
 <tr class="separator:ac184ce2a636c3c8c8ed1a777be1b4888"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac08b88b5f7b3d882c0337c46b0f9a9aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#ac08b88b5f7b3d882c0337c46b0f9a9aa">setInputPrompt</a> (String prompt)</td></tr>
+<tr class="memitem:ab31a1ceea37866836fb9038ac15453ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab31a1ceea37866836fb9038ac15453ec"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setNodes</b> (List&lt; <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt; nodes)</td></tr>
+<tr class="separator:ab31a1ceea37866836fb9038ac15453ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac08b88b5f7b3d882c0337c46b0f9a9aa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac08b88b5f7b3d882c0337c46b0f9a9aa"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setInputPrompt</b> (String prompt)</td></tr>
 <tr class="separator:ac08b88b5f7b3d882c0337c46b0f9a9aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03f195ecea5ee629e299e0c396e09b4b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a03f195ecea5ee629e299e0c396e09b4b">setTextChangeTimeout</a> (int <a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#aa29a3ec0c93c93d0de6768fb41146a78">timeout</a>)</td></tr>
+<tr class="memitem:a03f195ecea5ee629e299e0c396e09b4b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03f195ecea5ee629e299e0c396e09b4b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setTextChangeTimeout</b> (int timeout)</td></tr>
 <tr class="separator:a03f195ecea5ee629e299e0c396e09b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a594a0746d0125aa2e4cfa165555ca0c9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a594a0746d0125aa2e4cfa165555ca0c9">getTextChangeTimeout</a> ()</td></tr>
+<tr class="memitem:a594a0746d0125aa2e4cfa165555ca0c9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a594a0746d0125aa2e4cfa165555ca0c9"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>getTextChangeTimeout</b> ()</td></tr>
 <tr class="separator:a594a0746d0125aa2e4cfa165555ca0c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a199a12c82147c4d957ebe553355fe9a6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a199a12c82147c4d957ebe553355fe9a6">addTextChangeListener</a> (FieldEvents.TextChangeListener listener)</td></tr>
+<tr class="memitem:a199a12c82147c4d957ebe553355fe9a6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a199a12c82147c4d957ebe553355fe9a6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addTextChangeListener</b> (FieldEvents.TextChangeListener listener)</td></tr>
 <tr class="separator:a199a12c82147c4d957ebe553355fe9a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6d37f200c631dd2207fbf160e213b05e"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a6d37f200c631dd2207fbf160e213b05e">getTextareaStyle</a> ()</td></tr>
+<tr class="memitem:a6d37f200c631dd2207fbf160e213b05e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6d37f200c631dd2207fbf160e213b05e"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getTextareaStyle</b> ()</td></tr>
 <tr class="separator:a6d37f200c631dd2207fbf160e213b05e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a135499d8dafc652913faa5abab0e3d77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a135499d8dafc652913faa5abab0e3d77">setTextareaStyle</a> (String style)</td></tr>
+<tr class="memitem:a135499d8dafc652913faa5abab0e3d77"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a135499d8dafc652913faa5abab0e3d77"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setTextareaStyle</b> (String style)</td></tr>
 <tr class="separator:a135499d8dafc652913faa5abab0e3d77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1bfa0d2b9dda9dbf5d0d06f72d884d9c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a1bfa0d2b9dda9dbf5d0d06f72d884d9c">addListener</a> (FieldEvents.TextChangeListener listener)</td></tr>
+<tr class="memitem:a1bfa0d2b9dda9dbf5d0d06f72d884d9c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1bfa0d2b9dda9dbf5d0d06f72d884d9c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>addListener</b> (FieldEvents.TextChangeListener listener)</td></tr>
 <tr class="separator:a1bfa0d2b9dda9dbf5d0d06f72d884d9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7621aa0b671c1cec52f2eaf2c087494c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a7621aa0b671c1cec52f2eaf2c087494c">removeTextChangeListener</a> (FieldEvents.TextChangeListener listener)</td></tr>
+<tr class="memitem:a7621aa0b671c1cec52f2eaf2c087494c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7621aa0b671c1cec52f2eaf2c087494c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>removeTextChangeListener</b> (FieldEvents.TextChangeListener listener)</td></tr>
 <tr class="separator:a7621aa0b671c1cec52f2eaf2c087494c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1302dc072d9072d9f45daafb3eb61c72"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a1302dc072d9072d9f45daafb3eb61c72">removeListener</a> (FieldEvents.TextChangeListener listener)</td></tr>
+<tr class="memitem:a1302dc072d9072d9f45daafb3eb61c72"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1302dc072d9072d9f45daafb3eb61c72"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>removeListener</b> (FieldEvents.TextChangeListener listener)</td></tr>
 <tr class="separator:a1302dc072d9072d9f45daafb3eb61c72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0e6e03239674ac5ae574d99178173a0"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#aa0e6e03239674ac5ae574d99178173a0">getValue</a> ()</td></tr>
+<tr class="memitem:aa0e6e03239674ac5ae574d99178173a0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0e6e03239674ac5ae574d99178173a0"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>getValue</b> ()</td></tr>
 <tr class="separator:aa0e6e03239674ac5ae574d99178173a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1637fa1a13393b819f925408bf5b9515"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a1637fa1a13393b819f925408bf5b9515">setValue</a> (String value)</td></tr>
+<tr class="memitem:a1637fa1a13393b819f925408bf5b9515"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1637fa1a13393b819f925408bf5b9515"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setValue</b> (String value)</td></tr>
 <tr class="separator:a1637fa1a13393b819f925408bf5b9515"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a256fa306b07c887eea214380db7a26ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a256fa306b07c887eea214380db7a26ba">setErrors</a> (List&lt; <a class="el" href="classannis_1_1model_1_1_aql_parse_error.html">AqlParseError</a> &gt; errors)</td></tr>
+<tr class="memitem:a256fa306b07c887eea214380db7a26ba"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a256fa306b07c887eea214380db7a26ba"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setErrors</b> (List&lt; <a class="el" href="classannis_1_1model_1_1_aql_parse_error.html">AqlParseError</a> &gt; errors)</td></tr>
 <tr class="separator:a256fa306b07c887eea214380db7a26ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a4b859ded0934ad317debcb5ae01db2a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor_state.html">AqlCodeEditorState</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a4b859ded0934ad317debcb5ae01db2a8">getState</a> ()</td></tr>
+<tr class="memitem:a4b859ded0934ad317debcb5ae01db2a8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4b859ded0934ad317debcb5ae01db2a8"></a>
+<a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor_state.html">AqlCodeEditorState</a>&#160;</td><td class="memItemRight" valign="bottom"><b>getState</b> ()</td></tr>
 <tr class="separator:a4b859ded0934ad317debcb5ae01db2a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:a1a756daa479452bca9f0d8e6d43af151"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a1a756daa479452bca9f0d8e6d43af151">validate</a> (String query)</td></tr>
-<tr class="separator:a1a756daa479452bca9f0d8e6d43af151"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac485a293cd86efdfe7d8a9ad0476f6a"><td class="memItemLeft" align="right" valign="top">TreeMap&lt; String, Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#aac485a293cd86efdfe7d8a9ad0476f6a">mapQueryNodes</a> (List&lt; <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt; nodes)</td></tr>
-<tr class="separator:aac485a293cd86efdfe7d8a9ad0476f6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:aa29a3ec0c93c93d0de6768fb41146a78"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#aa29a3ec0c93c93d0de6768fb41146a78">timeout</a></td></tr>
-<tr class="separator:aa29a3ec0c93c93d0de6768fb41146a78"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92fef86b91ddd2cef41828307a449024"><td class="memItemLeft" align="right" valign="top">Property&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a92fef86b91ddd2cef41828307a449024">dataSource</a></td></tr>
-<tr class="separator:a92fef86b91ddd2cef41828307a449024"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-static-attribs"></a>
-Static Private Attributes</h2></td></tr>
-<tr class="memitem:a106cdf20cfb60ea102c09b124e856434"><td class="memItemLeft" align="right" valign="top">static final Logger&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a106cdf20cfb60ea102c09b124e856434">log</a> = LoggerFactory.getLogger(AqlCodeEditor.class)</td></tr>
-<tr class="separator:a106cdf20cfb60ea102c09b124e856434"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="aeedf25478c27c4d9d761c792f1ca22e3"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">annis.gui.components.codemirror.AqlCodeEditor.AqlCodeEditor </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a1bfa0d2b9dda9dbf5d0d06f72d884d9c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.addListener </td>
-          <td>(</td>
-          <td class="paramtype">FieldEvents.TextChangeListener&#160;</td>
-          <td class="paramname"><em>listener</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a199a12c82147c4d957ebe553355fe9a6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.addTextChangeListener </td>
-          <td>(</td>
-          <td class="paramtype">FieldEvents.TextChangeListener&#160;</td>
-          <td class="paramname"><em>listener</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aff430bbfe8ef5c44239056fb0ceca555"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Property annis.gui.components.codemirror.AqlCodeEditor.getPropertyDataSource </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4b859ded0934ad317debcb5ae01db2a8"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor_state.html">AqlCodeEditorState</a> annis.gui.components.codemirror.AqlCodeEditor.getState </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a6d37f200c631dd2207fbf160e213b05e"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.gui.components.codemirror.AqlCodeEditor.getTextareaStyle </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a594a0746d0125aa2e4cfa165555ca0c9"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.gui.components.codemirror.AqlCodeEditor.getTextChangeTimeout </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa0e6e03239674ac5ae574d99178173a0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">String annis.gui.components.codemirror.AqlCodeEditor.getValue </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aac485a293cd86efdfe7d8a9ad0476f6a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">TreeMap&lt;String, Integer&gt; annis.gui.components.codemirror.AqlCodeEditor.mapQueryNodes </td>
-          <td>(</td>
-          <td class="paramtype">List&lt; <a class="el" href="classannis_1_1model_1_1_query_node.html">QueryNode</a> &gt;&#160;</td>
-          <td class="paramname"><em>nodes</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1302dc072d9072d9f45daafb3eb61c72"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.removeListener </td>
-          <td>(</td>
-          <td class="paramtype">FieldEvents.TextChangeListener&#160;</td>
-          <td class="paramname"><em>listener</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7621aa0b671c1cec52f2eaf2c087494c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.removeTextChangeListener </td>
-          <td>(</td>
-          <td class="paramtype">FieldEvents.TextChangeListener&#160;</td>
-          <td class="paramname"><em>listener</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a256fa306b07c887eea214380db7a26ba"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.setErrors </td>
-          <td>(</td>
-          <td class="paramtype">List&lt; <a class="el" href="classannis_1_1model_1_1_aql_parse_error.html">AqlParseError</a> &gt;&#160;</td>
-          <td class="paramname"><em>errors</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac08b88b5f7b3d882c0337c46b0f9a9aa"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.setInputPrompt </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>prompt</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa0899e8ce14d15cb7b42a7252d4cecc2"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.setPropertyDataSource </td>
-          <td>(</td>
-          <td class="paramtype">Property&#160;</td>
-          <td class="paramname"><em>newDataSource</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a135499d8dafc652913faa5abab0e3d77"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.setTextareaStyle </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>style</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a03f195ecea5ee629e299e0c396e09b4b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.setTextChangeTimeout </td>
-          <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>timeout</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1637fa1a13393b819f925408bf5b9515"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.setValue </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>value</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1a756daa479452bca9f0d8e6d43af151"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.validate </td>
-          <td>(</td>
-          <td class="paramtype">String&#160;</td>
-          <td class="paramname"><em>query</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac184ce2a636c3c8c8ed1a777be1b4888"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.components.codemirror.AqlCodeEditor.valueChange </td>
-          <td>(</td>
-          <td class="paramtype">Property.ValueChangeEvent&#160;</td>
-          <td class="paramname"><em>event</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a92fef86b91ddd2cef41828307a449024"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">Property&lt;String&gt; annis.gui.components.codemirror.AqlCodeEditor.dataSource</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a106cdf20cfb60ea102c09b124e856434"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final Logger annis.gui.components.codemirror.AqlCodeEditor.log = LoggerFactory.getLogger(AqlCodeEditor.class)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa29a3ec0c93c93d0de6768fb41146a78"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int annis.gui.components.codemirror.AqlCodeEditor.timeout</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_aql_code_editor_8java.html">AqlCodeEditor.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui.html">gui</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1components.html">components</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1components_1_1codemirror.html">codemirror</a></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html">AqlCodeEditor</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:07 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>components</b></li><li class="navelem"><b>codemirror</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html">AqlCodeEditor</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

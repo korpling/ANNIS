@@ -1,6 +1,9 @@
 var classannis_1_1resolver_1_1_resolver_entry =
 [
-    [ "ElementType", "enumannis_1_1resolver_1_1_resolver_entry_1_1_element_type.html", "enumannis_1_1resolver_1_1_resolver_entry_1_1_element_type" ],
+    [ "ElementType", "classannis_1_1resolver_1_1_resolver_entry.html#enumannis_1_1resolver_1_1_resolver_entry_1_1_element_type", [
+      [ "edge", "classannis_1_1resolver_1_1_resolver_entry.html#a06a31888cabacecb34f9c34beeb8858e", null ],
+      [ "node", "classannis_1_1resolver_1_1_resolver_entry.html#ac1712396c5fbd7327b394298ec4080b2", null ]
+    ] ],
     [ "ResolverEntry", "classannis_1_1resolver_1_1_resolver_entry.html#a19a7d3f98b631eae52bdc3d25d51445c", null ],
     [ "ResolverEntry", "classannis_1_1resolver_1_1_resolver_entry.html#a6e23b0cc7802c0844e597f1a6c816db4", null ],
     [ "equals", "classannis_1_1resolver_1_1_resolver_entry.html#a587fc885ada877dff4b2a0f7b8f97981", null ],
@@ -24,14 +27,5 @@ var classannis_1_1resolver_1_1_resolver_entry =
     [ "setOrder", "classannis_1_1resolver_1_1_resolver_entry.html#a5fa5e637c58623bce3e602746201c65c", null ],
     [ "setVersion", "classannis_1_1resolver_1_1_resolver_entry.html#a790a3d1ff66c77b06fa9b2b67eeec779", null ],
     [ "setVisibility", "classannis_1_1resolver_1_1_resolver_entry.html#a0a5019201c9883591be3d33b8c068a2a", null ],
-    [ "setVisType", "classannis_1_1resolver_1_1_resolver_entry.html#a46b266d2c7075db88d2446858838e041", null ],
-    [ "corpus", "classannis_1_1resolver_1_1_resolver_entry.html#aea8a10234d350f8a93d0f59c68a6f16b", null ],
-    [ "displayName", "classannis_1_1resolver_1_1_resolver_entry.html#a8f5445535247d522588bcb6c09f4c9c7", null ],
-    [ "element", "classannis_1_1resolver_1_1_resolver_entry.html#af4473b65294ef7e240aaf13f62f7486c", null ],
-    [ "id", "classannis_1_1resolver_1_1_resolver_entry.html#a4a79cb2100105eb0d9cf0dd1e386bca6", null ],
-    [ "mappings", "classannis_1_1resolver_1_1_resolver_entry.html#ac78d8cdd5b8b5e4a35e3d133e3655752", null ],
-    [ "order", "classannis_1_1resolver_1_1_resolver_entry.html#a1bffcf7546e8d87c972ed8bb436d4d04", null ],
-    [ "version", "classannis_1_1resolver_1_1_resolver_entry.html#a7d8d88fae1beb8d1382fce48e651b822", null ],
-    [ "visibility", "classannis_1_1resolver_1_1_resolver_entry.html#a0f2d4aae7f1ee60671c78a4a90702b53", null ],
-    [ "visType", "classannis_1_1resolver_1_1_resolver_entry.html#a1f50935439c0201c0d44704a213edb8b", null ]
+    [ "setVisType", "classannis_1_1resolver_1_1_resolver_entry.html#a46b266d2c7075db88d2446858838e041", null ]
 ];

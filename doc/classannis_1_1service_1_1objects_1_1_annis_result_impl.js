@@ -12,8 +12,5 @@ var classannis_1_1service_1_1objects_1_1_annis_result_impl =
     [ "getTokenAnnotationLevelSet", "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#aeddaa33767b3c13baa73a5b78c2d2b4b", null ],
     [ "getTokenList", "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#a439c149e005b53ec276df8fa01a73852", null ],
     [ "hasMarker", "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#ace1203e680a1e8603b417d7dff3dee46", null ],
-    [ "isMarked", "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#a2697ac872adcbe2c4ce3c95a4512dd7d", null ],
-    [ "setGraph", "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#ac3ad93fb36d92457075281d2cc6f772c", null ],
-    [ "graph", "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#a5f0b2d35adb038cf7773be01300fb292", null ],
-    [ "paulaString", "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#a1d0a29235a1ff984f0db87d6439db57f", null ]
+    [ "setGraph", "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#ac3ad93fb36d92457075281d2cc6f772c", null ]
 ];

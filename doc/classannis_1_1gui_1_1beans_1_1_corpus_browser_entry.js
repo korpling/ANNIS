@@ -11,8 +11,5 @@ var classannis_1_1gui_1_1beans_1_1_corpus_browser_entry =
     [ "hashCode", "classannis_1_1gui_1_1beans_1_1_corpus_browser_entry.html#a028180f842c922ee1c253dbcae5c00d7", null ],
     [ "setCorpus", "classannis_1_1gui_1_1beans_1_1_corpus_browser_entry.html#a9de11f9a0782d2232dbc48ededcf3964", null ],
     [ "setExample", "classannis_1_1gui_1_1beans_1_1_corpus_browser_entry.html#aecad4063a66853d6badca9cb9459d222", null ],
-    [ "setName", "classannis_1_1gui_1_1beans_1_1_corpus_browser_entry.html#a3eff4683cea3fa1774aecf8af1654cb8", null ],
-    [ "corpus", "classannis_1_1gui_1_1beans_1_1_corpus_browser_entry.html#aecbbb153423f32e222d2af2b61a16095", null ],
-    [ "example", "classannis_1_1gui_1_1beans_1_1_corpus_browser_entry.html#a7bdeb6ef958bcc9849dd20a7ade3ea6d", null ],
-    [ "name", "classannis_1_1gui_1_1beans_1_1_corpus_browser_entry.html#aae6383cb6c0cb6e2d4ca51500515d0a9", null ]
+    [ "setName", "classannis_1_1gui_1_1beans_1_1_corpus_browser_entry.html#a3eff4683cea3fa1774aecf8af1654cb8", null ]
 ];

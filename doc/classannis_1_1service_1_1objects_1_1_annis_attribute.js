@@ -1,7 +1,20 @@
 var classannis_1_1service_1_1objects_1_1_annis_attribute =
 [
-    [ "SubType", "enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_sub_type.html", "enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_sub_type" ],
-    [ "Type", "enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type.html", "enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type" ],
+    [ "SubType", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_sub_type", [
+      [ "c", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#ad2a4024c42e134c83d1ea9b50df14103", null ],
+      [ "d", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a6582139c6460f35a2e20360ae4f67457", null ],
+      [ "m", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a61017ca5ab77d0b392efd6db091ef04f", null ],
+      [ "n", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#abbd4603baf9f6066c8756ac74f215e10", null ],
+      [ "p", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a5bad6b07f473350fc70dddc888d75ad4", null ],
+      [ "unknown", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a5003a6f4124c6bd4c7e028b86545f25b", null ]
+    ] ],
+    [ "Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", [
+      [ "edge", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a3b90973507510ae5bd74211d00d6c2fd", null ],
+      [ "meta", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#af1312aa1f4bddbf01cde25c9b94e1a78", null ],
+      [ "node", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#aaf924ffc68670c92a02f06e6c1b84a86", null ],
+      [ "segmentation", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#abeb29ea4879a3694683e96712207416f", null ],
+      [ "unknown", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a7b60f7217cb9bcf7cd543fe703da1fc3", null ]
+    ] ],
     [ "addValue", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a3bb0d6da255e0fc0c0b66316aa897745", null ],
     [ "equals", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a7f1f08292f6a742efde498e044cf73a5", null ],
     [ "getEdgeName", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#abe179a89a380a93458c1378ee308804f", null ],
@@ -16,10 +29,5 @@ var classannis_1_1service_1_1objects_1_1_annis_attribute =
     [ "setSubtype", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#aaa27adc465c6d0c2243f62ebea384e93", null ],
     [ "setType", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#ac5ffe6b3934c793b4e30c6d42075023c", null ],
     [ "setValueSet", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#ade887129f81141713c44ed930ac5a09d", null ],
-    [ "toString", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a046a937c9d161793e535db95fa06e34b", null ],
-    [ "distinctValues", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a982f440d5d26ac88e7bdd8f5711747a7", null ],
-    [ "edgeName", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a0a578d2fe8db3f2934f4e288970008f5", null ],
-    [ "name", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#afe916495328cb89264184987949d8a61", null ],
-    [ "subtype", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a979d60fa8ac0e96619636b9abe50c798", null ],
-    [ "type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a79767b2a21c78fbe902c95ec5e1cca4f", null ]
+    [ "toString", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#a046a937c9d161793e535db95fa06e34b", null ]
 ];

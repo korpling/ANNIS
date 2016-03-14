@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.3.5</span>
+   &#160;<span id="projectnumber">3.4.0</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -50,9 +50,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
       <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li><a href="namespaces.html"><span>Packages</span></a></li>
       <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
-      <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
         <span class="left">
@@ -74,7 +72,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="hierarchy.html"><span>Class&#160;Hierarchy</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
@@ -112,8 +109,6 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1objects_1_1_query
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="classannis_1_1gui_1_1objects_1_1_query_u_i_state-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">annis.gui.objects.QueryUIState Class Reference</div>  </div>
@@ -122,699 +117,118 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1objects_1_1_query
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Helper class to bundle all query relevant state information of the UI. </p>
 <dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div><div class="dynheader">
-Inheritance diagram for annis.gui.objects.QueryUIState:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classannis_1_1gui_1_1objects_1_1_query_u_i_state.png" usemap="#annis.gui.objects.QueryUIState_map" alt=""/>
-  <map id="annis.gui.objects.QueryUIState_map" name="annis.gui.objects.QueryUIState_map">
-</map>
- </div></div>
+</div>
+<p>Inherits Serializable.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type.html">QueryType</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type">QueryType</a></td></tr>
+<tr class="separator:enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a8e172d53a0f11af0f648b4b31d52eef1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a8e172d53a0f11af0f648b4b31d52eef1">QueryUIState</a> ()</td></tr>
-<tr class="separator:a8e172d53a0f11af0f648b4b31d52eef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0fcae076c07a9e6bbc39d47fd97f5da8"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a0fcae076c07a9e6bbc39d47fd97f5da8">getAql</a> ()</td></tr>
+<tr class="memitem:a0fcae076c07a9e6bbc39d47fd97f5da8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0fcae076c07a9e6bbc39d47fd97f5da8"></a>
+ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getAql</b> ()</td></tr>
 <tr class="separator:a0fcae076c07a9e6bbc39d47fd97f5da8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a447ac7fe15c7a15373f9b840f57e1eaf"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; Set&lt; String &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a447ac7fe15c7a15373f9b840f57e1eaf">getSelectedCorpora</a> ()</td></tr>
+<tr class="memitem:a447ac7fe15c7a15373f9b840f57e1eaf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a447ac7fe15c7a15373f9b840f57e1eaf"></a>
+ObjectProperty&lt; Set&lt; String &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getSelectedCorpora</b> ()</td></tr>
 <tr class="separator:a447ac7fe15c7a15373f9b840f57e1eaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a88f03884dce41c7e2442633796bbdaec"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a88f03884dce41c7e2442633796bbdaec">getLeftContext</a> ()</td></tr>
+<tr class="memitem:a88f03884dce41c7e2442633796bbdaec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a88f03884dce41c7e2442633796bbdaec"></a>
+ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getLeftContext</b> ()</td></tr>
 <tr class="separator:a88f03884dce41c7e2442633796bbdaec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94c9a1954468166e63d2597395222450"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a94c9a1954468166e63d2597395222450">getRightContext</a> ()</td></tr>
+<tr class="memitem:a94c9a1954468166e63d2597395222450"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94c9a1954468166e63d2597395222450"></a>
+ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getRightContext</b> ()</td></tr>
 <tr class="separator:a94c9a1954468166e63d2597395222450"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaead446a8319e22aaec629de5675a96c"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#aaead446a8319e22aaec629de5675a96c">getLimit</a> ()</td></tr>
+<tr class="memitem:aaead446a8319e22aaec629de5675a96c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaead446a8319e22aaec629de5675a96c"></a>
+ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getLimit</b> ()</td></tr>
 <tr class="separator:aaead446a8319e22aaec629de5675a96c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeef2e1fc3b611e19a8c8d2c16c673da4"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#aeef2e1fc3b611e19a8c8d2c16c673da4">getOffset</a> ()</td></tr>
-<tr class="separator:aeef2e1fc3b611e19a8c8d2c16c673da4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a370e960128fa67d6c2914f6c733e8a45"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a370e960128fa67d6c2914f6c733e8a45">getBaseText</a> ()</td></tr>
-<tr class="separator:a370e960128fa67d6c2914f6c733e8a45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e29d716677de142d83d94082fe01ddb"><td class="memItemLeft" align="right" valign="top">Map&lt; <a class="el" href="enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type.html">QueryType</a>, Future&lt;?&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a3e29d716677de142d83d94082fe01ddb">getExecutedTasks</a> ()</td></tr>
+<tr class="memitem:a341a0679bbecf8c7f26d8d134dc5f932"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a341a0679bbecf8c7f26d8d134dc5f932"></a>
+ObjectProperty&lt; Long &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getOffset</b> ()</td></tr>
+<tr class="separator:a341a0679bbecf8c7f26d8d134dc5f932"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a088108a55d46fb33276fb224d56148ab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a088108a55d46fb33276fb224d56148ab"></a>
+ObjectProperty&lt; Set&lt; Long &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getSelectedMatches</b> ()</td></tr>
+<tr class="separator:a088108a55d46fb33276fb224d56148ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae714842e38343a6a491e03644b446b61"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae714842e38343a6a491e03644b446b61"></a>
+ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getVisibleBaseText</b> ()</td></tr>
+<tr class="separator:ae714842e38343a6a491e03644b446b61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fca7489d15f45b1d7faf15973804d37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1fca7489d15f45b1d7faf15973804d37"></a>
+ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getContextSegmentation</b> ()</td></tr>
+<tr class="separator:a1fca7489d15f45b1d7faf15973804d37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e29d716677de142d83d94082fe01ddb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3e29d716677de142d83d94082fe01ddb"></a>
+Map&lt; <a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type">QueryType</a>, Future&lt;?&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getExecutedTasks</b> ()</td></tr>
 <tr class="separator:a3e29d716677de142d83d94082fe01ddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c4c3a0e9ac4c3a3dc62b43a57bbfb6a"><td class="memItemLeft" align="right" valign="top">BeanItemContainer&lt; <a class="el" href="classannis_1_1gui_1_1objects_1_1_query.html">Query</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a4c4c3a0e9ac4c3a3dc62b43a57bbfb6a">getHistory</a> ()</td></tr>
+<tr class="memitem:a4c4c3a0e9ac4c3a3dc62b43a57bbfb6a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c4c3a0e9ac4c3a3dc62b43a57bbfb6a"></a>
+BeanItemContainer&lt; <a class="el" href="classannis_1_1gui_1_1objects_1_1_query.html">Query</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getHistory</b> ()</td></tr>
 <tr class="separator:a4c4c3a0e9ac4c3a3dc62b43a57bbfb6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ef485f66e0df0a87ebdd89129cd3da6"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a2ef485f66e0df0a87ebdd89129cd3da6">getExporterName</a> ()</td></tr>
+<tr class="memitem:a2ef485f66e0df0a87ebdd89129cd3da6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2ef485f66e0df0a87ebdd89129cd3da6"></a>
+ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getExporterName</b> ()</td></tr>
 <tr class="separator:a2ef485f66e0df0a87ebdd89129cd3da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4c6d2c2612fd6ce815eb9ee093a08f0"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; List&lt; String &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#ad4c6d2c2612fd6ce815eb9ee093a08f0">getExportAnnotationKeys</a> ()</td></tr>
+<tr class="memitem:ad4c6d2c2612fd6ce815eb9ee093a08f0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad4c6d2c2612fd6ce815eb9ee093a08f0"></a>
+ObjectProperty&lt; List&lt; String &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getExportAnnotationKeys</b> ()</td></tr>
 <tr class="separator:ad4c6d2c2612fd6ce815eb9ee093a08f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a640e420ba043fa956e815ba148517861"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a640e420ba043fa956e815ba148517861">getExportParameters</a> ()</td></tr>
+<tr class="memitem:a640e420ba043fa956e815ba148517861"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a640e420ba043fa956e815ba148517861"></a>
+ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getExportParameters</b> ()</td></tr>
 <tr class="separator:a640e420ba043fa956e815ba148517861"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4fc387b8b481c6c596fa8d2a575a1b9b"><td class="memItemLeft" align="right" valign="top">BeanContainer&lt; Integer, <a class="el" href="classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html">UserGeneratedFrequencyEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a4fc387b8b481c6c596fa8d2a575a1b9b">getFrequencyTableDefinition</a> ()</td></tr>
+<tr class="memitem:a4fc387b8b481c6c596fa8d2a575a1b9b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4fc387b8b481c6c596fa8d2a575a1b9b"></a>
+BeanContainer&lt; Integer, <a class="el" href="classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html">UserGeneratedFrequencyEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getFrequencyTableDefinition</b> ()</td></tr>
 <tr class="separator:a4fc387b8b481c6c596fa8d2a575a1b9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a848107a68ac28fd5d56653ddb1a43f38"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; Set&lt; String &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a848107a68ac28fd5d56653ddb1a43f38">getFrequencyMetaData</a> ()</td></tr>
+<tr class="memitem:a848107a68ac28fd5d56653ddb1a43f38"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a848107a68ac28fd5d56653ddb1a43f38"></a>
+ObjectProperty&lt; Set&lt; String &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getFrequencyMetaData</b> ()</td></tr>
 <tr class="separator:a848107a68ac28fd5d56653ddb1a43f38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4aa255e681f762bbe0ccfacb92116dea"><td class="memItemLeft" align="right" valign="top">ObjectProperty&lt; <a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html">OrderType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a4aa255e681f762bbe0ccfacb92116dea">getOrder</a> ()</td></tr>
+<tr class="memitem:a4aa255e681f762bbe0ccfacb92116dea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4aa255e681f762bbe0ccfacb92116dea"></a>
+ObjectProperty&lt; <a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html">OrderType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getOrder</b> ()</td></tr>
 <tr class="separator:a4aa255e681f762bbe0ccfacb92116dea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
-Private Member Functions</h2></td></tr>
-<tr class="memitem:ac6403de2099bdd892fb584ab8a0f6e98"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#ac6403de2099bdd892fb584ab8a0f6e98">initTransients</a> ()</td></tr>
-<tr class="separator:ac6403de2099bdd892fb584ab8a0f6e98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa932e0d780b2361ce170ec598fc432a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#aa932e0d780b2361ce170ec598fc432a3">readObject</a> (java.io.ObjectInputStream in)  throws IOException, ClassNotFoundException   </td></tr>
-<tr class="separator:aa932e0d780b2361ce170ec598fc432a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
-Private Attributes</h2></td></tr>
-<tr class="memitem:a090c5865d241072a5b5a3f7fc8def104"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a090c5865d241072a5b5a3f7fc8def104">aql</a> = new ObjectProperty&lt;&gt;(&quot;&quot;)</td></tr>
-<tr class="separator:a090c5865d241072a5b5a3f7fc8def104"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45a20ec73e724a4ee53b91562539083a"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; Set&lt; String &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a45a20ec73e724a4ee53b91562539083a">selectedCorpora</a> = new ObjectProperty&lt;Set&lt;String&gt;&gt;(new LinkedHashSet&lt;String&gt;())</td></tr>
-<tr class="separator:a45a20ec73e724a4ee53b91562539083a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a545d9e655e24268cb49c3ae2758f4f09"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a545d9e655e24268cb49c3ae2758f4f09">leftContext</a> = new ObjectProperty&lt;&gt;(5)</td></tr>
-<tr class="separator:a545d9e655e24268cb49c3ae2758f4f09"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c0246e9d141f41ad9ae291f1e170454"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a1c0246e9d141f41ad9ae291f1e170454">rightContext</a> = new ObjectProperty&lt;&gt;(5)</td></tr>
-<tr class="separator:a1c0246e9d141f41ad9ae291f1e170454"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c2e89e5170547b4bcb05993a83f8470"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a4c2e89e5170547b4bcb05993a83f8470">limit</a> = new ObjectProperty&lt;&gt;(10)</td></tr>
-<tr class="separator:a4c2e89e5170547b4bcb05993a83f8470"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7eb765267dc828fa3a309d462593f240"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a7eb765267dc828fa3a309d462593f240">offset</a> = new ObjectProperty&lt;&gt;(0)</td></tr>
-<tr class="separator:a7eb765267dc828fa3a309d462593f240"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a622319a654c05b270f486e6fd95cbbed"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a622319a654c05b270f486e6fd95cbbed">baseText</a> = new ObjectProperty&lt;&gt;(null, String.class)</td></tr>
-<tr class="separator:a622319a654c05b270f486e6fd95cbbed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b2c19699bdcbdb3b008a950f9f6a9ed"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; <a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html">OrderType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a1b2c19699bdcbdb3b008a950f9f6a9ed">order</a> = new ObjectProperty&lt;&gt;(<a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html#aa366907be7fd06cad3c139829ba17a4a">OrderType.ascending</a>)</td></tr>
-<tr class="separator:a1b2c19699bdcbdb3b008a950f9f6a9ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05e15650f244f5f3a4c75dc09a3b0697"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a05e15650f244f5f3a4c75dc09a3b0697">exporterName</a> = new ObjectProperty&lt;&gt;(&quot;&quot;)</td></tr>
-<tr class="separator:a05e15650f244f5f3a4c75dc09a3b0697"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39c114e59fb8f8a2f1fcc55be7758b47"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; List&lt; String &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a39c114e59fb8f8a2f1fcc55be7758b47">exportAnnotationKeys</a> = new ObjectProperty&lt;List&lt;String&gt;&gt;(new ArrayList&lt;String&gt;())</td></tr>
-<tr class="separator:a39c114e59fb8f8a2f1fcc55be7758b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0cb2cfc3ac33098610491bb08630645"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#af0cb2cfc3ac33098610491bb08630645">exportParameters</a></td></tr>
-<tr class="separator:af0cb2cfc3ac33098610491bb08630645"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2a84bfc8de3a6710ac2625c595ab4de"><td class="memItemLeft" align="right" valign="top">transient Map&lt; <a class="el" href="enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type.html">QueryType</a>, Future&lt;?&gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#ab2a84bfc8de3a6710ac2625c595ab4de">executedTasks</a></td></tr>
-<tr class="separator:ab2a84bfc8de3a6710ac2625c595ab4de"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15fa228a34cef99f9042457155e5cab6"><td class="memItemLeft" align="right" valign="top">final BeanContainer&lt; Integer, <a class="el" href="classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html">UserGeneratedFrequencyEntry</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a15fa228a34cef99f9042457155e5cab6">frequencyTableDefinition</a> = new BeanContainer&lt;&gt;(UserGeneratedFrequencyEntry.class)</td></tr>
-<tr class="separator:a15fa228a34cef99f9042457155e5cab6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a174a09440bc3e48a3cbfd070192575c4"><td class="memItemLeft" align="right" valign="top">final ObjectProperty&lt; Set&lt; String &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a174a09440bc3e48a3cbfd070192575c4">frequencyMetaData</a></td></tr>
-<tr class="separator:a174a09440bc3e48a3cbfd070192575c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa56bb411989c577df480239c394864b5"><td class="memItemLeft" align="right" valign="top">final BeanItemContainer&lt; <a class="el" href="classannis_1_1gui_1_1objects_1_1_query.html">Query</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#aa56bb411989c577df480239c394864b5">history</a> = new BeanItemContainer&lt;&gt;(Query.class)</td></tr>
-<tr class="separator:aa56bb411989c577df480239c394864b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aef78a3a3150c0e0ee52fe88c0360e16a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef78a3a3150c0e0ee52fe88c0360e16a"></a>
+BeanContainer&lt; String, <a class="el" href="classannis_1_1service_1_1objects_1_1_annis_corpus.html">AnnisCorpus</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getAvailableCorpora</b> ()</td></tr>
+<tr class="separator:aef78a3a3150c0e0ee52fe88c0360e16a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a8e172d53a0f11af0f648b4b31d52eef1"></a>
+<hr/><h2 class="groupheader">Class Documentation</h2>
+<a name="enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type" id="enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">annis.gui.objects.QueryUIState.QueryUIState </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td class="memname">enum annis::gui::objects::QueryUIState::QueryType</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a0fcae076c07a9e6bbc39d47fd97f5da8"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;String&gt; annis.gui.objects.QueryUIState.getAql </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a370e960128fa67d6c2914f6c733e8a45"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;String&gt; annis.gui.objects.QueryUIState.getBaseText </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a3e29d716677de142d83d94082fe01ddb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Map&lt;<a class="el" href="enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type.html">QueryType</a>, Future&lt;?&gt; &gt; annis.gui.objects.QueryUIState.getExecutedTasks </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ad4c6d2c2612fd6ce815eb9ee093a08f0"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;List&lt;String&gt; &gt; annis.gui.objects.QueryUIState.getExportAnnotationKeys </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a2ef485f66e0df0a87ebdd89129cd3da6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;String&gt; annis.gui.objects.QueryUIState.getExporterName </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a640e420ba043fa956e815ba148517861"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;String&gt; annis.gui.objects.QueryUIState.getExportParameters </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a848107a68ac28fd5d56653ddb1a43f38"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;Set&lt;String&gt; &gt; annis.gui.objects.QueryUIState.getFrequencyMetaData </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4fc387b8b481c6c596fa8d2a575a1b9b"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">BeanContainer&lt;Integer, <a class="el" href="classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html">UserGeneratedFrequencyEntry</a>&gt; annis.gui.objects.QueryUIState.getFrequencyTableDefinition </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4c4c3a0e9ac4c3a3dc62b43a57bbfb6a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">BeanItemContainer&lt;<a class="el" href="classannis_1_1gui_1_1objects_1_1_query.html">Query</a>&gt; annis.gui.objects.QueryUIState.getHistory </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a88f03884dce41c7e2442633796bbdaec"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;Integer&gt; annis.gui.objects.QueryUIState.getLeftContext </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aaead446a8319e22aaec629de5675a96c"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;Integer&gt; annis.gui.objects.QueryUIState.getLimit </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aeef2e1fc3b611e19a8c8d2c16c673da4"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;Integer&gt; annis.gui.objects.QueryUIState.getOffset </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4aa255e681f762bbe0ccfacb92116dea"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;<a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html">OrderType</a>&gt; annis.gui.objects.QueryUIState.getOrder </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a94c9a1954468166e63d2597395222450"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;Integer&gt; annis.gui.objects.QueryUIState.getRightContext </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a447ac7fe15c7a15373f9b840f57e1eaf"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">ObjectProperty&lt;Set&lt;String&gt; &gt; annis.gui.objects.QueryUIState.getSelectedCorpora </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ac6403de2099bdd892fb584ab8a0f6e98"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.objects.QueryUIState.initTransients </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
+<table class="fieldtable">
+<tr><th colspan="3">Class Members</th></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a5c425a2a1177f699796f5fdb2445e360"></a></td>
+<td class="fieldname">
+COUNT</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a19f784226cd9e9c9fa0b2b2ee0458b17"></a></td>
+<td class="fieldname">
+EXPORT</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ae28e3803365d3149a3442a5eaa87057e"></a></td>
+<td class="fieldname">
+FIND</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a20b40c87fc99576ece463a9aed1192f6"></a></td>
+<td class="fieldname">
+FREQUENCY</td>
+<td class="fielddoc">
+</td></tr>
 </table>
-</div><div class="memdoc">
 
 </div>
 </div>
-<a class="anchor" id="aa932e0d780b2361ce170ec598fc432a3"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.objects.QueryUIState.readObject </td>
-          <td>(</td>
-          <td class="paramtype">java.io.ObjectInputStream&#160;</td>
-          <td class="paramname"><em>in</em></td><td>)</td>
-          <td> throws IOException, ClassNotFoundException</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<h2 class="groupheader">Member Data Documentation</h2>
-<a class="anchor" id="a090c5865d241072a5b5a3f7fc8def104"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;String&gt; annis.gui.objects.QueryUIState.aql = new ObjectProperty&lt;&gt;(&quot;&quot;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a622319a654c05b270f486e6fd95cbbed"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;String&gt; annis.gui.objects.QueryUIState.baseText = new ObjectProperty&lt;&gt;(null, String.class)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="ab2a84bfc8de3a6710ac2625c595ab4de"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">transient Map&lt;<a class="el" href="enumannis_1_1gui_1_1objects_1_1_query_u_i_state_1_1_query_type.html">QueryType</a>, Future&lt;?&gt; &gt; annis.gui.objects.QueryUIState.executedTasks</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a39c114e59fb8f8a2f1fcc55be7758b47"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;List&lt;String&gt; &gt; annis.gui.objects.QueryUIState.exportAnnotationKeys = new ObjectProperty&lt;List&lt;String&gt;&gt;(new ArrayList&lt;String&gt;())</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a05e15650f244f5f3a4c75dc09a3b0697"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;String&gt; annis.gui.objects.QueryUIState.exporterName = new ObjectProperty&lt;&gt;(&quot;&quot;)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="af0cb2cfc3ac33098610491bb08630645"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;String&gt; annis.gui.objects.QueryUIState.exportParameters</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= </div>
-<div class="line">    <span class="keyword">new</span> ObjectProperty&lt;&gt;(<span class="stringliteral">&quot;&quot;</span>)</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a174a09440bc3e48a3cbfd070192575c4"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;Set&lt;String&gt; &gt; annis.gui.objects.QueryUIState.frequencyMetaData</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= </div>
-<div class="line">    <span class="keyword">new</span> ObjectProperty&lt;Set&lt;String&gt;&gt; (<span class="keyword">new</span> TreeSet&lt;String&gt;())</div>
-</div><!-- fragment -->
-</div>
-</div>
-<a class="anchor" id="a15fa228a34cef99f9042457155e5cab6"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final BeanContainer&lt;Integer, <a class="el" href="classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html">UserGeneratedFrequencyEntry</a>&gt; annis.gui.objects.QueryUIState.frequencyTableDefinition = new BeanContainer&lt;&gt;(UserGeneratedFrequencyEntry.class)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="aa56bb411989c577df480239c394864b5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final BeanItemContainer&lt;<a class="el" href="classannis_1_1gui_1_1objects_1_1_query.html">Query</a>&gt; annis.gui.objects.QueryUIState.history = new BeanItemContainer&lt;&gt;(Query.class)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a545d9e655e24268cb49c3ae2758f4f09"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;Integer&gt; annis.gui.objects.QueryUIState.leftContext = new ObjectProperty&lt;&gt;(5)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a4c2e89e5170547b4bcb05993a83f8470"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;Integer&gt; annis.gui.objects.QueryUIState.limit = new ObjectProperty&lt;&gt;(10)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a7eb765267dc828fa3a309d462593f240"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;Integer&gt; annis.gui.objects.QueryUIState.offset = new ObjectProperty&lt;&gt;(0)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1b2c19699bdcbdb3b008a950f9f6a9ed"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;<a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html">OrderType</a>&gt; annis.gui.objects.QueryUIState.order = new ObjectProperty&lt;&gt;(<a class="el" href="enumannis_1_1service_1_1objects_1_1_order_type.html#aa366907be7fd06cad3c139829ba17a4a">OrderType.ascending</a>)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a1c0246e9d141f41ad9ae291f1e170454"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;Integer&gt; annis.gui.objects.QueryUIState.rightContext = new ObjectProperty&lt;&gt;(5)</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<a class="anchor" id="a45a20ec73e724a4ee53b91562539083a"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">final ObjectProperty&lt;Set&lt;String&gt; &gt; annis.gui.objects.QueryUIState.selectedCorpora = new ObjectProperty&lt;Set&lt;String&gt;&gt;(new LinkedHashSet&lt;String&gt;())</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">private</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="_query_u_i_state_8java.html">QueryUIState.java</a></li>
-</ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><a class="el" href="namespaceannis.html">annis</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui.html">gui</a></li><li class="navelem"><a class="el" href="namespaceannis_1_1gui_1_1objects.html">objects</a></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html">QueryUIState</a></li>
-    <li class="footer">Generated on Tue Aug 25 2015 15:53:08 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>objects</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1objects_1_1_query_u_i_state.html">QueryUIState</a></li>
+    <li class="footer">Generated on Mon Mar 14 2016 17:21:55 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>
