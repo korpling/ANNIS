@@ -230,7 +230,7 @@ public class CorefVisualizer extends WriterVisualizer
       head.appendChild(linkJQueryUIStructure);
       
       Script scriptJquery = new Script("text/javascript");
-      scriptJquery.setSrc(input.getResourcePath("coref/jquery-2.1.4.min.js"));
+      scriptJquery.setSrc(input.getResourcePath("coref/jquery.js"));
       head.appendChild(scriptJquery);
       
       Script scriptUI = new Script("text/javascript");
