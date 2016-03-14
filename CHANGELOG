@@ -1,3 +1,14 @@
+Version 3.4.0
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0+is%3Aclosed
+
+[Fixed Bugs]
+ #506 possible problems with Apache Collections library and serialization
+ #497 Can't close match reference window while preview is loading
+ #453 Dependencies not showing in Safari Browser
+
 Version 3.4.0-rc5
 =================
 
