@@ -5,6 +5,7 @@ Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0+is%3Aclosed
 
 [Fixed Bugs]
+ #508 "X is not a valid annotation name" error is not removed when "Search" button is clicked.
  #506 possible problems with Apache Collections library and serialization
  #497 Can't close match reference window while preview is loading
  #453 Dependencies not showing in Safari Browser
