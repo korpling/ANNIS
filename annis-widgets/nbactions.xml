@@ -34,4 +34,11 @@
                 <exec.executable>${profiler.java}</exec.executable>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-CodeServer</actionName>
+            <displayName>CodeServer</displayName>
+            <goals>
+                <goal>vaadin:run-codeserver</goal>
+            </goals>
+        </action>
     </actions>

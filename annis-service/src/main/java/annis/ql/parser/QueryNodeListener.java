@@ -297,6 +297,8 @@ public class QueryNodeListener extends AqlParserBaseListener
     }
     lastVariableDefinition = null;
     
+    n.setParseLocation(AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()));
+    
     currentAlternative.put(existingID, n);
     localNodes.put(n.getVariable(), n);
     currentTokenPosition.put(ctx.getSourceInterval(), n);

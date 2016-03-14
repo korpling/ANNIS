@@ -58,7 +58,7 @@ public class AudioVisualizer extends AbstractVisualizer<MediaElementPlayer>
   public MediaElementPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle)
   {
     List<String> corpusPath =
-      CommonHelper.getCorpusPath(input.getDocument().getSCorpusGraph(), input.getDocument());
+      CommonHelper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
     String binaryServletPath = "";
 

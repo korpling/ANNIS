@@ -50,7 +50,14 @@ public class CommaSeperatedStringConverterSet implements Converter<String, TreeS
   public String convertToPresentation(TreeSet value,
     Class<? extends String> targetType, Locale locale) throws ConversionException
   {
-    return joiner.join(value);
+    if(value == null)
+    {
+      return null;
+    }
+    else
+    {
+      return joiner.join(value);
+    }
   }
 
   @Override

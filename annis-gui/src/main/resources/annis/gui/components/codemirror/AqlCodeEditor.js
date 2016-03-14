@@ -131,6 +131,9 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       changeDelayTimerID = window.setTimeout(connector.sendTextIfNecessary, changeDelayTime);
     });
     
+    // While the text changing event has a timeout before it is send
+    // to the server we must be sure it has always the current text
+    // whenever the user leaves the textfield, otherwise the query might be old.
     cmTextArea.on("blur", function(instance)
     {
       connector.sendTextIfNecessary();

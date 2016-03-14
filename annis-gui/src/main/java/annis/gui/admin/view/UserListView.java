@@ -17,17 +17,19 @@
 package annis.gui.admin.view;
 
 import annis.security.User;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
 
 /**
- *
+ * Definition of interactions for a view displaying the user list.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface UserListView
+public interface UserListView extends Serializable
 {
   public void setUserList(Collection<User> users);
   
+  public void setLoadingAnimation(boolean show);
   
   public void addListener(Listener listener);
   
@@ -36,6 +38,7 @@ public interface UserListView
   public void emptyNewUserNameTextField();
   
   public void addAvailableGroupNames(Collection<String> groupNames);
+  public void addAvailablePermissions(Collection<String> permissions);
   
   public interface Listener
   {

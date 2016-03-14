@@ -19,10 +19,9 @@ import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.GridComponent;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Map;
 import java.util.Set;
+import org.corpus_tools.salt.common.STextualDS;
 
 /**
  * A component to visualize matched token and their context as "Keyword in
@@ -97,6 +96,14 @@ public class KWICComponent extends GridComponent implements KWICInterface
   {
     return true;
   }
+
+  @Override
+  protected
+  boolean isCoveredTokenMarked()
+  {
+    return true;
+  }
+  
   
   
 

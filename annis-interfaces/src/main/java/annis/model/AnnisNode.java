@@ -19,7 +19,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -100,10 +99,10 @@ public class AnnisNode implements Serializable
 
   public AnnisNode()
   {
-    nodeAnnotations = new TreeSet<Annotation>();
-    edgeAnnotations = new TreeSet<Annotation>();
-    incomingEdges = new HashSet<Edge>();
-    outgoingEdges = new HashSet<Edge>();
+    nodeAnnotations = new TreeSet<>();
+    edgeAnnotations = new TreeSet<>();
+    incomingEdges = new HashSet<>();
+    outgoingEdges = new HashSet<>();
   }
 
   public AnnisNode(long id)
@@ -299,8 +298,7 @@ public class AnnisNode implements Serializable
     }
     
     if (this.edgeAnnotations != other.edgeAnnotations
-      && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(
-      other.edgeAnnotations)))
+      && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(other.edgeAnnotations)))
     {
       return false;
     }

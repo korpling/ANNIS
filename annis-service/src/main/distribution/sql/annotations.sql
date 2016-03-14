@@ -33,8 +33,8 @@ UNION
 SELECT DISTINCT :id, e.namespace, e.name, e.value, count(r.id) as occurences,
   'edge', c.type, c.layer, c.name
 FROM _rank as r JOIN _component as c ON (r.component_ref = c.id) LEFT OUTER JOIN _edge_annotation as e ON (e.rank_ref = r.id)
-WHERE 
-      c.name IS NOT NULL
+WHERE
+      (c.name IS NOT NULL) OR (c.type = 'd')
 GROUP BY e.namespace, e.name, e.value, c.type, c.layer, c.name
 
 UNION

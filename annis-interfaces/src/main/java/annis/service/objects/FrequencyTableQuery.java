@@ -15,7 +15,6 @@
  */
 package annis.service.objects;
 
-import annis.service.objects.FrequencyTableEntry;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import java.util.ArrayList;

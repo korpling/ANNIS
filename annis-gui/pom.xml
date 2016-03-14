@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.3.6</version>
+    <version>3.4.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -26,7 +26,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
-    <vaadin.version>7.3.10</vaadin.version>
   </properties>
 
   <build>
@@ -100,7 +99,7 @@
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
-        <version>9.0.4.v20130625</version>
+        <version>9.3.7.v20160115</version>
         <configuration>
           <webApp>
             <contextPath>/annis-gui</contextPath>
@@ -113,7 +112,7 @@
           <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-continuation</artifactId>
-            <version>9.0.4.v20130625</version>
+            <version>9.3.7.v20160115</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -132,9 +131,48 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <optimizationLevel>9</optimizationLevel>
+          <style>OBF</style>
+        </configuration>
       </plugin>
       
     </plugins>
+    <pluginManagement>
+    	<plugins>
+    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+    		<plugin>
+    			<groupId>org.eclipse.m2e</groupId>
+    			<artifactId>lifecycle-mapping</artifactId>
+    			<version>1.0.0</version>
+    			<configuration>
+    				<lifecycleMappingMetadata>
+    					<pluginExecutions>
+    						<pluginExecution>
+    							<pluginExecutionFilter>
+    								<groupId>com.vaadin</groupId>
+    								<artifactId>
+    									vaadin-maven-plugin
+    								</artifactId>
+    								<versionRange>
+    									[7.3.10,)
+    								</versionRange>
+    								<goals>
+    									<goal>compile-theme</goal>
+    									<goal>update-theme</goal>
+    									<goal>resources</goal>
+    								</goals>
+    							</pluginExecutionFilter>
+    							<action>
+    								<ignore></ignore>
+    							</action>
+    						</pluginExecution>
+    					</pluginExecutions>
+    				</lifecycleMappingMetadata>
+    			</configuration>
+    		</plugin>
+    	</plugins>
+    </pluginManagement>
   </build>
 
   <dependencies>
@@ -169,7 +207,7 @@
     
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <version>${servlet.version}</version>
       <scope>provided</scope>
     </dependency>
@@ -180,8 +218,21 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>2.49.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-htmlunit-driver</artifactId>
+      <version>2.49.0</version>
+      <scope>test</scope>
+    </dependency>
+    
  
-
   </dependencies>
   <name>annis-gui</name>
 </project>

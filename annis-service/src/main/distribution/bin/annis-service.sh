@@ -31,7 +31,7 @@ launch() {
 			# check if daemon is running
 			if ps -p "$pid" > /dev/null 2>&1; then
             
-            echo "writing PID"
+				echo "writing PID"
 				# daemon is running, save pid
 				echo $pid > $pid_file
 				echo "done." 
@@ -42,7 +42,7 @@ launch() {
 			;;
 		2)
 			stop
-			start
+			launch
 			;;
 	esac
 }
@@ -94,16 +94,16 @@ case "$1" in
 	stop)
 		stop 
 		;;
-   start)
-      export service_args="-d"
-      export jvm_args="-Dannisservice.pid_file=$pid_file"
-      launch
+	start)
+		export service_args="-d"
+		export jvm_args="-Dannisservice.pid_file=$pid_file"
+		launch
 
 		;;
 	restart)
 		export service_args="-d"
-      export jvm_args="-Dannisservice.pid_file=$pid_file"
-      stop
+		export jvm_args="-Dannisservice.pid_file=$pid_file"
+		stop
 		launch
 		;;
 	status)

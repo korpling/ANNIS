@@ -15,7 +15,6 @@
  */
 package annis.test;
 
-import java.util.Map;
 import au.com.bytecode.opencsv.CSVReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,14 +24,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import static org.mockito.Mockito.*;
 import org.slf4j.LoggerFactory;
 
 /**

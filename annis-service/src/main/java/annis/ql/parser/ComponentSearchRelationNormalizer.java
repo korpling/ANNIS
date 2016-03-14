@@ -15,10 +15,10 @@
  */
 package annis.ql.parser;
 
+import annis.model.Join;
 import annis.model.QueryNode;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
-import annis.model.Join;
 import annis.sqlgen.model.PointingRelation;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
@@ -112,7 +112,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     
     QueryNode newTargetNode = new QueryNode(maxID.incrementAndGet(), targetNode, false); 
     newTargetNode.setArtificial(true);
-    newTargetNode.setVariable("x" + targetNode.getVariable());
+    newTargetNode.setVariable("x" + newTargetNode.getId() + "(" + targetNode.getVariable() + ")");
     
     newTargetNode.setThisNodeAsTarget(join);
     
@@ -128,7 +128,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     Preconditions.checkState(sourceNode.removeOutgoingJoin(join), "The join was not attached to the source node.");
     
     QueryNode newNode = new QueryNode(maxID.incrementAndGet(), sourceNode, false);
-    newNode.setVariable("x" + sourceNode.getVariable());
+    newNode.setVariable("x" + newNode.getId() + "(" + sourceNode.getVariable() + ")");
     newNode.addOutgoingJoin(join);
     newNode.setArtificial(true);
     

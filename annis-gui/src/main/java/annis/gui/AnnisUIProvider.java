@@ -30,17 +30,13 @@ public class AnnisUIProvider extends UIProvider
   public Class<? extends UI> getUIClass(UIClassSelectionEvent event)
   {
     String path = event.getRequest().getPathInfo();
-    if("/admin".equals(path))
-    {
-      return AdminUI.class;
-    }
-    else if(path != null && path.startsWith(EmbeddedVisUI.PREFIX))
+    if(path != null && path.startsWith(EmbeddedVisUI.URL_PREFIX))
     {
       return EmbeddedVisUI.class;
     }
     else
     {
-      return SearchUI.class;
+      return AnnisUI.class;
     }
   }
   

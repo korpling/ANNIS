@@ -1,10 +1,217 @@
+Version 3.4.0
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0+is%3Aclosed
+
+[Fixed Bugs]
+ #508 "X is not a valid annotation name" error is not removed when "Search" button is clicked.
+ #506 possible problems with Apache Collections library and serialization
+ #497 Can't close match reference window while preview is loading
+ #453 Dependencies not showing in Safari Browser
+
+Version 3.4.0-rc5
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc5+is%3Aclosed
+
+[Fixed Bugs]
+ #499 GraphML output of the Salt type is not using the most specific class/type
+
+Version 3.4.0-rc4
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc4+is%3Aclosed
+
+[Fixed Bugs]
+ #496 speaker icon in grid does nothing when visualization is embedded
+ #495 invalid GraphML
+ #494 fails to parse tok!="..." when used in the  AQL short form
+
+Version 3.4.0-rc3
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc3+is%3Aclosed
+
+[Fixed Bugs]
+ #493 can't set "default-base-text-segmentation" property to token
+ #491 htmlvis won't output spans which have the same annotation name and the same token span
+
+[Enhancements]
+ #492 htmlvis should support a pseudoregion that covers all token
+
+Version 3.4.0-rc2
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc2+is%3Aclosed
+
+[Fixed Bugs]
+ #490 LegacyGraphConverter modifies original Salt graph
+
+Version 3.4.0-rc1
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc1+is%3Aclosed
+
+[Fixed Bugs]
+ #489 query builder won't work with "tok != "value"
+ #485 Reference links for single matches fail when annotation namespace has a space character
+
+[Enhancements]
+ #488 allow to test the UI with Selenium
+ #487 re-order the physical layout of the fact tables so that columns that are more likely to be used in a (Merge) join are at the beginning
+ #486 better PostgreSQL planner estimations for "same span" operator
+
+Version 3.4.0-preview10
+=======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview10+is%3Aclosed
+
+[Fixed Bugs]
+ #483 fix wrong command: start needs to be launch
+ #479 color highlighting differs in KWIC
+ #478 htmlvis: can't use only "annis:BEGIN" or "annis:END"
+ #474 BEGIN and END instructions not working in htmlvis
+ #473 frequency definition: can't select more than one
+
+[Enhancements]
+ #484 update to jquery 2.2
+ #482 Better statistics for span and annotation columns
+ #481 update to Vaadin 7.6.x
+ #475 mapping properties contain "+" instead of spaces in embedded visualizer
+
+Version 3.4.0-preview9
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview9+is%3Aclosed
+
+[Enhancements]
+ #472 don't output the same frequency definition twice
+ #471 Update to Salt 3.0
+ #469 grid: allow to choose which annotations should show their namespace
+
+
+Version 3.4.0-preview8
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview8+is%3Aclosed
+
+[Fixed Bugs]
+ #468 switching to next page results in empty entry in history panel
+ #467 switching to next page does not work when corpus was de-selected after submitting the query
+ #465 executing search with empty corpus selection throws exception
+ #464 Can't query for corpora where document names contain ","
+
+[Enhancements]
+ #466  allow to import ZIP files in Kickstarter
+
+Version 3.4.0-preview7
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview7+is%3Aclosed
+
+[Fixed Bugs]
+ #458 component normalization fails to generate unique variable name
+ #457 share match: exception when a node is matched twice (as AQL node) 
+ #456 share match: some visualizers don't show the matched nodes
+
+[Enhancements]
+ #463 improve indexes for token related queries
+
+Version 3.4.0-preview6
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestones/3.4.0-preview6
+
+[Fixed Bugs]
+ #455 can't create reference link (match) for queries with more than one node
+
+Version 3.4.0-preview5
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview5+is%3Aclosed
+
+[Enhancements]
+ #454 Allow to share single matches as links for publications
+ #107 Share ANNIS visualizers as web service without front end
+
+Version 3.4.0-preview4
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview4+is%3Aclosed
+
+[Fixed Bugs]
+ #450 Extending a context for single match sometimes fails
+ #449 Error message "Corpus Properties does not exists" when logging in after following a corpus link
+
+[Enhancements]
+ #448 service update script does not copy the shiro.ini file
+ #105 Hit marking in HTML visualizations
+
+Version 3.4.0-preview3
+=====================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview3+is%3Aclosed
+
+[Fixed Bugs]
+ #447 language change in virtual keyboard can trigger exception
+ #446 order field empty when search view is re-attached
+ #444 Error message about not having the access rights for a corpus when validating query
+
+[Enhancements]
+ #445 Allow to show login window at each startup (per instance configuration)
+ #365 Using a corpus URL for a corpus not in the list should open login window
+
+Version 3.4.0-preview2
+=====================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview2+is%3Aclosed
+
+[Fixed Bugs]
+ #443 3.4-0-preview1: query fragment is not longer evaluated
+ #441 annotation existance check fails on annotations without namespace
+
+[Enhancements]
+ #442 add "anonymous" group to each new user per default
+
+Version 3.4.0-preview1
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview1+is%3Aclosed
+
+[Fixed Bugs]
+ #437 AQL: in precedence and near operator the "from" value can be large than the "to" value
+
+[Enhancements]
+ #440 Make it possible to switch to administration UI easily
+ #439 Easier upgrade for the service
+ #438 allow to filter documents by name in document list
+ #436 positions of semantic errors should be highlighted in query editor
+ #435 Existence validator
+ #426 enhance UI responsivness by using Vaadin push mechanism
+
 Version 3.3.6
 =============
 
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.6+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #434 AnnisUser does not implement Serializable
  #433 Authentifaction errors for result
  #431 Error in regular expression triggers exception
@@ -15,7 +222,7 @@ Version 3.3.5
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.5+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #430 Instance font reset in AQL text field
  #429 exit error codes are uniform and not documented
  #428 annis-service-distribution.tar.gz can't be read from Python
@@ -30,7 +237,7 @@ Version 3.3.4
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.4+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #424  Flat query builder disfunctional
 
 Version 3.3.3
@@ -39,7 +246,7 @@ Version 3.3.3
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.3+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #421 AQL errors not cleared when new query is set from server side
  #420 Text in AQL editor might get replaced with an older version
 
@@ -49,7 +256,7 @@ Version 3.3.2
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.2+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #419 server install documentation says ANNIS requires JDK 7 only, but later versions should work as well
  #418 Page offset is not reset when executing a new query
  #417 AQL lost when query panel hidden.
@@ -61,7 +268,7 @@ Version 3.3.1
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.1+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #415 Adding groups after creating a new user will invalidate password (admin UI)
  #414 NotSerializableException in authorization cache
  #413 Text export not working in ANNIS 3.3.0
@@ -74,7 +281,7 @@ Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.0+is%3Aclosed
 
 
-[Bugs]
+[Fixed Bugs]
  #412 Umlaut at beginning or end of annotation name doesn't trigger a parser error
  #411 Whole UI is scrolled when using "page down"
  #407 Corpus information hangs, then 504 error
@@ -111,7 +318,7 @@ Version 3.2.3
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.3+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #399 Firefox 37: no dependency visualization
 
 Version 3.2.2
@@ -120,7 +327,7 @@ Version 3.2.2
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.2+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #384 user that should be restricted to create new users can gain adminstration rights
  #381 fullscreen does not work for login window
  #380 can't import corpus if another corpus has a document with the same name
@@ -136,7 +343,7 @@ Version 3.2.1
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.1+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #375 admin UI: generated hash is not salted
  #374 admin UI: upload button available after failed login attempt
  #373 Highlighting failure in disjunction
@@ -150,7 +357,7 @@ Version 3.2.0
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.0+is%3Aclosed
 
-[Bugs]
+[Fixed Bugs]
  #368 AQL operator window broken in Query Builder
  #363 Tutorial doesn't work in an added instance
  #362 Wrapping in the discourse visualizer fails when line ends in non-maximally underscored element
@@ -190,7 +397,7 @@ https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.0+is%3Aclosed
 Version 3.1.8
 =============
 
-[Bugs]
+[Fixed Bugs]
  #350 AQL normalization fails for node with two outgoing edge annotations
 
 Version 3.1.7
@@ -201,7 +408,7 @@ We would like to give special thanks to Adriane Boyd and Lari Lampen for providi
 Changelog is also available on GitHub:
 https://github.com/korpling/annis/issues?milestone=17&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #340 fixed bug in CorefVisualizer. The annotation name is now displayed
  #336 Existence of directory is not checked when saving corpus properties
  #332 document browser needs long time to load when there is a larger number of metadata
@@ -211,7 +418,7 @@ Version 3.1.6
 Changelog is also available on GitHub:
 https://github.com/korpling/annis/issues?milestone=16&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #325 fetching results (subgraphs) slow
  #324 Source code contains files with invalid (Windows) file names
 
@@ -221,7 +428,7 @@ Version 3.1.5
 Changelog is also available on GitHub:
 https://github.com/korpling/annis/issues?milestone=15&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #323 css style sheet is not read in HTML visualizer when started from document browser on kickstarter
  #322 Invalid regex search error is not caught by interface
  #321 negated metadata queries don't work any longer
@@ -231,7 +438,7 @@ Version 3.1.4
 Changelog is also available on GitHub:
 https://github.com/korpling/annis/issues?milestone=14&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #316 OR-queries with different number of nodes don't work any longer
 
 Version 3.1.3
@@ -239,7 +446,7 @@ Version 3.1.3
 Changelog is also available on GitHub:
 https://github.com/korpling/annis/issues?milestone=13&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #314 Frequency query needs statistics workaround, too
  #313 incorrect documentation for "graph" and "binary"
  #310 corpus.properties is not created if corpus has  "/" in name
@@ -256,7 +463,7 @@ Version 3.1.2
 Changelog is also available on GitHub:
 https://github.com/korpling/annis/issues?milestone=11&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #309 corpora with token which have the same left or right text boundaries can't be imported
 
 Version 3.1.1
@@ -264,7 +471,7 @@ Version 3.1.1
 Changelog is also available on GitHub:
 https://github.com/korpling/annis/issues?milestone=11&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #308 corpus properties are fetched for sub-corpus
 
 Version 3.1.0
@@ -272,7 +479,7 @@ Version 3.1.0
 Changelog is also available on GitHub:
 https://github.com/korpling/annis/issues?milestone=8&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #304 Corpus migration on upgrade of kickstarter in windows fails
  #302 metadata in document browser doesn't work
  #301 Caching bug with document browser
@@ -315,7 +522,7 @@ Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?direction=asc&milestone=10&page=1&sort=created&state=closed
 
 
-[Bugs]
+[Fixed Bugs]
  #221 Precedence optimization fails when applied to spans which cover more than one token
 
 Version 3.0.0
@@ -332,7 +539,7 @@ move the folder on your file system to the new default location.
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?direction=asc&milestone=1&page=1&sort=created&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #158 Exception when using "#c=" fragment
  #155 Cannot create user specific corpus groups (3.0.0-rc.1)
  #147 test fails when building service
@@ -356,7 +563,7 @@ Version 3.0.0-rc.1
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?milestone=7&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #138 Bug in arity operator
  #135 Example query table of the annis-gui should respect the instance config
  #130 Unable to invoke method click in com.vaadin.shared.ui.button.ButtonServerRpc
@@ -395,7 +602,7 @@ Version 3.0.0-alpha.3
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?milestone=6&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #99 Corpus explorer does not output alignment edges with no annotations
  #98 Grid is broken in parallel corpora
  #97 Discourse vis displays multiple texts continuously in parallel corpora
@@ -432,7 +639,7 @@ First public alpha release in the new improved ANNIS 3.0 release series.
 Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 
-[Bugs]
+[Fixed Bugs]
  #31 Regex behavior in Falko metadata is incorrect
  #12 Staging area tables are not deleted after successfull import
  #1 Regex bug with initial optional parentheses

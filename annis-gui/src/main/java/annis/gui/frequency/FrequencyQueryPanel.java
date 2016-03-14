@@ -36,6 +36,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.FieldEvents;
+import com.vaadin.event.LayoutEvents;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -50,6 +51,7 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,6 +61,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +89,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
+  private transient WeakHashMap<Field,Object> field2ItemID;
   
   private final ProgressBar pbQuery = new ProgressBar();
   
@@ -93,7 +97,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
 
   
   public FrequencyQueryPanel(final QueryController controller, QueryUIState state)
-  {
+  {    
     this.controller = controller;
     this.state = state;
     
@@ -133,7 +137,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.setSortEnabled(false);
     tblFrequencyDefinition.setSelectable(true);
     tblFrequencyDefinition.setMultiSelect(true);
-    tblFrequencyDefinition.setTableFieldFactory(new FieldFactory(tblFrequencyDefinition));
+    tblFrequencyDefinition.setTableFieldFactory(new FieldFactory());
     tblFrequencyDefinition.setEditable(true);
     tblFrequencyDefinition.addValueChangeListener(new Property.ValueChangeListener() 
     {
@@ -161,7 +165,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       + "(n1#tok=\"fun\" | n1#tok=\"severity\")"
       + "</pre>");
     lblErrorOrMsg.setContentMode(ContentMode.HTML);
-    lblErrorOrMsg.addStyleName("warning");
+    lblErrorOrMsg.addStyleName("embedded-warning");
     lblErrorOrMsg.setWidth("100%");
     lblErrorOrMsg.setVisible(false);
     queryLayout.addComponent(lblErrorOrMsg);
@@ -189,7 +193,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout.addComponent(tblFrequencyDefinition);
     
     metaNamesContainer = new IndexedContainer();
-    PopupTwinColumnSelect metaSelect = new PopupTwinColumnSelect(metaNamesContainer);
+    PopupTwinColumnSelect metaSelect = new PopupTwinColumnSelect();
+    metaSelect.setSelectableContainer(metaNamesContainer);
     metaSelect.setPropertyDataSource(state.getFrequencyMetaData());
     metaSelect.setCaption("Metadata");
     
@@ -255,6 +260,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           cbAutomaticMode.setValue(Boolean.FALSE);
           tblFrequencyDefinition.removeItem(o);
+          
         }
       }
     });
@@ -357,6 +363,29 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout.setExpandRatio(tblFrequencyDefinition, 1.0f);
     queryLayout.setExpandRatio(layoutButtons, 0.0f);
     queryLayout.setExpandRatio(btShowFrequencies, 0.0f);
+    
+    queryLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener()
+    {
+      @Override
+      public void layoutClick(LayoutEvents.LayoutClickEvent event)
+      {
+        Component c = event.getClickedComponent();
+        if(c instanceof Field)
+        {
+          Object itemID = getField2ItemID().get((Field) c);
+          if(itemID != null)
+          {
+            if(!event.isCtrlKey() && !event.isShiftKey())
+            {
+              // deselect everything else if no modifier key was clicked
+              tblFrequencyDefinition.setValue(null);
+            }
+            // select the item
+            tblFrequencyDefinition.select(itemID);
+          }
+        }
+      }
+    });
     
     btShowQuery = new Button("New Analysis", new Button.ClickListener() 
     {
@@ -532,6 +561,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         lblErrorOrMsg.setVisible(true);
       }
       
+      Set<UserGeneratedFrequencyEntry> generatedEntries = new HashSet<>();
       
       for(QueryNode n : nodes)
       {
@@ -539,24 +569,33 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           if(n.getNodeAnnotations().isEmpty())
           {
-            int id = counter++;
-            
             UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
             entry.setAnnotation("tok");
             entry.setComment("automatically created from " + n.toAQLNodeFragment());
             entry.setNr(n.getVariable());
-            state.getFrequencyTableDefinition().addItem(id, entry);
+            
+            if(!generatedEntries.contains(entry))
+            {
+              int id = counter++;
+              state.getFrequencyTableDefinition().addItem(id, entry);
+              generatedEntries.add(entry);
+            }
           }
           else
           {
-            int id = counter++;
             QueryAnnotation firstAnno = n.getNodeAnnotations().iterator().next();
             
             UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
             entry.setAnnotation(firstAnno.getName());
             entry.setComment("automatically created from " + n.toAQLNodeFragment());
             entry.setNr(n.getVariable());
-            state.getFrequencyTableDefinition().addItem(id, entry);
+            
+            if(!generatedEntries.contains(entry))
+            {
+              int id = counter++;
+              state.getFrequencyTableDefinition().addItem(id, entry);
+              generatedEntries.add(entry);
+            }
           }
         }
       }
@@ -607,14 +646,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     btShowQuery.setVisible(true);
   }
   
-  public static class FieldFactory extends DefaultFieldFactory
+  public class FieldFactory extends DefaultFieldFactory
   {
-    
-    public Table tbl;
 
-    public FieldFactory(Table tbl)
+    public FieldFactory()
     {
-      this.tbl = tbl;
     }
     
     @Override
@@ -626,20 +662,10 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         TextField txt = new TextField(container.getContainerProperty(itemId,
           propertyId));
         txt.setWidth("100%");
-        if (tbl != null)
+        if(itemId != null)
         {
-          txt.addFocusListener(new FieldEvents.FocusListener()
-          {
-
-            @Override
-            public void focus(FieldEvents.FocusEvent event)
-            {
-              tbl.setValue(null);
-              tbl.select(itemId);
-            }
-          });
+          getField2ItemID().put(txt, itemId);
         }
-        
         return txt;
       }
       else if("comment".equals(propertyId))
@@ -652,5 +678,16 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     
   }
+
+  private WeakHashMap<Field, Object> getField2ItemID()
+  {
+    if(field2ItemID == null)
+    {
+      field2ItemID = new WeakHashMap<>();
+    }
+    return field2ItemID;
+  }
+  
+  
   
 }

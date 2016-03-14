@@ -30,9 +30,15 @@ import org.antlr.v4.runtime.misc.Interval;
  */
 public class NodeIDListener extends AqlParserBaseListener
 {
+  /**
+   * Maps a global character position in the input stream to a parse token interval.
+   */
   private final TreeMap<Integer, Interval> allNodeIntervals = new TreeMap<>();
+  /**
+   * Maps a parse token interval to the node ID it overlaps.
+   */
   private final Map<Interval, Long> nodeIntervalToID = new HashMap<>();
-
+  
   private void addNode(AqlParser.VariableExprContext ctx)
   {
     // first only collect all node intervals
@@ -80,7 +86,9 @@ public class NodeIDListener extends AqlParserBaseListener
   @Override
   public void exitStart(AqlParser.StartContext ctx)
   {
-    // iterate over all intervals in order and set the IDs
+    // Iterate over all intervals in order and set the IDs.
+    // Since the map is ordered by the global character position
+    // nodes which are mentioned first get their ID first.
     long id=1;
     for(Interval i : allNodeIntervals.values())
     {

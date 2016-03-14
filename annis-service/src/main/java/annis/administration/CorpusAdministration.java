@@ -15,13 +15,6 @@
  */
 package annis.administration;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
 import annis.CommonHelper;
 import annis.exceptions.AnnisException;
@@ -30,15 +23,22 @@ import annis.utils.ANNISFormatHelper;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Multimap;
 import com.google.common.io.ByteStreams;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -50,6 +50,8 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -112,6 +114,7 @@ public class CorpusAdministration
     // create tables and other stuff that is handled by the scheme fixer
     if (schemeFixer != null)
     {
+      schemeFixer.setDatabaseSchema(pgSchema);
       schemeFixer.checkAndFix();
     }
   }
@@ -858,6 +861,31 @@ public class CorpusAdministration
         getAbsolutePath());
     }
     return false;
+  }
+  
+  public void dumpTable(String tableName, File outputFile)
+  {
+    log.info("Dumping table {} to file {}", tableName, outputFile);
+    administrationDao.dumpTableToResource(tableName, new FileSystemResource(outputFile));
+    if(!outputFile.exists())
+    {
+      try
+      {
+        // when a table is empty to output file is generated, still create an empty
+        // file so the user knows something happend
+        outputFile.createNewFile();
+      }
+      catch (IOException ex)
+      {
+        log.error("Could not create (empty) output file", ex);
+      }
+    }
+  }
+  
+  public void restoreTable(String tableName, File inputFile)
+  {
+    log.info("Restoring table {} from file {}", tableName, inputFile);
+    administrationDao.restoreTableFromResource(tableName, new FileSystemResource(inputFile));
   }
 
   ///// Helper

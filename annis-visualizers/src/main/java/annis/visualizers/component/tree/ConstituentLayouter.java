@@ -16,9 +16,9 @@
 package annis.visualizers.component.tree;
 
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.component.tree.GraphicsBackend.Alignment;
 import annis.model.AnnisNode;
 import annis.model.Edge;
+import annis.visualizers.component.tree.GraphicsBackend.Alignment;
 import com.google.common.base.Preconditions;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.util.Pair;
@@ -26,7 +26,12 @@ import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class ConstituentLayouter<T extends GraphicsItem> {

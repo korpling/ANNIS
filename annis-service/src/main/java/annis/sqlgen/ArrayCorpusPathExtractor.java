@@ -1,10 +1,9 @@
 package annis.sqlgen;
 
-import static java.util.Arrays.asList;
-
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.List;
 

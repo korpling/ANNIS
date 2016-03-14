@@ -15,8 +15,8 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.administration.ImportStatus;
 import annis.administration.CorpusAdministration;
+import annis.administration.ImportStatus;
 import com.google.common.base.Charsets;
 import java.awt.Frame;
 import java.io.File;

@@ -65,13 +65,29 @@ CREATE TABLE annotation_category
   UNIQUE (namespace, name, toplevel_corpus)
 );
 
+-- Create the parent facts table definition. Note that the order of the columns can be important.
+-- When a plan uses a "Materialize" node in a MergeJoin the complete tuple (containing all columns/attributes) will be used
+-- and any join needs to go through each attribute before the attribute it is interested in.
+-- If the attribute is at the end of the tuple this will take much longer. Thus columns
+-- which are more likely to be used in a (Merge) join should be listed first.
 DROP TABLE IF EXISTS facts CASCADE;
 CREATE TABLE facts (
-  fid bigserial,
+  corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
   id bigint,
   text_ref integer,
-  corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
-  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
+  left_token integer,
+  right_token integer,
+  seg_index integer,
+  component_id integer, -- component id
+  rank_id bigint,
+  pre integer, -- pre-order value
+  post integer, -- post-order value
+  parent integer, -- foreign key to rank.pre of the parent node, or NULL for roots
+  "level" integer,
+  node_anno_category INTEGER REFERENCES annotation_category(id),
+  node_annotext varchar COLLATE "C", -- the combined name and value of the annotation, separated by ":"
+  span varchar COLLATE "C",
+  node_qannotext varchar COLLATE "C", -- the combined qualified name (with namespace) of the annotation, separated by ":"
   node_namespace varchar COLLATE "C",
   node_name varchar COLLATE "C",
   salt_id varchar COLLATE "C",
@@ -79,29 +95,23 @@ CREATE TABLE facts (
   "right" integer,
   token_index integer,
   is_token boolean,
-  span varchar COLLATE "C",
-  left_token integer,
-  right_token integer,
   seg_name varchar COLLATE "C",
-  seg_index integer,
-  rank_id bigint,
-  pre integer, -- pre-order value
-  post integer, -- post-order value
-  parent integer, -- foreign key to rank.pre of the parent node, or NULL for roots
   root boolean,
-  "level" integer,
-  component_id integer, -- component id
   edge_type character(1) COLLATE "C", -- edge type of this component
   edge_namespace varchar COLLATE "C", -- optional namespace of the edges’ names
   edge_name varchar COLLATE "C", -- name of the edges in this component
-  node_anno_category INTEGER REFERENCES annotation_category(id),
-  node_annotext varchar COLLATE "C", -- the combined name and value of the annotation, separated by ":"
-  node_qannotext varchar COLLATE "C", -- the combined qualified name (with namespace) of the annotation, separated by ":"
   edge_annotext varchar COLLATE "C", -- the combined name and value of the annotation, separated by ":"
   edge_qannotext varchar COLLATE "C", -- the combined qualified name (with namespace) of the annotation, separated by ":"
   n_sample boolean,
   n_na_sample boolean,
-  PRIMARY KEY (fid)
+  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
+  fid bigserial,
+  PRIMARY KEY (fid),
+  -- additional check constraints
+  CHECK(left_token <= right_token),
+  CHECK(pre <= post)
+-- this check causes problems with some corpora that were created with a buggy version of the Pepepr ANNIS Exporter
+--  CHECK("left" <= "right")
 );
 
 COMMENT ON COLUMN facts.component_id IS 'component id';
@@ -135,6 +145,15 @@ CREATE TABLE corpus_alias
   alias text COLLATE "C",
   corpus_ref bigint references corpus(id) ON DELETE CASCADE,
    PRIMARY KEY (alias, corpus_ref)
+);
+
+DROP TABLE IF EXISTS url_shortener CASCADE;
+CREATE  TABLE url_shortener 
+(
+  id UUID PRIMARY KEY,
+	"owner" varchar,
+  created timestamp with time zone,
+  url varchar
 );
 
 -- stats
@@ -234,4 +253,19 @@ CREATE TABLE example_queries
   "nodes" INTEGER NOT NULL,
   "used_ops" TEXT[] COLLATE "C" NOT NULL,
   "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
+);
+
+
+-- HACK: add a custom operator which is the same as "=" for integers but always
+-- returns 0.995 as join selectivity. See the description
+-- of "annis.hack_operator_same_span" in conf/develop.properties or the
+-- comments in DefaultWhereClauseGenerator#addSameSpanConditions(...)
+-- for details.
+DROP OPERATOR IF EXISTS ^=^ (integer, integer);
+CREATE OPERATOR ^=^ (
+ PROCEDURE= int4eq,
+ LEFTARG = integer,
+ RIGHTARG = integer,
+ JOIN = 'nlikejoinsel',
+ MERGES
 );

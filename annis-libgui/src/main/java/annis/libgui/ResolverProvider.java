@@ -16,8 +16,8 @@
 package annis.libgui;
 
 import annis.resolver.ResolverEntry;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.Serializable;
+import org.corpus_tools.salt.common.SDocument;
 
 /**
  *

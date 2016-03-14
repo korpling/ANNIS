@@ -15,32 +15,29 @@
  */
 package annis.sqlgen;
 
-import annis.model.QueryAnnotation;
-import static annis.sqlgen.TableAccessStrategy.*;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.SubgraphFilter;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.SqlConstraints.sqlString;
+import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
+import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import static com.google.common.collect.Multimaps.index;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**

@@ -15,37 +15,35 @@
  */
 package annis.administration;
 
+import annis.AnnisBaseRunner;
+import annis.AnnisRunnerException;
+import annis.UsageException;
+import annis.corpuspathsearch.Search;
+import annis.dao.QueryDao;
+import annis.dao.autogenqueries.QueriesGenerator;
+import annis.utils.Utils;
+import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-
-import annis.AnnisBaseRunner;
-import annis.AnnisRunnerException;
-import annis.UsageException;
-import annis.corpuspathsearch.Search;
-import annis.dao.AnnisDao;
-import annis.dao.autogenqueries.QueriesGenerator;
-import annis.utils.Utils;
-import java.io.File;
-import java.util.LinkedList;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 public class AnnisAdminRunner extends AnnisBaseRunner
 {
@@ -55,7 +53,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   // API for corpus administration
 
   private CorpusAdministration corpusAdministration;
-  private AnnisDao annisDao;
+  private QueryDao queryDao;
 
   private QueriesGenerator queriesGenerator;
   
@@ -139,6 +137,18 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     else if("cleanup-data".equals(command))
     {
       doCleanupData(commandArgs);
+    }
+    else if("check-db-schema-version".equals(command))
+    {
+      doCheckDBSchemaVersion();
+    }
+    else if("dump".equals(command))
+    {
+      doDumpTable(commandArgs);
+    }
+    else if("restore".equals(command))
+    {
+      doRestoreTable(commandArgs);
     }
     else
     {
@@ -417,7 +427,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         throw new ParseException(
           "Needs two arguments: corpus name and output folder");
       }
-      annisDao.exportCorpus(cmdLine.getArgs()[0], new File(cmdLine.getArgs()[1]));
+      queryDao.exportCorpus(cmdLine.getArgs()[0], new File(cmdLine.getArgs()[1]));
       
     }
     catch (ParseException ex)
@@ -448,7 +458,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         // interpret this as name
         try
         {
-          long numericID = annisDao.mapCorpusNameToId(id.trim());
+          long numericID = queryDao.mapCorpusNameToId(id.trim());
           ids.add(numericID);
         }
         catch(IllegalArgumentException ex)
@@ -573,6 +583,34 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       }
     }
   }
+  
+  
+  public void doCheckDBSchemaVersion()
+  {
+    if(corpusAdministration.checkDatabaseSchemaVersion())
+    {
+      out.println("Correct ANNNIS database schema version.");
+      System.exit(0);
+    }
+    else
+    {
+      out.println("Wrong ANNNIS database schema version.");
+      System.exit(1);
+    }
+    
+  }
+  
+  public void doDumpTable(List<String> commandArgs)
+  {
+    Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the output file as argument");
+    corpusAdministration.dumpTable(commandArgs.get(0), new File(commandArgs.get(1)));
+  }
+  
+  public void doRestoreTable(List<String> commandArgs)
+  {
+    Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the input file as argument");
+    corpusAdministration.restoreTable(commandArgs.get(0), new File(commandArgs.get(1)));
+  }
 
   private void usage(String error)
   {
@@ -679,14 +717,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     this.corpusAdministration = administration;
   }
 
-  public AnnisDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
   
   

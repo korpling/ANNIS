@@ -31,8 +31,6 @@ import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.util.SimpleByteSource;
-import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -73,7 +71,7 @@ public class ANNISUserRealm extends AuthorizingRealm implements
     SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 
     User user = confManager.getUser(userName);
-
+    
     if(user != null)
     {
       // only add any user role/permission if account is not expired
@@ -83,7 +81,8 @@ public class ANNISUserRealm extends AuthorizingRealm implements
 
         info.addRoles(user.getGroups());
         info.addRole(defaultUserRole);
-
+        // add the permission to create url short IDs from every IP
+        info.addStringPermission("shortener:create:*");       
         // add any manual given permissions
         info.addStringPermissions(user.getPermissions());
       }
@@ -91,6 +90,16 @@ public class ANNISUserRealm extends AuthorizingRealm implements
     else if(userName.equals(anonymousUser))
     {
       info.addRole(anonymousUser);
+      if (confManager.getUseShortenerWithoutLogin() != null)
+      {
+        // add the permission to create url short IDs from the trusted IPs
+        for(String trustedIPs : confManager.getUseShortenerWithoutLogin())
+        {
+          info.addStringPermission("shortener:create:" + trustedIPs.replaceAll(
+            "[.:]", "_"));
+        }
+      }
+
     }
     return info;
   }

@@ -17,14 +17,19 @@ package annis.gui;
 
 import annis.gui.beans.CitationProvider;
 import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.Query;
+import annis.gui.objects.QueryGenerator;
+import annis.libgui.Helper;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,19 +45,24 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
   public Object generateCell(Table source, Object itemId, Object columnId)
   {
     Button btLink = new Button();
-    btLink.setStyleName(BaseTheme.BUTTON_LINK);
-    btLink.setIcon(FontAwesome.LINK);
-    btLink.setDescription("show citation link");
+    btLink.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+    btLink.setIcon(FontAwesome.SHARE_ALT);
+    btLink.setDescription("Share query reference link");
     btLink.addClickListener(this);
 
-    if(itemId instanceof CitationProvider)
+    
+    if(itemId instanceof DisplayedResultQuery)
     {
-      final CitationProvider citationProvider = (CitationProvider) itemId;
-      btLink.addClickListener(new LinkClickListener(citationProvider));
+      btLink.addClickListener(new LinkClickListener((DisplayedResultQuery) itemId));
     }
     else if(itemId instanceof Query)
     {
       final CitationProvider citationProvider = new CitationProviderForQuery((Query) itemId);
+      btLink.addClickListener(new LinkClickListener(citationProvider));
+    }
+    else if(itemId instanceof CitationProvider)
+    {
+      final CitationProvider citationProvider = (CitationProvider) itemId;
       btLink.addClickListener(new LinkClickListener(citationProvider));
     }
 
@@ -120,24 +130,44 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
   {
 
     private final CitationProvider citationProvider;
+    private final DisplayedResultQuery query;
 
     public LinkClickListener(CitationProvider citationProvider)
     {
       this.citationProvider = citationProvider;
+      this.query = null;
+    }
+    
+    public LinkClickListener(DisplayedResultQuery query)
+    {
+      this.citationProvider = null;
+      this.query = query;
     }
 
     @Override
     public void buttonClick(ClickEvent event)
     {
 
-      if(citationProvider != null)
+      if(query != null)
       {
-        CitationWindow c =
-          new CitationWindow(
-          citationProvider.getQuery(),
-          citationProvider.getCorpora(),
-          citationProvider.getLeftContext(),
-          citationProvider.getRightContext());
+        ShareQueryReferenceWindow c
+          = new ShareQueryReferenceWindow(query, !Helper.isKickstarter(VaadinSession.getCurrent()));
+        UI.getCurrent().addWindow(c);
+        c.center();
+      }
+      else if(citationProvider != null)
+      {
+        ShareQueryReferenceWindow c
+          = new ShareQueryReferenceWindow(
+            QueryGenerator.displayed()
+            .query(citationProvider.getQuery())
+            .corpora(citationProvider.getCorpora())
+            .left(citationProvider.getLeftContext())
+            .right(citationProvider.getRightContext())
+            .offset(0)
+            .limit(10)
+            .build(),
+          !Helper.isKickstarter(VaadinSession.getCurrent()));
         UI.getCurrent().addWindow(c);
         c.center();
       }

@@ -15,7 +15,7 @@
  */
 package annis;
 
-import annis.dao.AnnisDao;
+import annis.dao.QueryDao;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.Match;
@@ -36,7 +36,7 @@ public class GraphHelper  {
    * @param matchGroup
    * @return 
    */
-  public static QueryData createQueryData(MatchGroup matchGroup, AnnisDao annisDao)
+  public static QueryData createQueryData(MatchGroup matchGroup, QueryDao annisDao)
   {
     QueryData queryData = new QueryData();
 

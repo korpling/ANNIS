@@ -34,8 +34,20 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.UI;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -43,9 +55,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -99,15 +113,13 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
   
-  private final EventBus loginDataLostBus = new EventBus();
+  private transient EventBus loginDataLostBus;
   
   @Override
   protected void init(VaadinRequest request)
   {  
     
     initLogging();
-    // load some additional properties from our ANNIS configuration
-    loadApplicationProperties("annis-gui.properties");
     
     // store the webservice URL property explicitly in the session in order to 
     // access it from the "external" servlets
@@ -160,7 +172,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    * @param configFile The file path of the configuration file relative to the base config folder.
    * @return list of files or directories in the order in which they should be processed (most important is last)
    */
-  protected List<File> getAllConfigLocations(String configFile)
+  public static List<File> getAllConfigLocations(String configFile)
   {
     LinkedList<File> locations = new LinkedList<File>();
 
@@ -185,21 +197,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return locations;
   }
 
-  protected void loadApplicationProperties(String configFile)
-  {
-
-    List<File> locations = getAllConfigLocations(configFile);
-
-    // load properties in the right order
-    for(File f : locations)
-    {
-      loadPropertyFile(f);
-    }
-  }
-
   protected Map<String, InstanceConfig> loadInstanceConfig()
   {
-    TreeMap<String, InstanceConfig> result = new TreeMap<String, InstanceConfig>();
+    TreeMap<String, InstanceConfig> result = new TreeMap<>();
 
 
     // get a list of all directories that contain instance informations
@@ -211,20 +211,23 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
         // get all sub-files ending on ".json"
         File[] instanceFiles =
           root.listFiles((FilenameFilter) new SuffixFileFilter(".json"));
-        for(File i : instanceFiles)
+        if(instanceFiles != null)
         {
-          if(i.isFile() && i.canRead())
+          for(File i : instanceFiles)
           {
-            try
+            if(i.isFile() && i.canRead())
             {
-              InstanceConfig config = getJsonMapper().readValue(i, InstanceConfig.class);
-              String name = StringUtils.removeEnd(i.getName(), ".json");
-              config.setInstanceName(name);
-              result.put(name, config);
-            }
-            catch (IOException ex)
-            {
-              log.warn("could not parse instance config: " + ex.getMessage());
+              try
+              {
+                InstanceConfig config = getJsonMapper().readValue(i, InstanceConfig.class);
+                String name = StringUtils.removeEnd(i.getName(), ".json");
+                config.setInstanceName(name);
+                result.put(name, config);
+              }
+              catch (IOException ex)
+              {
+                log.warn("could not parse instance config: " + ex.getMessage());
+              }
             }
           }
         }
@@ -242,28 +245,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return result;
   }
 
-  private void loadPropertyFile(File f)
-  {
-   if(f.canRead() && f.isFile())
-    {
-      try(FileInputStream fis = new FileInputStream(f))
-      {
-        Properties p = new Properties();
-        p.load(fis);
-        
-        // copy all properties to the session
-        for(String name : p.stringPropertyNames())
-        {
-          getSession().setAttribute(name, p.getProperty(name));
-        }
-        
-      }
-      catch(IOException ex)
-      {
-
-      }
-    }
-  }
 
   protected final void initLogging()
   {
@@ -330,7 +311,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
-    
     addCustomUIPlugins(pluginManager);
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
@@ -376,7 +356,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
   }
   
-  private void checkIfRemoteLoggedIn(VaadinRequest request)
+  private static void checkIfRemoteLoggedIn(VaadinRequest request)
   {
      // check if we are logged in using an external authentification mechanism
       // like Schibboleth
@@ -490,7 +470,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return jsonMapper;
   }
   
-  private class RemoteUserRequestHandler implements RequestHandler
+  private static class RemoteUserRequestHandler implements RequestHandler
   {
 
     @Override
@@ -505,8 +485,12 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   public EventBus getLoginDataLostBus()
   {
+    if(loginDataLostBus == null)
+    {
+      loginDataLostBus = new EventBus();
+    }
     return loginDataLostBus;
   }
-  
+ 
   
 }

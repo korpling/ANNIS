@@ -16,9 +16,9 @@
 package annis.service;
 
 import annis.service.objects.MatchGroup;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import javax.ws.rs.core.Response;
+import org.corpus_tools.salt.common.SaltProject;
 
 /**
  * Interface defining the REST API calls that ANNIS provides for querying the

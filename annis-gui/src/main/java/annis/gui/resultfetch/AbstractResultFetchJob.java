@@ -20,7 +20,7 @@ import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import org.corpus_tools.salt.common.SaltProject;
 
 /**
  * Asks for salt graphs for a given {@link MatchGroup}.

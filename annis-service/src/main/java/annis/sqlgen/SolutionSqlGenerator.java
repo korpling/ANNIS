@@ -15,19 +15,17 @@
  */
 package annis.sqlgen;
 
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.internal.QueryServiceImpl;
 import annis.service.objects.OrderType;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

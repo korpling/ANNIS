@@ -15,19 +15,18 @@
  */
 package annis.sqlgen;
 
-import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.SqlConstraints.sqlString;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import com.google.common.collect.Lists;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
-
-import static annis.sqlgen.TableAccessStrategy.*;
-import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
-import static annis.sqlgen.SqlConstraints.sqlString;
-import com.google.common.collect.Lists;
 
 /**
  *

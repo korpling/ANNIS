@@ -15,18 +15,17 @@
  */
 package annis.ql.parser;
 
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import com.google.common.base.Joiner;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
-
-import annis.model.QueryNode;
-import annis.model.QueryAnnotation;
-import com.google.common.base.Joiner;
-import java.util.Iterator;
-import java.util.LinkedList;
 import org.slf4j.LoggerFactory;
 
 public class QueryData implements Cloneable

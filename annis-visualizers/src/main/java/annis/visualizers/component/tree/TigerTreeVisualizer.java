@@ -17,23 +17,33 @@ package annis.visualizers.component.tree;
 
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.component.AbstractImageVisualizer;
-import annis.visualizers.component.tree.backends.staticimg.AbstractImageGraphicsItem;
-import annis.visualizers.component.tree.backends.staticimg.Java2dBackend;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
 import annis.service.ifaces.AnnisResult;
+import annis.visualizers.component.AbstractImageVisualizer;
+import annis.visualizers.component.tree.backends.staticimg.AbstractImageGraphicsItem;
+import annis.visualizers.component.tree.backends.staticimg.Java2dBackend;
+import com.vaadin.ui.Notification;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.*;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
@@ -336,26 +346,35 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
         layouts.add(item);
       }
     }
-
-    BufferedImage image = new BufferedImage(
-      (int) (width + (layouts.size() - 1) * TREE_DISTANCE + 2 * SIDE_MARGIN),
-      (int) (maxheight + 2 * TOP_MARGIN), BufferedImage.TYPE_INT_ARGB);
-    Graphics2D canvas = createCanvas(image);
-    double xOffset = SIDE_MARGIN;
-    for(AbstractImageGraphicsItem item : layouts)
+    
+    BufferedImage image;
+    if(width == 0 || maxheight == 0)
     {
-      AffineTransform t = canvas.getTransform();
-      Rectangle2D bounds = item.getBounds();
-      canvas.translate(xOffset, TOP_MARGIN + maxheight - bounds.getHeight());
-      renderTree(item, canvas);
-      xOffset += bounds.getWidth() + TREE_DISTANCE;
-      canvas.setTransform(t);
+      Notification.show("Can't generate tree visualization.", Notification.Type.WARNING_MESSAGE);
+      image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+    }
+    else
+    {
+      image = new BufferedImage(
+        (int) (width + (layouts.size() - 1) * TREE_DISTANCE + 2 * SIDE_MARGIN),
+        (int) (maxheight + 2 * TOP_MARGIN), BufferedImage.TYPE_INT_ARGB);
+      Graphics2D canvas = createCanvas(image);
+      double xOffset = SIDE_MARGIN;
+      for(AbstractImageGraphicsItem item : layouts)
+      {
+        AffineTransform t = canvas.getTransform();
+        Rectangle2D bounds = item.getBounds();
+        canvas.translate(xOffset, TOP_MARGIN + maxheight - bounds.getHeight());
+        renderTree(item, canvas);
+        xOffset += bounds.getWidth() + TREE_DISTANCE;
+        canvas.setTransform(t);
+      }
     }
     try
     {
       ImageIO.write(image, "png", outstream);
     }
-    catch(IOException e)
+    catch (IOException e)
     {
       throw new RuntimeException(e);
     }

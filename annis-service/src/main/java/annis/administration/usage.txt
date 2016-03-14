@@ -72,3 +72,11 @@ usage:
     will be deleted.
 
 * cleanup-data: Delete files not used by this instance in the data directory.
+
+* check-db-schema-version: Check if the schema used for the databases tables is the correct one. If not re-initialization is necessary.
+
+* dump: Dump a single table to a file.
+  Specificy the table name and the output file as arguments.
+
+* restore: Restore a single table from a file. 
+  Specificy the table name and the input file as arguments.

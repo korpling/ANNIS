@@ -15,12 +15,10 @@
  */
 package annis.service.objects;
 
+import annis.service.ifaces.AnnisToken;
 import java.util.HashMap;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import annis.service.ifaces.AnnisToken;
 
 public class AnnisTokenImpl extends HashMap<String, String> implements AnnisToken
 {

@@ -16,8 +16,9 @@
 package annis.libgui;
 
 import com.sun.jersey.api.client.Client;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class AnnisUser implements Serializable
 {
@@ -25,7 +26,7 @@ public class AnnisUser implements Serializable
   
   private final String userName;
   /** Never store the password on the disk */
-  private final transient String password;
+  private transient String password;
   private final boolean remote;
   
   public AnnisUser(String userName, String password)
@@ -46,6 +47,14 @@ public class AnnisUser implements Serializable
   public String getUserName()
   {
     return userName;
+  }
+  
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+
+    // explicitly set the password to "null" to make findbugs happy
+    this.password = null;
   }
 
 

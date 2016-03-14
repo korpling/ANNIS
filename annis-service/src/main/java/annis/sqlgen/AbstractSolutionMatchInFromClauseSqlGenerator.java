@@ -15,10 +15,9 @@
  */
 package annis.sqlgen;
 
-import java.util.List;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.util.List;
 
 public abstract class AbstractSolutionMatchInFromClauseSqlGenerator extends
     AbstractSqlGenerator implements FromClauseSqlGenerator<QueryData>

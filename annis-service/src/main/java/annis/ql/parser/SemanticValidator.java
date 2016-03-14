@@ -16,8 +16,9 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
-import annis.model.QueryNode;
+import annis.model.AqlParseError;
 import annis.model.Join;
+import annis.model.QueryNode;
 import annis.sqlgen.model.NonBindingJoin;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
@@ -51,13 +52,13 @@ public class SemanticValidator implements QueryDataTransformer
     int i = 1;
     for (List<QueryNode> alternative : data.getAlternatives())
     {
-      checkAlternative(data, alternative, i++);
+      checkAlternative(data, alternative, i++, data.getAlternatives().size() > 1);
     }
     // we actually don't manipulate the output
     return data;
   }
 
-  public void checkAlternative(QueryData data, List<QueryNode> alternative, int alternativeIndex)
+  public void checkAlternative(QueryData data, List<QueryNode> alternative, int alternativeIndex, boolean queryWasNormalized)
   {
     // check if there is at least one search expression
     if (alternative.isEmpty())
@@ -73,7 +74,7 @@ public class SemanticValidator implements QueryDataTransformer
       {
         if (j.getTarget() != null)
         {
-          throw new AnnisQLSemanticsException(
+          throw new AnnisQLSemanticsException(j.getParseLocation(),
             "No binary linguistic relations allowed if there is only one node in query.");
         }
       }
@@ -98,30 +99,29 @@ public class SemanticValidator implements QueryDataTransformer
    
     // check if each node is contained in the connected nodes
     if (!unconnectedNodes.isEmpty())
-    { 
-      List<String> variables = new LinkedList<>();
+    {
+      List<AqlParseError> errors = new LinkedList<>();
+      
       for (QueryNode n : alternative)
       {
         if(unconnectedNodes.contains(n.getId()))
         {
-          variables.add(n.getVariable());
+          errors.add(new AqlParseError(n, "variable \""
+            + n.getVariable() + "\" not bound (use linguistic operators)"));
+
         }
       }
       
-      if(alternative.size() == 1)
+      if(!errors.isEmpty())
       {
-        throw new AnnisQLSemanticsException("Variable(s) ["
-          + Joiner.on(",").join(variables)
-          + "] not bound (use linguistic operators).");
-      }
-      else
-      {
-        throw new AnnisQLSemanticsException("Variable(s) ["
-          + Joiner.on(",").join(variables)
-          + "] not bound in alternative "
-          + alternativeIndex + "(use linguistic operators). "
-          + "Normalized query is: \n"
-          + data.toAQL());
+        if(queryWasNormalized)
+        {
+          // add the normalized query as "error" so the user is able to see it
+          errors.add(new AqlParseError("Normalized query is: \n"
+          + data.toAQL()));
+        }
+        
+        throw new AnnisQLSemanticsException("Not all variables bound", errors);
       }
     }
     

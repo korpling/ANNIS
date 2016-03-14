@@ -15,12 +15,9 @@
  */
 package annis.provider;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonPackage;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import java.io.BufferedOutputStream;
+import annis.model.AnnisConstants;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,6 +25,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -35,17 +35,37 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.BinaryResourceImpl;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.xmi.XMIResource;
-import org.eclipse.emf.ecore.xmi.XMLParserPool;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
-import org.eclipse.emf.ecore.xmi.impl.XMLParserPoolImpl;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpus;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.SaltUtil;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.ATT_XMI_VERSION;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SALTCORE;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SDOCUMENTSTRUCTURE;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SALTCORE;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SDOCUMENTSTRUCTURE;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XMI;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XSI;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_XMI;
+import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_XSI;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Handler;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  *
@@ -55,14 +75,13 @@ import org.slf4j.LoggerFactory;
 public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
   MessageBodyReader<SaltProject>
 {
-  
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltProjectProvider.class);
-  private static final XMLParserPool xmlParserPool = 
-    new XMLParserPoolImpl();
-  
-  public static final MediaType APPLICATION_XMI_BINARY = new MediaType("application",
-    "xmi+binary");
-  public static final MediaType APPLICATION_XMI_XML = new MediaType("application",
+
+  private static final XMLOutputFactory outFactory = XMLOutputFactory.newFactory();
+
+  public static final MediaType APPLICATION_XMI_XML = new MediaType(
+    "application",
     "xmi+xml");
 
   @Override
@@ -71,7 +90,6 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
   {
     return (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)
       || MediaType.TEXT_XML_TYPE.isCompatible(mediaType)
-      || APPLICATION_XMI_BINARY.isCompatible(mediaType)
       || APPLICATION_XMI_XML.isCompatible(mediaType))
       && SaltProject.class.isAssignableFrom(type);
   }
@@ -92,61 +110,55 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     throws IOException, WebApplicationException
   {
 
-    
-    Resource resource;
-    Map<Object,Object> options = new HashMap<Object, Object>();
-    if(APPLICATION_XMI_BINARY.isCompatible(mediaType))
-    {
-      resource = new BinaryResourceImpl();
-    }
-    else
-    {
-      resource = new XMIResourceImpl();
-      options.putAll(((XMIResourceImpl) resource).getDefaultSaveOptions());
-      
-      options.put(XMIResource.OPTION_ENCODING, "UTF-8");
-      options.put(XMIResource.OPTION_CONFIGURATION_CACHE, Boolean.TRUE);
-      options.put(XMIResource.OPTION_USE_CACHED_LOOKUP_TABLE, new ArrayList());
-      options.put(XMIResource.OPTION_FORMATTED, Boolean.FALSE);
-      options.put(XMIResource.OPTION_PROCESS_DANGLING_HREF, "DISCARD");
-    }
-    
-    // add the project itself
-    resource.getContents().add(project);
+    SaltXML10Writer writer = new SaltXML10Writer();
 
-    // add all SDocumentGraph elements
-    for (SCorpusGraph corpusGraph : project.getSCorpusGraphs())
-    {
-      for (SDocument doc : corpusGraph.getSDocuments())
-      {
-        if (doc.getSDocumentGraph() != null)
-        {
-          resource.getContents().add(doc.getSDocumentGraph());
-        }
-      }
-    }
-    
-    long startTime = System.currentTimeMillis();
     try
     {
-      resource.save(new BufferedOutputStream(entityStream, 512*1024), options); 
-      entityStream.flush();
-    }
-    catch(Exception ex)
-    {
-      log.error("exception when serializing SaltProject", ex);
-    }
-    long endTime = System.currentTimeMillis();
-    log.debug("Saving XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
-  }
+      XMLStreamWriter xml = outFactory.createXMLStreamWriter(entityStream, "UTF-8");
 
+      xml.writeStartDocument("1.0");
+      xml.writeCharacters("\n");
+      long startTime = System.currentTimeMillis();
+      
+      // output XMI root element
+      writer.writeXMIRootElement(xml);
+      
+      for(SCorpusGraph corpusGraph : project.getCorpusGraphs())
+      {
+        for(SDocument doc : corpusGraph.getDocuments())
+        {
+          // make sure that any ANNIS feature on the document is copied to the document graph
+          SDocumentGraph docGraph = doc.getDocumentGraph();
+          for(SFeature feat : doc.getFeatures())
+          {
+            if(AnnisConstants.ANNIS_NS.equals(feat.getNamespace()))
+            {
+              SFeature newFeat = SaltFactory.createSFeature();
+              feat.copy(newFeat);
+              docGraph.addFeature(newFeat);
+            }
+          }
+          
+          writer.writeObjects(xml, docGraph);
+        }
+      }
+      xml.writeEndDocument();
+      long endTime = System.currentTimeMillis();
+      log.debug("Saving XMI (" + mediaType.toString() + ") needed {} ms",
+        endTime - startTime);
+    }
+    catch (XMLStreamException ex)
+    {
+      log.error("exception when serializing SDocumentGraph", ex);
+    }
+  }
+  
   @Override
   public boolean isReadable(Class<?> type, Type genericType,
     Annotation[] annotations, MediaType mediaType)
   {
     return (MediaType.APPLICATION_XML_TYPE.isCompatible(mediaType)
       || MediaType.TEXT_XML_TYPE.isCompatible(mediaType)
-      || APPLICATION_XMI_BINARY.isCompatible(mediaType)
       || APPLICATION_XMI_XML.isCompatible(mediaType))
       && SaltProject.class.isAssignableFrom(type);
   }
@@ -158,92 +170,106 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     IOException,
     WebApplicationException
   {
-   
-    Resource resource;
-    long startTime = System.currentTimeMillis();
-    if(APPLICATION_XMI_BINARY.isCompatible(mediaType))
-    {
-      resource = loadBinary(new NonCloseableInputStream(entityStream));
-    }
-    else
-    {
-      resource = loadXMI(new NonCloseableInputStream(entityStream));
-    }
-    long endTime = System.currentTimeMillis();
-    log.debug("Loading XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
+    SaltProject result = SaltFactory.createSaltProject();
     
-    SaltProject project = SaltCommonFactory.eINSTANCE.createSaltProject();
+    SAXParser parser;
+		XMLReader xmlReader;
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    MixedContentHandler handler = new MixedContentHandler();
     
-    TreeIterator<EObject> itContents = resource.getAllContents();
-    while(itContents.hasNext())
-    {
-      EObject o = itContents.next();
-      if(o instanceof SaltProject)
-      {
-        project = (SaltProject) o;
-        break;
-      }
-    }
-    
-    return project;
-  }
-  
-  private BinaryResourceImpl loadBinary(InputStream entityStream) throws IOException
-  {
-    BinaryResourceImpl resource = new BinaryResourceImpl();
-    
-    ResourceSet resourceSet = new ResourceSetImpl();
-    resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
-      SaltCommonPackage.eINSTANCE);
-
-    resourceSet.getResources().add(resource);
-
-
     try
     {
-      resource.load(entityStream, null);
+      parser = factory.newSAXParser();
+      xmlReader = parser.getXMLReader();
+      xmlReader.setContentHandler(handler);
+      InputSource source = new InputSource(entityStream);
+      source.setEncoding("UTF-8");
+      xmlReader.parse(source);
+      
+      for(SDocumentGraph g : handler.getDocGraphs())
+      {
+        
+        // create a separate corpus graph for each document
+        SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
+        
+        SCorpus parentCorpus = null;
+        SDocument doc = null;
+        
+        List<SNode> nodes = g.getNodes();
+        Iterator<String> it;
+        if(nodes != null && !nodes.isEmpty())
+        {
+          // the path of each node ID is always the document/corpus path
+          it = nodes.get(0).getPath().segmentsList().iterator();
+        }
+        else
+        {
+          // Old salt versions had a separate ID for the document graph
+          // which was the document name with the suffix "_graph".
+          // Thus this method of getting the corpus path is only the fallback.
+          it = g.getPath().segmentsList().iterator();
+        }
+        
+        
+        while(it.hasNext())
+        {
+          String name = it.next();
+          if(it.hasNext())
+          {
+            // this is a sub-corpus
+            parentCorpus = corpusGraph.createCorpus(parentCorpus, name);
+          }
+          else
+          {
+            // no more path elements left, must be a document
+            doc = corpusGraph.createDocument(parentCorpus, name);
+            break;
+          }
+        }
+        if(doc != null)
+        {
+          result.addCorpusGraph(corpusGraph);
+          doc.setDocumentGraph(g);
+        }
+      }
+      
     }
-    catch(IOException ex)
+    catch(ParserConfigurationException | SAXException ex)
     {
-      log.error("Salt binary deserialization failed", ex);
+      log.error("Error when parsing XMI", ex);
     }
-    return resource;
+    return result;
   }
   
-  private XMIResourceImpl loadXMI(InputStream entityStream) throws IOException
+  public static class MixedContentHandler extends SaltXML10Handler
   {
-    XMIResourceImpl resource = new XMIResourceImpl();
-    
-    ResourceSet resourceSet = new ResourceSetImpl();
-    resourceSet.getPackageRegistry().put(SaltCommonPackage.eINSTANCE.getNsURI(),
-      SaltCommonPackage.eINSTANCE);
-
-    resourceSet.getResources().add(resource);
-    
-    Map<Object,Object> options = resource.getDefaultLoadOptions();
-    options.put(XMIResource.OPTION_USE_PARSER_POOL, xmlParserPool);
-    options.put(XMIResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);
-    options.put(XMIResource.OPTION_DISABLE_NOTIFY, Boolean.FALSE);
-    options.put(XMIResource.OPTION_USE_DEPRECATED_METHODS, Boolean.FALSE);
-    
-    resource.load(entityStream, options);
-    
-    return resource;
+    public List<SDocumentGraph> getDocGraphs()
+    {
+      List<SDocumentGraph> docGraphs = new LinkedList<>();
+      for(Object o : getRootObjects())
+      {
+        if(o instanceof SDocumentGraph) {
+          docGraphs.add((SDocumentGraph) o);
+        }
+      }
+      return docGraphs;
+    }
   }
-  
+
   /**
-   * An {@link InputStream} that delegates all of the actions
-   * to a delegate object but can't be closed.
-   * 
-   * In {@link SaltProjectProvider#readFrom(java.lang.Class, java.lang.reflect.Type, java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType, javax.ws.rs.core.MultivaluedMap, java.io.InputStream) } we have to make
-   * sure the provided {@link InputStream} is not closed. Unfurtunally the
-   * SAX parser will always close the stream and there seems to be no option to
-   * avoid that. Thus we use this hack where the {@link #close() }
+   * An {@link InputStream} that delegates all of the actions to a delegate
+   * object but can't be closed.
+   *
+   * In {@link SaltProjectProvider#readFrom(java.lang.Class, java.lang.reflect.Type, java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType, javax.ws.rs.core.MultivaluedMap, java.io.InputStream)
+   * } we have to make sure the provided {@link InputStream} is not closed.
+   * Unfurtunally the SAX parser will always close the stream and there seems to
+   * be no option to avoid that. Thus we use this hack where the {@link #close()
+   * }
    * function does nothing.
    */
   public static class NonCloseableInputStream extends InputStream
   {
-    
+
     private final InputStream delegate;
 
     public NonCloseableInputStream(InputStream delegate)
@@ -251,14 +277,12 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       this.delegate = delegate;
     }
 
-    
     @Override
     public int read() throws IOException
     {
       return delegate.read();
     }
-    
-    
+
     @Override
     public int read(byte[] b) throws IOException
     {
@@ -282,7 +306,6 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     {
       return delegate.skip(n);
     }
-    
 
     @Override
     public void close() throws IOException

@@ -2,7 +2,12 @@ package annis.gui.widgets.gwt.client.ui;
 
 import annis.gui.widgets.gwt.client.ui.autoheightiframe.AutoHeightIFrameConnector;
 import com.google.gwt.core.client.JavaScriptException;
-import com.google.gwt.dom.client.*;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.IFrameElement;
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.NodeList;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.Timer;

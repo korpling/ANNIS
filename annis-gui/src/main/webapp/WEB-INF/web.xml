@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app id="WebApp_ID" version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
   <display-name>Annis corpus Search gui</display-name>
   <session-config>
     <session-timeout>4</session-timeout>
   </session-config>
   <context-param>
     <param-name>heartbeatInterval</param-name>
-    <param-value>60</param-value>
+    <!-- 30 seconds -->
+    <param-value>30</param-value>
   </context-param>
   <context-param>
     <description>Vaadin production mode</description>
@@ -22,7 +27,7 @@
   
   <servlet>
     <servlet-name>VaadinUI</servlet-name>
-    <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+    <servlet-class>annis.gui.servlets.AnnisServlet</servlet-class>
     <init-param>
       <param-name>UIProvider</param-name>
       <param-value>annis.gui.AnnisUIProvider</param-value>
@@ -34,6 +39,7 @@
       <param-name>widgetset</param-name>        	
       <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
     </init-param>
+    <async-supported>true</async-supported>
   </servlet>
  
   <servlet>
@@ -58,5 +64,4 @@
     <servlet-name>ResourceServlet</servlet-name>
     <url-pattern>/Resource/*</url-pattern>
   </servlet-mapping>
-  
 </web-app>

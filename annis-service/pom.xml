@@ -7,7 +7,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.3.6</version>
+    <version>3.4.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -128,7 +128,7 @@
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
-      <version>3.2.1</version>
+      <version>3.2.2</version>
       <scope>compile</scope>
     </dependency>
 
@@ -190,7 +190,7 @@
     <dependency>
       <groupId>jline</groupId>
       <artifactId>jline</artifactId>
-      <version>2.11</version>
+      <version>2.12.1</version>
       <scope>compile</scope>
     </dependency>
     
@@ -260,35 +260,35 @@
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-core</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.4</version>
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-web</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.4</version>
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-ehcache</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.4</version>
     </dependency>
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache-core</artifactId>
-      <version>2.6.9</version>
+      <version>2.6.11</version>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.0.13</version>
+      <version>1.1.3</version>
       <scope>compile</scope>
     </dependency>
     
     <dependency>
-      <groupId>com.tunnelvisionlabs</groupId>
+      <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>4.2.2</version>
+      <version>4.5.2-1</version>
       <scope>compile</scope>
     </dependency>
     
@@ -298,7 +298,7 @@
 
 
   <build>
-
+   
     <resources>
       <resource>
         <!-- include everything from src/main/java except *.java files -->
@@ -332,9 +332,9 @@
     <plugins>
 
       <plugin>
-        <groupId>com.tunnelvisionlabs</groupId>
+        <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>4.2.2</version>
+        <version>4.5.2-1</version>
         <executions>
           <execution>
            <goals>
@@ -415,5 +415,6 @@
   <name>annis-service</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <annis.userconfig>/etc/annis/user_config/</annis.userconfig>
   </properties>
 </project>

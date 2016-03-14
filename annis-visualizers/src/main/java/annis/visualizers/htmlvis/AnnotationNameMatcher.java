@@ -15,15 +15,14 @@
  */
 package annis.visualizers.htmlvis;
 
-import com.google.common.collect.Lists;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SNode;
 
 /**
  *
@@ -51,9 +50,9 @@ public class AnnotationNameMatcher implements SpanMatcher
   {
     if(node instanceof SSpan || node instanceof SToken)
     {
-      for(SAnnotation anno : node.getSAnnotations())
+      for(SAnnotation anno : node.getAnnotations())
       {
-        if(annotationName.equals(anno.getSName()) || annotationName.equals(anno.getQName()))
+        if(annotationName.equals(anno.getName()) || annotationName.equals(anno.getQName()))
         {
           return anno.getQName();
         }

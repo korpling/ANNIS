@@ -34,19 +34,23 @@ import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.Writer;
-import java.rmi.RemoteException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.LoggerFactory;
 
 public abstract class GeneralTextExporter implements Exporter, Serializable
@@ -57,7 +61,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
   @Override
-  public boolean convertText(String queryAnnisQL, int contextLeft, int contextRight,
+  public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
@@ -183,9 +187,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         
         if (Thread.interrupted())
         {
-          // return from loop and abort export
-          log.info("Exporter job was interrupted");
-          return false;
+          return new InterruptedException("Exporter job was interrupted");
         }
         
         // query the left over matches
@@ -217,21 +219,14 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       out.append("\n");
       out.append("finished");
       
-      return true;
+      return null;
 
     }
     catch (AnnisQLSemanticsException | AnnisQLSyntaxException 
-      | AnnisCorpusAccessException | RemoteException  ex)
+      | AnnisCorpusAccessException | UniformInterfaceException| IOException ex)
     {
-      log.error(
-        null, ex);
+      return ex;
     }
-    catch (IOException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    return false;
   }
 
   public void convertText(AnnisResultSet queryResult, List<String> keys,

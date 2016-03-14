@@ -16,8 +16,8 @@
 package annis.gui.admin;
 
 import annis.gui.LoginListener;
+import annis.libgui.Background;
 import annis.libgui.Helper;
-import annis.libgui.PollControl;
 import annis.service.objects.ImportJob;
 import com.google.common.base.Splitter;
 import com.sun.jersey.api.client.ClientResponse;
@@ -25,7 +25,6 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
@@ -74,11 +73,11 @@ public class ImportPanel extends Panel
   private final Button btDetailedLog;
   
   private File temporaryCorpusFile;
-  private final boolean needsLogin;
   
-  public ImportPanel(boolean needsLogin, boolean isLoggedIn)
+  private boolean kickstarterMode;
+  
+  public ImportPanel()
   {
-    this.needsLogin = needsLogin;
     
     setSizeFull();
    
@@ -111,10 +110,7 @@ public class ImportPanel extends Panel
     upload.setImmediate(true);
     upload.addStartedListener(this);
     upload.addFinishedListener(this);
-    if(needsLogin)
-    {
-      upload.setEnabled(isLoggedIn);
-    }
+    upload.setEnabled(true);
     
     actionBar.addComponent(upload);
     
@@ -279,8 +275,7 @@ public class ImportPanel extends Panel
         appendMessage("Import requested, update URL is " + location);
         
         UI ui = UI.getCurrent();
-        PollControl.runInBackground(500, 500, ui, 
-          new WaitForFinishRunner(location, ui));
+        Background.run(new WaitForFinishRunner(location, ui));
         
       }
       else
@@ -430,7 +425,7 @@ public class ImportPanel extends Panel
   @Override
   public void onLogin()
   {
-    if(needsLogin)
+    if(!kickstarterMode)
     {
       upload.setEnabled(true);
     }
@@ -439,9 +434,22 @@ public class ImportPanel extends Panel
   @Override
   public void onLogout()
   {
-    if(needsLogin)
+    if(!kickstarterMode)
     {
       upload.setEnabled(false);
+    }
+  }
+
+  public void updateMode(boolean kickstarterMode, boolean isLoggedIn)
+  {
+    this.kickstarterMode = kickstarterMode;
+    if(kickstarterMode)
+    {
+      upload.setEnabled(true);
+    }
+    else
+    {
+      upload.setEnabled(isLoggedIn);
     }
   }
   

@@ -15,8 +15,8 @@
  */
 package annis.visualizers.htmlvis;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.List;
+import org.corpus_tools.salt.core.SNode;
 
 /**
  *

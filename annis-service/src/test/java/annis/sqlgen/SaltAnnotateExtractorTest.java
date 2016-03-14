@@ -15,31 +15,29 @@
  */
 package annis.sqlgen;
 
+import annis.test.CsvResultSetProvider;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SPointingRelation;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.STextualRelation;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SLayer;
+import org.corpus_tools.salt.core.SNamedElement;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.sql.SQLException;
-import java.util.Comparator;
-
-import org.eclipse.emf.common.util.ECollections;
-import org.eclipse.emf.common.util.EList;
 import org.junit.Before;
 import org.junit.Test;
-
-import annis.test.CsvResultSetProvider;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNamedElement;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 /**
  *
@@ -88,15 +86,15 @@ public class SaltAnnotateExtractorTest
     SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
     assertNotNull(project);
     
-    assertEquals(1, project.getSCorpusGraphs().size());
+    assertEquals(1, project.getCorpusGraphs().size());
 
-    SCorpusGraph corpusGraph = project.getSCorpusGraphs().get(0);
+    SCorpusGraph corpusGraph = project.getCorpusGraphs().get(0);
 
-    assertEquals(1, corpusGraph.getSCorpora().size());
-    assertEquals("pcc2", corpusGraph.getSCorpora().get(0).getSName());
+    assertEquals(1, corpusGraph.getCorpora().size());
+    assertEquals("pcc2", corpusGraph.getCorpora().get(0).getName());
 
-    assertEquals(1, corpusGraph.getSDocuments().size());
-    assertEquals("4282", corpusGraph.getSDocuments().get(0).getSName());
+    assertEquals(1, corpusGraph.getDocuments().size());
+    assertEquals("4282", corpusGraph.getDocuments().get(0).getName());
 
   }
 
@@ -106,20 +104,20 @@ public class SaltAnnotateExtractorTest
     SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
     assertNotNull(project);
     
-    SDocumentGraph g = project.getSCorpusGraphs().get(0).getSDocuments().get(0).
-      getSDocumentGraph();
+    SDocumentGraph g = project.getCorpusGraphs().get(0).getDocuments().get(0).
+      getDocumentGraph();
 
-    EList<SLayer> layers = g.getSLayers();
+    List<SLayer> layers = new ArrayList<>(g.getLayers());
 
-    ECollections.sort(layers, new NameComparator());
+    Collections.sort(layers, new NameComparator());
 
     assertEquals(6, layers.size());
-    assertEquals("default_ns", layers.get(0).getSName());
-    assertEquals("dep", layers.get(1).getSName());
-    assertEquals("exmaralda", layers.get(2).getSName());
-    assertEquals("mmax", layers.get(3).getSName());
-    assertEquals("rst", layers.get(4).getSName());
-    assertEquals("tiger", layers.get(5).getSName());
+    assertEquals("default_ns", layers.get(0).getName());
+    assertEquals("dep", layers.get(1).getName());
+    assertEquals("exmaralda", layers.get(2).getName());
+    assertEquals("mmax", layers.get(3).getName());
+    assertEquals("rst", layers.get(4).getName());
+    assertEquals("tiger", layers.get(5).getName());
   }
 
   @Test
@@ -128,75 +126,75 @@ public class SaltAnnotateExtractorTest
     SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
     assertNotNull(project);
     
-    SDocumentGraph g = project.getSCorpusGraphs().get(0).getSDocuments().get(0).
-      getSDocumentGraph();
+    SDocumentGraph g = project.getCorpusGraphs().get(0).getDocuments().get(0).
+      getDocumentGraph();
 
-    EList<SNode> n = g.getSLayerByName("exmaralda").get(0).getSNodes();
-    ECollections.sort(n, new NameComparator());
+    List<SNode> n = new ArrayList<>(g.getLayerByName("exmaralda").get(0).getNodes());
+    Collections.sort(n, new NameComparator());
     assertEquals(9, n.size());
-    assertEquals("Focus_newInfSeg_10", n.get(0).getSName());
-    assertEquals("Focus_newInfSeg_9", n.get(1).getSName());
-    assertEquals("Inf-StatSeg_29", n.get(2).getSName());
-    assertEquals("Inf-StatSeg_30", n.get(3).getSName());
-    assertEquals("NPSeg_29", n.get(4).getSName());
-    assertEquals("NPSeg_30", n.get(5).getSName());
-    assertEquals("PPSeg_7", n.get(6).getSName());
-    assertEquals("SentSeg_10", n.get(7).getSName());
-    assertEquals("SentSeg_9", n.get(8).getSName());
+    assertEquals("Focus_newInfSeg_10", n.get(0).getName());
+    assertEquals("Focus_newInfSeg_9", n.get(1).getName());
+    assertEquals("Inf-StatSeg_29", n.get(2).getName());
+    assertEquals("Inf-StatSeg_30", n.get(3).getName());
+    assertEquals("NPSeg_29", n.get(4).getName());
+    assertEquals("NPSeg_30", n.get(5).getName());
+    assertEquals("PPSeg_7", n.get(6).getName());
+    assertEquals("SentSeg_10", n.get(7).getName());
+    assertEquals("SentSeg_9", n.get(8).getName());
 
-    n = g.getSLayerByName("mmax").get(0).getSNodes();
-    ECollections.sort(n, new NameComparator());
+    n = new ArrayList<>(g.getLayerByName("mmax").get(0).getNodes());
+    Collections.sort(n, new NameComparator());
     assertEquals(5, n.size());
-    assertEquals("primmarkSeg_1000154", n.get(0).getSName());
-    assertEquals("primmarkSeg_60", n.get(1).getSName());
-    assertEquals("sentenceSeg_50010", n.get(2).getSName());
-    assertEquals("sentenceSeg_50011", n.get(3).getSName());
-    assertEquals("sentenceSeg_5009", n.get(4).getSName());
+    assertEquals("primmarkSeg_1000154", n.get(0).getName());
+    assertEquals("primmarkSeg_60", n.get(1).getName());
+    assertEquals("sentenceSeg_50010", n.get(2).getName());
+    assertEquals("sentenceSeg_50011", n.get(3).getName());
+    assertEquals("sentenceSeg_5009", n.get(4).getName());
 
-    n = g.getSLayerByName("tiger").get(0).getSNodes();
-    ECollections.sort(n, new NameComparator());
+    n = new ArrayList<>(g.getLayerByName("tiger").get(0).getNodes());
+    Collections.sort(n, new NameComparator());
     assertEquals(10, n.size());
-    assertEquals("const_50", n.get(0).getSName());
-    assertEquals("const_52", n.get(1).getSName());
-    assertEquals("const_54", n.get(2).getSName());
-    assertEquals("const_55", n.get(3).getSName());
-    assertEquals("const_56", n.get(4).getSName());
-    assertEquals("const_57", n.get(5).getSName());
-    assertEquals("const_58", n.get(6).getSName());
-    assertEquals("const_59", n.get(7).getSName());
-    assertEquals("const_60", n.get(8).getSName());
-    assertEquals("const_61", n.get(9).getSName());
+    assertEquals("const_50", n.get(0).getName());
+    assertEquals("const_52", n.get(1).getName());
+    assertEquals("const_54", n.get(2).getName());
+    assertEquals("const_55", n.get(3).getName());
+    assertEquals("const_56", n.get(4).getName());
+    assertEquals("const_57", n.get(5).getName());
+    assertEquals("const_58", n.get(6).getName());
+    assertEquals("const_59", n.get(7).getName());
+    assertEquals("const_60", n.get(8).getName());
+    assertEquals("const_61", n.get(9).getName());
 
-    n = g.getSLayerByName("default_ns").get(0).getSNodes();
-    ECollections.sort(n, new NameComparator());
+    n = new ArrayList<>(g.getLayerByName("default_ns").get(0).getNodes());
+    Collections.sort(n, new NameComparator());
     assertEquals(12, n.size());
-    assertEquals("tok_150", n.get(0).getSName());
-    assertEquals("tok_151", n.get(1).getSName());
-    assertEquals("tok_152", n.get(2).getSName());
-    assertEquals("tok_153", n.get(3).getSName());
-    assertEquals("tok_154", n.get(4).getSName());
-    assertEquals("tok_155", n.get(5).getSName());
-    assertEquals("tok_156", n.get(6).getSName());
-    assertEquals("tok_157", n.get(7).getSName());
-    assertEquals("tok_158", n.get(8).getSName());
-    assertEquals("tok_159", n.get(9).getSName());
-    assertEquals("tok_160", n.get(10).getSName());
-    assertEquals("tok_161", n.get(11).getSName());
+    assertEquals("tok_150", n.get(0).getName());
+    assertEquals("tok_151", n.get(1).getName());
+    assertEquals("tok_152", n.get(2).getName());
+    assertEquals("tok_153", n.get(3).getName());
+    assertEquals("tok_154", n.get(4).getName());
+    assertEquals("tok_155", n.get(5).getName());
+    assertEquals("tok_156", n.get(6).getName());
+    assertEquals("tok_157", n.get(7).getName());
+    assertEquals("tok_158", n.get(8).getName());
+    assertEquals("tok_159", n.get(9).getName());
+    assertEquals("tok_160", n.get(10).getName());
+    assertEquals("tok_161", n.get(11).getName());
 
-    n = g.getSLayerByName("rst").get(0).getSNodes();
-    ECollections.sort(n, new NameComparator());
+    n = new ArrayList<>(g.getLayerByName("rst").get(0).getNodes());
+    Collections.sort(n, new NameComparator());
     assertEquals(9, n.size());
-    assertEquals("u0", n.get(0).getSName());
-    assertEquals("u10", n.get(1).getSName());
-    assertEquals("u11", n.get(2).getSName());
-    assertEquals("u12", n.get(3).getSName());
-    assertEquals("u20", n.get(4).getSName());
-    assertEquals("u23", n.get(5).getSName());
-    assertEquals("u24", n.get(6).getSName());
-    assertEquals("u27", n.get(7).getSName());
-    assertEquals("u28", n.get(8).getSName());
+    assertEquals("u0", n.get(0).getName());
+    assertEquals("u10", n.get(1).getName());
+    assertEquals("u11", n.get(2).getName());
+    assertEquals("u12", n.get(3).getName());
+    assertEquals("u20", n.get(4).getName());
+    assertEquals("u23", n.get(5).getName());
+    assertEquals("u24", n.get(6).getName());
+    assertEquals("u27", n.get(7).getName());
+    assertEquals("u28", n.get(8).getName());
     
-    assertEquals(0, g.getSLayerByName("dep").get(0).getSNodes().size());
+    assertEquals(0, g.getLayerByName("dep").get(0).getNodes().size());
   }
 
   @Test
@@ -205,152 +203,152 @@ public class SaltAnnotateExtractorTest
     SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
     assertNotNull(project);
     
-    SDocumentGraph g = project.getSCorpusGraphs().get(0).getSDocuments().get(0).
-      getSDocumentGraph();
+    SDocumentGraph g = project.getCorpusGraphs().get(0).getDocuments().get(0).
+      getDocumentGraph();
 
 
     // dep //
-    EList<SRelation> e = g.getSLayerByName("dep").get(0).getSRelations();
-    ECollections.sort(e, new EdgeComparator());
+    List<SRelation<SNode, SNode>> e = new ArrayList<>(g.getLayerByName("dep").get(0).getRelations());
+    Collections.sort(e, new EdgeComparator());
 
     assertEquals(9, e.size());
 
-    assertEquals("tok_150", e.get(0).getSSource().getSName());
-    assertEquals("tok_151", e.get(0).getSTarget().getSName());
+    assertEquals("tok_150", e.get(0).getSource().getName());
+    assertEquals("tok_151", e.get(0).getTarget().getName());
 
-    assertEquals("tok_152", e.get(1).getSSource().getSName());
-    assertEquals("tok_153", e.get(1).getSTarget().getSName());
+    assertEquals("tok_152", e.get(1).getSource().getName());
+    assertEquals("tok_153", e.get(1).getTarget().getName());
 
-    assertEquals("tok_156", e.get(2).getSSource().getSName());
-    assertEquals("tok_154", e.get(2).getSTarget().getSName());
+    assertEquals("tok_156", e.get(2).getSource().getName());
+    assertEquals("tok_154", e.get(2).getTarget().getName());
 
-    assertEquals("tok_156", e.get(3).getSSource().getSName());
-    assertEquals("tok_155", e.get(3).getSTarget().getSName());
+    assertEquals("tok_156", e.get(3).getSource().getName());
+    assertEquals("tok_155", e.get(3).getTarget().getName());
 
-    assertEquals("tok_156", e.get(4).getSSource().getSName());
-    assertEquals("tok_157", e.get(4).getSTarget().getSName());
+    assertEquals("tok_156", e.get(4).getSource().getName());
+    assertEquals("tok_157", e.get(4).getTarget().getName());
 
-    assertEquals("tok_157", e.get(5).getSSource().getSName());
-    assertEquals("tok_158", e.get(5).getSTarget().getSName());
+    assertEquals("tok_157", e.get(5).getSource().getName());
+    assertEquals("tok_158", e.get(5).getTarget().getName());
 
-    assertEquals("tok_158", e.get(6).getSSource().getSName());
-    assertEquals("tok_160", e.get(6).getSTarget().getSName());
+    assertEquals("tok_158", e.get(6).getSource().getName());
+    assertEquals("tok_160", e.get(6).getTarget().getName());
 
-    assertEquals("tok_160", e.get(7).getSSource().getSName());
-    assertEquals("tok_159", e.get(7).getSTarget().getSName());
+    assertEquals("tok_160", e.get(7).getSource().getName());
+    assertEquals("tok_159", e.get(7).getTarget().getName());
 
-    assertEquals("tok_160", e.get(8).getSSource().getSName());
-    assertEquals("tok_161", e.get(8).getSTarget().getSName());
+    assertEquals("tok_160", e.get(8).getSource().getName());
+    assertEquals("tok_161", e.get(8).getTarget().getName());
 
     // exmaralda //
-    e = g.getSLayerByName("exmaralda").get(0).getSRelations();
-    ECollections.sort(e, new EdgeComparator());
+    e = new ArrayList<>(g.getLayerByName("exmaralda").get(0).getRelations());
+    Collections.sort(e, new EdgeComparator());
 
     assertEquals(30, e.size());
 
-    assertEquals("Focus_newInfSeg_10", e.get(0).getSSource().getSName());
-    assertEquals("tok_154", e.get(0).getSTarget().getSName());
-    assertEquals("Focus_newInfSeg_10", e.get(1).getSSource().getSName());
-    assertEquals("tok_155", e.get(1).getSTarget().getSName());
-    assertEquals("Focus_newInfSeg_10", e.get(2).getSSource().getSName());
-    assertEquals("tok_156", e.get(2).getSTarget().getSName());
-    assertEquals("Focus_newInfSeg_10", e.get(3).getSSource().getSName());
-    assertEquals("tok_157", e.get(3).getSTarget().getSName());
-    assertEquals("Focus_newInfSeg_10", e.get(4).getSSource().getSName());
-    assertEquals("tok_158", e.get(4).getSTarget().getSName());
-    assertEquals("Focus_newInfSeg_10", e.get(5).getSSource().getSName());
-    assertEquals("tok_159", e.get(5).getSTarget().getSName());
-    assertEquals("Focus_newInfSeg_10", e.get(6).getSSource().getSName());
-    assertEquals("tok_160", e.get(6).getSTarget().getSName());
+    assertEquals("Focus_newInfSeg_10", e.get(0).getSource().getName());
+    assertEquals("tok_154", e.get(0).getTarget().getName());
+    assertEquals("Focus_newInfSeg_10", e.get(1).getSource().getName());
+    assertEquals("tok_155", e.get(1).getTarget().getName());
+    assertEquals("Focus_newInfSeg_10", e.get(2).getSource().getName());
+    assertEquals("tok_156", e.get(2).getTarget().getName());
+    assertEquals("Focus_newInfSeg_10", e.get(3).getSource().getName());
+    assertEquals("tok_157", e.get(3).getTarget().getName());
+    assertEquals("Focus_newInfSeg_10", e.get(4).getSource().getName());
+    assertEquals("tok_158", e.get(4).getTarget().getName());
+    assertEquals("Focus_newInfSeg_10", e.get(5).getSource().getName());
+    assertEquals("tok_159", e.get(5).getTarget().getName());
+    assertEquals("Focus_newInfSeg_10", e.get(6).getSource().getName());
+    assertEquals("tok_160", e.get(6).getTarget().getName());
 
-    assertEquals("Focus_newInfSeg_9", e.get(7).getSSource().getSName());
-    assertEquals("tok_150", e.get(7).getSTarget().getSName());
-    assertEquals("Focus_newInfSeg_9", e.get(8).getSSource().getSName());
-    assertEquals("tok_151", e.get(8).getSTarget().getSName());
-    assertEquals("Focus_newInfSeg_9", e.get(9).getSSource().getSName());
-    assertEquals("tok_152", e.get(9).getSTarget().getSName());
+    assertEquals("Focus_newInfSeg_9", e.get(7).getSource().getName());
+    assertEquals("tok_150", e.get(7).getTarget().getName());
+    assertEquals("Focus_newInfSeg_9", e.get(8).getSource().getName());
+    assertEquals("tok_151", e.get(8).getTarget().getName());
+    assertEquals("Focus_newInfSeg_9", e.get(9).getSource().getName());
+    assertEquals("tok_152", e.get(9).getTarget().getName());
     
-    assertEquals("Inf-StatSeg_29", e.get(10).getSSource().getSName());
-    assertEquals("tok_150", e.get(10).getSTarget().getSName());
-    assertEquals("Inf-StatSeg_29", e.get(11).getSSource().getSName());
-    assertEquals("tok_151", e.get(11).getSTarget().getSName());
+    assertEquals("Inf-StatSeg_29", e.get(10).getSource().getName());
+    assertEquals("tok_150", e.get(10).getTarget().getName());
+    assertEquals("Inf-StatSeg_29", e.get(11).getSource().getName());
+    assertEquals("tok_151", e.get(11).getTarget().getName());
     
-    assertEquals("Inf-StatSeg_30", e.get(12).getSSource().getSName());
-    assertEquals("tok_155", e.get(12).getSTarget().getSName());
+    assertEquals("Inf-StatSeg_30", e.get(12).getSource().getName());
+    assertEquals("tok_155", e.get(12).getTarget().getName());
 
-    assertEquals("NPSeg_29", e.get(13).getSSource().getSName());
-    assertEquals("tok_150", e.get(13).getSTarget().getSName());
-    assertEquals("NPSeg_29", e.get(14).getSSource().getSName());
-    assertEquals("tok_151", e.get(14).getSTarget().getSName());
+    assertEquals("NPSeg_29", e.get(13).getSource().getName());
+    assertEquals("tok_150", e.get(13).getTarget().getName());
+    assertEquals("NPSeg_29", e.get(14).getSource().getName());
+    assertEquals("tok_151", e.get(14).getTarget().getName());
     
-    assertEquals("NPSeg_30", e.get(15).getSSource().getSName());
-    assertEquals("tok_155", e.get(15).getSTarget().getSName());
+    assertEquals("NPSeg_30", e.get(15).getSource().getName());
+    assertEquals("tok_155", e.get(15).getTarget().getName());
     
-    assertEquals("PPSeg_7", e.get(16).getSSource().getSName());
-    assertEquals("tok_150", e.get(16).getSTarget().getSName());
-    assertEquals("PPSeg_7", e.get(17).getSSource().getSName());
-    assertEquals("tok_151", e.get(17).getSTarget().getSName());
+    assertEquals("PPSeg_7", e.get(16).getSource().getName());
+    assertEquals("tok_150", e.get(16).getTarget().getName());
+    assertEquals("PPSeg_7", e.get(17).getSource().getName());
+    assertEquals("tok_151", e.get(17).getTarget().getName());
 
 
-    assertEquals("SentSeg_10", e.get(18).getSSource().getSName());
-    assertEquals("tok_154", e.get(18).getSTarget().getSName());
-    assertEquals("SentSeg_10", e.get(19).getSSource().getSName());
-    assertEquals("tok_155", e.get(19).getSTarget().getSName());
-    assertEquals("SentSeg_10", e.get(20).getSSource().getSName());
-    assertEquals("tok_156", e.get(20).getSTarget().getSName());
-    assertEquals("SentSeg_10", e.get(21).getSSource().getSName());
-    assertEquals("tok_157", e.get(21).getSTarget().getSName());
-    assertEquals("SentSeg_10", e.get(22).getSSource().getSName());
-    assertEquals("tok_158", e.get(22).getSTarget().getSName());
-    assertEquals("SentSeg_10", e.get(23).getSSource().getSName());
-    assertEquals("tok_159", e.get(23).getSTarget().getSName());
-    assertEquals("SentSeg_10", e.get(24).getSSource().getSName());
-    assertEquals("tok_160", e.get(24).getSTarget().getSName());
-    assertEquals("SentSeg_10", e.get(25).getSSource().getSName());
-    assertEquals("tok_161", e.get(25).getSTarget().getSName());
+    assertEquals("SentSeg_10", e.get(18).getSource().getName());
+    assertEquals("tok_154", e.get(18).getTarget().getName());
+    assertEquals("SentSeg_10", e.get(19).getSource().getName());
+    assertEquals("tok_155", e.get(19).getTarget().getName());
+    assertEquals("SentSeg_10", e.get(20).getSource().getName());
+    assertEquals("tok_156", e.get(20).getTarget().getName());
+    assertEquals("SentSeg_10", e.get(21).getSource().getName());
+    assertEquals("tok_157", e.get(21).getTarget().getName());
+    assertEquals("SentSeg_10", e.get(22).getSource().getName());
+    assertEquals("tok_158", e.get(22).getTarget().getName());
+    assertEquals("SentSeg_10", e.get(23).getSource().getName());
+    assertEquals("tok_159", e.get(23).getTarget().getName());
+    assertEquals("SentSeg_10", e.get(24).getSource().getName());
+    assertEquals("tok_160", e.get(24).getTarget().getName());
+    assertEquals("SentSeg_10", e.get(25).getSource().getName());
+    assertEquals("tok_161", e.get(25).getTarget().getName());
     
     
-    assertEquals("SentSeg_9", e.get(26).getSSource().getSName());
-    assertEquals("tok_150", e.get(26).getSTarget().getSName());
-    assertEquals("SentSeg_9", e.get(27).getSSource().getSName());
-    assertEquals("tok_151", e.get(27).getSTarget().getSName());
-    assertEquals("SentSeg_9", e.get(28).getSSource().getSName());
-    assertEquals("tok_152", e.get(28).getSTarget().getSName());
-    assertEquals("SentSeg_9", e.get(29).getSSource().getSName());
-    assertEquals("tok_153", e.get(29).getSTarget().getSName());
+    assertEquals("SentSeg_9", e.get(26).getSource().getName());
+    assertEquals("tok_150", e.get(26).getTarget().getName());
+    assertEquals("SentSeg_9", e.get(27).getSource().getName());
+    assertEquals("tok_151", e.get(27).getTarget().getName());
+    assertEquals("SentSeg_9", e.get(28).getSource().getName());
+    assertEquals("tok_152", e.get(28).getTarget().getName());
+    assertEquals("SentSeg_9", e.get(29).getSource().getName());
+    assertEquals("tok_153", e.get(29).getTarget().getName());
     
     // mmax, only control samples //
-    e = g.getSLayerByName("mmax").get(0).getSRelations();
-    ECollections.sort(e, new EdgeComparator());
+    e = new ArrayList<>(g.getLayerByName("mmax").get(0).getRelations());
+    Collections.sort(e, new EdgeComparator());
 
     assertEquals(14, e.size());
 
-    assertEquals("primmarkSeg_60", e.get(1).getSSource().getSName());
-    assertEquals("tok_150", e.get(1).getSTarget().getSName());
-    assertEquals("sentenceSeg_50010", e.get(7).getSSource().getSName());
-    assertEquals("tok_158", e.get(7).getSTarget().getSName());
+    assertEquals("primmarkSeg_60", e.get(1).getSource().getName());
+    assertEquals("tok_150", e.get(1).getTarget().getName());
+    assertEquals("sentenceSeg_50010", e.get(7).getSource().getName());
+    assertEquals("tok_158", e.get(7).getTarget().getName());
 
     // tiger, only control samples //
-    e = g.getSLayerByName("tiger").get(0).getSRelations();
-    ECollections.sort(e, new EdgeComparator());
+    e = new ArrayList<>(g.getLayerByName("tiger").get(0).getRelations());
+    Collections.sort(e, new EdgeComparator());
 
     assertEquals(17, e.size());
 
-    assertEquals("const_59", e.get(9).getSSource().getSName());
-    assertEquals("tok_160", e.get(9).getSTarget().getSName());
-    assertEquals("const_61", e.get(16).getSSource().getSName());
-    assertEquals("tok_156", e.get(16).getSTarget().getSName());
+    assertEquals("const_59", e.get(9).getSource().getName());
+    assertEquals("tok_160", e.get(9).getTarget().getName());
+    assertEquals("const_61", e.get(16).getSource().getName());
+    assertEquals("tok_156", e.get(16).getTarget().getName());
 
     // urml, only control samples //
-    e = g.getSLayerByName("rst").get(0).getSRelations();
-    ECollections.sort(e, new EdgeComparator());
+    e = new ArrayList<>(g.getLayerByName("rst").get(0).getRelations());
+    Collections.sort(e, new EdgeComparator());
 
     assertEquals(20, e.size());
 
-    assertEquals("u0", e.get(0).getSSource().getSName());
-    assertEquals("u28", e.get(0).getSTarget().getSName());
-    assertEquals("u11", e.get(5).getSSource().getSName());
-    assertEquals("tok_153", e.get(5).getSTarget().getSName());
+    assertEquals("u0", e.get(0).getSource().getName());
+    assertEquals("u28", e.get(0).getTarget().getName());
+    assertEquals("u11", e.get(5).getSource().getName());
+    assertEquals("tok_153", e.get(5).getTarget().getName());
 
   }
 
@@ -360,15 +358,15 @@ public class SaltAnnotateExtractorTest
     SaltProject project = instance.extractData(resultSetProviderSingleText.getResultSet());
     assertNotNull(project);
     
-    SDocumentGraph g = project.getSCorpusGraphs().get(0).getSDocuments().get(0).
-      getSDocumentGraph();
+    SDocumentGraph g = project.getCorpusGraphs().get(0).getDocuments().get(0).
+      getDocumentGraph();
 
-    for (SRelation r : g.getSRelations())
+    for (SRelation<? extends SNode,? extends SNode> r : g.getRelations())
     {
       if(!(r instanceof STextualRelation))
       {
-        assertEquals(1, r.getSLayers().size());
-        String layerName = r.getSLayers().get(0).getSName();
+        assertEquals(1, r.getLayers().size());
+        String layerName = r.getLayers().iterator().next().getName();
 
         if ("exmaralda".equals(layerName) || "urml".equals(layerName) || "mmax".
           equals(layerName))
@@ -396,10 +394,10 @@ public class SaltAnnotateExtractorTest
     SaltProject project = instance.extractData(resultSetProviderMultiText.getResultSet());
     assertNotNull(project);
     
-    SDocumentGraph g = project.getSCorpusGraphs().get(0)
-      .getSDocuments().get(0).getSDocumentGraph();
+    SDocumentGraph g = project.getCorpusGraphs().get(0)
+      .getDocuments().get(0).getDocumentGraph();
     
-    assertEquals(3, g.getSTextualDSs().size());
+    assertEquals(3, g.getTextualDSs().size());
     
   }
 
@@ -409,30 +407,28 @@ public class SaltAnnotateExtractorTest
     @Override
     public int compare(SNamedElement arg0, SNamedElement arg1)
     {
-      return arg0.getSName().compareTo(arg1.getSName());
+      return arg0.getName().compareTo(arg1.getName());
     }
   }
 
-  public static class EdgeComparator implements Comparator<SRelation>
+  public static class EdgeComparator implements Comparator<SRelation<SNode,SNode>>
   {
 
     @Override
-    public int compare(SRelation arg0, SRelation arg1)
+    public int compare(SRelation<SNode,SNode> arg0, SRelation<SNode,SNode> arg1)
     {
-      int result = arg0.getSSource().getSName().compareTo(arg1.getSSource().
-        getSName());
+      int result = arg0.getSource().getName().compareTo(arg1.getSource().
+        getName());
       if (result == 0)
       {
-        result = arg0.getSTarget().getSName().compareTo(arg1.getSTarget().
-          getSName());
+        result = arg0.getTarget().getName().compareTo(arg1.getTarget().
+          getName());
       }
 
       if (result == 0)
       {
-        String t0 = arg0.getSTypes() != null && arg0.getSTypes().size() > 0
-          ? arg0.getSTypes().get(0) : null;
-        String t1 = arg1.getSTypes() != null && arg1.getSTypes().size() > 0
-          ? arg1.getSTypes().get(0) : null;
+        String t0 = arg0.getType();
+        String t1 = arg1.getType();
 
         if (t0 == null && t1 == null)
         {

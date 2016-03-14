@@ -15,17 +15,11 @@
  */
 package annis.gui.controller;
 
-import annis.gui.SearchUI;
-import annis.gui.components.ExceptionDialog;
+import annis.gui.AnnisUI;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
-import annis.model.AqlParseError;
 import annis.service.objects.MatchAndDocumentCount;
-import com.google.common.base.Joiner;
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.ui.Notification;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.slf4j.Logger;
@@ -44,9 +38,9 @@ public class CountCallback implements Runnable
 
   private final int pageSize;
 
-  private final SearchUI ui;
+  private final AnnisUI ui;
 
-  public CountCallback(ResultViewPanel panel, int pageSize, SearchUI ui)
+  public CountCallback(ResultViewPanel panel, int pageSize, AnnisUI ui)
   {
     this.panel = panel;
     this.pageSize = pageSize;
@@ -100,7 +94,7 @@ public class CountCallback implements Runnable
             {
               String documentString = countResult.getDocumentCount() > 1 ? "documents" : "document";
               String matchesString = countResult.getMatchCount() > 1 ? "matches" : "match";
-              ui.getControlPanel().getQueryPanel().
+              ui.getSearchView().getControlPanel().getQueryPanel().
                 setStatus("" + countResult.getMatchCount() + " " + matchesString + "\nin " + countResult.getDocumentCount() + " " + documentString);
               if (countResult.getMatchCount() > 0 && panel != null)
               {
@@ -111,41 +105,9 @@ public class CountCallback implements Runnable
           }
           else
           {
-            if (causeFinal.getResponse().getStatus() == 400)
-            {
-              List<AqlParseError> errors = 
-                causeFinal.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
-              String errMsg = Joiner.on("\n").join(errors);
-              
-              Notification.show("parsing error", errMsg,
-                Notification.Type.WARNING_MESSAGE);
-              ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-            }
-            else if (causeFinal.getResponse().getStatus() == 504)
-            {
-              String errMsg = "Timeout: query execution took too long.";
-              Notification.show(errMsg,
-                "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
-                Notification.Type.WARNING_MESSAGE);
-              ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-            }
-            else if (causeFinal.getResponse().getStatus() == 403)
-            {
-              String errMsg = "You don't have the access rights to query this corpus. " + "You might want to login to access more corpora.";
-              Notification.show(errMsg,
-                Notification.Type.WARNING_MESSAGE);
-              ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-            }
-            else
-            {
-              log.error("Unexpected exception:  " + causeFinal.getLocalizedMessage(),
-                causeFinal);
-              ExceptionDialog.show(causeFinal);
-              ui.getControlPanel().getQueryPanel().
-                setStatus("Unexpected exception:  " + causeFinal.getMessage());
-            }
+            ui.getQueryController().reportServiceException(causeFinal, true);
           } // end if cause != null
-          ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+          ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
         }
       });
     }

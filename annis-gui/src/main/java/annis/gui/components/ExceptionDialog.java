@@ -15,18 +15,15 @@
  */
 package annis.gui.components;
 
-import annis.gui.ReportBugWindow;
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.libgui.Helper;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -107,9 +104,9 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     btReportBug.setVisible(false);
     btReportBug.setIcon(FontAwesome.ENVELOPE_O);
     UI ui = UI.getCurrent();
-    if(ui instanceof SearchUI)
+    if(ui instanceof AnnisUI)
     {
-      btReportBug.setVisible(((SearchUI) ui).canReportBugs());
+      btReportBug.setVisible(((AnnisUI) ui).canReportBugs());
     }
     actionsLayout.addComponent(btReportBug);
     actionsLayout.setComponentAlignment(btDetails, Alignment.TOP_LEFT);
@@ -160,9 +157,9 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     {
       this.close();
       UI ui = UI.getCurrent();
-      if(ui instanceof SearchUI)
+      if(ui instanceof AnnisUI)
       {
-        ((SearchUI) ui).reportBug(cause);
+        ((AnnisUI) ui).reportBug(cause);
       }
     }
   }
