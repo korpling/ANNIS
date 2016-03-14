@@ -115,6 +115,15 @@ public class QueryController implements Serializable
           validateQuery();
         }
       });
+    
+    this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
+    {
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        validateQuery();
+      }
+    });
 
     for (Exporter e : SearchView.EXPORTER)
     {
