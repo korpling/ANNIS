@@ -21,6 +21,7 @@ import annis.gui.util.ANNISFontIcon;
 import annis.libgui.AnnisUser;
 import annis.libgui.Background;
 import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
 import annis.libgui.InstanceConfig;
 import annis.libgui.LoginDataLostException;
 import annis.libgui.visualizers.VisualizerInput;
@@ -54,6 +55,7 @@ import com.vaadin.ui.VerticalLayout;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -162,7 +164,7 @@ public class EmbeddedVisUI extends CommonUI
   }
 
   private void generateVisFromRemoteURL(final String visName, final String rawUri,
-    final Map<String, String[]> args)
+    Map<String, String[]> args)
   {
     try
     {
@@ -190,6 +192,9 @@ public class EmbeddedVisUI extends CommonUI
       final WebResource saltRes = client.resource(uri);
 
       displayLoadingIndicator();
+      
+      // copy the arguments for using them later in the callback
+      final Map<String, String[]> argsCopy = new LinkedHashMap<>(args);
       
       Background.runWithCallback(new Callable<SaltProject>()
       {
@@ -227,10 +232,10 @@ public class EmbeddedVisUI extends CommonUI
             return;
           }
 
-          if (args.containsKey(KEY_INSTANCE))
+          if (argsCopy.containsKey(KEY_INSTANCE))
           {
             Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
-            InstanceConfig newConfig = allConfigs.get(args.get(KEY_INSTANCE)[0]);
+            InstanceConfig newConfig = allConfigs.get(argsCopy.get(KEY_INSTANCE)[0]);
             if (newConfig != null)
             {
               setInstanceConfig(newConfig);
@@ -247,7 +252,7 @@ public class EmbeddedVisUI extends CommonUI
             visInput.setFont(getInstanceFont());
           }
           Properties mappings = new Properties();
-          for (Map.Entry<String, String[]> e : args.entrySet())
+          for (Map.Entry<String, String[]> e : argsCopy.entrySet())
           {
             if (!KEY_SALT.equals(e.getKey()) && e.getValue().length > 0)
             {
@@ -255,7 +260,7 @@ public class EmbeddedVisUI extends CommonUI
             }
           }
           visInput.setMappings(mappings);
-          String[] namespace = args.get(KEY_NAMESPACE);
+          String[] namespace = argsCopy.get(KEY_NAMESPACE);
           if (namespace != null && namespace.length > 0)
           {
             visInput.setNamespace(namespace[0]);
@@ -266,9 +271,9 @@ public class EmbeddedVisUI extends CommonUI
           }
 
           String baseText = null;
-          if (args.containsKey(KEY_BASE_TEXT))
+          if (argsCopy.containsKey(KEY_BASE_TEXT))
           {
-            String[] value = args.get(KEY_BASE_TEXT);
+            String[] value = argsCopy.get(KEY_BASE_TEXT);
             if (value.length > 0)
             {
               baseText = value[0];
@@ -279,9 +284,9 @@ public class EmbeddedVisUI extends CommonUI
             baseText,
             doc.getDocumentGraph());
 
-          if (args.containsKey(KEY_MATCH))
+          if (argsCopy.containsKey(KEY_MATCH))
           {
-            String[] rawMatch = args.get(KEY_MATCH);
+            String[] rawMatch = argsCopy.get(KEY_MATCH);
             if (rawMatch.length > 0)
             {
               // enhance the graph with match information from the arguments
@@ -318,9 +323,9 @@ public class EmbeddedVisUI extends CommonUI
           link.setVisible(false);
           link.addStyleName("dontprint");
           link.setTargetName("_blank");
-          if (args.containsKey(KEY_SEARCH_INTERFACE))
+          if (argsCopy.containsKey(KEY_SEARCH_INTERFACE))
           {
-            String[] interfaceLink = args.get(KEY_SEARCH_INTERFACE);
+            String[] interfaceLink = argsCopy.get(KEY_SEARCH_INTERFACE);
             if (interfaceLink.length > 0)
             {
               link.setResource(new ExternalResource(interfaceLink[0]));
@@ -333,6 +338,8 @@ public class EmbeddedVisUI extends CommonUI
           layout.setMargin(true);
 
           setContent(layout);
+          
+          IDGenerator.assignID(link);
         }
 
       });
