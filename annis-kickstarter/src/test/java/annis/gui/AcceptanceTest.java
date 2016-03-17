@@ -89,8 +89,7 @@ public class AcceptanceTest
     
     driver.get("http://localhost:" + WEB_PORT +  "/annis-gui/");
     
-    // initial wait for the title (can be longer than implicit wait time)
-    wait.until(ExpectedConditions.titleContains("(ANNIS Corpus Search)"));
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("v-app")));
   }
   
   @Test
@@ -156,6 +155,31 @@ public class AcceptanceTest
     Assert.assertEquals("Zossen", firstRow.get(4).getText());
     Assert.assertEquals("wollen", firstRow.get(5).getText());
     Assert.assertEquals("ein", firstRow.get(6).getText());
+  }
+  
+  /**
+   * Make sure the "Show in ANNIS search interface" link is shown in embedded visualizer.
+   * Regression test for
+   * https://github.com/korpling/ANNIS/issues/509
+   * (Link from embedded visualization to search UI is gone in 3.4.0)
+   */
+  @Test
+  public void testRegression509()
+  {
+    // only execute this test if pcc2 corpus is imported
+    Assume.assumeTrue(corpora.contains("pcc2"));
+    
+    driver.get("http://localhost:" + WEB_PORT +  "/annis-gui/embeddedvis/grid?embedded_ns=exmaralda&embedded_instance=&embedded_salt=http%3A%2F%2Flocalhost%3A5711%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dsalt%3A%2Fpcc2%2F11299%2F%2523tok_1%26left%3D5%26right%3D5&embedded_interface=http://localhost:8084/annis-gui/%23_q%3DdG9r%26_c%3DcGNjMg%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26m%3D0");
+    
+    // wait until page was loaded
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("v-app")));
+    // wait until visualization is actually there
+    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className(
+      "v-app-loading")));
+    
+    WebElement link = driver.findElement(By.xpath("//div[@id='VerticalLayout:Link']/a/span[2]"));
+    Assert.assertEquals("Show in ANNIS search interface", link.getText());
+    
   }
   
   @AfterClass
