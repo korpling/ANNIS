@@ -1,6 +1,6 @@
 What is the used ANNIS version?
 
-What browser did you use?
+What browser and operating system did you use?
 
 What steps will reproduce the problem?
 1.
