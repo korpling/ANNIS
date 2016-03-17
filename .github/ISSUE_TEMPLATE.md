@@ -1,8 +1,6 @@
-ANNIS-Version:
+What is the used ANNIS version?
 
-Browser:
-
-URL of query:
+What browser did you use?
 
 What steps will reproduce the problem?
 1.
@@ -12,7 +10,7 @@ What steps will reproduce the problem?
 What is the expected result?
 
 
-What happens instead
+What happens instead?
 
 
 Please provide any additional information below. Also please add a screenshot if possible.
