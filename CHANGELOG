@@ -1,3 +1,12 @@
+Version 3.4.1
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.1+is%3Aclosed
+
+[Fixed Bugs]
+ #509 Link from embedded visualization to search UI is gone in 3.4.0
+
 Version 3.4.0
 =============
 
