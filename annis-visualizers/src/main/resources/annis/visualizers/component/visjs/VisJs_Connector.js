@@ -71,11 +71,23 @@ enabled: true
 }
 }
 },
+interaction: {
+  navigationButtons: true,
+  keyboard: true
+        },
 layout: {
+//improvedLayout:true,
 hierarchical:{
+     levelSeparation: 150,
+    // nodeSpacing: 800,     
+    // edgeMinimization: false,
+     //parentCentralization: false,
+     //blockShifting: false,
+     direction: 'UD',
+     sortMethod: 'directed'
 }
-},
-physics: {
+} //,
+/*physics: {
 hierarchicalRepulsion: {
 centralGravity: 0.05,
 springLength: 100,
@@ -89,7 +101,7 @@ timestep: 0.5,
 stabilization: {
 iterations: 800
 }
-}
+}*/
 }
 ;
 $(container).remove("canvas");
@@ -115,9 +127,9 @@ visjscomponent.on("zoom", function (params) {
 
        var direction = zoomValues.direction;
        var scale = zoomValues.scale;
-       if (direction === '+' && scale <= 1) {
-       	 visjscomponent.setSize(canvasWidth*(1+scale), canvasHeight*(1+scale));
-       //	 visjscomponent.setSize(initCanvasWidth*(scale*10), initCanvasHeight*(scale*10));
+       if (direction === '+') {
+       	// visjscomponent.setSize(canvasWidth*(1+scale), canvasHeight*(1+scale));
+       	 visjscomponent.setSize(initCanvasWidth*(scale*10), initCanvasHeight*(scale*10));
        }
        else if  (direction === '-'){
 	       	if (canvasWidth*(1-scale) < minContainerWidth ||  canvasHeight*(1-scale) < minHeight){
@@ -139,16 +151,12 @@ visjscomponent.on("zoom", function (params) {
 		var newCanvasHeight = $(".vis-network canvas:first-child").height();
 		
 		$(container).css({"width": Math.max(newCanvasWidth, minContainerWidth), "height": Math.max(newCanvasHeight, minHeight)});
-		visjscomponent.fit();
-		/*visjscomponent.moveTo({
-					  position: {x:100, y:100}
-					  });*/
+		//visjscomponent.fit();
+		visjscomponent.focus("tok_1");
 
     });
 
 };
-
-
 
 window.addEventListener("resize", function(){
 	parentWidthNew = $(div).parent().width();
