@@ -216,11 +216,14 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   }
 
   private void addComponentPredicates(List<String> conditions, QueryNode node,
-    QueryNode target, String componentName, String relationType)
+    QueryNode target, String componentName, String relationType, boolean addComponentIDJoin)
   {
-    conditions.add(join("=", 
-      tables(node).aliasedColumn(COMPONENT_TABLE, "id"), 
-      tables(target).aliasedColumn(COMPONENT_TABLE, "id")));
+    if(addComponentIDJoin)
+    {
+      conditions.add(join("=", 
+        tables(node).aliasedColumn(COMPONENT_TABLE, "id"), 
+        tables(target).aliasedColumn(COMPONENT_TABLE, "id")));
+    }
     
     if ("lhs".equals(componentPredicates) || "both".equals(componentPredicates))
     {
@@ -270,7 +273,9 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     RankTableJoin rankTableJoin = (RankTableJoin) join;
     String componentName = rankTableJoin.getName();
-    addComponentPredicates(conditions, node, target, componentName, "d");
+    
+    // the parent and rank_id are already unique, so don't add extra join on component_id
+    addComponentPredicates(conditions, node, target, componentName, "d", false);
 
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "id"),
       tables(target).aliasedColumn(RANK_TABLE, "parent")));
@@ -566,7 +571,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     List<Long> corpusList = queryData.getCorpusList();
     String componentName = join.getName();
-    addComponentPredicates(conditions, node, target, componentName, "d");
+    addComponentPredicates(conditions, node, target, componentName, "d", true);
 
     if (!allowIdenticalSibling)
     {
@@ -635,7 +640,9 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     Sibling sibling = (Sibling) join;
     String componentName = sibling.getName();
-    addComponentPredicates(conditions, node, target, componentName, "d");
+    
+    // "parent" column is unique over all component IDs, thus don't add an extra join
+    addComponentPredicates(conditions, node, target, componentName, "d", false);
 
     conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "parent"),
       tables(target).aliasedColumn(RANK_TABLE, "parent")));
@@ -652,14 +659,15 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     RankTableJoin rankTableJoin = (RankTableJoin) join;
     String componentName = rankTableJoin.getName();
-    addComponentPredicates(conditions, node, target, componentName, relationType);
-
+    
     int min = rankTableJoin.getMinDistance();
     int max = rankTableJoin.getMaxDistance();
 
     // direct
     if (min == 1 && max == 1)
     {
+       addComponentPredicates(conditions, node, target, componentName, relationType, false);
+      
       conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "id"),
         tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
@@ -667,6 +675,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     }
     else
     {
+      addComponentPredicates(conditions, node, target, componentName, relationType, true);
+      
       conditions.add(join("<", tables(node).aliasedColumn(RANK_TABLE, "pre"),
         tables(target).aliasedColumn(RANK_TABLE, "pre")));
       conditions.add(join("<", tables(target).aliasedColumn(RANK_TABLE, "pre"),

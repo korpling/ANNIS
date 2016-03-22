@@ -141,10 +141,13 @@ public class TestDefaultWhereClauseGenerator
   // helper method to check create component predicates (name, edgeType)
   // on the expected side
   private void checkEdgeConditions(String componentPredicate, String edgeType,
-      String componentName, String... expected)
+      String componentName, boolean addComponentIDJoin, String... expected)
   {
     List<String> expectedConditions = new ArrayList<>();
-    expectedConditions.add(join("=", "_component23.id", "_component42.id"));
+    if(addComponentIDJoin)
+    {
+      expectedConditions.add(join("=", "_component23.id", "_component42.id"));
+    }
     if ("lhs".equals(componentPredicate) || "both".equals(componentPredicate))
     {
       expectedConditions
@@ -187,7 +190,7 @@ public class TestDefaultWhereClauseGenerator
     // given
     node23.addOutgoingJoin(new Dominance(node42, 1));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, false,
         join("=", "_rank23.id", "_rank42.parent"));
   }
 
@@ -202,7 +205,7 @@ public class TestDefaultWhereClauseGenerator
     String componentName = uniqueString();
     node23.addOutgoingJoin(new Dominance(node42, componentName, 1));
     // then
-    checkEdgeConditions(componentPredicate, "d", componentName,
+    checkEdgeConditions(componentPredicate, "d", componentName, false,
         join("=", "_rank23.id", "_rank42.parent"));
   }
 
@@ -221,7 +224,7 @@ public class TestDefaultWhereClauseGenerator
     j.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
     // then
-    checkEdgeConditions(componentPredicate, "d", componentName,
+    checkEdgeConditions(componentPredicate, "d", componentName, false,
         join("=", "_rank23.id", "_rank42.parent"));
     checkWhereConditions(
         node42,
@@ -239,7 +242,7 @@ public class TestDefaultWhereClauseGenerator
     // given
     node23.addOutgoingJoin(new Dominance(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, true,
         join("<", "_rank23.pre", "_rank42.pre"),
         join("<", "_rank42.pre", "_rank23.post"));
   }
@@ -255,7 +258,7 @@ public class TestDefaultWhereClauseGenerator
     int distance = uniqueInt();
     node23.addOutgoingJoin(new Dominance(node42, distance));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, true,
         join("<", "_rank23.pre", "_rank42.pre"),
         join("<", "_rank42.pre", "_rank23.post"),
         numberJoin("=", "_rank23.level", "_rank42.level", -distance));
@@ -273,7 +276,7 @@ public class TestDefaultWhereClauseGenerator
     int max = min + uniqueInt(1, 10);
     node23.addOutgoingJoin(new Dominance(node42, min, max));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, true,
         join("<", "_rank23.pre", "_rank42.pre"),
         join("<", "_rank42.pre", "_rank23.post"),
         between("_rank23.level", "_rank42.level", -min, -max));
@@ -298,6 +301,7 @@ public class TestDefaultWhereClauseGenerator
       componentPredicate,
       "d",
       null,
+      false,
       join("=", "_rank23.id", "_rank42.parent"),
       "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts_"
       + corpusId
@@ -324,6 +328,7 @@ public class TestDefaultWhereClauseGenerator
         componentPredicate,
         "d",
         null,
+        false,
         join("=", "_rank23.id", "_rank42.parent"),
         "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts_" + corpusId + " AS lrsub WHERE parent=_rank23.id AND "
       + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN("  + corpusId + ")"
@@ -341,7 +346,7 @@ public class TestDefaultWhereClauseGenerator
     String componentName = uniqueString();
     node23.addOutgoingJoin(new PointingRelation(node42, componentName, 1));
     // then
-    checkEdgeConditions(componentPredicate, "p", componentName,
+    checkEdgeConditions(componentPredicate, "p", componentName, false,
         join("=", "_rank23.id", "_rank42.parent"));
   }
 
@@ -356,7 +361,7 @@ public class TestDefaultWhereClauseGenerator
     String componentName = uniqueString();
     node23.addOutgoingJoin(new PointingRelation(node42, componentName));
     // then
-    checkEdgeConditions(componentPredicate, "p", componentName,
+    checkEdgeConditions(componentPredicate, "p", componentName, true,
         join("<", "_rank23.pre", "_rank42.pre"),
         join("<", "_rank42.pre", "_rank23.post"));
   }
@@ -370,7 +375,7 @@ public class TestDefaultWhereClauseGenerator
     // given
     node23.addOutgoingJoin(new Sibling(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, false,
         join("=", "_rank23.parent", "_rank42.parent"),
         join("<>", "_node23.id", "_node42.id"));
   }
@@ -386,7 +391,7 @@ public class TestDefaultWhereClauseGenerator
     generator.setAllowIdenticalSibling(true);
     node23.addOutgoingJoin(new Sibling(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, false,
         join("=", "_rank23.parent", "_rank42.parent"));
   }
 
@@ -399,7 +404,7 @@ public class TestDefaultWhereClauseGenerator
     // given
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, true,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" +
@@ -418,7 +423,7 @@ public class TestDefaultWhereClauseGenerator
     generator.setAllowIdenticalSibling(true);
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, true,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" +
@@ -439,7 +444,7 @@ public class TestDefaultWhereClauseGenerator
     given(queryData.getCorpusList()).willReturn(asList(corpusId));
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, true,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post AND toplevel_corpus IN(" + corpusId + ")" + "\n\t" +
@@ -460,7 +465,7 @@ public class TestDefaultWhereClauseGenerator
     given(queryData.getCorpusList()).willReturn(new ArrayList<Long>());
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, true,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" +
@@ -481,7 +486,7 @@ public class TestDefaultWhereClauseGenerator
     given(queryData.getCorpusList()).willReturn(null);
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, true,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" + "\n\t" + 
@@ -503,7 +508,7 @@ public class TestDefaultWhereClauseGenerator
     given(queryData.getCorpusList()).willReturn(asList(corpusId));
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
-    checkEdgeConditions(componentPredicate, "d", null,
+    checkEdgeConditions(componentPredicate, "d", null, true,
         join("=", "_rank23.component_ref", "_rank42.component_ref"),
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.component_ref = _rank23.component_ref AND" + "\n\t" +
