@@ -660,7 +660,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     // direct
     if (min == 1 && max == 1)
     {
-      conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "pre"),
+      conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "id"),
         tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
       // indirect"
