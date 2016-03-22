@@ -20,6 +20,7 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.RankTableJoin;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -62,29 +63,42 @@ public class SubcorpusConstraintWhereClause
 
     for (int left = 0; left < copyNodes.length; left++)
     {
-      for (int right = left + 1; right < copyNodes.length; right++)
+      for (int right = 0; right < copyNodes.length; right++)
       {
-        // only add constraint if the two nodes are not already connected by their component id
-        boolean needsCorpusRef = true;
-        for(Join j : copyNodes[left].getOutgoingJoins())
+        if(left != right)
         {
-          if(j.getTarget() != null 
-            && j.getTarget().getId() == copyNodes[right].getId() 
-            && j instanceof RankTableJoin)
+          // only add constraint if the two nodes are not already connected by their component or node id
+          boolean needsCorpusRef = false;
+          for(Join j : copyNodes[left].getOutgoingJoins())
           {
-            needsCorpusRef = false;
-            break;
+            if(j.getTarget() != null 
+              && j.getTarget().getId() == copyNodes[right].getId()
+              )
+            {
+              if((j instanceof RankTableJoin || j instanceof Identical))
+              {
+                // we definitly don't have to apply this join
+                needsCorpusRef = false;
+                break;
+              }
+              else
+              {
+                // there is at least one actual join between this nodes, assume we
+                // need a corpus_ref join for now
+                needsCorpusRef = true;
+              }
+            }
           }
-        }
-        
-        if (needsCorpusRef)
-        {
-          conditions.add(join("=",
-            tables(copyNodes[left]).aliasedColumn(NODE_TABLE, "corpus_ref"),
-            tables(copyNodes[right]).aliasedColumn(NODE_TABLE, "corpus_ref")));
-        }
-      }
-    }
+
+          if (needsCorpusRef)
+          {
+            conditions.add(join("=",
+              tables(copyNodes[left]).aliasedColumn(NODE_TABLE, "corpus_ref"),
+              tables(copyNodes[right]).aliasedColumn(NODE_TABLE, "corpus_ref")));
+          }
+        } // end if left != right
+      } // end right loop
+    } // end left loop
 
     return conditions;
   }
