@@ -82,7 +82,7 @@ FROM
     _rank.id AS rank_id,
     _rank.pre AS pre,
     _rank.post AS post,
-    _rank.parent AS parent,
+    (SELECT p.pre FROM _rank AS p WHERE p.id = _rank.parent) AS parent,
     _node.root AS root,
     _rank.level AS level,
 
