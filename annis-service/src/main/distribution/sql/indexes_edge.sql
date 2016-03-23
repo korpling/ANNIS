@@ -61,6 +61,13 @@ CREATE INDEX idx__facts_pre__:id
   (pre, component_id)
   WITH (FILLFACTOR=100);
 
+
+CREATE INDEX idx__facts_prepost__:id
+  ON facts_:id
+  USING btree
+  (component_id, pre, post)
+  WITH (FILLFACTOR=100);
+
 CREATE INDEX idx__facts_edge_type__:id
   ON facts_:id
   USING btree
