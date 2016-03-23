@@ -40,10 +40,13 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
@@ -76,6 +79,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis_embeddedvis")
+@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
 public class EmbeddedVisUI extends CommonUI
 {
 
