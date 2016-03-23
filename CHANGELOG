@@ -1,3 +1,13 @@
+Version 3.4.2
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.2+is%3Aclosed
+
+[Fixed Bugs]
+ #511 Embedded visualization keeps loading forever
+ #510 Wrong color in tree visualization for child nodes
+
 Version 3.4.1
 =============
 
