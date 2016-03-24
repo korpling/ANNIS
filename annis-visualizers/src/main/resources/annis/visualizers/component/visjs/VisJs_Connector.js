@@ -108,11 +108,11 @@ $(container).remove("canvas");
 
 visjscomponent = new vis.Network(container, data, options); 
 
-var initCanvasWidth = $(".vis-network canvas:first-child").width();
-var initCanvasHeight = $(".vis-network canvas:first-child").height();
+//var initCanvasWidth = $(".vis-network canvas:first-child").width();
+//var initCanvasHeight = $(".vis-network canvas:first-child").height();
 
 
-visjscomponent.on("zoom", function (params) {
+/*visjscomponent.on("zoom", function (params) {
 		//window.alert(JSON.stringify(visjscomponent.getScale(), null, 4));
 	
 		var canvasWidth = $(".vis-network canvas:first-child").width();
@@ -154,7 +154,7 @@ visjscomponent.on("zoom", function (params) {
 		//visjscomponent.fit();
 		visjscomponent.focus("tok_1");
 
-    });
+    });*/
 
 };
 
