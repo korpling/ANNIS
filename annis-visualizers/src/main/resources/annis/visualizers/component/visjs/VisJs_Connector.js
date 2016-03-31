@@ -15,6 +15,9 @@ var parentHeightNew = parentHeightOld;
 var container = div;
 var minHeight = containerHeight;
 
+
+
+
 $(container).css({"width": containerWidth, "height": containerHeight});
 
 var strNodes =  this.getState().strNodes;
@@ -76,18 +79,20 @@ interaction: {
   keyboard: true
         },
 layout: {
+
 //improvedLayout:true,
 hierarchical:{
-     levelSeparation: 150,
-    // nodeSpacing: 800,     
-    // edgeMinimization: false,
-     //parentCentralization: false,
-     //blockShifting: false,
+	
+    // levelSeparation: 150,
+     //nodeSpacing: 100,     
+    // edgeMinimization: true,
+    // parentCentralization: true,
+    // blockShifting: true,
      direction: 'UD',
      sortMethod: 'directed'
 }
-} //,
-/*physics: {
+} ,
+physics: {
 hierarchicalRepulsion: {
 centralGravity: 0.05,
 springLength: 100,
@@ -101,12 +106,15 @@ timestep: 0.5,
 stabilization: {
 iterations: 800
 }
-}*/
+}
 }
 ;
 $(container).remove("canvas");
 
 visjscomponent = new vis.Network(container, data, options); 
+
+//var spinner = "<i class='fa fa-spinner fa-pulse'></i>";
+//div.innerHTML = spinner;
 
 //var initCanvasWidth = $(".vis-network canvas:first-child").width();
 //var initCanvasHeight = $(".vis-network canvas:first-child").height();
@@ -155,6 +163,8 @@ visjscomponent = new vis.Network(container, data, options);
 		visjscomponent.focus("tok_1");
 
     });*/
+
+   
 
 };
 
