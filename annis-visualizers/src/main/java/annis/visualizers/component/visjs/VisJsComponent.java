@@ -38,7 +38,10 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
+import com.vaadin.annotations.Theme;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractJavaScriptComponent;
+import com.vaadin.ui.Image;
 
 
 
@@ -46,13 +49,16 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 
 @JavaScript(
 		  {"VisJs_Connector.js",
-		    "vaadin://jquery.js",
-		    "vis.min.js"	    
+			"vaadin://jquery.js",
+		    "vis.min.js"
 		  })
 @StyleSheet(
   {
-	  	"vis.min.css"
+	  	"vis.min.css",
+	  	"vaadin://themes/annis/font-awesome-4.5.0/css/font-awesome.min.css",
+	  	
   })
+
 
 
 /**
@@ -88,6 +94,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	 * @param visInput The input for the visualizer.
 	 */	
 	public VisJsComponent(VisualizerInput visInput){
+		
 			nodeAnnosConfiguration = visInput.getMappings().getProperty(MAPPING_ANNOS_KEY);
 			nodeAnnosRegexConfiguration = visInput.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
 			edgeAnnosConfiguration = visInput.getMappings().getProperty(MAPPING_EDGES);
@@ -100,8 +107,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			 
 			OutputStream osNodes = new ByteArrayOutputStream();
 			OutputStream osEdges = new ByteArrayOutputStream();
-			
-			
+						
 			VisJsVisualizer.setNodeWriter(osNodes);
 			VisJsVisualizer.setEdgeWriter(osEdges);
 			VisJsVisualizer.buildJSON();				
@@ -205,8 +211,6 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	      getState().strEdges = strEdges;
 	     
 	    }
-
-
 		
 		
 		
