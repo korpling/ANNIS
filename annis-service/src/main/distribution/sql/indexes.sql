@@ -28,13 +28,13 @@ CREATE INDEX idx__facts_left_token__:id
 CREATE INDEX idx__facts_node_annotext__:id
   ON facts_:id
   USING btree
-  (node_annotext varchar_pattern_ops)
+  (node_annotext varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts__q_node_qannotext__:id
   ON facts_:id
   USING btree
-  (node_qannotext varchar_pattern_ops)
+  (node_qannotext varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_node_name__:id
