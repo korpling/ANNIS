@@ -64,7 +64,10 @@ edges: json_edges
 };
 var options = {
 nodes:{
-shape: "box"
+shape: "box",
+fixed: {
+	x: true
+}
 },
 edges: {
 smooth: true,
@@ -83,15 +86,15 @@ layout: {
 //improvedLayout:true,
 hierarchical:{
 	
-    // levelSeparation: 150,
+     //levelSeparation: 150,
      //nodeSpacing: 100,     
-    // edgeMinimization: true,
+     //edgeMinimization: true,
     // parentCentralization: true,
-    // blockShifting: true,
+   //  blockShifting: false,
      direction: 'UD',
      sortMethod: 'directed'
 }
-} ,
+} /*,
 physics: {
 hierarchicalRepulsion: {
 centralGravity: 0.05,
@@ -106,15 +109,32 @@ timestep: 0.5,
 stabilization: {
 iterations: 800
 }
-}
+}*/
 }
 ;
 $(container).remove("canvas");
 
-visjscomponent = new vis.Network(container, data, options); 
+
 
 //var spinner = "<i class='fa fa-spinner fa-pulse'></i>";
-//div.innerHTML = spinner;
+//container.innerHTML += spinner;
+
+visjscomponent = new vis.Network(container, data, options); 
+
+
+
+$("div.vis-network div.vis-navigation div.vis-button.vis-up").css({"bottom": "50px", "left": "auto", "right": "55px"});
+$("div.vis-network div.vis-navigation div.vis-button.vis-down").css({"bottom": "10px", "left": "auto", "right": "55px"});
+$("div.vis-network div.vis-navigation div.vis-button.vis-left").css({"bottom": "10px", "left": "auto", "right": "95px"});
+$("div.vis-network div.vis-navigation div.vis-button.vis-right").css({"bottom": "10px", "left": "auto", "right": "15px"});
+
+$("div.vis-network div.vis-navigation div.vis-button.vis-zoomIn").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "15px"});
+$("div.vis-network div.vis-navigation div.vis-button.vis-zoomOut").css({"bottom": "auto", "top": "50px", "left": "auto", "right": "15px"});
+$("div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "55px"});
+
+
+
+
 
 //var initCanvasWidth = $(".vis-network canvas:first-child").width();
 //var initCanvasHeight = $(".vis-network canvas:first-child").height();
