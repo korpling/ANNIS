@@ -54,8 +54,7 @@ import com.vaadin.ui.Image;
 		  })
 @StyleSheet(
   {
-	  	"vis.min.css",
-	  	"vaadin://themes/annis/font-awesome-4.5.0/css/font-awesome.min.css",
+	  	"vaadin://themes/annis/visjs/vis.min.css"
 	  	
   })
 
