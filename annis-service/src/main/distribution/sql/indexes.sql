@@ -10,7 +10,7 @@ CREATE INDEX idx__facts_id__:id
 CREATE INDEX idx__facts_is_token__:id
   ON facts_:id
   USING btree
-  (is_token)
+  (is_token, corpus_ref, text_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_left__:id
@@ -40,13 +40,13 @@ CREATE INDEX idx__facts__q_node_qannotext__:id
 CREATE INDEX idx__facts_node_name__:id
   ON facts_:id
   USING btree
-  (node_name varchar_pattern_ops)
+  (node_name varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_node_namespace__:id
   ON facts_:id
   USING btree
-  (node_namespace varchar_pattern_ops)
+  (node_namespace varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_right__:id
@@ -65,25 +65,25 @@ CREATE INDEX idx__facts_right_token__:id
 CREATE INDEX idx__facts_root__:id
   ON facts_:id
   USING btree
-  (root)
+  (root, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_seg_name_index__:id
   ON facts_:id
   USING btree
-  (seg_name, corpus_ref, text_ref)
+  (seg_name)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_seg_index_index__:id
   ON facts_:id
   USING btree
-  (seg_index, corpus_ref, text_ref)
+  (seg_index)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_span__:id
   ON facts_:id
   USING btree
-  (span varchar_pattern_ops)
+  (span varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_token_index__:id
