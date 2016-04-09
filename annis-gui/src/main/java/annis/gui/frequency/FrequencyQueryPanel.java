@@ -89,7 +89,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
-  private transient WeakHashMap<Field,Object> field2ItemID;
+  
+  private transient WeakHashMap<Field<?>,Object> field2ItemID;
   
   private final ProgressBar pbQuery = new ProgressBar();
   
@@ -372,7 +373,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         Component c = event.getClickedComponent();
         if(c instanceof Field)
         {
-          Object itemID = getField2ItemID().get((Field) c);
+          Object itemID = getField2ItemID().get((Field<?>) c);
           if(itemID != null)
           {
             if(!event.isCtrlKey() && !event.isShiftKey())
@@ -654,7 +655,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     
     @Override
-    public Field createField(Container container, final Object itemId,
+    public Field<?> createField(Container container, final Object itemId,
       Object propertyId, Component uiContext)
     {
       if ("nr".equals(propertyId) || "annotation".equals(propertyId))
@@ -679,7 +680,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
   }
 
-  private WeakHashMap<Field, Object> getField2ItemID()
+  private WeakHashMap<Field<?>, Object> getField2ItemID()
   {
     if(field2ItemID == null)
     {

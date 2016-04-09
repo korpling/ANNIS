@@ -117,7 +117,7 @@ public class ReportBugWindow extends Window
         catch (FieldGroup.CommitException ex)
         {
           List<String> errorFields = new LinkedList<>();
-          for(Field f : form.getFields())
+          for(Field<?> f : form.getFields())
           {
             if (f instanceof AbstractComponent)
             {
