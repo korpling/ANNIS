@@ -96,7 +96,6 @@ public class TestAnnisResultImpl {
 	
 	// convert token list
 	@Test
-	@SuppressWarnings("deprecation")
 	public void getTokenList() {
 		// expected
 		List<AnnisToken> expected = new ArrayList<>();
@@ -111,7 +110,6 @@ public class TestAnnisResultImpl {
 	
 	// return last token
 	@Test
-	@SuppressWarnings("deprecation")
 	public void getStartEndNodeId() {
 		// wrap and test
 		AnnisResult annisResult = new AnnisResultImpl(graph);
@@ -120,7 +118,6 @@ public class TestAnnisResultImpl {
 	
 	// return annotation names of non-tokens
 	@Test
-	@SuppressWarnings("deprecation")
 	public void getAnnotationLevelSet() {
 		// add annotation data to tokens and nodes
 		token3.addNodeAnnotation(new Annotation(NAMESPACE, NAME1));
@@ -135,7 +132,6 @@ public class TestAnnisResultImpl {
 	
 	// return annotation names of tokens
 	@Test
-	@SuppressWarnings("deprecation")
 	public void getTokenAnnotationLevelSet() {
 		// add annotation data to tokens and nodes
 		token3.addNodeAnnotation(new Annotation(NAMESPACE, NAME1));
@@ -150,7 +146,6 @@ public class TestAnnisResultImpl {
 	
 	// return ID (as string) if node is a matched node, otherwise return null
 	@Test
-	@SuppressWarnings("deprecation")
 	public void getMarkerIdMatchedNode() {
 		// underlying graph has marker for node ID1
 		when(graph.getMatchedNodeIds()).thenReturn(new HashSet<>(Arrays.asList(ID1)));
@@ -163,7 +158,6 @@ public class TestAnnisResultImpl {
 
 	// a node is marked if it is a matched node
 	@Test
-	@SuppressWarnings("deprecation")
 	public void hasMarkerId() {
 		// underlying graph has marker for node ID1
 		when(graph.getMatchedNodeIds()).thenReturn(new HashSet<>(Arrays.asList(ID1)));

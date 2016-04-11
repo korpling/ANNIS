@@ -64,7 +64,6 @@ public class ProielDependecyTree extends AbstractDotVisualizer
 
   }
 
-  @SuppressWarnings("deprecation")
   private void writeAllNodes()
   {
 
@@ -90,7 +89,6 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     }
   }
 
-  @SuppressWarnings("deprecation")
   private void writeAllEdges()
   {
     for (Edge e : input.getResult().getGraph().getEdges())
@@ -158,7 +156,6 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     }
   }
 
-  @SuppressWarnings("deprecation")
   private void writeNode(AnnisNode n, String word)
   {
     String shape = "box";

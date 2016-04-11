@@ -41,7 +41,6 @@ import annis.utils.LegacyGraphConverter;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@SuppressWarnings("deprecation")
 public class VisualizerInput implements Serializable
 {
   private static final long serialVersionUID = 2L;

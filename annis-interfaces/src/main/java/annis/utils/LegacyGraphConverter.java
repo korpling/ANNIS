@@ -71,14 +71,12 @@ import annis.service.objects.Match;
  *  "PaulaInline"
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@SuppressWarnings("deprecation")
 public class LegacyGraphConverter
 {
   
   private final static Logger log = LoggerFactory.getLogger(LegacyGraphConverter.class
     );
 
-  @SuppressWarnings("deprecation")
   public static AnnisResultSet convertToResultSet(SaltProject p)
   {
     List<AnnotationGraph> annotationGraphs = convertToAOM(p);

@@ -116,7 +116,6 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public Shape getShape(AnnisNode n, VisualizerInput input)
     {
       if(isQueryMatch(n, input))
@@ -154,7 +153,6 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       }
     }
 
-    @SuppressWarnings("deprecation")
     private boolean isQueryMatch(AnnisNode n, VisualizerInput input)
     {
       return input.getMarkableExactMap().containsKey(Long.toString(n.getId()));
@@ -320,7 +318,6 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   
   
   @Override
-  @SuppressWarnings("deprecation")
   public void writeOutput(VisualizerInput input, OutputStream outstream)
   {
     AnnisResult result = input.getResult();

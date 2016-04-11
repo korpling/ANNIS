@@ -32,7 +32,6 @@ import java.util.Set;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@SuppressWarnings("deprecation")
 public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 {
 
