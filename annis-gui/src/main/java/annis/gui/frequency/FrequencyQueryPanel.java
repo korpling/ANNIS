@@ -87,7 +87,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private FrequencyResultPanel resultPanel;
   private Button btShowQuery;
   private VerticalLayout queryLayout;
-  private final QueryController controller;
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
@@ -101,7 +100,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   
   public FrequencyQueryPanel(final QueryController controller, QueryUIState state)
   {    
-    this.controller = controller;
     this.state = state;
     
     setWidth("99%");

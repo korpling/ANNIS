@@ -128,8 +128,6 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   // sType for the rst relation
   private final String RST_RELATION = "rst";
 
-  private final String RST_LAYER = "rst";
-
   /**
    * Create a unique id, for every RSTImpl instance, for building an unique html
    * id, in the DOM.

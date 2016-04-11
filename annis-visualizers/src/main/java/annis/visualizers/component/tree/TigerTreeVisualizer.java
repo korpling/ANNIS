@@ -154,6 +154,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       }
     }
 
+    @SuppressWarnings("deprecation")
     private boolean isQueryMatch(AnnisNode n, VisualizerInput input)
     {
       return input.getMarkableExactMap().containsKey(Long.toString(n.getId()));

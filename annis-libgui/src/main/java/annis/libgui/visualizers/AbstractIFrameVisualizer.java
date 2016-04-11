@@ -15,16 +15,17 @@
  */
 package annis.libgui.visualizers;
 
-import annis.gui.widgets.AutoHeightIFrame;
-import annis.libgui.VisualizationToggle;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.UI;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.UUID;
-import org.slf4j.LoggerFactory;
+
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.UI;
+
+import annis.gui.widgets.AutoHeightIFrame;
+import annis.libgui.VisualizationToggle;
 
 /**
  * Base class for all iframe visualizer plugins
@@ -34,8 +35,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements ResourcePlugin
 {
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(AbstractIFrameVisualizer.class);
-
   /**
    * Returns the character encoding for this particular Visualizer output. For
    * more information see

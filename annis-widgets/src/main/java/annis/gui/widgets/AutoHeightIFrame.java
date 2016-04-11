@@ -11,8 +11,6 @@ import java.net.URI;
 public class AutoHeightIFrame extends AbstractComponent
 {
 
-  private URI uri;
-
   private boolean heightWasSet = false;
 
   public static final int ADDITIONAL_HEIGHT = -1;
@@ -21,7 +19,6 @@ public class AutoHeightIFrame extends AbstractComponent
 
   public AutoHeightIFrame(URI uri)
   {
-    this.uri = uri;
     setWidth("100%");
     registerRpc(rpc);
     

@@ -15,14 +15,14 @@
  */
 package annis.gui.components;
 
+import org.json.JSONException;
+
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.ui.JavaScriptFunction;
+
 import elemental.json.JsonArray;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -35,7 +35,6 @@ import org.slf4j.LoggerFactory;
 public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
 {
 
-  private static final Logger log = LoggerFactory.getLogger(OnLoadCallbackExtension.class);
   private AbstractClientConnector target;
 
   public OnLoadCallbackExtension(Callback c)

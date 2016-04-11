@@ -58,7 +58,6 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 import annis.VersionInfo;
-import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -100,8 +99,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
-
-  private transient MediaController mediaController;
 
   private transient ObjectMapper jsonMapper;
   

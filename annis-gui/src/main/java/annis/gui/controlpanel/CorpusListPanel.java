@@ -129,8 +129,6 @@ public class CorpusListPanel extends VerticalLayout implements
     this.autoGenQueries = autoGenQueries;
     this.ui = ui;
 
-    final CorpusListPanel finalThis = this;
-
     setSizeFull();
 
     selectionLayout = new HorizontalLayout();
@@ -275,7 +273,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     });
     tblCorpora.setItemDescriptionGenerator(new TooltipGenerator());
-    tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
+    tblCorpora.addValueChangeListener(new CorpusTableChangedListener());
 
     Button btReload = new Button();
     btReload.addClickListener(new Button.ClickListener()
@@ -712,11 +710,8 @@ public class CorpusListPanel extends VerticalLayout implements
   private class CorpusTableChangedListener implements ValueChangeListener
   {
 
-    private final CorpusListPanel finalThis;
-
-    public CorpusTableChangedListener(CorpusListPanel finalThis)
+    public CorpusTableChangedListener()
     {
-      this.finalThis = finalThis;
     }
 
     @Override

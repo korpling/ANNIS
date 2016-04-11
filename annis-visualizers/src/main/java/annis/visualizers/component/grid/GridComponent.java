@@ -36,7 +36,6 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -63,8 +62,6 @@ import annis.model.RelannisNodeFeature;
 public class GridComponent extends Panel
 {
 
-  private static final org.slf4j.Logger log
-    = LoggerFactory.getLogger(GridComponent.class);
   public static final String MAPPING_ANNOS_KEY = "annos";
   public static final String MAPPING_ANNO_REGEX_KEY = "anno_regex";
   public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";

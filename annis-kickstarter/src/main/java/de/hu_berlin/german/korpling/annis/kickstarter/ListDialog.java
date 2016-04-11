@@ -185,7 +185,6 @@ public class ListDialog extends javax.swing.JDialog
 
       List<Map<String, Object>> stats = corpusAdmin.listCorpusStats();
 
-      int row = 0;
       for(Map<String, Object> map : stats)
       {
         String[] rowData = new String[tableModel.getColumnCount()];
@@ -203,7 +202,6 @@ public class ListDialog extends javax.swing.JDialog
         }
 
         tableModel.addRow(rowData);
-        row++;
       }
     }
     catch(Exception ex)

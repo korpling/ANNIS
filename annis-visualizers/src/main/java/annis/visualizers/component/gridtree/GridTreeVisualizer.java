@@ -309,8 +309,6 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         Map<String, ArrayList<Row>> table;
         // tracks all nodes which was visited.
         Set<SNode> visited = new HashSet<SNode>();
-        // the namespace which has triggered the visualiztion
-        private final String namespace;
 
         /**
          * Init a traverse handler for building a tree of topological fields.
@@ -327,7 +325,6 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             this.startIdx = startIdx;
             this.endIdx = endIdx;
             this.annotationKey = nodeKey;
-            this.namespace = namespace;
             this.table = table;
         }
 

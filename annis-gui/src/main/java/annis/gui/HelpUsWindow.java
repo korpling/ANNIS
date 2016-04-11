@@ -15,7 +15,6 @@
  */
 package annis.gui;
 
-import annis.libgui.IDGenerator;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -28,8 +27,8 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.libgui.IDGenerator;
 
 /**
  * A window displaying an invitation to participate in the development of ANNIS.
@@ -38,8 +37,6 @@ import org.slf4j.LoggerFactory;
  */
 public class HelpUsWindow extends Window
 {
-
-  private static final Logger log = LoggerFactory.getLogger(HelpUsWindow.class);
 
   private VerticalLayout layout;
 

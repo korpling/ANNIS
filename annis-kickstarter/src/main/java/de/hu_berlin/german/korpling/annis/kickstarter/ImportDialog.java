@@ -120,11 +120,6 @@ public class ImportDialog extends javax.swing.JDialog
       this.statementController = statementController;
     }
 
-    public void cancelStatement()
-    {
-      statementController.cancelStatements();
-    }
-
     @Override
     protected ImportStatus doInBackground() throws Exception
     {

@@ -17,13 +17,11 @@ package annis.dao;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Preconditions;
-import com.google.common.io.BaseEncoding;
 
 /**
  * A DAO for retrieving and adding URL shortener information from the database.
@@ -31,9 +29,7 @@ import com.google.common.io.BaseEncoding;
  */
 public class ShortenerDao extends AbstractDao
 {
-  private final static BaseEncoding encoding = BaseEncoding.base64Url().omitPadding();
-  private final Random random = new Random();
-  
+
   /**
    * 
    * @param str

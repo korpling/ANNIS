@@ -57,12 +57,6 @@ public class AdminView extends VerticalLayout implements View,
 
   public static final String NAME = "admin";
 
-  private final UserController userController;
-
-  private final GroupController groupManagementController;
-
-  private final CorpusController corpusController;
-
   private final List<UIView.Listener> listeners = new LinkedList<>();
 
   private final TabSheet tabSheet;
@@ -95,15 +89,15 @@ public class AdminView extends VerticalLayout implements View,
     boolean isLoggedIn = Helper.getUser() != null;
 
     corpusAdminPanel = new CorpusAdminPanel();
-    corpusController = new CorpusController(corpusManagement, corpusAdminPanel,
+    new CorpusController(corpusManagement, corpusAdminPanel,
       this, isLoggedIn);
 
     userManagementPanel = new UserManagementPanel();
-    userController = new UserController(userManagement,
+    new UserController(userManagement,
       userManagementPanel, this, isLoggedIn);
 
     groupManagementPanel = new GroupManagementPanel();
-    groupManagementController = new GroupController(groupManagement,
+    new GroupController(groupManagement,
       corpusManagement,
       groupManagementPanel, this, userManagementPanel, isLoggedIn);
 

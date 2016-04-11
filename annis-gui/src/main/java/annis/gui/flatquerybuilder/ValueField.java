@@ -52,7 +52,6 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
   
   /*ADDITIONAL ATTRIBUTES*/
   private FlatQueryBuilder sq;
-  private String level;
   private SearchBox sb;
   private ConcurrentSkipListMap<String, String> values;
   private ValueMode vm;
@@ -66,8 +65,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
   {    
     /*INIT VALUES*/
     this.sq = sq;
-    this.sb = sb;
-    this.level = level;    
+    this.sb = sb; 
     vm = (sb.isRegEx()) ? ValueMode.REGEX : ValueMode.NORMAL;
     values = new ConcurrentSkipListMap<>();
     for(String v : sq.getAvailableAnnotationLevels(level))

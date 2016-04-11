@@ -22,8 +22,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -43,9 +41,6 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
   OrderByClauseSqlGenerator<QueryData>,
   GroupByClauseSqlGenerator<QueryData>
 {
-
-  private static final Logger log = LoggerFactory.getLogger(
-    SolutionSqlGenerator.class);
 
   private boolean outputToplevelCorpus = true;
 

@@ -19,8 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,10 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,8 +96,6 @@ public class VisualizerPanel extends CssLayout
 
   private SDocument result;
 
-  private PluginSystem ps;
-
   private ResolverEntry entry;
 
   private Map<String, Long> markedAndCovered;
@@ -122,8 +115,6 @@ public class VisualizerPanel extends CssLayout
   private Set<String> visibleTokenAnnos;
 
   private String segmentationName;
-
-  private final String PERMANENT = "permanent";
 
   private final String ISVISIBLE = "visible";
 
@@ -160,8 +151,6 @@ public class VisualizerPanel extends CssLayout
     PluginSystem ps,
     InstanceConfig instanceConfig) throws IOException
   {
-
-    this.ps = ps;
     this.instanceConfig = instanceConfig;
     this.entry = entry;
     this.markersExact = markedExactMap;
@@ -261,24 +250,6 @@ public class VisualizerPanel extends CssLayout
 
   }
   
-  private List<SToken> createTokenList(List<String> tokenIDs, SDocumentGraph graph)
-  {
-    if(tokenIDs == null || graph == null)
-    {
-      return new LinkedList<>();
-    }
-    ArrayList<SToken> r = new ArrayList<>(tokenIDs.size());
-    for(String t : tokenIDs)
-    {
-      SNode n = graph.getNode(t);
-      if(n instanceof SToken)
-      {
-        r.add((SToken) n);
-      }
-    }
-    return r;
-  }
-
   private Component createComponent()
   {
     if (visPlugin == null)

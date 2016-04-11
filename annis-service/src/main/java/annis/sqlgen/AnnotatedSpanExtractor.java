@@ -15,9 +15,6 @@
  */
 package annis.sqlgen;
 
-import annis.dao.objects.AnnotatedSpan;
-import annis.model.Annotation;
-import com.google.common.base.Preconditions;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -27,10 +24,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
+
+import com.google.common.base.Preconditions;
+
+import annis.dao.objects.AnnotatedSpan;
+import annis.model.Annotation;
 
 /**
  * Maps a {@link ResultSet} row to an {@link AnnotatedSpan}
@@ -38,8 +39,6 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class AnnotatedSpanExtractor implements RowMapper<AnnotatedSpan>
 {
-  private final Logger log = LoggerFactory.getLogger(AnnotatedSpanExtractor.class);
-
   private List<Annotation> extractAnnotations(Array array) throws SQLException
   {
     List<Annotation> result = new ArrayList<>();

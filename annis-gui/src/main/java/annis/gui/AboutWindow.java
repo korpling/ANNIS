@@ -21,6 +21,7 @@ import com.vaadin.server.ExternalResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.Version;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -87,10 +88,10 @@ public class AboutWindow extends Window
     layout.addComponent(hLayout);
     
     layout.addComponent(new Label("ANNIS is a project of the "
-      + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
+      + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", ContentMode.HTML));
     layout.addComponent(new Label("Homepage: "
       + "<a href=\"http://corpus-tools.org/annis/\">"
-      + "http://corpus-tools.org/annis/</a>.", Label.CONTENT_XHTML));
+      + "http://corpus-tools.org/annis/</a>.", ContentMode.HTML));
     layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
     layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
     

@@ -196,7 +196,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           tokenTexts,
           tokenByIndex, nodeBySegmentationPath,
           key, nodeByRankID);
-        long pre = longValue(resultSet, RANK_TABLE, "pre");
         long rankID = longValue(resultSet, RANK_TABLE, "id");
         long componentID = longValue(resultSet, COMPONENT_TABLE, "id");
         if (!resultSet.wasNull())

@@ -15,6 +15,39 @@
  */
 package annis.dao;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import annis.AnnisXmlContextLoader;
 import annis.model.Annotation;
 import annis.ql.parser.AnnisParserAntlr;
@@ -29,38 +62,6 @@ import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.test.TestHelper;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import javax.annotation.Resource;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import org.junit.Assert;
-import static org.junit.Assert.assertThat;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import org.mockito.Mock;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations =
@@ -71,8 +72,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 }, loader=AnnisXmlContextLoader.class)
 public class TestQueryDaoImpl
 {
-  
-  private final static Logger log = LoggerFactory.getLogger(TestQueryDaoImpl.class);
 
   @Resource(name="queryDao")
   private QueryDao queryDaoBean;
@@ -101,11 +100,9 @@ public class TestQueryDaoImpl
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper;
   
   // constants for flow control verification
-  private static final String DDDQUERY = "DDDQUERY";
   private static final QueryData PARSE_RESULT = new QueryData();
   private static final String SQL = "SQL";
   private static final List<Long> CORPUS_LIST = new ArrayList<>();
-  private static final List<Long> DOCUMENT_LIST = new LinkedList<>();
 
   @SuppressWarnings("unchecked")
   @Before

@@ -44,7 +44,6 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
 {
   
   private VisualizerInput input;
-  private int scale = 50;
   private StringBuilder dot;
   private boolean displayAllNamespaces = false;
   private String requiredNodeNS;

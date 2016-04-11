@@ -15,18 +15,6 @@
  */
 package annis.gui.flatquerybuilder;
 
-import annis.libgui.Helper;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +25,22 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListSet;
+
 import org.apache.commons.lang3.StringUtils;
+
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.event.FieldEvents;
+import com.vaadin.shared.ui.combobox.FilteringMode;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.themes.ChameleonTheme;
+
+import annis.libgui.Helper;
 
 
 /**
@@ -90,7 +93,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     {
       cb.addItem(annoname);
     }
-    cb.setFilteringMode(AbstractSelect.Filtering.FILTERINGMODE_OFF);
+    cb.setFilteringMode(FilteringMode.OFF);
     cb.addListener((FieldEvents.TextChangeListener)this);    
     sb.addComponent(cb);
     HorizontalLayout sbtoolbar = new HorizontalLayout();
@@ -140,7 +143,11 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     // regex box functionality
     else if(event.getComponent()==reBox)
     {
-      boolean r = reBox.booleanValue();
+      Boolean r = reBox.getValue();
+      if(r == null)
+      {
+        r = false;
+      }
       cb.setNewItemsAllowed(r);
       if(!r)
       {         

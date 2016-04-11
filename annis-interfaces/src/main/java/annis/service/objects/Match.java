@@ -71,7 +71,7 @@ public class Match implements Serializable
   {
     saltIDs = new ArrayList<>(originalIDs);
     annos = new ArrayList<>(saltIDs.size());
-    for (URI saltID : saltIDs)
+    for(int i=0; i < saltIDs.size(); i++)
     {
       annos.add("");
     }
@@ -149,7 +149,7 @@ public class Match implements Serializable
     if(saltIDs != null)
     {
       annos = new ArrayList<>(saltIDs.size());
-      for (URI saltID : saltIDs)
+      for(int i=0; i < saltIDs.size(); i++)
       {
         annos.add("");
       }

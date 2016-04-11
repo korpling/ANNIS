@@ -15,22 +15,10 @@
  */
 package annis.utils;
 
-import annis.CommonHelper;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.AnnotationGraph;
-import annis.model.Edge;
-import annis.model.Edge.EdgeType;
-import annis.model.RelannisEdgeFeature;
-import annis.model.RelannisNodeFeature;
-import annis.service.ifaces.AnnisResultSet;
-import annis.service.objects.AnnisResultImpl;
-import annis.service.objects.AnnisResultSetImpl;
-import annis.service.objects.Match;
-import com.google.common.base.Preconditions;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -55,10 +45,24 @@ import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.DataSourceSequence;
-import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+
+import annis.CommonHelper;
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.model.AnnotationGraph;
+import annis.model.Edge;
+import annis.model.Edge.EdgeType;
+import annis.model.RelannisEdgeFeature;
+import annis.model.RelannisNodeFeature;
+import annis.service.ifaces.AnnisResultSet;
+import annis.service.objects.AnnisResultImpl;
+import annis.service.objects.AnnisResultSetImpl;
+import annis.service.objects.Match;
 
 /**
  * This class can convert the current Salt graph model into the legacy model 
@@ -67,6 +71,7 @@ import org.slf4j.LoggerFactory;
  *  "PaulaInline"
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
+@SuppressWarnings("deprecation")
 public class LegacyGraphConverter
 {
   

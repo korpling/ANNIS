@@ -167,29 +167,16 @@ public class GridExporter extends GeneralTextExporter
       return start;
     }
 
-    public void setStart(long start)
-    {
-      this.start = start;
-    }
-
     public long getEnd()
     {
       return end;
     }
 
-    public void setEnd(long end)
-    {
-      this.end = end;
-    }
 
     public String getValue()
     {
       return value;
     }
 
-    public void setValue(String value)
-    {
-      this.value = value;
-    }
   }
 }
