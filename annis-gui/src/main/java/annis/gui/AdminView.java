@@ -15,21 +15,10 @@
  */
 package annis.gui;
 
-import annis.gui.admin.CorpusAdminPanel;
-import annis.gui.admin.GroupManagementPanel;
-import annis.gui.admin.ImportPanel;
-import annis.gui.admin.UserManagementPanel;
-import annis.gui.admin.controller.CorpusController;
-import annis.gui.admin.controller.GroupController;
-import annis.gui.admin.controller.UserController;
-import annis.gui.admin.model.CorpusManagement;
-import annis.gui.admin.model.GroupManagement;
-import annis.gui.admin.model.UserManagement;
-import annis.gui.admin.model.WebResourceProvider;
-import annis.gui.admin.view.UIView;
-import annis.gui.admin.view.UIView.Listener;
-import annis.libgui.Background;
-import annis.libgui.Helper;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.WebResource;
@@ -42,9 +31,21 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
+
+import annis.gui.admin.CorpusAdminPanel;
+import annis.gui.admin.GroupManagementPanel;
+import annis.gui.admin.ImportPanel;
+import annis.gui.admin.UserManagementPanel;
+import annis.gui.admin.controller.CorpusController;
+import annis.gui.admin.controller.GroupController;
+import annis.gui.admin.controller.UserController;
+import annis.gui.admin.model.CorpusManagement;
+import annis.gui.admin.model.GroupManagement;
+import annis.gui.admin.model.UserManagement;
+import annis.gui.admin.model.WebResourceProvider;
+import annis.gui.admin.view.UIView;
+import annis.libgui.Background;
+import annis.libgui.Helper;
 
 /**
  *

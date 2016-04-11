@@ -15,15 +15,20 @@
  */
 package annis.gui.frequency;
 
-import annis.gui.QueryController;
-import annis.gui.admin.PopupTwinColumnSelect;
-import annis.gui.objects.FrequencyQuery;
-import annis.gui.objects.QueryUIState;
-import annis.libgui.Helper;
-import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.FrequencyTable;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.WeakHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -51,19 +56,16 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.WeakHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.QueryController;
+import annis.gui.admin.PopupTwinColumnSelect;
+import annis.gui.objects.FrequencyQuery;
+import annis.gui.objects.QueryUIState;
+import annis.libgui.Helper;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.FrequencyTable;
 
 /**
  *

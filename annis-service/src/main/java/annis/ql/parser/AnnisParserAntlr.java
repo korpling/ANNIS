@@ -15,17 +15,9 @@
  */
 package annis.ql.parser;
 
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.AqlParseError;
-import annis.model.ParsedEntityLocation;
-import annis.ql.AqlLexer;
-import annis.ql.AqlParser;
-import annis.ql.RawAqlPreParser;
-import com.google.common.base.Joiner;
 import java.util.LinkedList;
 import java.util.List;
-import org.antlr.v4.runtime.ANTLRErrorListener;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -37,6 +29,16 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.AqlParseError;
+import annis.model.ParsedEntityLocation;
+import annis.ql.AqlLexer;
+import annis.ql.AqlParser;
+import annis.ql.RawAqlPreParser;
 
 /**
  *

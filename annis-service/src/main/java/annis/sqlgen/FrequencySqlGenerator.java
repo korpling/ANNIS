@@ -15,16 +15,21 @@
  */
 package annis.sqlgen;
 
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
-import annis.service.objects.FrequencyTable;
-import annis.service.objects.FrequencyTableEntry;
-import annis.service.objects.FrequencyTableEntryType;
-import annis.service.objects.FrequencyTableQuery;
-import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.springframework.dao.DataAccessException;
+
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -34,16 +39,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
-import org.springframework.dao.DataAccessException;
+
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
+import annis.service.objects.FrequencyTable;
+import annis.service.objects.FrequencyTableEntry;
+import annis.service.objects.FrequencyTableEntryType;
+import annis.service.objects.FrequencyTableQuery;
 
 /**
  *

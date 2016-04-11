@@ -15,10 +15,6 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.AnnisBaseRunner;
-import annis.administration.CorpusAdministration;
-import annis.administration.ImportStatus;
-import annis.utils.Utils;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
@@ -27,19 +23,25 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
+
 import org.slf4j.LoggerFactory;
+
+import annis.AnnisBaseRunner;
+import annis.administration.CorpusAdministration;
+import annis.administration.ImportStatus;
+import annis.utils.Utils;
 
 /**
  *

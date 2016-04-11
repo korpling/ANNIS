@@ -15,22 +15,24 @@
  */
 package annis.visualizers.htmlvis;
 
-import annis.CommonHelper;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-import annis.model.RelannisNodeFeature;
-import com.google.common.escape.Escaper;
-import com.google.common.html.HtmlEscapers;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
+
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SNode;
+
+import com.google.common.escape.Escaper;
+import com.google.common.html.HtmlEscapers;
+
+import annis.CommonHelper;
+import annis.model.RelannisNodeFeature;
 
 /**
  *

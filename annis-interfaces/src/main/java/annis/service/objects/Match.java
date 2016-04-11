@@ -15,12 +15,6 @@
  */
 package annis.service.objects;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
-import com.google.common.net.PercentEscaper;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,12 +23,20 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 
 /**
  * Represents a single match of an AQL query.

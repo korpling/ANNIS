@@ -15,24 +15,9 @@
  */
 package annis.visualizers.component.grid;
 
-import annis.CommonHelper;
-import annis.gui.widgets.grid.AnnotationGrid;
-import annis.gui.widgets.grid.GridEvent;
-import annis.gui.widgets.grid.Row;
-import annis.libgui.Helper;
-import annis.libgui.media.MediaController;
-import annis.libgui.media.PDFController;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.model.AnnisConstants;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-import annis.model.RelannisNodeFeature;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.STextualDS;
@@ -50,8 +36,25 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
+
+import annis.CommonHelper;
+import annis.gui.widgets.grid.AnnotationGrid;
+import annis.gui.widgets.grid.GridEvent;
+import annis.gui.widgets.grid.Row;
+import annis.libgui.Helper;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.PDFController;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.model.AnnisConstants;
+import annis.model.RelannisNodeFeature;
 
 /**
  *

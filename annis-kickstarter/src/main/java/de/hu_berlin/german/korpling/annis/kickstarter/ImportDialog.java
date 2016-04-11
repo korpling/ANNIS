@@ -15,17 +15,6 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.administration.CorpusAdministration;
-import annis.administration.ImportStatus;
-import annis.administration.StatementController;
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.Appender;
-import ch.qos.logback.core.AppenderBase;
-import com.google.common.io.Files;
-import com.google.common.io.PatternFilenameFilter;
 import java.awt.HeadlessException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,15 +26,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.io.Files;
+
+import annis.administration.CorpusAdministration;
+import annis.administration.ImportStatus;
+import annis.administration.StatementController;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.AppenderBase;
 
 /**
  *
