@@ -294,9 +294,9 @@ public class FrequencyResultPanel extends VerticalLayout
       {
         File tmpFile = File.createTempFile("annis-frequency", ".txt");
         tmpFile.deleteOnExit();
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8))
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
+            CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\'))
         {
-          CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
           
           // write headers
           ArrayList<String> header = new ArrayList<>();
