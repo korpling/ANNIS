@@ -165,7 +165,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
     else
     {
       String txt = event.getText();
-      HashMap<Integer, Collection> levdistvals = new HashMap<>();
+      HashMap<Integer, Collection<String>> levdistvals = new HashMap<>();
       if (txt.length() > 1)
       {
         scb.removeAllItems();
@@ -183,7 +183,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
         }
         SortedSet<Integer> keys = new TreeSet<>(levdistvals.keySet());
         for(Integer k : keys.subSet(0, 10)){
-          List<String> valueList = new ArrayList(levdistvals.get(k));
+          List<String> valueList = new ArrayList<>(levdistvals.get(k));
           Collections.sort(valueList, String.CASE_INSENSITIVE_ORDER);
           for(String v : valueList){
             scb.addItem(v);

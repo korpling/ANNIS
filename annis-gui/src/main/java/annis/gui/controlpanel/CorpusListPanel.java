@@ -375,7 +375,7 @@ public class CorpusListPanel extends VerticalLayout implements
           getItemIds();
         corpusNamesByCorpusSet.retainAll(allCorpusNames);
 
-        corpusSetFilter = new SetFilter(corpusNamesByCorpusSet, "name");
+        corpusSetFilter = new SetFilter<>(corpusNamesByCorpusSet, "name");
         ui.getQueryState().getAvailableCorpora().addContainerFilter(
           corpusSetFilter);
 

@@ -168,7 +168,7 @@ public class SearchOptionsPanel extends FormLayout
       + "syllables, word forms belonging to different speakers, normalized or "
       + "diplomatic segmentations of a manuscript, etc.");
     
-    segmentationHelp = new HelpButton(cbSegmentation);
+    segmentationHelp = new HelpButton<Object>(cbSegmentation);
 
     cbOrder = new ComboBox("Order", orderContainer);
     cbOrder.setNewItemsAllowed(false);

@@ -337,7 +337,7 @@ public class CorefVisualizer extends WriterVisualizer
         
         for(STextualDS t : texts)
         {
-          DataSourceSequence sequence= new DataSourceSequence(t, 0,
+          DataSourceSequence<Integer> sequence= new DataSourceSequence<>(t, 0,
             (t.getText()!= null) ? t.getText().length():0);
           List<SToken> token = saltGraph.getSortedTokenByText(saltGraph.getTokensBySequence(sequence));
 

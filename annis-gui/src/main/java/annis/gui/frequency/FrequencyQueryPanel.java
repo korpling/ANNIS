@@ -16,6 +16,7 @@
 package annis.gui.frequency;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -256,12 +257,16 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Set<Object> selected = new HashSet((Set<Object>) tblFrequencyDefinition.getValue());
-        for(Object o : selected)
+        Object rawValue = tblFrequencyDefinition.getValue();
+        if(rawValue instanceof Collection<?>)
         {
-          cbAutomaticMode.setValue(Boolean.FALSE);
-          tblFrequencyDefinition.removeItem(o);
-          
+          Set<Object> selected = new HashSet<>((Collection<?>) rawValue);
+          for(Object o : selected)
+          {
+            cbAutomaticMode.setValue(Boolean.FALSE);
+            tblFrequencyDefinition.removeItem(o);
+            
+          }
         }
       }
     });

@@ -166,7 +166,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
   public void textChange(FieldEvents.TextChangeEvent event)
   {        
     String txt = event.getText();
-    HashMap<Integer, Collection> levdistvals = new HashMap<>();
+    HashMap<Integer, Collection<String>> levdistvals = new HashMap<>();
     if (txt.length() > 1)
     {
       cb.removeAllItems();
@@ -184,7 +184,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
       }
       SortedSet<Integer> keys = new TreeSet<>(levdistvals.keySet());
       for(Integer k : keys.subSet(0, 5)){
-        List<String> values = new ArrayList(levdistvals.get(k));
+        List<String> values = new ArrayList<>(levdistvals.get(k));
         Collections.sort(values, String.CASE_INSENSITIVE_ORDER);
         for(String v : values){
           cb.addItem(v);
