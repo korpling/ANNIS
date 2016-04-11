@@ -64,6 +64,7 @@ public class PartiturVisualizer extends WriterVisualizer
   }
 
   @Override
+  @SuppressWarnings("deprecation")
   public void writeOutput(VisualizerInput input, Writer writer)
   {
     try

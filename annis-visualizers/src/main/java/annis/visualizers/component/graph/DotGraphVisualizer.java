@@ -79,6 +79,7 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
     internalCreateDot();
   }
 
+  @SuppressWarnings("deprecation")
   private void internalCreateDot()
   {
     w("digraph G {\n");
@@ -162,6 +163,7 @@ public class DotGraphVisualizer extends AbstractDotVisualizer
     return false;
   }
 
+  @SuppressWarnings("deprecation")
   private void writeNode(AnnisNode node)
   {
 

@@ -44,6 +44,7 @@ public class AnnisGraphTools implements Serializable
       this.input = input;
   }
 
+  @SuppressWarnings("deprecation")
   public List<DirectedGraph<AnnisNode, Edge>> getSyntaxGraphs()
   {
     AnnotationGraph ag = input.getResult().getGraph();

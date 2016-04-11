@@ -126,12 +126,6 @@ public class CorefVisualizer extends WriterVisualizer
   {
     private String name;
     private String value;
-
-    public SerializableAnnotation(String name, String value)
-    {
-      this.name = name;
-      this.value = value;
-    }
     
     public SerializableAnnotation(SAnnotation orig)
     {

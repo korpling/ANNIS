@@ -79,6 +79,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
     w("}");
   }
   
+  @SuppressWarnings("deprecation")
   private void writeAllRealToken()
   {
     // Token are in a subgraph
@@ -93,6 +94,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
     w("  }\n");
   }
   
+  @SuppressWarnings("deprecation")
   private void writeAllPseudoToken()
   {
     // write out pseudo token nodes
@@ -121,6 +123,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
     }
   }
 
+  @SuppressWarnings("deprecation")
   private void writeAllDepEdges()
   {
     for (Edge e : input.getResult().getGraph().getEdges())
@@ -209,6 +212,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
     }
   }
 
+  @SuppressWarnings("deprecation")
   private void writeNode(AnnisNode n)
   {
     String color = "#000000";
@@ -232,6 +236,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
     w("\" ];\n");
   }
 
+  @SuppressWarnings("deprecation")
   private void writeToken(AnnisNode n)
   {
     w("  " + n.getId() + "[label=\"" + n.getSpannedText() + "\" ");

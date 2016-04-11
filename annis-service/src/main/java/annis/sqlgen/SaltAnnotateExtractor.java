@@ -614,17 +614,17 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     node.addFeature(feat);
   }
 
-  private void addStringSFeature(SNode node, String name,
-    String value) throws SQLException
-  {
-    SFeature feat = SaltFactory.createSFeature();
-    feat.setNamespace(ANNIS_NS);
-    feat.setName(name);
-    feat.setValue(value);
-    node.addFeature(feat);
-  }
-
-// non used functions, commmented out in order to avoid some findbugs warnings 
+//non used functions, commmented out in order to avoid some findbugs warnings 
+//  private void addStringSFeature(SNode node, String name,
+//    String value) throws SQLException
+//  {
+//    SFeature feat = SaltFactory.createSFeature();
+//    feat.setNamespace(ANNIS_NS);
+//    feat.setName(name);
+//    feat.setValue(value);
+//    node.addFeature(feat);
+//  }
+//  
 //  private void addLongSFeature(SNode node, ResultSet resultSet, String name,
 //    String table, String tupleName) throws SQLException
 //  {

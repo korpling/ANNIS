@@ -160,7 +160,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
               res = res.queryParam("filter", filter.name());
             }
 
-            Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
             stopwatch.start();
             SaltProject p = res.post(SaltProject.class, currentMatches);
             stopwatch.stop();

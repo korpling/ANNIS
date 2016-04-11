@@ -84,7 +84,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
       cbChooseBuilder.addItem(b.getCaption());
     }
     
-    cbChooseBuilder.addListener((Property.ValueChangeListener) this);
+    cbChooseBuilder.addValueChangeListener((Property.ValueChangeListener) this);
     
     layout.addComponent(cbChooseBuilder);
     layout.setExpandRatio(cbChooseBuilder, 0.0f);

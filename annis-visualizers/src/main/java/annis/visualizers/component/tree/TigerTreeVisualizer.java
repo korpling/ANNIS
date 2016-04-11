@@ -116,6 +116,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public Shape getShape(AnnisNode n, VisualizerInput input)
     {
       if(isQueryMatch(n, input))
@@ -318,6 +319,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   
   
   @Override
+  @SuppressWarnings("deprecation")
   public void writeOutput(VisualizerInput input, OutputStream outstream)
   {
     AnnisResult result = input.getResult();
