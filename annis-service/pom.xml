@@ -375,7 +375,7 @@
           <systemProperties>
             <property>
               <name>annis.home</name>
-              <value>${project.base}/src/main/distribution/</value>
+              <value>${project.basedir}/src/main/distribution/</value>
             </property>
           </systemProperties>
         </configuration>
