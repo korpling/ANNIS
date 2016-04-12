@@ -64,10 +64,10 @@ edges: json_edges
 };
 var options = {
 nodes:{
-shape: "box",
-fixed: {
+shape: "box" //,
+/*fixed: {
 	x: true
-}
+}*/
 },
 edges: {
 smooth: true,
@@ -94,12 +94,12 @@ hierarchical:{
      direction: 'UD',
      sortMethod: 'directed'
 }
-} /*,
+} ,
 physics: {
 hierarchicalRepulsion: {
 centralGravity: 0.05,
-springLength: 100,
-springConstant: 0.0007,
+springLength: 200,
+springConstant: 1.5,
 nodeDistance: nodeDist,
 damping: 0.04
 },
@@ -109,7 +109,7 @@ timestep: 0.5,
 stabilization: {
 iterations: 800
 }
-}*/
+}
 }
 ;
 $(container).remove("canvas");
