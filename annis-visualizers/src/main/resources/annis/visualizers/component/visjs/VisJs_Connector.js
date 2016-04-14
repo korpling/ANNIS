@@ -46,15 +46,27 @@ var json_edges = JSON.parse(strEdges);
 
 
 var nodeDist;
+var sprLength;
+var sprConstant;
+
 var nNodes = json_nodes.length;
 if (nNodes < 20){
 	nodeDist = 100;
+	sprLength = 200;
+	sprConstant = 1.2;
 } else if (nNodes >=20 && nNodes < 100){
-	nodeDist = 150
+	nodeDist = 150;
+	sprLength = 200;
+	sprConstant = 1.2;
+
 } else if (nNodes >= 100 && nNodes < 400) {
 	nodeDist = 200
+	sprLength = 250;
+	sprConstant = 0.8;
 } else {
 	nodeDist = 400
+	sprLength = 250;
+	sprConstant = 0.5;
 };
 
 
@@ -82,32 +94,25 @@ interaction: {
   keyboard: true
         },
 layout: {
-
-//improvedLayout:true,
 hierarchical:{
-	
-     //levelSeparation: 150,
-     //nodeSpacing: 100,     
-     //edgeMinimization: true,
-    // parentCentralization: true,
-   //  blockShifting: false,
      direction: 'UD',
      sortMethod: 'directed'
 }
 } ,
 physics: {
 hierarchicalRepulsion: {
-centralGravity: 0.05,
-springLength: 200,
-springConstant: 1.5,
+centralGravity: 0.0,
+springLength: sprLength,
+springConstant: sprConstant,
 nodeDistance: nodeDist,
 damping: 0.04
 },
-maxVelocity: 27,
+maxVelocity: 50,
+minVelocity: 7,
 solver: 'hierarchicalRepulsion',
-timestep: 0.5,
+timestep: 0.4,
 stabilization: {
-iterations: 800
+iterations: 700
 }
 }
 }
