@@ -28,15 +28,13 @@ public class VisJs extends AbstractVisualizer<Panel>{
 
 	@Override
 	public Panel createComponent(VisualizerInput visInput,
+	//public VisJsComponent createComponent(VisualizerInput visInput,
 			VisualizationToggle visToggle) 
 	{
 			
-		/*Panel panel = new Panel();		
-		panel.setHeight("300px");
-		panel.setWidth("100%");
-		panel.setScrollLeft(10);*/
-	//	VisJsComponent visjsComponent = new VisJsComponent(visInput);		
-		//panel.setContent(visjsComponent);		
+		//VisJsComponent visjsComponent = new VisJsComponent(visInput);	
+		//return visjsComponent;
+
 		VisJsPanel panel = new VisJsPanel(visInput);
 		return panel;
 	}
