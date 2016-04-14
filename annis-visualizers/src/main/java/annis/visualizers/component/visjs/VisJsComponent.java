@@ -204,8 +204,10 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	      super.attach();
 	      //set an initial size
 	      //it will be adjusted to the size of panel by VisJs_Connector.js
-	      setHeight("400px");
-	      setWidth("1000px");
+	     // setHeight("600px");
+	      //setWidth("1000px");
+	      setHeight("100%");
+	      setWidth("100%");
 	      getState().strNodes = strNodes;
 	      getState().strEdges = strEdges;
 	     
