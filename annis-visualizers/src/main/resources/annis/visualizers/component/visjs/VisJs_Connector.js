@@ -37,27 +37,24 @@ var json_edges = JSON.parse(strEdges);
 
 
 var nodeDist;
-var sprLength;
+var sprLength = 100;
 var sprConstant;
 
 var nNodes = json_nodes.length;
+window.alert(nNodes);
 if (nNodes < 20){
 	nodeDist = 100;
-	sprLength = 200;
-	sprConstant = 1.15;
+	sprConstant = 1.2;
 } else if (nNodes >=20 && nNodes < 100){
-	nodeDist = 150;
-	sprLength = 160;
-	sprConstant = 0.55;
+	nodeDist = 120;
+	sprConstant = 1.0;
 
 } else if (nNodes >= 100 && nNodes < 400) {
-	nodeDist = 200
-	sprLength = 140;
-	sprConstant = 0.45;
+	nodeDist = 150;
+	sprConstant = 0.8;
 } else {
-	nodeDist = 400
-	sprLength = 100;
-	sprConstant = 0.4;
+	nodeDist = 180;
+	sprConstant = 0.6;
 };
 
 
@@ -90,24 +87,23 @@ hierarchical:{
 } ,
 physics: {
 hierarchicalRepulsion: {
-centralGravity: 0.0,
+centralGravity: 0.8,
 springLength: sprLength,
 springConstant: sprConstant,
 nodeDistance: nodeDist,
 damping: 0.04
 },
 maxVelocity: 50,
-minVelocity: 7,
+minVelocity: 1,
 solver: 'hierarchicalRepulsion',
-timestep: 0.4,
+timestep: 0.5,
 stabilization: {
-iterations: 700
+iterations: 1000
 }
 }
 }
 ;
 $(container).remove("canvas");
-
 
 
 visjscomponent = new vis.Network(container, data, options); 
@@ -122,6 +118,7 @@ $("div.vis-network div.vis-navigation div.vis-button.vis-right").css({"bottom": 
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomIn").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "15px"});
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomOut").css({"bottom": "auto", "top": "50px", "left": "auto", "right": "15px"});
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "55px"});
+	
 
 };
 
