@@ -41,7 +41,7 @@ var sprLength = 100;
 var sprConstant;
 
 var nNodes = json_nodes.length;
-window.alert(nNodes);
+
 if (nNodes < 20){
 	nodeDist = 100;
 	sprConstant = 1.2;
