@@ -118,9 +118,11 @@ $("div.vis-network div.vis-navigation div.vis-button.vis-right").css({"bottom": 
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomIn").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "15px"});
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomOut").css({"bottom": "auto", "top": "50px", "left": "auto", "right": "15px"});
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "55px"});
-	
+
 
 };
+
+
 
 window.addEventListener("resize", function(){
 	$(container).css({"width": "100%", "height": "100%"});
