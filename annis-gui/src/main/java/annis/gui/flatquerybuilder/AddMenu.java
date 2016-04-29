@@ -28,15 +28,11 @@ import java.util.List;
 public class AddMenu extends Panel
 {
   private MenuBar addMenu = new MenuBar();
-  private VerticalNode vn;
-  private FlatQueryBuilder sq;
   
   private static final String BUTTON_ADDLEVEL_LABEL = "+"; 
   
   public AddMenu(final FlatQueryBuilder sq, final VerticalNode vn, String firstLevel)
   {
-    this.vn = vn;
-    this.sq = sq;
     final MenuItem add = addMenu.addItem(BUTTON_ADDLEVEL_LABEL, null);
     for (final String annoname : vn.getAnnonames())
     {      

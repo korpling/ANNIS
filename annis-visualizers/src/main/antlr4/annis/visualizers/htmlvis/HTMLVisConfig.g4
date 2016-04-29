@@ -28,6 +28,7 @@ STYLE : 'style';
 COLON : ':';
 BEGIN : 'annis:BEGIN';
 END : 'annis:END';
+ALL : 'annis:ALL';
 QUOTE : '"';
 NEWLINE : '\n';
 COMMENT : '#' ~('\n')+ -> skip;
@@ -62,6 +63,7 @@ qName
 condition
   : BEGIN # conditionBegin
   | END # conditionEnd
+  | ALL # conditionAll
   | qName # conditionName
   | TOK # conditionTok
   | qName EQUALS value # conditionNameAndValue

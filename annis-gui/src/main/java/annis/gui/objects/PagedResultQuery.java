@@ -15,12 +15,12 @@
  */
 package annis.gui.objects;
 
-import annis.service.objects.OrderType;
-import com.google.common.base.Preconditions;
 import java.util.Objects;
 import java.util.Set;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+
+import annis.service.objects.OrderType;
 
 /**
  * Parameters for a query that shows the result to the user
@@ -28,9 +28,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class PagedResultQuery extends ContextualizedQuery
-{
-  private final static Logger log = LoggerFactory.getLogger(PagedResultQuery.class);
-  
+{  
   private long offset;
   private int limit;
   private OrderType order = OrderType.ascending;

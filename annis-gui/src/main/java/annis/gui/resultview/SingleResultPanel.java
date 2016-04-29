@@ -20,18 +20,15 @@ import annis.gui.AnnisUI;
 import annis.gui.ShareSingleMatchGenerator;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
-import annis.gui.SearchView;
 import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
-import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
 import static annis.libgui.Helper.calculateMarkedAndCoveredIDs;
+import annis.libgui.IDGenerator;
 import annis.libgui.InstanceConfig;
-import annis.libgui.MatchedNodeColors;
 import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProvider;
 import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
@@ -47,22 +44,12 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -73,7 +60,12 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.EList;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -85,13 +77,11 @@ public class SingleResultPanel extends CssLayout implements
 {
   private static final long serialVersionUID = 2L;
 
-  private static final String HIDE_KWIC = "hide_kwic";
-
   private static final String INITIAL_OPEN = "initial_open";
 
   private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
-  private transient SDocument result;
+  private SDocument result;
 
   private Map<String, String> markedCoveredMap;
 
@@ -209,12 +199,12 @@ public class SingleResultPanel extends CssLayout implements
      * Extract the top level corpus name and the document name of this single
      * result.
      */
-    path = CommonHelper.getCorpusPath(result.getSCorpusGraph(), result);
+    path = CommonHelper.getCorpusPath(result.getGraph(), result);
     Collections.reverse(path);
     corpusName = path.get(0);
     documentName = path.get(path.size() - 1);
 
-    MinMax minMax = getIds(result.getSDocumentGraph());
+    MinMax minMax = getIds(result.getDocumentGraph());
 
     // build label
     StringBuilder sb = new StringBuilder("Path: ");
@@ -316,20 +306,7 @@ public class SingleResultPanel extends CssLayout implements
     initVisualizer();
   }
   
-  private void writeObject(ObjectOutputStream out) throws IOException
-  {
-    out.defaultWriteObject();
-    
-    CommonHelper.writeSDocument(result, out);
-  }
-  
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
-    
-   this.result = CommonHelper.readSDocument(in);
-  }
-  
+
   private void showShareSingleMatchGenerator()
   {
     // select the current match
@@ -368,7 +345,7 @@ public class SingleResultPanel extends CssLayout implements
     {
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
-        result.getSDocumentGraph());
+        result.getDocumentGraph());
       Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes, segmentationName);
       for (VisualizerPanel p : visualizers)
       {
@@ -397,7 +374,7 @@ public class SingleResultPanel extends CssLayout implements
   {
     if (event.getButton() == btInfo && result != null)
     {
-      Window infoWindow = new Window("Info for " + result.getSId());
+      Window infoWindow = new Window("Info for " + result.getId());
 
       infoWindow.setModal(false);
       MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size()
@@ -440,7 +417,7 @@ public class SingleResultPanel extends CssLayout implements
 
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
-        result.getSDocumentGraph());
+        result.getDocumentGraph());
 
       Map<String, Long> markedAndCovered = 
         Helper.calculateMarkedAndCoveredIDs(result, segNodes, segmentationName);
@@ -511,6 +488,7 @@ public class SingleResultPanel extends CssLayout implements
     {
       btLink.setVisible(false);
     }
+    IDGenerator.assignIDForFields(SingleResultPanel.this, infoBar, btInfo);
   }
   
   
@@ -626,7 +604,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private MinMax getIds(SDocumentGraph graph)
   {
-    EList<SToken> sTokens = graph.getSTokens();
+    List<SToken> sTokens = graph.getTokens();
 
     MinMax minMax = new MinMax();
     minMax.min = Long.MAX_VALUE;
@@ -640,7 +618,7 @@ public class SingleResultPanel extends CssLayout implements
       {
         for (SToken t : sTokens)
         {
-          SFeature feature = t.getSFeature(ANNIS_NS,
+          SFeature feature = t.getFeature(ANNIS_NS,
             FEAT_RELANNIS_NODE);
           if(feature != null && feature.getValue() instanceof RelannisNodeFeature)
           {
@@ -693,13 +671,13 @@ public class SingleResultPanel extends CssLayout implements
   {
     this.query = query;
     if (p != null
-      && p.getSCorpusGraphs() != null
-      && !p.getSCorpusGraphs().isEmpty()
-      && p.getSCorpusGraphs().get(0) != null
-      && p.getSCorpusGraphs().get(0).getSDocuments() != null
-      && !p.getSCorpusGraphs().get(0).getSDocuments().isEmpty())
+      && p.getCorpusGraphs() != null
+      && !p.getCorpusGraphs().isEmpty()
+      && p.getCorpusGraphs().get(0) != null
+      && p.getCorpusGraphs().get(0).getDocuments() != null
+      && !p.getCorpusGraphs().get(0).getDocuments().isEmpty())
     {
-      this.result = p.getSCorpusGraphs().get(0).getSDocuments().get(0);
+      this.result = p.getCorpusGraphs().get(0).getDocuments().get(0);
     }
 
     removeComponent(reloadVisualizer);

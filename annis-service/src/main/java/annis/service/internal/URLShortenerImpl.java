@@ -16,9 +16,9 @@
 
 package annis.service.internal;
 
-import annis.dao.ShortenerDao;
 import java.nio.BufferUnderflowException;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -28,11 +28,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.subject.Subject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.dao.ShortenerDao;
 
 /**
  * Service to create and query unique IDs for URLs used by the frontend.
@@ -45,9 +46,6 @@ import org.slf4j.LoggerFactory;
 @Path("annis/shortener")
 public class URLShortenerImpl
 {
-  
-  private final static Logger log = LoggerFactory.getLogger(URLShortenerImpl.class);
-  
   private ShortenerDao shortenerDao;
   
   @Context

@@ -126,7 +126,6 @@ public class TimeHelper
   {
     int offset = getOffset(rightNode);
     String time = null;
-    TimeHelper t = null;
 
     for (long i = offset + 1; i < token.size(); i++)
     {

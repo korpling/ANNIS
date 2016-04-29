@@ -15,23 +15,25 @@
  */
 package annis.visualizers.component.pdf;
 
-import annis.CommonHelper;
-import annis.libgui.Helper;
 import static annis.libgui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
 import static annis.libgui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.service.objects.AnnisBinaryMetaData;
+
+import java.util.List;
+import java.util.UUID;
+
+import org.apache.commons.lang3.Validate;
+
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
-import java.util.List;
-import java.util.UUID;
-import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.CommonHelper;
+import annis.libgui.Helper;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.service.objects.AnnisBinaryMetaData;
 
 /**
  * Inits the wrapper for the pdf visualization. Neccesary steps for this are:
@@ -46,8 +48,6 @@ import org.slf4j.LoggerFactory;
  */
 @JavaScript({"pdf.js", "pdf_connector.js"})
 public class PDFPanel extends AbstractJavaScriptComponent {
-
-  private static final Logger log = LoggerFactory.getLogger(PDFPanel.class);
 
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   private final static Escaper urlParamEscape = UrlEscapers.urlPathSegmentEscaper();
@@ -103,7 +103,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
   private String getBinaryPath() {
     List<String> corpusPath =
-            CommonHelper.getCorpusPath(input.getDocument().getSCorpusGraph(),
+            CommonHelper.getCorpusPath(input.getDocument().getGraph(),
             input.getDocument());
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);

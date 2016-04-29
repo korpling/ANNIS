@@ -15,9 +15,6 @@
  */
 package annis.service.objects;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
 import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,12 +23,20 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 
 /**
  * Represents a single match of an AQL query.
@@ -48,6 +53,10 @@ public class Match implements Serializable
   private final static Splitter matchSplitter = Splitter.on(" ").trimResults().omitEmptyStrings();
   private final static Splitter annoIDSplitter = Splitter.on("::").trimResults().limit(3);
  
+  private static final Escaper spaceEscaper = Escapers.builder()
+          .addEscape(' ', "%20")
+          .addEscape('%', "%25") // also encode the percent itself
+          .build();
   
   private List<URI> saltIDs;
   private List<String> annos;
@@ -62,7 +71,7 @@ public class Match implements Serializable
   {
     saltIDs = new ArrayList<>(originalIDs);
     annos = new ArrayList<>(saltIDs.size());
-    for (URI saltID : saltIDs)
+    for(int i=0; i < saltIDs.size(); i++)
     {
       annos.add("");
     }
@@ -140,7 +149,7 @@ public class Match implements Serializable
     if(saltIDs != null)
     {
       annos = new ArrayList<>(saltIDs.size());
-      for (URI saltID : saltIDs)
+      for(int i=0; i < saltIDs.size(); i++)
       {
         annos.add("");
       }
@@ -165,6 +174,9 @@ public class Match implements Serializable
     for (String singleMatch : splitter.split(raw))
     {
       URI uri;
+      
+      // undo any escaping
+      singleMatch = singleMatch.replace("%20", " ").replace("%25", "%");
       
       String id = "";
       String anno = null;
@@ -211,10 +223,17 @@ public class Match implements Serializable
       {
         
         uri = new java.net.URI(id).normalize();
-
+        
         if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
         {
           throw new URISyntaxException("not a Salt id", uri.toString());
+        }
+        // check if the path ends with "/" (which was wrongly used by older ANNIS versions)
+        String path = uri.getPath();
+        if(path.endsWith("/"))
+        {
+          path = path.substring(0, path.length()-1);
+          uri = new URI(uri.getScheme(), uri.getHost(), path, uri.getFragment());
         }
         
       }
@@ -263,7 +282,7 @@ public class Match implements Serializable
       String v = uri.toASCIIString();
       if(anno != null && !anno.isEmpty())
       {
-        v = anno + "::" + uri;
+        v = spaceEscaper.escape(anno) + "::" + uri;
       }
       return v;
     }

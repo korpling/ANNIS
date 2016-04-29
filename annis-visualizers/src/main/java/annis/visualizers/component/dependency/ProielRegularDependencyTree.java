@@ -15,19 +15,19 @@
  */
 package annis.visualizers.component.dependency;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
 import annis.visualizers.component.AbstractDotVisualizer;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -46,7 +46,6 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
   private List<AnnisNode> realToken;
   private List<AnnisNode> pseudoToken;
   private Set<String> alreadyWrittenEdge;
-  private Random rand = new Random();
 
   @Override
   public String getShortName()
@@ -101,13 +100,11 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
       if (!n.isToken())
       {
         boolean isDepNode = false;
-        String word = null;
         for (Annotation anno : n.getNodeAnnotations())
         {
           if ("tiger".equals(anno.getNamespace()) && "word".equals(anno.getName()))
           {
             isDepNode = true;
-            word= anno.getValue();
             break;
           }
         }
@@ -120,7 +117,7 @@ public class ProielRegularDependencyTree extends AbstractDotVisualizer
       }
     }
   }
-
+  
   private void writeAllDepEdges()
   {
     for (Edge e : input.getResult().getGraph().getEdges())

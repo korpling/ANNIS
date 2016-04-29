@@ -28,6 +28,7 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
+import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.OrderType;
 import annis.service.objects.SubgraphFilter;
@@ -40,16 +41,14 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Splitter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import com.google.common.io.Files;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -67,9 +66,9 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.util.SaltUtil;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,6 +169,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private static class Benchmark
   {
 
+    private String name;
     private String functionCall;
 
     private QueryData queryData;
@@ -187,6 +187,8 @@ public class AnnisRunner extends AnnisBaseRunner
     private int runs;
 
     private int errors;
+    
+    private Integer count;
 
     private final List<Long> values = Collections.synchronizedList(
       new ArrayList<Long>());
@@ -216,7 +218,8 @@ public class AnnisRunner extends AnnisBaseRunner
       return -1;
     }
   }
-  private List<AnnisRunner.Benchmark> benchmarks;
+  private String benchmarkName = null;
+  private final ArrayList<Benchmark> benchmarks;
 
   private static final int SEQUENTIAL_RUNS = 5;
 
@@ -333,9 +336,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doCorpus("pcc2");
-    doSet("freq-def to 1:tok, 2:lemma");
-    doFrequency("tok . tok");
+    doDoc("NoSta-D-Kafka NoSta-D-Kafka");
   }
 
   public void doParse(String annisQuery)
@@ -470,6 +471,12 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     out.println("recording new benchmark session");
     benchmarks.clear();
+    benchmarkName = null;
+  }
+  
+  public void doBenchmarkName(String name)
+  {
+    this.benchmarkName = name;
   }
 
   public void doBenchmark(String benchmarkCount)
@@ -492,7 +499,7 @@ public class AnnisRunner extends AnnisBaseRunner
     List<AnnisRunner.Benchmark> session = new ArrayList<>();
 
     // create sql + plan for each query and create count copies for each benchmark
-    for (AnnisRunner.Benchmark benchmark : benchmarks)
+    for (Benchmark benchmark : benchmarks)
     {
       if (clearCaches)
       {
@@ -512,7 +519,7 @@ public class AnnisRunner extends AnnisBaseRunner
         out.println("---> query plan for: " + benchmark.functionCall);
         out.println(benchmark.plan);
       }
-      catch (RuntimeException e)
+      catch (RuntimeException ex)
       { // nested DataAccessException would be better
         out.println("---> query plan failed for " + benchmark.functionCall);
       }
@@ -533,7 +540,7 @@ public class AnnisRunner extends AnnisBaseRunner
         {
           queryDao.executeQueryFunction(benchmark.queryData, generator);
         }
-        catch (RuntimeException e)
+        catch (RuntimeException ex)
         {
           error = true;
         }
@@ -687,7 +694,7 @@ public class AnnisRunner extends AnnisBaseRunner
     try
     {
       File outputDir = new File("annis_benchmark_results");
-      if(outputDir.mkdirs())
+      if(outputDir.isDirectory() || outputDir.mkdirs())
       {
         int i=1;
         for(AnnisRunner.Benchmark b : benchmarks)
@@ -701,6 +708,16 @@ public class AnnisRunner extends AnnisBaseRunner
           }
           
           i++;
+          
+          // also write out a "time" and "count" file which can be used by the ANNIS4 prototype
+          if(b.name != null)
+          {
+            Files.write("" + b.avgTimeInMilliseconds, new File(outputDir, b.name + ".time"), StandardCharsets.UTF_8);
+            if(b.count != null)
+            {
+              Files.write("" + b.count, new File(outputDir, b.name + ".count"), StandardCharsets.UTF_8);
+            }
+          }
         }
       }
     }
@@ -1030,8 +1047,15 @@ public class AnnisRunner extends AnnisBaseRunner
 
     if (annisQuery != null)
     {
-      benchmarks.add(new AnnisRunner.Benchmark(queryFunction + " " + annisQuery,
-        queryData));
+      if(benchmarkName == null)
+      {
+        benchmarkName = "auto_" + benchmarks.size();
+      }
+      Benchmark b = new AnnisRunner.Benchmark(queryFunction + " " + annisQuery,
+        queryData);
+      b.name = benchmarkName;
+      benchmarks.add(b);
+      benchmarkName = null;
     }
     // printing of NOTICE conflicts with benchmarkFile
     // out.println("NOTICE: corpus = " + queryData.getCorpusList());
@@ -1041,7 +1065,13 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCount(String annisQuery)
   {
-    out.println(queryDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count")));
+    MatchAndDocumentCount count = queryDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count"));
+    if(!benchmarks.isEmpty())
+    {
+      Benchmark lastBench = benchmarks.get(benchmarks.size()-1);
+      lastBench.count = count.getMatchCount();
+    }
+    out.println(count);
   }
 
   public void doMatrix(String annisQuery)
@@ -1087,7 +1117,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     // write result to File
     URI path = URI.createFileURI("/tmp/annissalt");
-    result.saveSaltProject_DOT(path);
+    SaltUtil.save_DOT(result, path);
     System.out.println("graph as dot written to /tmp/annissalt");
   }
 
@@ -1239,33 +1269,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private String printSaltAsXMI(SaltProject project)
   {
-    try
-    {
-      Resource resource = new XMIResourceImpl();
-      // add the project itself
-      resource.getContents().add(project);
+    // TODO: actuall transform it
+    throw new UnsupportedOperationException("Not implemented yet");
 
-      // add all SDocumentGraph elements
-      for (SCorpusGraph corpusGraph : project.getSCorpusGraphs())
-      {
-        for (SDocument doc : corpusGraph.getSDocuments())
-        {
-          if (doc.getSDocumentGraph() != null)
-          {
-            resource.getContents().add(doc.getSDocumentGraph());
-          }
-        }
-      }
-      ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-      resource.save(outStream, null);
-      return new String(outStream.toByteArray(), "UTF-8");
-
-    }
-    catch (IOException ex)
-    {
-      log.error(null, ex);
-    }
-    return "";
   }
 
   public AnnisParserAntlr getAnnisParser()

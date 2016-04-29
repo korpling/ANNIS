@@ -52,7 +52,6 @@ public class ResourceServlet extends HttpServlet implements Plugin
     Collections.synchronizedMap(new HashMap<String, ResourcePlugin>());
 
   @Override
-  @SuppressWarnings("unchecked")
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
     OutputStream outStream = response.getOutputStream();

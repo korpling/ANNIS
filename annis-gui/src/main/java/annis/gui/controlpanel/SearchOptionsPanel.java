@@ -15,19 +15,16 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.AnnisUI;
-import annis.gui.components.HelpButton;
-import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
-import annis.gui.objects.QueryUIState;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.service.objects.CorpusConfig;
-import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.OrderType;
-import annis.service.objects.SegmentationList;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.ImmutableList;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
 import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -41,13 +38,16 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.AnnisUI;
+import annis.gui.components.HelpButton;
+import annis.gui.objects.QueryUIState;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.service.objects.CorpusConfig;
+import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.OrderType;
+import annis.service.objects.SegmentationList;
 
 /**
  *
@@ -168,7 +168,7 @@ public class SearchOptionsPanel extends FormLayout
       + "syllables, word forms belonging to different speakers, normalized or "
       + "diplomatic segmentations of a manuscript, etc.");
     
-    segmentationHelp = new HelpButton(cbSegmentation);
+    segmentationHelp = new HelpButton<Object>(cbSegmentation);
 
     cbOrder = new ComboBox("Order", orderContainer);
     cbOrder.setNewItemsAllowed(false);

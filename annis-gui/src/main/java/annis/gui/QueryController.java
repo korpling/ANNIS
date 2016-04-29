@@ -15,6 +15,39 @@
  */
 package annis.gui;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SaltProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.FutureCallback;
+import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanContainer;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
+
 import annis.gui.components.ExceptionDialog;
 import annis.gui.controller.CountCallback;
 import annis.gui.controller.ExportBackgroundJob;
@@ -49,41 +82,10 @@ import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
-import com.google.common.base.Joiner;
-import com.google.common.eventbus.EventBus;
-import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanContainer;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TabSheet;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A controller to modifiy the query UI state.
- *
+ *s
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class QueryController implements Serializable
@@ -115,6 +117,15 @@ public class QueryController implements Serializable
           validateQuery();
         }
       });
+    
+    this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
+    {
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        validateQuery();
+      }
+    });
 
     for (Exporter e : SearchView.EXPORTER)
     {
@@ -387,7 +398,12 @@ public class QueryController implements Serializable
 
       if(config.containsKey(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
       {
-        getState().getVisibleBaseText().setValue(config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
+        String configVal = config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
+        if("".equals(configVal) || "tok".equals(configVal))
+        {
+          configVal = null;
+        }
+        getState().getVisibleBaseText().setValue(configVal);
       }
       else
       {

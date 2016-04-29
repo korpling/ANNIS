@@ -20,11 +20,11 @@ import annis.gui.AnnisUI;
 import annis.gui.QueryController;
 import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.controlpanel.QueryPanel;
-import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
 import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProviderImpl;
@@ -44,13 +44,7 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,6 +60,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -145,7 +145,7 @@ public class ResultViewPanel extends VerticalLayout implements
     resultLayout.addStyleName("result-view-css");
     Panel resultPanel = new Panel(resultLayout);
     resultPanel.setSizeFull();
-    resultPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    resultPanel.addStyleName(ValoTheme.PANEL_BORDERLESS);
     resultPanel.addStyleName("result-view-panel");
 
     this.instanceConfig = instanceConfig;
@@ -173,6 +173,16 @@ public class ResultViewPanel extends VerticalLayout implements
     setComponentAlignment(paging, Alignment.TOP_CENTER);
     setExpandRatio(paging, 0.0f);
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(ResultViewPanel.this, resultLayout);
+    IDGenerator.assignIDForEachField(paging);
+  }
+  
+  
 
   /**
    * Informs the user about the searching process.
@@ -337,9 +347,9 @@ public class ResultViewPanel extends VerticalLayout implements
     List<SingleResultPanel> result = new LinkedList<>();
 
     int i = 0;
-    for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
+    for (SCorpusGraph corpusGraph : p.getCorpusGraphs())
     {
-      SDocument doc = corpusGraph.getSDocuments().get(0);
+      SDocument doc = corpusGraph.getDocuments().get(0);
       Match m = new Match();
       if(allMatches != null && localMatchIndex >= 0 && localMatchIndex < allMatches.size())
       {
@@ -404,22 +414,22 @@ public class ResultViewPanel extends VerticalLayout implements
   {
     Set<String> result = new TreeSet<>();
 
-    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    for (SCorpusGraph corpusGraphs : p.getCorpusGraphs())
     {
-      for (SDocument doc : corpusGraphs.getSDocuments())
+      for (SDocument doc : corpusGraphs.getDocuments())
       {
-        SDocumentGraph g = doc.getSDocumentGraph();
+        SDocumentGraph g = doc.getDocumentGraph();
         if (g != null)
         {
           // collect the start nodes of a segmentation chain of length 1
-          for (SNode n : g.getSNodes())
+          for (SNode n : g.getNodes())
           {
             SFeature feat
-              = n.getSFeature(AnnisConstants.ANNIS_NS,
+              = n.getFeature(AnnisConstants.ANNIS_NS,
                 AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
-            if (feat != null && feat.getSValueSTEXT() != null)
+            if (feat != null && feat.getValue_STEXT() != null)
             {
-              result.add(feat.getSValueSTEXT());
+              result.add(feat.getValue_STEXT());
             }
           }
         } // end if graph not null

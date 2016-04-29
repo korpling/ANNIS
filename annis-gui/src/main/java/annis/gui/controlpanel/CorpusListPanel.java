@@ -15,17 +15,16 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.AnnisUI;
-import annis.gui.CorpusBrowserPanel;
-import annis.gui.ExampleQueriesPanel;
-import annis.gui.MetaDataPanel;
-import annis.gui.filter.SetFilter;
-import annis.libgui.Background;
-import annis.libgui.CorpusSet;
-import annis.libgui.Helper;
-import annis.libgui.InstanceConfig;
-import annis.security.UserConfig;
-import annis.service.objects.AnnisCorpus;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.ws.rs.core.Response;
+
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Sets;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -41,7 +40,6 @@ import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
@@ -62,13 +60,19 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import javax.ws.rs.core.Response;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.AnnisUI;
+import annis.gui.CorpusBrowserPanel;
+import annis.gui.ExampleQueriesPanel;
+import annis.gui.MetaDataPanel;
+import annis.gui.filter.SetFilter;
+import annis.libgui.Background;
+import annis.libgui.CorpusSet;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.libgui.InstanceConfig;
+import annis.security.UserConfig;
+import annis.service.objects.AnnisCorpus;
 
 /**
  *
@@ -124,8 +128,6 @@ public class CorpusListPanel extends VerticalLayout implements
     this.instanceConfig = instanceConfig;
     this.autoGenQueries = autoGenQueries;
     this.ui = ui;
-
-    final CorpusListPanel finalThis = this;
 
     setSizeFull();
 
@@ -271,7 +273,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     });
     tblCorpora.setItemDescriptionGenerator(new TooltipGenerator());
-    tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
+    tblCorpora.addValueChangeListener(new CorpusTableChangedListener());
 
     Button btReload = new Button();
     btReload.addClickListener(new Button.ClickListener()
@@ -296,7 +298,17 @@ public class CorpusListPanel extends VerticalLayout implements
     setExpandRatio(tblCorpora, 1.0f);
 
     updateCorpusSetList(true, true);
+    
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora);
+  }
+  
+  
 
   public void updateCorpusSetList(boolean scrollToSelected)
   {
@@ -363,7 +375,7 @@ public class CorpusListPanel extends VerticalLayout implements
           getItemIds();
         corpusNamesByCorpusSet.retainAll(allCorpusNames);
 
-        corpusSetFilter = new SetFilter(corpusNamesByCorpusSet, "name");
+        corpusSetFilter = new SetFilter<>(corpusNamesByCorpusSet, "name");
         ui.getQueryState().getAvailableCorpora().addContainerFilter(
           corpusSetFilter);
 
@@ -698,11 +710,8 @@ public class CorpusListPanel extends VerticalLayout implements
   private class CorpusTableChangedListener implements ValueChangeListener
   {
 
-    private final CorpusListPanel finalThis;
-
-    public CorpusTableChangedListener(CorpusListPanel finalThis)
+    public CorpusTableChangedListener()
     {
-      this.finalThis = finalThis;
     }
 
     @Override
@@ -765,8 +774,8 @@ public class CorpusListPanel extends VerticalLayout implements
 
     Window window = new Window("Corpus information for " + c.getName()
       + " (ID: " + c.getId() + ")", infoLayout);
-    window.setWidth(70, UNITS_EM);
-    window.setHeight(45, UNITS_EM);
+    window.setWidth(70, Unit.EM);
+    window.setHeight(45, Unit.EM);
     window.setResizable(true);
     window.setModal(false);
     window.setResizeLazy(true);
@@ -906,6 +915,10 @@ public class CorpusListPanel extends VerticalLayout implements
             } // end if querying the server for corpus list was successful
           }
         });
+      }
+      catch(Throwable ex)
+      {
+        log.warn("Could not get corpus list", ex);
       }
       finally
       {

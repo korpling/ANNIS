@@ -15,19 +15,20 @@
  */
 package annis.visualizers.component.kwic;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.corpus_tools.salt.common.STextualDS;
+
+import com.vaadin.server.VaadinSession;
+
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import com.vaadin.server.VaadinSession;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import java.util.Map;
-import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import org.eclipse.emf.common.util.EList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Key words in context visualizer (KWIC).
@@ -40,8 +41,6 @@ import org.slf4j.LoggerFactory;
 @PluginImplementation
 public class KWICVisualizer extends AbstractVisualizer<KWICInterface>
 {
-  private static final Logger log = LoggerFactory.getLogger(KWICVisualizer.class);
-  
   @Override
   public String getShortName()
   {
@@ -57,8 +56,8 @@ public class KWICVisualizer extends AbstractVisualizer<KWICInterface>
     PDFController pdfController = VaadinSession.getCurrent().getAttribute(
       PDFController.class);
     
-    EList<STextualDS> texts = visInput.getDocument().getSDocumentGraph().
-      getSTextualDSs();
+    List<STextualDS> texts = visInput.getDocument().getDocumentGraph().
+      getTextualDSs();
 
     // having the KWIC nested in a panel can slow down rendering
     if (texts.size() == 1)

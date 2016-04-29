@@ -15,10 +15,43 @@
  */
 package annis.utils;
 
-import annis.CommonHelper;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SPointingRelation;
+import org.corpus_tools.salt.common.SSequentialDS;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SLayer;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
+import org.corpus_tools.salt.util.SaltUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+
+import annis.CommonHelper;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
@@ -30,35 +63,6 @@ import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisResultImpl;
 import annis.service.objects.AnnisResultSetImpl;
 import annis.service.objects.Match;
-import com.google.common.base.Preconditions;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSequentialDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class can convert the current Salt graph model into the legacy model 
@@ -90,9 +94,9 @@ public class LegacyGraphConverter
     
     if(p != null)
     {
-      for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
+      for (SCorpusGraph corpusGraph : p.getCorpusGraphs())
       {
-        for (SDocument doc : corpusGraph.getSDocuments())
+        for (SDocument doc : corpusGraph.getDocuments())
         {
           result.add(convertToAnnotationGraph(doc));
         }
@@ -104,20 +108,20 @@ public class LegacyGraphConverter
 
   public static AnnotationGraph convertToAnnotationGraph(SDocument document)
   {
-    SFeature featMatchedIDs = document.getSFeature(ANNIS_NS,
-      FEAT_MATCHEDIDS);
+    
+    SDocumentGraph docGraph = document.getDocumentGraph();
+    SFeature featMatchedIDs = docGraph.getFeature(ANNIS_NS, FEAT_MATCHEDIDS);
     Match match = new Match();
-    if (featMatchedIDs != null && featMatchedIDs.getSValueSTEXT() != null)
+    if (featMatchedIDs != null && featMatchedIDs.getValue_STEXT() != null)
     {    
-       match = Match.parseFromString(featMatchedIDs.getSValueSTEXT(), ',');
+       match = Match.parseFromString(featMatchedIDs.getValue_STEXT(), ',');
     }
-    SDocumentGraph docGraph = document.getSDocumentGraph();
     
     // get matched node names by using the IDs
     List<Long> matchedNodeIDs = new ArrayList<>();
     for(URI u : match.getSaltIDs())
     {
-      SNode node = docGraph.getSNode(u.toASCIIString());
+      SNode node = docGraph.getNode(u.toASCIIString());
       if(node == null)
       {
         // that's weird, fallback to the id
@@ -127,7 +131,8 @@ public class LegacyGraphConverter
       else
       {
         RelannisNodeFeature relANNISFeat = 
-          (RelannisNodeFeature) node.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+          (RelannisNodeFeature) node.getFeature(
+            SaltUtil.createQName(ANNIS_NS, FEAT_RELANNIS_NODE)).getValue();
         
         matchedNodeIDs.add(relANNISFeat.getInternalID());
       }
@@ -144,64 +149,66 @@ public class LegacyGraphConverter
     Set<Long> matchSet = new HashSet<>(matchedNodeIDs);
     AnnotationGraph annoGraph = new AnnotationGraph();
 
-    List<String> pathList = 
-      CommonHelper.getCorpusPath(docGraph.getSDocument().getSCorpusGraph(), 
-      docGraph.getSDocument());
+    List<String> pathList =  CommonHelper.getCorpusPath(
+      docGraph.getDocument().getGraph(), docGraph.getDocument());
     
     annoGraph.setPath(pathList.toArray(new String[pathList.size()]));
-    annoGraph.setDocumentName(docGraph.getSDocument().getSName());
+    annoGraph.setDocumentName(docGraph.getDocument().getName());
 
     Map<SNode, AnnisNode> allNodes = new HashMap<>();
 
-    for (SNode sNode : docGraph.getSNodes())
+    for (SNode sNode : docGraph.getNodes())
     {
-      SFeature featNodeRaw = sNode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE);
+      SFeature featNodeRaw = sNode.getFeature(SaltUtil.createQName(ANNIS_NS, FEAT_RELANNIS_NODE));
       if (featNodeRaw != null)
       {
         RelannisNodeFeature featNode = (RelannisNodeFeature) featNodeRaw.getValue();
         long internalID = featNode.getInternalID();
         AnnisNode aNode = new AnnisNode(internalID);
 
-        for (SAnnotation sAnno : sNode.getSAnnotations())
+        for (SAnnotation sAnno : sNode.getAnnotations())
         {
-          aNode.addNodeAnnotation(new Annotation(sAnno.getSNS(),
-            sAnno.getSName(),
-            sAnno.getSValueSTEXT()));
+          aNode.addNodeAnnotation(new Annotation(sAnno.getNamespace(),
+            sAnno.getName(),
+            sAnno.getValue_STEXT()));
         }
-        aNode.setName(sNode.getSName());
-        aNode.setNamespace(sNode.getSLayers().get(0).getSName());
+        aNode.setName(sNode.getName());
+        Set<SLayer> layers = sNode.getLayers();
+        if(!layers.isEmpty())
+        {
+          aNode.setNamespace(layers.iterator().next().getName());
+        }
 
-        RelannisNodeFeature feat = (RelannisNodeFeature) sNode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        RelannisNodeFeature feat = (RelannisNodeFeature) sNode.getFeature(
+          SaltUtil.createQName(ANNIS_NS, FEAT_RELANNIS_NODE)).getValue();
         
         if (sNode instanceof SToken)
         {
-          BasicEList<STYPE_NAME> textualRelation = new BasicEList<>();
-          textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-          EList<SDataSourceSequence> seqList =
-            docGraph.getOverlappedDSSequences(sNode,
-            textualRelation);
+          List<DataSourceSequence> seqList =
+            docGraph.getOverlappedDataSourceSequence(sNode,
+            SALT_TYPE.STEXT_OVERLAPPING_RELATION);
           if (seqList != null)
           {
-            SDataSourceSequence seq = seqList.get(0);
-            Preconditions.checkNotNull(seq, "SDataSourceSequence is null for token %s", sNode.getSId());
-            SSequentialDS seqDS = seq.getSSequentialDS();
-            Preconditions.checkNotNull(seqDS, "SSequentalDS is null for token %s", sNode.getSId());
-            Preconditions.checkNotNull(seqDS.getSData(), "SSequentalDS data is null for token %s", sNode.getSId());
+            DataSourceSequence seq = seqList.get(0);
+            Preconditions.checkNotNull(seq, "DataSourceSequence is null for token %s", sNode.getId());
+            SSequentialDS seqDS = seq.getDataSource();
+            Preconditions.checkNotNull(seqDS, "SSequentalDS is null for token %s", sNode.getId());
+            Preconditions.checkNotNull(seqDS.getData(), "SSequentalDS data is null for token %s", sNode.getId());
             
-            String seqDSData = (String) seqDS.getSData();
-            Preconditions.checkNotNull(seqDSData, "casted SSequentalDS data is null for token %s", sNode.getSId());
+            String seqDSData = (String) seqDS.getData();
+            Preconditions.checkNotNull(seqDSData, "casted SSequentalDS data is null for token %s", sNode.getId());
             
-            Preconditions.checkNotNull(seq.getSStart(), "SSequentalDS start is null for token %s", sNode.getSId());
-            Preconditions.checkNotNull(seq.getSEnd(), "SSequentalDS end is null for supposed token %s", sNode.getSId());
+            Preconditions.checkNotNull(seq.getStart(), "SSequentalDS start is null for token %s", sNode.getId());
+            Preconditions.checkNotNull(seq.getEnd(), "SSequentalDS end is null for supposed token %s", sNode.getId());
             
-            int start = seq.getSStart();
-            int end = seq.getSEnd();
+            int start = seq.getStart().intValue();
+            int end = seq.getEnd().intValue();
             
-            Preconditions.checkState(start >= 0 && start <= end && end <= seqDSData.length(), "Illegal start or end of textual DS for token (start %s, end: %s)", sNode.getSId(), start, end);
+            Preconditions.checkState(start >= 0 && start <= end && end <= seqDSData.length(), "Illegal start or end of textual DS for token (start %s, end: %s)", sNode.getId(), start, end);
             
             String spannedText = seqDSData.substring(start, end);
             Preconditions.checkNotNull(spannedText, "spanned text is null for supposed token %s (start: %s, end: %s)",
-              sNode.getSId(), start, end);
+              sNode.getId(), start, end);
             
             
             aNode.setSpannedText(spannedText);
@@ -236,37 +243,32 @@ public class LegacyGraphConverter
       }
     }
 
-    for (SRelation rel : docGraph.getSRelations())
+    for (SRelation rel : docGraph.getRelations())
     {
-      RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
-      if (featEdge != null)
+      RelannisEdgeFeature featRelation = RelannisEdgeFeature.extract(rel);
+      if (featRelation != null)
       {
-        addEdge(rel, featEdge.getPre(), featEdge.getComponentID(),
+        addRelation(rel, 
+          featRelation.getPre(), featRelation.getComponentID(),
           allNodes, annoGraph);
       }
     }
     
-    // add edges with empty edge name for every dominance edge
-    for(SDominanceRelation rel : docGraph.getSDominanceRelations())
+    // add relations with empty relation name for every dominance relation
+    List<SDominanceRelation> dominanceRelations = new LinkedList<>(docGraph.getDominanceRelations());
+    for(SDominanceRelation rel : dominanceRelations)
     {
       RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
       if(featEdge != null 
         && featEdge.getArtificialDominanceComponent() != null 
         && featEdge.getArtificialDominancePre() != null)
       {
-        SDominanceRelation newRel = SaltFactory.eINSTANCE.createSDominanceRelation();
-        newRel.setSSource(rel.getSSource());
-        newRel.setSTarget(rel.getSTarget());
-        for(SLayer layer : rel.getSLayers())
-        {
-          newRel.getSLayers().add(layer);
-        }
-        for(SAnnotation anno : rel.getSAnnotations())
-        {
-          newRel.addSAnnotation(anno);
-        }
         
-        addEdge(newRel, featEdge.getArtificialDominancePre(), featEdge.getArtificialDominanceComponent(), allNodes, annoGraph);
+        addRelation(SDominanceRelation.class,
+          null, rel.getAnnotations(),
+          rel.getSource(), rel.getTarget(), rel.getLayers(), 
+          featEdge.getArtificialDominancePre(), 
+          featEdge.getArtificialDominanceComponent(), allNodes, annoGraph);
 
       }
     }
@@ -274,38 +276,58 @@ public class LegacyGraphConverter
     return annoGraph;
   }
   
-  private static void addEdge(SRelation rel, long pre, long componentID, 
+  private static void addRelation(SRelation<? extends SNode, ? extends SNode> rel,
+    long pre, long componentID, 
+    Map<SNode, AnnisNode> allNodes, AnnotationGraph annoGraph)
+  {
+    addRelation(rel.getClass(), 
+      rel.getType(),
+      rel.getAnnotations(),
+      rel.getSource(), rel.getTarget(), rel.getLayers(), 
+      pre, componentID, allNodes, annoGraph);
+  }
+  
+  private static void addRelation(
+    Class<? extends SRelation> clazz,
+    String type,
+    Collection<SAnnotation> annotations,
+    SNode source, SNode target,
+    Set<SLayer> relLayers,
+    long pre, long componentID, 
     Map<SNode, AnnisNode> allNodes, AnnotationGraph annoGraph)
   {
     Edge aEdge = new Edge();
-    aEdge.setSource(allNodes.get(rel.getSSource()));
-    aEdge.setDestination(allNodes.get(rel.getSTarget()));
+    
+    aEdge.setSource(allNodes.get(source));
+    aEdge.setDestination(allNodes.get(target));
 
     aEdge.setEdgeType(EdgeType.UNKNOWN);
     aEdge.setPre(pre);
     aEdge.setComponentID(componentID);
 
-    aEdge.setNamespace(rel.getSLayers().get(0).getSName());
-    aEdge.setName((rel.getSTypes() != null && rel.getSTypes().size() > 0)
-      ? rel.getSTypes().get(0) : null);
-
-    if (rel instanceof SDominanceRelation)
+    if(!relLayers.isEmpty())
+    {
+       aEdge.setNamespace(relLayers.iterator().next().getName());
+    }
+    aEdge.setName(type);
+    
+    if (SDominanceRelation.class.isAssignableFrom(clazz))
     {
       aEdge.setEdgeType(EdgeType.DOMINANCE);
     }
-    else if (rel instanceof SPointingRelation)
+    else if (SPointingRelation.class.isAssignableFrom(clazz))
     {
       aEdge.setEdgeType(EdgeType.POINTING_RELATION);
     }
-    else if (rel instanceof SSpanningRelation)
+    else if (SSpanningRelation.class.isAssignableFrom(clazz))
     {
       aEdge.setEdgeType(EdgeType.COVERAGE);
     }
 
-    for (SAnnotation sAnno : rel.getSAnnotations())
+    for (SAnnotation sAnno : annotations)
     {
-      aEdge.addAnnotation(new Annotation(sAnno.getSNS(), sAnno.getSName(),
-        sAnno.getSValueSTEXT()));
+      aEdge.addAnnotation(new Annotation(sAnno.getNamespace(), sAnno.getName(),
+        sAnno.getValue_STEXT()));
     }
 
     annoGraph.addEdge(aEdge);

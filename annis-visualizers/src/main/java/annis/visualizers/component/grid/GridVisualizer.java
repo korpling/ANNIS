@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * <b>hide_tok:true</b> switches the line with the token value off.
  * </li>
  * <li>
- * <b>show_ns:true</b> always show the namespace of the annotations.
+ * <b>show_ns</b> If set to "true" always show the namespace of the annotations. Alternativly a comma-separated list of fully qualified annotation names (e.g. {@code myns::lemma}) or regular expressions enclosed in slashes (e.g. {@code /my.*::lem.+/} for which the namespace should be shown can be given.
  * </li>
  * <li>
  * <b>pdf_page_key</b>: name of the annotation that contains the pdf page number

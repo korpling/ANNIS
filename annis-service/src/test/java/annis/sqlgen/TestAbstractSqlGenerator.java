@@ -115,7 +115,8 @@ public class TestAbstractSqlGenerator {
 		String fromClause = uniqueString();
 		setupSelectAndFromClause(selectClause, fromClause);
 		String fromClause2 = uniqueString();
-		FromClauseSqlGenerator fromClauseSqlGenerator2 = mock(FromClauseSqlGenerator.class);
+		@SuppressWarnings("unchecked")
+    FromClauseSqlGenerator<QueryData> fromClauseSqlGenerator2 = mock(FromClauseSqlGenerator.class);
 		given(fromClauseSqlGenerator2.fromClause(eq(queryData), eq(alternative), anyString()))
 			.willReturn(fromClause2);
 		fromClauseSqlGenerators.add(fromClauseSqlGenerator2);
@@ -234,7 +235,8 @@ public class TestAbstractSqlGenerator {
 		String fromClause = uniqueString();
 		setupSelectAndFromClause(selectClause, fromClause);
 		String groupBy = uniqueString();
-		GroupByClauseSqlGenerator groupByClauseSqlGenerator = mock(GroupByClauseSqlGenerator.class);
+		@SuppressWarnings("unchecked")
+    GroupByClauseSqlGenerator<QueryData> groupByClauseSqlGenerator = mock(GroupByClauseSqlGenerator.class);
 		generator.setGroupByClauseSqlGenerator(groupByClauseSqlGenerator);
 		given(groupByClauseSqlGenerator.groupByAttributes(eq(queryData), eq(alternative)))
 			.willReturn(groupBy);
@@ -257,7 +259,8 @@ public class TestAbstractSqlGenerator {
 		String fromClause = uniqueString();
 		setupSelectAndFromClause(selectClause, fromClause);
 		String orderBy = uniqueString();
-		OrderByClauseSqlGenerator orderByClauseSqlGenerator = mock(OrderByClauseSqlGenerator.class);
+		@SuppressWarnings("unchecked")
+    OrderByClauseSqlGenerator<QueryData> orderByClauseSqlGenerator = mock(OrderByClauseSqlGenerator.class);
 		generator.setOrderByClauseSqlGenerator(orderByClauseSqlGenerator);
 		given(orderByClauseSqlGenerator.orderByClause(eq(queryData), eq(alternative), anyString()))
 			.willReturn(orderBy);
@@ -280,7 +283,8 @@ public class TestAbstractSqlGenerator {
 		String fromClause = uniqueString();
 		setupSelectAndFromClause(selectClause, fromClause);
 		String limitOffset = uniqueString();
-		LimitOffsetClauseSqlGenerator limitOffsetClauseSqlGenerator = mock(LimitOffsetClauseSqlGenerator.class);
+		@SuppressWarnings("unchecked")
+    LimitOffsetClauseSqlGenerator<QueryData> limitOffsetClauseSqlGenerator = mock(LimitOffsetClauseSqlGenerator.class);
 		generator.setLimitOffsetClauseSqlGenerator(limitOffsetClauseSqlGenerator);
 		given(limitOffsetClauseSqlGenerator.limitOffsetClause(eq(queryData), eq(alternative), anyString()))
 			.willReturn(limitOffset);

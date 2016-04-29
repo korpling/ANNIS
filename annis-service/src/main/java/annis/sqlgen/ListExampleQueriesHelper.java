@@ -15,14 +15,14 @@
  */
 package annis.sqlgen;
 
-import annis.examplequeries.ExampleQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+
+import annis.examplequeries.ExampleQuery;
 
 /**
  * Generates SQL query for example queries
@@ -33,8 +33,6 @@ public class ListExampleQueriesHelper implements
   ParameterizedRowMapper<ExampleQuery>
 {
 
-  private static final Logger log = LoggerFactory.
-    getLogger(ListExampleQueriesHelper.class);
 
   public String createSQLQuery(List<Long> corpusIDs)
   {

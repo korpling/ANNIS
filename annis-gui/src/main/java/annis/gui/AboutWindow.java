@@ -16,10 +16,12 @@
 package annis.gui;
 
 import annis.VersionInfo;
+import annis.libgui.IDGenerator;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.Version;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -49,6 +51,8 @@ public class AboutWindow extends Window
   private static final Logger log = LoggerFactory.getLogger(AboutWindow.class);
     
   private VerticalLayout layout;
+  
+  private Button btClose;
   
   public AboutWindow()
   {
@@ -84,10 +88,10 @@ public class AboutWindow extends Window
     layout.addComponent(hLayout);
     
     layout.addComponent(new Label("ANNIS is a project of the "
-      + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
+      + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", ContentMode.HTML));
     layout.addComponent(new Label("Homepage: "
       + "<a href=\"http://corpus-tools.org/annis/\">"
-      + "http://corpus-tools.org/annis/</a>.", Label.CONTENT_XHTML));
+      + "http://corpus-tools.org/annis/</a>.", ContentMode.HTML));
     layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
     layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
     
@@ -127,7 +131,7 @@ public class AboutWindow extends Window
     
     layout.addComponent(txtThirdParty);
     
-    Button btClose = new Button("Close");
+    btClose = new Button("Close");
     final AboutWindow finalThis = this;
     btClose.addClickListener(new OkClickListener(finalThis));
     layout.addComponent(btClose);
@@ -137,6 +141,15 @@ public class AboutWindow extends Window
     layout.setExpandRatio(txtThirdParty, 1.0f);
     
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(AboutWindow.this, btClose);
+  }
+  
+  
 
   private static class OkClickListener implements Button.ClickListener
   {

@@ -66,6 +66,12 @@ public class TransitivePrecedenceOptimizerTest
         break;
       }
     }
+    if(!postProcessorExists)
+    {
+      // insert the post processor
+      parser.getPostProcessors().add(new TransitivePrecedenceOptimizer());
+      postProcessorExists = true;
+    }
   }
 
   @After

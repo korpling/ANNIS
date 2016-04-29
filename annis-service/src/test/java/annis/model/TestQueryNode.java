@@ -87,18 +87,4 @@ public class TestQueryNode {
     assertThat(target.isPartOfEdge(), is(true));
 	}
 
-	@Test
-	public void setTokenIndexToken() {
-		QueryNode node = new QueryNode(1);
-		node.setTokenIndex(1L);
-		assertThat(node.isToken(), is(true));
-	}
-	
-	@Test
-	public void setTokenIndexNull() {
-		QueryNode node = new QueryNode(1);
-		node.setTokenIndex(null);
-		assertThat(node.isToken(), is(false));
-	}
-	
 }

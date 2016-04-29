@@ -15,17 +15,17 @@
  */
 package annis.gui.components;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.Validate;
+import org.json.JSONException;
+
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.UI;
+
 import elemental.json.JsonArray;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.Validate;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A component that can make pure JavaScript based "screenshots".
@@ -35,9 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 @JavaScript({"vaadin://jquery.js", "html2canvas.js", "screenshotmaker.js"})
 public class ScreenshotMaker extends AbstractJavaScriptExtension
-{
-  private static final Logger log = LoggerFactory.getLogger(ScreenshotMaker.class);
-  
+{ 
   public ScreenshotMaker(final ScreenshotCallback callback)
   {
     Validate.notNull(callback);

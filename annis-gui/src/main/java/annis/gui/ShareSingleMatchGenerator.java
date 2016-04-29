@@ -15,17 +15,20 @@
  */
 package annis.gui;
 
-import annis.gui.objects.PagedResultQuery;
-import annis.libgui.Helper;
-import annis.libgui.PluginSystem;
-import annis.libgui.visualizers.FilteringVisualizerPlugin;
-import annis.libgui.visualizers.VisualizerPlugin;
-import annis.resolver.ResolverEntry;
-import annis.service.objects.Match;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.ws.rs.core.UriBuilder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
@@ -43,15 +46,14 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URLDecoder;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.ws.rs.core.UriBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.objects.PagedResultQuery;
+import annis.libgui.Helper;
+import annis.libgui.PluginSystem;
+import annis.libgui.visualizers.FilteringVisualizerPlugin;
+import annis.libgui.visualizers.VisualizerPlugin;
+import annis.resolver.ResolverEntry;
+import annis.service.objects.Match;
 
 /**
  *
@@ -79,8 +81,6 @@ public class ShareSingleMatchGenerator extends Window implements
   private final PagedResultQuery query;
   private final String segmentation;
   private final PluginSystem ps;
-  
-  private final Escaper urlParamEscaper = UrlEscapers.urlFormParameterEscaper();
   
   public ShareSingleMatchGenerator(List<ResolverEntry> visualizers, 
     Match match,
@@ -287,7 +287,7 @@ public class ShareSingleMatchGenerator extends Window implements
     {
       if(!key.startsWith(EmbeddedVisUI.KEY_PREFIX))
       {
-        String value = Helper.encodeQueryParam(entry.getMappings().getProperty(key));
+        String value = Helper.encodeJersey(entry.getMappings().getProperty(key));
         result = result.queryParam(key, value);
       }
     }

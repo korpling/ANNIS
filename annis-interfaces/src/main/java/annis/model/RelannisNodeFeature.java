@@ -17,9 +17,9 @@ package annis.model;
 
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Serializable;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 
 /**
  * Common Features included in the Salt graph that are available
@@ -195,7 +195,7 @@ public class RelannisNodeFeature implements Serializable
   public static RelannisNodeFeature extract(SNode node)
   {
     RelannisNodeFeature featNode = null;
-    SFeature sfeatNode = node.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE);
+    SFeature sfeatNode = node.getFeature(ANNIS_NS +"::"+ FEAT_RELANNIS_NODE);
     if(sfeatNode != null)
     {
       featNode = (RelannisNodeFeature) sfeatNode.getValue();

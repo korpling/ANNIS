@@ -15,17 +15,9 @@
  */
 package annis.ql.parser;
 
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.AqlParseError;
-import annis.model.ParsedEntityLocation;
-import annis.ql.AqlLexer;
-import annis.ql.AqlParser;
-import annis.ql.RawAqlPreParser;
-import com.google.common.base.Joiner;
 import java.util.LinkedList;
 import java.util.List;
-import org.antlr.v4.runtime.ANTLRErrorListener;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -37,6 +29,16 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.AqlParseError;
+import annis.model.ParsedEntityLocation;
+import annis.ql.AqlLexer;
+import annis.ql.AqlParser;
+import annis.ql.RawAqlPreParser;
 
 /**
  *
@@ -187,10 +189,9 @@ public class AnnisParserAntlr
     {
       this.errors = errors;
     }
-    
-     @Override
-    public void syntaxError(Recognizer recognizer, Token offendingSymbol,
-      int line, int charPositionInLine, String msg, RecognitionException e)
+
+    @Override
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
     {
       if(errors != null)
       {
@@ -199,7 +200,7 @@ public class AnnisParserAntlr
     }
   }
   
-  public static class AqlLexerErrorListener implements ANTLRErrorListener<Integer>
+  public static class AqlLexerErrorListener extends BaseErrorListener
   {
 
     private final List<AqlParseError> errors;
@@ -208,13 +209,9 @@ public class AnnisParserAntlr
     {
       this.errors = errors;
     }
-    
-    
-    
+
     @Override
-    public <T extends Integer> void syntaxError(
-      Recognizer<T, ?> recognizer, T offendingSymbol, int line,
-      int charPositionInLine, String msg, RecognitionException e)
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
     {
       if(errors != null)
       {
@@ -236,16 +233,15 @@ public class AnnisParserAntlr
     }
 
     @Override
-    public <T extends Token> void syntaxError(
-      Recognizer<T, ?> recognizer, T offendingSymbol, int line,
-      int charPositionInLine, String msg, RecognitionException e)
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
     {
-      if(errors != null)
+      if(errors != null && offendingSymbol instanceof Token)
       {
-        Token t = offendingSymbol;
+        Token t = (Token) offendingSymbol;
         errors.add(new AqlParseError(getLocation(t, t), msg));
       }
     }
+    
   }
   
   

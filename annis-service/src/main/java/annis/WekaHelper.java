@@ -15,9 +15,6 @@
  */
 package annis;
 
-import annis.dao.objects.AnnotatedMatch;
-import annis.dao.objects.AnnotatedSpan;
-import annis.model.Annotation;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,9 +25,12 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.dao.objects.AnnotatedMatch;
+import annis.dao.objects.AnnotatedSpan;
+import annis.model.Annotation;
 
 /**
  *
@@ -38,8 +38,6 @@ import org.slf4j.LoggerFactory;
  */
 public class WekaHelper
 {
-  
-  private static final Logger log = LoggerFactory.getLogger(WekaHelper.class);
   
   public static SortedMap<Integer, SortedSet<String>> exportArffHeader(
     Iterator<AnnotatedMatch> matches, PrintWriter w)

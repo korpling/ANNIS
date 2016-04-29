@@ -32,7 +32,6 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -41,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import org.corpus_tools.salt.common.SaltProject;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 public interface QueryDao

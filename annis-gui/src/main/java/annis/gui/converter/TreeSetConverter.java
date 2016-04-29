@@ -33,16 +33,26 @@ public class TreeSetConverter implements Converter<Object, TreeSet>
   public TreeSet convertToModel(Object value,
     Class<? extends TreeSet> targetType, Locale locale) throws ConversionException
   {
-    TreeSet result = new TreeSet(CaseSensitiveOrder.INSTANCE);
-    if(value instanceof Collection)
+    TreeSet<String> result = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
+    if(value instanceof Collection<?>)
     {
-      result.addAll((Collection) value);
+      for(Object item : (Collection<?>) value)
+      {
+        if(item instanceof String)
+        {
+          result.add((String) item);
+        }
+      }
       Preconditions.checkState(result.size() == ((Collection) value).size(), 
         "Collection which was used with the TreeSetConverter had duplicate entries.");
     }
+    else if(value instanceof String)
+    {
+      result.add((String) value);
+    }
     else
     {
-      result.add(value);
+      throw new IllegalStateException("Value used in the TreeSetConverter is neither a Collection of Strings nor a String");
     }
     return result;
   }

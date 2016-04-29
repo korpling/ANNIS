@@ -121,7 +121,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       if(isQueryMatch(n, input))
       {
         // get CSS color name
-        String backColorName = input.getMarkableMap().get("" + n.getId());
+        String backColorName = input.getMarkableExactMap().get("" + n.getId());
         Color backColor = Color.RED;
         try
         {

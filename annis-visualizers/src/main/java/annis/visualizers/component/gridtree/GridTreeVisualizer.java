@@ -16,6 +16,30 @@
 package annis.visualizers.component.gridtree;
 
 import static annis.CommonHelper.getSpannedText;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.GraphTraverseHandler;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+
+import com.vaadin.ui.Panel;
+
 import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
@@ -23,28 +47,8 @@ import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
-import com.vaadin.ui.Panel;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import org.eclipse.emf.common.util.EList;
 
 /**
  * A grid visualizing hierarchical tree annotations as ordered grid layers.
@@ -100,7 +104,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             this.input = visInput;
 
             // save the graph for convenience access
-            graph = input.getSResult().getSDocumentGraph();
+            graph = input.getSResult().getDocumentGraph();
 
             // init an empty grid
             AnnotationGrid grid = new AnnotationGrid(input.getId(), getTokKey());
@@ -110,7 +114,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             grid.setEscapeHTML(Boolean.parseBoolean(escapeHTML));
 
             // get all roots for having a start point for the traversal
-            EList<SNode> roots = graph.getSRoots();
+            List<SNode> roots = graph.getRoots();
 
             /**
              * This abstract representation is used by the AnnotationGrid for
@@ -126,22 +130,22 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
              * we have can calculate the offset of each token index. Also the
              * token index of the last token is fetched.
              */
-            EList<SToken> sortedToken = graph.getSortedSTokenByText();
+            List<SToken> sortedToken = graph.getSortedTokenByText();
             int startIdx = -1;
             int endIdx = -1;
 
             if (sortedToken != null && sortedToken.get(0) != null) {
                 RelannisNodeFeature f = (RelannisNodeFeature) sortedToken.get(0).
-                        getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+                        getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
                 startIdx = (int) f.getTokenIndex();
 
                 f = (RelannisNodeFeature) sortedToken.get(sortedToken.size() - 1).
-                        getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+                        getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
                 endIdx = (int) f.getTokenIndex();
             }
 
             // init the traversal
-            SGraphTraverseHandler traverse = new Traverse(startIdx, endIdx,
+            GraphTraverseHandler traverse = new Traverse(startIdx, endIdx,
                     getNodeKey(), input.getNamespace(), table);
 
             // TODO build the grid tree above the token/annotation level
@@ -224,7 +228,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         }
 
         private boolean hasAnno(SNode n) {
-            EList<SAnnotation> annos = n.getSAnnotations();
+            Set<SAnnotation> annos = n.getAnnotations();
             if (annos != null) {
                 for (SAnnotation a : annos) {
                     if (getTokKey().equals(a.getName())) {
@@ -243,8 +247,8 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
 
             if (getTokKey().equals("tok")) {
 
-                for (SToken t : graph.getSortedSTokenByText()) {
-                    RelannisNodeFeature f = (RelannisNodeFeature) t.getSFeature(
+                for (SToken t : graph.getSortedTokenByText()) {
+                    RelannisNodeFeature f = (RelannisNodeFeature) t.getFeature(
                             ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
                     int idx = (int) f.getTokenIndex();
@@ -253,11 +257,11 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
                 }
             } else {
 
-                EList<SSpan> sSpans = graph.getSSpans();
+                List<SSpan> sSpans = graph.getSpans();
                 if (sSpans != null) {
                     for (SNode n : sSpans) {
                         if (hasAnno(n)) {
-                            RelannisNodeFeature f = (RelannisNodeFeature) n.getSFeature(
+                            RelannisNodeFeature f = (RelannisNodeFeature) n.getFeature(
                                     ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
                             int leftIdx = (int) f.getLeftToken();
@@ -275,11 +279,11 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
 
         private String getAnnoText(SNode n) {
 
-            EList<SAnnotation> annos = n.getSAnnotations();
+            Set<SAnnotation> annos = n.getAnnotations();
             if (annos != null) {
                 for (SAnnotation a : annos) {
                     if (getTokKey().equals(a.getName())) {
-                        return a.getSValueSTEXT();
+                        return a.getValue_STEXT();
                     }
                 }
             }
@@ -288,7 +292,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         }
     }
 
-    private static class Traverse implements SGraphTraverseHandler {
+    private static class Traverse implements GraphTraverseHandler {
 
         /**
          * Tracks the depth of the traversal. Steps are counted, when the node
@@ -305,8 +309,6 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         Map<String, ArrayList<Row>> table;
         // tracks all nodes which was visited.
         Set<SNode> visited = new HashSet<SNode>();
-        // the namespace which has triggered the visualiztion
-        private final String namespace;
 
         /**
          * Init a traverse handler for building a tree of topological fields.
@@ -323,7 +325,6 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             this.startIdx = startIdx;
             this.endIdx = endIdx;
             this.annotationKey = nodeKey;
-            this.namespace = namespace;
             this.table = table;
         }
 
@@ -345,19 +346,19 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
                 }
 
                 RelannisNodeFeature f = (RelannisNodeFeature) currNode.
-                        getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+                        getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
                 // cut off the most left and right indexes
                 int leftIdx = Math.max(((int) f.getLeftToken()), startIdx);
                 int rightIdx = Math.min(((int) f.getRightToken()), endIdx);
 
                 GridEvent e = new GridEvent(currNode.getId(), leftIdx, rightIdx, anno.
-                        getSValueSTEXT());
+                        getValue_STEXT());
 
                 // add match id
-                SFeature featMatched = currNode.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+                SFeature featMatched = currNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
                 Long match = featMatched == null ? null : featMatched.
-                        getSValueSNUMERIC();
+                        getValue_SNUMERIC();
                 e.setMatch(match);
 
                 // set tooltip
@@ -391,7 +392,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         }
 
         private SAnnotation getAnno(SNode n) {
-            EList<SAnnotation> annos = n.getSAnnotations();
+            Set<SAnnotation> annos = n.getAnnotations();
             if (annos != null) {
                 for (SAnnotation a : annos) {
                     if (annotationKey.equals(a.getName())) {

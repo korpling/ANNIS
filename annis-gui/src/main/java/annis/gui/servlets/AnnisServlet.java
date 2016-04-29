@@ -15,19 +15,23 @@
  */
 package annis.gui.servlets;
 
-import annis.gui.requesthandler.ShortenerRequestHandler;
-import annis.libgui.AnnisBaseUI;
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
-import com.vaadin.server.VaadinServlet;
-import com.vaadin.server.VaadinSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+
 import javax.servlet.ServletException;
+
+import com.vaadin.server.ServiceException;
+import com.vaadin.server.SessionInitEvent;
+import com.vaadin.server.SessionInitListener;
+import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.VaadinSession;
+
+import annis.gui.requesthandler.ShortenerRequestHandler;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
 
 /**
  *
@@ -82,10 +86,26 @@ public class AnnisServlet extends VaadinServlet
       @Override
       public void sessionInit(SessionInitEvent event) throws ServiceException
       {
+        VaadinSession session = event.getSession();
+        if(Helper.isKickstarter(session))
+        {
+          // only load configurations from the WEB-INF/conf folder
+          File config = new File(event.getService().getBaseDirectory(),
+            "/WEB-INF/conf/annis-gui.properties");
+          loadPropertyFile(config, session);
+          // manually override the service URL if given
+          String serviceURL = session.getConfiguration().getInitParameters().getProperty(Helper.KEY_WEB_SERVICE_URL);
+          if(serviceURL != null)
+          {
+            session.setAttribute(Helper.KEY_WEB_SERVICE_URL, serviceURL);
+          }
+        }
+        else
+        {
+          // load some additional properties from our ANNIS configuration
+          loadApplicationProperties("annis-gui.properties", session);
+        }
         
-        // load some additional properties from our ANNIS configuration
-        loadApplicationProperties("annis-gui.properties", event.getSession());
-
         event.getSession().addRequestHandler(new ShortenerRequestHandler());
       }
     });

@@ -27,8 +27,8 @@ import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.libgui.IDGenerator;
 
 /**
  * A window displaying an invitation to participate in the development of ANNIS.
@@ -38,10 +38,10 @@ import org.slf4j.LoggerFactory;
 public class HelpUsWindow extends Window
 {
 
-  private static final Logger log = LoggerFactory.getLogger(HelpUsWindow.class);
-
   private VerticalLayout layout;
 
+  private final Button btClose;
+  
   public HelpUsWindow()
   {
     setSizeFull();
@@ -96,15 +96,23 @@ public class HelpUsWindow extends Window
 
     final HelpUsWindow finalThis = this;
 
-    Button btClose = new Button("Close");
+    btClose = new Button("Close");
     btClose.addClickListener(new OkClickListener(finalThis));
     layout.addComponent(btClose);
 
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(hLayout, 1.0f);
-
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(HelpUsWindow.this, btClose);
+  }
+  
+  
 
   private static class OkClickListener implements Button.ClickListener
   {

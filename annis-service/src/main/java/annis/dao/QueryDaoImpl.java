@@ -60,16 +60,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
-import de.hu_berlin.german.korpling.saltnpepper.salt.impl.SaltFactoryImpl;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.exceptions.SaltResourceException;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -102,9 +92,17 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpus;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.SaltUtil;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -168,7 +166,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   /**
    * @param graphSqlGenerator the graphSqlGenerator to set
    */
-  public void setGraphSqlGenerator(AnnotateSqlGenerator graphSqlGenerator)
+  public void setGraphSqlGenerator(AnnotateSqlGenerator<SaltProject> graphSqlGenerator)
   {
     this.graphSqlGenerator = graphSqlGenerator;
   }
@@ -1024,16 +1022,16 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     // check if the corpus really exists
     mapCorpusNameToId(toplevelCorpus);
     
-    SaltProject corpusProject = SaltFactory.eINSTANCE.createSaltProject();
-    SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
+    SaltProject corpusProject = SaltFactory.createSaltProject();
+    SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
     corpusGraph.setSaltProject(corpusProject);
     
-    SCorpus rootCorpus = corpusGraph.createSCorpus(null, toplevelCorpus);
+    SCorpus rootCorpus = corpusGraph.createCorpus(null, toplevelCorpus);
     
     // add all root metadata
     for(Annotation metaAnno : listCorpusAnnotations(toplevelCorpus))
     {
-      rootCorpus.createSMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
+      rootCorpus.createMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
         metaAnno.getValue());
     }
     
@@ -1049,9 +1047,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
       }
     }
     
-    File projectFile = new File(outputDirectory, "saltProject"+"."+ SaltFactory.FILE_ENDING_SALT);
-    URI saltProjectFileURI = URI.createFileURI(projectFile.getAbsolutePath());
-    Resource resource= SaltFactoryImpl.getResourceSet().createResource(saltProjectFileURI);
     
     List<Annotation> docs = listDocuments(toplevelCorpus);
     int i=1;
@@ -1059,49 +1054,49 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     {
       log.info("Loading document {} from database ({}/{})", docAnno.getName(), i, docs.size());
       SaltProject docProject = retrieveAnnotationGraph(toplevelCorpus, docAnno.getName(), null);
-      if(docProject != null && docProject.getSCorpusGraphs() != null
-        && !docProject.getSCorpusGraphs().isEmpty())
+      if(docProject != null && docProject.getCorpusGraphs() != null
+        && !docProject.getCorpusGraphs().isEmpty())
       {
         List<Annotation> docMetaData = listCorpusAnnotations(toplevelCorpus,
           docAnno.getName(), true);
         
-        SCorpusGraph docCorpusGraph = docProject.getSCorpusGraphs().get(0);
+        SCorpusGraph docCorpusGraph = docProject.getCorpusGraphs().get(0);
         // TODO: we could re-use the actual corpus structure instead of just adding a flat list of documents
-        if(docCorpusGraph.getSDocuments() != null)
+        if(docCorpusGraph.getDocuments() != null)
         {
-          for(SDocument doc : docCorpusGraph.getSDocuments())
+          for(SDocument doc : docCorpusGraph.getDocuments())
           {
             log.info("Removing SFeatures from {} ({}/{})", docAnno.getName(), i, docs.size());
             // remove all ANNIS specific features that require a special Java class
-            SDocumentGraph graph = doc.getSDocumentGraph();
+            SDocumentGraph graph = doc.getDocumentGraph();
             if(graph != null)
             {
-              if(graph.getSNodes() != null)
+              if(graph.getNodes() != null)
               {
-                for(SNode n : graph.getSNodes())
+                for(SNode n : graph.getNodes())
                 {
                   n.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE);
                 }
               }
-              if(graph.getSRelations() != null)
+              if(graph.getRelations() != null)
               {
-                for(SRelation e : graph.getSRelations())
+                for(SRelation e : graph.getRelations())
                 {
                   e.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_EDGE);
                 }
               }
             }
             
-            log.info("Saving document {} ({}/{})", doc.getSName(), i, docs.size());
-            doc.saveSDocumentGraph(URI.createFileURI(
-              new File(documentRootDir, doc.getSName() + "." 
-                + SaltFactory.FILE_ENDING_SALT).getAbsolutePath()));
+            log.info("Saving document {} ({}/{})", doc.getName(), i, docs.size());
+            SaltUtil.saveDocumentGraph(graph, URI.createFileURI(
+              new File(documentRootDir, doc.getName() + "." 
+                + SaltUtil.FILE_ENDING_SALT_XML).getAbsolutePath()));
             
-            SDocument docCopy = corpusGraph.createSDocument(rootCorpus, doc.getSName());
-            log.info("Adding metadata to document {} ({}/{})", doc.getSName(), i, docs.size());
+            SDocument docCopy = corpusGraph.createDocument(rootCorpus, doc.getName());
+            log.info("Adding metadata to document {} ({}/{})", doc.getName(), i, docs.size());
             for(Annotation metaAnno : docMetaData)
             {
-              docCopy.createSMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
+              docCopy.createMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
                 metaAnno.getValue());
             }
           }
@@ -1112,18 +1107,12 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     
     // save the actual SaltProject
     log.info("Saving corpus structure");
-    try 
-		{//must be done after all, because it doesn't work, if not all SDocumentGraph objects 
-			XMLResource xmlProjectResource= (XMLResource) resource;
-			xmlProjectResource.getContents().add(corpusProject);
-			xmlProjectResource.setEncoding("UTF-8");
-			xmlProjectResource.save(null);
-		}//must be done after all, because it doesn't work, if not all SDocumentGraph objects  
-		catch (IOException e) 
-		{
-			throw new SaltResourceException("Cannot save salt project to given uri \"" 
-        + outputDirectory.getAbsolutePath() + "\"", e);
-		}
+
+    File projectFile = new File(outputDirectory, SaltUtil.FILE_SALT_PROJECT);
+    SaltXML10Writer writer = new SaltXML10Writer(projectFile);
+		writer.writeSaltProject(corpusProject);
+      
+		
   }
   
   

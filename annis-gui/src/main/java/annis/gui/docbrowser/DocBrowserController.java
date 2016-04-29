@@ -15,16 +15,16 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.AnnisUI;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.libgui.PluginSystem;
-import annis.libgui.visualizers.FilteringVisualizerPlugin;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.libgui.visualizers.VisualizerPlugin;
-import annis.service.objects.CorpusConfig;
-import annis.service.objects.RawTextWrapper;
-import annis.service.objects.Visualizer;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
+
 import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -42,16 +42,17 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.AnnisUI;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.libgui.PluginSystem;
+import annis.libgui.visualizers.FilteringVisualizerPlugin;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerPlugin;
+import annis.service.objects.CorpusConfig;
+import annis.service.objects.RawTextWrapper;
+import annis.service.objects.Visualizer;
 
 /**
  * Represents a global controller for the doc browser feature.
@@ -60,8 +61,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DocBrowserController implements Serializable
 {
-
-  private final Logger log = LoggerFactory.getLogger(DocBrowserController.class);
 
   // holds the complete state of the gui
   private final AnnisUI ui;
@@ -207,7 +206,7 @@ public class DocBrowserController implements Serializable
 
       if (txt != null)
       {
-        SDocument sDoc = txt.getSCorpusGraphs().get(0).getSDocuments().get(0);
+        SDocument sDoc = txt.getCorpusGraphs().get(0).getDocuments().get(0);
         input.setResult(sDoc);
       }
     }

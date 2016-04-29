@@ -15,6 +15,16 @@
  */
 package annis.visualizers.component;
 
+import java.util.List;
+
+import org.apache.commons.lang3.Validate;
+
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.VaadinSession;
+
 import annis.CommonHelper;
 import annis.gui.components.medialement.MediaElement;
 import annis.gui.components.medialement.MediaElementPlayer;
@@ -24,16 +34,7 @@ import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinaryMetaData;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.server.VaadinSession;
-import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -43,8 +44,6 @@ import org.slf4j.LoggerFactory;
 public class AudioVisualizer extends AbstractVisualizer<MediaElementPlayer>
 {
 
-  private Logger log = LoggerFactory.getLogger(AudioVisualizer.class);
-  
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   private final static Escaper urlParamEscape = UrlEscapers.urlPathSegmentEscaper();
   
@@ -58,7 +57,7 @@ public class AudioVisualizer extends AbstractVisualizer<MediaElementPlayer>
   public MediaElementPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle)
   {
     List<String> corpusPath =
-      CommonHelper.getCorpusPath(input.getDocument().getSCorpusGraph(), input.getDocument());
+      CommonHelper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
     String binaryServletPath = "";
 

@@ -61,7 +61,7 @@ public class RSTPanel extends Panel
     buttonRight.setHeight("100%");
     buttonRight.addStyleName("right-button");
 
-    buttonLeft.addListener(new Button.ClickListener()
+    buttonLeft.addClickListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(Button.ClickEvent event)
@@ -81,7 +81,7 @@ public class RSTPanel extends Panel
       }
     });
 
-    buttonRight.addListener(new Button.ClickListener()
+    buttonRight.addClickListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(Button.ClickEvent event)

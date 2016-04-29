@@ -38,7 +38,7 @@ import java.util.TreeSet;
  * Breadth-first search is used in order to find the shortest precedence 
  * relation between nodes . This is just an approximation since beeing near in 
  * the reachability graph does not necessary mean the relation is more 
- * restrictive than a relation with more edges. Still it is assumed that
+ * restrictive than a relation with more relations. Still it is assumed that
  * "normal" AQL queries will satisfiy this condition. And in the end, even
  * a "is after this token somewhere in the text" condition is a huge improvement.
  * 

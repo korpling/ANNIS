@@ -6,7 +6,7 @@
   <artifactId>annis-all</artifactId>
   <packaging>pom</packaging>
   <name>ANNIS corpus search</name>
-  <version>3.4.0-SNAPSHOT</version>
+  <version>3.5.0-SNAPSHOT</version>
   <description>
     ANNIS is an open source, versatile web browser-based search and
     visualization architecture for complex multilevel linguistic corpora with
@@ -64,12 +64,28 @@
     <repository>
       <id>korpling</id>
       <url>http://korpling.german.hu-berlin.de/maven2/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>oss-snapshot</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
     </repository>
   </repositories>
   
   <properties>
     <servlet.version>3.0.1</servlet.version>
-    <vaadin.version>7.5.9</vaadin.version>
+    <vaadin.version>7.6.4</vaadin.version>
   </properties>
 
   <build>
@@ -96,7 +112,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.1</version>
+        <version>3.5.1</version>
         <configuration>
           <reportPlugins>
             <plugin>

@@ -15,14 +15,6 @@
  */
 package annis.administration;
 
-import annis.AnnisRunnerException;
-import annis.CommonHelper;
-import annis.exceptions.AnnisException;
-import annis.service.objects.ImportJob;
-import annis.utils.ANNISFormatHelper;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Multimap;
-import com.google.common.io.ByteStreams;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,12 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.mail.EmailException;
@@ -52,6 +45,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Multimap;
+import com.google.common.io.ByteStreams;
+
+import annis.AnnisRunnerException;
+import annis.CommonHelper;
+import annis.exceptions.AnnisException;
+import annis.service.objects.ImportJob;
+import annis.utils.ANNISFormatHelper;
 
 /**
  *
