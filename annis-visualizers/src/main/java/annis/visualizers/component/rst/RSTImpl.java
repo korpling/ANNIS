@@ -492,7 +492,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
    */
   private String getText(SToken currNode) {
 
-    List<DataSourceSequence> sSequences = currNode.getGraph().
+    List<DataSourceSequence> sSequences = ((SDocumentGraph) currNode.getGraph()).
             getOverlappedDataSourceSequence(currNode, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
 
     // only support one text for spanns
