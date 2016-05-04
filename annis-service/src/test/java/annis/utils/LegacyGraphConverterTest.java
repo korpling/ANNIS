@@ -5,18 +5,32 @@
 package annis.utils;
 
 import annis.AnnisXmlContextLoader;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.model.AnnotationGraph;
+import annis.model.Edge;
+import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
+import annis.sqlgen.AomAnnotateExtractor;
+import annis.sqlgen.ArrayCorpusPathExtractor;
+import annis.sqlgen.CorpusPathExtractor;
+import annis.sqlgen.PostgreSqlArraySolutionKey;
+import annis.sqlgen.SaltAnnotateExtractor;
+import annis.sqlgen.SolutionKey;
+import annis.sqlgen.TestAnnotateSqlGenerator;
+import annis.test.CsvResultSetProvider;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
+import org.corpus_tools.salt.common.SaltProject;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,16 +38,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.AnnotationGraph;
-import annis.model.Edge;
-import annis.sqlgen.*;
-import annis.test.CsvResultSetProvider;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import org.apache.commons.collections.ListUtils;
-import org.springframework.context.annotation.PropertySource;
 
 /**
  *
@@ -43,7 +47,9 @@ import org.springframework.context.annotation.PropertySource;
 // TODO: do not text context only for annopool
 @ContextConfiguration(locations =
 {
-  "file:src/main/distribution/conf/spring/Common.xml"
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml"
 }, loader=AnnisXmlContextLoader.class)
 public class LegacyGraphConverterTest
 {
@@ -86,7 +92,7 @@ public class LegacyGraphConverterTest
       @Override
       protected SolutionKey<?> createSolutionKey()
       {
-        PostgreSqlArraySolutionKey<Long> key = new PostgreSqlArraySolutionKey<Long>();
+        PostgreSqlArraySolutionKey<Long> key = new PostgreSqlArraySolutionKey<>();
         key.setKeyColumnName("key");
         key.setIdColumnName("id");
         return key;
@@ -97,9 +103,14 @@ public class LegacyGraphConverterTest
 
     TestAnnotateSqlGenerator.setupOuterQueryFactsTableColumnAliases(saltExtractor);
     
+    List<Match> matches = new ArrayList<>();
+    matches.add(Match.parseFromString("salt:/pcc2/4282/#tok_155 tiger::pos::salt:/pcc2/4282#tok_156"));
+    MatchGroup matchGroup = new MatchGroup(matches);
+    
     SaltProject p =
       saltExtractor.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateExtractorTest.class.
       getResourceAsStream("SampleAnnotateResult.csv")).getResultSet());
+    SaltAnnotateExtractor.addMatchInformation(p, matchGroup);
 
     List<AnnotationGraph> expected =
       aomSqlGen.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateExtractorTest.class.

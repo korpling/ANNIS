@@ -22,7 +22,10 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Colors for matched nodes. The names and color values correspond to the
  * CSS standard.
- * @author thomas
+ * <br/><br/>
+ * These colors must always be synchronized with the "match-color"
+ * definitions in the annis.scss style sheet.
+ * @author Thomas Krause <krauseto@hu-berlin.>
  */
 public enum MatchedNodeColors
 {
@@ -31,10 +34,20 @@ public enum MatchedNodeColors
   MediumVioletRed(new Color(199, 21, 133)),
   LimeGreen(new Color(50, 205, 50)),
   Peru(new Color(205, 133, 63)),
+  SkyBlue(new Color(135, 206, 235)),
   IndianRed(new Color(205, 92, 92)),
   YellowGreen(new Color(173, 255, 47)),
   DarkRed(new Color(139, 0, 0)),
-  OrangeRed(new Color(255, 69, 0));
+  OrangeRed(new Color(255, 69, 0)),
+  Gold(new Color(255, 215, 0)),
+  Tan(new Color(210, 180, 140)),
+  Navy(new Color(0, 0, 128)),
+  MediumSpringGreen(new Color(0, 250, 154)),
+  DodgerBlue(new Color(30, 144, 255)),
+  OliveDrab(new Color(107, 142,  35)),
+  LightPink(new Color(255, 182, 193))
+  ;
+  
   private final Color color;
 
   private MatchedNodeColors(Color color)
@@ -59,6 +72,23 @@ public enum MatchedNodeColors
     result.append(twoDigitHex(color.getBlue()));
     return result.toString();
   }
+  
+  /**
+   * Returns the hexadecimal RGB representation beginning with a hash-sign.
+   * @param match
+   * @return the color in the format "#rrggbb"
+   */
+  public static String getHTMLColorByMatch(Long match)
+  {
+    if(match == null)
+    {
+      return null;
+    }
+    int m = ((int) ((long) match))-1;
+    m = Math.min(m, MatchedNodeColors.values().length);
+    MatchedNodeColors c = MatchedNodeColors.values()[m];
+    return c.getHTMLColor();
+  }
 
   private String twoDigitHex(int i)
   {
@@ -82,7 +112,7 @@ public enum MatchedNodeColors
       return null;
     }
     long m = match;
-    m = Math.min(m, 8);
+    m = Math.min(m, MatchedNodeColors.values().length);
     return "match_" + m;
   }
 }

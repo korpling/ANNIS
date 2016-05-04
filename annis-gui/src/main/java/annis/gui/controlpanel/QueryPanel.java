@@ -15,43 +15,42 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.AnnisUI;
 import annis.gui.ExportPanel;
-import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
-import annis.gui.QueryController;
-import annis.gui.SearchUI;
-import annis.gui.beans.HistoryEntry;
-import annis.gui.components.ExceptionDialog;
-import annis.gui.components.VirtualKeyboard;
+import annis.gui.components.VirtualKeyboardCodeEditor;
+import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.frequency.FrequencyResultPanel;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
+import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
-import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.model.AqlParseError;
+import annis.model.QueryNode;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.LinkedList;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.slf4j.LoggerFactory;
 import org.vaadin.hene.popupbutton.PopupButton;
 
@@ -59,7 +58,7 @@ import org.vaadin.hene.popupbutton.PopupButton;
  *
  * @author thomas
  */
-public class QueryPanel extends GridLayout implements TextChangeListener,
+public class QueryPanel extends GridLayout implements 
   ValueChangeListener
 {
 
@@ -69,30 +68,35 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   // the view name
   public static final String NAME = "query";
-  public static final String OK_STATUS = "Status: Ok";
 
-  private TextArea txtQuery;
+  private AqlCodeEditor txtQuery;
   private TextArea txtStatus;
   private Button btShowResult;
   //private Button btShowResultNewTab;
   private PopupButton btHistory;
-  private ListSelect lstHistory;
-  private QueryController controller;
+  private final ListSelect lstHistory;
+  private final QueryUIState state;
   private ProgressBar piCount;
   private String lastPublicStatus;
-  private List<HistoryEntry> history;
   private Window historyWindow;
   private PopupButton btMoreActions;
   private FrequencyQueryPanel frequencyPanel;
   
-  public QueryPanel(SearchUI ui)
+  private final AnnisUI ui;
+  
+  private final BeanItemContainer<Query> historyContainer =
+    new BeanItemContainer<>(Query.class);;
+  
+  public QueryPanel(final AnnisUI ui)
   {
     super(4,5);
+    this.ui = ui;
     
-    this.controller = ui.getQueryController();
-    this.lastPublicStatus = OK_STATUS;
-    this.history = new LinkedList<HistoryEntry>();
+    this.lastPublicStatus = "Welcome to ANNIS! "
+      + "A tutorial is available on the right side.";
 
+    this.state = ui.getQueryState();
+    
     setSpacing(true);
     setMargin(false);
 
@@ -102,25 +106,34 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setColumnExpandRatio(2, 0.0f);
     setColumnExpandRatio(3, 0.0f);
 
-    txtQuery = new TextArea();
+    txtQuery = new AqlCodeEditor();
+    txtQuery.setPropertyDataSource(state.getAql());
     txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
-    txtQuery.addStyleName("corpus-font-force");
+    if(ui.getInstanceFont() == null)
+    {
+      txtQuery.addStyleName("default-query-font");
+      txtQuery.setTextareaStyle("default-query-font");
+    }
+    else
+    {
+      txtQuery.addStyleName(Helper.CORPUS_FONT);
+      txtQuery.setTextareaStyle(Helper.CORPUS_FONT);
+    }
+    
     txtQuery.addStyleName("keyboardInput");
     txtQuery.setWidth("100%");
-//    txtQuery.setHeight(10f, Unit.EM);
-    txtQuery.setRows(10);
+    txtQuery.setHeight(15f, Unit.EM);
     txtQuery.setTextChangeTimeout(500);
-    txtQuery.addTextChangeListener((TextChangeListener) this);
 
-    final VirtualKeyboard virtualKeyboard;
+    final VirtualKeyboardCodeEditor virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)
     {
       virtualKeyboard = null;
     }
     else
     {
-      virtualKeyboard = new VirtualKeyboard();
+      virtualKeyboard = new VirtualKeyboardCodeEditor();
       virtualKeyboard.setKeyboardLayout(ui.getInstanceConfig().getKeyboardLayout());
       virtualKeyboard.extend(txtQuery);
     }
@@ -128,7 +141,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtStatus = new TextArea();
     txtStatus.setValue(this.lastPublicStatus);
     txtStatus.setWidth("100%");
-    txtStatus.setHeight(3.5f, Unit.EM);
+    txtStatus.setHeight(4.0f, Unit.EM);
     txtStatus.addStyleName("border-layout");
     txtStatus.setReadOnly(true);
     
@@ -140,6 +153,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
 
     btShowResult = new Button("Search");
+    btShowResult.setIcon(FontAwesome.SEARCH);
     btShowResult.setWidth("100%");
     btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
@@ -149,14 +163,17 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
     VerticalLayout historyListLayout = new VerticalLayout();
     historyListLayout.setSizeUndefined();
-
+    
     lstHistory = new ListSelect();
     lstHistory.setWidth("200px");
     lstHistory.setNullSelectionAllowed(false);
     lstHistory.setValue(null);
     lstHistory.addValueChangeListener((ValueChangeListener) this);
     lstHistory.setImmediate(true);
-
+    lstHistory.setContainerDataSource(historyContainer);
+    lstHistory.setItemCaptionPropertyId("query");
+    lstHistory.addStyleName(Helper.CORPUS_FONT);
+    
     Button btShowMoreHistory = new Button("Show more details", new Button.ClickListener()
     {
       @Override
@@ -169,7 +186,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
           historyWindow.setWidth("400px");
           historyWindow.setHeight("250px");
         }
-        historyWindow.setContent(new HistoryPanel(history, controller));
+        historyWindow.setContent(new HistoryPanel(state.getHistory(), 
+          ui.getQueryController()));
 
         if(UI.getCurrent().getWindows().contains(historyWindow))
         {
@@ -201,17 +219,17 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       btShowKeyboard = new Button();
       btShowKeyboard.setWidth("100%");
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
-      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_SMALL);
-      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
+      btShowKeyboard.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+      btShowKeyboard.addStyleName(ValoTheme.BUTTON_SMALL);
+      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboardCodeEditor.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
     }
     
     Button btShowQueryBuilder = new Button("Query<br />Builder");
     btShowQueryBuilder.setHtmlContentAllowed(true);
-    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_ICON_ON_TOP);
-    btShowQueryBuilder.setIcon(new ThemeResource("tango-icons/32x32/document-properties.png"));
+    btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_SMALL);
+    btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP);
+    btShowQueryBuilder.setIcon(new ThemeResource("images/tango-icons/32x32/document-properties.png"));
     btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
     
     VerticalLayout moreActionsLayout = new VerticalLayout();
@@ -228,17 +246,19 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 //    moreActionsLayout.addComponent(btShowResultNewTab);
     
     Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
+    btShowExport.setIcon(FontAwesome.DOWNLOAD);
     btShowExport.setWidth("100%");
     moreActionsLayout.addComponent(btShowExport);
     
     Button btShowFrequency = new Button("Frequency Analysis", new ShowFrequencyClickListener(ui));
+    btShowFrequency.setIcon(FontAwesome.BAR_CHART_O);
     btShowFrequency.setWidth("100%");
     moreActionsLayout.addComponent(btShowFrequency);
     
     
     /*
      * We use the grid layout for a better rendering efficiency, but this comes
-     * with the cost of some complexitiy when defining the positions of the
+     * with the cost of some complexity when defining the positions of the
      * elements in the layout.
      * 
      * This grid hopefully helps a little bit in understanding the "magic"
@@ -251,6 +271,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * MOR: "More actions" button 
      * HIST: "History" button
      * STAT: Text field with the real status
+     * PROG: indefinite progress bar (spinning circle)
      * 
      *   \  0  |  1  |  2  |  3  
      * --+-----+---+---+---+-----
@@ -260,13 +281,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * --+-----+-----+-----+-----
      * 2 | SEA | MOR | HIST|     
      * --+-----+-----+-----+-----
-     * 3 | STAT| STAT| STAT| STAT
+     * 3 | STAT| STAT| STAT| PROG
      */
     addComponent(txtQuery, 0, 0, 2, 1);
-    addComponent(txtStatus, 0, 3, 3, 3);
+    addComponent(txtStatus, 0, 3, 2, 3);
     addComponent(btShowResult, 0, 2);
     addComponent(btMoreActions, 1, 2);
     addComponent(btHistory, 2, 2);
+    addComponent(piCount, 3, 3);
     addComponent(btShowQueryBuilder, 3, 0);
     if(btShowKeyboard != null)
     {
@@ -282,18 +304,25 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setColumnExpandRatio(3, 0.0f);
     
     //setComponentAlignment(btShowQueryBuilder, Alignment.BOTTOM_CENTER);
-    
   }
 
-  public void updateShortHistory(List<HistoryEntry> history)
+  @Override
+  public void attach()
   {
-    this.history = history;
+    super.attach();
+    IDGenerator.assignIDForFields(QueryPanel.this, btShowResult, btMoreActions);
+    
+  }
+  
+  
 
-    lstHistory.removeAllItems();
+  public void updateShortHistory()
+  {
+    historyContainer.removeAllItems();
 
     int counter = 0;
 
-    for(HistoryEntry e : history)
+    for(Query q : state.getHistory().getItemIds())
     {
       if(counter >= MAX_HISTORY_MENU_ITEMS)
       {
@@ -301,7 +330,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       }
       else
       {
-        lstHistory.addItem(e);
+        historyContainer.addBean(q);
       }
       counter++;
     }
@@ -313,8 +342,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       txtQuery.setValue(query);
     }
-
-    validateQuery(query);
   }
 
   public String getQuery()
@@ -325,12 +352,17 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     }
     return "";
   }
-
-  @Override
-  public void textChange(TextChangeEvent event)
+  
+  public void setNodes(List<QueryNode> nodes)
   {
-    validateQuery(event.getText());
+    txtQuery.setNodes(nodes);
   }
+  
+  public void setErrors(List<AqlParseError> errors)
+  {
+    txtQuery.setErrors(errors);
+  }
+  
   
   public void notifyFrequencyTabClose()
   {
@@ -338,86 +370,16 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     frequencyPanel = null;
   }
 
-
-  private void validateQuery(String query)
-  {
-    txtStatus.setReadOnly(false);
-    
-    if(query.isEmpty())
-    {
-      txtStatus.setValue("Empty query");
-    }
-    else
-    {
-      // validate query
-      try
-      {
-        AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
-        Future<String> future = annisResource.path("query").path("check").queryParam("q", query)
-          .get(String.class);
-
-        // wait for maximal one seconds
-
-        try
-        {
-          String result = future.get(1, TimeUnit.SECONDS);
-
-          if ("ok".equalsIgnoreCase(result))
-          {
-            txtStatus.setValue(lastPublicStatus);
-          }
-          else
-          {
-            txtStatus.setValue(result);
-          }
-        }
-        catch (InterruptedException ex)
-        {
-          log.warn(null, ex);
-        }
-        catch (ExecutionException ex)
-        {
-          if(ex.getCause() instanceof UniformInterfaceException)
-          {
-            UniformInterfaceException cause = (UniformInterfaceException) ex.
-              getCause();
-            if (cause.getResponse().getStatus() == 400)
-            {
-              txtStatus.setValue(cause.getResponse().getEntity(String.class));
-            }
-            else
-            {
-              log.error(
-                "Exception when communicating with service", ex);
-              ExceptionDialog.show(ex,
-                "Exception when communicating with service.");
-            }
-          }
-        }
-        catch (TimeoutException ex)
-        {
-          txtStatus.setValue("Validation of query took too long.");
-        }
-
-      }
-      catch(ClientHandlerException ex)
-      {
-        log.error(
-            "Could not connect to web service", ex);
-          ExceptionDialog.show(ex, "Could not connect to web service");
-      }
-    }
-    txtStatus.setReadOnly(true);
-  }
+  
 
   @Override
   public void valueChange(ValueChangeEvent event)
   {
     btHistory.setPopupVisible(false);
-    HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
-    if(controller != null && e != null)
+    Object q = event.getProperty().getValue();
+    if(ui != null && ui.getQueryController() != null && q instanceof Query)
     {
-      controller.setQuery(new Query(e.getQuery(), e.getCorpora()));
+      ui.getQueryController().setQuery((Query) q);
     }
   }
 
@@ -427,10 +389,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if(controller != null)
+      if(ui != null && ui.getQueryController() != null)
       {
-        controller.setQuery((txtQuery.getValue()));
-        controller.executeQuery();
+        ui.getQueryController().executeSearch(true, true);
       }
     }
   }
@@ -457,18 +418,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         if(!piCount.isVisible())
         {
-          replaceComponent(txtStatus, piCount);
           piCount.setVisible(true);
           piCount.setEnabled(true);
-        }
-      }
-      else
-      {
-        if(piCount.isVisible())
-        {
-          replaceComponent(piCount, txtStatus);
-          piCount.setVisible(false);
-          piCount.setEnabled(false);
         }
       }
       
@@ -488,12 +439,24 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     }
   }
 
+    public void setStatus(String status, String resultStatus)
+  {
+    if(txtStatus != null)
+    {
+      txtStatus.setReadOnly(false);
+      txtStatus.setValue(status + resultStatus);
+      lastPublicStatus = status;
+      txtStatus.setReadOnly(true);
+    }
+  }
+
+  
   private static class ShowKeyboardClickListener implements ClickListener
   {
 
-    private final VirtualKeyboard virtualKeyboard;
+    private final VirtualKeyboardCodeEditor virtualKeyboard;
 
-    public ShowKeyboardClickListener(VirtualKeyboard virtualKeyboard)
+    public ShowKeyboardClickListener(VirtualKeyboardCodeEditor virtualKeyboard)
     {
       this.virtualKeyboard = virtualKeyboard;
     }
@@ -507,10 +470,10 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   
   private class ShowExportClickListener implements ClickListener
   {
-    private SearchUI ui;
+    private AnnisUI ui;
     private ExportPanel panel;
     
-    public ShowExportClickListener(SearchUI ui)
+    public ShowExportClickListener(AnnisUI ui)
     {
       this.ui = ui;
     }
@@ -520,16 +483,17 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       if(panel == null)
       {
-        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getQueryController());
+        panel = new ExportPanel(QueryPanel.this, 
+          ui.getQueryController(), state);
       }
       
-      final TabSheet tabSheet = ui.getMainTab();
+      final TabSheet tabSheet = ui.getSearchView().getMainTab();
       Tab tab = tabSheet.getTab(panel);
       
       if(tab == null)
       {
         tab = tabSheet.addTab(panel, "Export");
-        tab.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
+        tab.setIcon(FontAwesome.DOWNLOAD);
       }
       
       
@@ -543,9 +507,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   
   private class ShowFrequencyClickListener implements ClickListener
   {
-    private SearchUI ui;
+    private AnnisUI ui;
     
-    public ShowFrequencyClickListener(SearchUI ui)
+    public ShowFrequencyClickListener(AnnisUI ui)
     {
       this.ui = ui;
     }
@@ -555,17 +519,17 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       if(frequencyPanel == null)
       {
-        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController());
+        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController(), state);
         txtQuery.addTextChangeListener(frequencyPanel);
       }
       
-      final TabSheet tabSheet = ui.getMainTab();
+      final TabSheet tabSheet = ui.getSearchView().getMainTab();
       Tab tab = tabSheet.getTab(frequencyPanel);
       
       if(tab == null)
       {
         tab = tabSheet.addTab(frequencyPanel, "Frequency Analysis");
-        tab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
+        tab.setIcon(FontAwesome.BAR_CHART_O);
       }
       
       
@@ -581,9 +545,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   {
     
     private QueryBuilderChooser queryBuilder;
-    private SearchUI ui;
+    private AnnisUI ui;
     
-    public ShowQueryBuilderClickListener(SearchUI ui)
+    public ShowQueryBuilderClickListener(AnnisUI ui)
     {
       this.ui = ui;
     }
@@ -595,13 +559,13 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
          queryBuilder = new QueryBuilderChooser(ui.getQueryController(), ui, ui.getInstanceConfig());
       }
-      final TabSheet tabSheet = ui.getMainTab();
+      final TabSheet tabSheet = ui.getSearchView().getMainTab();
       Tab tab = tabSheet.getTab(queryBuilder);
       
       if(tab == null)
       {
         tab = tabSheet.addTab(queryBuilder, "Query Builder", 
-          new ThemeResource("tango-icons/16x16/document-properties.png"));
+          new ThemeResource("images/tango-icons/16x16/document-properties.png"));
         
         ui.addAction(new ShortcutListener("^Query builder")
         {
@@ -622,8 +586,15 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
   }
 
-  public QueryController getQueryController()
+  public String getLastPublicStatus()
   {
-    return this.controller;
+    return lastPublicStatus;
   }
+
+  public ProgressBar getPiCount()
+  {
+    return piCount;
+  }
+  
+  
 }

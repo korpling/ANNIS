@@ -17,7 +17,7 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.AnnisBaseRunner;
 import annis.administration.CorpusAdministration;
-import annis.service.internal.AnnisServiceRunner;
+import annis.administration.ImportStatus;
 import annis.utils.Utils;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -29,6 +29,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -36,8 +37,8 @@ import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.webapp.WebAppContext;
+import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -51,18 +52,20 @@ public class MainFrame extends javax.swing.JFrame
     MainFrame.class);
 
   private class MainFrameWorker extends SwingWorker<String, String>
-    implements Serializable
   {
+    
+    private final KickstartRunner delegate = new KickstartRunner();
 
     @Override
     protected String doInBackground() throws Exception
     {
+      delegate.resetRunner();
       setProgress(1);
       try
       {
-        startService();
+        delegate.startService();
         setProgress(2);
-        startJetty();
+        delegate.startJetty();
       }
       catch (Exception ex)
       {
@@ -71,46 +74,6 @@ public class MainFrame extends javax.swing.JFrame
       return "";
     }
 
-    private void startService() throws Exception
-    {
-
-      // starts RMI service at bean creation
-      AnnisServiceRunner runner = new AnnisServiceRunner();
-      runner.setUseAuthentification(false);
-      runner.start(true);
-    }
-
-    private void startJetty() throws Exception
-    {
-      // disable jetty logging
-      org.eclipse.jetty.util.log.Log.setLog(new JettyNoLogger());
-      
-      Server jetty = new Server(8080);
-      // add context for our bundled webapp
-      WebAppContext context = new WebAppContext("./webapp/", "/annis-gui");
-      context.setInitParameter("managerClassName",
-        "annis.security.TestSecurityManager");
-      String webxmlOverrride = System.getProperty("annis.home")
-        + "/conf/override-web.xml";//ClassLoader.getSystemResource("webxmloverride.xml").toString();
-      List<String> listWebXMLOverride = new LinkedList<String>();
-      listWebXMLOverride.add(webxmlOverrride);
-      context.setOverrideDescriptors(listWebXMLOverride);
-      
-      
-      // Exclude some jersey classes explicitly from the web application classpath.
-      // If they still exists some automatic dependency resolution of Jersey will
-      // fail.
-      // Whenever we add new dependencies on jersey classes for the service but 
-      // not for the GUI and "Missing dependency" errors occur, add the classes
-      // to the server class list
-      context.addServerClass("com.sun.jersey.json.");
-      context.addServerClass("com.sun.jersey.server.");
-      
-      jetty.setHandler(context);
-
-      // start
-      jetty.start();
-    }
 
     @Override
     protected void done()
@@ -136,11 +99,18 @@ public class MainFrame extends javax.swing.JFrame
         log.error(null, ex);
       }
     }
+    
+    public void setTimeoutDisabled(boolean disabled)
+    {
+      delegate.setTimeoutDisabled(disabled);
+    }
+    
   } //end MainFrameWorker class
   private CorpusAdministration corpusAdministration;
-  private SwingWorker<String, String> serviceWorker;
+  private MainFrameWorker serviceWorker;
   private boolean wasStarted = false;
-
+  
+  
   /**
    * Creates new form MainFrame
    */
@@ -177,9 +147,16 @@ public class MainFrame extends javax.swing.JFrame
 
     try
     {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
+      {
+        if ("Nimbus".equals(info.getName()))
+        {
+          UIManager.setLookAndFeel(info.getClassName());
+          break;
+        }
+      }
     }
-    catch (Exception ex)
+    catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ex)
     {
       log.error(null, ex);
     }
@@ -233,6 +210,7 @@ public class MainFrame extends javax.swing.JFrame
             "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
           btLaunch.setEnabled(true);
           btLaunch.setForeground(Color.blue);
+          cbDisableTimeout.setEnabled(true);
         }
         else
         {
@@ -245,7 +223,10 @@ public class MainFrame extends javax.swing.JFrame
       }
       catch (Exception ex)
       {
-        new ExceptionDialog(ex).setVisible(true);
+        ImportStatus importStatus = corpusAdministration
+          .getAdministrationDao().initImportStatus();
+        importStatus.addException("unknown exception", ex);
+        new ExceptionDialog(importStatus).setVisible(true);
       }
   }
 
@@ -266,6 +247,7 @@ public class MainFrame extends javax.swing.JFrame
     btLaunch = new javax.swing.JButton();
     pbStart = new javax.swing.JProgressBar();
     btExit = new javax.swing.JButton();
+    cbDisableTimeout = new javax.swing.JCheckBox();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("ANNIS Kickstarter");
@@ -358,6 +340,18 @@ public class MainFrame extends javax.swing.JFrame
       }
     });
 
+    cbDisableTimeout.setText("disable query timeout");
+    cbDisableTimeout.setToolTipText("If this checkbox is active no query timeout will be applied. Please note the only way to abort the query is either the automatic timeout or by closing the ANNIS kickstarter.");
+    cbDisableTimeout.setEnabled(false);
+    cbDisableTimeout.setName("cbDisableTimeout"); // NOI18N
+    cbDisableTimeout.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        cbDisableTimeoutActionPerformed(evt);
+      }
+    });
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
@@ -371,7 +365,10 @@ public class MainFrame extends javax.swing.JFrame
           .addComponent(lblStatusService, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
           .addComponent(pbStart, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
           .addComponent(btLaunch, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-          .addComponent(btExit, javax.swing.GroupLayout.Alignment.TRAILING))
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addComponent(cbDisableTimeout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(btExit)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -390,7 +387,9 @@ public class MainFrame extends javax.swing.JFrame
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(btLaunch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(btExit)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(btExit)
+          .addComponent(cbDisableTimeout))
         .addContainerGap())
     );
 
@@ -435,9 +434,12 @@ public class MainFrame extends javax.swing.JFrame
         Desktop.getDesktop().browse(new URI(
           "http://localhost:8080/annis-gui/"));
       }
-      catch (Exception ex)
+      catch (IOException | URISyntaxException ex)
       {
-        new ExceptionDialog(this, ex).setVisible(true);
+       ImportStatus importStatus = corpusAdministration
+          .getAdministrationDao().initImportStatus();
+        importStatus.addException("unknown exception", ex);
+        new ExceptionDialog(importStatus).setVisible(true);
       }
 
     }//GEN-LAST:event_btLaunchActionPerformed
@@ -462,6 +464,16 @@ public class MainFrame extends javax.swing.JFrame
       this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
     }//GEN-LAST:event_btLaunchMouseExited
+
+  private void cbDisableTimeoutActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_cbDisableTimeoutActionPerformed
+  {//GEN-HEADEREND:event_cbDisableTimeoutActionPerformed
+    
+    if(serviceWorker != null)
+    {
+      serviceWorker.setTimeoutDisabled(cbDisableTimeout.isSelected());
+    }
+    
+  }//GEN-LAST:event_cbDisableTimeoutActionPerformed
 
 
   private boolean isInitialized()
@@ -506,6 +518,7 @@ public class MainFrame extends javax.swing.JFrame
   private javax.swing.JButton btInit;
   private javax.swing.JButton btLaunch;
   private javax.swing.JButton btList;
+  private javax.swing.JCheckBox cbDisableTimeout;
   private javax.swing.JLabel lblStatusService;
   private javax.swing.JProgressBar pbStart;
   // End of variables declaration//GEN-END:variables

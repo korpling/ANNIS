@@ -20,6 +20,8 @@ import annis.libgui.Helper;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.google.common.base.Preconditions;
 import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -33,7 +35,6 @@ import com.vaadin.server.VaadinSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -54,11 +55,20 @@ public class BinaryRequestHandler implements RequestHandler
 
   private static final int BUFFER_SIZE = 0x1000; //4K
   
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
+  private final String prefix;
+  
+  public BinaryRequestHandler(String urlPrefix)
+  {
+    this.prefix = urlPrefix + "/Binary";
+  }
+  
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if(request.getPathInfo().startsWith("/Binary"))
+    if(request.getPathInfo() != null && request.getPathInfo().startsWith(prefix))
     {
       if("GET".equalsIgnoreCase(request.getMethod()))
       {
@@ -103,19 +113,17 @@ public class BinaryRequestHandler implements RequestHandler
       response.resetBuffer();
       response.setBufferSize(BUFFER_SIZE); // 4K
       
-      OutputStream out = response.getOutputStream();
-
       String requestedRangeRaw = request.getHeader("Range");
 
       WebResource binaryRes = Helper.getAnnisWebResource()
         .path("query").path("corpora")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
-        .path(URLEncoder.encode(documentName, "UTF-8")).path("binary");
+        .path(urlPathEscape.escape(toplevelCorpusName))
+        .path(urlPathEscape.escape(documentName)).path("binary");
 
       WebResource metaBinaryRes = Helper.getAnnisWebResource()
         .path("meta").path("binary")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
-        .path(URLEncoder.encode(documentName, "UTF-8"));
+        .path(urlPathEscape.escape(toplevelCorpusName))
+        .path(urlPathEscape.escape(documentName));
 
       // tell client that we support byte ranges
       response.setHeader("Accept-Ranges", "bytes");
@@ -162,11 +170,14 @@ public class BinaryRequestHandler implements RequestHandler
         response.flushBuffer();
         if(sendContent)
         {
-          writeFromServiceToClient(
-            r.getStart(), contentLength, binaryRes, out, mimeType);
+          try (
+            OutputStream out = response.getOutputStream();)
+          {
+            writeFromServiceToClient(
+              r.getStart(), contentLength, binaryRes, out, mimeType);
+          }
         }
         
-        out.close();
 
       }
       catch(ContentRange.InvalidRangeException ex)
@@ -179,15 +190,10 @@ public class BinaryRequestHandler implements RequestHandler
     }
     catch (IOException ex)
     {
-      log.error("IOException in BinaryRequestHandler", ex);
+      log.warn("IOException in BinaryRequestHandler", ex);
       response.setStatus(500);
     }
-    catch (ClientHandlerException ex)
-    {
-      log.error(null, ex);
-      response.setStatus(500);
-    }
-    catch (UniformInterfaceException ex)
+    catch (ClientHandlerException | UniformInterfaceException ex)
     {
       log.error(null, ex);
       response.setStatus(500);

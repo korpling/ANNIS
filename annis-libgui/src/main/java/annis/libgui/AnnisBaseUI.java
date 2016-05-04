@@ -15,15 +15,16 @@
  */
 package annis.libgui;
 
+import annis.VersionInfo;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.google.common.base.Charsets;
+import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
 import com.vaadin.sass.internal.ScssStylesheet;
 import com.vaadin.server.ClassResource;
@@ -33,10 +34,20 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.ComponentContainer;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.UI;
-import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -44,9 +55,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -94,43 +107,27 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
 
-  private Properties versionProperties;
-
   private transient MediaController mediaController;
 
   private transient ObjectMapper jsonMapper;
   
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
   
+  private transient EventBus loginDataLostBus;
   
   @Override
   protected void init(VaadinRequest request)
   {  
     
     initLogging();
-    // load some additional properties from our ANNIS configuration
-    loadApplicationProperties("annis-gui.properties");
     
     // store the webservice URL property explicitly in the session in order to 
     // access it from the "external" servlets
-    getSession().getSession().setAttribute(WEBSERVICEURL_KEY, 
-    getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
-    
+    getSession().getSession().setAttribute(WEBSERVICEURL_KEY,
+      getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
+
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     alreadyAddedCSS.clear();
-    
-    // get version of ANNIS
-    ClassResource res = new ClassResource(AnnisBaseUI.class, "version.properties");
-    versionProperties = new Properties();
-    try
-    {
-      versionProperties.load(res.getStream().getStream());
-      getSession().setAttribute("annis-version", getVersion());
-    }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
-    }
     
     initPlugins();
     
@@ -175,7 +172,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    * @param configFile The file path of the configuration file relative to the base config folder.
    * @return list of files or directories in the order in which they should be processed (most important is last)
    */
-  protected List<File> getAllConfigLocations(String configFile)
+  public static List<File> getAllConfigLocations(String configFile)
   {
     LinkedList<File> locations = new LinkedList<File>();
 
@@ -200,21 +197,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return locations;
   }
 
-  protected void loadApplicationProperties(String configFile)
-  {
-
-    List<File> locations = getAllConfigLocations(configFile);
-
-    // load properties in the right order
-    for(File f : locations)
-    {
-      loadPropertyFile(f);
-    }
-  }
-
   protected Map<String, InstanceConfig> loadInstanceConfig()
   {
-    TreeMap<String, InstanceConfig> result = new TreeMap<String, InstanceConfig>();
+    TreeMap<String, InstanceConfig> result = new TreeMap<>();
 
 
     // get a list of all directories that contain instance informations
@@ -226,20 +211,23 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
         // get all sub-files ending on ".json"
         File[] instanceFiles =
           root.listFiles((FilenameFilter) new SuffixFileFilter(".json"));
-        for(File i : instanceFiles)
+        if(instanceFiles != null)
         {
-          if(i.isFile() && i.canRead())
+          for(File i : instanceFiles)
           {
-            try
+            if(i.isFile() && i.canRead())
             {
-              InstanceConfig config = getJsonMapper().readValue(i, InstanceConfig.class);
-              String name = StringUtils.removeEnd(i.getName(), ".json");
-              config.setInstanceName(name);
-              result.put(name, config);
-            }
-            catch (IOException ex)
-            {
-              log.warn("could not parse instance config: " + ex.getMessage());
+              try
+              {
+                InstanceConfig config = getJsonMapper().readValue(i, InstanceConfig.class);
+                String name = StringUtils.removeEnd(i.getName(), ".json");
+                config.setInstanceName(name);
+                result.put(name, config);
+              }
+              catch (IOException ex)
+              {
+                log.warn("could not parse instance config: " + ex.getMessage());
+              }
             }
           }
         }
@@ -257,44 +245,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return result;
   }
 
-  private void loadPropertyFile(File f)
-  {
-   if(f.canRead() && f.isFile())
-    {
-      FileInputStream fis = null;
-      try
-      {
-        fis = new FileInputStream(f);
-        Properties p = new Properties();
-        p.load(fis);
-        
-        // copy all properties to the session
-        for(String name : p.stringPropertyNames())
-        {
-          getSession().setAttribute(name, p.getProperty(name));
-        }
-        
-      }
-      catch(IOException ex)
-      {
-
-      }
-      finally
-      {
-        if(fis != null)
-        {
-          try
-          {
-            fis.close();
-          }
-          catch(IOException ex)
-          {
-            log.error("could not close stream", ex);
-          }
-        }
-      }
-    }
-  }
 
   protected final void initLogging()
   {
@@ -343,64 +293,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   }
 
-  public String getBuildRevision()
-  {
-    String result = versionProperties.getProperty("build_revision", "");
-    return result;
-  }
-
-  public String getVersion()
-  {
-    String rev = getBuildRevision();
-    Date date = getBuildDate();
-    StringBuilder result = new StringBuilder();
-
-    result.append(getVersionNumber());
-    if (!"".equals(rev) || date != null)
-    {
-      result.append(" (");
-
-      boolean added = false;
-      if (!"".equals(rev))
-      {
-        result.append("rev. ");
-        result.append(rev);
-        added = true;
-      }
-      if (date != null)
-      {
-        result.append(added ? ", built " : "");
-
-        SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        result.append(d.format(date));
-      }
-
-      result.append(")");
-    }
-
-    return result.toString();
-
-  }
-
-  public String getVersionNumber()
-  {
-    return versionProperties.getProperty("version", "UNKNOWNVERSION");
-  }
-
-  public Date getBuildDate()
-  {
-    Date result = null;
-    try
-    {
-      DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-      result = format.parse(versionProperties.getProperty("build_date"));
-    }
-    catch (Exception ex)
-    {
-      log.debug(null, ex);
-    }
-    return result;
-  }
   
   /**
    * Override this method to append additional plugins to the internal {@link PluginManager}.
@@ -419,16 +311,18 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     log.info("Adding plugins");
     pluginManager = PluginManagerFactory.createPluginManager();
-    
     addCustomUIPlugins(pluginManager);
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
     
     File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-" 
-      + getVersionNumber() + ".jar");
-    pluginManager.addPluginsFrom(builtin.toURI());
-    log.info("added plugins from {}", builtin.getPath());
-    
+      + VersionInfo.getReleaseName() + ".jar");
+    if(builtin.canRead()) { 
+      pluginManager.addPluginsFrom(builtin.toURI());
+      log.info("added built-in plugins from  {}", builtin.getPath());
+    } else {
+      log.warn("could not find built-in plugin file {}", builtin.getPath());
+    }
     File basicPlugins = new File(baseDir, "WEB-INF/plugins");
     if (basicPlugins.isDirectory())
     {
@@ -462,16 +356,14 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
   }
   
-  private void checkIfRemoteLoggedIn(VaadinRequest request)
+  private static void checkIfRemoteLoggedIn(VaadinRequest request)
   {
      // check if we are logged in using an external authentification mechanism
       // like Schibboleth
       String remoteUser = request.getRemoteUser();
       if(remoteUser != null)
       { 
-        // treat as anonymous user
-        Client client = Helper.createRESTClient();;
-        Helper.setUser(new AnnisUser(remoteUser, client, true));
+        Helper.setUser(new AnnisUser(remoteUser, null, true));
       }
   }
   
@@ -528,10 +420,10 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       
       File tmpFile = File.createTempFile("annis-stylesheet", ".scss");
       Files.write(wrappedContent, tmpFile, Charsets.UTF_8);
-      ScssStylesheet styleSheet = ScssStylesheet.get(tmpFile.getCanonicalPath(), "UTF-8");
+      ScssStylesheet styleSheet = ScssStylesheet.get(tmpFile.getCanonicalPath());
       styleSheet.compile();
       
-      return styleSheet.toString();
+      return styleSheet.printState();
       
     }
     catch (IOException ex)
@@ -578,7 +470,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     return jsonMapper;
   }
   
-  private class RemoteUserRequestHandler implements RequestHandler
+  private static class RemoteUserRequestHandler implements RequestHandler
   {
 
     @Override
@@ -588,7 +480,17 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       checkIfRemoteLoggedIn(request);
       // we never write any information in this handler
       return false;
-    }
-    
+    }  
   }
+
+  public EventBus getLoginDataLostBus()
+  {
+    if(loginDataLostBus == null)
+    {
+      loginDataLostBus = new EventBus();
+    }
+    return loginDataLostBus;
+  }
+ 
+  
 }

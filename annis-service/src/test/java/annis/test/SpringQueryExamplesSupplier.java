@@ -17,7 +17,6 @@ package annis.test;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.experimental.theories.ParameterSignature;
 import org.junit.experimental.theories.ParameterSupplier;
 import org.junit.experimental.theories.PotentialAssignment;
@@ -32,7 +31,7 @@ public class SpringQueryExamplesSupplier extends ParameterSupplier {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext(annotation.contextLocation());
 		@SuppressWarnings("unchecked")
 		List<String> exampleList = (List<String>) ctx.getBean(annotation.exampleList());
-		List<PotentialAssignment> examples = new ArrayList<PotentialAssignment>();
+		List<PotentialAssignment> examples = new ArrayList<>();
 		for (final String example : exampleList)
 			examples.add(new PotentialAssignment() {
 

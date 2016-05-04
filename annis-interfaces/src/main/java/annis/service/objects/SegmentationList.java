@@ -16,7 +16,6 @@
 
 package annis.service.objects;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;

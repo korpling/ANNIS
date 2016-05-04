@@ -15,17 +15,13 @@
  */
 package annis.model;
 
+import annis.sqlgen.model.RankTableJoin;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 import org.junit.Before;
 import org.junit.Test;
-
-import annis.sqlgen.model.RankTableJoin;
 
 public class TestQueryNode {
 	
@@ -91,18 +87,4 @@ public class TestQueryNode {
     assertThat(target.isPartOfEdge(), is(true));
 	}
 
-	@Test
-	public void setTokenIndexToken() {
-		QueryNode node = new QueryNode(1);
-		node.setTokenIndex(1L);
-		assertThat(node.isToken(), is(true));
-	}
-	
-	@Test
-	public void setTokenIndexNull() {
-		QueryNode node = new QueryNode(1);
-		node.setTokenIndex(null);
-		assertThat(node.isToken(), is(false));
-	}
-	
 }

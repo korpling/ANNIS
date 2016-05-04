@@ -15,24 +15,25 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
+import annis.libgui.Background;
 import annis.libgui.Helper;
-import annis.libgui.PollControl;
 import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.Visualizer;
-import annis.service.objects.Visualizer;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.event.FieldEvents;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.UI;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class DocBrowserPanel extends Panel
 {
 
-  private final SearchUI ui;
+  private final AnnisUI ui;
 
   private VerticalLayout layout;
 
@@ -58,7 +59,9 @@ public class DocBrowserPanel extends Panel
   private CorpusConfig corpusConfig;
 
   final ProgressBar progress;
-
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   /**
    * Normally get the page size from annis-service.properties for the paging
    * component. If something went wrong this value or the amount of documents
@@ -66,7 +69,7 @@ public class DocBrowserPanel extends Panel
    */
   private final int PAGE_SIZE = 20;
 
-  private DocBrowserPanel(SearchUI ui, String corpus)
+  private DocBrowserPanel(AnnisUI ui, String corpus)
   {
     this.ui = ui;
     this.corpus = corpus;
@@ -82,6 +85,7 @@ public class DocBrowserPanel extends Panel
     progress = new ProgressBar();
     progress.setIndeterminate(true);
     progress.setSizeFull();
+    
   }
 
   @Override
@@ -93,7 +97,8 @@ public class DocBrowserPanel extends Panel
     if (table == null)
     {
       layout.addComponent(progress);
-      PollControl.runInBackground(100, ui, new LoadingDocs());
+      layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
+      Background.run(new LoadingDocs());
     }
   }
 
@@ -110,14 +115,14 @@ public class DocBrowserPanel extends Panel
    * @return A new wrapper panel for a doc browser. Make sure, that this is not
    * done several times.
    */
-  public static DocBrowserPanel initDocBrowserPanel(SearchUI ui, String corpus)
+  public static DocBrowserPanel initDocBrowserPanel(AnnisUI ui, String corpus)
   {
     return new DocBrowserPanel(ui, corpus);
   }
 
   public void openVis(String doc, Visualizer config, Button btn)
   {
-    ui.getDocBrowserController().openDocVis(corpus, doc, config, btn);
+    ui.getSearchView().getDocBrowserController().openDocVis(corpus, doc, config, btn);
   }
 
   private class LoadingDocs implements Runnable
@@ -128,41 +133,46 @@ public class DocBrowserPanel extends Panel
     {
 
       WebResource res = Helper.getAnnisWebResource();
-      try
-      {
-        final List<Annotation> docs = res.path("meta/docnames/"
-          + URLEncoder.encode(corpus, "UTF-8")).
-          get(new Helper.AnnotationListType());
+      final List<Annotation> docs = res.path("meta/docnames/"
+        + urlPathEscape.escape(corpus)).
+        get(new Helper.AnnotationListType());
 
-        ui.access(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
-            layout.removeComponent(progress);
-            layout.addComponent(table);
-
-            table.setDocNames(docs);
-          }
-        });
-      }
-      catch (final UnsupportedEncodingException ex)
+      ui.access(new Runnable()
       {
-        log.
-          error("UTF-8 encoding is not supported on server, this is weird", ex);
-        ui.access(new Runnable()
+        @Override
+        public void run()
         {
-          @Override
-          public void run()
+          table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
+          layout.removeComponent(progress);
+          
+          TextField txtFilter = new TextField();
+          txtFilter.setWidth("100%");
+          txtFilter.setInputPrompt("Filter documents by name");
+          txtFilter.setImmediate(true);
+          txtFilter.setTextChangeTimeout(500);
+          txtFilter.addTextChangeListener(new FieldEvents.TextChangeListener()
           {
-            Notification.show(
-              "UTF-8 encoding is not supported on server, this is weird: " + ex.
-              getLocalizedMessage(),
-              Notification.Type.WARNING_MESSAGE);
-          }
-        });
-      }
+
+            @Override
+            public void textChange(FieldEvents.TextChangeEvent event)
+            {
+              if (table != null)
+              {
+                table.setContainerFilter(new SimpleStringFilter(
+                  DocBrowserTable.PROP_DOC_NAME, event.getText(), true,
+                  false));
+              }
+            }
+          });
+          
+          layout.addComponent(txtFilter);
+          layout.addComponent(table);
+          layout.setExpandRatio(table, 1.0f);
+          
+
+          table.setDocNames(docs);
+        }
+      });
     }
   }
 
@@ -170,4 +180,5 @@ public class DocBrowserPanel extends Panel
   {
     return corpus;
   }
+
 }

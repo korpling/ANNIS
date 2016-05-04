@@ -1,0 +1,34 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          annisservices
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start all annis services installed on korpling
+# Description:       Start all annis services installed on korpling
+### END INIT INFO
+# Author: Thomas Krause <krauseto@hu-berlin.de>
+
+# Config
+ANNIS_USER=annis
+
+# wrapper for annis-service.sh
+service() {
+	echo $1
+	echo "-----------"
+	export ANNIS_HOME=/opt/annis/$1/
+	sudo -u $ANNIS_USER -E $ANNIS_HOME/bin/annis-service.sh $2
+	sleep 2
+}
+
+# Aktionen
+
+# only or stop a certain instance if second param is given
+if [ -n "$2" ]; then
+	service $2 $1
+else
+	service "annis-stable" $1
+#	service "annis3-snapshot" $1
+fi
+

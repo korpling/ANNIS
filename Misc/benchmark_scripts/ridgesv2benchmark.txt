@@ -10,6 +10,6 @@ count pos="NN" . pos . tok . dipl
 count norm & dipl & dipl & #1 _l_ #2 & #1 _r_ #3 
 count dipl="An" .dipl,2,10 dipl="ES"
 count pos="NN" & dipl & norm & #1 _=_ #3 & #1 _o_ #2
-dipl=/[eE][sS]/ _o_ norm
+count dipl=/[eE][sS]/ _o_ norm
 
 benchmark 20

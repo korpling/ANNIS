@@ -15,11 +15,13 @@
  */
 package annis.gui;
 
-import annis.libgui.Helper;
 import annis.gui.beans.CorpusBrowserEntry;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
+import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -35,15 +37,17 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.LoggerFactory;
-
 /**
  *
  * @author thomas
@@ -53,6 +57,8 @@ public class CorpusBrowserPanel extends Panel
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     CorpusBrowserPanel.class);
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   /**
    *
@@ -94,19 +100,19 @@ public class CorpusBrowserPanel extends Panel
     setContent(accordion);
     accordion.setSizeFull();
 
-    containerNodeAnno = new BeanItemContainer<CorpusBrowserEntry>(
+    containerNodeAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerNodeAnno.setItemSorter(new ExampleSorter());
 
-    containerEdgeType = new BeanItemContainer<CorpusBrowserEntry>(
+    containerEdgeType = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerEdgeType.setItemSorter(new ExampleSorter());
 
-    containerEdgeAnno = new BeanItemContainer<CorpusBrowserEntry>(
+    containerEdgeAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerEdgeAnno.setItemSorter(new ExampleSorter());
 
-    containerMetaAnno = new BeanItemContainer<CorpusBrowserEntry>(
+    containerMetaAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerMetaAnno.setItemSorter(new ExampleSorter());
 
@@ -131,11 +137,12 @@ public class CorpusBrowserPanel extends Panel
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
     boolean stripEdgeAnno = true;
-    HashSet<String> nodeAnnoNames = new HashSet<String>();
-    HashSet<String> edgeAnnoNames = new HashSet<String>();
-    HashSet<String> edgeNames = new HashSet<String>();
-    HashSet<String> fullEdgeNames = new HashSet<String>();
+    HashSet<String> nodeAnnoNames = new HashSet<>();
+    HashSet<String> edgeAnnoNames = new HashSet<>();
+    HashSet<String> edgeNames = new HashSet<>();
+    HashSet<String> fullEdgeNames = new HashSet<>();
     boolean hasDominance = false;
+    boolean hasEmptyDominance = false;
 
     List<AnnisAttribute> attributes = fetchAnnos(corpus.getName());
 
@@ -160,6 +167,10 @@ public class CorpusBrowserPanel extends Panel
         if (a.getSubtype() == AnnisAttribute.SubType.d)
         {
           hasDominance = true;
+          if(a.getEdgeName() == null || a.getEdgeName().isEmpty())
+          {
+            hasEmptyDominance = true;
+          }
         }
 
         String annoName = killNamespace(a.getName());
@@ -183,7 +194,7 @@ public class CorpusBrowserPanel extends Panel
       edgeNames.add(name);
     }
 
-    if (hasDominance)
+    if (hasDominance && !hasEmptyDominance)
     {
       CorpusBrowserEntry cbe = new CorpusBrowserEntry();
       cbe.setName("(dominance)");
@@ -193,7 +204,7 @@ public class CorpusBrowserPanel extends Panel
     }
 
     // secound round, fill the actual containers
-    Set<String> metaAnnosKey = new HashSet<String>();
+    Set<String> metaAnnosKey = new HashSet<>();
     for (AnnisAttribute a : attributes)
     {
       // if the annotation name is already in the example skip this.
@@ -225,7 +236,14 @@ public class CorpusBrowserPanel extends Panel
         CorpusBrowserEntry cbeEdgeType = new CorpusBrowserEntry();
         String name = stripEdgeName ? killNamespace(a.getEdgeName()) : a.
           getEdgeName();
-        cbeEdgeType.setName(name);
+        if((name == null || name.isEmpty()) && a.getSubtype() == AnnisAttribute.SubType.d)
+        {
+          cbeEdgeType.setName("(dominance)");
+        }
+        else
+        {
+          cbeEdgeType.setName(name);
+        }
         cbeEdgeType.setCorpus(corpus);
         if (a.getSubtype() == AnnisAttribute.SubType.p)
         {
@@ -310,14 +328,14 @@ public class CorpusBrowserPanel extends Panel
 
   private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)
   {
-    Collection<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
+    Collection<AnnisAttribute> result = new ArrayList<>();
     try
     {
       WebResource service = Helper.getAnnisWebResource();
       if (service != null)
       {
         WebResource query = service.path("query").path("corpora")
-          .path(URLEncoder.encode(toplevelCorpus, "UTF-8"))
+          .path(urlPathEscape.escape(toplevelCorpus))
           .path("annotations")
           .queryParam("fetchvalues", "true")
           .queryParam("onlymostfrequentvalues", "true");
@@ -338,15 +356,7 @@ public class CorpusBrowserPanel extends Panel
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error("UTF-8 encoding is not supported on server, this is weird", ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    return new LinkedList<AnnisAttribute>(result);
+    return new LinkedList<>(result);
   }
 
   public static class ExampleTable extends Table
@@ -369,7 +379,7 @@ public class CorpusBrowserPanel extends Panel
           CorpusBrowserEntry corpusBrowserEntry = (CorpusBrowserEntry) itemId;
           Label l = new Label(corpusBrowserEntry.getExample());
           l.setContentMode(ContentMode.TEXT);
-          l.addStyleName("corpus-font-force");
+          l.addStyleName(Helper.CORPUS_FONT_FORCE);
           return l;
         }
       });
@@ -397,7 +407,7 @@ public class CorpusBrowserPanel extends Panel
 
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().
         getValue();
-      Set<String> corpusNameSet = new HashSet<String>();
+      Set<String> corpusNameSet = new HashSet<>();
       corpusNameSet.add(corpus.getName());
       if (controller != null && cbe != null)
       {
@@ -437,6 +447,10 @@ public class CorpusBrowserPanel extends Panel
 
   private String killNamespace(String qName)
   {
+    if(qName == null)
+    {
+      return "";
+    }
     String[] splitted = qName.split(":");
     return splitted[splitted.length - 1];
   }

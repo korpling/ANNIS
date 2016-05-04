@@ -15,16 +15,14 @@
  */
 package annis;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
-
-import java.io.PrintStream;
-
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 
@@ -73,7 +71,7 @@ public class TestAnnisBaseRunner {
 	
 	// if argument list is empty, the program runs interactive
 	@Test
-	public void runInteractive() {
+	public void runInteractive() throws IOException {
 		// sanity check
 		assertThat(instance.interactive, is(false));
 		
@@ -87,7 +85,7 @@ public class TestAnnisBaseRunner {
 	
 	// if argument list is not empty, the first arg is the command, the second the arguments
 	@Test
-	public void runKnownCommand() {
+	public void runKnownCommand() throws IOException {
 		// sanity check
 		assertThat(instance.args, is(nullValue()));
 		

@@ -17,28 +17,33 @@ package annis.visualizers.iframe.dependency;
 
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.iframe.WriterVisualizer;
-import static annis.model.AnnisConstants.*;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import annis.visualizers.iframe.WriterVisualizer;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeMap;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SPointingRelation;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SLayer;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.json.JSONException;
@@ -58,7 +63,7 @@ import org.slf4j.LoggerFactory;
  * Mappings: <br />
  * If a annotation key is specified with <b>node_key:key</b>, all
  * nodes which carry this annotation are searched for pointing relations and
- * instead token the annotation value is used.
+ * instead of the token span the annotation value is used.
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
@@ -107,7 +112,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         {
           
           RelannisNodeFeature feat = 
-            (RelannisNodeFeature) snode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            (RelannisNodeFeature) snode.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
           
           if (snode instanceof SToken)
           {
@@ -148,14 +153,14 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   public void printHTMLOutput(VisualizerInput input, Writer writer,
     Map<SNode, Integer> selectedNodes)
   {
-    SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
+    SDocumentGraph sDocumentGraph = input.getSResult().getDocumentGraph();
 
-    for (SNode n : sDocumentGraph.getSNodes())
+    for (SNode n : sDocumentGraph.getNodes())
     {
       if (selectNode(n))
       {
         RelannisNodeFeature feat = 
-          (RelannisNodeFeature) n.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+          (RelannisNodeFeature) n.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
         
         int tokenIdx = feat != null ? (int) feat.getTokenIndex() : -1;
         selectedNodes.put(n, tokenIdx);
@@ -191,7 +196,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       
       println(
         "<script type=\"text/javascript\" src=\""
-        + input.getResourcePath("vakyartha/jquery-1.9.0.min.js") + "\"></script>", 
+        + input.getResourcePath("vakyartha/jquery.js") + "\"></script>", 
         writer);
       println("<script type=\"text/javascript\" src=\""
         + input.getResourcePath("vakyartha/raphael-min.js") + "\"></script>", writer);
@@ -230,29 +235,51 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         vakyarthaObject.put("tooltip", completeAnnotation);
 
         JSONObject govs = new JSONObject();
-        EList<Edge> sEdges = node.getSGraph().getInEdges(node.getSId());
+        List<SRelation<SNode,SNode>> sEdges = node.getGraph().getInRelations(node.getId());
 
-        for (Edge e : sEdges)
+        for (SRelation<? extends SNode,? extends SNode> e : sEdges)
         {
-          if (!(e instanceof SPointingRelation))
+          if(e instanceof SPointingRelation)
           {
-            continue;
-          }
+            SPointingRelation sRelation = (SPointingRelation) e;
+            boolean includeEdge = true;
 
-          SPointingRelation sRelation = (SPointingRelation) e;
-          SNode source = (SNode) sRelation.getSource();
 
-          String label = "";
-          for (SAnnotation anno : sRelation.getSAnnotations())
-          {
-            label = anno.getSValueSTEXT();
-            break;
-          }
+            // check layer
+            if(input.getNamespace() != null)
+            {
+              // must be included in the layer in order to be included
+              includeEdge = false;
+              if(sRelation.getLayers() != null)
+              {
+                for(SLayer layer : sRelation.getLayers())
+                {
+                  if(input.getNamespace().equals(layer.getName()))
+                  {
+                    includeEdge = true;
+                    break;
+                  }
+                }
+              }
+            }
 
-          if (sRelation.getSource() != null && node2Int.containsKey(source))
-          {
-            govs.put(String.valueOf(node2Int.get(source)), label);
-          }
+            if(includeEdge)
+            {
+              SNode source = (SNode) sRelation.getSource();
+
+              String label = "";
+              for (SAnnotation anno : sRelation.getAnnotations())
+              {
+                label = anno.getValue_STEXT();
+                break;
+              }
+
+              if (sRelation.getSource() != null && node2Int.containsKey(source))
+              {
+                govs.put(String.valueOf(node2Int.get(source)), label);
+              }
+            }
+          } // end if pointing relation
         }
 
         vakyarthaObject.put("govs", govs);
@@ -262,8 +289,8 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         String tokenColor = "black";
         if (input.getMarkedAndCovered().containsKey(node))
         {
-          int colorNumber = ((int) (long) input.getMarkedAndCovered().get(node)) - 1;
-          tokenColor = MatchedNodeColors.values()[colorNumber].getHTMLColor();
+          tokenColor = MatchedNodeColors
+                  .getHTMLColorByMatch(input.getMarkedAndCovered().get(node));
         }
         tAttris.put("fill", tokenColor);
         tAttris.put("font", "11px " + StringUtils.join(fontsText, ","));
@@ -335,7 +362,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       && mappings.getProperty(MAPPING_NODE_KEY) != null)
     {
 
-      EList<SAnnotation> annos = node.getSAnnotations();
+      Set<SAnnotation> annos = node.getAnnotations();
       SAnnotation anno = null;
 
       for (SAnnotation a : annos)
@@ -347,7 +374,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         }
       }
 
-      return anno != null ? anno.getQName() + "=" + anno.getSValueSTEXT() : "";
+      return anno != null ? anno.getQName() + "=" + anno.getValue_STEXT(): "";
     }
 
     return "";
@@ -360,16 +387,15 @@ public class VakyarthaDependencyTree extends WriterVisualizer
    */
   private String getText(SNode node, VisualizerInput input)
   {
-    SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
-    EList<STYPE_NAME> textRelations = new BasicEList<STYPE_NAME>();
-    textRelations.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-    EList<SDataSourceSequence> sequences = sDocumentGraph.
-      getOverlappedDSSequences(node, textRelations);
+    SDocumentGraph sDocumentGraph = input.getSResult().getDocumentGraph();
+
+    List<DataSourceSequence> sequences = sDocumentGraph.
+      getOverlappedDataSourceSequence(node, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
 
     if (sequences != null && sequences.size() > 0)
     {
-      return ((STextualDS) sequences.get(0).getSSequentialDS()).getSText().
-        substring(sequences.get(0).getSStart(), sequences.get(0).getSEnd());
+      return ((STextualDS) sequences.get(0).getDataSource()).getText().
+        substring(sequences.get(0).getStart().intValue(), sequences.get(0).getEnd().intValue());
     }
 
     return "";
@@ -408,7 +434,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
 
     // if mapping is set, we check, if the node carries the mapped annotation key
-    EList<SAnnotation> annos = n.getSAnnotations();
+    Set<SAnnotation> annos = n.getAnnotations();
     for (SAnnotation a : annos)
     {
       if (annoKey.equals(a.getName()))

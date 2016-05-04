@@ -8,7 +8,11 @@ var currentNumberIndex = 1;//0;
 $(document).ready(function()
 {
   $("td[title]").tooltip({
-    showBody: " - "
+    // no animation
+    show: false,
+    content: function () {
+        return $(this).attr('title');
+    }
   });
 });
 

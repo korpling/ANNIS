@@ -1,0 +1,24 @@
+@import "../valo/valo";
+@import "../annis/annis.scss";
+@import "../annis/partitur.scss";
+@import "../annis/pdf.scss";
+@import "../annis/raw_text.scss";
+
+$v-app-background-color: white;
+$v-app-loading-text: "ANNIS visualization is loading...";
+
+@include v-font(ANNISFontIcon,
+'../../../../annis/fonts/annisicon');
+
+.annis_embeddedvis {
+  @include annis;
+}
+
+@media print {
+  .annis_embeddedvis {    
+    .dontprint {
+      visibility: hidden;
+    }
+
+  }
+}

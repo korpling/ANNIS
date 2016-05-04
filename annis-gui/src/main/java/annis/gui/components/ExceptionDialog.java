@@ -15,17 +15,15 @@
  */
 package annis.gui.components;
 
-import annis.gui.ReportBugWindow;
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.libgui.Helper;
 import com.google.common.base.Preconditions;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -61,7 +59,8 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     
     layout = new VerticalLayout();
     setContent(layout);
-    layout.setSizeFull();
+    layout.setWidth("100%");
+    layout.setHeight("-1");
     
     if(caption == null)
     {
@@ -103,11 +102,11 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     btReportBug = new Button("Report Problem", this);
     btReportBug.setStyleName(BaseTheme.BUTTON_LINK);
     btReportBug.setVisible(false);
-    btReportBug.setIcon(new ThemeResource("../runo/icons/16/email.png"));
+    btReportBug.setIcon(FontAwesome.ENVELOPE_O);
     UI ui = UI.getCurrent();
-    if(ui instanceof SearchUI)
+    if(ui instanceof AnnisUI)
     {
-      btReportBug.setVisible(((SearchUI) ui).canReportBugs());
+      btReportBug.setVisible(((AnnisUI) ui).canReportBugs());
     }
     actionsLayout.addComponent(btReportBug);
     actionsLayout.setComponentAlignment(btDetails, Alignment.TOP_LEFT);
@@ -115,7 +114,8 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     
     lblStacktrace = new Label(Helper.convertExceptionToMessage(ex), ContentMode.PREFORMATTED);
     detailsPanel = new Panel(lblStacktrace);
-    detailsPanel.setSizeFull();
+    detailsPanel.setWidth("100%");
+    detailsPanel.setHeight("300px");
     detailsPanel.setVisible(false);
     lblStacktrace.setSizeUndefined();
     lblStacktrace.setVisible(true);
@@ -138,7 +138,6 @@ public class ExceptionDialog extends Window implements Button.ClickListener
       {
         detailsPanel.setVisible(false);
         btDetails.setCaption("Show Details");
-        setHeight("200px");
         layout.setExpandRatio(detailsPanel, 0.0f);
         layout.setExpandRatio(actionsLayout, 1.0f);
       }
@@ -146,7 +145,6 @@ public class ExceptionDialog extends Window implements Button.ClickListener
       {
         detailsPanel.setVisible(true);
         btDetails.setCaption("Hide Details");
-        setHeight("500px");
         layout.setExpandRatio(detailsPanel, 1.0f);
         layout.setExpandRatio(actionsLayout, 0.0f);
       }
@@ -159,9 +157,9 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     {
       this.close();
       UI ui = UI.getCurrent();
-      if(ui instanceof SearchUI)
+      if(ui instanceof AnnisUI)
       {
-        ((SearchUI) ui).reportBug(cause);
+        ((AnnisUI) ui).reportBug(cause);
       }
     }
   }
@@ -179,7 +177,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     dlg.setModal(true);
     dlg.setResizable(true);
     dlg.setWidth("500px");
-    dlg.setHeight("200px");
+    dlg.setHeight("-1");
     
     UI.getCurrent().addWindow(dlg);
     dlg.center();

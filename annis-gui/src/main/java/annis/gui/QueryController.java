@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2014 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,238 +15,405 @@
  */
 package annis.gui;
 
-import annis.gui.resultfetch.SingleResultFetchJob;
-import annis.libgui.Helper;
-import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
-import annis.libgui.media.MediaController;
-import annis.gui.model.PagedResultQuery;
-import annis.gui.model.Query;
-import annis.gui.paging.PagingCallback;
+import annis.gui.controller.CountCallback;
+import annis.gui.controller.ExportBackgroundJob;
+import annis.gui.controller.FrequencyBackgroundJob;
+import annis.gui.controller.SpecificPagingCallback;
+import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
+import annis.gui.exporter.Exporter;
+import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.DisplayedResultQuery;
+import annis.gui.objects.ExportQuery;
+import annis.gui.objects.FrequencyQuery;
+import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.Query;
+import annis.gui.objects.QueryGenerator;
+import annis.gui.objects.QueryUIState;
+import annis.gui.resultfetch.ResultFetchJob;
+import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
-import annis.libgui.PollControl;
-import annis.gui.resultfetch.ResultFetchJob;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
+import annis.model.AqlParseError;
+import annis.model.QueryNode;
+import annis.service.objects.CorpusConfig;
+import annis.service.objects.FrequencyTableEntry;
+import annis.service.objects.FrequencyTableEntryType;
+import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
-import annis.service.objects.MatchGroup;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import com.google.common.base.Joiner;
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanContainer;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TabSheet.Tab;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import org.apache.commons.collections15.set.ListOrderedSet;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Manages all the query related actions.
- *
- * <strong>This class is not reentrant.</strong>
- * It is expected that you call the functions from the Vaadin session lock
- * context, either implicitly (e.g. from a component constructor or a handler
- * callback) or explicitly with {@link VaadinSession#lock() }.
+ * A controller to modifiy the query UI state.
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class QueryController implements TabSheet.SelectedTabChangeListener,
-  Serializable
+public class QueryController implements Serializable
 {
 
   private static final Logger log = LoggerFactory.getLogger(
-    ResultViewPanel.class);
+    QueryController.class);
 
-  private final SearchUI ui;
+  private final SearchView searchView;
+  private final AnnisUI ui;
 
-  private transient Future<?> lastMatchFuture;
+  private final QueryUIState state;
 
-  private final ListOrderedSet<HistoryEntry> history;
+  private final Map<String, Exporter> exporterMap = new HashMap<>();
 
-  private Future<MatchAndDocumentCount> futureCount;
-
-  private UUID lastQueryUUID;
-
-  private PagedResultQuery preparedQuery;
-
-  private Map<UUID, PagedResultQuery> queries;
-
-  private BiMap<UUID, ResultViewPanel> queryPanels;
-
-  private Map<UUID, MatchAndDocumentCount> counts;
-
-  /**
-   * Stores updated queries. They are created when single results are queried
-   * again with a different context.
-   */
-  private Map<UUID, Map<Integer, PagedResultQuery>> updatedQueries;
-
-  /**
-   * Holds the matches from the last query. Useful for repeated queries in order
-   * to change the context.
-   */
-  private MatchGroup matches;
-
-  private int maxShortID;
-
-  private List<CorpusSelectionChangeListener> corpusSelChangeListeners
-    = new LinkedList<CorpusSelectionChangeListener>();
-
-  public QueryController(SearchUI ui)
+  public QueryController(SearchView searchView, AnnisUI ui)
   {
+    this.searchView = searchView;
     this.ui = ui;
-    this.history = new ListOrderedSet<HistoryEntry>();
-  }
-  
+    this.state = ui.getQueryState();
 
-  public void updateCorpusSetList()
-  {
-    ui.getControlPanel().getCorpusList().updateCorpusSetList();
-  }
+    this.state.getAql().addValueChangeListener(
+      new Property.ValueChangeListener()
+      {
 
-  public void setQueryFromUI()
-  {
-    setQuery(ui.getControlPanel().getQueryPanel().getQuery());
-  }
-
-  public void setQuery(String query)
-  {
-    setQuery(new Query(query, ui.getControlPanel().getCorpusList().
-      getSelectedCorpora()));
-  }
-
-  public void setQuery(Query query)
-  {
-    // Check if a corpus is selected.
-    if (ui.getControlPanel().getCorpusList().getSelectedCorpora().isEmpty()
-      && query.getCorpora() != null)
+        @Override
+        public void valueChange(Property.ValueChangeEvent event)
+        {
+          validateQuery();
+        }
+      });
+    
+    this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
     {
-      ui.getControlPanel().getCorpusList().selectCorpora(query.getCorpora());
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        validateQuery();
+      }
+    });
+
+    for (Exporter e : SearchView.EXPORTER)
+    {
+      String name = e.getClass().getSimpleName();
+      exporterMap.put(name, e);
     }
+    
+    this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
+    {
 
-    PagedResultQuery paged = new PagedResultQuery(
-      ui.getControlPanel().getSearchOptions().getLeftContext(),
-      ui.getControlPanel().getSearchOptions().getRightContext(),
-      0,
-      ui.getControlPanel().getSearchOptions().getResultsPerPage(),
-      ui.getControlPanel().getSearchOptions().getSegmentationLayer(),
-      query.getQuery(), query.getCorpora());
-
-    setQuery(paged);
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        // TODO: check if the corpus is actually available to the user
+      }
+    });
   }
 
-  public void setQuery(PagedResultQuery query)
+  public void validateQuery()
   {
-    // only allow offset at multiples of the limit size
-    query.setOffset(query.getOffset() - (query.getOffset() % query.getLimit()));
+    QueryPanel qp = searchView.getControlPanel().getQueryPanel();
 
-    preparedQuery = query;
+    // reset status
+    qp.setErrors(null);
+    qp.setNodes(null);
 
-    ui.getControlPanel().getQueryPanel().setQuery(query.getQuery());
-    ui.getControlPanel().getSearchOptions().setLeftContext(query.
-      getContextLeft());
-    ui.getControlPanel().getSearchOptions().setRightContext(query.
-      getContextRight());
-    ui.getControlPanel().getSearchOptions().setSegmentationLayer(query.
-      getSegmentation());
-    ui.getControlPanel().getSearchOptions().setResultsPerPage(query.getLimit());
-
-    if (query.getCorpora() != null)
+    String query = state.getAql().getValue();
+    if (query == null || query.isEmpty())
     {
-      ui.getControlPanel().getCorpusList().selectCorpora(query.getCorpora());
-    }
+      qp.setStatus("Empty query");
 
-  }
-
-  /**
-   * Cancel queries from the client side.
-   *
-   * Important: This does not magically cancel the query on the server side, so
-   * don't use this to implement a "real" query cancelation.
-   */
-  private void cancelQueries()
-  {
-    // don't spin forever when canceled
-    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-
-    // abort last tasks if running
-    if (futureCount != null && !futureCount.isDone())
-    {
-      futureCount.cancel(true);
-    }
-    if (lastMatchFuture != null && !lastMatchFuture.isDone())
-    {
-      lastMatchFuture.cancel(true);
-    }
-
-    futureCount = null;
-
-  }
-
-  /**
-   * Adds a history entry to the history panel.
-   *
-   * @param e the entry, which is added.
-   *
-   * @see HistoryPanel
-   */
-  public void addHistoryEntry(HistoryEntry e)
-  {
-    // remove it first in order to let it appear on the beginning of the list
-    history.remove(e);
-    history.add(0, e);
-    ui.getControlPanel().getQueryPanel().updateShortHistory(history.asList());
-  }
-
-  public void addCorpusSelectionChangeListener(
-    CorpusSelectionChangeListener listener)
-  {
-    if (corpusSelChangeListeners == null)
-    {
-      corpusSelChangeListeners = new LinkedList<CorpusSelectionChangeListener>();
-    }
-    corpusSelChangeListeners.add(listener);
-  }
-
-  public void removeCorpusSelectionChangeListener(
-    CorpusSelectionChangeListener listener)
-  {
-    if (corpusSelChangeListeners == null)
-    {
-      corpusSelChangeListeners = new LinkedList<CorpusSelectionChangeListener>();
     }
     else
     {
-      corpusSelChangeListeners.remove(listener);
+      // validate query
+      try
+      {
+        AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
+        Future<List<QueryNode>> future = annisResource.path("query").path(
+          "parse/nodes")
+          .queryParam("q", Helper.encodeJersey(query))
+          .get(new GenericType<List<QueryNode>>()
+          {
+          });
+
+        // wait for maximal one seconds
+        try
+        {
+          List<QueryNode> nodes = future.get(1, TimeUnit.SECONDS);
+
+          qp.setNodes(nodes);
+
+          if (state.getSelectedCorpora().getValue() == null
+            || state.getSelectedCorpora().getValue().isEmpty())
+          {
+            qp.setStatus(
+              "Please select a corpus from the list below, then click on \"Search\".");
+          }
+          else
+          {
+            qp.setStatus(
+              "Valid query, click on \"Search\" to start searching.");
+          }
+
+        }
+        catch (InterruptedException ex)
+        {
+          log.warn(null, ex);
+        }
+        catch (ExecutionException ex)
+        {
+          if (ex.getCause() instanceof UniformInterfaceException)
+          {
+            reportServiceException((UniformInterfaceException) ex.getCause(),
+              false);
+          }
+          else
+          {
+            // something unknown, report
+            ExceptionDialog.show(ex);
+          }
+        }
+        catch (TimeoutException ex)
+        {
+          qp.setStatus("Validation of query took too long.");
+        }
+
+      }
+      catch (ClientHandlerException ex)
+      {
+        log.error(
+          "Could not connect to web service", ex);
+        ExceptionDialog.show(ex, "Could not connect to web service");
+      }
     }
   }
 
-  public UUID executeQuery()
+  /**
+   * Show errors that occured during the execution of a query to the user.
+   *
+   * @param ex The exception to report in the user interface
+   * @param showNotification If true a notification is shown instead of only
+   * displaying the error in the status label.
+   */
+  public void reportServiceException(UniformInterfaceException ex,
+    boolean showNotification)
   {
-    return executeQuery(true);
+    QueryPanel qp = searchView.getControlPanel().getQueryPanel();
+
+    String caption = null;
+    String description = null;
+
+    if (ex.getResponse().getStatus() == 400)
+    {
+      List<AqlParseError> errors
+        = ex.getResponse().getEntity(
+          new GenericType<List<AqlParseError>>()
+          {
+          });
+      caption = "Parsing error";
+      description = Joiner.on("\n").join(errors);
+      qp.setStatus(description);
+      qp.setErrors(errors);
+    }
+    else if (ex.getResponse().getStatus() == 504)
+    {
+      caption = "Timeout";
+      description = "Query execution took too long.";
+      qp.setStatus(caption + ": " + description);
+    }
+    else if (ex.getResponse().getStatus() == 403)
+    {
+      
+      if(Helper.getUser() == null)
+      {
+        // not logged in
+        qp.setStatus("You don't have the access rights to query this corpus. " 
+        + "You might want to login to access more corpora.");
+        searchView.getMainToolbar().showLoginWindow(true);
+      }
+      else
+      {
+        // logged in but wrong user
+        caption = "You don't have the access rights to query this corpus. " 
+        + "You might want to login as another user to access more corpora.";
+        qp.setStatus(caption);
+      }
+    }
+    else
+    {
+      log.error(
+        "Exception when communicating with service", ex);
+      qp.setStatus("Unexpected exception:  " + ex.getMessage());
+      ExceptionDialog.show(ex,
+        "Exception when communicating with service.");
+    }
+
+    if (showNotification && caption != null)
+    {
+      Notification.show(caption, description, Notification.Type.WARNING_MESSAGE);
+    }
+
+  }
+  
+  /**
+   * Only changes the value of the property if it is not equals to the old one.
+   * @param <T>
+   * @param prop
+   * @param newValue 
+   */
+  private static <T> void  setIfNew(Property<T> prop, T newValue)
+  {
+    if(!Objects.equals(prop.getValue(), newValue))
+    {
+      prop.setValue(newValue);
+    }
+  }
+
+  public void setQuery(Query q)
+  {
+    // only change the values if actually changed (the value change listeners should not be triggered if not necessary)
+    setIfNew(state.getAql(), q.getQuery());
+    setIfNew(state.getSelectedCorpora(), q.getCorpora());
+   
+    if (q instanceof ContextualizedQuery)
+    {
+      setIfNew(state.getLeftContext(), ((ContextualizedQuery) q).getLeftContext());
+      setIfNew(state.getRightContext(), ((ContextualizedQuery) q).getRightContext());
+      setIfNew(state.getContextSegmentation(), ((ContextualizedQuery) q).getSegmentation());
+    }
+    if (q instanceof PagedResultQuery)
+    {
+      setIfNew(state.getOffset(), ((PagedResultQuery) q).getOffset());
+      setIfNew(state.getLimit(), ((PagedResultQuery) q).getLimit());
+      setIfNew(state.getOrder(), ((PagedResultQuery) q).getOrder());
+    }
+    if(q instanceof DisplayedResultQuery)
+    {
+      setIfNew(state.getSelectedMatches(), ((DisplayedResultQuery) q).getSelectedMatches());
+      setIfNew(state.getVisibleBaseText(), ((DisplayedResultQuery) q).getBaseText());
+    }
+    if (q instanceof ExportQuery)
+    {
+      setIfNew(state.getExporterName(), ((ExportQuery) q).getExporterName());
+      setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).
+        getAnnotationKeys());
+      setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
+    }
+  }
+  
+
+  /**
+   * Get the current query as it is defined by the current {@link QueryUIState}.
+   *
+   * @return
+   */
+  public DisplayedResultQuery getSearchQuery()
+  {
+    return QueryGenerator.displayed()
+      .query(state.getAql().getValue())
+      .corpora(state.getSelectedCorpora().getValue())
+      .left(state.getLeftContext().getValue())
+      .right(state.getRightContext().getValue())
+      .segmentation(state.getContextSegmentation().getValue())
+      .baseText(state.getVisibleBaseText().getValue())
+      .limit(state.getLimit().getValue())
+      .offset(state.getOffset().getValue())
+      .order(state.getOrder().getValue())
+      .selectedMatches(state.getSelectedMatches().getValue())
+      .build();
   }
 
   /**
-   * Common actions for preparing the executions of a query.
+   * Get the current query as it is defined by the UI controls.
+   *
+   * @return
    */
-  private void prepareExecuteQuery()
+  public ExportQuery getExportQuery()
   {
-    cancelQueries();
+    return QueryGenerator.export()
+      .query(state.getAql().getValue())
+      .corpora(state.getSelectedCorpora().getValue())
+      .left(state.getLeftContext().getValue())
+      .right(state.getRightContext().getValue())
+      .segmentation(state.getVisibleBaseText().getValue())
+      .exporter(state.getExporterName().getValue())
+      .annotations(state.getExportAnnotationKeys().getValue())
+      .param(state.getExportParameters().getValue())
+      .build();
+  }
+
+  /**
+   * Executes a query.
+   * @param replaceOldTab
+   * @param freshQuery If true the offset and the selected matches are reset before executing the query. 
+   */
+  public void executeSearch(boolean replaceOldTab, boolean freshQuery)
+  {
+    if (freshQuery)
+    {
+      getState().getOffset().setValue(0l);
+      getState().getSelectedMatches().setValue(new TreeSet<Long>());
+      // get the value for the visible segmentation from the configured context
+      Set<String> selectedCorpora = getState().getSelectedCorpora().getValue();
+      CorpusConfig config = new CorpusConfig();
+      if(selectedCorpora != null && !selectedCorpora.isEmpty())
+      {
+        config = ui.getCorpusConfigWithCache(selectedCorpora.iterator().next());
+      }
+
+      if(config.containsKey(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
+      {
+        String configVal = config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
+        if("".equals(configVal) || "tok".equals(configVal))
+        {
+          configVal = null;
+        }
+        getState().getVisibleBaseText().setValue(configVal);
+      }
+      else
+      {
+        getState().getVisibleBaseText().setValue(getState().getContextSegmentation().getValue());
+      }
+    }
+    // construct a query from the current properties
+    DisplayedResultQuery displayedQuery = getSearchQuery();
+
+    searchView.getControlPanel().getQueryPanel().setStatus("Searching...");
+
+    cancelSearch();
 
     // cleanup resources
     VaadinSession session = VaadinSession.getCurrent();
@@ -256,86 +423,56 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
       session.getAttribute(MediaController.class).clearMediaPlayers();
     }
 
-    ui.updateFragment(preparedQuery);
+    searchView.updateFragment(displayedQuery);
 
-    HistoryEntry e = new HistoryEntry();
-    e.setCorpora(preparedQuery.getCorpora());
-    e.setQuery(preparedQuery.getQuery());
-    addHistoryEntry(e);
 
-  }
-
-  public UUID executeQuery(boolean replaceOldTab)
-  {
-
-    Validate.notNull(preparedQuery,
-      "You have to set a query before you can execute it.");
-
-    prepareExecuteQuery();
-
-    if (preparedQuery.getCorpora() == null || preparedQuery.getCorpora().
+    if (displayedQuery.getCorpora() == null || displayedQuery.getCorpora().
       isEmpty())
     {
       Notification.show("Please select a corpus",
         Notification.Type.WARNING_MESSAGE);
-      return null;
+      return;
     }
-    if ("".equals(preparedQuery.getQuery()))
+    if ("".equals(displayedQuery.getQuery()))
     {
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
-      return null;
+      return;
     }
-
-    UUID oldQueryUUID = lastQueryUUID;
-    lastQueryUUID = UUID.randomUUID();
+    
+    addHistoryEntry(displayedQuery);
 
     AsyncWebResource res = Helper.getAnnisAsyncWebResource();
 
     //
     // begin execute match fetching
     //
-    // remove old result from view
-    ResultViewPanel oldPanel = getQueryPanels().get(oldQueryUUID);
-
-    if (replaceOldTab && oldQueryUUID != null && oldPanel != null)
+    ResultViewPanel oldPanel = searchView.getLastSelectedResultView();
+    if (replaceOldTab)
     {
-      removeQuery(oldQueryUUID);
+      // remove old panel from view
+      searchView.closeTab(oldPanel);
     }
 
-    // create a short ID for display
-    maxShortID++;
-
-    ResultViewPanel newResultView = new ResultViewPanel(this, ui, lastQueryUUID,
-      ui.getInstanceConfig());
-
-    Tab newTab;
-
-    String caption = getQueryPanels().isEmpty()
-      ? "Query Result" : "Query Result #" + maxShortID;
-
-    if (replaceOldTab && oldPanel != null)
-    {
-      ui.getMainTab().replaceComponent(oldPanel, newResultView);
-      newTab = ui.getMainTab().getTab(newResultView);
-
-      newTab.setCaption(caption);
-    }
-    else
-    {
-      newTab = ui.getMainTab().addTab(newResultView, caption);
-      newTab.setClosable(true);
-      newTab.setIcon(new ThemeResource("tango-icons/16x16/system-search.png"));
-    }
-    ui.getMainTab().setSelectedTab(newResultView);
-    ui.notifiyQueryStarted();
-
+    ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
+      ui.getInstanceConfig(), displayedQuery);
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
-      lastQueryUUID));
+      ui, searchView, newResultView, displayedQuery));
 
-    getQueryPanels().put(lastQueryUUID, newResultView);
+    TabSheet.Tab newTab;
 
-    PollControl.runInBackground(500, ui, new ResultFetchJob(preparedQuery,
-      newResultView, ui, this));
+    List<ResultViewPanel> existingResultPanels = getResultPanels();
+    String caption = existingResultPanels.isEmpty()
+      ? "Query Result" : "Query Result #" + (existingResultPanels.size() + 1);
+
+    newTab = searchView.getMainTab().addTab(newResultView, caption);
+    newTab.setClosable(true);
+    newTab.setIcon(FontAwesome.SEARCH);
+
+    searchView.getMainTab().setSelectedTab(newResultView);
+    searchView.notifiyQueryStarted();
+
+    Background.run(new ResultFetchJob(displayedQuery,
+      newResultView, ui));
 
     //
     // end execute match fetching
@@ -344,344 +481,236 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     // begin execute count
     //
     // start count query
-    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
+    searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
 
-    futureCount = res.path("query").path("search").path("count").
-      queryParam(
-        "q", preparedQuery.getQuery()).queryParam("corpora",
-        StringUtils.join(preparedQuery.getCorpora(), ",")).get(
+    AsyncWebResource countRes = res.path("query").path("search").
+      path("count").
+      queryParam("q", Helper.encodeJersey(displayedQuery.getQuery()))
+      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")));
+    Future<MatchAndDocumentCount> futureCount = countRes.get(
         MatchAndDocumentCount.class);
+    state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 
-    PollControl.runInBackground(500, ui, new CountCallback(lastQueryUUID));
+    Background.run(new CountCallback(newResultView, displayedQuery.getLimit(), ui));
 
     //
     // end execute count
     //
-    // remember the query object for later re-usage
-    getQueries().put(lastQueryUUID, preparedQuery);
-
-    return lastQueryUUID;
   }
 
-  private void updateMatches(UUID uuid, PagedResultQuery newQuery)
+  public void executeExport(ExportPanel panel, EventBus eventBus)
   {
-    ResultViewPanel panel = getQueryPanels().get(uuid);
-    if (panel != null && preparedQuery != null)
-    {
-      prepareExecuteQuery();
 
-      getQueries().put(uuid, newQuery);
-      lastMatchFuture = PollControl.runInBackground(500, ui,
-        new ResultFetchJob(newQuery, panel, ui, this));
+    Future exportFuture = state.getExecutedTasks().get(
+      QueryUIState.QueryType.EXPORT);
+    if (exportFuture != null && !exportFuture.isDone())
+    {
+      exportFuture.cancel(true);
+    }
+
+    ExportQuery query = getExportQuery();
+
+    addHistoryEntry(query);
+
+    exportFuture = Background.call(new ExportBackgroundJob(query,
+      getExporterByName(query.getExporterName()), ui, eventBus, panel));
+    state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
+  }
+
+  public void cancelExport()
+  {
+    Future exportFuture = state.getExecutedTasks().get(
+      QueryUIState.QueryType.EXPORT);
+    if (exportFuture != null && !exportFuture.isDone())
+    {
+      if (!exportFuture.cancel(true))
+      {
+        log.warn("Could not cancel export");
+      }
+    }
+  }
+
+  public void executeFrequency(FrequencyQueryPanel panel)
+  {
+    // kill old request
+    Future freqFuture = state.getExecutedTasks().get(
+      QueryUIState.QueryType.FREQUENCY);
+    if (freqFuture != null && !freqFuture.isDone())
+    {
+      freqFuture.cancel(true);
+    }
+
+    if ("".equals(state.getAql().getValue()))
+    {
+      Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
+      panel.showQueryDefinitionPanel();
+      return;
+    }
+    else if (state.getSelectedCorpora().getValue().isEmpty())
+    {
+      Notification.show("Please select a corpus",
+        Notification.Type.WARNING_MESSAGE);
+      panel.showQueryDefinitionPanel();
+      return;
+    }
+
+    BeanContainer<Integer, UserGeneratedFrequencyEntry> container
+      = state.getFrequencyTableDefinition();
+
+    FrequencyTableQuery freqDefinition = new FrequencyTableQuery();
+    for (Integer id : container.getItemIds())
+    {
+      UserGeneratedFrequencyEntry userGen
+        = container.getItem(id).getBean();
+      freqDefinition.add(userGen.toFrequencyTableEntry());
+    }
+    // additionally add meta data columns
+    for (String m : state.getFrequencyMetaData().getValue())
+    {
+      FrequencyTableEntry entry = new FrequencyTableEntry();
+      entry.setType(FrequencyTableEntryType.meta);
+      entry.setKey(m);
+      freqDefinition.add(entry);
+    }
+
+    FrequencyQuery query = QueryGenerator
+      .frequency().query(state.getAql().getValue())
+      .corpora(state.getSelectedCorpora().getValue())
+      .def(freqDefinition).build();
+
+    addHistoryEntry(query);
+
+    FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, query, panel);
+
+    freqFuture = Background.call(job);
+    state.getExecutedTasks().put(QueryUIState.QueryType.FREQUENCY, freqFuture);
+  }
+
+  public Exporter getExporterByName(String name)
+  {
+    return exporterMap.get(name);
+  }
+
+  private List<ResultViewPanel> getResultPanels()
+  {
+    ArrayList<ResultViewPanel> result = new ArrayList<>();
+    for (int i = 0; i < searchView.getMainTab().getComponentCount(); i++)
+    {
+      Component c = searchView.getMainTab().getTab(i).getComponent();
+      if (c instanceof ResultViewPanel)
+      {
+        result.add((ResultViewPanel) c);
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Cancel queries from the client side.
+   *
+   * Important: This does not magically cancel the query on the server side, so
+   * don't use this to implement a "real" query cancelation.
+   */
+  private void cancelSearch()
+  {
+    // don't spin forever when canceled
+    searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+
+    Map<QueryUIState.QueryType, Future<?>> exec = state.getExecutedTasks();
+    // abort last tasks if running
+    if (exec.containsKey(QueryUIState.QueryType.COUNT)
+      && !exec.get(QueryUIState.QueryType.COUNT).isDone())
+    {
+      exec.get(QueryUIState.QueryType.COUNT).cancel(true);
+    }
+    if (exec.containsKey(QueryUIState.QueryType.FIND)
+      && !exec.get(QueryUIState.QueryType.FIND).isDone())
+    {
+      exec.get(QueryUIState.QueryType.FIND).cancel(true);
+    }
+
+    exec.remove(QueryUIState.QueryType.COUNT);
+    exec.remove(QueryUIState.QueryType.FIND);
+
+  }
+
+  /**
+   * Adds a history entry to the history panel.
+   *
+   * @param q the entry, which is added.
+   *
+   * @see HistoryPanel
+   */
+  public void addHistoryEntry(Query q)
+  {
+    try
+    {
+      Query queryCopy = q.clone();
+      // remove it first in order to let it appear on the beginning of the list
+      state.getHistory().removeItem(queryCopy);
+      state.getHistory().addItemAt(0, queryCopy);
+      searchView.getControlPanel().getQueryPanel().updateShortHistory();
+    }
+    catch(CloneNotSupportedException ex)
+    {
+      log.error("Can't clone the query", ex);
+    }
+  }
+
+  public void changeContext(PagedResultQuery originalQuery,
+    Match match,
+    long offset, int newContext,
+    final VisualizerContextChanger visCtxChange, boolean left)
+  {
+
+    try
+    {
+    final PagedResultQuery newQuery = (PagedResultQuery) originalQuery.clone();
+      if (left)
+      {
+        newQuery.setLeftContext(newContext);
+      }
+      else
+      {
+        newQuery.setRightContext(newContext);
+      }
+
+      newQuery.setOffset(offset);
+
+
+      Background.runWithCallback(new SingleResultFetchJob(match, newQuery), 
+        new FutureCallback<SaltProject>()
+        {
+
+        @Override
+        public void onSuccess(SaltProject result)
+        {
+          visCtxChange.updateResult(result, newQuery);
+        }
+
+        @Override
+        public void onFailure(Throwable t)
+        {
+          ExceptionDialog.show(t, "Could not extend context.");
+        }
+      });
+    }
+    catch(CloneNotSupportedException ex)
+    {
+      log.error("Can't clone the query", ex);
     }
   }
 
   public void corpusSelectionChangedInBackground()
   {
-    ui.getControlPanel().getSearchOptions()
-      .updateSearchPanelConfigurationInBackground(ui.getControlPanel().
-        getCorpusList().
-        getSelectedCorpora(), ui);
-
-    // Since there is a serious lag when selecting the corpus don't update
-    // the corpus fragment any longer.
-    // The user can manually get the corpus link with the corpus explorer.
-    //ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
-
-    if (corpusSelChangeListeners != null)
-    {
-
-      Set<String> selected = getSelectedCorpora();
-      for (CorpusSelectionChangeListener listener : corpusSelChangeListeners)
-      {
-        listener.onCorpusSelectionChanged(selected);
-      }
-    }
+    searchView.getControlPanel().getSearchOptions()
+      .updateSearchPanelConfigurationInBackground(getState().
+        getSelectedCorpora().getValue(), ui);
   }
 
-  @Override
-  public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
+  public QueryUIState getState()
   {
-    if (event.getTabSheet().getSelectedTab() instanceof ResultViewPanel)
-    {
-      ResultViewPanel panel = (ResultViewPanel) event.getTabSheet().
-        getSelectedTab();
-      UUID uuid = getQueryPanels().inverse().get(panel);
-      if (uuid != null)
-      {
-        lastQueryUUID = uuid;
-        PagedResultQuery query = getQueries().get(uuid);
-        if (query != null)
-        {
-          ui.updateFragment(query);
-        }
-      }
-    }
+    return ui.getQueryState();
   }
 
-  public Set<String> getSelectedCorpora()
-  {
-    return ui.getControlPanel().getCorpusList().getSelectedCorpora();
-  }
-
-  /**
-   * Get the query that is currently prepared for execution, but not executed
-   * yet.
-   *
-   * @return
-   */
-  public PagedResultQuery getPreparedQuery()
-  {
-    return preparedQuery;
-  }
-
-  /**
-   * Clear the collected informations about a certain query. Also remove any
-   * attached {@link ResultViewPanel} for that query.
-   *
-   * @param uuid The UUID of the query to remove.
-   */
-  private void removeQuery(UUID uuid)
-  {
-    if (uuid != null)
-    {
-      getQueries().remove(uuid);
-      getQueryPanels().remove(uuid);
-      getCounts().remove(uuid);
-    }
-  }
-
-  public void notifyTabClose(ResultViewPanel panel)
-  {
-    if (panel != null)
-    {
-      removeQuery(getQueryPanels().inverse().get(panel));
-    }
-  }
-
-  public String getQueryDraft()
-  {
-    return ui.getControlPanel().getQueryPanel().getQuery();
-  }
-
-  private Map<UUID, PagedResultQuery> getQueries()
-  {
-    if (queries == null)
-    {
-      queries = new HashMap<UUID, PagedResultQuery>();
-    }
-    return queries;
-  }
-
-  private BiMap<UUID, ResultViewPanel> getQueryPanels()
-  {
-    if (queryPanels == null)
-    {
-      queryPanels = HashBiMap.create();
-    }
-    return queryPanels;
-  }
-
-  private Map<UUID, MatchAndDocumentCount> getCounts()
-  {
-    if (counts == null)
-    {
-      counts = new HashMap<UUID, MatchAndDocumentCount>();
-    }
-    return counts;
-  }
-
-  private class SpecificPagingCallback implements PagingCallback
-  {
-
-    private UUID uuid;
-
-    public SpecificPagingCallback(UUID uuid)
-    {
-      this.uuid = uuid;
-    }
-
-    @Override
-    public void switchPage(int offset, int limit)
-    {
-      PagedResultQuery query = getQueries().get(uuid);
-      if (query != null)
-      {
-        query.setOffset(offset);
-        query.setLimit(limit);
-
-        // execute the result query again
-        updateMatches(uuid, query);
-      }
-    }
-  }
-
-  private class CountCallback implements Runnable
-  {
-
-    private UUID uuid;
-
-    public CountCallback(UUID uuid)
-    {
-      this.uuid = uuid;
-    }
-
-    @Override
-    public void run()
-    {
-
-      final MatchAndDocumentCount countResult;
-      MatchAndDocumentCount tmpCountResult = null;
-      if (futureCount != null)
-      {
-        UniformInterfaceException cause = null;
-        try
-        {
-          tmpCountResult = futureCount.get();
-          getCounts().put(uuid, tmpCountResult);
-        }
-        catch (InterruptedException ex)
-        {
-          log.warn(null, ex);
-        }
-        catch (ExecutionException root)
-        {
-          if (root.getCause() instanceof UniformInterfaceException)
-          {
-            cause = (UniformInterfaceException) root.getCause();
-          }
-          else
-          {
-            log.error("Unexcepted ExecutionException cause", root);
-          }
-        }
-        finally
-        {
-          countResult = tmpCountResult;
-        }
-
-        futureCount = null;
-
-        final UniformInterfaceException causeFinal = cause;
-        ui.accessSynchronously(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            if (causeFinal == null)
-            {
-              if (countResult != null)
-              {
-                String documentString = countResult.getDocumentCount() > 1 ? "documents" : "document";
-                String matchesString = countResult.getMatchCount() > 1 ? "matches" : "match";
-
-                ui.getControlPanel().getQueryPanel().setStatus("" + countResult.
-                  getMatchCount() + " " + matchesString
-                  + "\nin " + countResult.getDocumentCount() + " " + documentString);
-                if (lastQueryUUID != null && countResult.getMatchCount() > 0
-                  && getQueryPanels().get(lastQueryUUID) != null)
-                {
-                  getQueryPanels().get(lastQueryUUID).getPaging().setPageSize(
-                    getQueries().get(uuid).getLimit(), false);
-                  getQueryPanels().get(lastQueryUUID).setCount(countResult.
-                    getMatchCount());
-                }
-              }
-            }
-            else
-            {
-              if (causeFinal.getResponse().getStatus() == 400)
-              {
-                Notification.show(
-                  "parsing error",
-                  causeFinal.getResponse().getEntity(String.class),
-                  Notification.Type.WARNING_MESSAGE);
-              }
-              else if (causeFinal.getResponse().getStatus() == 504) // gateway timeout
-              {
-                Notification.show(
-                  "Timeout: query execution took too long.",
-                  "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
-                  Notification.Type.WARNING_MESSAGE);
-              }
-              else
-              {
-                log.error("Unexpected exception:  " + causeFinal.
-                  getLocalizedMessage(), causeFinal);
-                ExceptionDialog.show(causeFinal);
-              }
-            } // end if cause != null
-
-            ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-          }
-        });
-      }
-    }
-  }
-
-  public void changeCtx(UUID queryID, int offset, int context,
-    VisualizerContextChanger visCtxChange, boolean left)
-  {
-
-    PagedResultQuery query;
-
-    if (queries.containsKey(queryID) && queryPanels.containsKey(queryID))
-    {
-      if (updatedQueries == null)
-      {
-        updatedQueries = new HashMap<UUID, Map<Integer, PagedResultQuery>>();
-      }
-
-      if (!updatedQueries.containsKey(queryID))
-      {
-        updatedQueries.put(queryID, new HashMap<Integer, PagedResultQuery>());
-      }
-
-      if (!updatedQueries.get(queryID).containsKey(offset))
-      {
-        query = (PagedResultQuery) queries.get(queryID).clone();
-        updatedQueries.get(queryID).put(offset, query);
-      }
-      else
-      {
-        query = updatedQueries.get(queryID).get(offset);
-      }
-
-      if (left)
-      {
-        query.setContextLeft(context);
-      }
-      else
-      {
-        query.setContextRight(context);
-      }
-
-      query.setOffset(offset);
-      query.setLimit(1);
-
-      if (matches != null && matches.getMatches() != null
-        && !matches.getMatches().isEmpty())
-      {
-        // The size is the match list corresponds to the page size of the 
-        // result view, thus we can make an index shift to the right position of 
-        // match in the match list via modulo of size of the match list.
-        List<Match> extractMatches = matches.getMatches();
-        Match m = extractMatches.get(offset % extractMatches.size());
-
-        PollControl.runInBackground(500, ui,
-          new SingleResultFetchJob(m, query,
-            visCtxChange));
-      }
-    }
-    else
-    {
-      log.warn("no query with {} found");
-      return;
-    }
-  }
-
-  public void setMatches(MatchGroup matches)
-  {
-    this.matches = matches;
-  }
 }

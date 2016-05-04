@@ -15,9 +15,9 @@
  */
 package annis.service.internal;
 
-import annis.service.objects.ImportJob;
-import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
+import annis.administration.ImportStatus;
+import annis.service.objects.ImportJob;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -27,19 +27,7 @@ import ch.qos.logback.core.AppenderBase;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Queues;
-import com.google.common.io.ByteStreams;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -115,7 +103,7 @@ public class ImportWorker extends Thread
   private void importSingleCorpusFile(ImportJob job)
   {
     currentJob.setStatus(ImportJob.Status.RUNNING);
-    corpusAdmin.sendStatusMail(currentJob.getStatusEmail(), 
+    corpusAdmin.sendImportStatusMail(currentJob.getStatusEmail(), 
           job.getCaption(), ImportJob.Status.RUNNING, null);
     
    
@@ -124,7 +112,7 @@ public class ImportWorker extends Thread
     // do the actual import
     if(job.getImportRootDirectory() != null)
     {
-      AdministrationDao.ImportStats importStats = corpusAdmin.importCorporaSave(
+      ImportStatus importStats = corpusAdmin.importCorporaSave(
         job.isOverwrite(), job.getAlias(), job.getStatusEmail(), true, job.getImportRootDirectory().getAbsolutePath());
     
       if (!importStats.getStatus())

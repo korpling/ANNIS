@@ -17,7 +17,7 @@ package annis.sqlgen;
 
 import annis.dao.objects.AnnotatedSpan;
 import annis.model.Annotation;
-import java.io.UnsupportedEncodingException;
+import com.google.common.base.Preconditions;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +42,7 @@ public class AnnotatedSpanExtractor implements RowMapper<AnnotatedSpan>
 
   private List<Annotation> extractAnnotations(Array array) throws SQLException
   {
-    List<Annotation> result = new ArrayList<Annotation>();
+    List<Annotation> result = new ArrayList<>();
 
     if (array != null)
     {
@@ -57,33 +56,21 @@ public class AnnotatedSpanExtractor implements RowMapper<AnnotatedSpan>
           String name = null;
           String value = null;
 
-          String[] split = line.split(":");
-          if (split.length > 2)
+          String[] split = line.split(":", 3);
+          
+          Preconditions.checkState(split.length == 3, 
+            "The annotation string for the matrix entry must contain a namespace, name and value");
+          
+          if (split.length == 3)
           {
             namespace = split[0];
             name = split[1];
             value = split[2];
           }
-          else if (split.length > 1)
+          
+          if("".equals(namespace))
           {
-            name = split[0];
-            value = split[1];
-          }
-          else
-          {
-            name = split[0];
-          }
-
-          if (value != null)
-          {
-            try
-            {
-              value = new String(Base64.decodeBase64(value), "UTF-8");
-            }
-            catch (UnsupportedEncodingException ex)
-            {
-              log.error(null, ex);
-            }
+            namespace = null;
           }
 
           result.add(new annis.model.Annotation(namespace, name, value));

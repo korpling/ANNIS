@@ -15,6 +15,11 @@
  */
 package annis.sqlgen;
 
+import annis.model.Join;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.model.QueryNode.TextMatching;
+import annis.ql.parser.QueryData;
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.isNotNull;
 import static annis.sqlgen.SqlConstraints.isNull;
@@ -26,39 +31,10 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-import static annis.test.TestUtils.size;
-import static annis.test.TestUtils.uniqueInt;
-import static annis.test.TestUtils.uniqueLong;
-import static annis.test.TestUtils.uniqueString;
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.hasItem;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-
-import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
-import annis.model.QueryNode.TextMatching;
-import annis.ql.parser.QueryData;
-import annis.sqlgen.annopool.ApAnnotationConditionProvider;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
-import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
@@ -70,6 +46,26 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
+import static annis.test.TestUtils.size;
+import static annis.test.TestUtils.uniqueInt;
+import static annis.test.TestUtils.uniqueLong;
+import static annis.test.TestUtils.uniqueString;
+import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import java.util.List;
+import java.util.Set;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import static org.junit.matchers.JUnitMatchers.hasItem;
+import org.junit.runner.RunWith;
+import static org.mockito.BDDMockito.given;
+import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 /*
  * FIXME: refactor tests, so they use the same condition constants everywhere
@@ -107,7 +103,7 @@ public class TestDefaultWhereClauseGenerator
 
     
     generator = new TestWhereClauseGenerator();
-    generator.setAnnoCondition(new ApAnnotationConditionProvider());
+    generator.setAnnoCondition(new AnnotationConditionProvider());
    
   }
   
@@ -147,7 +143,7 @@ public class TestDefaultWhereClauseGenerator
   private void checkEdgeConditions(String componentPredicate, String edgeType,
       String componentName, String... expected)
   {
-    List<String> expectedConditions = new ArrayList<String>();
+    List<String> expectedConditions = new ArrayList<>();
     expectedConditions.add(join("=", "_component23.id", "_component42.id"));
     if ("lhs".equals(componentPredicate) || "both".equals(componentPredicate))
     {
@@ -192,7 +188,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new Dominance(node42, 1));
     // then
     checkEdgeConditions(componentPredicate, "d", null,
-        join("=", "_rank23.pre", "_rank42.parent"));
+        join("=", "_rank23.id", "_rank42.parent"));
   }
 
   /**
@@ -207,7 +203,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new Dominance(node42, componentName, 1));
     // then
     checkEdgeConditions(componentPredicate, "d", componentName,
-        join("=", "_rank23.pre", "_rank42.parent"));
+        join("=", "_rank23.id", "_rank42.parent"));
   }
 
   /**
@@ -226,10 +222,10 @@ public class TestDefaultWhereClauseGenerator
         "value3", TextMatching.REGEXP_EQUAL));
     // then
     checkEdgeConditions(componentPredicate, "d", componentName,
-        join("=", "_rank23.pre", "_rank42.parent"));
+        join("=", "_rank23.id", "_rank42.parent"));
     checkWhereConditions(
         node42,
-        "_rank_annotation42.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"
+        "_rank_annotation42.qannotext ~ '^(namespace3:name3:(value3))$'"
     );
   }
 
@@ -293,15 +289,21 @@ public class TestDefaultWhereClauseGenerator
   {
     // given
     node23.addOutgoingJoin(new LeftDominance(node42));
+    
+    long corpusId = uniqueLong();
+    given(queryData.getCorpusList()).willReturn(asList(corpusId));
+    
     // then
     checkEdgeConditions(
-        componentPredicate,
-        "d",
-        null,
-        join("=", "_rank23.pre", "_rank42.parent"),
-        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.pre AND "
-      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
-      + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
+      componentPredicate,
+      "d",
+      null,
+      join("=", "_rank23.id", "_rank42.parent"),
+      "_node42.left_token IN (SELECT min(lrsub.left_token) FROM facts_"
+      + corpusId
+      + " AS lrsub WHERE parent=_rank23.id AND "
+      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(" + corpusId + ")"
+      + ")");
   }
 
   /**
@@ -313,15 +315,19 @@ public class TestDefaultWhereClauseGenerator
   {
     // given
     node23.addOutgoingJoin(new RightDominance(node42));
+    
+    long corpusId = uniqueLong();
+    given(queryData.getCorpusList()).willReturn(asList(corpusId));
+    
     // then
     checkEdgeConditions(
         componentPredicate,
         "d",
         null,
-        join("=", "_rank23.pre", "_rank42.parent"),
-        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.pre AND "
-      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
-      + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
+        join("=", "_rank23.id", "_rank42.parent"),
+        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM facts_" + corpusId + " AS lrsub WHERE parent=_rank23.id AND "
+      + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN("  + corpusId + ")"
+      + ")");
   }
 
   /**
@@ -336,7 +342,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new PointingRelation(node42, componentName, 1));
     // then
     checkEdgeConditions(componentPredicate, "p", componentName,
-        join("=", "_rank23.pre", "_rank42.parent"));
+        join("=", "_rank23.id", "_rank42.parent"));
   }
 
   /**
@@ -588,22 +594,6 @@ public class TestDefaultWhereClauseGenerator
     checkWhereConditions("_rank23.root IS TRUE");
   }
 
-  // WHERE condition for namespace
-  @Test
-  public void whereClauseForNodeNamespace()
-  {
-    node23.setNamespace("namespace");
-    checkWhereConditions(join("=", "_node23.namespace", "'namespace'"));
-  }
-
-  // WHERE condition for name
-  @Test
-  public void whereClauseForNodeName()
-  {
-    node23.setName("name");
-    checkWhereConditions(join("=", "_node23.name", "'name'"));
-  }
-
   // WHERE condition for spanned text (string)
   @Test
   public void whereClauseForNodeSpanString()
@@ -631,9 +621,9 @@ public class TestDefaultWhereClauseGenerator
         "value3", TextMatching.REGEXP_EQUAL));
     
     checkWhereConditions(
-      "_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'node'))",
-      "_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', 'value2', NULL, ARRAY[], 'node'))",
-      "_annotation23_3.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'node'))"
+      "_annotation23_1.qannotext LIKE 'namespace1:name1:%'",
+      "_annotation23_2.qannotext LIKE 'namespace2:name2:value2'",
+      "_annotation23_3.qannotext ~ '^(namespace3:name3:(value3))$'"
     );
   }
   
@@ -646,18 +636,18 @@ public class TestDefaultWhereClauseGenerator
     node42.addNodeAnnotation(new QueryAnnotation("namespace3", "name3"));
     node42.addNodeAnnotation(new QueryAnnotation("namespace4", "name4"));
     
-    // does not make any sense, but an simple enough condition :)
-    node23.addOutgoingJoin(new Identical(node42));
+    node23.addOutgoingJoin(new Precedence(node42, 1));
     
     
     checkWhereConditions(node23,
-      "_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'node'))",
-      "_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', NULL, NULL, ARRAY[], 'node'))",
-      "_node23.id = _node42.id"
+      "_annotation23_1.qannotext LIKE 'namespace1:name1:%'",
+      "_annotation23_2.qannotext LIKE 'namespace2:name2:%'",
+      "_node23.right_token = _node42.left_token - 1",
+      "_node23.text_ref = _node42.text_ref"
     );
     checkWhereConditions(node42,
-      "_annotation42_1.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, NULL, ARRAY[], 'node'))",
-      "_annotation42_2.anno_ref= ANY(getAnno('namespace4', 'name4', NULL, NULL, ARRAY[], 'node'))"
+      "_annotation42_1.qannotext LIKE 'namespace3:name3:%'",
+      "_annotation42_2.qannotext LIKE 'namespace4:name4:%'"
     );
   }
   
@@ -670,8 +660,10 @@ public class TestDefaultWhereClauseGenerator
         "value3", TextMatching.REGEXP_NOT_EQUAL));
     
     checkWhereConditions(
-      "_annotation23_1.anno_ref= ANY(getAnnoNot('namespace2', 'name2', 'value2', NULL, ARRAY[], 'node'))",
-      "_annotation23_2.anno_ref= ANY(getAnnoNot('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'node'))"
+      "_annotation23_1.qannotext NOT LIKE 'namespace2:name2:value2'",
+      "_annotation23_1.qannotext LIKE 'namespace2:name2:%'",
+      "_annotation23_2.qannotext !~ '^(namespace3:name3:(value3))$'",
+      "_annotation23_2.qannotext LIKE 'namespace3:name3:%'"
     );
   }
 
@@ -688,9 +680,9 @@ public class TestDefaultWhereClauseGenerator
         "value3", TextMatching.REGEXP_EQUAL));
     node42.addOutgoingJoin(j);
     checkWhereConditions(
-      "_rank_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'edge'))",
-      "_rank_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', 'value2', NULL, ARRAY[], 'edge'))",
-      "_rank_annotation23_3.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"
+      "_rank_annotation23_1.qannotext LIKE 'namespace1:name1:%'",
+      "_rank_annotation23_2.qannotext LIKE 'namespace2:name2:value2'",
+      "_rank_annotation23_3.qannotext ~ '^(namespace3:name3:(value3))$'"
     );
   }
   
@@ -707,8 +699,10 @@ public class TestDefaultWhereClauseGenerator
     node42.addOutgoingJoin(j);
     
     checkWhereConditions(
-      "_rank_annotation23_1.anno_ref= ANY(getAnnoNot('namespace2', 'name2', 'value2', NULL, ARRAY[], 'edge'))",
-      "_rank_annotation23_2.anno_ref= ANY(getAnnoNot('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"
+      "_rank_annotation23_1.qannotext NOT LIKE 'namespace2:name2:value2'",
+      "_rank_annotation23_1.qannotext LIKE 'namespace2:name2:%'",
+      "_rank_annotation23_2.qannotext !~ '^(namespace3:name3:(value3))$'",
+      "_rank_annotation23_2.qannotext LIKE 'namespace3:name3:%'"
     );
   }
 
@@ -719,7 +713,20 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new SameSpan(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.left_token", "_node42.left_token"),
-        join("=", "(_node23.right_token - _node23.left_token)", "(_node42.right_token - _node42.left_token)")
+        join("=", "_node23.right_token", "_node42.right_token"),
+        join("<>", "_node23.id", "_node42.id")
+    );
+  }
+  
+  @Test
+  public void whereClauseForNodeSameSpanOperatorHack()
+  {
+    generator.setHackOperatorSameSpan(true);
+    node23.addOutgoingJoin(new SameSpan(node42));
+    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
+        join("=", "_node23.left_token", "_node42.left_token"),
+        join("^=^", "_node23.right_token", "_node42.right_token"),
+        join("<>", "_node23.id", "_node42.id")
     );
   }
 
@@ -800,7 +807,7 @@ public class TestDefaultWhereClauseGenerator
 
   private void checkWhereConditions(QueryNode node, String... expected)
   {
-    List<QueryNode> alternative = new ArrayList<QueryNode>();
+    List<QueryNode> alternative = new ArrayList<>();
     alternative.add(node);
     Set<String> actual = generator.whereConditions(queryData, alternative, "");
     for (String item : expected)

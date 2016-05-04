@@ -15,9 +15,9 @@
  */
 package annis.gui.flatquerybuilder;
 
+import annis.libgui.Helper;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.OptionGroup;
-import com.vaadin.data.Item;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -46,7 +46,7 @@ public class MetaBox extends Panel implements Button.ClickListener
     btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     // metabox values for ebene
-    Collection<String> annonames = new TreeSet<String>();
+    Collection<String> annonames = new TreeSet<>();
     for(String a :sq.getAvailableMetaLevels(level))
     {
       annonames.add(a);
@@ -61,7 +61,7 @@ public class MetaBox extends Panel implements Button.ClickListener
     
     l.setMultiSelect(true);
     l.setNullSelectionAllowed(true); 
-    l.addStyleName("corpus-font-force");
+    l.addStyleName(Helper.CORPUS_FONT_FORCE);
     l.setImmediate(true);
     
     tcs = l;

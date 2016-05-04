@@ -2,7 +2,6 @@ package annis.dao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 public class DocumentNameMapRow implements ParameterizedRowMapper<String>

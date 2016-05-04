@@ -15,17 +15,20 @@
  */
 package annis.libgui.media;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import org.eclipse.emf.common.util.EList;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SGraph;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.SaltUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for getting time annotations on {@link SSpan} from
@@ -34,6 +37,8 @@ import org.eclipse.emf.common.util.EList;
  */
 public class TimeHelper
 {
+  
+  private final static Logger log = LoggerFactory.getLogger(TimeHelper.class);
 
   /**
    * Get start and end time from the overlapped {@link SToken}. The minimum
@@ -45,48 +50,56 @@ public class TimeHelper
    */
   public static double[] getOverlappedTime(SNode node)
   {
-    SGraph graph = node.getSGraph();
+    SGraph graph = node.getGraph();
 
-    final List<Double> startTimes = new LinkedList<Double>();
-    final List<Double> endTimes = new  LinkedList<Double>();
+    final List<Double> startTimes = new LinkedList<>();
+    final List<Double> endTimes = new  LinkedList<>();
     
-    List<SToken> token = new LinkedList<SToken>();
+    List<SToken> token = new LinkedList<>();
     if(node instanceof SToken)
     {
       token.add((SToken) node);
     }
     else
     {
-      EList<Edge> outEdges = graph.getOutEdges(node.getSId());
-      if (outEdges != null)
+      List<SRelation<SNode,SNode>> outRelations = graph.getOutRelations(node.getId());
+      if (outRelations != null)
       {
-        for (Edge e : outEdges)
+        for (SRelation<? extends SNode, ? extends SNode> e : outRelations)
         {
           if (e instanceof SSpanningRelation)
           {
-            SToken tok = ((SSpanningRelation) e).getSToken();
+            SToken tok = ((SSpanningRelation) e).getTarget();
             token.add(tok);
           }
         }
-      } // end for each out edges
+      } // end for each out relations
     }
 
     for (SToken tok : token)
     {
 
-      SAnnotation anno = tok.getSAnnotation("annis::time");
-      if (anno != null && !anno.getSValueSTEXT().matches(
-        "\\-[0-9]*(\\.[0-9]*)?"))
+      SAnnotation anno = tok.getAnnotation(SaltUtil.createQName("annis", "time"));
+      if (anno != null
+        && anno.getValue_STEXT() != null
+        && !anno.getValue_STEXT().isEmpty() 
+        && !anno.getValue_STEXT().matches("\\-[0-9]*(\\.[0-9]*)?"))
       {
-        String[] split = anno.getSValueSTEXT().split("-");
-        if (split.length == 1)
+        try
         {
-          startTimes.add(Double.parseDouble(split[0]));
+          String[] split = anno.getValue_STEXT().split("-");
+          if (split.length == 1)
+          {
+            startTimes.add(Double.parseDouble(split[0]));
+          }
+          if (split.length == 2)
+          {
+            startTimes.add(Double.parseDouble(split[0]));
+            endTimes.add(Double.parseDouble(split[1]));
+          }
         }
-        if (split.length == 2)
-        {
-          startTimes.add(Double.parseDouble(split[0]));
-          endTimes.add(Double.parseDouble(split[1]));
+        catch(NumberFormatException ex) {
+          log.debug("Invalid time annotation", ex);
         }
       }
 

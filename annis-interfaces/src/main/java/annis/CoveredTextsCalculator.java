@@ -15,27 +15,26 @@
  */
 package annis;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.eclipse.emf.common.util.BasicEList;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.STextualRelation;
+import org.corpus_tools.salt.core.GraphTraverseHandler;
+import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
 
 /**
  * Traverses the Salt graph and gets the covered {@link STextualDS} for a list
  * of nodes. 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class CoveredTextsCalculator implements SGraphTraverseHandler
+public class CoveredTextsCalculator implements GraphTraverseHandler
 {
   private Set<STextualDS> texts;
 
@@ -45,15 +44,15 @@ public class CoveredTextsCalculator implements SGraphTraverseHandler
     texts = new LinkedHashSet<STextualDS>();
     if (startNodes.size() > 0)
     {
-      graph.traverse(new BasicEList<SNode>(startNodes),
+      graph.traverse(new ArrayList<SNode>(startNodes),
         GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredTextsCalculator",
-        (SGraphTraverseHandler) this, true);
+        (GraphTraverseHandler) this, true);
     }
   }
 
   @Override
   public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-    SNode currNode, SRelation edge, SNode fromNode, long order)
+    SNode currNode, SRelation relation, SNode fromNode, long order)
   {
     if (currNode instanceof STextualDS)
     {
@@ -63,17 +62,17 @@ public class CoveredTextsCalculator implements SGraphTraverseHandler
 
   @Override
   public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-    SNode currNode, SRelation edge, SNode fromNode, long order)
+    SNode currNode, SRelation relation, SNode fromNode, long order)
   {
   }
 
   @Override
   public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-    String traversalId, SRelation edge, SNode currNode, long order)
+    String traversalId, SRelation relation, SNode currNode, long order)
   {
-    if (edge == null || edge instanceof SDominanceRelation ||
-      edge instanceof SSpanningRelation ||
-      edge instanceof STextualRelation)
+    if (relation == null || relation instanceof SDominanceRelation ||
+      relation instanceof SSpanningRelation ||
+      relation instanceof STextualRelation)
     {
       return true;
     }

@@ -49,7 +49,8 @@ public class TestAnnisAdminRunner {
 	@Test
 	public void initializeDatabase() {
 		run("init -h host --port 5432 -d database -u user -p password");
-		verify(administration).initializeDatabase("host", "5432", "database", "user", "password", "postgres", "postgres", null, false);
+		verify(administration).initializeDatabase("host", "5432", "database", "user", 
+      "password", "postgres", "postgres", null, false, "public");
 	}
 
 	@Test

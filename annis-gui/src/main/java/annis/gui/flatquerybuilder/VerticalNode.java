@@ -53,7 +53,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     v.setSpacing(true);
     vframe = new VerticalLayout();
     vframe.setSpacing(true);
-    sboxes = new ArrayList<SearchBox>(); 
+    sboxes = new ArrayList<>(); 
     btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     SearchBox sb = new SearchBox(ebene, sq, this, isRegex, negativeSearch);

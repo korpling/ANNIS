@@ -20,7 +20,7 @@ window.annis_gui_components_OnLoadCallbackExtension = function() {
 
   var timeoutID;
   
-  this.execCallback = function() {
+  this.recallCallback = function() {
     if(timeoutID) {
       //console.debug("clearing timeout " + timeoutID);
       window.clearTimeout(timeoutID);
@@ -30,12 +30,20 @@ window.annis_gui_components_OnLoadCallbackExtension = function() {
     component.loaded();
     
   };
+  
+  var alreadyLoaded = false;
 
-  $(document).ready(this.execCallback);
+  $(document).ready(function() {
+    if(!alreadyLoaded)
+    {
+      component.loaded();
+    }
+    alreadyLoaded = true;
+   });
 
   this.requestRecall = function(delay) {
     if(!timeoutID) {
-      timeoutID = window.setTimeout(this.execCallback, delay);
+      timeoutID = window.setTimeout(this.recallCallback, delay);
       //console.debug("Setted timeout " + timeoutID);
     }
   };

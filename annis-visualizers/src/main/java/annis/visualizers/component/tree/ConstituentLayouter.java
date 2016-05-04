@@ -16,16 +16,22 @@
 package annis.visualizers.component.tree;
 
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.component.tree.GraphicsBackend.Alignment;
 import annis.model.AnnisNode;
 import annis.model.Edge;
+import annis.visualizers.component.tree.GraphicsBackend.Alignment;
+import com.google.common.base.Preconditions;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.util.Pair;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class ConstituentLayouter<T extends GraphicsItem> {
@@ -72,7 +78,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		}
 		
 		public Point2D getDominanceConnector(AnnisNode node, Rectangle2D bounds) {
-			if (node.isToken()) {
+			if (AnnisGraphTools.isTerminal(node, input)) {
 				return new Point2D.Double(bounds.getCenterX(), (orientation == VerticalOrientation.TOP_ROOT) ? bounds.getMinY() : bounds.getMaxY()); 
 			} else {
 				return new Point2D.Double(bounds.getCenterX(), bounds.getCenterY());
@@ -139,12 +145,12 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 	}
 
 	private NodeStructureData fillHeightMap(AnnisNode node, int height, NodeStructureData parent) {
-		if (node.isToken()) {
+		if (AnnisGraphTools.isTerminal(node, input)) {
 			NodeStructureData structureData = new NodeStructureData(parent);
 			structureData.setChildHeight(0);
 			structureData.setTokenArity(1);
-			structureData.setLeftCorner(node.getTokenIndex().longValue());
-			structureData.setRightCorner(node.getTokenIndex().longValue());
+			structureData.setLeftCorner(node.getLeftToken());
+			structureData.setRightCorner(node.getLeftToken());
 			dataMap.put(node, structureData);
 			return structureData;
 		} else {
@@ -164,7 +170,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 				rightCorner = Math.max(childData.getRightCorner(), rightCorner);
 				tokenArity += childData.getTokenArity();
 				arity += 1;
-				if (n.isToken()) {
+				if (AnnisGraphTools.isTerminal(n, input)) {
 					hasTokenChildren = true;
 					leftmostImmediate = Math.min(leftmostImmediate, childData.getLeftCorner());
 					rightmostImmediate = Math.max(rightmostImmediate, childData.getLeftCorner());
@@ -212,7 +218,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		List<NodeStructureData> allNonterminals = new ArrayList<NodeStructureData>();
 		boolean allContinuous = true;
 		for (AnnisNode n: this.graph.getVertices()) {
-			if (!n.isToken()) {
+			if (!AnnisGraphTools.isTerminal(n, input)) {
 				allNonterminals.add(dataMap.get(n));
 				allContinuous &= dataMap.get(n).isContinuous();
 			}
@@ -304,15 +310,18 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 	}
 
 	private double computeTreeHeight() {
-		return (dataMap.get(root).getHeight()) * styler.getHeightStep() + styler.getFont(TOKEN_NODE).getLineHeight() / 2;
+		return (dataMap.get(root).getHeight()) * styler.getHeightStep() + styler.getFont(TOKEN_NODE, input).getLineHeight() / 2;
 	}
 	
-	private List<AnnisNode> getTokens(LayoutOptions options) {
+	private List<AnnisNode> getTokens(LayoutOptions options) 
+  {
 		List<AnnisNode> tokens = new ArrayList<AnnisNode>();
-		for (AnnisNode n: graph.getVertices()) {
-			if (n.isToken()) {
-				tokens.add(n);
-			}
+    for (AnnisNode n: graph.getVertices()) 
+    {
+      if(AnnisGraphTools.isTerminal(n, input))
+      {
+        tokens.add(n);
+      }
 		}
 		Collections.sort(tokens, options.getHorizontalOrientation().getComparator());					
 		return tokens;
@@ -324,7 +333,8 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		boolean first = true;
 		
 		List<AnnisNode> leaves = getTokens(options);
-		GraphicsBackend.Font tokenFont = styler.getFont(leaves.get(0));
+    Preconditions.checkState(leaves.isEmpty() == false, "No terminal nodes found");
+		GraphicsBackend.Font tokenFont = styler.getFont(leaves.get(0), input);
 		
 		for (AnnisNode token: leaves) {
 			if (first) {
@@ -344,10 +354,10 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		treeLayout.setParentItem(backend.group());
 		if (options.getOrientation() == VerticalOrientation.TOP_ROOT) {
 			treeLayout.setNtStart(computeTreeHeight());
-			treeLayout.setBaseline(treeLayout.getNtStart() + styler.getFont(TOKEN_NODE).getLineHeight());
+			treeLayout.setBaseline(treeLayout.getNtStart() + styler.getFont(TOKEN_NODE, input).getLineHeight());
 		} else {
-			treeLayout.setBaseline(styler.getFont(TOKEN_NODE).getLineHeight());
-			treeLayout.setNtStart(styler.getFont(TOKEN_NODE).getLineHeight());
+			treeLayout.setBaseline(styler.getFont(TOKEN_NODE, input).getLineHeight());
+			treeLayout.setNtStart(styler.getFont(TOKEN_NODE, input).getLineHeight());
 		}
 		calculateNodePosition(root, treeLayout, options);
 		Edge e = getOutgoingEdges(root).get(0);
@@ -366,7 +376,9 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 		for (Edge e: getOutgoingEdges(current)) {
 			AnnisNode child = graph.getOpposite(current, e);
 			Point2D childPos;
-			if (child.isToken()) {
+      
+      if (AnnisGraphTools.isTerminal(child, input)) 
+      {
 				childPos = addTerminalNode(child, treeLayout);
 			} else {
 				childPos = calculateNodePosition(child, treeLayout, options);
@@ -395,7 +407,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 
 		GraphicsItem label = backend.makeLabel(
 				labeler.getLabel(current, input), new Point2D.Double(xCenter, y), 
-				styler.getFont(current), styler.getTextBrush(current, input), 
+				styler.getFont(current, input), styler.getTextBrush(current, input), 
         Alignment.CENTERED, styler.getShape(current, input));
 		treeLayout.addNodeRect(current, label.getBounds());
 		
@@ -407,7 +419,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 
 	private Point2D addTerminalNode(AnnisNode terminal, TreeLayoutData treeLayout) {
 		GraphicsItem label = backend.makeLabel(
-				labeler.getLabel(terminal, input), treeLayout.getTokenPosition(terminal), styler.getFont(terminal), 
+				labeler.getLabel(terminal, input), treeLayout.getTokenPosition(terminal), styler.getFont(terminal, input), 
 				styler.getTextBrush(terminal, input), Alignment.NONE, styler.getShape(terminal, input));
 		label.setParentItem(treeLayout.getParentItem());
 		treeLayout.addNodeRect(terminal, label.getBounds());

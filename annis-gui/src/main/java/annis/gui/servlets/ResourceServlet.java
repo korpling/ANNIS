@@ -16,10 +16,18 @@
 package annis.gui.servlets;
 
 import annis.libgui.visualizers.ResourcePlugin;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -122,11 +130,10 @@ public class ResourceServlet extends HttpServlet implements Plugin
             response.setCharacterEncoding("UTF-8");
           }
           OutputStream bufferedOut = new BufferedOutputStream(outStream);
-          InputStream resourceInStream = new BufferedInputStream(resource.openStream());
-
           try
+          (InputStream resourceInStream = new BufferedInputStream(resource.openStream())) 
           {
-            int v = -1;
+            int v;
             while((v = resourceInStream.read()) != -1)
             {
               bufferedOut.write(v);
@@ -134,7 +141,6 @@ public class ResourceServlet extends HttpServlet implements Plugin
           }
           finally
           {
-            resourceInStream.close();
             bufferedOut.flush();
             outStream.flush();
           }

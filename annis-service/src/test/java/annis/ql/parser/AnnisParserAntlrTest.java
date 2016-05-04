@@ -21,10 +21,11 @@ import java.util.LinkedList;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -98,7 +99,7 @@ public class AnnisParserAntlrTest
   public void testParse()
   {
     System.out.println("parse " + aql);
-    List<Long> corpusList = new LinkedList<Long>();
+    List<Long> corpusList = new LinkedList<>();
     corpusList.add(1234l);
     
     AnnisParserAntlr instance = new AnnisParserAntlr();

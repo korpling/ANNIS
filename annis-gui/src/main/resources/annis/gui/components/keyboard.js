@@ -1383,8 +1383,16 @@ var VKI_attach, VKI_show, VKI_close;
             span.appendChild(document.createTextNode(this.VKI_i18n['07']));
             span.title = this.VKI_i18n['08'];
           VKI_addListener(span, 'click', function() {
-            self.VKI_target.value = "";
-            self.VKI_target.focus();
+            if(self.VKI_target.CodeMirror)
+            {
+              self.VKI_target.CodeMirror.setValue("");
+              self.VKI_target.CodeMirror.focus();
+            }
+            else
+            {
+              self.VKI_target.value = "";
+              self.VKI_target.focus();
+            }
             return false;
           }, false);
           VKI_mouseEvents(span);
@@ -1573,6 +1581,8 @@ var VKI_attach, VKI_show, VKI_close;
                         } catch(e) { self.VKI_target.range = document.selection.createRange(); }
                         if (!self.VKI_target.range.text.length) self.VKI_target.range.moveStart('character', -1);
                         self.VKI_target.range.text = "";
+                      } else if(self.VKI_target.CodeMirror) {
+                        self.VKI_target.CodeMirror.execCommand("delCharBefore");
                       } else self.VKI_target.value = self.VKI_target.value.substr(0, self.VKI_target.value.length - 1);
                       if (self.VKI_shift) self.VKI_modify("Shift");
                       if (self.VKI_altgr) self.VKI_modify("AltGr");
@@ -1582,7 +1592,12 @@ var VKI_attach, VKI_show, VKI_close;
                     break;
                   case "Enter":
                     VKI_addListener(td, 'click', function() {
-                      if (self.VKI_target.nodeName != "TEXTAREA") {
+                      if(self.VKI_target.CodeMirror) {
+                        // don't try to submit a for code mirror "textarea"
+                        self.VKI_target.CodeMirror.execCommand("newlineAndIndent");
+                        return true;
+                      }
+                      else if (self.VKI_target.nodeName != "TEXTAREA") {
                         if (self.VKI_enterSubmit && self.VKI_target.form) {
                           for (var z = 0, subm = false; z < self.VKI_target.form.elements.length; z++)
                             if (self.VKI_target.form.elements[z].type == "submit") subm = true;
@@ -1692,28 +1707,40 @@ var VKI_attach, VKI_show, VKI_close;
    */
   this.VKI_insert = function(text) {
     this.VKI_target.focus();
-    if (this.VKI_target.maxLength) this.VKI_target.maxlength = this.VKI_target.maxLength;
-    if (typeof this.VKI_target.maxlength == "undefined" ||
-        this.VKI_target.maxlength < 0 ||
-        this.VKI_target.value.length < this.VKI_target.maxlength) {
-      if (this.VKI_target.setSelectionRange && !this.VKI_target.readOnly && !this.VKI_isIE) {
-        var rng = [this.VKI_target.selectionStart, this.VKI_target.selectionEnd];
-        this.VKI_target.value = this.VKI_target.value.substr(0, rng[0]) + text + this.VKI_target.value.substr(rng[1]);
-        if (text == "\n" && this.VKI_isOpera) rng[0]++;
-        this.VKI_target.setSelectionRange(rng[0] + text.length, rng[0] + text.length);
-      } else if (this.VKI_target.createTextRange && !this.VKI_target.readOnly) {
-        try {
+    
+    if(this.VKI_target.CodeMirror)
+    {
+      // we don't have a real textarea. but a CodeMirror code editor
+      var cm = this.VKI_target.CodeMirror;
+      cm.focus();
+      cm.getDoc().replaceRange(text, cm.getCursor());
+     // cm.focus();
+    }
+    else
+    {
+      if (this.VKI_target.maxLength) this.VKI_target.maxlength = this.VKI_target.maxLength;
+      if (typeof this.VKI_target.maxlength == "undefined" ||
+          this.VKI_target.maxlength < 0 ||
+          this.VKI_target.value.length < this.VKI_target.maxlength) {
+        if (this.VKI_target.setSelectionRange && !this.VKI_target.readOnly && !this.VKI_isIE) {
+          var rng = [this.VKI_target.selectionStart, this.VKI_target.selectionEnd];
+          this.VKI_target.value = this.VKI_target.value.substr(0, rng[0]) + text + this.VKI_target.value.substr(rng[1]);
+          if (text == "\n" && this.VKI_isOpera) rng[0]++;
+          this.VKI_target.setSelectionRange(rng[0] + text.length, rng[0] + text.length);
+        } else if (this.VKI_target.createTextRange && !this.VKI_target.readOnly) {
+          try {
+            this.VKI_target.range.select();
+          } catch(e) { this.VKI_target.range = document.selection.createRange(); }
+          this.VKI_target.range.text = text;
+          this.VKI_target.range.collapse(true);
           this.VKI_target.range.select();
-        } catch(e) { this.VKI_target.range = document.selection.createRange(); }
-        this.VKI_target.range.text = text;
-        this.VKI_target.range.collapse(true);
+        } else this.VKI_target.value += text;
+        if (this.VKI_shift) this.VKI_modify("Shift");
+        if (this.VKI_altgr) this.VKI_modify("AltGr");
+        this.VKI_target.focus();
+      } else if (this.VKI_target.createTextRange && this.VKI_target.range)
         this.VKI_target.range.select();
-      } else this.VKI_target.value += text;
-      if (this.VKI_shift) this.VKI_modify("Shift");
-      if (this.VKI_altgr) this.VKI_modify("AltGr");
-      this.VKI_target.focus();
-    } else if (this.VKI_target.createTextRange && this.VKI_target.range)
-      this.VKI_target.range.select();
+    }
   };
 
 

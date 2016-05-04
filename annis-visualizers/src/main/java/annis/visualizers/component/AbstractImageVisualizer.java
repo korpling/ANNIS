@@ -55,7 +55,7 @@ public abstract class AbstractImageVisualizer extends AbstractVisualizer<ImagePa
 
     Embedded emb = new Embedded("", resource);
     emb.setMimeType(getContentType());
-    emb.setSizeFull();
+    emb.setSizeUndefined();
     emb.setStandby("loading image");
     emb.setAlternateText("Visualization of the result");
     

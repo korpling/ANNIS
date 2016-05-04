@@ -15,14 +15,11 @@
  */
 package annis.model;
 
-import annis.model.QueryNode;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertThat;
-
-import org.junit.Test;
-
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Sibling;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
 public class TestSibling {
 

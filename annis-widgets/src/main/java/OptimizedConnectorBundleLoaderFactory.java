@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import java.util.HashSet;
-import java.util.Set;
 import com.google.gwt.core.ext.typeinfo.JClassType;
 import com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory;
 import com.vaadin.shared.ui.Connect.LoadStyle;
+import java.util.HashSet;
+import java.util.Set;
 
 public class OptimizedConnectorBundleLoaderFactory extends
   ConnectorBundleLoaderFactory
 {
 
-  private Set<String> eagerConnectors = new HashSet<String>();
+  private Set<String> eagerConnectors = new HashSet<>();
 
   
   {

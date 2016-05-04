@@ -15,12 +15,10 @@
  */
 package annis.gui.querybuilder;
 
-import annis.libgui.Helper;
 import annis.gui.QueryController;
-import annis.gui.controlpanel.ControlPanel;
-import annis.gui.model.Query;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
+import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -62,14 +60,14 @@ public class TigerQueryBuilderCanvas extends Panel
   private AbsoluteDropHandler handler;
   private int number = 0;
   private NodeWindow preparedEdgeSource = null;
-  private QueryController controller;
+  private final QueryController controller;
 
   public TigerQueryBuilderCanvas(QueryController controller)
   {
     this.controller = controller;
 
-    nodes = new HashMap<NodeWindow, GripDragComponent>();
-    edges = new ArrayList<EdgeWindow>();
+    nodes = new HashMap<>();
+    edges = new ArrayList<>();
 
     setSizeFull();
     setImmediate(true);
@@ -82,14 +80,14 @@ public class TigerQueryBuilderCanvas extends Panel
     area.addStyleName("no-box-drag-hints");
 
     canvas = new SimpleCanvas();
-    canvas.setWidth("2000px");
-    canvas.setHeight("2000px");
+    canvas.setSizeFull();
     canvas.addStyleName("tigerquery-builder-canvas");
 
     handler = new AbsoluteDropHandler(this, area);
 
     DragAndDropWrapper areaPane = new DragAndDropWrapper(area);
-    areaPane.setSizeFull();
+    areaPane.setWidth("2000px");
+    areaPane.setHeight("2000px");
     areaPane.setDropHandler(handler);
 
     area.addComponent(canvas, "top:0px;left:0px");
@@ -103,23 +101,23 @@ public class TigerQueryBuilderCanvas extends Panel
 
   public void updateQuery()
   {
-    controller.setQuery(new Query(getAQLQuery(), null));
+    controller.getState().getAql().setValue(getAQLQuery());
   }
 
   public Set<String> getAvailableAnnotationNames()
   {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
 
     WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
-    Set<String> corpusSelection = controller.getSelectedCorpora();
+    Set<String> corpusSelection = controller.getState().getSelectedCorpora().getValue();
 
-    if (service != null)
+    if (service != null && corpusSelection != null)
     {
       try
       {
-        List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
+        List<AnnisAttribute> atts = new LinkedList<>();
         
         for(String corpus : corpusSelection)
         {
@@ -206,7 +204,7 @@ public class TigerQueryBuilderCanvas extends Panel
   private List<Line2D> createArrow(double x, double y, double direction,
     double arrowLength)
   {
-    LinkedList<Line2D> result = new LinkedList<Line2D>();
+    LinkedList<Line2D> result = new LinkedList<>();
 
 
     double dir1 = direction + Math.PI / 8.0;
@@ -296,7 +294,7 @@ public class TigerQueryBuilderCanvas extends Panel
 
   public void deleteNode(NodeWindow n)
   {
-    LinkedList<EdgeWindow> edgesToRemove = new LinkedList<EdgeWindow>();
+    LinkedList<EdgeWindow> edgesToRemove = new LinkedList<>();
     for (EdgeWindow e : edges)
     {
       if (e.getSource() == n || e.getTarget() == n)
@@ -390,7 +388,7 @@ public class TigerQueryBuilderCanvas extends Panel
     StringBuilder query = new StringBuilder();
     StringBuffer nodeIdentityOperations = new StringBuffer();
     Map<NodeWindow, Integer> nodeComponentMap =
-      new HashMap<NodeWindow, Integer>();
+      new HashMap<>();
 
 
     //creating node definitions
@@ -426,8 +424,14 @@ public class TigerQueryBuilderCanvas extends Panel
           {
             if (operator.equals("!="))
             {
-              prefix = "tok" + c.getName()
-                + operator;
+              if(c.getName().trim().isEmpty())
+              {
+                prefix = "tok" + c.getName() + operator;
+              }
+              else
+              {
+                prefix = c.getName() + operator;
+              }
             }
           }
           else

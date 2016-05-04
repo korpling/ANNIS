@@ -15,14 +15,12 @@
  */
 package annis.sqlgen;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.Assert;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
 /**
  * Abstract base class for a SQL statement which coalesces multiple alternatives
@@ -40,7 +38,7 @@ import annis.ql.parser.QueryData;
  *
  * @param <T> Type into which the JDBC result set is transformed.
  */
-public abstract class AbstractUnionSqlGenerator<T> extends AbstractSqlGenerator<T>
+public abstract class AbstractUnionSqlGenerator extends AbstractSqlGenerator
 {
 
   // corpusList, documents
@@ -51,8 +49,7 @@ public abstract class AbstractUnionSqlGenerator<T> extends AbstractSqlGenerator<
 
     StringBuffer sb = new StringBuffer();
 
-    sb.append(indent);
-    List<String> alternatives = new ArrayList<String>();
+    List<String> alternatives = new ArrayList<>();
     for (List<QueryNode> alternative : queryData.getAlternatives())
     {
       alternatives.add(createSqlForAlternative(queryData, alternative, indent));

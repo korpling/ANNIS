@@ -15,15 +15,12 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryNode;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-
 import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.HashBag;
-
-import annis.model.QueryNode;
-import java.util.List;
 
 
 public class TableAccessStrategy {
@@ -52,8 +49,8 @@ public class TableAccessStrategy {
   private Map<String, Boolean> tablePartitioned;
 	
 	public TableAccessStrategy() {
-		this.tableAliases = new HashMap<String, String>();
-		this.columnAliases = new HashMap<String, Map<String,String>>();
+		this.tableAliases = new HashMap<>();
+		this.columnAliases = new HashMap<>();
 		
 	}
 	
@@ -65,9 +62,9 @@ public class TableAccessStrategy {
   /** Copy constructor */
   public TableAccessStrategy(TableAccessStrategy tas)
   {
-    this.tableAliases = new HashMap<String, String>(tas.getTableAliases());
-    this.columnAliases = new HashMap<String, Map<String, String>>(tas.getColumnAliases());
-    this.tablePartitioned = new HashMap<String, Boolean>();
+    this.tableAliases = new HashMap<>(tas.getTableAliases());
+    this.columnAliases = new HashMap<>(tas.getColumnAliases());
+    this.tablePartitioned = new HashMap<>();
     this.node = tas.getNode();
   }
 
@@ -289,14 +286,14 @@ public class TableAccessStrategy {
 	}
   
   public static boolean usesComponentTable(QueryNode node) {
-		return node == null || node.isPartOfEdge() || usesEdgeAnnotationTable(node);
+		return node == null || node.isPartOfEdge() || useEdgeAnnotationTable(node);
 	}
 	
 	public boolean usesEdgeAnnotationTable() {
 		return node == null || ! node.getEdgeAnnotations().isEmpty();
 	}
   
-  public static boolean usesEdgeAnnotationTable(QueryNode node) {
+  public static boolean useEdgeAnnotationTable(QueryNode node) {
 		return node == null || ! node.getEdgeAnnotations().isEmpty();
 	}
 	

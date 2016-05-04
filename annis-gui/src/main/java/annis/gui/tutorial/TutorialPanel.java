@@ -15,10 +15,15 @@
  */
 package annis.gui.tutorial;
 
-import com.vaadin.server.ExternalResource;
+import annis.gui.components.NavigateableSinglePage;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -26,17 +31,51 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class TutorialPanel extends VerticalLayout
 {
-  private BrowserFrame embedded;
+
+  private static final Logger log = LoggerFactory.getLogger(TutorialPanel.class);
+
+  private NavigateableSinglePage embedded;
+
   public TutorialPanel()
   {
-    setSizeFull();   
+    setSizeFull();
     
-    embedded = new BrowserFrame();
-    embedded.setSizeFull();
-    addComponent(embedded);
 
-    String contextPath = VaadinService.getCurrentRequest().getContextPath();
-    embedded.setSource(new ExternalResource(contextPath + "/VAADIN/tutorial/index.html"));
+    String localBasePath = VaadinService.getCurrent()
+                  .getBaseDirectory().getAbsolutePath();
+    URI appURI = UI.getCurrent().getPage().getLocation();
+    URI tutorialURI;
     
+    String relativeFile = "/VAADIN/tutorial/index.html";
+    
+    try
+    {
+      String oldPath = VaadinService.getCurrentRequest().getContextPath();
+      if (oldPath == null)
+      {
+        oldPath = "";
+      }
+      if (oldPath.endsWith("/"))
+      {
+        oldPath = oldPath.substring(0, oldPath.length() - 1);
+      }
+      tutorialURI = new URI(appURI.getScheme(),
+        appURI.getUserInfo(),
+        appURI.getHost(),
+        appURI.getPort(),
+        oldPath + relativeFile,
+        null,
+        null);
+      embedded = new NavigateableSinglePage(new File(localBasePath + relativeFile), 
+        tutorialURI);
+      embedded.setSizeFull();
+      addComponent(embedded);
+
+    }
+    catch (URISyntaxException ex)
+    {
+      log.error("Invalid tutorial URI", ex);
+    }
+
   }
 }

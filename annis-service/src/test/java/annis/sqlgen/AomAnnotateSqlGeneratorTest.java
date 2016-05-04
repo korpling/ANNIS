@@ -1,27 +1,24 @@
 package annis.sqlgen;
 
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.model.Edge;
+import annis.model.Edge.EdgeType;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import static annis.test.TestUtils.uniqueInt;
 import static annis.test.TestUtils.uniqueString;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.BDDMockito.given;
 import org.mockito.Mock;
-
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.Edge;
-import annis.model.Edge.EdgeType;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class AomAnnotateSqlGeneratorTest
 {
@@ -75,7 +72,7 @@ public class AomAnnotateSqlGeneratorTest
     // given
     stubNodeResultSet();
     // when
-    AnnisNode actual = generator.mapNode(resultSet, tableAccessStrategy);
+    AnnisNode actual = generator.mapNode(resultSet, tableAccessStrategy, null);
     // then
     AnnisNode expected = new AnnisNode(ID, CORPUS_REF, TEXT_REF, LEFT, RIGHT, NODE_NAMESPACE, NODE_NAME, TOKEN_INDEX, SPAN, LEFT_TOKEN, RIGHT_TOKEN);
     assertThat(actual, is(expected));
@@ -88,7 +85,7 @@ public class AomAnnotateSqlGeneratorTest
     stubNodeResultSet();
     given(resultSet.wasNull()).willReturn(true);
     // when
-    AnnisNode node = generator.mapNode(resultSet, tableAccessStrategy);
+    AnnisNode node = generator.mapNode(resultSet, tableAccessStrategy, null);
     // then
     assertThat(node.isToken(), is(false));
   }
@@ -100,7 +97,7 @@ public class AomAnnotateSqlGeneratorTest
     stubNodeResultSet();
     given(resultSet.wasNull()).willReturn(false);
     // when
-    AnnisNode node = generator.mapNode(resultSet, tableAccessStrategy);
+    AnnisNode node = generator.mapNode(resultSet, tableAccessStrategy, null);
     // then
     assertThat(node.isToken(), is(true));
   }

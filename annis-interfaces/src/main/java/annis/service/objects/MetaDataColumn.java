@@ -17,7 +17,6 @@
 package annis.service.objects;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -66,4 +65,5 @@ public class MetaDataColumn implements Serializable {
   {
     this.name = name;
   }
+  
 }

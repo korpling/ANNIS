@@ -31,10 +31,13 @@ OR:'|';
 EQ_VAL:'==';
 EQ: '=';
 NEQ:'!=';
-DOMINANCE:'>';
-POINTING:'->';
+NAMED_DOMINANCE: DOMINANCE ID;
+DOMINANCE: '>';
+POINTING:'->' ID;
+NAMED_PRECEDENCE: PRECEDENCE ID;
 PRECEDENCE:'.';
-TEST:'%';
+NAMED_NEAR: NEAR ID;
+NEAR:'^';
 IDENT_COV:'_=_';
 INCLUSION:'_i_';
 OVERLAP:'_o_';
@@ -45,7 +48,7 @@ RIGHT_OVERLAP:'_or_';
 LEFT_CHILD:'@l';
 RIGHT_CHILD:'@r';
 COMMON_PARENT:'$';
-IDENTITY:'_id_';
+IDENTITY:'_ident_';
 ROOT:':root';
 ARITY:':arity';
 TOKEN_ARITY:':tokenarity';
@@ -59,20 +62,20 @@ COLON:':';
 DOUBLECOLON:'::';
 
 
-WS  :   ( ' ' | '\t' | '\r' | '\n' )+ -> skip ;  
+WS  :   [ \t\r\n]+ -> skip;  
 
 VAR_DEF
-	:	('a'..'z'|'A'..'Z') ( '0' .. '9'|'a'..'z'|'A'..'Z')* '#'
+	:	[a-zA-Z] [0-9a-zA-Z]* '#'
 	;
 
 REF
-	:	'#' ( '0' .. '9'|'a'..'z'|'A'..'Z')+
+	:	'#' [0-9a-zA-Z]+
 	;
 
-ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')*
+ID  :	[a-zA-Z_\%] [a-zA-Z0-9_\-\%]*
     ;
 
-DIGITS : ('0'..'9')+;
+DIGITS : [0-9]+;
 
 
 START_TEXT_REGEX : '/' -> pushMode(IN_REGEX);
@@ -82,9 +85,9 @@ START_TEXT_PLAIN:'"' -> pushMode(IN_TEXT);
 mode IN_REGEX;
 
 END_TEXT_REGEX : '/' -> popMode;
-TEXT_REGEX : (~'/'|'\\/')+;
+TEXT_REGEX : (~'/')+;
 
 mode IN_TEXT;
 
 END_TEXT_PLAIN : '"' -> popMode;
-TEXT_PLAIN : (~'"'|'\\"')+;
+TEXT_PLAIN : (~'"')+;

@@ -15,20 +15,17 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.SearchUI;
-import static annis.gui.resultfetch.ResultFetchJob.log;
-import annis.gui.model.PagedResultQuery;
-import annis.gui.resultview.ResultViewPanel;
+import annis.gui.objects.PagedResultQuery;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Helper;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
 import java.util.List;
+import org.corpus_tools.salt.common.SaltProject;
+import java.util.concurrent.Callable;
 
 /**
  * Fetches a result which contains only one subgraph. This single query always
@@ -37,56 +34,44 @@ import java.util.List;
  * find command and hopefully this query is bit faster.
  *
  * @see ResultFetchJob
- * @see QueryController
+ * @see LegacyQueryController
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class SingleResultFetchJob extends AbstractResultFetchJob implements
-  Runnable
+  Callable<SaltProject>
 {
 
-  private VisualizerContextChanger visContextChanger;
+  private final Match match;
 
-  private Match match;
+  private final PagedResultQuery query;
 
-  private PagedResultQuery query;
-
-  public SingleResultFetchJob(Match match, PagedResultQuery query,
-    VisualizerContextChanger visContextChanger)
+  public SingleResultFetchJob(Match match, PagedResultQuery query)
   {
     this.match = match;
     this.query = query;
-    this.visContextChanger = visContextChanger;
   }
 
   @Override
-  public void run()
+  public SaltProject call() throws Exception
   {
     WebResource subgraphRes
       = Helper.getAnnisWebResource().path("query/search/subgraph");
 
     if (Thread.interrupted())
     {
-      return;
+      return null;
     }
 
-    if (Thread.interrupted())
-    {
-      return;
-    }
-
-    List<Match> subList = new LinkedList<Match>();
+    List<Match> subList = new LinkedList<>();
     subList.add(match);
     SaltProject p = executeQuery(subgraphRes,
       new MatchGroup(subList),
-      query.getContextLeft(), query.getContextRight(),
+      query.getLeftContext(), query.getRightContext(),
       query.getSegmentation(), SubgraphFilter.all);
 
-    visContextChanger.updateResult(p, query);
-
-    if (Thread.interrupted())
-    {
-      return;
-    }
+    return p;
+    
   }
+  
 }

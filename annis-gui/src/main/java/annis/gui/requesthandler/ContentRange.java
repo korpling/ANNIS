@@ -18,7 +18,6 @@ package annis.gui.requesthandler;
 
 import com.google.common.base.Splitter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,7 +59,7 @@ public class ContentRange
     long totalSize,
     int maxNum) throws InvalidRangeException
   {
-    List<ContentRange> result = new ArrayList<ContentRange>();
+    List<ContentRange> result = new ArrayList<>();
     if (rawRange != null)
     {
       if(!fullPattern.matcher(rawRange).matches())

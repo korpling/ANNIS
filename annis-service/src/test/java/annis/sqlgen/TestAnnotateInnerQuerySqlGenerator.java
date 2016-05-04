@@ -1,28 +1,24 @@
 package annis.sqlgen;
 
-import annis.sqlgen.extensions.AnnotateQueryData;
-import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.test.TestUtils.newSet;
-import static annis.test.TestUtils.uniqueAlphaString;
-import static annis.test.TestUtils.uniqueInt;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import static annis.test.TestUtils.uniqueAlphaString;
+import static annis.test.TestUtils.uniqueInt;
+import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import java.util.Collections;
+import java.util.List;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import static org.mockito.BDDMockito.given;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class TestAnnotateInnerQuerySqlGenerator
 {
@@ -43,7 +39,7 @@ public class TestAnnotateInnerQuerySqlGenerator
   // test data
   @Mock private QueryData queryData;
   @Mock private AnnotateQueryData annotateQueryData;
-  private List<QueryNode> alternative = new ArrayList<QueryNode>(); 
+  private List<QueryNode> alternative = new ArrayList<>(); 
   private static final String INDENT = TABSTOP;
   
   @Before
@@ -65,7 +61,7 @@ public class TestAnnotateInnerQuerySqlGenerator
     int left = uniqueInt(10);
     int right = uniqueInt(20);
     
-    List extensions = new ArrayList<AnnotateQueryData>();
+    List extensions = new ArrayList<>();
     extensions.add(annotateQueryData);
 
     given(annotateQueryData.getLeft()).willReturn(left);

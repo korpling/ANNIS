@@ -15,17 +15,15 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import static annis.sqlgen.SqlConstraints.in;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
-import java.util.LinkedList;
 
 /**
  *
@@ -40,13 +38,13 @@ public class MetaDataAndCorpusWhereClauseGenerator
   public Set<String> whereConditions(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    Set<String> conditions = new HashSet<String>();
+    Set<String> conditions = new HashSet<>();
     List<Long> corpusList = queryData.getCorpusList();
     List<Long> documents = queryData.getDocuments();
 
     if (documents == null && corpusList == null)
     {
-      return new HashSet<String>();
+      return new HashSet<>();
     }
 
     for (QueryNode node : alternative)
@@ -55,7 +53,7 @@ public class MetaDataAndCorpusWhereClauseGenerator
       // conditions.add("-- select documents by metadata and toplevel corpus");
       if (documents != null)
       {
-        List<String> emptyList = new LinkedList<String>();
+        List<String> emptyList = new LinkedList<>();
         emptyList.add("NULL");
         
         conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "corpus_ref"),

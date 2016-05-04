@@ -16,12 +16,16 @@
 package annis.visualizers.component.graph;
 
 import annis.libgui.MatchedNodeColors;
-import annis.visualizers.component.AbstractDotVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
-import java.util.*;
+import annis.visualizers.component.AbstractDotVisualizer;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**

@@ -19,9 +19,10 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.UI;
-import org.json.JSONArray;
+import elemental.json.JsonArray;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -34,6 +35,7 @@ import org.json.JSONException;
 public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
 {
 
+  private static final Logger log = LoggerFactory.getLogger(OnLoadCallbackExtension.class);
   private AbstractClientConnector target;
 
   public OnLoadCallbackExtension(Callback c)
@@ -46,23 +48,15 @@ public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
     addFunction("loaded", new JavaScriptFunction()
     {
       @Override
-      public void call(JSONArray arguments) throws JSONException
+      public void call(JsonArray arguments) throws JSONException
       {
         if (c != null)
         {
-          UI.getCurrent().access(new Runnable()
+          boolean handled = c.onCompononentLoaded(target);
+          if (!handled)
           {
-            @Override
-            public void run()
-            {
-              boolean handled = c.onCompononentLoaded(target);
-              if (!handled)
-              {
-                callFunction("requestRecall", recallDelay);
-              }
-            }
-          });
-
+            callFunction("requestRecall", recallDelay);
+          }
         }
       }
     });

@@ -4,7 +4,7 @@
 
 if [ -z "$ANNIS_HOME" ]; then
 	echo Please set the environment variable ANNIS_HOME to the Annis distribution directory.
-	exit
+	exit 2
 fi
 
 # build classpath
@@ -31,17 +31,18 @@ launch() {
 			# check if daemon is running
 			if ps -p "$pid" > /dev/null 2>&1; then
             
-            echo "writing PID"
+				echo "writing PID"
 				# daemon is running, save pid
 				echo $pid > $pid_file
 				echo "done." 
 			else
 				echo "FAILED."
+				exit 1
 			fi
 			;;
 		2)
 			stop
-			start
+			launch
 			;;
 	esac
 }
@@ -57,6 +58,7 @@ stop() {
 					;;
 				*)
 					echo "AnnisService could not be stopped."
+					exit 1
 			esac
 			;;
 		1)
@@ -92,16 +94,16 @@ case "$1" in
 	stop)
 		stop 
 		;;
-   start)
-      export service_args="-d"
-      export jvm_args="-Dannisservice.pid_file=$pid_file"
-      launch
+	start)
+		export service_args="-d"
+		export jvm_args="-Dannisservice.pid_file=$pid_file"
+		launch
 
 		;;
 	restart)
 		export service_args="-d"
-      export jvm_args="-Dannisservice.pid_file=$pid_file"
-      stop
+		export jvm_args="-Dannisservice.pid_file=$pid_file"
+		stop
 		launch
 		;;
 	status)
@@ -119,6 +121,7 @@ case "$1" in
 		;;
 	*)
 		echo "usage: annisservice.sh start|stop|run|restart|status"
+		exit 4
 esac
 
 exit 0

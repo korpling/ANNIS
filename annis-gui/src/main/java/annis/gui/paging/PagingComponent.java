@@ -15,12 +15,16 @@
  */
 package annis.gui.paging;
 
-import com.vaadin.ui.themes.ChameleonTheme;
+import annis.gui.AnnisUI;
+import annis.gui.ShareQueryReferenceWindow;
+import annis.gui.util.ANNISFontIcon;
+import annis.libgui.Helper;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -30,6 +34,8 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,15 +53,13 @@ public class PagingComponent extends Panel implements
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     PagingComponent.class);
 
-  public static final ThemeResource LEFT_ARROW = new ThemeResource(
-    "left_arrow.png");
+  public static final Resource LEFT_ARROW = ANNISFontIcon.LEFT_ARROW;
 
-  public static final ThemeResource RIGHT_ARROW = new ThemeResource(
-    "right_arrow.png");
+  public static final Resource RIGHT_ARROW = ANNISFontIcon.RIGHT_ARROW;
 
-  public static final ThemeResource FIRST = new ThemeResource("first.png");
+  public static final Resource FIRST = ANNISFontIcon.FIRST;
 
-  public static final ThemeResource LAST = new ThemeResource("last.png");
+  public static final Resource LAST = ANNISFontIcon.LAST;
 
   private HorizontalLayout layout;
 
@@ -79,9 +83,11 @@ public class PagingComponent extends Panel implements
 
   private int pageSize;
 
-  private int currentPage;
+  private long currentPage;
 
   private Label lblInfo;
+  
+  private final Button btShareQuery;
 
   public PagingComponent()
   {
@@ -106,7 +112,7 @@ public class PagingComponent extends Panel implements
 
     addStyleName("toolbar");
 
-    callbacks = new HashSet<PagingCallback>();
+    callbacks = new HashSet<>();
 
     layout = new HorizontalLayout();
     layout.setSpacing(true);
@@ -118,7 +124,11 @@ public class PagingComponent extends Panel implements
     lblInfo = new Label();
     lblInfo.setContentMode(ContentMode.HTML);
     lblInfo.addStyleName("right-aligned-text");
-
+    
+    btShareQuery = new Button(FontAwesome.SHARE_ALT);
+    btShareQuery.setDescription("Share query reference link");
+    btShareQuery.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+    
     layout.setWidth("100%");
     layout.setHeight("-1px");
 
@@ -157,7 +167,7 @@ public class PagingComponent extends Panel implements
     txtPage = new TextField();
     txtPage.setDescription("current page");
     txtPage.setHeight("-1px");
-    txtPage.setWidth(3.f, UNITS_EM);
+    txtPage.setWidth(5.f, UNITS_EM);
     Validator pageValidator = new PageValidator(
       "must be an integer greater than zero");
     txtPage.addValidator(pageValidator);
@@ -179,6 +189,7 @@ public class PagingComponent extends Panel implements
     layout.addComponent(btLast);
     layout.addComponent(lblStatus);
     layout.addComponent(lblInfo);
+    layout.addComponent(btShareQuery);
 
     layout.setComponentAlignment(btFirst, Alignment.MIDDLE_LEFT);
     layout.setComponentAlignment(btPrevious, Alignment.MIDDLE_LEFT);
@@ -196,6 +207,22 @@ public class PagingComponent extends Panel implements
 
     update(false);
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    if(getUI() instanceof AnnisUI)
+    {
+      btShareQuery.addClickListener(new QueryReferenceLinkHandler((AnnisUI) getUI()));
+    }
+    else
+    {
+      btShareQuery.setVisible(false);
+    }
+  }
+  
+  
 
   private void update(boolean informCallbacks)
   {
@@ -238,12 +265,12 @@ public class PagingComponent extends Panel implements
     return (1 + (mycount / pageSize));
   }
 
-  public int getStartNumber()
+  public long getStartNumber()
   {
     return (currentPage - 1) * pageSize;
   }
 
-  public void setStartNumber(int startNumber)
+  public void setStartNumber(long startNumber)
   {
     currentPage = (startNumber / pageSize) + 1;
     update(false);
@@ -310,14 +337,37 @@ public class PagingComponent extends Panel implements
     update(true);
   }
 
-  private int sanitizePage(int page)
+  private long sanitizePage(long page)
   {
-    int val = Math.max(1, page);
+    long val = Math.max(1, page);
     val = Math.min(1 + (count.get() / pageSize), val);
     return val;
   }
+  
+  private class QueryReferenceLinkHandler implements Button.ClickListener
+  {
+    private final AnnisUI ui;
 
-  public class EnterHandler implements Action.Handler
+    public QueryReferenceLinkHandler(AnnisUI ui)
+    {
+      this.ui = ui;
+    }
+    
+    
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      ShareQueryReferenceWindow w = new ShareQueryReferenceWindow(
+        ui.getQueryController().getSearchQuery(),
+        !Helper.isKickstarter(getSession())
+      );
+      getUI().addWindow(w);
+      w.center();
+    }
+    
+  }
+
+  private class EnterHandler implements Action.Handler
   {
     private final Action enterKeyShortcutAction 
       = new ShortcutAction(null, ShortcutAction.KeyCode.ENTER, null);
@@ -367,7 +417,7 @@ public class PagingComponent extends Panel implements
   {
     if (text != null && text.length() > 0)
     {
-      String prefix = "Result for: <span class=\"corpus-font-force\">";
+      String prefix = "Result for: <span class=\"" + Helper.CORPUS_FONT_FORCE + "\">";
       lblInfo.setDescription(prefix + text.replaceAll("\n", " ") + "</span>");
       lblInfo.setValue(text.length() < 50 ? prefix + StringEscapeUtils.
         escapeHtml4(text.substring(0, text.length())) : prefix + StringEscapeUtils.

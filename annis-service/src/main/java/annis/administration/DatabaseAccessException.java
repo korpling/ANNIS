@@ -21,7 +21,7 @@ import annis.AnnisRunnerException;
 public class DatabaseAccessException extends AnnisRunnerException {
 
 	public DatabaseAccessException() {
-		super();
+		super(5);
 	}
 
 	public DatabaseAccessException(String message, Throwable cause) {
@@ -29,11 +29,11 @@ public class DatabaseAccessException extends AnnisRunnerException {
 	}
 
 	public DatabaseAccessException(String message) {
-		super(message);
+		super(message, 5);
 	}
 
 	public DatabaseAccessException(Throwable cause) {
-		super(cause);
+		super(cause, 5);
 	}
 
 }

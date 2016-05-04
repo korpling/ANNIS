@@ -21,6 +21,6 @@ package annis.service.objects;
  */
 public enum FrequencyTableEntryType
 {
-  span, annotation
+  span, annotation, meta
   
 }

@@ -15,35 +15,62 @@
  */
 package annis.rest.provider;
 
+import annis.model.AqlParseError;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import org.postgresql.util.PSQLException;
-import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Provider
-public class SQLExceptionMapper implements ExceptionMapper<DataAccessResourceFailureException>
+public class SQLExceptionMapper implements ExceptionMapper<SQLException>
 {
-
-  @Override
-  public Response toResponse(DataAccessResourceFailureException ex)
+  /**
+   * Maps an exception to a response or returns null if it wasn't handled
+   * @param sqlEx
+   * @return 
+   */
+  public static Response map(SQLException sqlEx)
   {
-    if(ex.getCause() instanceof PSQLException)
+    if (null != sqlEx.getSQLState())
     {
-      SQLException sqlEx = (SQLException) ex.getCause();
-      if("57014".equals(sqlEx.getSQLState())) //query_canceled
+      switch (sqlEx.getSQLState())
       {
-        return Response.status(504).entity(sqlEx.getMessage()).build();
+        //query_canceled
+        case "57014":
+          return Response.status(504).entity(sqlEx.getMessage()).build();
+        case "2201B":
+          // regular expression did not compile
+          AqlParseError error = new AqlParseError(sqlEx.getMessage());
+          return Response.status(Response.Status.BAD_REQUEST).entity(
+            new GenericEntity<List<AqlParseError>>(Arrays.asList(error))
+            {
+            })
+            .type("application/xml").build();
       }
     }
-    
-    return Response.status(500).entity(ex.getMessage()).build();
+    return null;
+  }
+
+  @Override
+  public Response toResponse(SQLException sqlEx)
+  {
+    Response r = map(sqlEx);
+    if(r != null)
+    {
+      return r;
+    }
+ 
+    // default
+    return Response.status(500).entity(sqlEx.getMessage()).build();
     
   }
+  
   
 }

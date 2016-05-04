@@ -15,16 +15,16 @@
  */
 package annis.gui.exporter;
 
+import annis.libgui.Helper;
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.server.Page;
-import com.vaadin.ui.Notification;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,8 +36,8 @@ public class WekaExporter implements Exporter, Serializable
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(WekaExporter.class);
 
   @Override
-  public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, String keysAsString, String argsAsString,
+  public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
+    Set<String> corpora, List<String> keys, String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
     //this is a full result export
@@ -46,7 +46,7 @@ public class WekaExporter implements Exporter, Serializable
     {
       WebResource res = annisResource.path("search").path("matrix")
         .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("q", queryAnnisQL);
+        .queryParam("q", Helper.encodeJersey(queryAnnisQL));
       
       
       if(argsAsString.startsWith("metakeys="))
@@ -54,32 +54,19 @@ public class WekaExporter implements Exporter, Serializable
         res = res.queryParam("metakeys", argsAsString.substring("metakeys".length()+1));
       }
       
-      InputStream result = res.get(InputStream.class);
       try
+      (InputStream result = res.get(InputStream.class)) 
       {
         IOUtils.copy(result, out);
       }
-      finally
-      {
-        result.close();
-      }
       
       out.flush();
+      
+      return null;
     }
-    catch(UniformInterfaceException ex)
+    catch(UniformInterfaceException | ClientHandlerException | IOException ex)
     {
-      log.error(null, ex);
-      Notification n = new Notification("Service exception", ex.getResponse().getEntity(String.class),
-        Notification.Type.WARNING_MESSAGE, true);
-      n.show(Page.getCurrent());
-    }
-    catch(ClientHandlerException ex)
-    {
-      log.error(null, ex);
-    }
-    catch (IOException ex)
-    {
-      log.error(null, ex);
+      return ex;
     }
   }
 

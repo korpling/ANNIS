@@ -16,29 +16,25 @@
 package annis.sqlgen;
 
 import annis.model.QueryAnnotation;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import static annis.test.TestUtils.uniqueInt;
 import static annis.test.TestUtils.uniqueLong;
 import static annis.test.TestUtils.uniqueString;
-
+import com.google.common.collect.Lists;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
-
+import java.util.Map;
 import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.HashBag;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.MockitoAnnotations.initMocks;
 import org.mockito.Spy;
-
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
-import annis.service.objects.AnnisCorpus;
-import com.google.common.collect.Lists;
-import java.util.LinkedList;
-import java.util.Map;
 
 public class TestAbstractFromClauseGenerator {
 
@@ -123,7 +119,7 @@ public class TestAbstractFromClauseGenerator {
 		List<Long> corpora = Lists.newArrayList(corpusID);
     
     Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
-    Map<String, Boolean> tablePartioned = new HashMap<String, Boolean>();
+    Map<String, Boolean> tablePartioned = new HashMap<>();
     tablePartioned.put(table, Boolean.TRUE);
     
     TableAccessStrategy tas = new TableAccessStrategy(node);
@@ -151,10 +147,10 @@ public class TestAbstractFromClauseGenerator {
     long corpusID = uniqueInt(0, Integer.MAX_VALUE);
 		List<Long> corporaNonEmpty = Lists.newArrayList(corpusID);
     List<Long> multipleCorpora = Lists.newArrayList(uniqueLong(), corpusID, uniqueLong());
-    List<Long> corpusEmpty = new LinkedList<Long>();
+    List<Long> corpusEmpty = new LinkedList<>();
     
     Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
-    Map<String, Boolean> tablePartioned = new HashMap<String, Boolean>();
+    Map<String, Boolean> tablePartioned = new HashMap<>();
     tablePartioned.put(table, Boolean.TRUE);
     
     TableAccessStrategy tas = new TableAccessStrategy(node);
@@ -216,7 +212,7 @@ public class TestAbstractFromClauseGenerator {
 	// simulate that count copies of the table (alias) are required
 	private Map<String, String> setupTableAliases(QueryNode node, String table, String tableAlias, int count) 
   {
-		HashMap<String, String> tableAliases = new HashMap<String, String>();
+		HashMap<String, String> tableAliases = new HashMap<>();
 		tableAliases.put(table, tableAlias);
     if(count > 0)
     {

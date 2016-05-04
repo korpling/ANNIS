@@ -9,16 +9,15 @@ CREATE TABLE _corpus_stats AS SELECT
     (SELECT count(*) FROM _node WHERE token_index IS NOT NULL) as tokens,
 
     -- max corpus id
-    (SELECT max(id) + 1 FROM _corpus) AS max_corpus_id,
+    (SELECT max(id) FROM _corpus) AS max_corpus_id,
 
     -- max corpus pre
-    (SELECT max(pre) + 1 FROM _corpus) AS max_corpus_pre,
+    (SELECT max(pre) FROM _corpus) AS max_corpus_pre,
 
     -- max corpus post
-    (SELECT max(post) + 1 FROM _corpus) AS max_corpus_post,
+    (SELECT max(post) FROM _corpus) AS max_corpus_post,
 
-    NULL::integer AS max_component_id,
-    NULL::bigint AS max_node_id,
+    (SELECT max(id) FROM _node) AS max_node_id,
 
     ':path' AS source_path
 ;

@@ -57,39 +57,45 @@ refOrNode
   ;
 
 precedence
-	: PRECEDENCE (layer=ID)? # DirectPrecedence
-	| PRECEDENCE (layer=ID)? STAR # IndirectPrecedence
-	| PRECEDENCE (layer=ID COMMA?)? rangeSpec #RangePrecedence
+	: (PRECEDENCE | NAMED_PRECEDENCE) # DirectPrecedence
+	| (PRECEDENCE | NAMED_PRECEDENCE) STAR # IndirectPrecedence
+	| (PRECEDENCE | NAMED_PRECEDENCE) COMMA? rangeSpec #RangePrecedence
+	;
+
+near
+	: (NEAR | NAMED_NEAR) # DirectNear
+	| (NEAR | NAMED_NEAR) STAR # IndirectNear
+	| (NEAR | NAMED_NEAR)COMMA? rangeSpec #RangeNear
 	;
 
 dominance
-	: DOMINANCE (layer=ID)?  (LEFT_CHILD | RIGHT_CHILD)? (anno=edgeSpec)? # DirectDominance
-	| DOMINANCE (layer=ID)? STAR # IndirectDominance
-	| DOMINANCE (layer=ID)? rangeSpec # RangeDominance
+	: (DOMINANCE | NAMED_DOMINANCE)  (LEFT_CHILD | RIGHT_CHILD)? (anno=edgeSpec)? # DirectDominance
+	| (DOMINANCE | NAMED_DOMINANCE) STAR # IndirectDominance
+	| (DOMINANCE | NAMED_DOMINANCE) COMMA? rangeSpec # RangeDominance
 	;
 	
 pointing
-	: POINTING label=ID (anno=edgeSpec)? # DirectPointing
-	| POINTING label=ID (anno=edgeSpec)? STAR # IndirectPointing
-	| POINTING label=ID (anno=edgeSpec)? COMMA? rangeSpec # RangePointing
+	: POINTING (anno=edgeSpec)? # DirectPointing
+	| POINTING (anno=edgeSpec)? STAR # IndirectPointing
+	| POINTING (anno=edgeSpec)? COMMA? rangeSpec # RangePointing
 	;
 
 spanrelation
   : IDENT_COV # IdenticalCoverage
-	|	LEFT_ALIGN # LeftAlign
-	|	RIGHT_ALIGN # RightAlign
-	|	INCLUSION # Inclusion
-	|	OVERLAP # Overlap
-	|	RIGHT_OVERLAP # RightOverlap
-	| LEFT_OVERLAP # LeftOverlap
+  |	LEFT_ALIGN # LeftAlign
+  |	RIGHT_ALIGN # RightAlign
+  |	INCLUSION # Inclusion
+  |	OVERLAP # Overlap
+  |	RIGHT_OVERLAP # RightOverlap
+  | LEFT_OVERLAP # LeftOverlap
 ; 
 
 commonparent
-  : COMMON_PARENT (label=ID)? # CommonParent
+  : COMMON_PARENT (label=ID)?
   ;
 
 commonancestor
-  : COMMON_PARENT (label=ID)? STAR  # CommonAncestor
+  : COMMON_PARENT (label=ID)? STAR
   ;
 
 identity
@@ -104,44 +110,50 @@ notequalvalue
   : NEQ 
   ;
 
+
 operator
   : precedence
+  | near
   | spanrelation
   | dominance
   | pointing
   | commonparent
   | commonancestor
   | identity
-  | equalvalue
-  | notequalvalue
   ;
 
+/* Addtional operators that are do not bind two variables. */
+nonbinding_operator
+ : equalvalue
+ | notequalvalue
+ ;
 
 n_ary_linguistic_term
-  :  refOrNode (operator refOrNode)+ # Relation
+  :  refOrNode (operator refOrNode)+ # BindingRelation
+  | REF (nonbinding_operator REF)+ # NonBindingRelation
   ;
 
 	
 unary_linguistic_term
-	:	left=REF ROOT # RootTerm
-	|	left=REF ARITY EQ rangeSpec # ArityTerm
-	|	left=REF TOKEN_ARITY EQ rangeSpec # TokenArityTerm
-	;
+  :	left=REF ROOT # RootTerm
+  |	left=REF ARITY EQ rangeSpec # ArityTerm
+  |	left=REF TOKEN_ARITY EQ rangeSpec # TokenArityTerm
+  ;
 
 variableExpr
   : qName op=(EQ|NEQ) txt=textSpec # AnnoEqTextExpr
   | TOK # TokOnlyExpr 
   | NODE # NodeExpr
   | TOK op=(EQ|NEQ) txt=textSpec # TokTextExpr
-	|	txt=textSpec # TextOnly // shortcut for tok="..."
+  | txt=textSpec # TextOnly // shortcut for tok="..."
   | qName # AnnoOnlyExpr
   ;
 
 expr
   : VAR_DEF variableExpr # NamedVariableTermExpr
   | variableExpr # VariableTermExpr
-	|	unary_linguistic_term # UnaryTermExpr
-	|	n_ary_linguistic_term #  BinaryTermExpr
+  | unary_linguistic_term # UnaryTermExpr
+  | n_ary_linguistic_term #  BinaryTermExpr
   | META DOUBLECOLON id=qName op=(EQ|NEQ) txt=textSpec # MetaTermExpr 
   ;
 

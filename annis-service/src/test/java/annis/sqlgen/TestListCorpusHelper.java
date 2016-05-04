@@ -15,19 +15,16 @@
  */
 package annis.sqlgen;
 
+import annis.service.objects.AnnisCorpus;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.junit.Before;
 import org.junit.Test;
-
-import annis.service.objects.AnnisCorpus;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestListCorpusHelper {
 

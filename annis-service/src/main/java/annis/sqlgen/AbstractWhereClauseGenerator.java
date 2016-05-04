@@ -1,25 +1,20 @@
 package annis.sqlgen;
 
+import annis.model.Join;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import annis.model.QueryNode;
-import annis.model.QueryAnnotation;
-import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
-import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.Near;
 import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
@@ -29,6 +24,10 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractWhereClauseGenerator extends
     TableAccessStrategyFactory implements WhereClauseSqlGenerator<QueryData>
@@ -38,7 +37,7 @@ public abstract class AbstractWhereClauseGenerator extends
   public Set<String> whereConditions(QueryData queryData,
       List<QueryNode> alternative, String indent)
   {
-    List<String> conditions = new ArrayList<String>();
+    List<String> conditions = new ArrayList<>();
 
     for (QueryNode node : alternative)
     {
@@ -55,14 +54,6 @@ public abstract class AbstractWhereClauseGenerator extends
       if (node.isRoot())
       {
         addIsRootConditions(conditions, queryData, node);
-      }
-      if (node.getNamespace() != null)
-      {
-        addNodeNamespaceConditions(conditions, queryData, node);
-      }
-      if (node.getName() != null)
-      {
-        addNodeNameCondition(conditions, queryData, node);
       }
       if (node.getArity() != null)
       {
@@ -113,6 +104,10 @@ public abstract class AbstractWhereClauseGenerator extends
         {
           addPrecedenceConditions(conditions, node, target, (Precedence) join,
               queryData);
+        } else if (join instanceof Near)
+        {
+          addNearConditions(conditions, node, target, (Near) join,
+              queryData);
         } else if (join instanceof Sibling)
         {
           addSiblingConditions(conditions, node, target, (Sibling) join,
@@ -155,7 +150,7 @@ public abstract class AbstractWhereClauseGenerator extends
             NODE_ANNOTATION_TABLE, queryData);
       }
 
-      // edge annotations
+      // relation annotations
       int j = 0;
       for (QueryAnnotation annotation : node.getEdgeAnnotations())
       {
@@ -165,7 +160,7 @@ public abstract class AbstractWhereClauseGenerator extends
       }
     }
 
-    return new HashSet<String>(conditions);
+    return new HashSet<>(conditions);
   }
 
   protected abstract void addSpanConditions(List<String> conditions,
@@ -177,21 +172,15 @@ public abstract class AbstractWhereClauseGenerator extends
   protected abstract void addIsRootConditions(List<String> conditions,
       QueryData queryData, QueryNode node);
 
-  protected abstract void addNodeNamespaceConditions(List<String> conditions,
-      QueryData queryData, QueryNode node);
-
-  protected abstract void addNodeNameCondition(List<String> conditions,
-      QueryData queryData, QueryNode node);
-
   protected abstract void addNodeArityConditions(List<String> conditions,
       QueryData queryData, QueryNode node);
 
   protected abstract void addTokenArityConditions(List<String> conditions,
       QueryData queryData, QueryNode node);
 
-  protected abstract void addSingleEdgeCondition(QueryNode node,
+  protected abstract void addSingleRelationCondition(QueryNode node,
       QueryNode target, List<String> conditions, Join join,
-      final String edgeType);
+      final String relationType);
 
   protected abstract void addSiblingConditions(List<String> conditions,
       QueryNode node, QueryNode target, Sibling join, QueryData queryData);
@@ -225,6 +214,9 @@ public abstract class AbstractWhereClauseGenerator extends
 
   protected abstract void addPrecedenceConditions(List<String> conditions,
       QueryNode node, QueryNode target, Precedence join, QueryData queryData);
+
+  protected abstract void addNearConditions(List<String> conditions,
+      QueryNode node, QueryNode target, Near join, QueryData queryData);
 
   protected abstract void addAnnotationConditions(List<String> conditions,
       QueryNode node, int index, QueryAnnotation annotation, String table,

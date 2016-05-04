@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+  "
+       default-lazy-init="true">
 
   <import resource="Common.xml" />
+  <import resource="file:${annis.home}/conf/spring/SqlGenerator.xml" />
+  <import resource="file:${annis.home}/conf/spring/Dao.xml"/>
   <import resource="Admin.xml" />
   
-<bean id="importWorker" class="annis.service.internal.ImportWorker" lazy-init="true">
-  <property name="corpusAdmin" ref="corpusAdministration" />
-</bean>
+  <bean id="importWorker" class="annis.service.internal.ImportWorker" lazy-init="true">
+    <property name="corpusAdmin" ref="corpusAdministration" />
+  </bean>
   
   <!-- AdminService -->
   <bean id="adminService" class="annis.service.internal.AdminServiceImpl" 
-        init-method="init" lazy-init="true">
+        init-method="init" lazy-init="false">
     <property name="adminDao" ref="administrationDao"/>
     <property name="importWorker" ref="importWorker" />
-    <property name="annisDao" ref="annisDao" />
+    <property name="queryDao" ref="queryDao" />
     <property name="corpusAdmin" ref="corpusAdministration" />
+    <property name="deleteCorpusDao" ref="deleteCorpusDao" />
   </bean>
 
   <!-- Default Corpus Config -->
@@ -44,7 +47,7 @@
 
   <!-- QueryService -->
   <bean id="queryService" class="annis.service.internal.QueryServiceImpl" init-method="init" lazy-init="true">
-    <property name="annisDao" ref="annisDao"/>
+    <property name="queryDao" ref="queryDao"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="defaultCorpusConfig" ref="defaultCorpusConfig" />
     <property name="port" value="${annis.webservice-port}" />
@@ -52,6 +55,13 @@
 
   <!-- MetadataService -->
   <bean id="metadataService" class="annis.service.internal.MetadataServiceImpl" init-method="init" lazy-init="true">
-    <property name="annisDao" ref="annisDao" />
+    <property name="queryDao" ref="queryDao" />
   </bean>
+  
+  <!-- URL shortener service -->
+  <bean id="urlShortenerService" class="annis.service.internal.URLShortenerImpl" 
+        init-method="init" lazy-init="true">
+    <property name="shortenerDao" ref="shortenerDao"/>
+  </bean>
+
 </beans>

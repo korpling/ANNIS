@@ -17,7 +17,12 @@ package annis.visualizers.iframe;
 
 import annis.libgui.visualizers.AbstractIFrameVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import org.slf4j.LoggerFactory;
 
 /**

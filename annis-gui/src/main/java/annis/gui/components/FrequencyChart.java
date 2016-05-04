@@ -15,8 +15,9 @@
  */
 package annis.gui.components;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.gui.frequency.FrequencyResultPanel;
+import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.service.objects.FrequencyTable;
 import com.vaadin.data.Property;
@@ -83,9 +84,9 @@ public class FrequencyChart extends VerticalLayout
     String font = "sans-serif";
     float fontSize = 7.0f; // in pixel
     UI ui = UI.getCurrent();
-    if(ui instanceof SearchUI)
+    if(ui instanceof AnnisUI)
     {
-      InstanceConfig cfg = ((SearchUI) ui).getInstanceConfig();
+      InstanceConfig cfg = ((AnnisUI) ui).getInstanceConfig();
       if(cfg != null && cfg.getFont() != null)
       {
         if(cfg.getFrequencyFont() != null)
@@ -138,7 +139,7 @@ public class FrequencyChart extends VerticalLayout
       setSizeFull();
       
       whiteboard = new FrequencyWhiteboard(freqPanel);
-      whiteboard.addStyleName("corpus-font-force");
+      whiteboard.addStyleName(Helper.CORPUS_FONT_FORCE);
       
       setContent(whiteboard);
     }

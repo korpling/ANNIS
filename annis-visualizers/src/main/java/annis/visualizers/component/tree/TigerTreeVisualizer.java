@@ -17,35 +17,50 @@ package annis.visualizers.component.tree;
 
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.component.AbstractImageVisualizer;
-import annis.visualizers.component.tree.backends.staticimg.AbstractImageGraphicsItem;
-import annis.visualizers.component.tree.backends.staticimg.Java2dBackend;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.Edge;
 import annis.service.ifaces.AnnisResult;
+import annis.visualizers.component.AbstractImageVisualizer;
+import annis.visualizers.component.tree.backends.staticimg.AbstractImageGraphicsItem;
+import annis.visualizers.component.tree.backends.staticimg.Java2dBackend;
+import com.vaadin.ui.Notification;
 import edu.uci.ics.jung.graph.DirectedGraph;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.*;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  * Visualizes a constituent syntax tree.
  * 
+ * <p>
  * Mappings:<br />
  * The annotation names to be displayed in non terminal nodes can be 
  * set e.g. using <b>node_key:cat</b> for an annotation called cat (the default), and 
  * similarly the edge labels using <b>edge_key:func</b> for an edge label called 
- * <b>func</b> (the default). Instructions are separated using semicolons.
+ * <b>func</b> (the default). Instructions are separated using semicolons. <br /><br />
  * 
+ * With the mapping <b>terminal_name</b> and <b>terminal_ns</b> you can
+ * select span nodes with the corresponding annotations as terminal elements
+ * instead of the default tokens.
+ * </p>
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
@@ -59,7 +74,9 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   private final DefaultLabeler labeler;
   private transient DefaultStyler styler;
   private AnnisGraphTools graphtools;
-
+  public static final String TERMINAL_NAME_KEY = "terminal_name";
+  public static final String TERMINAL_NS_KEY = "terminal_ns";
+  
   public class DefaultStyler implements TreeElementStyler
   {
 
@@ -69,10 +86,10 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     public static final int TOKEN_SPACING = 15;
     public static final int VEDGE_OVERLAP_THRESHOLD = 20;
     private final Java2dBackend backend;
-
+    
     public DefaultStyler(Java2dBackend backend_)
     {
-      backend = backend_;
+      this.backend = backend_;
     }
 
     public int getLabelPadding()
@@ -80,9 +97,9 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       return LABEL_PADDING;
     }
 
-    public GraphicsBackend.Font getFont(AnnisNode n)
+    public GraphicsBackend.Font getFont(AnnisNode n, VisualizerInput input)
     {
-      if(n.isToken())
+      if(AnnisGraphTools.isTerminal(n, input))
       {
         return backend.getFont(Font.SANS_SERIF, 12, java.awt.Font.PLAIN);
       }
@@ -104,7 +121,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       if(isQueryMatch(n, input))
       {
         // get CSS color name
-        String backColorName = input.getMarkableMap().get("" + n.getId());
+        String backColorName = input.getMarkableExactMap().get("" + n.getId());
         Color backColor = Color.RED;
         try
         {
@@ -114,7 +131,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
         {
         }
 
-        if(n.isToken())
+        if(AnnisGraphTools.isTerminal(n, input))
         {
           return new Shape.Rectangle(Color.WHITE, backColor, DEFAULT_PEN_STYLE, getLabelPadding());
         }
@@ -125,7 +142,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       }
       else
       {
-        if(n.isToken())
+        if(AnnisGraphTools.isTerminal(n, input))
         {
           return new Shape.Invisible(getLabelPadding());
         }
@@ -227,14 +244,25 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     @Override
     public String getLabel(AnnisNode n, VisualizerInput input)
     {
-      if(n.isToken())
+    
+      if(AnnisGraphTools.isTerminal(n, input))
       {
-        String spannedText = n.getSpannedText();
-        if(spannedText == null || "".equals(spannedText))
-        {
-          spannedText = " ";
+        String terminalName = input.getMappings().getProperty(TERMINAL_NAME_KEY);
+        if(terminalName == null)
+        {        
+          
+          String spannedText = n.getSpannedText();
+          if (spannedText == null || "".equals(spannedText))
+          {
+            spannedText = " ";
+          }
+          return spannedText;
         }
-        return spannedText;
+        else
+        {
+          String terminalNamespace = input.getMappings().getProperty(TERMINAL_NS_KEY);
+          return extractAnnotation(n.getNodeAnnotations(), terminalNamespace, terminalName); 
+        }
       }
       else
       {
@@ -254,14 +282,13 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
 
     private String extractAnnotation(Set<Annotation> annotations, String namespace, String featureName)
     {
-      for(Annotation a : annotations)
+      String result = AnnisGraphTools.extractAnnotation(annotations, namespace,
+        featureName);
+      if(result == null)
       {
-        if(a.getNamespace().equals(namespace) && a.getName().equals(featureName))
-        {
-          return a.getValue();
-        }
+        result = "--";
       }
-      return "--";
+      return result;
     }
   }
 
@@ -319,26 +346,35 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
         layouts.add(item);
       }
     }
-
-    BufferedImage image = new BufferedImage(
-      (int) (width + (layouts.size() - 1) * TREE_DISTANCE + 2 * SIDE_MARGIN),
-      (int) (maxheight + 2 * TOP_MARGIN), BufferedImage.TYPE_INT_ARGB);
-    Graphics2D canvas = createCanvas(image);
-    double xOffset = SIDE_MARGIN;
-    for(AbstractImageGraphicsItem item : layouts)
+    
+    BufferedImage image;
+    if(width == 0 || maxheight == 0)
     {
-      AffineTransform t = canvas.getTransform();
-      Rectangle2D bounds = item.getBounds();
-      canvas.translate(xOffset, TOP_MARGIN + maxheight - bounds.getHeight());
-      renderTree(item, canvas);
-      xOffset += bounds.getWidth() + TREE_DISTANCE;
-      canvas.setTransform(t);
+      Notification.show("Can't generate tree visualization.", Notification.Type.WARNING_MESSAGE);
+      image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+    }
+    else
+    {
+      image = new BufferedImage(
+        (int) (width + (layouts.size() - 1) * TREE_DISTANCE + 2 * SIDE_MARGIN),
+        (int) (maxheight + 2 * TOP_MARGIN), BufferedImage.TYPE_INT_ARGB);
+      Graphics2D canvas = createCanvas(image);
+      double xOffset = SIDE_MARGIN;
+      for(AbstractImageGraphicsItem item : layouts)
+      {
+        AffineTransform t = canvas.getTransform();
+        Rectangle2D bounds = item.getBounds();
+        canvas.translate(xOffset, TOP_MARGIN + maxheight - bounds.getHeight());
+        renderTree(item, canvas);
+        xOffset += bounds.getWidth() + TREE_DISTANCE;
+        canvas.setTransform(t);
+      }
     }
     try
     {
       ImageIO.write(image, "png", outstream);
     }
-    catch(IOException e)
+    catch (IOException e)
     {
       throw new RuntimeException(e);
     }

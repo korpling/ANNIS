@@ -3,15 +3,11 @@ package annis.test;
 
 
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-
 import java.sql.Array;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.Validate;
 import org.hamcrest.Description;
@@ -19,6 +15,8 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 
 /**
@@ -51,7 +49,7 @@ public class TestUtils {
    * @return A {@link HashSet} containing the specified items.
    */
   public static <T> Set<T> newSet(T... items) {
-    Set<T> set = new HashSet<T>();
+    Set<T> set = new HashSet<>();
     for (T item : items) {
       set.add(item);
     }
@@ -66,7 +64,7 @@ public class TestUtils {
    * @return An empty typed set.
    */
   public static <T> Set<T> emptySetOf(Class<T> clazz) {
-    Set<T> set = new HashSet<T>();
+    Set<T> set = new HashSet<>();
     return set;
   }
 

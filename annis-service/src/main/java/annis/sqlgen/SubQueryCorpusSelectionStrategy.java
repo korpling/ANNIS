@@ -15,13 +15,11 @@
  */
 package annis.sqlgen;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public class SubQueryCorpusSelectionStrategy {
 
@@ -44,7 +42,7 @@ public class SubQueryCorpusSelectionStrategy {
 		if (hasCorpusSelection(corpusList, metaData))
 			sb.append(" WHERE ");
 		
-		List<String> conditions = new ArrayList<String>();
+		List<String> conditions = new ArrayList<>();
 		
 		if ( ! corpusList.isEmpty() ) {
 			conditions.add("c1.pre >= c2.pre");

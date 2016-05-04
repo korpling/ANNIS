@@ -38,8 +38,8 @@ public class Row implements Serializable
    */
   public Row()
   {
-    this.events = new ArrayList<GridEvent>();
-    this.textIDs = new HashSet<String>();
+    this.events = new ArrayList<>();
+    this.textIDs = new HashSet<>();
 
     occupancySet = new BitSet();
   }
@@ -182,7 +182,7 @@ public class Row implements Serializable
    */
   public Set<String> getTextIDs()
   {
-    return new HashSet<String>(textIDs);
+    return new HashSet<>(textIDs);
   }
   
   /**

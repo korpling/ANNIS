@@ -24,28 +24,21 @@ import annis.libgui.media.PDFController;
 import annis.libgui.media.TimeHelper;
 import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Range;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -58,7 +51,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.EList;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.STextualRelation;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SLayer;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +71,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EventExtractor {
 
-  private static Logger log = LoggerFactory.getLogger(EventExtractor.class);
+  private static final Logger log = LoggerFactory.getLogger(EventExtractor.class);
 
   /**
    * Converts Salt document graph to rows.
@@ -78,7 +81,7 @@ public class EventExtractor {
    * @param showTokenAnnos
    * @param mediaLayer  A set of all annotation layers which should be treated as special media layer.
    * @param annotationNames
-   * @param unsetValueForMedia
+   * @param replaceValueWithMediaIcon If true the actual value is removed and an icon for playing the media file is shown instead.
    * @param startTokenIndex token index of the first token in the match
    * @param endTokenIndex token index of the last token in the match
    * @param pdfController makes status of all pdfviewer available for the
@@ -89,16 +92,16 @@ public class EventExtractor {
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
           VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
           List<String> annotationNames, 
-          Set<String> mediaLayer, boolean unsetValueForMedia,
+          Set<String> mediaLayer, boolean replaceValueWithMediaIcon,
           long startTokenIndex, long endTokenIndex,
           PDFController pdfController, STextualDS text) 
   {
 
-    SDocumentGraph graph = input.getDocument().getSDocumentGraph();
+    SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
     // only look at annotations which were defined by the user
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
-            new LinkedHashMap<String, ArrayList<Row>>();
+            new LinkedHashMap<>();
 
     for (String anno : annotationNames) {
       rowsByAnnotation.put(anno, new ArrayList<Row>());
@@ -110,26 +113,26 @@ public class EventExtractor {
 
     if(showSpanAnnos)
     {
-      for (SSpan span : graph.getSSpans())
+      for (SSpan span : graph.getSpans())
       {
         if(text == null || text == CommonHelper.getTextualDSForNode(span, graph))
         {
           addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation,
-            true, mediaLayer, unsetValueForMedia);
+            true, mediaLayer, replaceValueWithMediaIcon);
         }
       } // end for each span
     }
     
     if(showTokenAnnos)
     {
-      for(SToken tok : graph.getSTokens())
+      for(SToken tok : graph.getTokens())
       {
         if(text == null || text == CommonHelper.getTextualDSForNode(tok, graph))
         {
           addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false,
-            mediaLayer, unsetValueForMedia);
+            mediaLayer, replaceValueWithMediaIcon);
         }
       }
     }
@@ -166,7 +169,7 @@ public class EventExtractor {
   public static void removeEmptySpace(LinkedHashMap<String, 
     ArrayList<Row>> rowsByAnnotation, Row tokenRow)
   {
-    List<Range<Integer>> gaps = new LinkedList<Range<Integer>>();
+    List<Range<Integer>> gaps = new LinkedList<>();
 
     BitSet totalOccupancyGrid = new BitSet();
     for(Map.Entry<String, ArrayList<Row>> layer : rowsByAnnotation.entrySet())
@@ -220,7 +223,7 @@ public class EventExtractor {
         ArrayList<Row> rows = rowEntry.getValue();
         for(Row r : rows)
         {
-          List<GridEvent> eventsCopy = new LinkedList<GridEvent>(r.getEvents());
+          List<GridEvent> eventsCopy = new LinkedList<>(r.getEvents());
           for(GridEvent e : eventsCopy)
           {
             if(e.getLeft() >= g.upperEndpoint())
@@ -255,13 +258,32 @@ public class EventExtractor {
     AtomicInteger eventCounter,
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
     boolean addMatch,
-    Set<String> mediaLayer, boolean unsetValueForMedia)
+    Set<String> mediaLayer, boolean replaceValueWithMediaIcon)
   {
+
+    List<String> matchedAnnos = new ArrayList<>();
+    SFeature featMatchedAnnos = graph.getFeature(ANNIS_NS, FEAT_MATCHEDANNOS);
+    if(featMatchedAnnos != null)
+    {
+      matchedAnnos = Splitter.on(',').trimResults()
+        .splitToList(featMatchedAnnos.getValue_STEXT());
+    }
+    // check if the span is a matched node
+    SFeature featMatched = node.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+    Long matchRaw = featMatched == null ? null : featMatched.
+      getValue_SNUMERIC();
+    
+    String matchedQualifiedAnnoName = "";
+    if(matchRaw != null && matchRaw <= matchedAnnos.size())
+    {
+      matchedQualifiedAnnoName = matchedAnnos.get((int) ((long) matchRaw)-1);
+    }
+    
 
     // calculate the left and right values of a span
     // TODO: howto get these numbers with Salt?
     RelannisNodeFeature feat = (RelannisNodeFeature) node.
-      getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+      getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
     long leftLong = feat.getLeftToken();
     long rightLong = feat.getRightToken();
@@ -272,13 +294,13 @@ public class EventExtractor {
     int left = (int) (leftLong - startTokenIndex);
     int right = (int) (rightLong - startTokenIndex);
 
-    for (SAnnotation anno : node.getSAnnotations())
+    for (SAnnotation anno : node.getAnnotations())
     {
       ArrayList<Row> rows = rowsByAnnotation.get(anno.getQName());
       if (rows == null)
       {
         // try again with only the name
-        rows = rowsByAnnotation.get(anno.getSName());
+        rows = rowsByAnnotation.get(anno.getName());
       }
       if (rows != null)
       {
@@ -289,31 +311,40 @@ public class EventExtractor {
 
         String id = "event_" + eventCounter.incrementAndGet();
         GridEvent event = new GridEvent(id, left, right,
-          anno.getSValueSTEXT());
+          anno.getValue_STEXT());
         event.setTooltip(Helper.getQualifiedName(anno));
 
-        // check if the span is a matched node
-        SFeature featMatched = node.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        Long match = featMatched == null ? null : featMatched.
-          getSValueSNUMERIC();
-        if(addMatch)
+        if(addMatch && matchRaw != null)
         {
-          event.setMatch(match);
+          long match = matchRaw;
+          
+          if(matchedQualifiedAnnoName.isEmpty())
+          {
+            // always set the match when there is no matched annotation at all
+            event.setMatch(match);
+          }
+          // check if the annotation also matches
+          else if(matchedQualifiedAnnoName.equals(anno.getQName()))
+          {
+            event.setMatch(match);
+          }
+
         }
         if(node instanceof SSpan)
         {
           // calculate overlapped SToken
-          EList<Edge> outEdges = graph.getOutEdges(node.getSId());
+          
+          List<? extends SRelation<? extends SNode, ? extends SNode>> outEdges = graph.getOutRelations(node.getId());
           if (outEdges != null)
           {
-            for (Edge e : outEdges)
+            for (SRelation<? extends SNode, ? extends SNode> e : outEdges)
             {
               if (e instanceof SSpanningRelation)
               {
                 SSpanningRelation spanRel = (SSpanningRelation) e;
 
-                SToken tok = spanRel.getSToken();
-                event.getCoveredIDs().add(tok.getSId());
+                SToken tok = spanRel.getTarget();
+                event.getCoveredIDs().add(tok.getId());
 
                 // get the STextualDS of this token and add it to the event
                 String textID = getTextID(tok, graph);
@@ -327,7 +358,7 @@ public class EventExtractor {
         }
         else if(node instanceof SToken)
         {
-          event.getCoveredIDs().add(node.getSId());
+          event.getCoveredIDs().add(node.getId());
           // get the STextualDS of this token and add it to the event
           String textID = getTextID((SToken) node, graph);
           if(textID != null)
@@ -344,7 +375,7 @@ public class EventExtractor {
           double[] startEndTime = TimeHelper.getOverlappedTime(node);
           if (startEndTime.length == 1)
           {
-            if (unsetValueForMedia)
+            if (replaceValueWithMediaIcon)
             {
               event.setValue(" ");
               event.setTooltip("play excerpt " + event.getStartTime());
@@ -355,7 +386,7 @@ public class EventExtractor {
           {
             event.setStartTime(startEndTime[0]);
             event.setEndTime(startEndTime[1]);
-            if (unsetValueForMedia)
+            if (replaceValueWithMediaIcon)
             {
               event.setValue(" ");
               event.setTooltip("play excerpt " + event.getStartTime() + "-"
@@ -383,15 +414,15 @@ public class EventExtractor {
 
   private static String getTextID(SToken tok, SDocumentGraph graph)
   {
-    EList<Edge> tokenOutEdges = graph.getOutEdges(tok.getSId());
+    List<? extends SRelation<? extends SNode, ? extends SNode>> tokenOutEdges = graph.getOutRelations(tok.getId());
     if (tokenOutEdges != null)
     {
-      for (Edge tokEdge : tokenOutEdges)
+      for (SRelation<? extends SNode, ? extends SNode> tokEdge : tokenOutEdges)
       {
         if (tokEdge instanceof STextualRelation)
         {
           return ((STextualRelation) tokEdge).
-            getSTextualDS().getSId();
+            getTarget().getId();
         }
       }
     }
@@ -412,15 +443,15 @@ public class EventExtractor {
   public static List<String> computeDisplayAnnotations(VisualizerInput input,
           Class<? extends SNode> type) {
     if (input == null) {
-      return new LinkedList<String>();
+      return new LinkedList<>();
     }
 
-    SDocumentGraph graph = input.getDocument().getSDocumentGraph();
+    SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
     Set<String> annoPool = SToken.class.isAssignableFrom(type) ?
       getAnnotationLevelSet(graph, null, type)
       : getAnnotationLevelSet(graph, input.getNamespace(), type);
-    List<String> annos = new LinkedList<String>(annoPool);
+    List<String> annos = new LinkedList<>(annoPool);
 
     String annosConfiguration = input.getMappings().getProperty(
             MAPPING_ANNOS_KEY);
@@ -435,7 +466,7 @@ public class EventExtractor {
           // check if they match
           Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
 
-          LinkedList<String> matchingAnnos = new LinkedList<String>();
+          LinkedList<String> matchingAnnos = new LinkedList<>();
           for (String a : annoPool) {
             if (regex.matcher(a).matches()) {
               matchingAnnos.add(a);
@@ -475,6 +506,91 @@ public class EventExtractor {
     }
     return annos;
   }
+  
+  /**
+   * Returns the annotations to which should be displayed together with their namespace.
+   *
+   * This will check the "show_ns" paramter for determining.
+   * the annotations to display. It also iterates over all nodes of the graph
+   * matching the type.
+   *
+   * @param input The input for the visualizer.
+   * @param types Which types of nodes to include
+   * @return
+   */
+  public static Set<String> computeDisplayedNamespace(VisualizerInput input,
+          List<Class<? extends SNode>> types) {
+    if (input == null) {
+      return new HashSet<>();
+    }    
+
+    String showNamespaceConfig = input.getMappings().getProperty(
+            GridComponent.MAPPING_SHOW_NAMESPACE);
+    
+    if (showNamespaceConfig != null)
+    {
+      
+      SDocumentGraph graph = input.getDocument().getDocumentGraph();
+
+      Set<String> annoPool = new LinkedHashSet<>();
+      for(Class<? extends SNode> t : types)
+      {
+        annoPool.addAll(SToken.class.isAssignableFrom(t)
+        ? getAnnotationLevelSet(graph, null, t)
+        : getAnnotationLevelSet(graph, input.getNamespace(), t));
+      }
+      
+      
+      if ("true".equalsIgnoreCase(showNamespaceConfig))
+      {
+        // all annotations should be displayed with a namespace
+        return annoPool;
+      }
+      else if("false".equalsIgnoreCase(showNamespaceConfig))
+      {
+        return new LinkedHashSet<>();
+      }
+      else
+      {
+        Set<String> annos = new LinkedHashSet<>();
+        
+        List<String> defs = Splitter.on(',').omitEmptyStrings()
+          .trimResults().splitToList(showNamespaceConfig);
+        for (String s : defs)
+        {
+          // is regular expression?
+          if (s.startsWith("/") && s.endsWith("/"))
+          {
+            // go over all remaining items in our pool of all annotations and
+            // check if they match
+            Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
+
+            LinkedList<String> matchingAnnos = new LinkedList<>();
+            for (String a : annoPool)
+            {
+              if (regex.matcher(a).matches())
+              {
+                matchingAnnos.add(a);
+              }
+            }
+
+            annos.addAll(matchingAnnos);
+            annoPool.removeAll(matchingAnnos);
+
+          }
+          else
+          {
+            annos.add(s);
+            annoPool.remove(s);
+          }
+        }
+        
+        return annos;
+      }
+    }
+    
+    return new LinkedHashSet<>();
+  }
 
   /**
    * Get the qualified name of all annotations belonging to spans having a
@@ -489,24 +605,24 @@ public class EventExtractor {
    */
   private static Set<String> getAnnotationLevelSet(SDocumentGraph graph,
           String namespace, Class<? extends SNode> type) {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
 
     if (graph != null) {
-      EList<? extends SNode> nodes;
+      List<? extends SNode> nodes;
       // catch most common cases directly
       if (SSpan.class == type) {
-        nodes = graph.getSSpans();
+        nodes = graph.getSpans();
       } else if (SToken.class == type) {
-        nodes = graph.getSTokens();
+        nodes = graph.getTokens();
       } else {
-        nodes = graph.getSNodes();
+        nodes = graph.getNodes();
       }
       if (nodes != null) {
         for (SNode n : nodes) {
           if (type.isAssignableFrom(n.getClass())) {
-            for (SLayer layer : n.getSLayers()) {
-              if (namespace == null || namespace.equals(layer.getSName())) {
-                for (SAnnotation anno : n.getSAnnotations()) {
+            for (SLayer layer : n.getLayers()) {
+              if (namespace == null || namespace.equals(layer.getName())) {
+                for (SAnnotation anno : n.getAnnotations()) {
                   result.add(anno.getQName());
                 }
                 // we got all annotations of this node, jump to next node
@@ -608,7 +724,7 @@ public class EventExtractor {
     
     BitSet tokenCoverage = new BitSet();
     // get the sorted token
-    List<SToken> sortedTokenList = graph.getSortedSTokenByText();
+    List<SToken> sortedTokenList = graph.getSortedTokenByText();
     // add all token belonging to the right text to the bit set
     ListIterator<SToken> itToken = sortedTokenList.listIterator();
     while (itToken.hasNext())
@@ -616,7 +732,7 @@ public class EventExtractor {
       SToken t = itToken.next();
       if (text == null || text == CommonHelper.getTextualDSForNode(t, graph))
       {
-        RelannisNodeFeature feat = (RelannisNodeFeature) t.getSFeature(
+        RelannisNodeFeature feat = (RelannisNodeFeature) t.getFeature(
           ANNIS_NS,
           FEAT_RELANNIS_NODE).getValue();
         long tokenIndexRaw = feat.getTokenIndex();
@@ -688,15 +804,15 @@ public class EventExtractor {
       int lastTokenIndex = -1;
 
       // sort the coveredIDs
-      LinkedList<String> sortedCoveredToken = new LinkedList<String>(event.
+      LinkedList<String> sortedCoveredToken = new LinkedList<>(event.
         getCoveredIDs());
       Collections.sort(sortedCoveredToken, new Comparator<String>()
       {
         @Override
         public int compare(String o1, String o2)
         {
-          SNode node1 = graph.getSNode(o1);
-          SNode node2 = graph.getSNode(o2);
+          SNode node1 = graph.getNode(o1);
+          SNode node2 = graph.getNode(o2);
 
           if (node1 == node2)
           {
@@ -711,10 +827,10 @@ public class EventExtractor {
             return +1;
           }
 
-          RelannisNodeFeature feat1 = (RelannisNodeFeature) node1.getSFeature(
+          RelannisNodeFeature feat1 = (RelannisNodeFeature) node1.getFeature(
             ANNIS_NS,
             FEAT_RELANNIS_NODE).getValue();
-          RelannisNodeFeature feat2 = (RelannisNodeFeature) node2.getSFeature(
+          RelannisNodeFeature feat2 = (RelannisNodeFeature) node2.getFeature(
             ANNIS_NS,
             FEAT_RELANNIS_NODE).getValue();
 
@@ -726,12 +842,12 @@ public class EventExtractor {
       });
 
       // first calculate all gaps
-      List<GridEvent> gaps = new LinkedList<GridEvent>();
+      List<GridEvent> gaps = new LinkedList<>();
       for (String id : sortedCoveredToken)
       {
 
-        SNode node = graph.getSNode(id);
-        RelannisNodeFeature feat = (RelannisNodeFeature) node.getSFeature(
+        SNode node = graph.getNode(id);
+        RelannisNodeFeature feat = (RelannisNodeFeature) node.getFeature(
           ANNIS_NS,
           FEAT_RELANNIS_NODE).getValue();
         long tokenIndexRaw = feat.getTokenIndex();

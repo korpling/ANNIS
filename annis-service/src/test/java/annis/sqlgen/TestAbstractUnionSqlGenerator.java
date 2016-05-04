@@ -15,39 +15,33 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
+import static annis.test.TestUtils.newSet;
+import static annis.test.TestUtils.uniqueString;
+import java.util.ArrayList;
+import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
 import static org.mockito.BDDMockito.given;
+import org.mockito.InjectMocks;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.MockitoAnnotations.initMocks;
-import static annis.test.TestUtils.newSet;
-import static annis.test.TestUtils.uniqueString;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 import org.mockito.Spy;
-import org.springframework.dao.DataAccessException;
-
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
 
 public class TestAbstractUnionSqlGenerator {
 
-	@InjectMocks private AbstractUnionSqlGenerator<?> generator;
+	@InjectMocks private AbstractUnionSqlGenerator generator;
 	@Mock private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
 	@Mock private FromClauseSqlGenerator<QueryData> fromClauseSqlGenerator;
-	@Spy private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators = new ArrayList<FromClauseSqlGenerator<QueryData>>();
+	@Spy private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators = new ArrayList<>();
 	@Mock private WhereClauseSqlGenerator<QueryData> whereClauseSqlGenerator;
-	@Spy private List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators = new ArrayList<WhereClauseSqlGenerator<QueryData>>();
+	@Spy private List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators = new ArrayList<>();
 	@Mock private GroupByClauseSqlGenerator<QueryData> groupByClauseSqlGenerator;
 	@Mock private OrderByClauseSqlGenerator<QueryData> orderByClauseSqlGenerator;
 	@Mock private LimitOffsetClauseSqlGenerator<QueryData> limitOffsetClauseSqlGenerator;
@@ -55,19 +49,13 @@ public class TestAbstractUnionSqlGenerator {
 	// test data
 	private QueryData queryData = new QueryData();
 	private QueryNode annisNode = new QueryNode();
-	private List<QueryNode> alternative = new ArrayList<QueryNode>();
-	private List<List<QueryNode>> alternatives = new ArrayList<List<QueryNode>>();
+	private List<QueryNode> alternative = new ArrayList<>();
+	private List<List<QueryNode>> alternatives = new ArrayList<>();
 	
 	@Before
 	public void setup() {
 		// wire up dependencies
-		generator = new AbstractUnionSqlGenerator<Object>() {
-
-			@Override
-			public Object extractData(ResultSet rs) throws SQLException,
-					DataAccessException {
-				throw new UnsupportedOperationException("This SqlGenerator is only used for test purposes.");
-			}
+		generator = new AbstractUnionSqlGenerator() {
 		};
 		initMocks(this);
 		fromClauseSqlGenerators.add(fromClauseSqlGenerator);

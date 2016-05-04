@@ -15,14 +15,13 @@
  */
 package annis.dao;
 
+import static annis.sqlgen.SqlConstraints.sqlString;
+import com.google.common.base.Joiner;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-
-import static annis.sqlgen.SqlConstraints.sqlString;
 
 public class ListCorpusByNameDaoHelper extends ParameterizedSingleColumnRowMapper<Long>
 {
@@ -32,7 +31,7 @@ public class ListCorpusByNameDaoHelper extends ParameterizedSingleColumnRowMappe
     Validate.notEmpty(corpusNames, "Need at least one corpus name");
 
     // turn corpus names into sql strings (enclosed with ')
-    List<String> corpusNamesSqlStrings = new ArrayList<String>();
+    List<String> corpusNamesSqlStrings = new ArrayList<>();
     for (String corpus : corpusNames)
     {
       corpusNamesSqlStrings.add(sqlString(corpus));
@@ -40,9 +39,23 @@ public class ListCorpusByNameDaoHelper extends ParameterizedSingleColumnRowMappe
 
     // build sql query
     StringBuilder sb = new StringBuilder();
-    sb.append("SELECT id FROM corpus WHERE name IN ( ");
-    sb.append(StringUtils.join(corpusNamesSqlStrings, ", "));
-    sb.append(" ) AND top_level = 't'");
+    
+    List<String> singeCorpusSelect = new LinkedList<>();
+    int idx=0;
+    for(String c : corpusNamesSqlStrings)
+    {
+      singeCorpusSelect.add("SELECT id, " 
+        + idx + "::int AS sourceIdx FROM corpus WHERE name=" + c 
+        + " AND top_level IS TRUE");
+      idx++;
+    }
+    
+    sb.append("SELECT tmp.id FROM\n");
+    sb.append("(\n");
+    Joiner.on("\nUNION\n").appendTo(sb, singeCorpusSelect);
+    sb.append(") AS tmp\n");
+    sb.append("ORDER BY tmp.sourceIdx");
+    
     return sb.toString();
   }
 }

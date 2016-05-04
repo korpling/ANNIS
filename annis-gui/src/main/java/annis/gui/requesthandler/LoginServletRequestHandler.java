@@ -18,10 +18,10 @@ package annis.gui.requesthandler;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
+import annis.libgui.LoginDataLostException;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -46,12 +46,19 @@ public class LoginServletRequestHandler implements RequestHandler
 
   private final static Logger log = LoggerFactory.getLogger(
     LoginServletRequestHandler.class);
+  
+  private final String prefix;
+  
+  public LoginServletRequestHandler(String urlPrefix)
+  {
+    this.prefix = urlPrefix + "/login";
+  }
 
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if("/login".equals(request.getPathInfo()))
+    if(request.getPathInfo() != null && request.getPathInfo().startsWith(prefix))
     {
       if("GET".equalsIgnoreCase(request.getMethod()))
       {
@@ -88,10 +95,11 @@ public class LoginServletRequestHandler implements RequestHandler
         .replaceAll("%or%", "or")
         .replaceAll("%cancelcaption%", "Cancel");
 
-      OutputStreamWriter writer = new OutputStreamWriter(out, Charsets.UTF_8);
-      CharStreams.copy(new StringReader(htmlSource), writer);
-      writer.close();
-      out.flush();
+      try (OutputStreamWriter writer = new OutputStreamWriter(out, Charsets.UTF_8))
+      {
+        CharStreams.copy(new StringReader(htmlSource), writer);
+        out.flush();
+      }
     }
     catch (IOException ex)
     {
@@ -144,22 +152,28 @@ public class LoginServletRequestHandler implements RequestHandler
 
       String webserviceURL = (String) annisServiceURLObject;
 
-      Client client = Helper.createRESTClient(username, password);
-
       try
       {
-        WebResource res = client.resource(webserviceURL)
+        AnnisUser user = new AnnisUser(username, password);
+        WebResource res = user.getClient().resource(webserviceURL)
           .path("admin").path("is-authenticated");
         if ("true".equalsIgnoreCase(res.get(String.class)))
         {
           // everything ok, save this user configuration for re-use
-          Helper.setUser(new AnnisUser(username, client));
+          Helper.setUser(user);
         }
       }
       catch (ClientHandlerException ex)
       {
         session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
           "Authentification error: " + ex.getMessage());
+        response.setStatus(502); // bad gateway
+      }
+      catch (LoginDataLostException ex)
+      {
+        session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+          "Lost password in memory. Sorry.");
+        response.setStatus(500); // server error
       }
       catch (UniformInterfaceException ex)
       {
@@ -168,21 +182,31 @@ public class LoginServletRequestHandler implements RequestHandler
         {
           session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Username or password wrong");
+          response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
+        }
+        else if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.
+          getStatusCode())
+        {
+          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+            "Account has expired");
+          response.setStatus(Response.Status.FORBIDDEN.getStatusCode()); // Forbidden
         }
         else
         {
           log.error(null, ex);
           session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Unexpected exception: " + ex.getMessage());
+          response.setStatus(500);
         }
       }
 
-      OutputStreamWriter writer = new OutputStreamWriter(response.
-        getOutputStream(), Charsets.UTF_8);
-      String html = Resources.toString(LoginServletRequestHandler.class.getResource(
-        "closelogin.html"), Charsets.UTF_8);
-      CharStreams.copy(new StringReader(html), writer);
-      writer.close();
+      try (OutputStreamWriter writer = new OutputStreamWriter(response.
+        getOutputStream(), Charsets.UTF_8)) 
+      {
+        String html = Resources.toString(LoginServletRequestHandler.class.getResource(
+          "closelogin.html"), Charsets.UTF_8);
+        CharStreams.copy(new StringReader(html), writer);
+      }
 
     } // end if login attempt
 

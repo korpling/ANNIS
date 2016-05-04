@@ -15,16 +15,14 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
-
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
 import org.springframework.util.Assert;
 
 /**
@@ -38,9 +36,9 @@ import org.springframework.util.Assert;
  *
  * @param <T> Type into which the JDBC result set is transformed.
  */
-public abstract class AbstractSqlGenerator<T>
+public abstract class AbstractSqlGenerator
   extends TableAccessStrategyFactory
-  implements SqlGenerator<QueryData, T>
+  implements SqlGenerator<QueryData>
 {
 
   // generators for different SQL statement clauses
@@ -57,7 +55,8 @@ public abstract class AbstractSqlGenerator<T>
   @Override
   public String toSql(QueryData queryData)
   {
-    return toSql(queryData, "");
+    String result = toSql(queryData, "");
+    return result;
   }
 
   @Override
@@ -66,8 +65,17 @@ public abstract class AbstractSqlGenerator<T>
     Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
 
     // push alternative down
-    List<QueryNode> alternative = queryData.getAlternatives().get(0);
-
+    List<QueryNode> alternative = queryData.getAlternatives().get(0);;
+    // find the first alternative which has the maximum width in order to make sure
+    // getMaxWidth() and alternative.size() are always the same
+    for(List<QueryNode> a :  queryData.getAlternatives())
+    {
+      if(a.size() == queryData.getMaxWidth())
+      {
+        alternative = a;
+        break;
+      }
+    }
     StringBuffer sb = new StringBuffer();
     sb.append(indent);
     sb.append(createSqlForAlternative(queryData, alternative, indent));
@@ -118,6 +126,7 @@ public abstract class AbstractSqlGenerator<T>
   private void appendSelectClause(StringBuffer sb, QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    sb.append(indent);
     sb.append("SELECT ");
     sb.append(selectClauseSqlGenerator.selectClause(queryData, alternative,
       indent));
@@ -129,7 +138,7 @@ public abstract class AbstractSqlGenerator<T>
   {
     sb.append(indent);
     sb.append("FROM");
-    List<String> fromTables = new ArrayList<String>();
+    List<String> fromTables = new ArrayList<>();
     for (FromClauseSqlGenerator<QueryData> generator : fromClauseSqlGenerators)
     {
       fromTables.add(generator.fromClause(queryData, alternative, indent));
@@ -151,7 +160,7 @@ public abstract class AbstractSqlGenerator<T>
     }
 
     // treat each condition as mutable string to remove last AND
-    List<StringBuffer> conditions = new ArrayList<StringBuffer>();
+    List<StringBuffer> conditions = new ArrayList<>();
 
     for (WhereClauseSqlGenerator<QueryData> generator : whereClauseSqlGenerators)
     {
@@ -210,11 +219,15 @@ public abstract class AbstractSqlGenerator<T>
   {
     if (groupByClauseSqlGenerator != null)
     {
-      sb.append(indent);
-      sb.append("GROUP BY ");
-      sb.append(groupByClauseSqlGenerator.groupByAttributes(queryData,
-        alternative));
-      sb.append("\n");
+      String atts = groupByClauseSqlGenerator.groupByAttributes(queryData,
+        alternative);
+      if(atts != null && !atts.isEmpty())
+      {
+        sb.append(indent);
+        sb.append("GROUP BY ");
+        sb.append(atts);
+        sb.append("\n");
+      }
     }
   }
 
@@ -236,7 +249,6 @@ public abstract class AbstractSqlGenerator<T>
   {
     if (limitOffsetClauseSqlGenerator != null)
     {
-      sb.append(indent);
       sb.append(limitOffsetClauseSqlGenerator.limitOffsetClause(queryData,
         alternative, indent));
       sb.append("\n");

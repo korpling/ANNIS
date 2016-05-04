@@ -17,19 +17,35 @@ package annis.gui;
 
 import annis.libgui.Helper;
 import annis.model.Annotation;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.*;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.Table;
 import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -45,6 +61,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     MetaDataPanel.class);
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   private VerticalLayout layout;
 
@@ -101,7 +119,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
       corpusSelection.setWidth(100, Unit.PERCENTAGE);
       corpusSelection.setHeight("-1px");
-      corpusSelection.addValueChangeListener(this);
+      corpusSelection.addValueChangeListener(MetaDataPanel.this);
 
       selectionLayout.setWidth(100, Unit.PERCENTAGE);
       selectionLayout.setHeight("-1px");
@@ -161,25 +179,19 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   private Table setupTable(BeanItemContainer<Annotation> metaData)
   {
     final BeanItemContainer<Annotation> mData = metaData;
+    mData.sort(new Object[] {"namespace", "name"}, new boolean[] {true, true});
     Table tblMeta = new Table();
     tblMeta.setContainerDataSource(mData);
     tblMeta.addGeneratedColumn("genname", new MetaTableNameGenerator(mData));
     tblMeta.addGeneratedColumn("genvalue", new MetaTableValueGenerator(mData));
 
 
-    tblMeta.setVisibleColumns(new String[]
-    {
-      "genname", "genvalue"
-    });
+    tblMeta.setVisibleColumns("genname", "genvalue");
 
-    tblMeta.setColumnHeaders(new String[]
-    {
-      "Name", "Value"
-    });
+    tblMeta.setColumnHeaders("Name", "Value");
     tblMeta.setSizeFull();
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
-    tblMeta.setSortContainerPropertyId("name");
     tblMeta.addStyleName(ChameleonTheme.TABLE_STRIPED);
     return tblMeta;
   }
@@ -192,7 +204,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName,
       documentName);
 
-    Map<Integer, List<Annotation>> hashMetaData = new HashMap<Integer, List<Annotation>>();
+    Map<Integer, List<Annotation>> hashMetaData = new HashMap<>();
 
 
     if (metadata != null && !metadata.isEmpty())
@@ -201,11 +213,11 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       if (documentName != null)
       {
         hashMetaData =
-          new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
+          new TreeMap<>(Collections.reverseOrder());
       }
       else
       {
-        hashMetaData = new TreeMap<Integer, List<Annotation>>();
+        hashMetaData = new TreeMap<>();
       }
 
       for (Annotation metaDatum : metadata)
@@ -230,14 +242,14 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     Map<Integer, List<Annotation>> splittedAnnotationsList)
   {
     List<BeanItemContainer<Annotation>> listOfBeanItemCon =
-      new ArrayList<BeanItemContainer<Annotation>>();
+      new ArrayList<>();
 
 
 
     for (List<Annotation> list : splittedAnnotationsList.values())
     {
       BeanItemContainer<Annotation> metaContainer =
-        new BeanItemContainer<Annotation>(Annotation.class);
+        new BeanItemContainer<>(Annotation.class);
       metaContainer.addAll(list);
 
       listOfBeanItemCon.add(metaContainer);
@@ -247,13 +259,26 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
   private List<Annotation> getAllSubcorpora(String toplevelCorpusName)
   {
-
+    List<Annotation> result = new LinkedList<>();
     WebResource res = Helper.getAnnisWebResource();
     try
     {
       res = res.path("meta").path("docnames")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-      docs = res.get(new Helper.AnnotationListType());
+        .path(urlPathEscape.escape(toplevelCorpusName));
+      result = res.get(new Helper.AnnotationListType());
+      
+      Collections.sort(result, new Comparator<Annotation>()
+      {
+
+        @Override
+        public int compare(Annotation arg0, Annotation arg1)
+        {
+          return ComparisonChain.start()
+            .compare(arg0.getName(), arg1.getName())
+            .result();
+        }
+      });
+      
     }
     catch (UniformInterfaceException ex)
     {
@@ -269,16 +294,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
 
-    return docs;
+    return result;
   }
 
   @Override
@@ -287,7 +304,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     if (lastSelectedItem == null
       || !lastSelectedItem.equals(event.getProperty().getValue()))
     {
-      lastSelectedItem = event.getProperty().toString();
+      lastSelectedItem = event.getProperty().getValue().toString();
       List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName,
         lastSelectedItem);
 
@@ -312,7 +329,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   private void loadTable(String item, List<Annotation> metaData)
   {
     BeanItemContainer<Annotation> metaContainer =
-      new BeanItemContainer<Annotation>(Annotation.class);
+      new BeanItemContainer<>(Annotation.class);
     metaContainer.addAll(metaData);
 
     if (corpusAnnotationTable != null)
@@ -360,7 +377,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     }
   }  
 
-  private static class MetaTableNameGenerator implements ColumnGenerator
+  public static class MetaTableNameGenerator implements ColumnGenerator
   {
 
     private final BeanItemContainer<Annotation> mData;
@@ -386,7 +403,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     }
   }
 
-  private static class MetaTableValueGenerator implements ColumnGenerator
+  public static class MetaTableValueGenerator implements ColumnGenerator
   {
 
     private final BeanItemContainer<Annotation> mData;
@@ -401,7 +418,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     public Component generateCell(Table source, Object itemId, Object columnId)
     {
       Annotation anno = mData.getItem(itemId).getBean();
-      Label l = new Label(anno.getValue(), Label.CONTENT_RAW);
+      Label l = new Label(anno.getValue(), ContentMode.HTML);
       return l;
     }
   }

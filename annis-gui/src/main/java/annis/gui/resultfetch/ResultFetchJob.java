@@ -15,30 +15,30 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.QueryController;
-import annis.gui.SearchUI;
-import annis.gui.model.PagedResultQuery;
+import annis.gui.AnnisUI;
+import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
+import annis.model.AqlParseError;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
+import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,30 +56,30 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
 
   protected ResultViewPanel resultPanel;
 
-  private Future<MatchGroup> futureMatches;
+  private final Future<MatchGroup> futureMatches;
 
   protected AsyncWebResource res;
 
   protected PagedResultQuery query;
 
-  protected SearchUI ui;
-  private QueryController queryController;
+  protected AnnisUI ui;
 
-  public ResultFetchJob(PagedResultQuery query, ResultViewPanel resultPanel,
-    SearchUI ui, QueryController controller)
+  public ResultFetchJob(PagedResultQuery query,
+    ResultViewPanel resultPanel,
+    AnnisUI ui)
   {
     this.resultPanel = resultPanel;
     this.query = query;
     this.ui = ui;
-    this.queryController = controller;
-
+    
     res = Helper.getAnnisAsyncWebResource();
-
+    
     futureMatches = res.path("query").path("search").path("find")
-      .queryParam("q", query.getQuery())
+      .queryParam("q", Helper.encodeJersey(query.getQuery()))
       .queryParam("offset", "" + query.getOffset())
       .queryParam("limit", "" + query.getLimit())
-      .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
+      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(query.getCorpora(), ",")))
+      .queryParam("order", query.getOrder().toString())
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(MatchGroup.class);
 
@@ -114,9 +114,6 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       // get the matches
       result = futureMatches.get();
       
-      // store the matches for later purposes
-      queryController.setMatches(result);
-
       // get the subgraph for each match, when the result is not empty
       if (result.getMatches().isEmpty())
       {
@@ -145,7 +142,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
         }
 
         // since annis found something, inform the user that subgraphs are created
-        ui.accessSynchronously(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
@@ -155,36 +152,38 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
         });
 
         // prepare fetching subgraphs
-        final int totalResultSize = result.getMatches().size();
        
-        final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<SaltProject>(
-          totalResultSize);
-        int current = 0;
+        final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<>(
+          result.getMatches().size());
+        int current = 0;        
+        final ArrayList<Match> matchList = new ArrayList<>(result.getMatches());
 
-        for (Match m : result.getMatches())
+        for (Match m : matchList)
         {
           if (Thread.interrupted())
           {
             return;
           }
 
-          List<Match> subList = new LinkedList<Match>();
+          List<Match> subList = new LinkedList<>();
           subList.add(m);
           final SaltProject p = executeQuery(subgraphRes, 
             new MatchGroup(subList), 
-            query.getContextLeft(), query.getContextRight(),
+            query.getLeftContext(), query.getRightContext(),
             query.getSegmentation(), SubgraphFilter.all);
 
           queue.put(p);
+          log.debug("added match {} to queue", current+1);
 
+          
           if (current == 0)
           {
-            ui.accessSynchronously(new Runnable()
+            ui.access(new Runnable()
             {
               @Override
               public void run()
               {
-                resultPanel.setQueryResultQueue(queue, query, totalResultSize);
+                resultPanel.setQueryResultQueue(queue, query, matchList);
               }
             });
           }
@@ -198,14 +197,10 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
         }
       } // end if no results
 
-      if (Thread.interrupted())
-      {
-        return;
-      }
     }
     catch (InterruptedException ex)
     {
-      log.warn(null, ex);
+      // just return
     }
     catch (final ExecutionException root)
     {
@@ -223,12 +218,22 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
               UniformInterfaceException ex = (UniformInterfaceException) cause;
               if (ex.getResponse().getStatus() == 400)
               {
-                paging.setInfo("parsing error: " + ex.getResponse().
-                  getEntity(String.class));
+                List<AqlParseError> errors
+                  = ex.getResponse().getEntity(
+                    new GenericType<List<AqlParseError>>()
+                    {
+                    });
+                String errMsg = Joiner.on(" | ").join(errors);
+
+                paging.setInfo("parsing error: " + errMsg);
               }
               else if (ex.getResponse().getStatus() == 504)
               {
-                paging.setInfo("Timeout: query exeuction took too long");
+                paging.setInfo("Timeout: query execution took too long");
+              }
+              else if(ex.getResponse().getStatus() == 403)
+              {
+                paging.setInfo("Not authorized to query this corpus.");
               }
               else
               {
@@ -246,13 +251,6 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           }
         }
       });
-    }
-    finally
-    {
-      if (Thread.interrupted())
-      {
-        return;
-      }
-    }
+    } // end catch
   }
 }

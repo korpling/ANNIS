@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -41,24 +42,32 @@ import org.slf4j.LoggerFactory;
 public class QueryNodeListener extends AqlParserBaseListener
 {
   private static final Logger log = LoggerFactory.getLogger(QueryNodeListener.class);
+
+  private Map<Interval, Long> nodeIntervalToID;
   
   private QueryData data = null;
 
-  private final List<QueryNode> currentAlternative = new ArrayList<QueryNode>();
-
-  private long aliasCount = 0l;
+  /**
+   * Maps the node ID to the query node.
+   */
+  private final TreeMap<Long, QueryNode> currentAlternative = new TreeMap<>();
+  
   private String lastVariableDefinition = null;
 
   private final Multimap<String, QueryNode> localNodes = HashMultimap.create();
   
   private List<Map<Interval, QueryNode>> tokenPositions;
   private final Map<Interval, QueryNode> currentTokenPosition = Maps.newHashMap();
-  private final Map<Interval, Long> globalTokenPositions = Maps.newHashMap();
   
-  private final List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
+  private final List<QueryAnnotation> metaData = new ArrayList<>();
 
-  public QueryNodeListener()
+  public QueryNodeListener(Map<Interval, Long> nodeIntervalToID)
   {
+    this.nodeIntervalToID = nodeIntervalToID;
+    if(this.nodeIntervalToID == null)
+    {
+      this.nodeIntervalToID = new HashMap<>();
+    }
   }
 
   public QueryData getQueryData()
@@ -75,7 +84,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   public void enterOrTop(AqlParser.OrTopContext ctx)
   {
     data = new QueryData();
-    tokenPositions = new ArrayList<Map<Interval, QueryNode>>();
+    tokenPositions = new ArrayList<>();
   }
 
   @Override
@@ -89,8 +98,8 @@ public class QueryNodeListener extends AqlParserBaseListener
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
-    data.addAlternative(new ArrayList<QueryNode>(currentAlternative));
-    tokenPositions.add(new HashMap<Interval, QueryNode>(currentTokenPosition));
+    data.addAlternative(new ArrayList<>(currentAlternative.values()));
+    tokenPositions.add(new HashMap<>(currentTokenPosition));
   }
 
   
@@ -270,11 +279,11 @@ public class QueryNodeListener extends AqlParserBaseListener
 
   private QueryNode newNode(ParserRuleContext ctx)
   {
-    Long existingID = globalTokenPositions.get(ctx.getSourceInterval());
+    Long existingID = nodeIntervalToID.get(ctx.getSourceInterval());
     
     if(existingID == null)
     {
-      existingID = ++aliasCount;
+      throw new IllegalStateException("Could not find a node ID for interval " + ctx.getSourceInterval().toString());
     }
     
     QueryNode n = new QueryNode(existingID);
@@ -288,10 +297,11 @@ public class QueryNodeListener extends AqlParserBaseListener
     }
     lastVariableDefinition = null;
     
-    currentAlternative.add(n);
+    n.setParseLocation(AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()));
+    
+    currentAlternative.put(existingID, n);
     localNodes.put(n.getVariable(), n);
     currentTokenPosition.put(ctx.getSourceInterval(), n);
-    globalTokenPositions.put(ctx.getSourceInterval(), n.getId());
     
     return n;
   }

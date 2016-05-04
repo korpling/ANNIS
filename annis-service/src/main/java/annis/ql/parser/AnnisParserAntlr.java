@@ -17,12 +17,15 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.AqlParseError;
+import annis.model.ParsedEntityLocation;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
 import annis.ql.RawAqlPreParser;
 import com.google.common.base.Joiner;
 import java.util.LinkedList;
 import java.util.List;
+import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -45,23 +48,25 @@ public class AnnisParserAntlr
   private static final Logger log = LoggerFactory.getLogger(AnnisParserAntlr.class);
   private int precedenceBound;
   private List<QueryDataTransformer> postProcessors;
-
+  
   public QueryData parse(String aql, List<Long> corpusList)
   {
-    final List<String> errors = new LinkedList<String>();
+    final List<AqlParseError> errors = new LinkedList<>();
     
 
     AqlLexer lexerNonDNF = new AqlLexer(new ANTLRInputStream(aql));
+    lexerNonDNF.removeErrorListeners();
+    lexerNonDNF.addErrorListener(new AqlLexerErrorListener(errors));
     
     // bring first into DNF
     RawAqlPreParser rawParser = new RawAqlPreParser(new CommonTokenStream(lexerNonDNF));
     rawParser.removeErrorListeners();
-    rawParser.addErrorListener(new StringListErrorListener(errors));
+    rawParser.addErrorListener(new AqlParseErrorListener(errors));
     
     RawAqlPreParser.StartContext treeRaw = rawParser.start();
     if (!errors.isEmpty())
     {
-      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
     //treeRaw.inspect(rawParser);
     
@@ -78,7 +83,7 @@ public class AnnisParserAntlr
     AqlParser parserDNF = new AqlParser(new CommonTokenStream(source));
     
     parserDNF.removeErrorListeners();
-    parserDNF.addErrorListener(new StringListErrorListener(errors));
+    parserDNF.addErrorListener(new AqlParseErrorListener(errors));
 
     AqlParser.StartContext treeDNF = parserDNF.start();
     
@@ -86,11 +91,14 @@ public class AnnisParserAntlr
     
     if (!errors.isEmpty())
     {
-      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
       
     ParseTreeWalker walker = new ParseTreeWalker();
-    QueryNodeListener nodeListener = new QueryNodeListener();
+    NodeIDListener idListener = new NodeIDListener();
+    walker.walk(idListener, treeDNF);
+    
+    QueryNodeListener nodeListener = new QueryNodeListener(idListener.getNodeIntervalToID());
 
     try
     {
@@ -111,7 +119,7 @@ public class AnnisParserAntlr
         {
           data = transformer.transform(data);
         }
-      }
+      }      
       return data;
 
     }
@@ -133,10 +141,10 @@ public class AnnisParserAntlr
     AqlParser parser = new AqlParser(new CommonTokenStream(
       lexer));
     
-    final List<String> errors = new LinkedList<String>();
+    final List<AqlParseError> errors = new LinkedList<>();
 
     parser.removeErrorListeners();
-    parser.addErrorListener(new StringListErrorListener(errors));
+    parser.addErrorListener(new AqlParseErrorListener(errors));
 
     ParseTree tree = parser.start();
     
@@ -146,10 +154,10 @@ public class AnnisParserAntlr
     }
     else
     {
-      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
   }
-  
+
   public int getPrecedenceBound()
   {
     return precedenceBound;
@@ -179,16 +187,88 @@ public class AnnisParserAntlr
     {
       this.errors = errors;
     }
-    
-     @Override
-    public void syntaxError(Recognizer recognizer, Token offendingSymbol,
-      int line, int charPositionInLine, String msg, RecognitionException e)
+
+    @Override
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
     {
       if(errors != null)
       {
         errors.add("line " + line + ":" + charPositionInLine + " " + msg);
       }
     }
+  }
+  
+  public static class AqlLexerErrorListener extends BaseErrorListener
+  {
+
+    private final List<AqlParseError> errors;
+
+    public AqlLexerErrorListener(List<AqlParseError> errors)
+    {
+      this.errors = errors;
+    }
+
+    @Override
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
+    {
+      if(errors != null)
+      {
+        ParsedEntityLocation loc = 
+          new ParsedEntityLocation(line, charPositionInLine, line, charPositionInLine);
+        errors.add(new AqlParseError(loc, msg));
+      }
+    }
+    
+  }
+  
+  public static class AqlParseErrorListener extends BaseErrorListener
+  {
+    private final List<AqlParseError> errors;
+
+    public AqlParseErrorListener(List<AqlParseError> errors)
+    {
+      this.errors = errors;
+    }
+
+    @Override
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e)
+    {
+      if(errors != null && offendingSymbol instanceof Token)
+      {
+        Token t = (Token) offendingSymbol;
+        errors.add(new AqlParseError(getLocation(t, t), msg));
+      }
+    }
+    
+  }
+  
+  
+  
+  public static ParsedEntityLocation getLocation(Token start, Token stop)
+  {
+    if(start == null)
+    {
+      return new ParsedEntityLocation();
+    }
+    if(stop == null)
+    {
+      stop = start;
+    }
+    
+    int startLine = start.getLine();
+    int endLine = stop.getLine();
+    
+    int startColumn = start.getCharPositionInLine();
+    // We assume a token can be only one line (newline character is whitespace and a separator).
+    // Thus the end column of a token is the start position plus its actual text length;
+    String stopTokenText = stop.getText();    
+    int endColumn = stop.getCharPositionInLine();
+    if(stopTokenText != null && !stopTokenText.isEmpty())
+    {
+      endColumn += stopTokenText.length()-1;
+    }
+    
+    return new ParsedEntityLocation(startLine, startColumn, endLine, endColumn);
   }
   
 }

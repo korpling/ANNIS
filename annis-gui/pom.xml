@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.1.8</version>
+    <version>3.4.3</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -46,7 +46,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.2</version>
+        <version>2.5</version>
         <configuration>
           <webResources>
             <webResource>
@@ -94,56 +94,12 @@
         </executions>
       </plugin>
    
-      <!-- 
-      Maven does not copy the "bundle" artifacts to WEB-INF/lib so we have to do it by ourself. 
-      See http://jira.codehaus.org/browse/MWAR-267 for the bug report and
-      http://maven.apache.org/plugins/maven-dependency-plugin/examples/copying-artifacts.html
-      for the workaround that was applied here
-      -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.4</version>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
-                  <artifactId>salt-saltCommon</artifactId>
-                  <version>1.1.7</version>
-                  <type>bundle</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
-                  <artifactId>salt-graph</artifactId>
-                  <version>1.1.7</version>
-                  <type>bundle</type>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
-                  <artifactId>salt-saltCore</artifactId>
-                  <version>1.1.7</version>
-                  <type>bundle</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib/</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-   
       <!-- A simple Jetty test server at http://localhost:8080/annis-gui can 
       be launched with the Maven goal jetty:run and stopped with jetty:stop -->
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
-        <version>9.0.4.v20130625</version>
+        <version>9.3.7.v20160115</version>
         <configuration>
           <webApp>
             <contextPath>/annis-gui</contextPath>
@@ -156,37 +112,67 @@
           <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-continuation</artifactId>
-            <version>9.0.4.v20130625</version>
+            <version>9.3.7.v20160115</version>
           </dependency>
         </dependencies>
       </plugin>
       
-      <!-- workaround for automatically compile SCSS file in maven
-      http://dev.vaadin.com/ticket/10291
-      -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-maven-plugin</artifactId>
+        <version>${vaadin.version}</version>
         <executions>
           <execution>
-            <phase>generate-sources</phase>
             <goals>
-              <goal>java</goal>
+              <goal>clean</goal>
+              <goal>resources</goal>
+              <goal>update-theme</goal>
+              <goal>compile-theme</goal>
             </goals>
-            <configuration>
-              <classpathScope>compile</classpathScope>
-              <mainClass>com.vaadin.sass.SassCompiler</mainClass>
-              <arguments>
-                <argument>src/main/webapp/VAADIN/themes/annis/styles.scss</argument>
-                <argument>src/main/webapp/VAADIN/themes/annis/styles.css</argument>
-              </arguments>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <optimizationLevel>9</optimizationLevel>
+          <style>OBF</style>
+        </configuration>
       </plugin>
       
     </plugins>
+    <pluginManagement>
+    	<plugins>
+    		<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+    		<plugin>
+    			<groupId>org.eclipse.m2e</groupId>
+    			<artifactId>lifecycle-mapping</artifactId>
+    			<version>1.0.0</version>
+    			<configuration>
+    				<lifecycleMappingMetadata>
+    					<pluginExecutions>
+    						<pluginExecution>
+    							<pluginExecutionFilter>
+    								<groupId>com.vaadin</groupId>
+    								<artifactId>
+    									vaadin-maven-plugin
+    								</artifactId>
+    								<versionRange>
+    									[7.3.10,)
+    								</versionRange>
+    								<goals>
+    									<goal>compile-theme</goal>
+    									<goal>update-theme</goal>
+    									<goal>resources</goal>
+    								</goals>
+    							</pluginExecutionFilter>
+    							<action>
+    								<ignore></ignore>
+    							</action>
+    						</pluginExecution>
+    					</pluginExecutions>
+    				</lifecycleMappingMetadata>
+    			</configuration>
+    		</plugin>
+    	</plugins>
+    </pluginManagement>
   </build>
 
   <dependencies>
@@ -221,8 +207,8 @@
     
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>${servlet.version}</version>
       <scope>provided</scope>
     </dependency>
     
@@ -232,8 +218,21 @@
       <version>4.11</version>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>2.49.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-htmlunit-driver</artifactId>
+      <version>2.49.0</version>
+      <scope>test</scope>
+    </dependency>
+    
  
-
   </dependencies>
   <name>annis-gui</name>
 </project>

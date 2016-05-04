@@ -15,17 +15,21 @@
  */
 package annis.dao.autogenqueries;
 
-import annis.dao.AnnisDao;
+import annis.GraphHelper;
+import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,7 +49,7 @@ public class QueriesGenerator
   private final Logger log = LoggerFactory.getLogger(QueriesGenerator.class);
 
   // for executing AQL queries
-  private AnnisDao annisDao;
+  private QueryDao queryDao;
 
   // only contains one element: the top level corpus id of the imported corpus
   private List<Long> corpusIds;
@@ -140,7 +144,7 @@ public class QueriesGenerator
     }
     else
     {
-      List<Long> ids = annisDao.mapCorpusNamesToIds(corpusNames);
+      List<Long> ids = queryDao.mapCorpusNamesToIds(corpusNames);
       for (Long id : ids)
       {
         delExampleQueries(id);
@@ -153,7 +157,7 @@ public class QueriesGenerator
    * queries.
    *
    * @param corpusId Determines the corpus, for which the example queries are
-   * generated for. It must be the final relAnnis id of the corpus.
+   * generated for. It must be the final ANNIS id of the corpus.
    *
    * @param delete Deletes the already existing example queries in the database.
    */
@@ -172,20 +176,23 @@ public class QueriesGenerator
    * queries.
    *
    * @param corpusId Determines the corpus, for which the example queries are
-   * generated for. It must be the final relAnnis id of the corpus.
+   * generated for. It must be the final ANNIS id of the corpus.
    */
   public void generateQueries(long corpusId)
   {
-    corpusIds = new ArrayList<Long>();
+    corpusIds = new ArrayList<>();
     corpusIds.add(corpusId);
-    List<String> corpusNames = getAnnisDao().mapCorpusIdsToNames(corpusIds);
-    corpusName = corpusNames.get(0);
-
-    if (queryBuilder != null)
+    List<String> corpusNames = getQueryDao().mapCorpusIdsToNames(corpusIds);
+    if(!corpusNames.isEmpty())
     {
-      for (QueryBuilder qB : queryBuilder)
+      corpusName = corpusNames.get(0);
+
+      if (queryBuilder != null)
       {
-        generateQuery(qB);
+        for (QueryBuilder qB : queryBuilder)
+        {
+          generateQuery(qB);
+        }
       }
     }
   }
@@ -195,13 +202,13 @@ public class QueriesGenerator
    * queries.
    *
    * @param name Determines the corpus, for which the example queries are
-   * generated for. It must be the final relAnnis id of the corpus.
+   * generated for. It must be the final ANNIS id of the corpus.
    */
   public void generateQueries(String name, boolean delete)
   {
-    List<String> names = new ArrayList<String>();
+    List<String> names = new ArrayList<>();
     names.add(name);
-    List<Long> ids = annisDao.mapCorpusNamesToIds(names);
+    List<Long> ids = queryDao.mapCorpusNamesToIds(names);
     if (!ids.isEmpty())
     {
       generateQueries(ids.get(0), delete);
@@ -219,7 +226,7 @@ public class QueriesGenerator
    */
   public void generateQueries(Boolean overwrite)
   {
-    List<AnnisCorpus> corpora = annisDao.listCorpora();
+    List<AnnisCorpus> corpora = queryDao.listCorpora();
     for (AnnisCorpus annisCorpus : corpora)
     {
       generateQueries(annisCorpus.getId(), overwrite);
@@ -228,50 +235,71 @@ public class QueriesGenerator
 
   private void generateQuery(QueryBuilder queryBuilder)
   {
-
-    // retrieve the aql query for analyzing purposes
-    String aql = queryBuilder.getAQL();
-
-    // set some necessary extensions for generating complete sql
-    QueryData queryData = getAnnisDao().parseAQL(aql, this.corpusIds);
-    queryData.addExtension(queryBuilder.getLimitOffsetQueryData());
-    queryData.addExtension(queryBuilder.getAnnotateQueryData());
-
-
-    // retrieve the salt project to analyze
-    SaltProject saltProject = getAnnisDao().annotate(queryData);
-    queryBuilder.analyzingQuery(saltProject);
-
-    // set the corpus name
-    ExampleQuery exampleQuery = queryBuilder.getExampleQuery();
-    exampleQuery.setCorpusName(corpusName);
-
-    // copy the example query to the database
-    if (exampleQuery.getExampleQuery() != null
-      && !"".equals(exampleQuery.getExampleQuery()))
+    try
     {
-      if (getTableInsertSelect().containsKey("example_queries"))
-      {
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO example_queries (");
-        sql.append(getTableInsertSelect().get("example_queries")).append(") ");
-        sql.append("VALUES (\n");
-        sql.append("'").append(exampleQuery.getExampleQuery()).append("', ");
-        sql.append("'").append(exampleQuery.getDescription()).append("', ");
-        sql.append("'").append(exampleQuery.getType()).append("', ");
-        sql.append("'").append(exampleQuery.getNodes()).append("', ");
-        sql.append("'").append("{}").append("', ");
-        sql.append("'").append(corpusIds.get(0)).append("'");
-        sql.append("\n)");
 
-        getJdbcTemplate().execute(sql.toString());
-        log.info("generated example query: {}", exampleQuery.getExampleQuery());
+      // retrieve the aql query for analyzing purposes
+      String aql = queryBuilder.getAQL();
+
+      // set some necessary extensions for generating complete sql
+      QueryData queryData = getQueryDao().parseAQL(aql, this.corpusIds);
+      queryData.addExtension(queryBuilder.getLimitOffsetQueryData());
+      
+      // retrieve the salt project to analyze
+      List<Match> matches = getQueryDao().find(queryData);
+      
+      if(matches.isEmpty())
+      {
+        return;
+      }
+      
+      QueryData matchQueryData = GraphHelper.createQueryData(new MatchGroup(matches), queryDao);
+      matchQueryData.addExtension(queryBuilder.getAnnotateQueryData());
+      
+      SaltProject saltProject = getQueryDao().graph(matchQueryData);
+      queryBuilder.analyzingQuery(saltProject);
+
+      // set the corpus name
+      ExampleQuery exampleQuery = queryBuilder.getExampleQuery();
+      exampleQuery.setCorpusName(corpusName);
+
+      // copy the example query to the database
+      if (exampleQuery.getExampleQuery() != null
+        && !"".equals(exampleQuery.getExampleQuery()))
+      {
+        if (getTableInsertSelect().containsKey("example_queries"))
+        {
+          
+          Object[] values = new Object[]
+          { 
+            exampleQuery.getExampleQuery(),
+            exampleQuery.getDescription(),
+            exampleQuery.getType() == null ? "" : exampleQuery.getType(),
+            exampleQuery.getNodes(),
+            "{}",
+            corpusIds.get(0)
+          };
+          int[] argTypes = new int[]
+          {
+            Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
+            Types.VARCHAR, Types.INTEGER
+          };
+
+          getJdbcTemplate().update("INSERT INTO example_queries(" 
+            + getTableInsertSelect().get("example_queries") 
+            + ") VALUES(?, ?, ?, ?, ?::text[], ?)", values, argTypes);
+          log.info("generated example query: {}", exampleQuery.getExampleQuery());
+        }
+      }
+      else
+      {
+        log.warn("could not generating auto query with {}", queryBuilder.
+          getClass().getName());
       }
     }
-    else
+    catch(Exception ex)
     {
-      log.warn("could not generating auto query with {}", queryBuilder.
-        getClass().getName());
+      log.warn("Cannot generate example query", ex);
     }
   }
 
@@ -317,19 +345,19 @@ public class QueriesGenerator
   }
 
   /**
-   * @return the annisDao
+   * @return the queryDao
    */
-  public AnnisDao getAnnisDao()
+  public QueryDao getQueryDao()
   {
-    return annisDao;
+    return queryDao;
   }
 
   /**
-   * @param annisDao the annisDao to set
+   * @param queryDao the queryDao to set
    */
-  public void setAnnisDao(AnnisDao annisDao)
+  public void setQueryDao(QueryDao queryDao)
   {
-    this.annisDao = annisDao;
+    this.queryDao = queryDao;
   }
 
   /**

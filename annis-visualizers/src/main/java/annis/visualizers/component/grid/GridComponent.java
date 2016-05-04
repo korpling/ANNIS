@@ -24,18 +24,15 @@ import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import annis.model.RelannisNodeFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,6 +43,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +67,8 @@ public class GridComponent extends Panel
   public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
   public static final String MAPPING_TOK_ANNOS_KEY = "tok_anno";
   public static final String MAPPING_ESCAPE_HTML = "escape_html";
+  public static final String MAPPING_SHOW_NAMESPACE = "show_ns";
+  
   private AnnotationGrid grid;
   private final transient VisualizerInput input;
   private final transient MediaController mediaController;
@@ -70,7 +76,8 @@ public class GridComponent extends Panel
   private final VerticalLayout layout;
   private Set<String> manuallySelectedTokenAnnos;
   private String segmentationName;
-  private transient STextualDS enforcedText;
+  private final transient STextualDS enforcedText;
+  private final Label lblEmptyToken;
   
   public enum ElementType
   {
@@ -93,16 +100,20 @@ public class GridComponent extends Panel
     layout.setSizeUndefined();
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
+    lblEmptyToken = new Label("(Empty token list, you may want to select another base text from the menu above.)");
+    lblEmptyToken.setVisible(false);
+    lblEmptyToken.addStyleName("empty_token_hint");
+    layout.addComponent(lblEmptyToken);
     if (input != null)
     {
       this.manuallySelectedTokenAnnos = input.getVisibleTokenAnnos();
       this.segmentationName = forceToken ? null :  input.getSegmentationName();
       
-      EList<STextualDS> texts
-        = input.getDocument().getSDocumentGraph().getSTextualDSs();
+      List<STextualDS> texts
+        = input.getDocument().getDocumentGraph().getTextualDSs();
       if (texts != null && texts.size() > 0 && !Helper.isRTLDisabled())
       {
-        if (CommonHelper.containsRTLText(texts.get(0).getSText()))
+        if (CommonHelper.containsRTLText(texts.get(0).getText()))
         {
           addStyleName("rtl");
         }
@@ -120,23 +131,35 @@ public class GridComponent extends Panel
     String resultID = input.getId();
     grid = new AnnotationGrid(mediaController, pdfController, resultID);
     grid.addStyleName(getMainStyle());
-    grid.addStyleName("corpus-font-force");
+    grid.addStyleName(Helper.CORPUS_FONT_FORCE);
     grid.setEscapeHTML(Boolean.parseBoolean(input.getMappings().
       getProperty(MAPPING_ESCAPE_HTML, "true")));
+    LinkedList<Class<? extends SNode>> types = new LinkedList<>();
+    if(isShowingSpanAnnotations())
+    {
+      types.add(SSpan.class);
+    }
+    if(isShowingTokenAnnotations())
+    {
+      types.add(SToken.class);
+    }
+    grid.setAnnosWithNamespace(EventExtractor.computeDisplayedNamespace(input, types));
+    
+    
     layout.addComponent(grid);
-    SDocumentGraph graph = input.getDocument().getSDocumentGraph();
+    SDocumentGraph graph = input.getDocument().getDocumentGraph();
     
     List<SNode> tokens = CommonHelper.getSortedSegmentationNodes(segmentationName,
       graph);
     Preconditions.checkArgument(!tokens.isEmpty(), "Token list must be non-empty");
     RelannisNodeFeature featTokStart
       = (RelannisNodeFeature) tokens.get(0).
-      getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).
+      getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).
       getValue();
     long startIndex = featTokStart.getTokenIndex();
     RelannisNodeFeature featTokEnd
       = (RelannisNodeFeature) tokens.get(tokens.size() - 1).
-      getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).
+      getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).
       getValue();
     long endIndex = featTokEnd.getTokenIndex();
     
@@ -153,7 +176,7 @@ public class GridComponent extends Panel
       if(isTokenFirst())
       {
         // copy original list but add token row at the beginning
-        LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<String, ArrayList<Row>>();
+        LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<>();
         
         newList.put("tok", Lists.newArrayList(tokenRow));
         newList.putAll(rowsByAnnotation);
@@ -169,6 +192,20 @@ public class GridComponent extends Panel
     
     EventExtractor.removeEmptySpace(rowsByAnnotation, tokenRow);
     
+    // check if the token row only contains empty values
+    boolean tokenRowIsEmpty = true;
+    for(GridEvent tokenEvent : tokenRow.getEvents())
+    {
+      if(tokenEvent.getValue() != null && !tokenEvent.getValue().trim().isEmpty())
+      {
+        tokenRowIsEmpty = false;
+        break;
+      }
+    }
+    if(!isHidingToken() && canShowEmptyTokenWarning())
+    {
+      lblEmptyToken.setVisible(tokenRowIsEmpty);
+    }
     grid.setRowsByAnnotation(rowsByAnnotation);
     grid.setTokenIndexOffset(tokenOffsetForText.get());
   }
@@ -179,7 +216,7 @@ public class GridComponent extends Panel
   {
     /* we will only add tokens of one texts which is mentioned by any
       included annotation. */
-    Set<String> validTextIDs = new HashSet<String>();
+    Set<String> validTextIDs = new HashSet<>();
     
     if(enforcedText == null)
     {
@@ -196,16 +233,16 @@ public class GridComponent extends Panel
        * we want to show all token if no valid text was found and we have only one
        * text and the first one if there are more than one text.
        */
-      EList<STextualDS> allTexts = graph.getSTextualDSs();
+      List<STextualDS> allTexts = graph.getTextualDSs();
       if (validTextIDs.isEmpty() && allTexts != null && (allTexts.size() == 1
         || allTexts.size() == 2))
       {
-        validTextIDs.add(allTexts.get(0).getSId());
+        validTextIDs.add(allTexts.get(0).getId());
       }
     }
     else
     {
-      validTextIDs.add(enforcedText.getSId());
+      validTextIDs.add(enforcedText.getId());
     }
     
     Row tokenRow = new Row();
@@ -215,10 +252,10 @@ public class GridComponent extends Panel
       STextualDS tokenText = CommonHelper.getTextualDSForNode(t, graph);
 
       // only add token if text ID matches the valid one
-      if (tokenText != null && validTextIDs.contains(tokenText.getSId()))
+      if (tokenText != null && validTextIDs.contains(tokenText.getId()))
       {
         RelannisNodeFeature feat
-          = (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS,
+          = (RelannisNodeFeature) t.getFeature(AnnisConstants.ANNIS_NS,
             AnnisConstants.FEAT_RELANNIS_NODE).getValue();
         long idxLeft = feat.getLeftToken() - startIndex;
         long idxRight = feat.getRightToken() - startIndex;
@@ -229,10 +266,11 @@ public class GridComponent extends Panel
         }
         String text = extractTextForToken(t, segmentationName);
         GridEvent event
-          = new GridEvent(t.getSId(), (int) idxLeft, (int) idxRight, text);
-        event.setTextID(tokenText.getSId());
+          = new GridEvent(t.getId(), (int) idxLeft, (int) idxRight, text);
+        event.setTextID(tokenText.getId());
         // check if the token is a matched node
-        Long match = markCoveredTokens(input.getMarkedAndCovered(), t);
+        Long match = isCoveredTokenMarked() ? 
+          markCoveredTokens(input.getMarkedAndCovered(), t) : tokenMatch(t);
         event.setMatch(match);
         tokenRow.addEvent(event);
       }
@@ -249,11 +287,11 @@ public class GridComponent extends Panel
     }
     else if(segmentation != null)
     {
-      for(SAnnotation anno : t.getSAnnotations())
+      for(SAnnotation anno : t.getAnnotations())
       {
-        if(anno.getSName().equals(segmentation))
+        if(anno.getName().equals(segmentation))
         {
-          return anno.getSValueSTEXT();
+          return anno.getValue_STEXT();
         }
       }
     }
@@ -263,7 +301,7 @@ public class GridComponent extends Panel
   private LinkedHashMap<String, ArrayList<Row>> computeAnnotationRows(
     long startIndex, long endIndex)
   {
-    List<String> annos = new LinkedList<String>();
+    List<String> annos = new LinkedList<>();
     
     boolean showSpanAnnotations = isShowingSpanAnnotations();
     if(showSpanAnnotations)
@@ -289,7 +327,7 @@ public class GridComponent extends Panel
     
     if(isFilteringMediaLayer())
     {
-      mediaAnnotations = new HashSet<String>();
+      mediaAnnotations = new HashSet<>();
       Pattern patternMedia = Pattern.compile("(annis::)?time");
       for (String qname : annos)
       {
@@ -302,7 +340,7 @@ public class GridComponent extends Panel
     
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation
       = EventExtractor.parseSalt(input, showSpanAnnotations, 
-        showTokenAnnotations, annos, mediaAnnotations, isUnsettingValueForMedia(),
+        showTokenAnnotations, annos, mediaAnnotations, isAddingPlaybackRow(),
         (int) startIndex, (int) endIndex, pdfController, enforcedText);
     
     return rowsByAnnotation;
@@ -355,7 +393,17 @@ public class GridComponent extends Panel
     return false;
   }
   
-  protected boolean isUnsettingValueForMedia()
+  protected boolean isAddingPlaybackRow()
+  {
+    return false;
+  }
+  
+  protected boolean canShowEmptyTokenWarning()
+  {
+    return false;
+  }
+  
+  protected boolean isCoveredTokenMarked()
   {
     return false;
   }
@@ -382,6 +430,21 @@ public class GridComponent extends Panel
       return markedAndCovered.get(tok);
     }
     return f != null ? f.getMatchedNode() : null;
+  }
+  
+  /**
+   * Checks if a token is a marked match
+   *
+   * @param tok the checked token.
+   * @return Returns null, if token is not marked.
+   */
+  private Long tokenMatch(SNode tok)
+  {
+    // check if the span is a matched node
+    SFeature featMatched = tok.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+    Long matchRaw = featMatched == null ? null : featMatched.
+      getValue_SNUMERIC();
+    return matchRaw;
   }
 
   public VisualizerInput getInput()

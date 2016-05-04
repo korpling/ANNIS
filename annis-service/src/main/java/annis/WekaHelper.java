@@ -18,12 +18,7 @@ package annis;
 import annis.dao.objects.AnnotatedMatch;
 import annis.dao.objects.AnnotatedSpan;
 import annis.model.Annotation;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -54,7 +49,7 @@ public class WekaHelper
     w.append("\n");
     // figure out what annotations are used at each match position
     SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
-      new TreeMap<Integer, SortedSet<String>>();
+      new TreeMap<>();
     while(matches.hasNext())
     {
       AnnotatedMatch match = matches.next();
@@ -104,12 +99,12 @@ public class WekaHelper
     {
       AnnotatedMatch match = matches.next();
       
-      List<String> line = new ArrayList<String>();
+      List<String> line = new ArrayList<>();
       int k = 0;
       for(; k < match.size(); ++k)
       {
         AnnotatedSpan span = match.get(k);
-        Map<String, String> valueByName = new HashMap<String, String>();
+        Map<String, String> valueByName = new HashMap<>();
 
         if(span != null)
         {

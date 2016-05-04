@@ -16,17 +16,21 @@
 package annis.visualizers.htmlvis;
 
 import annis.CommonHelper;
-import annis.model.AnnisConstants;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import com.google.common.escape.Escaper;
+import com.google.common.html.HtmlEscapers;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SNode;
 
 /**
  *
@@ -34,7 +38,7 @@ import java.util.TreeSet;
  */
 public class SpanHTMLOutputter
 {
-  public enum Type {EMPTY, VALUE, ANNO_NAME, CONSTANT};
+  public enum Type {EMPTY, VALUE, ESCAPED_VALUE, ANNO_NAME, CONSTANT, META_NAME};
   
   public static final String NULL_VAL = "NULL";
   
@@ -43,19 +47,29 @@ public class SpanHTMLOutputter
   private String attribute;
   private String style = "";
   private String constant;
+  private String metaname;
+  private HashMap<String, String> hshMeta = new HashMap<>();
+  private String tokenColor;
+  
+  private final static Escaper htmlEscaper = HtmlEscapers.htmlEscaper();
+  
   
   public void outputHTML(SNode node, String matchedQName,
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
+    SortedMap<Long, List<OutputItem>> outputStartTags, 
+    SortedMap<Long, List<OutputItem>> outputEndTags, String tokenColor,
+    int priority)
   {
+      
+    this.tokenColor = tokenColor;
+    
     if(node instanceof SToken && "tok".equals(matchedQName))
     {
-      SToken tok = (SToken) node;
-      outputToken(tok, outputStartTags, outputEndTags);
+        SToken tok = (SToken) node;
+        outputToken(tok, outputStartTags, outputEndTags, priority);
     }
     else if(node instanceof SSpan || node instanceof SToken)
     {
-      outputAnnotation(node, matchedQName, outputStartTags, outputEndTags);
+        outputAnnotation(node, matchedQName, outputStartTags, outputEndTags,priority);
     }
     else
     {
@@ -64,17 +78,27 @@ public class SpanHTMLOutputter
   }
   
   private void outputAnnotation(SNode span, String matchedQName, 
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
+    SortedMap<Long, List<OutputItem>> outputStartTags, 
+    SortedMap<Long, List<OutputItem>> outputEndTags,
+    int priority)
   {
+    long left;
+    long right;
     
-    RelannisNodeFeature feat = 
-      (RelannisNodeFeature) span.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-    
-    long left = feat.getLeftToken();
-    long right = feat.getRightToken();
-    
-    SAnnotation matchedAnnotation = span.getSAnnotation(matchedQName);
+        RelannisNodeFeature feat = 
+        (RelannisNodeFeature) span.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+        left = feat.getLeftToken();
+        right = feat.getRightToken();
+  
+    SAnnotation matchedAnnotation;
+    if (type == Type.META_NAME){
+        matchedAnnotation = span.getAnnotation("meta::" + constant); //constant property is used to store metadata names, see VisParser.java
+    }
+    else
+    {
+        matchedAnnotation = span.getAnnotation(matchedQName);
+    }
     
     String value;
     // output to an inner text node
@@ -84,25 +108,33 @@ public class SpanHTMLOutputter
         value = constant;
         break;
       case VALUE:
-        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSValueSTEXT();
+        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
+        break;
+      case ESCAPED_VALUE:
+        value = htmlEscaper.escape(matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT());
         break;
       case ANNO_NAME:
-        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
+        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getName();
+        break;
+      case META_NAME:
+        value = matchedAnnotation.getValue() == null ? "NULL" : matchedAnnotation.getValue().toString();
+        matchedQName = "meta::" + metaname;
         break;
       default:
         value = "";
         break;
     }
-    outputAny(left, right, matchedQName, value, outputStartTags, outputEndTags);
+    outputAny(left, right, matchedQName, value, outputStartTags, outputEndTags, priority);
   }
   
   private void outputToken(SToken tok,
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
+    SortedMap<Long, List<OutputItem>> outputStartTags, 
+    SortedMap<Long, List<OutputItem>> outputEndTags,
+    int priority)
   {
 
     RelannisNodeFeature feat = 
-      (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+      (RelannisNodeFeature) tok.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
     
     long index = feat.getTokenIndex();
     
@@ -116,6 +148,9 @@ public class SpanHTMLOutputter
       case VALUE:
         value = CommonHelper.getSpannedText(tok);
         break;
+      case ESCAPED_VALUE:
+        value = htmlEscaper.escape(CommonHelper.getSpannedText(tok));
+        break;
       case ANNO_NAME:
         value = "tok";
         break;
@@ -123,13 +158,14 @@ public class SpanHTMLOutputter
         value = "";
         break;
     }
-    outputAny(index, index, "tok", value, outputStartTags, outputEndTags);    
+    outputAny(index, index, "tok", value, outputStartTags, outputEndTags, priority);    
   }
   
-  private void outputAny(long left, long right, String matchedQName,
-    String value, 
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
+  public void outputAny(long left, long right, String matchedQName,
+    String value,
+    SortedMap<Long, List<OutputItem>> outputStartTags, 
+    SortedMap<Long, List<OutputItem>> outputEndTags,
+    int priority)
   {
     
     String startTag = "<" + element;
@@ -143,6 +179,8 @@ public class SpanHTMLOutputter
       else
       {
         startTag += " class=\"" + style + "\" ";
+        String colorStyle= " style=\" color:" + tokenColor + "\" ";
+        startTag += colorStyle;
       }
     }
     String inner = "";
@@ -163,11 +201,11 @@ public class SpanHTMLOutputter
     // add tags to output
     if(outputStartTags.get(left) == null)
     {
-      outputStartTags.put(left, new TreeSet<OutputItem>());
+      outputStartTags.put(left, new ArrayList<OutputItem>());
     }
     if(outputEndTags.get(right) == null)
     {
-      outputEndTags.put(right, new TreeSet<OutputItem>());
+      outputEndTags.put(right, new ArrayList<OutputItem>());
     }
     
     if(NULL_VAL.equals(element))
@@ -187,6 +225,7 @@ public class SpanHTMLOutputter
     itemStart.setOutputString(startTag);
     itemStart.setLength(right-left);
     itemStart.setqName(matchedQName);
+    itemStart.setPriority(priority);
     
     OutputItem itemEnd = new OutputItem();
     if(endTag.isEmpty())
@@ -199,6 +238,7 @@ public class SpanHTMLOutputter
     }
     itemEnd.setLength(right-left);
     itemEnd.setqName(matchedQName);
+    itemEnd.setPriority(priority);
     
     outputStartTags.get(left).add(itemStart);
     outputEndTags.get(right).add(itemEnd);
@@ -254,5 +294,24 @@ public class SpanHTMLOutputter
   {
     this.attribute = attribute;
   }
+
+    public HashMap<String, String> getMeta() {
+        return hshMeta;
+    }
+
+    public void setMeta( HashMap<String, String> meta) {
+        this.hshMeta = meta;
+    }
+
+    public String getMetaname() {
+        return metaname;
+    }
+
+    public void setMetaname(String metaname) {
+        this.metaname = metaname;
+    }
   
+    
+    
 }
+

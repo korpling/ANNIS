@@ -16,51 +16,47 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
+import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
-import annis.libgui.PollControl;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MediaPlayer;
 import annis.libgui.media.PDFViewer;
+import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
 import annis.visualizers.LoadableVisualizer;
+import com.google.common.base.Joiner;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import static annis.model.AnnisConstants.*;
-import com.vaadin.server.StreamResource;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.Callable;
@@ -70,6 +66,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,11 +90,9 @@ public class VisualizerPanel extends CssLayout
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
-  public static final ThemeResource ICON_COLLAPSE = new ThemeResource(
-    "icon-collapse.gif");
+  public static final Resource ICON_COLLAPSE = FontAwesome.MINUS_SQUARE_O;
 
-  public static final ThemeResource ICON_EXPAND = new ThemeResource(
-    "icon-expand.gif");
+  public static final Resource ICON_EXPAND = FontAwesome.PLUS_SQUARE_O;
 
   private String corpusName;
 
@@ -100,7 +100,7 @@ public class VisualizerPanel extends CssLayout
 
   private Component vis;
 
-  private transient SDocument result;
+  private SDocument result;
 
   private PluginSystem ps;
 
@@ -137,6 +137,8 @@ public class VisualizerPanel extends CssLayout
   private InstanceConfig instanceConfig;
 
   private VisualizerContextChanger visCtxChanger;
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
@@ -260,30 +262,16 @@ public class VisualizerPanel extends CssLayout
 
   }
   
-  private void writeObject(ObjectOutputStream out) throws IOException
-  {
-    out.defaultWriteObject();
-    
-    CommonHelper.writeSDocument(result, out);
-  }
-  
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
-    
-   this.result = CommonHelper.readSDocument(in);
-  }
-  
   private List<SToken> createTokenList(List<String> tokenIDs, SDocumentGraph graph)
   {
     if(tokenIDs == null || graph == null)
     {
-      return new LinkedList<SToken>();
+      return new LinkedList<>();
     }
-    ArrayList<SToken> r = new ArrayList<SToken>(tokenIDs.size());
+    ArrayList<SToken> r = new ArrayList<>(tokenIDs.size());
     for(String t : tokenIDs)
     {
-      SNode n = graph.getSNode(t);
+      SNode n = graph.getNode(t);
       if(n instanceof SToken)
       {
         r.add((SToken) n);
@@ -303,7 +291,7 @@ public class VisualizerPanel extends CssLayout
 
     Component c = visPlugin.createComponent(input, this);
     c.setVisible(false);
-    c.addStyleName("corpus-font");
+    c.addStyleName(Helper.CORPUS_FONT);
     c.addStyleName("vis-content");
 
     return c;
@@ -345,12 +333,18 @@ public class VisualizerPanel extends CssLayout
     if (visPlugin != null
       && visPlugin.isUsingText()
       && result != null
-      && result.getSDocumentGraph().getSNodes().size() > 0)
+      && result.getDocumentGraph().getNodes().size() > 0)
     {
-      SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
-        get(0).getSName(), result.getSName());
+      List<String> nodeAnnoFilter = null;
+      if(visPlugin instanceof FilteringVisualizerPlugin)
+      {
+        nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
+          corpusName, documentName, input.getMappings());
+      }
+      SaltProject p = getDocument(result.getGraph().getRoots().
+        get(0).getName(), result.getName(), nodeAnnoFilter);
 
-      SDocument wholeDocument = p.getSCorpusGraphs().get(0).getSDocuments()
+      SDocument wholeDocument = p.getCorpusGraphs().get(0).getDocuments()
         .get(0);
 
       input.setDocument(wholeDocument);
@@ -390,22 +384,23 @@ public class VisualizerPanel extends CssLayout
     }
   }
 
-  private SaltProject getDocument(String toplevelCorpusName, String documentName)
+  private SaltProject getDocument(String toplevelCorpusName, String documentName,
+    List<String> nodeAnnoFilter)
   {
     SaltProject txt = null;
     try
     {
-      toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
-      documentName = URLEncoder.encode(documentName, "UTF-8");
-      WebResource annisResource = Helper.getAnnisWebResource();
-      txt = annisResource.path("query").path("graph").path(toplevelCorpusName).
-        path(documentName).get(SaltProject.class);
+      toplevelCorpusName = urlPathEscape.escape(toplevelCorpusName);
+      documentName = urlPathEscape.escape(documentName);
+      WebResource res = Helper.getAnnisWebResource().path("query").path("graph").path(toplevelCorpusName).
+        path(documentName);
+      if(nodeAnnoFilter != null)
+      {
+        res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
+      }
+      txt = res.get(SaltProject.class);
     }
-    catch (RuntimeException e)
-    {
-      log.error("General remote service exception", e);
-    }
-    catch (Exception e)
+    catch (ClientHandlerException | UniformInterfaceException e)
     {
       log.error("General remote service exception", e);
     }
@@ -452,8 +447,7 @@ public class VisualizerPanel extends CssLayout
         new LoadComponentTask());
       
       // run the actual code to load the visualizer
-      PollControl.runInBackground(500, 150, null,
-        new BackgroundJob(future, callback, UI.getCurrent()));
+      Background.run(new BackgroundJob(future, callback, UI.getCurrent()));
 
     } // end if create input was needed
 
@@ -541,44 +535,6 @@ public class VisualizerPanel extends CssLayout
     return htmlID;
   }
 
-  /**
-   * Since there is a bug in the annis-service some ANNIS Features are not set
-   * when the whole document is requested, we have to copy it manually from the
-   * old nodes
-   *
-   * @param source orignal node
-   * @param target node which is missing the annis feature
-   * @param featureNameSpace namespace of the feature
-   * @param featureName name of the feature
-   * @param copyIfExists If true the feature is copied even if it already exists
-   * on target node.
-   */
-  private void copyAnnisFeature(SNode source, SNode target,
-    String featureNameSpace, String featureName, boolean copyIfExists)
-  {
-    SFeature sfeature;
-
-    if ((sfeature = source.getSFeature(featureNameSpace, featureName)) != null)
-    {
-      if (target.getSFeature(featureNameSpace, featureName) == null)
-      {
-        target.createSFeature(sfeature.getNamespace(), sfeature.getName(),
-          sfeature.getSValueSTEXT());
-        log.debug("copy SFeature {} value {}", sfeature.getQName(), sfeature.
-          getValueString());
-      }
-      else if (copyIfExists)
-      {
-        SFeature targetFeature = target.getSFeature(featureNameSpace,
-          featureName);
-        targetFeature.setValue(sfeature.getValue());
-
-        log.debug("overwriting SFeature {} value {}", sfeature.getQName(),
-          sfeature.
-          getValueString());
-      }
-    }
-  }
 
   private class BackgroundJob implements Runnable
   {

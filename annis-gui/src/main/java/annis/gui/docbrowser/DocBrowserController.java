@@ -15,19 +15,25 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
+import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
-import annis.libgui.PollControl;
+import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.RawTextWrapper;
 import annis.service.objects.Visualizer;
+import com.google.common.base.Joiner;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
@@ -35,14 +41,15 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import com.vaadin.ui.VerticalLayout;
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +64,7 @@ public class DocBrowserController implements Serializable
   private final Logger log = LoggerFactory.getLogger(DocBrowserController.class);
 
   // holds the complete state of the gui
-  private final SearchUI ui;
+  private final AnnisUI ui;
 
   // track the already initiated doc browsers
   private final Map<String, Component> initedDocBrowsers;
@@ -68,17 +75,18 @@ public class DocBrowserController implements Serializable
   // keep track of already visible doc visualizer, so it easy to switch to them.
   private final Map<String, Panel> visibleVisHolder;
 
-  private static final ThemeResource EYE_ICON = new ThemeResource("eye.png");
+  private static final Resource EYE_ICON = FontAwesome.EYE;
 
-  private static final ThemeResource DOC_ICON = new ThemeResource(
-    "document_ico.png");
+  private static final Resource DOC_ICON = FontAwesome.FILE_TEXT_O;
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
-  public DocBrowserController(SearchUI ui)
+  public DocBrowserController(AnnisUI ui)
   {
     this.ui = ui;
-    this.initedDocBrowsers = new HashMap<String, Component>();
-    this.initiatedVis = new HashMap<String, Component>();
-    this.visibleVisHolder = new HashMap<String, Panel>();
+    this.initedDocBrowsers = new HashMap<>();
+    this.initiatedVis = new HashMap<>();
+    this.visibleVisHolder = new HashMap<>();
   }
 
   public void openDocVis(String corpus, String doc, Visualizer visConfig, Button btn)
@@ -91,7 +99,7 @@ public class DocBrowserController implements Serializable
     if (visibleVisHolder.containsKey(canonicalTitle))
     {
       Panel visHolder = visibleVisHolder.get(canonicalTitle);
-      ui.getTabSheet().setSelectedTab(visHolder);
+      ui.getSearchView().getTabSheet().setSelectedTab(visHolder);
       return;
     }
 
@@ -110,20 +118,23 @@ public class DocBrowserController implements Serializable
     ProgressBar progressBar = new ProgressBar(1.0f);
     progressBar.setIndeterminate(true);
     progressBar.setSizeFull();
-    visHolder.setContent(progressBar);
-
-    Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
+    VerticalLayout layoutProgress = new VerticalLayout(progressBar);
+    layoutProgress.setSizeFull();
+    layoutProgress.setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
+    
+    visHolder.setContent(layoutProgress);
+    
+    Tab visTab = ui.getSearchView().getTabSheet().addTab(visHolder, tabCaption);
     visTab.setDescription(canonicalTitle);
     visTab.setIcon(EYE_ICON);
     visTab.setClosable(true);
-    ui.getTabSheet().setSelectedTab(visTab);
+    ui.getSearchView().getTabSheet().setSelectedTab(visTab);
 
     // register visible visHolder
     this.visibleVisHolder.put(canonicalTitle, visHolder);
 
-    PollControl.runInBackground(100, ui,
-      new DocVisualizerFetcher(corpus, doc, canonicalTitle,
-        visConfig.getType(), visHolder, visConfig, btn)
+    Background.run(new DocVisualizerFetcher(corpus, doc, canonicalTitle,
+        visConfig.getType(), visHolder, visConfig, btn, UI.getCurrent())
     );
   }
 
@@ -138,11 +149,11 @@ public class DocBrowserController implements Serializable
     }
 
     // init tab and put to front
-    TabSheet.Tab tab = ui.getTabSheet().addTab(initedDocBrowsers.get(corpus),
+    TabSheet.Tab tab = ui.getSearchView().getTabSheet().addTab(initedDocBrowsers.get(corpus),
       corpus);
     tab.setIcon(DOC_ICON);
     tab.setClosable(true);
-    ui.getTabSheet().setSelectedTab(tab);
+    ui.getSearchView().getTabSheet().setSelectedTab(tab);
   }
 
   /**
@@ -154,60 +165,58 @@ public class DocBrowserController implements Serializable
    * @param config the visualizer configuration
    * @param isUsingRawText indicates, whether the text from text table is taken,
    * or if the salt project is traversed.
+   * @param nodeAnnoFilter A list of node annotation names for filtering the nodes or null if no filtering should be applied.
    * @return a {@link VisualizerInput} input, which is usable for rendering the
    * whole document.
    */
-  private VisualizerInput createInput(String corpus, String docName,
-    Visualizer config, boolean isUsingRawText)
+  public static VisualizerInput createInput(String corpus, String docName,
+    Visualizer config, boolean isUsingRawText, List<String> nodeAnnoFilter)
   {
     VisualizerInput input = new VisualizerInput();
-
-    try
-    {
-      String encodedToplevelCorpus = URLEncoder.encode(corpus, "UTF-8");
-      String encodedDocument = URLEncoder.encode(docName, "UTF-8");
-      if (isUsingRawText)
-      {
-        WebResource w = Helper.getAnnisWebResource();
-        w = w.path("query").path("rawtext")
-          .path(encodedToplevelCorpus).path(encodedDocument);
-        RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
-        input.setRawText(rawTextWrapper);
-      }
-      else
-      {
-        // get the whole document wrapped in a salt project
-        SaltProject txt = null;
-
-        WebResource annisResource = Helper.getAnnisWebResource();
-        txt = annisResource.path("query").path("graph").
-          path(encodedToplevelCorpus).
-          path(encodedDocument).get(SaltProject.class);
-
-        if (txt != null)
-        {
-          SDocument sDoc = txt.getSCorpusGraphs().get(0).getSDocuments().get(0);
-          input.setResult(sDoc);
-        }
-      }
-    }
-    catch (RuntimeException e)
-    {
-      log.error("General remote service exception", e);
-    }
-    catch (Exception e)
-    {
-      log.error("General remote service exception", e);
-    }
 
     // set mappings and namespaces. some visualizer do not survive without   
     input.setMappings(parseMappings(config));
     input.setNamespace(config.getNamespace());
+    
+    String encodedToplevelCorpus = urlPathEscape.escape(corpus);
+    String encodedDocument = urlPathEscape.escape(docName);
+    if (isUsingRawText)
+    {
+      WebResource w = Helper.getAnnisWebResource();
+      w = w.path("query").path("rawtext")
+        .path(encodedToplevelCorpus).path(encodedDocument);
+      RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
+      input.setRawText(rawTextWrapper);
+    }
+    else 
+    {
+      // get the whole document wrapped in a salt project
+      SaltProject txt = null;
+
+      WebResource res = Helper.getAnnisWebResource()
+        .path("query").path("graph").
+        path(encodedToplevelCorpus).
+        path(encodedDocument);
+
+      if(nodeAnnoFilter != null)
+      {
+        res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
+      }
+
+      txt = res.get(SaltProject.class);
+
+      if (txt != null)
+      {
+        SDocument sDoc = txt.getCorpusGraphs().get(0).getDocuments().get(0);
+        input.setResult(sDoc);
+      }
+    }
+
 
     return input;
   }
 
-  private Properties parseMappings(Visualizer config)
+  private static Properties parseMappings(Visualizer config)
   {
     Properties mappings = new Properties();
 
@@ -253,7 +262,8 @@ public class DocBrowserController implements Serializable
       String type,
       Panel visHolder,
       Visualizer config,
-      Button btn)
+      Button btn,
+      final UI ui)
     {
       this.corpus = corpus;
       this.doc = doc;
@@ -274,19 +284,26 @@ public class DocBrowserController implements Serializable
       final VisualizerPlugin visualizer = ((PluginSystem) ui).
               getVisualizer(type);
       
+      List<String> nodeAnnoFilter = null;
+      if(visualizer instanceof FilteringVisualizerPlugin)
+      {
+        nodeAnnoFilter = ((FilteringVisualizerPlugin) visualizer)
+          .getFilteredNodeAnnotationNames(corpus, doc, parseMappings(config));
+      }
+      
       // check if a visualization is already initiated
       {
         if (createVis)
         {
           // fetch the salt project - so long part
           input = createInput(corpus, doc, config, visualizer.
-            isUsingRawText());
+            isUsingRawText(), nodeAnnoFilter);
 
         }
       }
      
       // after initializing the visualizer update the gui
-      UI.getCurrent().access(new Runnable()
+      ui.access(new Runnable()
       {
         @Override
         public void run()
@@ -299,7 +316,7 @@ public class DocBrowserController implements Serializable
             // create and format visualizer
             
             Component vis = visualizer.createComponent(input, null);
-            vis.addStyleName("corpus-font-force");
+            vis.addStyleName(Helper.CORPUS_FONT_FORCE);
             vis.setPrimaryStyleName("docviewer");
             vis.setCaption(canonicalTitle);
             vis.setWidth(100, Unit.PERCENTAGE);

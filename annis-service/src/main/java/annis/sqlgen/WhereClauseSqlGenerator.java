@@ -15,10 +15,9 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryNode;
 import java.util.List;
 import java.util.Set;
-
-import annis.model.QueryNode;
 
 public interface WhereClauseSqlGenerator<T> {
 

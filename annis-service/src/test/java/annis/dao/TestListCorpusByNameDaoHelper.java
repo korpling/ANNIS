@@ -15,11 +15,9 @@
  */
 package annis.dao;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.Arrays;
 import java.util.List;
-
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class TestListCorpusByNameDaoHelper {
@@ -31,8 +29,16 @@ public class TestListCorpusByNameDaoHelper {
 		// a few dummy corpus names
 		List<String> corpusNames = Arrays.asList("a", "b", "c");
 		
-		String expected = "SELECT id FROM corpus WHERE name IN ( 'a', 'b', 'c' ) AND top_level = 't'";
-		
+		String expected = "SELECT tmp.id FROM\n"
+      + "(\n"
+      + "SELECT id, 0::int AS sourceIdx FROM corpus WHERE name='a' AND top_level IS TRUE\n"
+      + "UNION\n"
+      + "SELECT id, 1::int AS sourceIdx FROM corpus WHERE name='b' AND top_level IS TRUE\n"
+      + "UNION\n"
+      + "SELECT id, 2::int AS sourceIdx FROM corpus WHERE name='c' AND top_level IS TRUE"
+      + ") AS tmp\n"
+      + "ORDER BY tmp.sourceIdx";
+    
 		assertEquals(expected, listCorpusByNameDaoHelper.createSql(corpusNames));
 	}
 }

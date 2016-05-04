@@ -16,12 +16,9 @@
 package annis.service;
 
 import annis.service.objects.MatchGroup;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
+import org.corpus_tools.salt.common.SaltProject;
 
 /**
  * Interface defining the REST API calls that ANNIS provides for querying the
@@ -59,9 +56,6 @@ public interface QueryService
    * @param corpora A comma separated list of corpus names
    * @return A XML represenation of the total matches and the number of documents that contain matches.
    */
-  @GET
-  @Path("search/count")
-  @Produces("application/xml")
   public Response count(String q,String corpora);
   
   /**
@@ -76,40 +70,50 @@ public interface QueryService
    * produces:
    * <code>application/xml</code>:<br />
    * {@code
-   * 
    * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
    * <match-group>
    *   <!-- each match is enclosed in an match tag -->
    *   <match>
+   *     <!-- the first matched node of match 1 did not match an annotation -->
+   *     <anno></anno>
+   *     <!-- the second matched node of match 1 was a match on the 'tiger::pos' annotation-->
+   *     <anno>tiger::pos</anno>
    *     <!-- ID of first matched node of match 1 -->
    *     <id>salt:/pcc2/11299/#tok_1</id>
    *     <!-- ID of second matched noded  of match 1 -->
    *     <id>salt:/pcc2/11299/#tok_2</id>
-   *     <!-- more IDs if necessary -->
    *   </match>
    *   <match>
+   *     <anno></anno>
+   *     <anno>tiger::pos</anno>
    *     <!-- ID of first matched noded of match 2 -->
-   *     <id>salt:/pcc2/11299/#tok_3</id>
+   *     <id>salt:/pcc2/11299/#tok_2</id>
    *     <!-- ID of second matched noded of match 2-->
-   *     <id>salt:/pcc2/11299/#tok_4</id>
+   *     <id>salt:/pcc2/11299/#tok_3</id>
    *   </match>
    *   <!-- and so on -->
    * </match-group>
+   * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+   * <match-group>
    * }
    * 
    * <i>or</i> produces:
-   * <code>plain/text</code>:<br />
+   * <code>text/plain</code>:<br />
    * {@code
-   * salt:/pcc2/11299/#tok_1 salt:/pcc2/11299/#tok_2
-   * salt:/pcc2/11299/#tok_2 salt:/pcc2/11299/#tok_3
-   * salt:/pcc2/11299/#tok_3 salt:/pcc2/11299/#tok_4
+   * salt:/pcc2/11299/#tok_1 tiger::pos::salt:/pcc2/11299/#tok_2
+   * salt:/pcc2/11299/#tok_2 tiger::pos::salt:/pcc2/11299/#tok_3
+   * salt:/pcc2/11299/#tok_3 tiger::pos::salt:/pcc2/11299/#tok_4
    * }
-   * One line per match, each ID is separated by space.
+   * One line per match, each ID is separated by space. An ID can be prepended
+   * by the fully qualified annotation name (which is separated with '::' from the ID).
    * 
    * @param q The AQL query
    * @param corpora A comma separated list of corpus names
    * @param offset Optional offset from where to start the matches. Default is 0.
    * @param limit Optional limit of the number of returned matches. Set to -1 if unlimited. Default is -1.
+   * @param order Optional order how the results should be sorted. Can be either "normal", "random" or "inverted"
+   *  "normal" is the default ordering, "inverted" inverses the default ordering and "random" is a non-stable
+   *  (thus you will get different results for the same offset and limit) random ordering.
    * @return
    * @throws IOException 
    */
@@ -117,7 +121,8 @@ public interface QueryService
     String q,
     String corpora,
     String offset,
-    String limit) throws IOException;
+    String limit,
+    String order) throws IOException;
   
   /**
    * Get a graph as {@link SaltProject} from a set of (matched) Salt IDs.
@@ -135,30 +140,38 @@ public interface QueryService
    * <match-group>
    *   <!-- each match is enclosed in an match tag -->
    *   <match>
+   *     <!-- the first matched node of match 1 did not match an annotation -->
+   *     <anno></anno>
+   *     <!-- the second matched node of match 1 was a match on the 'tiger::pos' annotation-->
+   *     <anno>tiger::pos</anno>
    *     <!-- ID of first matched node of match 1 -->
    *     <id>salt:/pcc2/11299/#tok_1</id>
    *     <!-- ID of second matched noded  of match 1 -->
    *     <id>salt:/pcc2/11299/#tok_2</id>
-   *     <!-- more IDs if necessary -->
    *   </match>
    *   <match>
+   *     <anno></anno>
+   *     <anno>tiger::pos</anno>
    *     <!-- ID of first matched noded of match 2 -->
-   *     <id>salt:/pcc2/11299/#tok_3</id>
+   *     <id>salt:/pcc2/11299/#tok_2</id>
    *     <!-- ID of second matched noded of match 2-->
-   *     <id>salt:/pcc2/11299/#tok_4</id>
+   *     <id>salt:/pcc2/11299/#tok_3</id>
    *   </match>
    *   <!-- and so on -->
    * </match-group>
+   * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+   * <match-group>
    * }
    * 
    * <i>or</i> accepts:
-   * <code>plain/text</code>:<br />
+   * <code>text/plain</code>:<br />
    * {@code
-   * salt:/pcc2/11299/#tok_1 salt:/pcc2/11299/#tok_2
-   * salt:/pcc2/11299/#tok_2 salt:/pcc2/11299/#tok_3
-   * salt:/pcc2/11299/#tok_3 salt:/pcc2/11299/#tok_4
+   * salt:/pcc2/11299/#tok_1 tiger::pos::salt:/pcc2/11299/#tok_2
+   * salt:/pcc2/11299/#tok_2 tiger::pos::salt:/pcc2/11299/#tok_3
+   * salt:/pcc2/11299/#tok_3 tiger::pos::salt:/pcc2/11299/#tok_4
    * }
-   * One line per match, each ID is separated by space.
+   * One line per match, each ID is separated by space. An ID can be prepended
+   * by the fully qualified annotation name (which is separated with '::' from the ID).
    * 
    * produces:<br />
    * <code>application/xml</code> or <code>application/xmi+xml</code>:<br />
@@ -193,13 +206,17 @@ public interface QueryService
    * <code>application/xml</code> or <code>application/xmi+xml</code>:<br />
    * A representation of the Salt graph in the EMF XMI format.
    * 
-   * @param top The toplevel corpus
+   * @param top The toplevel corpus.
    * @param doc The document.
+   * @param filternodeanno A comma seperated list of node annotations which are 
+   * used as a filter for the graph. Only nodes having one of the annotations
+   * are included in the result.
    * @return 
    */
   public SaltProject graph(
     String top,
-    String doc);
+    String doc,
+    String filternodeanno);
   
   /**
    * Get the content an ANNIS binary object for a specific document.

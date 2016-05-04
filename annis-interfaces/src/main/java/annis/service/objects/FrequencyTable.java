@@ -15,6 +15,7 @@
  */
 package annis.service.objects;
 
+import com.google.common.base.Joiner;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -195,6 +196,14 @@ public class FrequencyTable implements Serializable
       }
       return true;
     }
+
+    @Override
+    public String toString()
+    {
+      return Joiner.on(" | ").join(tupel) + " -> " + count;
+    }
+    
+    
   }
   
   

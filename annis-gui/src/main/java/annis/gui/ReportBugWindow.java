@@ -15,20 +15,32 @@
  */
 package annis.gui;
 
+import annis.VersionInfo;
 import annis.libgui.Helper;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.UserError;
 import com.vaadin.server.VaadinService;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Version;
-import com.vaadin.ui.*;
+import com.vaadin.ui.AbstractComponent;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Image;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -39,7 +51,9 @@ import java.util.List;
 import java.util.UUID;
 import javax.activation.FileDataSource;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.mail.*;
+import org.apache.commons.mail.ByteArrayDataSource;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.MultiPartEmail;
 import org.slf4j.LoggerFactory;
 
 
@@ -69,10 +83,13 @@ public class ReportBugWindow extends Window
     ReportFormLayout layout = new ReportFormLayout();
     setContent(layout);
     
-    layout.setHeight("350px");
-    layout.setWidth("750px");
+    layout.setWidth("100%");
+    layout.setHeight("-1px");
     
-    form = new FieldGroup(new BeanItem<BugReport>(new BugReport()));
+    setHeight("420px");
+    setWidth("750px");
+    
+    form = new FieldGroup(new BeanItem<>(new BugReport()));
     form.bindMemberFields(layout);
     form.setBuffered(true);
     
@@ -99,7 +116,7 @@ public class ReportBugWindow extends Window
         }
         catch (FieldGroup.CommitException ex)
         {
-          List<String> errorFields = new LinkedList<String>();
+          List<String> errorFields = new LinkedList<>();
           for(Field f : form.getFields())
           {
             if (f instanceof AbstractComponent)
@@ -171,6 +188,7 @@ public class ReportBugWindow extends Window
     
     Button btShowScreenshot = new Button("Show attached screenshot", new ShowScreenshotClickListener(imgScreenshot));
     btShowScreenshot.addStyleName(BaseTheme.BUTTON_LINK);
+    btShowScreenshot.setIcon(FontAwesome.PLUS_SQUARE_O);
     
     layout.addComponent(btShowScreenshot);
     layout.addComponent(imgScreenshot);
@@ -201,8 +219,7 @@ public class ReportBugWindow extends Window
       sbMsg.append("Reporter: ").append(form.getField("name").getValue().
         toString()).append(" (").append(form.getField("email").getValue().
         toString()).append(")\n");
-      sbMsg.append("Version: ").append(VaadinSession.getCurrent().getAttribute(
-        "annis-version")).append(
+      sbMsg.append("Version: ").append(VersionInfo.getVersion()).append(
         "\n");
       sbMsg.append("Vaadin Version: ").append(Version.getFullVersion()).append(
         "\n");
@@ -345,25 +362,25 @@ public class ReportBugWindow extends Window
       txtSummary = new TextField("Short Summary");
       txtSummary.setRequired(true);
       txtSummary.setRequiredError("You must provide a summary");
-      txtSummary.setColumns(50);
+      txtSummary.setWidth("100%");
 
       txtDescription = new TextArea("Long Description");
       txtDescription.setRequired(true);
       txtDescription.setRequiredError("You must provide a description");
       txtDescription.setRows(10);
-      txtDescription.setColumns(50);
+      txtDescription.setWidth("100%");
 
       txtName = new TextField("Your Name");
       txtName.setRequired(true);
       txtName.setRequiredError("You must provide your name");
-      txtName.setColumns(50);
+      txtName.setWidth("100%");
 
       txtMail = new TextField("Your e-mail adress");
       txtMail.setRequired(true);
       txtMail.setRequiredError("You must provide a valid e-mail adress");
       txtMail.addValidator(new EmailValidator(
         "You must provide a valid e-mail adress"));
-      txtMail.setColumns(50);
+      txtMail.setWidth("100%");
 
       addComponents(txtSummary, txtDescription, txtName, txtMail);
 
@@ -405,10 +422,12 @@ public class ReportBugWindow extends Window
       if(imgScreenshot.isVisible())
       {
         event.getButton().setCaption("Hide attached screenshot");
+        event.getButton().setIcon(FontAwesome.MINUS_SQUARE_O);
       }
       else
       {
         event.getButton().setCaption("Show attached screenshot");
+        event.getButton().setIcon(FontAwesome.PLUS_SQUARE_O);
       }
     }
   }

@@ -18,7 +18,6 @@ package annis.gui.widgets;
 import com.vaadin.server.PaintException;
 import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
-
 import com.vaadin.ui.LegacyComponent;
 import java.awt.geom.Line2D;
 import java.util.LinkedList;
@@ -35,7 +34,7 @@ public class SimpleCanvas extends AbstractComponent implements LegacyComponent
   
   public SimpleCanvas()
   {
-    lines = new LinkedList<Line2D>();
+    lines = new LinkedList<>();
   }
   
   @Override

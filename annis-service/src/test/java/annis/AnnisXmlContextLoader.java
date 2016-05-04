@@ -19,14 +19,13 @@ import annis.utils.Utils;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.test.context.support.GenericXmlContextLoader;
 
 /**
- *
+ * A simplified loader that ignores any user defined configuration files.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnisXmlContextLoader extends GenericXmlContextLoader
@@ -47,6 +46,8 @@ public class AnnisXmlContextLoader extends GenericXmlContextLoader
     MutablePropertySources sources = ctx.getEnvironment().getPropertySources();
     try
     {
+      sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
+        "conf/annis-service-developer.properties").getAbsolutePath()));
       sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
         "conf/annis-service.properties").getAbsolutePath()));
     }

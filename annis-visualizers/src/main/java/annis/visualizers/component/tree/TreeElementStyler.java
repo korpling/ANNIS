@@ -16,15 +16,15 @@
 package annis.visualizers.component.tree;
 
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.component.tree.GraphicsBackend.Font;
 import annis.model.AnnisNode;
 import annis.model.Edge;
+import annis.visualizers.component.tree.GraphicsBackend.Font;
 import java.awt.Color;
 import java.awt.Stroke;
 
   public interface TreeElementStyler {
 	
-	Font getFont(AnnisNode n);
+	Font getFont(AnnisNode n, VisualizerInput input);
 	Font getFont(Edge e);
 	
 	Color getTextBrush(AnnisNode n, VisualizerInput input);
