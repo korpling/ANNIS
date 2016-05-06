@@ -1,12 +1,31 @@
 //Connector
 window.annis_visualizers_component_visjs_VisJsComponent = function() {
 
-var div = this.getElement(); 
+var outerDiv = this.getElement();
 
-var containerWidth = $(div).parent().width();
-var containerHeight =  $(div).parent().height();
+outerDiv.innerHTML = "<div id='myDiv'></div>" +
+		"<canvas id='myCanvas'></canvas>";
+
+//var div = this.getElement(); 
+var div =outerDiv.getElementsByTagName("div")[0];
+
+//var containerWidth = $(div).parent().width();
+//var containerHeight =  $(div).parent().height();
+
+
 
 var container = div;
+
+$(container).css({"width": "100%", "height": "90%"});
+var	containerWidth = $(container).width();
+var	containerHeight =  $(container).height();
+
+div.style.border = "thin solid red";
+div.style.display = "inline-block";
+
+
+var legendCanvas = outerDiv.getElementsByTagName("canvas")[0];
+$(legendCanvas).css({"width": "100%", "height": "10%"});
 
 
 //$(container).css({"width": containerWidth, "height": containerHeight});
@@ -119,19 +138,32 @@ $("div.vis-network div.vis-navigation div.vis-button.vis-zoomIn").css({"bottom":
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomOut").css({"bottom": "auto", "top": "50px", "left": "auto", "right": "15px"});
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "55px"});
 
+drawLegend();
+  
+
 
 };
 
 
-
 window.addEventListener("resize", function(){
-	$(container).css({"width": "100%", "height": "100%"});
+	$(container).css({"width": "100%", "height": "90%"});
 	containerWidth = $(container).width();
 	containerHeight =  $(container).height();
 	visjscomponent.setSize(containerWidth, containerHeight);
 	visjscomponent.fit();
 
+
 }); 
 
+
+function drawLegend() {
+  var canvas = outerDiv.getElementsByTagName("canvas")[1];
+  if (canvas.getContext) {
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = "#CCFF99";
+    ctx.fillRect(5,5,40,40);
+
+  }
+};
 
 };
