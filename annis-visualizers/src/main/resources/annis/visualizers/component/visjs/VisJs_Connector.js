@@ -4,7 +4,7 @@ window.annis_visualizers_component_visjs_VisJsComponent = function() {
 var outerDiv = this.getElement();
 
 outerDiv.innerHTML = "<div id='myDiv'></div>" +
-		"<canvas id='myCanvas'></canvas>";
+		"<div id='myLegend'></canvas>";
 
 //var div = this.getElement(); 
 var div =outerDiv.getElementsByTagName("div")[0];
@@ -24,8 +24,8 @@ div.style.border = "thin solid red";
 div.style.display = "inline-block";
 
 
-var legendCanvas = outerDiv.getElementsByTagName("canvas")[0];
-$(legendCanvas).css({"width": "100%", "height": "10%"});
+var legend_container = outerDiv.getElementsByTagName("div")[1];
+$(legend_container).css({"width": "100%", "height": "10%"});
 
 
 //$(container).css({"width": containerWidth, "height": containerHeight});
@@ -140,8 +140,6 @@ $("div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends").css({"bot
 
 drawLegend();
   
-
-
 };
 
 
@@ -157,13 +155,35 @@ window.addEventListener("resize", function(){
 
 
 function drawLegend() {
-  var canvas = outerDiv.getElementsByTagName("canvas")[1];
-  if (canvas.getContext) {
-    var ctx = canvas.getContext('2d');
-    ctx.fillStyle = "#CCFF99";
-    ctx.fillRect(5,5,40,40);
+//var legend_container = outerDiv.getElementsByTagName("canvas")[1];
 
-  }
+var legend_nodes = 
+[{"id":"legendToken","label":"Token","color":"#CCFF99","x":0,"physics":"false","level":0}
+,{"id":"legendSpan","label":"Spanning Node","color":"#A9D0F5","x":150,"physics":"false","level":0}
+,{"id":"legendStructure","label":"Structure Node","color":"#FFCC00","x":300,"physics":"false","level":0}
+];
+var legend_edges = [];
+var data = {
+nodes: legend_nodes,
+edges: legend_edges
+};
+
+var options = {
+nodes:{
+shape: "box"
+},
+layout: {
+hierarchical:{
+     direction: 'UD',
+     sortMethod: 'directed'
+	}
+ }
+};
+$(legend_container).remove("canvas");
+
+
+legend = new vis.Network(legend_container, data, options); 
+
 };
 
 };
