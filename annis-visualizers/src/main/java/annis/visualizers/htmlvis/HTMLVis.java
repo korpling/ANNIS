@@ -312,7 +312,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     {
       WebResource resBinary = Helper.getAnnisWebResource().path(
         "query/corpora/").path(corpusName).path(corpusName)
-        .path("binary").path(visConfigName + ".fonts");
+        .path("binary").path(visConfigName + ".fonts.json");
 
       ClientResponse response = resBinary.get(ClientResponse.class);
       if (response.getStatus() == ClientResponse.Status.OK.getStatusCode())
