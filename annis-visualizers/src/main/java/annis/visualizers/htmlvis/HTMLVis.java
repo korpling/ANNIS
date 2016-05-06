@@ -325,38 +325,41 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       try (InputStream inStreamJSON = inStreamJSONRaw)
       {
         ObjectMapper mapper = createJsonMapper();
-        WebFont fontConfig = mapper.readValue(inStreamJSON, WebFont.class);
+        WebFontList fontConfigList = mapper.readValue(inStreamJSON, WebFontList.class);
        
-        if(fontConfig != null && fontConfig.getName() != null) {
-          StringBuilder sb = new StringBuilder();
-          
-          sb.append("@font-face {\n");
-          sb.append("  font-family: '" + fontConfig.getName() + "';\n");
-          sb.append("  font-weight: '" + fontConfig.getWeight() + "';\n");
-          sb.append("  font-style: '" + fontConfig.getStyle() + "';\n");
-          
-          List<String> sourceDefs = new LinkedList<>();
-          for(Map.Entry<String, String> src : fontConfig.getSources().entrySet()) {
-            sourceDefs.add("url('" + src.getValue() + "') format('" + src.getKey() + "')");
-          }
-          
-          if(!sourceDefs.isEmpty())
-          {
-            sb.append("  src: ");
-            sb.append(Joiner.on(",\n    ").join(sourceDefs));
-            sb.append(";\n");
-          }
-          
-          sb.append("}\n");
-          
-          UI currentUI = UI.getCurrent();
-          if (currentUI instanceof AnnisBaseUI)
-          {
-            // do not add identical CSS files
-            ((AnnisBaseUI) currentUI).injectUniqueCSS(sb.toString());
+        for(WebFont fontConfig : fontConfigList.getWebFonts())
+        {
+        
+          if(fontConfig != null && fontConfig.getName() != null) {
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("@font-face {\n");
+            sb.append("  font-family: '" + fontConfig.getName() + "';\n");
+            sb.append("  font-weight: '" + fontConfig.getWeight() + "';\n");
+            sb.append("  font-style: '" + fontConfig.getStyle() + "';\n");
+            
+            List<String> sourceDefs = new LinkedList<>();
+            for(Map.Entry<String, String> src : fontConfig.getSources().entrySet()) {
+              sourceDefs.add("url('" + src.getValue() + "') format('" + src.getKey() + "')");
+            }
+            
+            if(!sourceDefs.isEmpty())
+            {
+              sb.append("  src: ");
+              sb.append(Joiner.on(",\n    ").join(sourceDefs));
+              sb.append(";\n");
+            }
+            
+            sb.append("}\n");
+            
+            UI currentUI = UI.getCurrent();
+            if (currentUI instanceof AnnisBaseUI)
+            {
+              // do not add identical CSS files
+              ((AnnisBaseUI) currentUI).injectUniqueCSS(sb.toString());
+            }
           }
         }
-       
         
       }
       catch (IOException ex)
