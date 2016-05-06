@@ -1,31 +1,16 @@
 //Connector
 window.annis_visualizers_component_visjs_VisJsComponent = function() {
 
-var outerDiv = this.getElement();
-
-outerDiv.innerHTML = "<div id='myDiv'></div>" +
-		"<div id='myLegend'></canvas>";
-
-//var div = this.getElement(); 
-var div =outerDiv.getElementsByTagName("div")[0];
-
-//var containerWidth = $(div).parent().width();
-//var containerHeight =  $(div).parent().height();
-
-
+var div = this.getElement(); 
 
 var container = div;
 
-$(container).css({"width": "100%", "height": "90%"});
+$(container).css({"width": "100%", "height": "100%"});
 var	containerWidth = $(container).width();
 var	containerHeight =  $(container).height();
 
 div.style.border = "thin solid red";
 div.style.display = "inline-block";
-
-
-var legend_container = outerDiv.getElementsByTagName("div")[1];
-$(legend_container).css({"width": "100%", "height": "10%"});
 
 
 //$(container).css({"width": containerWidth, "height": containerHeight});
@@ -137,14 +122,12 @@ $("div.vis-network div.vis-navigation div.vis-button.vis-right").css({"bottom": 
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomIn").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "15px"});
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomOut").css({"bottom": "auto", "top": "50px", "left": "auto", "right": "15px"});
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "55px"});
-
-drawLegend();
   
 };
 
 
 window.addEventListener("resize", function(){
-	$(container).css({"width": "100%", "height": "90%"});
+	$(container).css({"width": "100%", "height": "100%"});
 	containerWidth = $(container).width();
 	containerHeight =  $(container).height();
 	visjscomponent.setSize(containerWidth, containerHeight);
@@ -154,36 +137,5 @@ window.addEventListener("resize", function(){
 }); 
 
 
-function drawLegend() {
-//var legend_container = outerDiv.getElementsByTagName("canvas")[1];
-
-var legend_nodes = 
-[{"id":"legendToken","label":"Token","color":"#CCFF99","x":0,"physics":"false","level":0}
-,{"id":"legendSpan","label":"Spanning Node","color":"#A9D0F5","x":150,"physics":"false","level":0}
-,{"id":"legendStructure","label":"Structure Node","color":"#FFCC00","x":300,"physics":"false","level":0}
-];
-var legend_edges = [];
-var data = {
-nodes: legend_nodes,
-edges: legend_edges
-};
-
-var options = {
-nodes:{
-shape: "box"
-},
-layout: {
-hierarchical:{
-     direction: 'UD',
-     sortMethod: 'directed'
-	}
- }
-};
-$(legend_container).remove("canvas");
-
-
-legend = new vis.Network(legend_container, data, options); 
-
-};
 
 };
