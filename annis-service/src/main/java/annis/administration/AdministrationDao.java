@@ -2147,24 +2147,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
    */
   private void writeAmountOfNodesBack(List<ExampleQuery> exampleQueries)
   {
-    StringBuilder sb = new StringBuilder();
 
+    String sqlTemplate = "UPDATE _" + EXAMPLE_QUERIES_TAB + " SET nodes=?, used_ops=CAST(? AS text[]) WHERE example_query=?;";
+    
     for (ExampleQuery eQ : exampleQueries)
     {
-      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES_TAB).append(
-        " SET ");
-      sb.append("nodes=").append(String.valueOf(eQ.getNodes()));
-      sb.append(" WHERE example_query='");
-      sb.append(eQ.getExampleQuery()).append("';\n");
-
-      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES_TAB).append(
-        " SET ");
-      sb.append("used_ops='").append(String.valueOf(eQ.getUsedOperators()));
-      sb.append("' WHERE example_query='");
-      sb.append(eQ.getExampleQuery()).append("';\n");
+      getJdbcTemplate().update(sqlTemplate, eQ.getNodes(), eQ.getUsedOperators(), eQ.getExampleQuery());
     }
-
-    getJdbcTemplate().execute(sb.toString());
   }
 
   /**
