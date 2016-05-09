@@ -22,9 +22,11 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -139,9 +141,25 @@ public class MainFrame extends javax.swing.JFrame
     }
     this.setIconImages(allImages);
 
+    // find the location of the kickstarter
+    if(System.getProperty("annis.home") == null)
+    {
+      try
+      {
+       URL classLocation = getClass().getProtectionDomain().getCodeSource().getLocation();
+       File jarFile = new File(classLocation.toURI());
+       System.setProperty("annis.home", jarFile.getParent());
+      }
+      catch(SecurityException | URISyntaxException ex)
+      {
+        log.warn("Could not reliable get the location of ANNIS Kickstarter, fallback to working directory is used.", ex);
+        // fallback to current working directory
+        System.setProperty("annis.home", ".");
+      }
+    }
+    
 
     // init corpusAdministration
-    System.setProperty("annis.home", ".");
     this.corpusAdministration =
       (CorpusAdministration) AnnisBaseRunner.getBean("corpusAdministration",
       true, "file:"

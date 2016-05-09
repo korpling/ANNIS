@@ -82,6 +82,21 @@
           </systemPropertyVariables>
         </configuration>
       </plugin>
+      
+       <plugin>
+      	<groupId>org.codehaus.mojo</groupId>
+      	<artifactId>exec-maven-plugin</artifactId>
+      	<version>1.4.0</version>
+      	<configuration>
+      		<systemProperties>
+      			<!-- whatever main class we are executing always set the annis.home variable to target distribution directory -->
+      			<systemProperty>
+      				<key>annis.home</key>
+      				<value>${project.build.directory}/annis-kickstarter-${project.version}-distribution/annis-kickstarter-${project.version}/</value>
+      			</systemProperty>
+      		</systemProperties>
+      	</configuration>
+      </plugin>
      
     </plugins>
   </build>
