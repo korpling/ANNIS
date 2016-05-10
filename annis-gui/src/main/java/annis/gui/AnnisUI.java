@@ -192,6 +192,7 @@ public class AnnisUI extends CommonUI
       toURI());
     pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
       toURI());
+    pluginManager.addPluginsFrom(ClassURI.CLASSPATH("annis.gui.exporter.**"));
   }
 
   /**

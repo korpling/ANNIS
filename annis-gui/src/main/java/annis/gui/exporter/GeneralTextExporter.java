@@ -62,6 +62,11 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
 {
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
+  public GeneralTextExporter()
+  {
+    
+  }
+  
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString,

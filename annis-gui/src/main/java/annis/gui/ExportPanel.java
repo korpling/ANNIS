@@ -61,8 +61,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 public class ExportPanel extends GridLayout
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    ExportPanel.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ExportPanel.class);
 
   private final ComboBox cbLeftContext;
 
@@ -74,7 +73,7 @@ public class ExportPanel extends GridLayout
 
   private final ClassToInstanceMap<Exporter> exporterInstances = MutableClassToInstanceMap.create();
   private final IndexedContainer exporterClassContainer = new IndexedContainer();
-  
+
   private final ComboBox cbExporter;
 
   private final Button btDownload;
@@ -101,12 +100,11 @@ public class ExportPanel extends GridLayout
 
   private UI ui;
   private final QueryUIState state;
-  
+
   private final FormLayout formLayout;
   private final Label lblHelp;
-  
-  public ExportPanel(QueryPanel queryPanel,
-    QueryController controller, QueryUIState state)
+
+  public ExportPanel(QueryPanel queryPanel, QueryController controller, QueryUIState state)
   {
     super(2, 3);
     this.queryPanel = queryPanel;
@@ -115,58 +113,34 @@ public class ExportPanel extends GridLayout
 
     this.eventBus = new EventBus();
     this.eventBus.register(ExportPanel.this);
-    
+
     this.formLayout = new FormLayout();
     formLayout.setWidth("-1px");
-    
+
     setWidth("99%");
     setHeight("-1px");
 
     setColumnExpandRatio(0, 0.0f);
     setColumnExpandRatio(1, 1.0f);
-   
-    
+
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
     cbExporter.setPropertyDataSource(controller.getState().getExporter());
     cbExporter.setContainerDataSource(exporterClassContainer);
+
     
-    Exporter firstExporter = null;
-    if(getUI() instanceof AnnisBaseUI)
-    {
-      PluginManagerUtil util = new PluginManagerUtil(((AnnisBaseUI) getUI()).getPluginManager());
-      for(Exporter e : util.getPlugins(Exporter.class))
-      {
-        if(firstExporter == null)
-        {
-          firstExporter = e;
-        }
-        
-        exporterInstances.put(e.getClass(), e);
-        cbExporter.setItemCaption(e.getClass(), e.getClass().getSimpleName());
-        exporterClassContainer.addItem(e.getClass());
-        
-      }
-    }
-    if(firstExporter != null)
-    {
-      cbExporter.setValue(firstExporter.getClass().getSimpleName());
-    }
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
 
     formLayout.addComponent(cbExporter);
     addComponent(formLayout, 0, 0);
-    
+
     lblHelp = new Label();
     lblHelp.setContentMode(ContentMode.HTML);
     addComponent(lblHelp, 1, 0);
-    if(firstExporter != null)
-    {
-      lblHelp.setValue(firstExporter.getHelpMessage());
-    }
     
+
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
 
@@ -176,10 +150,10 @@ public class ExportPanel extends GridLayout
     cbLeftContext.setNewItemsAllowed(true);
     cbRightContext.setNewItemsAllowed(true);
 
-    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
-      Integer.MIN_VALUE, Integer.MAX_VALUE));
-    cbRightContext.addValidator(new IntegerRangeValidator("must be a number",
-      Integer.MIN_VALUE, Integer.MAX_VALUE));
+    cbLeftContext.addValidator(
+        new IntegerRangeValidator("must be a number", Integer.MIN_VALUE, Integer.MAX_VALUE));
+    cbRightContext.addValidator(
+        new IntegerRangeValidator("must be a number", Integer.MIN_VALUE, Integer.MAX_VALUE));
 
     for (Integer i : SearchOptionsPanel.PREDEFINED_CONTEXTS)
     {
@@ -189,20 +163,20 @@ public class ExportPanel extends GridLayout
 
     cbLeftContext.setValue(5);
     cbRightContext.setValue(5);
-    
+
     formLayout.addComponent(cbLeftContext);
     formLayout.addComponent(cbRightContext);
 
     txtAnnotationKeys = new TextField("Annotation Keys");
     txtAnnotationKeys.setDescription("Some exporters will use this comma "
-      + "seperated list of annotation keys to limit the exported data to these "
-      + "annotations.");
+        + "seperated list of annotation keys to limit the exported data to these "
+        + "annotations.");
     formLayout.addComponent(new HelpButton<String>(txtAnnotationKeys));
 
     txtParameters = new TextField("Parameters");
     txtParameters.setDescription("You can input special parameters "
-      + "for certain exporters. See the description of each exporter "
-      + "(‘?’ button above) for specific parameter settings.");
+        + "for certain exporters. See the description of each exporter "
+        + "(‘?’ button above) for specific parameter settings.");
     formLayout.addComponent(new HelpButton<String>(txtParameters));
 
     btExport = new Button("Perform Export");
@@ -214,20 +188,15 @@ public class ExportPanel extends GridLayout
     btCancel.setIcon(FontAwesome.TIMES_CIRCLE);
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
-    if(firstExporter != null)
-    {
-      btCancel.setVisible(firstExporter.isCancelable());
-    }
     
+
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
     btDownload.setIcon(FontAwesome.DOWNLOAD);
     btDownload.setDisableOnClick(true);
     btDownload.setEnabled(false);
 
-    HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport,
-      btCancel,
-      btDownload);
+    HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport, btCancel, btDownload);
     addComponent(layoutExportButtons, 0, 1, 1, 1);
 
     VerticalLayout vLayout = new VerticalLayout();
@@ -240,24 +209,20 @@ public class ExportPanel extends GridLayout
 
     progressLabel = new Label();
     vLayout.addComponent(progressLabel);
-    
-    if(state != null)
+
+    if (state != null)
     {
       cbLeftContext.setPropertyDataSource(state.getLeftContext());
       cbRightContext.setPropertyDataSource(state.getRightContext());
       cbExporter.setPropertyDataSource(state.getExporter());
-      
-      if(firstExporter != null)
-      {
-        state.getExporter().setValue(firstExporter.getClass());
-      }
+
       txtAnnotationKeys.setConverter(new CommaSeperatedStringConverterList());
       txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
-      
+
       txtParameters.setPropertyDataSource(state.getExportParameters());
-      
+
     }
-    
+
   }
 
   @Override
@@ -265,21 +230,48 @@ public class ExportPanel extends GridLayout
   {
     super.attach();
     this.ui = UI.getCurrent();
-  }
-  
+    
+    Exporter firstExporter = null;
+    if (this.ui instanceof AnnisBaseUI)
+    {
+      PluginManagerUtil util = new PluginManagerUtil(((AnnisBaseUI) getUI()).getPluginManager());
+      for (Exporter e : util.getPlugins(Exporter.class))
+      {
+        if (firstExporter == null)
+        {
+          firstExporter = e;
+        }
 
-  public class ExporterSelectionHelpListener implements
-    Property.ValueChangeListener
+        exporterInstances.put(e.getClass(), e);
+        cbExporter.setItemCaption(e.getClass(), e.getClass().getSimpleName());
+        exporterClassContainer.addItem(e.getClass());
+
+      }
+    }
+    
+    if (firstExporter != null)
+    {
+      cbExporter.setValue(firstExporter.getClass());
+      btCancel.setVisible(firstExporter.isCancelable());
+      if(state != null)
+      {
+        state.getExporter().setValue(firstExporter.getClass());
+      }
+    }
+    
+  }
+
+  public class ExporterSelectionHelpListener implements Property.ValueChangeListener
   {
 
     @Override
     public void valueChange(ValueChangeEvent event)
     {
       Exporter exporter = exporterInstances.get(event.getProperty().getValue());
-      if(exporter != null)
+      if (exporter != null)
       {
         btCancel.setVisible(exporter.isCancelable());
-        
+
         String helpMessage = exporter.getHelpMessage();
         if (helpMessage != null)
         {
@@ -301,7 +293,7 @@ public class ExportPanel extends GridLayout
   @Subscribe
   public void handleExportProgress(final Integer exports)
   {
-    if(ui != null)
+    if (ui != null)
     {
       // if we ui access() here it seems to confuse the isInterrupted() flag
       // of the parent thread and cancelling won't work any longer
@@ -312,8 +304,7 @@ public class ExportPanel extends GridLayout
         {
           if (exportTime != null && exportTime.isRunning())
           {
-            progressLabel.setValue(
-              "exported " + exports + " items in " + exportTime.toString());
+            progressLabel.setValue("exported " + exports + " items in " + exportTime.toString());
           }
           else
           {
@@ -337,7 +328,7 @@ public class ExportPanel extends GridLayout
       }
     }
   }
-  
+
   public void showResult(File currentTmpFile, boolean manuallyCancelled)
   {
     btExport.setEnabled(true);
@@ -352,32 +343,29 @@ public class ExportPanel extends GridLayout
     if (tmpOutputFile == null)
     {
       Notification.show("Could not create the Exporter",
-        "The server logs might contain more information about this "
-        + "so you should contact the provider of this ANNIS installation "
-        + "for help.", Notification.Type.ERROR_MESSAGE);
+          "The server logs might contain more information about this "
+              + "so you should contact the provider of this ANNIS installation " + "for help.",
+          Notification.Type.ERROR_MESSAGE);
     }
     else if (manuallyCancelled)
     {
       // we were aborted, don't do anything
-      Notification.show("Export cancelled",
-        Notification.Type.WARNING_MESSAGE);
+      Notification.show("Export cancelled", Notification.Type.WARNING_MESSAGE);
     }
     else
     {
-      if (downloader != null && btDownload.getExtensions().contains(
-        downloader))
+      if (downloader != null && btDownload.getExtensions().contains(downloader))
       {
         btDownload.removeExtension(downloader);
       }
-      downloader = new FileDownloader(new FileResource(
-        tmpOutputFile));
+      downloader = new FileDownloader(new FileResource(tmpOutputFile));
 
       downloader.extend(btDownload);
       btDownload.setEnabled(true);
 
       Notification.show("Export finished",
-        "Click on the button right to the export button to actually download the file.",
-        Notification.Type.HUMANIZED_MESSAGE);
+          "Click on the button right to the export button to actually download the file.",
+          Notification.Type.HUMANIZED_MESSAGE);
     }
   }
 
@@ -396,22 +384,19 @@ public class ExportPanel extends GridLayout
         }
       }
       tmpOutputFile = null;
-      
-      
+
       final Exporter exporter = exporterInstances.get(cbExporter.getValue());
       if (exporter != null)
       {
-        if("".equals(queryPanel.getQuery()))
+        if ("".equals(queryPanel.getQuery()))
         {
-          Notification.show("Empty query",
-            Notification.Type.WARNING_MESSAGE);
+          Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
           btExport.setEnabled(true);
           return;
         }
         else if (state.getSelectedCorpora().getValue().isEmpty())
         {
-          Notification.show("Please select a corpus",
-            Notification.Type.WARNING_MESSAGE);
+          Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
           btExport.setEnabled(true);
           return;
         }
@@ -425,17 +410,16 @@ public class ExportPanel extends GridLayout
           btCancel.setEnabled(true);
           btCancel.setDisableOnClick(true);
         }
-        
+
         controller.executeExport(ExportPanel.this, eventBus);
 
-        
         if (exportTime == null)
         {
           exportTime = Stopwatch.createUnstarted();
         }
         exportTime.reset();
         exportTime.start();
-        
+
       }
     }
   }
