@@ -30,6 +30,7 @@ import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 
 import annis.service.objects.SubgraphFilter;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  * An exporter that will take all token and segmentation nodes and exports
@@ -39,6 +40,7 @@ import annis.service.objects.SubgraphFilter;
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
+@PluginImplementation
 public class DialogExporter extends SaltBasedExporter
 {
 

@@ -20,6 +20,8 @@ import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.SubgraphFilter;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+
 import com.google.common.base.Splitter;
 import java.io.IOException;
 import java.io.Writer;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@PluginImplementation
 public class TokenExporter extends GeneralTextExporter
 {
 

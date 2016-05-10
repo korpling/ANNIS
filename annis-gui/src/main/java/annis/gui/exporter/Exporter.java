@@ -17,15 +17,18 @@ package annis.gui.exporter;
 
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.WebResource;
+
+import net.xeoh.plugins.base.Plugin;
+
 import java.io.Writer;
 import java.util.List;
 import java.util.Set;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface Exporter
+public interface Exporter extends Plugin
 {
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight, 
    Set<String> corpora, List<String> keys, String args, 

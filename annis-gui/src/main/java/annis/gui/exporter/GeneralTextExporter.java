@@ -55,7 +55,9 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
 import annis.utils.LegacyGraphConverter;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+@PluginImplementation
 public abstract class GeneralTextExporter implements Exporter, Serializable
 {
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();

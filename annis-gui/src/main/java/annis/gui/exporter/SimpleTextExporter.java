@@ -16,11 +16,13 @@
 package annis.gui.exporter;
 
 import annis.service.objects.SubgraphFilter;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  * Simple text exporter.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
+@PluginImplementation
 public class SimpleTextExporter extends GeneralTextExporter
 {
 

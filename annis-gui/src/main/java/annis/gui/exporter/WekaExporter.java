@@ -31,7 +31,9 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
 import annis.libgui.Helper;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
+@PluginImplementation
 public class WekaExporter implements Exporter, Serializable
 {
 
