@@ -17,9 +17,10 @@ package annis.gui.controller;
 
 import annis.gui.AnnisUI;
 import annis.gui.ExportPanel;
-import annis.gui.exporter.Exporter;
 import annis.gui.objects.ExportQuery;
 import annis.libgui.Helper;
+import annis.libgui.exporter.Exporter;
+
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import java.io.File;

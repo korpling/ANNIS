@@ -32,8 +32,8 @@ import com.vaadin.data.util.ObjectProperty;
 
 import annis.gui.controlpanel.CorpusSorter;
 import annis.gui.exporter.CSVExporter;
-import annis.gui.exporter.Exporter;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.libgui.exporter.Exporter;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.OrderType;
 

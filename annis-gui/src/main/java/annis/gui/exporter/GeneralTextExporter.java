@@ -46,6 +46,7 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
+import annis.libgui.exporter.Exporter;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;

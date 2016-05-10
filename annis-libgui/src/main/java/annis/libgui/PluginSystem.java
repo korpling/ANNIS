@@ -15,6 +15,7 @@
  */
 package annis.libgui;
 
+import annis.libgui.exporter.Exporter;
 import annis.libgui.visualizers.VisualizerPlugin;
 import java.io.Serializable;
 import net.xeoh.plugins.base.PluginManager;
@@ -35,4 +36,8 @@ public interface PluginSystem extends Serializable
   
   /** Gets a visualizer by its short name */
   public VisualizerPlugin getVisualizer(String shortName); 
+  
+  /** Gets the plugin instance of an exporter by it's class */
+  public Exporter getExporter(Class<? extends Exporter> clazz);
+  
 }

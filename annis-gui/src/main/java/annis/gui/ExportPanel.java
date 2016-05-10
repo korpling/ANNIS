@@ -49,9 +49,10 @@ import annis.gui.components.HelpButton;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.converter.CommaSeperatedStringConverterList;
-import annis.gui.exporter.Exporter;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.AnnisBaseUI;
+import annis.libgui.PluginSystem;
+import annis.libgui.exporter.Exporter;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
@@ -71,7 +72,6 @@ public class ExportPanel extends GridLayout
 
   private final TextField txtParameters;
 
-  private final ClassToInstanceMap<Exporter> exporterInstances = MutableClassToInstanceMap.create();
   private final IndexedContainer exporterClassContainer = new IndexedContainer();
 
   private final ComboBox cbExporter;
@@ -103,13 +103,16 @@ public class ExportPanel extends GridLayout
 
   private final FormLayout formLayout;
   private final Label lblHelp;
+  
+  private final PluginSystem ps;
 
-  public ExportPanel(QueryPanel queryPanel, QueryController controller, QueryUIState state)
+  public ExportPanel(QueryPanel queryPanel, QueryController controller, QueryUIState state, PluginSystem ps)
   {
     super(2, 3);
     this.queryPanel = queryPanel;
     this.controller = controller;
     this.state = state;
+    this.ps = ps;
 
     this.eventBus = new EventBus();
     this.eventBus.register(ExportPanel.this);
@@ -242,7 +245,6 @@ public class ExportPanel extends GridLayout
           firstExporter = e;
         }
 
-        exporterInstances.put(e.getClass(), e);
         cbExporter.setItemCaption(e.getClass(), e.getClass().getSimpleName());
         exporterClassContainer.addItem(e.getClass());
 
@@ -267,7 +269,8 @@ public class ExportPanel extends GridLayout
     @Override
     public void valueChange(ValueChangeEvent event)
     {
-      Exporter exporter = exporterInstances.get(event.getProperty().getValue());
+      @SuppressWarnings("unchecked")
+      Exporter exporter = ps.getExporter((Class<? extends Exporter>) event.getProperty().getValue());
       if (exporter != null)
       {
         btCancel.setVisible(exporter.isCancelable());
@@ -385,7 +388,8 @@ public class ExportPanel extends GridLayout
       }
       tmpOutputFile = null;
 
-      final Exporter exporter = exporterInstances.get(cbExporter.getValue());
+      @SuppressWarnings("unchecked")
+      final Exporter exporter = ps.getExporter((Class<? extends Exporter>) cbExporter.getValue());
       if (exporter != null)
       {
         if ("".equals(queryPanel.getQuery()))

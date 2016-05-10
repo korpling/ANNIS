@@ -49,6 +49,7 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
+import annis.libgui.exporter.Exporter;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;

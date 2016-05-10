@@ -15,13 +15,12 @@
  */
 package annis.gui;
 
-import annis.gui.components.ExceptionDialog;
-import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
-import annis.gui.objects.QueryUIState;
-import annis.gui.querybuilder.TigerQueryBuilderPlugin;
-import annis.libgui.Helper;
 import static annis.libgui.Helper.DEFAULT_CONFIG;
-import annis.service.objects.CorpusConfig;
+
+import java.io.IOException;
+
+import org.slf4j.LoggerFactory;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
@@ -32,10 +31,21 @@ import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
-import java.io.IOException;
+
+import annis.gui.components.ExceptionDialog;
+import annis.gui.exporter.CSVExporter;
+import annis.gui.exporter.DialogExporter;
+import annis.gui.exporter.GridExporter;
+import annis.gui.exporter.SimpleTextExporter;
+import annis.gui.exporter.TokenExporter;
+import annis.gui.exporter.WekaExporter;
+import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
+import annis.gui.objects.QueryUIState;
+import annis.gui.querybuilder.TigerQueryBuilderPlugin;
+import annis.libgui.Helper;
+import annis.service.objects.CorpusConfig;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
-import org.slf4j.LoggerFactory;
 
 /**
  * GUI for searching in corpora.
@@ -192,7 +202,12 @@ public class AnnisUI extends CommonUI
       toURI());
     pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
       toURI());
-    pluginManager.addPluginsFrom(ClassURI.CLASSPATH("annis.gui.exporter.**"));
+    pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVExporter.class));
+    pluginManager.addPluginsFrom(ClassURI.PLUGIN(WekaExporter.class));
+    pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
+    pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
+    pluginManager.addPluginsFrom(ClassURI.PLUGIN(GridExporter.class));
+    pluginManager.addPluginsFrom(ClassURI.PLUGIN(DialogExporter.class));
   }
 
   /**

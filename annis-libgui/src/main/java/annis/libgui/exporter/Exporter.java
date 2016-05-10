@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.exporter;
+package annis.libgui.exporter;
 
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.WebResource;

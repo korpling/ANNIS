@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import annis.gui.exporter.Exporter;
+import annis.libgui.exporter.Exporter;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.OrderType;
 

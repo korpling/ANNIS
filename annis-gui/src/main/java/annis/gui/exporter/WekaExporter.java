@@ -31,6 +31,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
 import annis.libgui.Helper;
+import annis.libgui.exporter.Exporter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation

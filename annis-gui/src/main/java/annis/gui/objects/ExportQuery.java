@@ -17,7 +17,7 @@ package annis.gui.objects;
 
 import com.google.common.base.Splitter;
 
-import annis.gui.exporter.Exporter;
+import annis.libgui.exporter.Exporter;
 
 import java.util.List;
 import java.util.Objects;
