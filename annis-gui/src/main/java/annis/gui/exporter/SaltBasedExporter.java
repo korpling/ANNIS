@@ -15,32 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
-import annis.libgui.Helper;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.Match;
-import annis.service.objects.MatchGroup;
-import annis.service.objects.SubgraphFilter;
-import annis.utils.LegacyGraphConverter;
-import com.google.common.base.Splitter;
-import com.google.common.base.Stopwatch;
-import com.google.common.escape.Escaper;
-import com.google.common.eventbus.EventBus;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,9 +27,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Stopwatch;
+import com.google.common.escape.Escaper;
+import com.google.common.eventbus.EventBus;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+
+import annis.exceptions.AnnisCorpusAccessException;
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.exceptions.AnnisQLSyntaxException;
+import annis.libgui.Helper;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
+import annis.service.objects.SubgraphFilter;
 
 /**
  * An abstract base class for exporters that use Salt subgraphs to produce
@@ -249,15 +246,15 @@ public abstract class SaltBasedExporter implements Exporter, Serializable
     Writer out) throws IOException
   {
     int matchNumber = offset;
-    if(p != null && p.getSCorpusGraphs() != null)
+    if(p != null && p.getCorpusGraphs() != null)
     {
-      for(SCorpusGraph corpusGraph : p.getSCorpusGraphs())
+      for(SCorpusGraph corpusGraph : p.getCorpusGraphs())
       {
-        if(corpusGraph.getSDocuments() != null)
+        if(corpusGraph.getDocuments() != null)
         {
-          for(SDocument doc : corpusGraph.getSDocuments())
+          for(SDocument doc : corpusGraph.getDocuments())
           {
-            convertText(doc.getSDocumentGraph(), annoKeys, args, matchNumber, out);
+            convertText(doc.getDocumentGraph(), annoKeys, args, matchNumber, out);
           }
         }
       }

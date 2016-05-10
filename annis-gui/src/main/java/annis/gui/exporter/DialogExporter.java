@@ -15,18 +15,21 @@
  */
 package annis.gui.exporter;
 
-import annis.service.objects.SubgraphFilter;
-import com.google.common.base.Strings;
-import com.google.common.collect.Table;
-import com.google.common.collect.TreeBasedTable;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
+
+import com.google.common.base.Strings;
+import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
+
+import annis.service.objects.SubgraphFilter;
 
 /**
  * An exporter that will take all token and segmentation nodes and exports
@@ -47,7 +50,7 @@ public class DialogExporter extends SaltBasedExporter
   {
     if(graph != null)
     {
-      List<SToken> token = graph.getSortedSTokenByText();
+      List<SToken> token = graph.getSortedTokenByText();
       // a map which is used to determine how much space each column will need
       Map<Integer, Integer> columnToWidth = new HashMap<>();
       
@@ -59,7 +62,7 @@ public class DialogExporter extends SaltBasedExporter
       int i=0;
       for(SToken t : token)
       {
-        String coveredText = graph.getSText(t);
+        String coveredText = graph.getText(t);
         grid.put("", i, coveredText);
         // a token will need at least its own number of characters as width
         columnToWidth.put(i, coveredText.length());
