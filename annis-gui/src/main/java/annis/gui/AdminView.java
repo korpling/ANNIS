@@ -15,21 +15,10 @@
  */
 package annis.gui;
 
-import annis.gui.admin.CorpusAdminPanel;
-import annis.gui.admin.GroupManagementPanel;
-import annis.gui.admin.ImportPanel;
-import annis.gui.admin.UserManagementPanel;
-import annis.gui.admin.controller.CorpusController;
-import annis.gui.admin.controller.GroupController;
-import annis.gui.admin.controller.UserController;
-import annis.gui.admin.model.CorpusManagement;
-import annis.gui.admin.model.GroupManagement;
-import annis.gui.admin.model.UserManagement;
-import annis.gui.admin.model.WebResourceProvider;
-import annis.gui.admin.view.UIView;
-import annis.gui.admin.view.UIView.Listener;
-import annis.libgui.Background;
-import annis.libgui.Helper;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.WebResource;
@@ -42,9 +31,21 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
+
+import annis.gui.admin.CorpusAdminPanel;
+import annis.gui.admin.GroupManagementPanel;
+import annis.gui.admin.ImportPanel;
+import annis.gui.admin.UserManagementPanel;
+import annis.gui.admin.controller.CorpusController;
+import annis.gui.admin.controller.GroupController;
+import annis.gui.admin.controller.UserController;
+import annis.gui.admin.model.CorpusManagement;
+import annis.gui.admin.model.GroupManagement;
+import annis.gui.admin.model.UserManagement;
+import annis.gui.admin.model.WebResourceProvider;
+import annis.gui.admin.view.UIView;
+import annis.libgui.Background;
+import annis.libgui.Helper;
 
 /**
  *
@@ -55,12 +56,6 @@ public class AdminView extends VerticalLayout implements View,
 {
 
   public static final String NAME = "admin";
-
-  private final UserController userController;
-
-  private final GroupController groupManagementController;
-
-  private final CorpusController corpusController;
 
   private final List<UIView.Listener> listeners = new LinkedList<>();
 
@@ -94,15 +89,15 @@ public class AdminView extends VerticalLayout implements View,
     boolean isLoggedIn = Helper.getUser() != null;
 
     corpusAdminPanel = new CorpusAdminPanel();
-    corpusController = new CorpusController(corpusManagement, corpusAdminPanel,
+    new CorpusController(corpusManagement, corpusAdminPanel,
       this, isLoggedIn);
 
     userManagementPanel = new UserManagementPanel();
-    userController = new UserController(userManagement,
+    new UserController(userManagement,
       userManagementPanel, this, isLoggedIn);
 
     groupManagementPanel = new GroupManagementPanel();
-    groupManagementController = new GroupController(groupManagement,
+    new GroupController(groupManagement,
       corpusManagement,
       groupManagementPanel, this, userManagementPanel, isLoggedIn);
 

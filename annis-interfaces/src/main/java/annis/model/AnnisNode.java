@@ -99,10 +99,10 @@ public class AnnisNode implements Serializable
 
   public AnnisNode()
   {
-    nodeAnnotations = new TreeSet<Annotation>();
-    edgeAnnotations = new TreeSet<Annotation>();
-    incomingEdges = new HashSet<Edge>();
-    outgoingEdges = new HashSet<Edge>();
+    nodeAnnotations = new TreeSet<>();
+    edgeAnnotations = new TreeSet<>();
+    incomingEdges = new HashSet<>();
+    outgoingEdges = new HashSet<>();
   }
 
   public AnnisNode(long id)
@@ -298,8 +298,7 @@ public class AnnisNode implements Serializable
     }
     
     if (this.edgeAnnotations != other.edgeAnnotations
-      && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(
-      other.edgeAnnotations)))
+      && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(other.edgeAnnotations)))
     {
       return false;
     }

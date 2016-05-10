@@ -205,11 +205,6 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
     public ResolverEntry.ElementType element;
     public String vis_type;
     public String display_name;
-
-    public RemoveIndexElement()
-    {
-      
-    }
     
     public RemoveIndexElement(ResolverEntry e)
     {

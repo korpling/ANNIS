@@ -37,14 +37,12 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
  */
 public class QueryBuilderChooser extends Panel implements Property.ValueChangeListener
 {
-  private final PluginSystem pluginSystem;
   private final QueryController controller;
   private final ComboBox cbChooseBuilder;
   private final Map<String, String> short2caption;
   private final Map<String, QueryBuilderPlugin> pluginRegistry;
   private Component lastComponent;
   private final VerticalLayout layout;
-  private final InstanceConfig instanceConfig;
   private Component component;
   
   public QueryBuilderChooser(QueryController controller,
@@ -52,8 +50,6 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     InstanceConfig instanceConfig)
   {
     this.controller = controller;
-    this.pluginSystem = pluginSystem;
-    this.instanceConfig = instanceConfig;
     
     this.pluginRegistry = new HashMap<>();
     this.short2caption = new HashMap<>();
@@ -84,7 +80,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
       cbChooseBuilder.addItem(b.getCaption());
     }
     
-    cbChooseBuilder.addListener((Property.ValueChangeListener) this);
+    cbChooseBuilder.addValueChangeListener((Property.ValueChangeListener) this);
     
     layout.addComponent(cbChooseBuilder);
     layout.setExpandRatio(cbChooseBuilder, 0.0f);

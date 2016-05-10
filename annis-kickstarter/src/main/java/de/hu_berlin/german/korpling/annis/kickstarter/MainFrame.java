@@ -15,11 +15,6 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.AnnisBaseRunner;
-import annis.administration.CorpusAdministration;
-import annis.administration.ImportStatus;
-import annis.service.internal.AnnisServiceRunner;
-import annis.utils.Utils;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
@@ -27,22 +22,28 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.webapp.WebAppContext;
+
 import org.slf4j.LoggerFactory;
+
+import annis.AnnisBaseRunner;
+import annis.administration.CorpusAdministration;
+import annis.administration.ImportStatus;
+import annis.utils.Utils;
 
 /**
  *
@@ -55,19 +56,20 @@ public class MainFrame extends javax.swing.JFrame
     MainFrame.class);
 
   private class MainFrameWorker extends SwingWorker<String, String>
-    implements Serializable
   {
+    
+    private final KickstartRunner delegate = new KickstartRunner();
 
     @Override
     protected String doInBackground() throws Exception
     {
-      runner = null;
+      delegate.resetRunner();
       setProgress(1);
       try
       {
-        startService();
+        delegate.startService();
         setProgress(2);
-        startJetty();
+        delegate.startJetty();
       }
       catch (Exception ex)
       {
@@ -76,47 +78,6 @@ public class MainFrame extends javax.swing.JFrame
       return "";
     }
 
-    private void startService() throws Exception
-    {
-
-      // starts RMI service at bean creation
-      runner = new AnnisServiceRunner();
-      runner.setUseAuthentification(false);
-      runner.start(true);
-     
-    }
-
-    private void startJetty() throws Exception
-    {
-      // disable jetty logging
-      org.eclipse.jetty.util.log.Log.setLog(new JettyNoLogger());
-      
-      Server jetty = new Server(8080);
-      // add context for our bundled webapp
-      WebAppContext context = new WebAppContext("./webapp/", "/annis-gui");
-      context.setInitParameter("managerClassName",
-        "annis.security.TestSecurityManager");
-      String webxmlOverrride = System.getProperty("annis.home")
-        + "/conf/override-web.xml";//ClassLoader.getSystemResource("webxmloverride.xml").toString();
-      List<String> listWebXMLOverride = new LinkedList<String>();
-      listWebXMLOverride.add(webxmlOverrride);
-      context.setOverrideDescriptors(listWebXMLOverride);
-      
-      
-      // Exclude some jersey classes explicitly from the web application classpath.
-      // If they still exists some automatic dependency resolution of Jersey will
-      // fail.
-      // Whenever we add new dependencies on jersey classes for the service but 
-      // not for the GUI and "Missing dependency" errors occur, add the classes
-      // to the server class list
-      context.addServerClass("com.sun.jersey.json.");
-      context.addServerClass("com.sun.jersey.server.");
-      
-      jetty.setHandler(context);
-
-      // start
-      jetty.start();
-    }
 
     @Override
     protected void done()
@@ -142,13 +103,18 @@ public class MainFrame extends javax.swing.JFrame
         log.error(null, ex);
       }
     }
+    
+    public void setTimeoutDisabled(boolean disabled)
+    {
+      delegate.setTimeoutDisabled(disabled);
+    }
+    
   } //end MainFrameWorker class
   private CorpusAdministration corpusAdministration;
-  private SwingWorker<String, String> serviceWorker;
+  private MainFrameWorker serviceWorker;
   private boolean wasStarted = false;
-  private AnnisServiceRunner runner;
-  private int oldTimeout;
-
+  
+  
   /**
    * Creates new form MainFrame
    */
@@ -175,9 +141,25 @@ public class MainFrame extends javax.swing.JFrame
     }
     this.setIconImages(allImages);
 
+    // find the location of the kickstarter
+    if(System.getProperty("annis.home") == null)
+    {
+      try
+      {
+       URL classLocation = getClass().getProtectionDomain().getCodeSource().getLocation();
+       File jarFile = new File(classLocation.toURI());
+       System.setProperty("annis.home", jarFile.getParent());
+      }
+      catch(SecurityException | URISyntaxException ex)
+      {
+        log.warn("Could not reliable get the location of ANNIS Kickstarter, fallback to working directory is used.", ex);
+        // fallback to current working directory
+        System.setProperty("annis.home", ".");
+      }
+    }
+    
 
     // init corpusAdministration
-    System.setProperty("annis.home", ".");
     this.corpusAdministration =
       (CorpusAdministration) AnnisBaseRunner.getBean("corpusAdministration",
       true, "file:"
@@ -273,7 +255,6 @@ public class MainFrame extends javax.swing.JFrame
    * WARNING: Do NOT modify this code. The content of this method is always
    * regenerated by the Form Editor.
    */
-  @SuppressWarnings("unchecked")
   // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
   private void initComponents()
   {
@@ -506,19 +487,9 @@ public class MainFrame extends javax.swing.JFrame
   private void cbDisableTimeoutActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_cbDisableTimeoutActionPerformed
   {//GEN-HEADEREND:event_cbDisableTimeoutActionPerformed
     
-    if(runner != null)
+    if(serviceWorker != null)
     {
-      if(cbDisableTimeout.isSelected())
-      {
-        // unset timeout
-        oldTimeout = runner.getTimeout();
-        runner.setTimeout(-1);
-      }
-      else
-      {
-        // restore timeout
-        runner.setTimeout(oldTimeout);
-      }
+      serviceWorker.setTimeoutDisabled(cbDisableTimeout.isSelected());
     }
     
   }//GEN-LAST:event_cbDisableTimeoutActionPerformed

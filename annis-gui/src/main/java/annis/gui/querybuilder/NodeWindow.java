@@ -301,22 +301,23 @@ public class NodeWindow extends Panel implements Button.ClickListener
         cbName.addItem(n);
       }
       cbName.setValue("tok");
-      cbName.addListener((ValueChangeListener) this);
+      cbName.addValueChangeListener((ValueChangeListener) this);
       
       
       cbOperator = new ComboBox();
       cbOperator.setNewItemsAllowed(false);
+      cbOperator.setNullSelectionAllowed(false);
       cbOperator.setImmediate(true);
       for(String o : NODE_OPERATORS)
       {
         cbOperator.addItem(o);
       }
       cbOperator.setValue(NODE_OPERATORS[0]);
-      cbOperator.addListener((ValueChangeListener) this);
+      cbOperator.addValueChangeListener((ValueChangeListener) this);
       
       txtValue = new TextField();
       txtValue.setImmediate(true);
-      txtValue.addListener((ValueChangeListener) this);
+      txtValue.addValueChangeListener((ValueChangeListener) this);
       
       cbOperator.setWidth("4em");
       cbName.setWidth("100%");

@@ -15,23 +15,23 @@
  */
 package annis.provider;
 
-import annis.utils.GraphMLConverter;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.util.internal.persistence.GraphMLWriter;
 
 /**
  *
@@ -45,10 +45,6 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     "application",
     "graphml+xml");
 
-  private final static Logger log = LoggerFactory.getLogger(
-    GraphMLProvider.class);
-
-  
   @Override
   public boolean isWriteable(
     Class<?> type, Type genericType, Annotation[] annotations,
@@ -75,18 +71,18 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
 
     // collect document graphs from the salt project
     List<SDocument> docs = new LinkedList<>();
-    List<SCorpusGraph> corpusGraphs = t.getSCorpusGraphs();
+    List<SCorpusGraph> corpusGraphs = t.getCorpusGraphs();
     if(corpusGraphs != null)
     {
       for(SCorpusGraph c : corpusGraphs)
       {
-        if(c.getSDocuments() != null)
+        if(c.getDocuments() != null)
         {
-          docs.addAll(c.getSDocuments());
+          docs.addAll(c.getDocuments());
         }
       }
     }
-    GraphMLConverter.convertFromSalt(entityStream, docs);
+    GraphMLWriter.writeDocuments(entityStream, docs);
   }
   
   

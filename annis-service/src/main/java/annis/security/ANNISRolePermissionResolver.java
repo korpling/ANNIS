@@ -17,10 +17,10 @@ package annis.security;
 
 import java.util.Collection;
 import java.util.HashSet;
+
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.WildcardPermission;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -28,9 +28,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ANNISRolePermissionResolver implements RolePermissionResolver
 {
-
-  private final static org.slf4j.Logger log = LoggerFactory.getLogger(
-    ANNISRolePermissionResolver.class);
 
   private ANNISUserConfigurationManager confManager;
 

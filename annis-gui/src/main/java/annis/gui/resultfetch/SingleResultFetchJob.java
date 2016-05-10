@@ -15,17 +15,19 @@
  */
 package annis.gui.resultfetch;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import org.corpus_tools.salt.common.SaltProject;
+
+import com.sun.jersey.api.client.WebResource;
+
 import annis.gui.objects.PagedResultQuery;
-import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Helper;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
-import com.sun.jersey.api.client.WebResource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Fetches a result which contains only one subgraph. This single query always

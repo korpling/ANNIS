@@ -33,24 +33,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @XmlRootElement
 public class QueryNode implements Serializable
 {
-  public enum Type {NODE, AND, OR};
-
   // this class is send to the front end
   // node object in database
   private long id;
-  private long corpus; // FIXME: Corpus object with annotations or move to
-  // graph?
-  private long textId;
-  private long left;
-  private long right;
   private String spannedText;
-  private Long tokenIndex;
-  private long leftToken;
-  private long rightToken;
   private Set<QueryAnnotation> nodeAnnotations;
-  // node position in annotation graph
-  private String name;
-  private String namespace;
   // node constraints
   private boolean partOfEdge;
   private boolean root;
@@ -180,9 +167,9 @@ public class QueryNode implements Serializable
 
   public QueryNode()
   {
-    nodeAnnotations = new TreeSet<QueryAnnotation>();
-    outgoingJoins = new ArrayList<Join>();
-    ingoingJoins = new ArrayList<Join>();
+    nodeAnnotations = new TreeSet<>();
+    outgoingJoins = new ArrayList<>();
+    ingoingJoins = new ArrayList<>();
   }
 
   public QueryNode(long id)
@@ -200,35 +187,26 @@ public class QueryNode implements Serializable
   public QueryNode(QueryNode other,boolean copyOutgoingJoins)
   {
     this.arity = other.arity;
-    this.corpus = other.corpus;
     this.id = other.id;
     if(copyOutgoingJoins)
     {
-      this.outgoingJoins = new ArrayList<Join>(other.outgoingJoins);
+      this.outgoingJoins = new ArrayList<>(other.outgoingJoins);
     }
     else
     {
-      this.outgoingJoins = new ArrayList<Join>();
+      this.outgoingJoins = new ArrayList<>();
     }
     // do not copy the ingoing join since this is a property of the joins itself
     // only if they change their target it is allowed to change the state of 
     // the ingoing joins of the query node
     this.ingoingJoins = new ArrayList<>();
-    this.left = other.left;
-    this.leftToken = other.leftToken;
-    this.name = other.name;
-    this.namespace = other.namespace;
     this.nodeAnnotations = new TreeSet<>(other.nodeAnnotations);
     this.partOfEdge = other.partOfEdge;
-    this.right = other.right;
-    this.rightToken = other.rightToken;
     this.root = other.root;
     this.spanTextMatching = other.spanTextMatching;
     this.spannedText = other.spannedText;
-    this.textId = other.textId;
     this.token = other.token;
     this.tokenArity = other.tokenArity;
-    this.tokenIndex = other.tokenIndex;
     this.variable = other.variable;
   }
   
@@ -245,25 +223,6 @@ public class QueryNode implements Serializable
     this.id = newId;
   }
 
-  public QueryNode(long id, long corpusRef, long textRef, long left,
-    long right, String namespace, String name, long tokenIndex,
-    String span, long leftToken, long rightToken)
-  {
-    this(id);
-
-    this.corpus = corpusRef;
-    this.textId = textRef;
-    this.left = left;
-    this.right = right;
-    this.leftToken = leftToken;
-    this.rightToken = rightToken;
-
-    setNamespace(namespace);
-    setName(name);
-    setTokenIndex(tokenIndex);
-
-    setSpannedText(span, TextMatching.EXACT_EQUAL);
-  }
 
   public static String qName(String namespace, String name)
   {
@@ -304,13 +263,6 @@ public class QueryNode implements Serializable
     {
       sb.append("; bound to '");
       sb.append(variable);
-      sb.append("'");
-    }
-
-    if (name != null)
-    {
-      sb.append("; named '");
-      sb.append(qName(namespace, name));
       sb.append("'");
     }
 
@@ -429,7 +381,7 @@ public class QueryNode implements Serializable
   
   public String toAQLEdgeFragment()
   {
-    List<String> frags = new LinkedList<String>();
+    List<String> frags = new LinkedList<>();
     for (Join join : outgoingJoins)
     {
       frags.add(join.toAQLFragment(this));
@@ -484,11 +436,6 @@ public class QueryNode implements Serializable
 
   }
   
-  public String getQualifiedName()
-  {
-    return qName(namespace, name);
-  }
-
   @Override
   public boolean equals(Object obj)
   {
@@ -505,47 +452,20 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    if (this.corpus != other.corpus)
-    {
-      return false;
-    }
-    if (this.textId != other.textId)
-    {
-      return false;
-    }
-    if (this.left != other.left)
-    {
-      return false;
-    }
-    if (this.right != other.right)
-    {
-      return false;
-    }
+    
     if ((this.spannedText == null) ? (other.spannedText != null)
       : !this.spannedText.equals(other.spannedText))
     {
       return false;
     }
-    if (this.leftToken != other.leftToken)
-    {
-      return false;
-    }
+    
     if (this.nodeAnnotations != other.nodeAnnotations
       && (this.nodeAnnotations == null || !this.nodeAnnotations.equals(
       other.nodeAnnotations)))
     {
       return false;
     }
-    if ((this.name == null) ? (other.name != null) : !this.name.equals(
-      other.name))
-    {
-      return false;
-    }
-    if ((this.namespace == null) ? (other.namespace != null)
-      : !this.namespace.equals(other.namespace))
-    {
-      return false;
-    }
+
     if (this.partOfEdge != other.partOfEdge)
     {
       return false;
@@ -618,7 +538,7 @@ public class QueryNode implements Serializable
   // .append(this.spanTextMatching, other.spanTextMatching)
   // .append(this.outgoingJoins, other.outgoingJoins)
   // .append(this.variable, other.variable)
-  // .append(this.edgeAnnotations, other.edgeAnnotations)
+  // .append(this.relationAnnotations, other.relationAnnotations)
   // .append(this.marker, other.marker)
   // .isEquals();
   // }
@@ -642,7 +562,7 @@ public class QueryNode implements Serializable
   @XmlTransient
   public Set<QueryAnnotation> getEdgeAnnotations()
   {
-    Set<QueryAnnotation> edgeAnnotations = new TreeSet<QueryAnnotation>();
+    Set<QueryAnnotation> edgeAnnotations = new TreeSet<>();
     
     for(Join j : ingoingJoins)
     {
@@ -662,26 +582,6 @@ public class QueryNode implements Serializable
     this.root = root;
   }
   
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-
-  public String getNamespace()
-  {
-    return namespace;
-  }
-
-  public void setNamespace(String namespace)
-  {
-    this.namespace = namespace;
-  }
-
   public String getSpannedText()
   {
     return spannedText;
@@ -752,78 +652,6 @@ public class QueryNode implements Serializable
   public void setPartOfEdge(boolean partOfEdge)
   {
     this.partOfEdge = partOfEdge;
-  }
-
-  public long getCorpus()
-  {
-    return corpus;
-  }
-
-  public void setCorpus(long corpus)
-  {
-    this.corpus = corpus;
-  }
-
-  public long getTextId()
-  {
-    return textId;
-  }
-
-  public void setTextId(long textIndex)
-  {
-    this.textId = textIndex;
-  }
-
-  public long getLeft()
-  {
-    return left;
-  }
-
-  public void setLeft(long left)
-  {
-    this.left = left;
-  }
-
-  public long getRight()
-  {
-    return right;
-  }
-
-  public void setRight(long right)
-  {
-    this.right = right;
-  }
-
-  public Long getTokenIndex()
-  {
-    return tokenIndex;
-  }
-
-  public void setTokenIndex(Long tokenIndex)
-  {
-    this.tokenIndex = tokenIndex;
-    // FIXME: vermengung von node und constraint semantik
-    setToken(tokenIndex != null);
-  }
-
-  public long getLeftToken()
-  {
-    return leftToken;
-  }
-
-  public void setLeftToken(long leftToken)
-  {
-    this.leftToken = leftToken;
-  }
-
-  public long getRightToken()
-  {
-    return rightToken;
-  }
-
-  public void setRightToken(long rightToken)
-  {
-    this.rightToken = rightToken;
   }
 
   public Range getArity()

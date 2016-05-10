@@ -172,13 +172,13 @@ public class ExportPanel extends GridLayout
     txtAnnotationKeys.setDescription("Some exporters will use this comma "
       + "seperated list of annotation keys to limit the exported data to these "
       + "annotations.");
-    formLayout.addComponent(new HelpButton(txtAnnotationKeys));
+    formLayout.addComponent(new HelpButton<String>(txtAnnotationKeys));
 
     txtParameters = new TextField("Parameters");
     txtParameters.setDescription("You can input special parameters "
       + "for certain exporters. See the description of each exporter "
       + "(‘?’ button above) for specific parameter settings.");
-    formLayout.addComponent(new HelpButton(txtParameters));
+    formLayout.addComponent(new HelpButton<String>(txtParameters));
 
     btExport = new Button("Perform Export");
     btExport.setIcon(FontAwesome.PLAY);

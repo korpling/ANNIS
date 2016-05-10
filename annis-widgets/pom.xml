@@ -5,11 +5,10 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.4.0-SNAPSHOT</version>
+    <version>3.5.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-widgets</artifactId>
   <packaging>jar</packaging>
   <name>annis-widgets</name>

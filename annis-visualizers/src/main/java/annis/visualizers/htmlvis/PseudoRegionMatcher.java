@@ -15,9 +15,9 @@
  */
 package annis.visualizers.htmlvis;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.LinkedList;
 import java.util.List;
+import org.corpus_tools.salt.core.SNode;
 
 /**
  *
@@ -26,11 +26,14 @@ import java.util.List;
 public class PseudoRegionMatcher implements SpanMatcher
 {
 
+  private String annotationName;
+
   enum PseudoRegion
   {
 
     BEGIN,
-    END;
+    END,
+    ALL;
   }
 
   final private PseudoRegion psdRegion;
@@ -47,6 +50,24 @@ public class PseudoRegionMatcher implements SpanMatcher
   {
 
     this.psdRegion = psdRegion;
+    if (null != psdRegion)
+    {
+      switch (psdRegion)
+      {
+        case BEGIN:
+          this.annotationName = "annis_BEGIN";
+          break;
+        case END:
+          this.annotationName = "annis_END";
+          break;
+        case ALL:
+          this.annotationName = "annis_ALL";
+          break;
+        default:
+          break;
+      }
+    }
+
   }
 
   public PseudoRegion getPsdRegion()
@@ -59,6 +80,11 @@ public class PseudoRegionMatcher implements SpanMatcher
   {
     // we don't need any annotation, so return empty list
     return new LinkedList<>();
+  }
+
+  public String getAnnotationName()
+  {
+    return annotationName;
   }
 
 }

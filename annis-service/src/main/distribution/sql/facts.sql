@@ -14,7 +14,9 @@ CREATE TABLE facts_:id
 )
 INHERITS (facts);
 
-
+ALTER TABLE facts_:id ALTER COLUMN span SET STATISTICS :stat_target;
+ALTER TABLE facts_:id ALTER COLUMN node_annotext SET STATISTICS :stat_target;
+ALTER TABLE facts_:id ALTER COLUMN node_qannotext SET STATISTICS :stat_target;
 
 INSERT INTO facts_:id
 (
@@ -122,5 +124,5 @@ FROM
       AND annotation_category.toplevel_corpus = :id
     )
 ) as tmp
-ORDER BY n_sample, corpus_ref, is_token
+ORDER BY corpus_ref, n_sample, is_token
 ;

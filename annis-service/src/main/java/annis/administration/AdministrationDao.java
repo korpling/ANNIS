@@ -92,6 +92,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private boolean temporaryStagingArea;
 
   private DeleteCorpusDao deleteCorpusDao;
+  
+  private boolean hackDistinctLeftRightToken;
+
 
   /**
    * Searches for textes which are empty or only contains whitespaces. If that
@@ -180,8 +183,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   private Map<String, String> tableInsertFrom;
 
-  // all files have to carry this suffix.
-  private String annisFileSuffix = ".annis";
   /**
    * Optional tab for example queries. If this tab not exist, a dummy file from
    * the resource folder is used.
@@ -224,7 +225,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
   private QueriesGenerator queriesGenerator;
-
+  
   /**
    * Called when Spring configuration finished
    */
@@ -317,7 +318,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
       new FileSystemResource(new File(getScriptPath(),
-          FILE_RESOLVER_VIS_MAP + annisFileSuffix)));
+          FILE_RESOLVER_VIS_MAP + ".annis")));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
 
@@ -536,7 +537,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     boolean overwrite,
     ANNISFormatVersion version)
   {
-    this.annisFileSuffix = ".annis";
     createStagingAreaV33(temporaryStagingArea);
     bulkImport(path, version);
 
@@ -586,7 +586,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     // create the new facts table partition
     createFacts(corpusID, version, offsets);
-
+    
+    if(hackDistinctLeftRightToken)
+    {
+      adjustDistinctLeftRightToken(corpusID);
+    }
+    
     if (temporaryStagingArea)
     {
       dropStagingArea();
@@ -614,8 +619,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     boolean overwrite,
     ANNISFormatVersion version)
   {
-    this.annisFileSuffix = ".tab";
-
     createStagingAreaV32(temporaryStagingArea);
     bulkImport(path, version);
 
@@ -676,7 +679,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     // create the new facts table partition
     createFacts(corpusID, version, offsets);
-
+    
+    if(hackDistinctLeftRightToken)
+    {
+      adjustDistinctLeftRightToken(corpusID);
+    }
+    
     if (temporaryStagingArea)
     {
       dropStagingArea();
@@ -757,15 +765,15 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
       {
-        importResolverVisMapTable(path, table);
+        importResolverVisMapTable(path, table, version.getFileSuffix());
       }
       // check if example query exists. If not copy it from the resource folder.
       else if (table.equalsIgnoreCase(EXAMPLE_QUERIES_TAB))
       {
-        File f = new File(path, table + annisFileSuffix);
+        File f = new File(path, table + version.getFileSuffix());
         if (f.exists())
         {
-          log.info(table + annisFileSuffix + " file exists");
+          log.info(table + version.getFileSuffix() + " file exists");
           bulkloadTableFromResource(tableInStagingArea(table),
             new FileSystemResource(f));
 
@@ -781,7 +789,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
             generateExampleQueries = EXAMPLE_QUERIES_CONFIG.TRUE;
           }
 
-          log.info(table + annisFileSuffix + " file not found");
+          log.info(table + version.getFileSuffix() + " file not found");
         }
       }
       else if (table.equalsIgnoreCase("node"))
@@ -791,7 +799,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       else
       {
         bulkloadTableFromResource(tableInStagingArea(table),
-          new FileSystemResource(new File(path, table + annisFileSuffix)));
+          new FileSystemResource(new File(path, table + version.getFileSuffix())));
       }
     }
   }
@@ -799,7 +807,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private void bulkImportNode(String path, ANNISFormatVersion version)
   {
     // check column number by reading first line
-    File nodeTabFile = new File(path, "node" + annisFileSuffix);
+    File nodeTabFile = new File(path, "node" + version.getFileSuffix());
     try (BufferedReader reader
       = new BufferedReader(new InputStreamReader(
           new FileInputStream(nodeTabFile), "UTF-8"));)
@@ -852,7 +860,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       else
       {
         throw new RuntimeException("Illegal number of columns in node"
-          + annisFileSuffix + ", "
+          + version.getFileSuffix() + ", "
           + "should be 13 or 10 but was " + columnNumber);
       }
         }
@@ -1271,7 +1279,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       info("creating annotation category table for corpus with ID " + corpusID);
     executeSqlFromScript("annotation_category.sql", args);
   }
-
+  
   void analyzeFacts(long corpusID)
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
@@ -1290,13 +1298,53 @@ public class AdministrationDao extends AbstractAdminstrationDao
     getJdbcTemplate().update("SET statement_timeout TO 0");
     getJdbcTemplate().execute("ANALYZE facts");
   }
+  
+  void adjustDistinctLeftRightToken(long corpusID)
+  {
+    /* HACK: 
+     adjust the left/right_token value to the average maximal left/right_token
+     value per corpus/text on import to enhance the planner selectivity estimations.
+    */
+    
+    log.info("adjusting statistical information for left_token and right_token columns");
+    
+    int adjustedLeft = getJdbcTemplate().queryForObject("SELECT avg(maxleft)::integer\n" 
+      + "FROM\n" +"( SELECT max(left_token) maxleft FROM _node GROUP BY corpus_ref, text_ref ) AS m", Integer.class);
+    int adjustedRight = getJdbcTemplate().queryForObject("SELECT avg(maxright)::integer\n" 
+      + "FROM\n" +"( SELECT max(right_token) maxright FROM _node GROUP BY corpus_ref, text_ref ) AS m", Integer.class);
+    
+    getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN left_token SET (n_distinct=" + adjustedLeft + ")");
+    getJdbcTemplate().execute("ALTER TABLE facts_" + corpusID + " ALTER COLUMN right_token SET (n_distinct=" + adjustedRight + ")");
+  }
 
   void createFacts(long corpusID, ANNISFormatVersion version, Offsets offsets)
   {
     MapSqlParameterSource args = offsets.makeArgs()
       .addValue(":id", corpusID);
-
+    
     log.info("creating materialized facts table for corpus with ID " + corpusID);
+    
+    String defaultStatTargetRaw = 
+      getJdbcTemplate().queryForObject("SHOW default_statistics_target", String.class);
+    
+    // this is the minimal value
+    int selectedStatTarget = 250;
+    
+    if(defaultStatTargetRaw != null)
+    {
+      try
+      {
+        int defaultStatTargetConfig = Integer.parseInt(defaultStatTargetRaw);
+        // make sure the sample size is not less than the default one
+        selectedStatTarget = Math.max(selectedStatTarget, defaultStatTargetConfig);
+      }
+      catch(NumberFormatException ex)
+      {
+        log.warn("Could not parse the \"default_statistics_target\" PostgreSQL parameter.");
+      }
+    }
+    args.addValue(":stat_target", selectedStatTarget);
+    
     if (version == ANNISFormatVersion.V3_3)
     {
       executeSqlFromScript("facts.sql", args);
@@ -1308,7 +1356,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     log.info("indexing the new facts table (general indexes)");
     executeSqlFromScript("indexes.sql", args);
-
+    
     log.info("indexing the new facts table (edge related indexes)");
     executeSqlFromScript("indexes_edge.sql", args);
 
@@ -1932,7 +1980,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    * @param path The path to the ANNIS file.
    * @param table The final table in the database of the resolver_vis_map table.
    */
-  private void importResolverVisMapTable(String path, String table)
+  private void importResolverVisMapTable(String path, String table, String annisFileSuffix)
   {
     try
     {
@@ -2094,24 +2142,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
    */
   private void writeAmountOfNodesBack(List<ExampleQuery> exampleQueries)
   {
-    StringBuilder sb = new StringBuilder();
 
+    String sqlTemplate = "UPDATE _" + EXAMPLE_QUERIES_TAB + " SET nodes=?, used_ops=CAST(? AS text[]) WHERE example_query=?;";
+    
     for (ExampleQuery eQ : exampleQueries)
     {
-      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES_TAB).append(
-        " SET ");
-      sb.append("nodes=").append(String.valueOf(eQ.getNodes()));
-      sb.append(" WHERE example_query='");
-      sb.append(eQ.getExampleQuery()).append("';\n");
-
-      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES_TAB).append(
-        " SET ");
-      sb.append("used_ops='").append(String.valueOf(eQ.getUsedOperators()));
-      sb.append("' WHERE example_query='");
-      sb.append(eQ.getExampleQuery()).append("';\n");
+      getJdbcTemplate().update(sqlTemplate, eQ.getNodes(), eQ.getUsedOperators(), eQ.getExampleQuery());
     }
-
-    getJdbcTemplate().execute(sb.toString());
   }
 
   /**
@@ -2165,6 +2202,18 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     this.deleteCorpusDao = deleteCorpusDao;
   }
+
+  public boolean isHackDistinctLeftRightToken()
+  {
+    return hackDistinctLeftRightToken;
+  }
+
+  public void setHackDistinctLeftRightToken(boolean hackDistinctLeftRightToken)
+  {
+    this.hackDistinctLeftRightToken = hackDistinctLeftRightToken;
+  }
+  
+  
 
   /**
    * Checks, if a already exists a corpus with the same name of the top level

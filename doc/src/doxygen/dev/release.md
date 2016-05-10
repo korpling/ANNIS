@@ -27,7 +27,7 @@ Updating the version {#dev-release-version-update}
 1. Update the parent pom.xml and set the version there
 2. execute
 \code{.sh}
-mvn -N versions:update-child-modules
+mvn versions:update-child-modules
 \endcode
 
 Creating a changelog entry {#dev-release-changelog}
@@ -61,7 +61,8 @@ Testing cycle {#dev-release-test}
 1. Build the complete project *with* tests.
 \code{.sh}
 mvn clean
-mvn install
+mvn -DskipTests=true install
+mvn test
 \endcode
 2. Do manual tests. If you have to fix any bug document it in the issue tracker, [update the changelog](@ref dev-release-changelog) and start over at step 1.
 If no bugs are left to fix go to the next section. 
@@ -105,7 +106,8 @@ Testing cycle {#dev-release-preview-test}
 1. Build the complete project *with* tests.
 \code{.sh}
 mvn clean
-mvn install
+mvn -DskipTests=true install 
+mvn test
 \endcode
 2. Do manual tests. If you have to fix any bug document it in the issue tracker, [update the changelog](@ref dev-release-changelog) and start over at step 1.
 If no bugs are left to fix go to the next section. 

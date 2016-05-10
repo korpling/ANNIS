@@ -17,10 +17,10 @@ package annis.test;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.junit.experimental.theories.ParameterSignature;
 import org.junit.experimental.theories.ParameterSupplier;
 import org.junit.experimental.theories.PotentialAssignment;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class SpringQueryExamplesSupplier extends ParameterSupplier {
@@ -28,7 +28,8 @@ public class SpringQueryExamplesSupplier extends ParameterSupplier {
 	@Override
 	public List<PotentialAssignment> getValueSources(ParameterSignature signature) {
 		SpringQueryExamples annotation = signature.getAnnotation(SpringQueryExamples.class);
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(annotation.contextLocation());
+		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(annotation.contextLocation());
+		ctx.registerShutdownHook();
 		@SuppressWarnings("unchecked")
 		List<String> exampleList = (List<String>) ctx.getBean(annotation.exampleList());
 		List<PotentialAssignment> examples = new ArrayList<>();

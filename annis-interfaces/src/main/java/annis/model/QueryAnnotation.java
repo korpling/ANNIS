@@ -23,14 +23,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class QueryAnnotation implements Comparable<QueryAnnotation>, Serializable
 {
 
-	// this class is sent to the front end
-	
-
 	private String namespace;
 	private String name;
 	private String value;
 	private String type;
-	private String corpusName;
 	private TextMatching textMatching;
 
   public QueryAnnotation()
@@ -40,7 +36,7 @@ public class QueryAnnotation implements Comparable<QueryAnnotation>, Serializabl
   
 	public QueryAnnotation(String namespace, String name)
 	{
-		this(namespace, name, null, null);
+		this(namespace, name, (String) null, (TextMatching) null);
 	}
 
 	public QueryAnnotation(String namespace, String name, String value)
@@ -57,12 +53,10 @@ public class QueryAnnotation implements Comparable<QueryAnnotation>, Serializabl
 		this.textMatching = textMatching;
 	}
 
-	public QueryAnnotation(String namespace, String name, String value, String type,
-			String corpusName)
+	public QueryAnnotation(String namespace, String name, String value, String type)
 	{
 		this(namespace, name, value);
 		this.type = type;
-		this.corpusName = corpusName;
 	}
 
 	@Override
@@ -159,8 +153,4 @@ public class QueryAnnotation implements Comparable<QueryAnnotation>, Serializabl
 		return type;
 	}
 
-	public String getCorpusName()
-	{
-		return corpusName;
-	}
 }

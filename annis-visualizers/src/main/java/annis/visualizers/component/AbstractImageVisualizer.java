@@ -15,18 +15,19 @@
  */
 package annis.visualizers.component;
 
-import annis.libgui.ImagePanel;
-import annis.libgui.VisualizationToggle;
-import annis.libgui.visualizers.AbstractVisualizer;
-import annis.libgui.visualizers.VisualizerInput;
-import com.vaadin.server.StreamResource;
-import com.vaadin.ui.Embedded;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
-import org.slf4j.LoggerFactory;
+
+import com.vaadin.server.StreamResource;
+import com.vaadin.ui.Embedded;
+
+import annis.libgui.ImagePanel;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
 
 /**
  *
@@ -34,8 +35,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractImageVisualizer extends AbstractVisualizer<ImagePanel>
 {
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(AbstractImageVisualizer.class);
-
   @Override
   public ImagePanel createComponent(final VisualizerInput visInput, VisualizationToggle visToggle)
   {

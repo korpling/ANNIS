@@ -101,9 +101,9 @@ public class AnnotationGraph implements Serializable
 		return nodes.add(node);
 	}
 
-	public boolean addEdge(Edge edge)
+	public boolean addEdge(Edge relation)
 	{
-		return edges.add(edge);
+		return edges.add(relation);
 	}
 
 	public AnnisNode getToken(long tokenIndex)

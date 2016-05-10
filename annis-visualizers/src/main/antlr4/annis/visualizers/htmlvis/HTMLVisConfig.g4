@@ -28,23 +28,27 @@ STYLE : 'style';
 COLON : ':';
 BEGIN : 'annis:BEGIN';
 END : 'annis:END';
+ALL : 'annis:ALL';
 QUOTE : '"';
 NEWLINE : '\n';
 COMMENT : '#' ~('\n')+ -> skip;
 ID: [a-zA-Z0-9\_\-*?]+;
 TXT : (.)+?;
+TEMPVALUE :'%%value%%';
+TEMPANNO: '%%anno%%';
 
 innervalue: ~(QUOTE)+;
 value : QUOTE innervalue QUOTE;
-
-innertype: ~(QUOTE)+;
-
+temp: TEMPVALUE|TEMPANNO;
+innertype: ~(QUOTE|TEMPVALUE|TEMPANNO)+;
+innerhtmltemp: (innertype* temp innertype*)+; 
 innermeta: ~(QUOTE|WS|NEWLINE)+;
 
 type
   : VALUE # typeValue
   | ESCAPED_VALUE # typeEscapedValue
   | ANNO # typeAnno
+  | QUOTE innerhtmltemp QUOTE # typeHtmlTemp
   | QUOTE innertype QUOTE # typeConstant
   | META COLON COLON innermeta # typeMeta
   ;
@@ -62,6 +66,7 @@ qName
 condition
   : BEGIN # conditionBegin
   | END # conditionEnd
+  | ALL # conditionAll
   | qName # conditionName
   | TOK # conditionTok
   | qName EQUALS value # conditionNameAndValue

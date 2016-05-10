@@ -55,14 +55,6 @@ public abstract class AbstractWhereClauseGenerator extends
       {
         addIsRootConditions(conditions, queryData, node);
       }
-      if (node.getNamespace() != null)
-      {
-        addNodeNamespaceConditions(conditions, queryData, node);
-      }
-      if (node.getName() != null)
-      {
-        addNodeNameCondition(conditions, queryData, node);
-      }
       if (node.getArity() != null)
       {
         addNodeArityConditions(conditions, queryData, node);
@@ -158,7 +150,7 @@ public abstract class AbstractWhereClauseGenerator extends
             NODE_ANNOTATION_TABLE, queryData);
       }
 
-      // edge annotations
+      // relation annotations
       int j = 0;
       for (QueryAnnotation annotation : node.getEdgeAnnotations())
       {
@@ -180,21 +172,15 @@ public abstract class AbstractWhereClauseGenerator extends
   protected abstract void addIsRootConditions(List<String> conditions,
       QueryData queryData, QueryNode node);
 
-  protected abstract void addNodeNamespaceConditions(List<String> conditions,
-      QueryData queryData, QueryNode node);
-
-  protected abstract void addNodeNameCondition(List<String> conditions,
-      QueryData queryData, QueryNode node);
-
   protected abstract void addNodeArityConditions(List<String> conditions,
       QueryData queryData, QueryNode node);
 
   protected abstract void addTokenArityConditions(List<String> conditions,
       QueryData queryData, QueryNode node);
 
-  protected abstract void addSingleEdgeCondition(QueryNode node,
+  protected abstract void addSingleRelationCondition(QueryNode node,
       QueryNode target, List<String> conditions, Join join,
-      final String edgeType);
+      final String relationType);
 
   protected abstract void addSiblingConditions(List<String> conditions,
       QueryNode node, QueryNode target, Sibling join, QueryData queryData);

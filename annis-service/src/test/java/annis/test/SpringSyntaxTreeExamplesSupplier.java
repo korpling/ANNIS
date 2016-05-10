@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.junit.experimental.theories.ParameterSignature;
 import org.junit.experimental.theories.ParameterSupplier;
 import org.junit.experimental.theories.PotentialAssignment;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
@@ -31,7 +31,8 @@ public class SpringSyntaxTreeExamplesSupplier extends ParameterSupplier {
 	@Override
 	public List<PotentialAssignment> getValueSources(ParameterSignature signature) {
 		SpringSyntaxTreeExamples annotation = signature.getAnnotation(SpringSyntaxTreeExamples.class);
-		ApplicationContext ctx = new ClassPathXmlApplicationContext(annotation.contextLocation());
+		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(annotation.contextLocation());
+		ctx.registerShutdownHook();
 		@SuppressWarnings("unchecked")
 		Map<String, String> exampleMap = (Map<String, String>) ctx.getBean(annotation.exampleMap());
 		List<PotentialAssignment> examples = new ArrayList<>();

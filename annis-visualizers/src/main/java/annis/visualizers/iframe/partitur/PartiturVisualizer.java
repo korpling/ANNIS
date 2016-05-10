@@ -47,16 +47,6 @@ public class PartiturVisualizer extends WriterVisualizer
   private List<AnnisNode> nodes;
   private List<AnnisNode> token;  
 
-  public enum ElementType
-  {
-
-    begin,
-    end,
-    middle,
-    single,
-    noEvent
-  }
-
   @Override
   public String getShortName()
   {
@@ -405,54 +395,6 @@ public class PartiturVisualizer extends WriterVisualizer
     }
   }
 
-  private ElementType getTypeForToken(PartiturParser.Token token, String tier)
-  {
-    // get token before and after
-    PartiturParser.Token beforeToken = token.getBefore();
-    PartiturParser.Token afterToken = token.getAfter();
-
-    PartiturParser.Event event = token.getTier2Event().get(tier);
-
-    if (event != null)
-    {
-      PartiturParser.Event beforeEvent =
-        beforeToken == null ? null : beforeToken.getTier2Event().get(tier);
-      PartiturParser.Event afterEvent =
-        afterToken == null ? null : afterToken.getTier2Event().get(tier);
-
-      boolean left = false;
-      boolean right = false;
-      // check if the events left and right have the same
-      // id (and are the same event)
-      if (beforeEvent != null && beforeEvent.getId() == event.getId())
-      {
-        left = true;
-      }
-      if (afterEvent != null && afterEvent.getId() == event.getId())
-      {
-        right = true;
-      }
-
-      if (left && right)
-      {
-        return ElementType.middle;
-      }
-      else if (left)
-      {
-        return ElementType.end;
-      }
-      else if (right)
-      {
-        return ElementType.begin;
-      }
-      else
-      {
-        return ElementType.single;
-      }
-    }
-
-    return ElementType.noEvent;
-  }
 
   private boolean checkRTL(List<AnnisToken> tokenList)
   {

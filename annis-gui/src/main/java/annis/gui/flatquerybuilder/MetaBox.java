@@ -21,6 +21,8 @@ import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
+
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
 
@@ -77,7 +79,18 @@ public class MetaBox extends Panel implements Button.ClickListener
   
   public Collection<String> getValues()
   {
-    Collection<String> result = (Collection)tcs.getValue();
+    Collection<String> result = new ArrayList<>();
+    Object value = tcs.getValue();
+    if(value instanceof Collection)
+    {
+      for(Object v : (Collection) value)
+      {
+        if(v instanceof String)
+        {
+          result.add((String) v);
+        }
+      }
+    }
     return result;
   } 
   

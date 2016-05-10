@@ -15,13 +15,10 @@
  */
 package annis.sqlgen;
 
-import annis.dao.objects.AnnotatedMatch;
-import annis.dao.objects.AnnotatedSpan;
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.TEXT_TABLE;
+
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -36,11 +33,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+
+import annis.dao.objects.AnnotatedMatch;
+import annis.dao.objects.AnnotatedSpan;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
 
 /**
  *
@@ -54,8 +55,6 @@ public class MatrixSqlGenerator
   OrderByClauseSqlGenerator<QueryData>,
   SqlGeneratorAndExtractor<QueryData, List<AnnotatedMatch>>
 {
-
-  private final Logger log = LoggerFactory.getLogger(MatrixSqlGenerator.class);
 
   @Deprecated
   private String matchedNodesViewName;

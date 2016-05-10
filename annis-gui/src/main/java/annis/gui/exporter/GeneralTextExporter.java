@@ -15,6 +15,33 @@
  */
 package annis.gui.exporter;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.core.MediaType;
+
+import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SaltProject;
+
+import com.google.common.base.Splitter;
+import com.google.common.base.Stopwatch;
+import com.google.common.escape.Escaper;
+import com.google.common.eventbus.EventBus;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
@@ -28,36 +55,9 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
 import annis.utils.LegacyGraphConverter;
-import com.google.common.base.Splitter;
-import com.google.common.base.Stopwatch;
-import com.google.common.escape.Escaper;
-import com.google.common.eventbus.EventBus;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import javax.ws.rs.core.MediaType;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
 
 public abstract class GeneralTextExporter implements Exporter, Serializable
 {
-  
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(GeneralTextExporter.class);
-
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
   @Override
@@ -160,7 +160,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
               res = res.queryParam("filter", filter.name());
             }
 
-            Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
             stopwatch.start();
             SaltProject p = res.post(SaltProject.class, currentMatches);
             stopwatch.stop();

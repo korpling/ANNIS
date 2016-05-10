@@ -15,18 +15,10 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.AnnisUI;
-import annis.gui.ExportPanel;
-import annis.gui.HistoryPanel;
-import annis.gui.components.VirtualKeyboardCodeEditor;
-import annis.gui.components.codemirror.AqlCodeEditor;
-import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.objects.Query;
-import annis.gui.objects.QueryUIState;
-import annis.gui.querybuilder.QueryBuilderChooser;
-import annis.libgui.Helper;
-import annis.model.AqlParseError;
-import annis.model.QueryNode;
+import java.util.List;
+
+import org.vaadin.hene.popupbutton.PopupButton;
+
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -49,9 +41,20 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.List;
-import org.slf4j.LoggerFactory;
-import org.vaadin.hene.popupbutton.PopupButton;
+
+import annis.gui.AnnisUI;
+import annis.gui.ExportPanel;
+import annis.gui.HistoryPanel;
+import annis.gui.components.VirtualKeyboardCodeEditor;
+import annis.gui.components.codemirror.AqlCodeEditor;
+import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.objects.Query;
+import annis.gui.objects.QueryUIState;
+import annis.gui.querybuilder.QueryBuilderChooser;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.model.AqlParseError;
+import annis.model.QueryNode;
 
 /**
  *
@@ -60,8 +63,6 @@ import org.vaadin.hene.popupbutton.PopupButton;
 public class QueryPanel extends GridLayout implements 
   ValueChangeListener
 {
-
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(QueryPanel.class);
 
   public static final int MAX_HISTORY_MENU_ITEMS = 5;
 
@@ -303,8 +304,17 @@ public class QueryPanel extends GridLayout implements
     setColumnExpandRatio(3, 0.0f);
     
     //setComponentAlignment(btShowQueryBuilder, Alignment.BOTTOM_CENTER);
+  }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    IDGenerator.assignIDForFields(QueryPanel.this, btShowResult, btMoreActions);
     
   }
+  
+  
 
   public void updateShortHistory()
   {

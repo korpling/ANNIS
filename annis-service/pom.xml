@@ -7,7 +7,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.4.0-SNAPSHOT</version>
+    <version>3.5.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -128,14 +128,14 @@
     <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
-      <version>3.2.1</version>
+      <version>3.2.2</version>
       <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>commons-cli</groupId>
       <artifactId>commons-cli</artifactId>
-      <version>1.2</version>
+      <version>1.3.1</version>
       <scope>compile</scope>
     </dependency>
     
@@ -286,9 +286,9 @@
     </dependency>
     
     <dependency>
-      <groupId>com.tunnelvisionlabs</groupId>
+      <groupId>org.antlr</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>4.2.2</version>
+      <version>4.5.2-1</version>
       <scope>compile</scope>
     </dependency>
     
@@ -332,9 +332,9 @@
     <plugins>
 
       <plugin>
-        <groupId>com.tunnelvisionlabs</groupId>
+        <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>4.2.2</version>
+        <version>4.5.2-1</version>
         <executions>
           <execution>
            <goals>
@@ -349,7 +349,7 @@
 
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.5.5</version>
+        <version>2.6</version>
         <executions>
           <execution>
             <id>create-distribution</id>
@@ -364,19 +364,18 @@
             <descriptor>src/main/assembly/annis.xml</descriptor>
             <descriptor>src/main/assembly/annis_lite.xml</descriptor>
           </descriptors>
-          <finalName />
         </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.12.4</version>
+        <version>2.19.1</version>
         <configuration>
           <systemProperties>
             <property>
               <name>annis.home</name>
-              <value>src/main/distribution/</value>
+              <value>${project.basedir}/src/main/distribution/</value>
             </property>
           </systemProperties>
         </configuration>
@@ -398,6 +397,22 @@
         <configuration>
           <skip>false</skip>
         </configuration>
+      </plugin>
+      
+      <plugin>
+      	<groupId>org.codehaus.mojo</groupId>
+      	<artifactId>exec-maven-plugin</artifactId>
+      	<version>1.4.0</version>
+      	<configuration>
+      		<systemProperties>
+      			<!-- whatever main class we are executing always set the annis.home variable to target distribution directory -->
+      			<systemProperty>
+      				<key>annis.home</key>
+      				<value>${project.build.directory}/annis-service-${project.version}-distribution/annis-service-${project.version}/</value>
+      			</systemProperty>
+      		</systemProperties>
+      		<workingDirectory>${project.build.directory}/annis-service-${project.version}-distribution/annis-service-${project.version}/</workingDirectory>
+      	</configuration>
       </plugin>
       
       

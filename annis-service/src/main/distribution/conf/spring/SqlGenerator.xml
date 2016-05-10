@@ -68,7 +68,7 @@ limitations under the License.
     <property name="useIsTokenColumn" value="$dev{annis.use-is-token-column}" />
     <property name="useComponentRefPredicateInCommonAncestorSubquery" value="$dev{annis.use-component-ref-predicate-in-common-ancestor-subquery}"/>
     <property name="useToplevelCorpusPredicateInCommonAncestorSubquery" value="$dev{annis.use-toplevel-corpus-predicate-in-common-ancestor-subquery}"/>
-    
+    <property name="hackOperatorSameSpan" value="$dev{annis.hack_operator_same_span}" />
     <!-- missing: annoCondition -->
     
   </bean>

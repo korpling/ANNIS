@@ -15,48 +15,37 @@
  */
 package annis.sqlgen;
 
-import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
 import static annis.test.TestUtils.uniqueInt;
 import static annis.test.TestUtils.uniqueLong;
 import static annis.test.TestUtils.uniqueString;
-import com.google.common.collect.Lists;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.HashBag;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
 import org.mockito.Spy;
+
+import com.google.common.collect.Lists;
+
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
 
 public class TestAbstractFromClauseGenerator {
 
-	private AbstractFromClauseGenerator generator;
 	@Spy private TableAccessStrategy tableAccessStrategy = new TableAccessStrategy();
 	
 	@Before
 	public void setup() {
 		initMocks(this);
-		generator = new AbstractFromClauseGenerator() {
-			
-			@Override
-			public String fromClause(QueryData queryData, List<QueryNode> alternative,
-					String indent) {
-				throw new UnsupportedOperationException("This AbstractFromClauseGenerator is only used for testing purposes");
-			}
-			
-			@Override
-			protected TableAccessStrategy createTableAccessStrategy() {
-				return tableAccessStrategy;
-			}
-		};
 	}
 	
 	/**

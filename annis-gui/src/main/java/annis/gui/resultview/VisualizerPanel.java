@@ -15,20 +15,28 @@
  */
 package annis.gui.resultview;
 
-import annis.CommonHelper;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.libgui.InstanceConfig;
-import annis.libgui.PluginSystem;
-import annis.libgui.VisualizationToggle;
-import annis.libgui.media.MediaController;
-import annis.libgui.media.MediaPlayer;
-import annis.libgui.media.PDFViewer;
-import annis.libgui.visualizers.FilteringVisualizerPlugin;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.libgui.visualizers.VisualizerPlugin;
-import annis.resolver.ResolverEntry;
-import annis.visualizers.LoadableVisualizer;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -47,33 +55,22 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.CommonHelper;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
+import annis.libgui.PluginSystem;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.MediaPlayer;
+import annis.libgui.media.PDFViewer;
+import annis.libgui.visualizers.FilteringVisualizerPlugin;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerPlugin;
+import annis.resolver.ResolverEntry;
+import annis.service.objects.Match;
+import annis.visualizers.LoadableVisualizer;
 
 /**
  * Controls the visibility of visualizer plugins and provides some control
@@ -97,12 +94,12 @@ public class VisualizerPanel extends CssLayout
   private String corpusName;
 
   private String documentName;
+  
+  private Match match;
 
   private Component vis;
 
-  private transient SDocument result;
-
-  private PluginSystem ps;
+  private SDocument result;
 
   private ResolverEntry entry;
 
@@ -123,8 +120,6 @@ public class VisualizerPanel extends CssLayout
   private Set<String> visibleTokenAnnos;
 
   private String segmentationName;
-
-  private final String PERMANENT = "permanent";
 
   private final String ISVISIBLE = "visible";
 
@@ -148,8 +143,7 @@ public class VisualizerPanel extends CssLayout
   public VisualizerPanel(
     final ResolverEntry entry,
     SDocument result,
-    String corpusName,
-    String documentName,
+    Match match,
     Set<String> visibleTokenAnnos,
     Map<String, Long> markedAndCovered,
     @Deprecated Map<String, String> markedAndCoveredMap,
@@ -161,8 +155,6 @@ public class VisualizerPanel extends CssLayout
     PluginSystem ps,
     InstanceConfig instanceConfig) throws IOException
   {
-
-    this.ps = ps;
     this.instanceConfig = instanceConfig;
     this.entry = entry;
     this.markersExact = markedExactMap;
@@ -171,8 +163,13 @@ public class VisualizerPanel extends CssLayout
     this.visCtxChanger = parent;
 
     this.result = result;
-    this.corpusName = corpusName;
-    this.documentName = documentName;
+    this.match = match;
+    if(!match.getSaltIDs().isEmpty())
+    {
+      List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
+      this.corpusName = corpusPath.get(0);
+      this.documentName = corpusPath.get(corpusPath.size()-1);
+    }
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
     this.segmentationName = segmentationName;
@@ -262,38 +259,6 @@ public class VisualizerPanel extends CssLayout
 
   }
   
-  private void writeObject(ObjectOutputStream out) throws IOException
-  {
-    out.defaultWriteObject();
-    
-    CommonHelper.writeSDocument(result, out);
-  }
-  
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
-    
-   this.result = CommonHelper.readSDocument(in);
-  }
-  
-  private List<SToken> createTokenList(List<String> tokenIDs, SDocumentGraph graph)
-  {
-    if(tokenIDs == null || graph == null)
-    {
-      return new LinkedList<>();
-    }
-    ArrayList<SToken> r = new ArrayList<>(tokenIDs.size());
-    for(String t : tokenIDs)
-    {
-      SNode n = graph.getSNode(t);
-      if(n instanceof SToken)
-      {
-        r.add((SToken) n);
-      }
-    }
-    return r;
-  }
-
   private Component createComponent()
   {
     if (visPlugin == null)
@@ -347,7 +312,7 @@ public class VisualizerPanel extends CssLayout
     if (visPlugin != null
       && visPlugin.isUsingText()
       && result != null
-      && result.getSDocumentGraph().getSNodes().size() > 0)
+      && result.getDocumentGraph().getNodes().size() > 0)
     {
       List<String> nodeAnnoFilter = null;
       if(visPlugin instanceof FilteringVisualizerPlugin)
@@ -355,11 +320,13 @@ public class VisualizerPanel extends CssLayout
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
           corpusName, documentName, input.getMappings());
       }
-      SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
-        get(0).getSName(), result.getSName(), nodeAnnoFilter);
+      SaltProject p = getDocument(result.getGraph().getRoots().
+        get(0).getName(), result.getName(), nodeAnnoFilter);
 
-      SDocument wholeDocument = p.getSCorpusGraphs().get(0).getSDocuments()
+      SDocument wholeDocument = p.getCorpusGraphs().get(0).getDocuments()
         .get(0);
+      
+      Helper.addMatchToDocumentGraph(match, wholeDocument);
 
       input.setDocument(wholeDocument);
     }
@@ -549,44 +516,6 @@ public class VisualizerPanel extends CssLayout
     return htmlID;
   }
 
-  /**
-   * Since there is a bug in the annis-service some ANNIS Features are not set
-   * when the whole document is requested, we have to copy it manually from the
-   * old nodes
-   *
-   * @param source orignal node
-   * @param target node which is missing the annis feature
-   * @param featureNameSpace namespace of the feature
-   * @param featureName name of the feature
-   * @param copyIfExists If true the feature is copied even if it already exists
-   * on target node.
-   */
-  private void copyAnnisFeature(SNode source, SNode target,
-    String featureNameSpace, String featureName, boolean copyIfExists)
-  {
-    SFeature sfeature;
-
-    if ((sfeature = source.getSFeature(featureNameSpace, featureName)) != null)
-    {
-      if (target.getSFeature(featureNameSpace, featureName) == null)
-      {
-        target.createSFeature(sfeature.getNamespace(), sfeature.getName(),
-          sfeature.getSValueSTEXT());
-        log.debug("copy SFeature {} value {}", sfeature.getQName(), sfeature.
-          getSValue().toString());
-      }
-      else if (copyIfExists)
-      {
-        SFeature targetFeature = target.getSFeature(featureNameSpace,
-          featureName);
-        targetFeature.setSValue(sfeature.getSValue());
-
-        log.debug("overwriting SFeature {} value {}", sfeature.getQName(),
-          sfeature.
-          getSValue().toString());
-      }
-    }
-  }
 
   private class BackgroundJob implements Runnable
   {
