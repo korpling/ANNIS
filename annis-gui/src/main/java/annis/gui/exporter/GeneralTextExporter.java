@@ -57,15 +57,10 @@ import annis.service.objects.SubgraphFilter;
 import annis.utils.LegacyGraphConverter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
-@PluginImplementation
 public abstract class GeneralTextExporter implements Exporter, Serializable
 {
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
-  public GeneralTextExporter()
-  {
-    
-  }
   
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
