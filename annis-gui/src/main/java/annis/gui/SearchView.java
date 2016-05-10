@@ -100,16 +100,6 @@ public class SearchView extends GridLayout implements View,
 
   public static final String NAME = "";
 
-  static final Exporter[] EXPORTER = new Exporter[]
-  {
-    new WekaExporter(),
-    new CSVExporter(),
-    new TokenExporter(),
-    new GridExporter(),
-    new SimpleTextExporter(),
-    new DialogExporter()
-  };
-
   private final static Escaper urlPathEscape = UrlEscapers.
     urlPathSegmentEscaper();
 

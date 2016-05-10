@@ -78,5 +78,19 @@ public class WekaExporter implements Exporter, Serializable
     return false;
   }
   
+  @Override
+  public String getHelpMessage()
+  {
+    return  "The WEKA Exporter exports only the "
+        + "values of the elements searched for by the user, ignoring the context "
+        + "around search results. The values for all annotations of each of the "
+        + "found nodes is given in a comma-separated table (CSV). At the top of "
+        + "the export, the names of the columns are given in order according to "
+        + "the WEKA format.<br/><br/>"
+        + "Parameters: <br/>"
+        + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+        + "<code>metakeys=title,documentname</code>)";
+  }
+  
   
 }

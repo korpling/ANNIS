@@ -16,6 +16,9 @@
 package annis.gui.objects;
 
 import com.google.common.base.Splitter;
+
+import annis.gui.exporter.Exporter;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -25,7 +28,7 @@ import java.util.Objects;
  */
 public class ExportQuery extends ContextualizedQuery
 {
-  private String exporterName;
+  private Class<? extends Exporter> exporter;
   
   private List<String> annotationKeys;
   private String parameters;
@@ -48,18 +51,19 @@ public class ExportQuery extends ContextualizedQuery
   public void setParameters(String parameters)
   {
     this.parameters = parameters;
-  }
+  }  
 
-  public String getExporterName()
-  {
-    return exporterName;
-  }
-
-  public void setExporterName(String exporterName)
-  {
-    this.exporterName = exporterName;
-  }
   
+  public Class<? extends Exporter> getExporter()
+  {
+    return exporter;
+  }
+
+  public void setExporter(Class<? extends Exporter> exporter)
+  {
+    this.exporter = exporter;
+  }
+
   public ExportQuery annotationKeys(String annotationKeys)
   {
     this.annotationKeys = Splitter.on(',').omitEmptyStrings()
@@ -73,9 +77,9 @@ public class ExportQuery extends ContextualizedQuery
     return this;
   }
   
-  public ExportQuery exporter(String exporter)
+  public ExportQuery exporter(Class<? extends Exporter> exporter)
   {
-    this.exporterName = exporter;
+    this.exporter = exporter;
     return this;
   }
   
@@ -83,7 +87,7 @@ public class ExportQuery extends ContextualizedQuery
   public int hashCode()
   {
     return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(), 
-      getAnnotationKeys(), getExporterName(), getParameters());
+      getAnnotationKeys(), getExporter(), getParameters());
   }
 
   @Override
@@ -105,7 +109,7 @@ public class ExportQuery extends ContextualizedQuery
       && Objects.equals(getRightContext(), other.getRightContext())
       && Objects.equals(getSegmentation(), other.getSegmentation())
       && Objects.equals(getAnnotationKeys(), other.getAnnotationKeys())
-      && Objects.equals(getExporterName(), other.getExporterName())
+      && Objects.equals(getExporter(), other.getExporter())
       && Objects.equals(getParameters(), other.getParameters());
   }
   

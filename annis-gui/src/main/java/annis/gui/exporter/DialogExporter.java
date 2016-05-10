@@ -117,4 +117,11 @@ public class DialogExporter extends SaltBasedExporter
     return SubgraphFilter.all;
   }
   
+  @Override
+  public String getHelpMessage()
+  {
+    return null;
+  }
+  
+  
 }

@@ -15,12 +15,14 @@
  */
 package annis.gui.objects;
 
-import annis.service.objects.FrequencyTableQuery;
-import annis.service.objects.OrderType;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import annis.gui.exporter.Exporter;
+import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.OrderType;
 
 /**
  * Helper class to construct new {@link Query} objects (or one of the child classes)
@@ -155,9 +157,9 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     {
       super(new ExportQuery());
     }
-    public ExportQueryGenerator exporter(String name)
+    public ExportQueryGenerator exporter(Class<? extends Exporter> exporter)
     {
-      getCurrent().setExporterName(name);
+      getCurrent().setExporter(exporter);
       return this;
     }
     

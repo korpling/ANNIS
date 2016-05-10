@@ -148,7 +148,23 @@ public class GridExporter extends GeneralTextExporter
     return SubgraphFilter.all;
   }
   
-  
+  @Override
+  public String getHelpMessage()
+  {
+    return "The Grid Exporter can export all annotations of a search result and its "
+    + "context. Each annotation layer is represented in a separate line, and the "
+    + "tokens covered by each annotation are given as number ranges after each "
+    + "annotation in brackets. To suppress token numbers, input numbers=false "
+    + "into the parameters box below. To display only a subset of annotations "
+    + "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
+    + "to show tokens and the "
+    + "annotations pos and cat.<br /><br />"
+    + "Parameters: <br/>"
+    + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+    + "<code>metakeys=title,documentname</code>) <br />"
+    + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
+    + "<code>numbers=false</code>)";
+  }
 
 
   private static class Span

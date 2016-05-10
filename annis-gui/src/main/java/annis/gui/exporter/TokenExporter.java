@@ -99,7 +99,18 @@ public class TokenExporter extends GeneralTextExporter
   }
 
   
-  
+  @Override
+  public String getHelpMessage()
+  {
+    return "The Token Exporter exports the token covered by the matched nodes of every search result and "
+        + "its context, one line per result. "
+        + "Beside the text of the token it also contains all token annotations separated by \"/\"."
+        + "<p>"
+        + "<strong>This exporter does not work well with dialog data "
+        + "(corpora that have more than one primary text). "
+        + "Use the GridExporter instead.</strong>"
+        + "</p>";
+  }
   
   
   

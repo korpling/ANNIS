@@ -36,4 +36,6 @@ public interface Exporter extends Plugin
   
   public boolean isCancelable();
   
+  public String getHelpMessage();
+  
 }

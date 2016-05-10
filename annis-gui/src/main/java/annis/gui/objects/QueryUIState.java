@@ -15,13 +15,6 @@
  */
 package annis.gui.objects;
 
-import annis.gui.controlpanel.CorpusSorter;
-import annis.gui.frequency.UserGeneratedFrequencyEntry;
-import annis.service.objects.AnnisCorpus;
-import annis.service.objects.OrderType;
-import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.ObjectProperty;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -32,6 +25,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
+
+import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.ObjectProperty;
+
+import annis.gui.controlpanel.CorpusSorter;
+import annis.gui.exporter.CSVExporter;
+import annis.gui.exporter.Exporter;
+import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.OrderType;
 
 /**
  * Helper class to bundle all query relevant state information of the UI.
@@ -60,7 +64,7 @@ public class QueryUIState implements Serializable
   private final ObjectProperty<Set<Long>> selectedMatches = 
     new ObjectProperty<Set<Long>>(new TreeSet<Long>());
   
-  private final ObjectProperty<String> exporterName = new ObjectProperty<>("");
+  private final ObjectProperty<Class<? extends Exporter>> exporter = new ObjectProperty<Class<? extends Exporter>>(CSVExporter.class);
   private final ObjectProperty<List<String>> exportAnnotationKeys 
     = new ObjectProperty<List<String>>(new ArrayList<String>());
   private final ObjectProperty<String> exportParameters = 
@@ -149,11 +153,11 @@ public class QueryUIState implements Serializable
   public BeanItemContainer<Query> getHistory()
   {
     return history;
-  }
+  }  
 
-  public ObjectProperty<String> getExporterName()
+  public ObjectProperty<Class<? extends Exporter>> getExporter()
   {
-    return exporterName;
+    return exporter;
   }
 
   public ObjectProperty<List<String>> getExportAnnotationKeys()

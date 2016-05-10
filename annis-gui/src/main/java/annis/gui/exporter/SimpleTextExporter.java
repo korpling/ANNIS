@@ -32,4 +32,15 @@ public class SimpleTextExporter extends GeneralTextExporter
     return SubgraphFilter.token;
   }
   
+  @Override
+  public String getHelpMessage()
+  {
+    return "The SimpleTextExporter exports only the plain text of every search result. "
+    + "<p>"
+    + "<strong>This exporter does not work well with dialog data "
+    + "(corpora that have more than one primary text). "
+    + "Use the GridExporter instead.</strong>"
+    + "</p>" ;
+  }
+  
 }

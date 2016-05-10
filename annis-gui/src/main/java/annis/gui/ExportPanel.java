@@ -15,17 +15,18 @@
  */
 package annis.gui;
 
-import annis.gui.components.HelpButton;
-import annis.gui.controlpanel.QueryPanel;
-import annis.gui.controlpanel.SearchOptionsPanel;
-import annis.gui.converter.CommaSeperatedStringConverterList;
-import annis.gui.exporter.Exporter;
-import annis.gui.objects.QueryUIState;
+import java.io.File;
+
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.MutableClassToInstanceMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
@@ -43,10 +44,15 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.components.HelpButton;
+import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
+import annis.gui.converter.CommaSeperatedStringConverterList;
+import annis.gui.exporter.Exporter;
+import annis.gui.objects.QueryUIState;
+import annis.libgui.AnnisBaseUI;
+import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  *
@@ -66,8 +72,9 @@ public class ExportPanel extends GridLayout
 
   private final TextField txtParameters;
 
-  private final Map<String, String> help4Exporter = new HashMap<>();
-
+  private final ClassToInstanceMap<Exporter> exporterInstances = MutableClassToInstanceMap.create();
+  private final IndexedContainer exporterClassContainer = new IndexedContainer();
+  
   private final ComboBox cbExporter;
 
   private final Button btDownload;
@@ -115,33 +122,51 @@ public class ExportPanel extends GridLayout
     setWidth("99%");
     setHeight("-1px");
 
-    initHelpMessages();
-
     setColumnExpandRatio(0, 0.0f);
     setColumnExpandRatio(1, 1.0f);
-    
+   
     
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
+    cbExporter.setPropertyDataSource(controller.getState().getExporter());
+    cbExporter.setContainerDataSource(exporterClassContainer);
     
-    for(Exporter e : SearchView.EXPORTER)
+    Exporter firstExporter = null;
+    if(getUI() instanceof AnnisBaseUI)
     {
-      cbExporter.addItem(e.getClass().getSimpleName());
+      PluginManagerUtil util = new PluginManagerUtil(((AnnisBaseUI) getUI()).getPluginManager());
+      for(Exporter e : util.getPlugins(Exporter.class))
+      {
+        if(firstExporter == null)
+        {
+          firstExporter = e;
+        }
+        
+        exporterInstances.put(e.getClass(), e);
+        cbExporter.setItemCaption(e.getClass(), e.getClass().getSimpleName());
+        exporterClassContainer.addItem(e.getClass());
+        
+      }
     }
-    
-    cbExporter.setValue(SearchView.EXPORTER[0].getClass().getSimpleName());
+    if(firstExporter != null)
+    {
+      cbExporter.setValue(firstExporter.getClass().getSimpleName());
+    }
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
 
     formLayout.addComponent(cbExporter);
     addComponent(formLayout, 0, 0);
     
-    
-    lblHelp = new Label(help4Exporter.get((String) cbExporter.getValue()));
+    lblHelp = new Label();
     lblHelp.setContentMode(ContentMode.HTML);
     addComponent(lblHelp, 1, 0);
-
+    if(firstExporter != null)
+    {
+      lblHelp.setValue(firstExporter.getHelpMessage());
+    }
+    
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
 
@@ -189,8 +214,11 @@ public class ExportPanel extends GridLayout
     btCancel.setIcon(FontAwesome.TIMES_CIRCLE);
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
-    btCancel.setVisible(SearchView.EXPORTER[0].isCancelable());
-
+    if(firstExporter != null)
+    {
+      btCancel.setVisible(firstExporter.isCancelable());
+    }
+    
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
     btDownload.setIcon(FontAwesome.DOWNLOAD);
@@ -217,10 +245,12 @@ public class ExportPanel extends GridLayout
     {
       cbLeftContext.setPropertyDataSource(state.getLeftContext());
       cbRightContext.setPropertyDataSource(state.getRightContext());
-      cbExporter.setPropertyDataSource(state.getExporterName());
+      cbExporter.setPropertyDataSource(state.getExporter());
       
-      state.getExporterName().setValue(SearchView.EXPORTER[0].getClass().getSimpleName());
-      
+      if(firstExporter != null)
+      {
+        state.getExporter().setValue(firstExporter.getClass());
+      }
       txtAnnotationKeys.setConverter(new CommaSeperatedStringConverterList());
       txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
       
@@ -237,64 +267,6 @@ public class ExportPanel extends GridLayout
     this.ui = UI.getCurrent();
   }
   
-  
-
-  private void initHelpMessages()
-  {
-    help4Exporter.put(SearchView.EXPORTER[0].getClass().getSimpleName(),
-      "The WEKA Exporter exports only the "
-      + "values of the elements searched for by the user, ignoring the context "
-      + "around search results. The values for all annotations of each of the "
-      + "found nodes is given in a comma-separated table (CSV). At the top of "
-      + "the export, the names of the columns are given in order according to "
-      + "the WEKA format.<br/><br/>"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>)");
-
-    help4Exporter.put(SearchView.EXPORTER[1].getClass().getSimpleName(),
-      "The CSV Exporter exports only the "
-      + "values of the elements searched for by the user, ignoring the context "
-      + "around search results. The values for all annotations of each of the "
-      + "found nodes is given in a comma-separated table (CSV). <br/><br/>"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>)");
-
-    help4Exporter.put(SearchView.EXPORTER[2].getClass().getSimpleName(),
-      "The Token Exporter exports the token covered by the matched nodes of every search result and "
-      + "its context, one line per result. "
-      + "Beside the text of the token it also contains all token annotations separated by \"/\"."
-      + "<p>"
-      + "<strong>This exporter does not work well with dialog data "
-      + "(corpora that have more than one primary text). "
-      + "Use the GridExporter instead.</strong>"
-      + "</p>");
-
-    help4Exporter.put(SearchView.EXPORTER[3].getClass().getSimpleName(),
-      "The Grid Exporter can export all annotations of a search result and its "
-      + "context. Each annotation layer is represented in a separate line, and the "
-      + "tokens covered by each annotation are given as number ranges after each "
-      + "annotation in brackets. To suppress token numbers, input numbers=false "
-      + "into the parameters box below. To display only a subset of annotations "
-      + "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
-      + "to show tokens and the "
-      + "annotations pos and cat.<br /><br />"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>) <br />"
-      + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
-      + "<code>numbers=false</code>)");
-    
-    help4Exporter.put(SearchView.EXPORTER[4].getClass().getSimpleName(),
-      "The SimpleTextExporter exports only the plain text of every search result. "
-      + "<p>"
-      + "<strong>This exporter does not work well with dialog data "
-      + "(corpora that have more than one primary text). "
-      + "Use the GridExporter instead.</strong>"
-      + "</p>"    
-    );
-  }
 
   public class ExporterSelectionHelpListener implements
     Property.ValueChangeListener
@@ -303,23 +275,26 @@ public class ExportPanel extends GridLayout
     @Override
     public void valueChange(ValueChangeEvent event)
     {
-      String helpMessage = help4Exporter.get((String) event.getProperty().
-        getValue());
-      if (helpMessage != null)
-      {
-        lblHelp.setValue(helpMessage);
-      }
-      else
-      {
-        lblHelp.setValue("No help available for this exporter");
-      }
-      
-      Exporter exporter = controller.getExporterByName((String) event.getProperty().getValue());
+      Exporter exporter = exporterInstances.get(event.getProperty().getValue());
       if(exporter != null)
       {
         btCancel.setVisible(exporter.isCancelable());
+        
+        String helpMessage = exporter.getHelpMessage();
+        if (helpMessage != null)
+        {
+          lblHelp.setValue(helpMessage);
+        }
+        else
+        {
+          lblHelp.setValue("No help available for this exporter");
+        }
       }
-      
+      else
+      {
+        btCancel.setVisible(false);
+        lblHelp.setValue("No valid exporter selected");
+      }
     }
   }
 
@@ -423,8 +398,7 @@ public class ExportPanel extends GridLayout
       tmpOutputFile = null;
       
       
-      String exporterName = (String) cbExporter.getValue();
-      final Exporter exporter = controller.getExporterByName(exporterName);
+      final Exporter exporter = exporterInstances.get(cbExporter.getValue());
       if (exporter != null)
       {
         if("".equals(queryPanel.getQuery()))
