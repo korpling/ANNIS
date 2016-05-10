@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.OrderType;
 
@@ -157,7 +157,7 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     {
       super(new ExportQuery());
     }
-    public ExportQueryGenerator exporter(Class<? extends Exporter> exporter)
+    public ExportQueryGenerator exporter(Class<? extends ExporterPlugin> exporter)
     {
       getCurrent().setExporter(exporter);
       return this;

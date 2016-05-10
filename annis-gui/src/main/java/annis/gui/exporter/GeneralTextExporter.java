@@ -46,7 +46,7 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
@@ -58,7 +58,7 @@ import annis.service.objects.SubgraphFilter;
 import annis.utils.LegacyGraphConverter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
-public abstract class GeneralTextExporter implements Exporter, Serializable
+public abstract class GeneralTextExporter implements ExporterPlugin, Serializable
 {
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   

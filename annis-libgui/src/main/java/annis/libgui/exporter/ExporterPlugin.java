@@ -28,7 +28,7 @@ import java.util.Set;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface Exporter extends Plugin
+public interface ExporterPlugin extends Plugin
 {
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight, 
    Set<String> corpora, List<String> keys, String args, 

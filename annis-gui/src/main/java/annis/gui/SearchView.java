@@ -33,7 +33,7 @@ import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MediaControllerImpl;
 import annis.libgui.media.MimeTypeErrorListener;

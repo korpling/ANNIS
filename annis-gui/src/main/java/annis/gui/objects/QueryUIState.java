@@ -33,7 +33,7 @@ import com.vaadin.data.util.ObjectProperty;
 import annis.gui.controlpanel.CorpusSorter;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.OrderType;
 
@@ -64,7 +64,7 @@ public class QueryUIState implements Serializable
   private final ObjectProperty<Set<Long>> selectedMatches = 
     new ObjectProperty<Set<Long>>(new TreeSet<Long>());
   
-  private final ObjectProperty<Class<? extends Exporter>> exporter = new ObjectProperty<Class<? extends Exporter>>(CSVExporter.class);
+  private final ObjectProperty<Class<? extends ExporterPlugin>> exporter = new ObjectProperty<Class<? extends ExporterPlugin>>(CSVExporter.class);
   private final ObjectProperty<List<String>> exportAnnotationKeys 
     = new ObjectProperty<List<String>>(new ArrayList<String>());
   private final ObjectProperty<String> exportParameters = 
@@ -155,7 +155,7 @@ public class QueryUIState implements Serializable
     return history;
   }  
 
-  public ObjectProperty<Class<? extends Exporter>> getExporter()
+  public ObjectProperty<Class<? extends ExporterPlugin>> getExporter()
   {
     return exporter;
   }

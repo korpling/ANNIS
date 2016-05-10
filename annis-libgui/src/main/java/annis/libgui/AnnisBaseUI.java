@@ -60,7 +60,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 import annis.VersionInfo;
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -97,7 +97,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   private transient PluginManager pluginManager;
   
-  private final ClassToInstanceMap<Exporter> exporterRegistry = MutableClassToInstanceMap.create();
+  private final ClassToInstanceMap<ExporterPlugin> exporterRegistry = MutableClassToInstanceMap.create();
   
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
@@ -351,7 +351,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       resourceAddedDate.put(vis.getShortName(), new Date());
     }
     
-    for (Exporter e : util.getPlugins(Exporter.class))
+    for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class))
     {
       exporterRegistry.put(e.getClass(), e);
     }
@@ -456,7 +456,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   }
   
   @Override
-  public Exporter getExporter(Class<? extends Exporter> clazz)
+  public ExporterPlugin getExporter(Class<? extends ExporterPlugin> clazz)
   {
     return exporterRegistry.get(clazz);
   }

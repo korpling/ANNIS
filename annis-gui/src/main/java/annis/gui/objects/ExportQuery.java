@@ -17,7 +17,7 @@ package annis.gui.objects;
 
 import com.google.common.base.Splitter;
 
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 public class ExportQuery extends ContextualizedQuery
 {
-  private Class<? extends Exporter> exporter;
+  private Class<? extends ExporterPlugin> exporter;
   
   private List<String> annotationKeys;
   private String parameters;
@@ -54,12 +54,12 @@ public class ExportQuery extends ContextualizedQuery
   }  
 
   
-  public Class<? extends Exporter> getExporter()
+  public Class<? extends ExporterPlugin> getExporter()
   {
     return exporter;
   }
 
-  public void setExporter(Class<? extends Exporter> exporter)
+  public void setExporter(Class<? extends ExporterPlugin> exporter)
   {
     this.exporter = exporter;
   }
@@ -77,7 +77,7 @@ public class ExportQuery extends ContextualizedQuery
     return this;
   }
   
-  public ExportQuery exporter(Class<? extends Exporter> exporter)
+  public ExportQuery exporter(Class<? extends ExporterPlugin> exporter)
   {
     this.exporter = exporter;
     return this;

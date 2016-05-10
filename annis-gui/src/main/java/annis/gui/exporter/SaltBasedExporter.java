@@ -49,7 +49,7 @@ import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
@@ -60,7 +60,7 @@ import annis.service.objects.SubgraphFilter;
  * some kind of textual output.
  * @author thomas
  */
-public abstract class SaltBasedExporter implements Exporter, Serializable
+public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltBasedExporter.class);

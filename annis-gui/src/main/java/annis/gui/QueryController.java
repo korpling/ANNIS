@@ -71,7 +71,7 @@ import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Background;
 import annis.libgui.Helper;
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.model.AqlParseError;
@@ -506,7 +506,7 @@ public class QueryController implements Serializable
 
     addHistoryEntry(query);
     
-    Exporter exporterImpl = ui.getExporter(query.getExporter());
+    ExporterPlugin exporterImpl = ui.getExporter(query.getExporter());
     
     exportFuture = Background.call(new ExportBackgroundJob(query,
       exporterImpl, ui, eventBus, panel));

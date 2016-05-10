@@ -31,11 +31,11 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
 import annis.libgui.Helper;
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
-public class CSVExporter implements Exporter, Serializable
+public class CSVExporter implements ExporterPlugin, Serializable
 {
 
   @Override

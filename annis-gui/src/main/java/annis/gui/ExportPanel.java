@@ -52,7 +52,7 @@ import annis.gui.converter.CommaSeperatedStringConverterList;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.PluginSystem;
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
@@ -234,11 +234,11 @@ public class ExportPanel extends GridLayout
     super.attach();
     this.ui = UI.getCurrent();
     
-    Exporter firstExporter = null;
+    ExporterPlugin firstExporter = null;
     if (this.ui instanceof AnnisBaseUI)
     {
       PluginManagerUtil util = new PluginManagerUtil(((AnnisBaseUI) getUI()).getPluginManager());
-      for (Exporter e : util.getPlugins(Exporter.class))
+      for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class))
       {
         if (firstExporter == null)
         {
@@ -270,7 +270,7 @@ public class ExportPanel extends GridLayout
     public void valueChange(ValueChangeEvent event)
     {
       @SuppressWarnings("unchecked")
-      Exporter exporter = ps.getExporter((Class<? extends Exporter>) event.getProperty().getValue());
+      ExporterPlugin exporter = ps.getExporter((Class<? extends ExporterPlugin>) event.getProperty().getValue());
       if (exporter != null)
       {
         btCancel.setVisible(exporter.isCancelable());
@@ -389,7 +389,7 @@ public class ExportPanel extends GridLayout
       tmpOutputFile = null;
 
       @SuppressWarnings("unchecked")
-      final Exporter exporter = ps.getExporter((Class<? extends Exporter>) cbExporter.getValue());
+      final ExporterPlugin exporter = ps.getExporter((Class<? extends ExporterPlugin>) cbExporter.getValue());
       if (exporter != null)
       {
         if ("".equals(queryPanel.getQuery()))

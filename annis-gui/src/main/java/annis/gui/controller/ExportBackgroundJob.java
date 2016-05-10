@@ -19,7 +19,7 @@ import annis.gui.AnnisUI;
 import annis.gui.ExportPanel;
 import annis.gui.objects.ExportQuery;
 import annis.libgui.Helper;
-import annis.libgui.exporter.Exporter;
+import annis.libgui.exporter.ExporterPlugin;
 
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -42,11 +42,11 @@ public class ExportBackgroundJob implements Callable<File>
 
   private final AnnisUI ui;
 
-  private final Exporter exporter;
+  private final ExporterPlugin exporter;
   
   private Exception exportError;
 
-  public ExportBackgroundJob(ExportQuery query, Exporter exporter, AnnisUI ui,
+  public ExportBackgroundJob(ExportQuery query, ExporterPlugin exporter, AnnisUI ui,
     EventBus eventBus, ExportPanel panel)
   {
     this.query = query;
