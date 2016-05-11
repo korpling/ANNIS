@@ -72,30 +72,29 @@ public class CSVHelper
 
       }
     }
+
+    // important: don't close the wrapper CSVWriter!
+    @SuppressWarnings("resource")
+    CSVWriter csvWriter = new CSVWriter(w, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
+  
+    // print column names and data types
+    int count = columnsByNodePos.keySet().size();
+    ArrayList<String> headerLine = new ArrayList<>();
     
-    try(CSVWriter csvWriter = new CSVWriter(w, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\'))
+    for(int j = 0; j < count; ++j)
     {
-      // print column names and data types
-      int count = columnsByNodePos.keySet().size();
-      ArrayList<String> headerLine = new ArrayList<>();
+      headerLine.add(fullColumnName(j + 1, "id"));
+      headerLine.add(fullColumnName(j + 1, "span"));
       
-      for(int j = 0; j < count; ++j)
+      SortedSet<String> annotationNames = columnsByNodePos.get(j);
+      for(String name : annotationNames)
       {
-        headerLine.add(fullColumnName(j + 1, "id"));
-        headerLine.add(fullColumnName(j + 1, "span"));
-        
-        SortedSet<String> annotationNames = columnsByNodePos.get(j);
-        for(String name : annotationNames)
-        {
-          headerLine.add(fullColumnName(j + 1, name));
-        }
+        headerLine.add(fullColumnName(j + 1, name));
       }
-      csvWriter.writeNext(headerLine.toArray(new String[headerLine.size()]));
-    } 
-    catch (IOException e)
-    {
-      log.warn("Could not close CSV file", e);
     }
+    csvWriter.writeNext(headerLine.toArray(new String[headerLine.size()]));
+     
+    
     return columnsByNodePos;
   }
   
