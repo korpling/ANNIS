@@ -25,8 +25,10 @@ import com.google.common.collect.MutableClassToInstanceMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Property;
+import com.vaadin.data.Container.Sortable;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.ItemSorter;
 import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
@@ -125,7 +127,7 @@ public class ExportPanel extends GridLayout
 
     setColumnExpandRatio(0, 0.0f);
     setColumnExpandRatio(1, 1.0f);
-
+    
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
@@ -250,6 +252,7 @@ public class ExportPanel extends GridLayout
 
       }
     }
+    exporterClassContainer.sort(new Object[] {"simpleName"}, new boolean[] {true});
     
     if (firstExporter != null)
     {
