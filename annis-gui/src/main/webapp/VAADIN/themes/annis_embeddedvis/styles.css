@@ -999,7 +999,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.6.4";
+	content: "7.6.6";
 }
 
 .v-widget {
@@ -5160,6 +5160,8 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-grid-sidebar.v-contextmenu .v-grid-sidebar-content {
 	padding: 4px 0;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .annis_embeddedvis .v-grid-sidebar.v-contextmenu .v-grid-sidebar-content .gwt-MenuBar .gwt-MenuItem .column-hiding-toggle {
@@ -5714,6 +5716,8 @@ div.v-layout.v-horizontal.v-widget {
 .annis_embeddedvis .v-grid-sidebar.v-contextmenu.open .v-grid-sidebar-content {
 	margin: 0 0 2px;
 	padding: 4px 4px 2px;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .annis_embeddedvis .v-grid-sidebar.v-contextmenu.closed {
