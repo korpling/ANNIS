@@ -305,7 +305,7 @@ var hierarchy =
       [ "annis.ql.parser.SemanticValidator", "classannis_1_1ql_1_1parser_1_1_semantic_validator.html", null ],
       [ "annis.ql.parser.TransitivePrecedenceOptimizer", "classannis_1_1ql_1_1parser_1_1_transitive_precedence_optimizer.html", null ]
     ] ],
-    [ "annis.gui.objects.QueryGenerator< T extends Query, >", "classannis_1_1gui_1_1objects_1_1_query_generator.html", null ],
+    [ "annis.gui.objects.QueryGenerator< T extends Query, QG extends QueryGenerator< T, QG >", "classannis_1_1gui_1_1objects_1_1_query_generator.html", null ],
     [ "annis.gui.objects.QueryGenerator< FrequencyQuery, FrequencyQueryGenerator >", "classannis_1_1gui_1_1objects_1_1_query_generator.html", null ],
     [ "annis.gui.objects.QueryGenerator< T, QG >", "classannis_1_1gui_1_1objects_1_1_query_generator.html", null ],
     [ "annis.service.QueryService", "interfaceannis_1_1service_1_1_query_service.html", [
@@ -463,8 +463,8 @@ var hierarchy =
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
     ] ],
-    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
     [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
+    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
     [ "UriFragmentChangedListener", null, [
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
     ] ],

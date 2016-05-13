@@ -1,7 +1,7 @@
 var classannis_1_1gui_1_1objects_1_1_query_generator =
 [
-    [ "build", "classannis_1_1gui_1_1objects_1_1_query_generator.html#afd3b5e099ee5124f0e20d85c1ce37f56", null ],
-    [ "corpora", "classannis_1_1gui_1_1objects_1_1_query_generator.html#aa80b6e74c7b941377254433e693e133e", null ],
-    [ "getCurrent", "classannis_1_1gui_1_1objects_1_1_query_generator.html#a48c92ef043f6e05dc0885e06d54f0cb0", null ],
-    [ "query", "classannis_1_1gui_1_1objects_1_1_query_generator.html#abf67506e3ee98a3fb86fdec7457b6521", null ]
+    [ "build", "classannis_1_1gui_1_1objects_1_1_query_generator.html#aed426f3f8ba172e1ccaac00313342089", null ],
+    [ "corpora", "classannis_1_1gui_1_1objects_1_1_query_generator.html#a8e5a8ffb292752a8bf84c030b3d04ffa", null ],
+    [ "getCurrent", "classannis_1_1gui_1_1objects_1_1_query_generator.html#a10e8c0da32df43b1e85b9be76362fb90", null ],
+    [ "query", "classannis_1_1gui_1_1objects_1_1_query_generator.html#ab76ee78a1e5d1bb59f082751fdb6f715", null ]
 ];
