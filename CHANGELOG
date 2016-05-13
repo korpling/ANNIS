@@ -1,3 +1,15 @@
+Version 3.4.4
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.4+is%3Aclosed
+
+[Fixed Bugs]
+ #519 update to Vaadin 7.6.6
+ #516 Incorrect hit submatch colors in arch_dependency and KWIC
+ #515 Escaping example_queries
+
+
 Version 3.4.3
 =============
 
