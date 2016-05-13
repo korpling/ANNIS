@@ -47,13 +47,13 @@ public class VisJsPanel extends Panel{
 		tfToken.addStyleName("legend-token");	
 		
 		TextField tfSpan = new TextField();
-		tfSpan.setValue("spanning\n node");
+		tfSpan.setValue("spanning node");
 		tfSpan.setReadOnly(true);		
 		tfSpan.addStyleName("legend");
 		tfSpan.addStyleName("legend-span");	
 		
 		TextField tfStruct = new TextField();
-		tfStruct.setValue("structure\n node");
+		tfStruct.setValue("structure node");
 		tfStruct.setReadOnly(true);		
 		tfStruct.addStyleName("legend");
 		tfStruct.addStyleName("legend-struct");	
