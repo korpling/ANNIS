@@ -38,7 +38,7 @@ import org.corpus_tools.salt.core.SNode;
  */
 public class SpanHTMLOutputter
 {
-  public enum Type {EMPTY, VALUE, ESCAPED_VALUE, ANNO_NAME, CONSTANT, META_NAME};
+  public enum Type {EMPTY, VALUE, ESCAPED_VALUE, ANNO_NAME, CONSTANT, META_NAME,HTML_TEMPLATE};
   
   public static final String NULL_VAL = "NULL";
   
@@ -106,6 +106,11 @@ public class SpanHTMLOutputter
     {
       case CONSTANT:
         value = constant;
+        break;
+      case HTML_TEMPLATE:
+        String original = constant;
+        String innerValue = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
+        value = original.replaceAll("%%value%%", innerValue) + "  "; 
         break;
       case VALUE:
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
@@ -184,7 +189,7 @@ public class SpanHTMLOutputter
       }
     }
     String inner = "";
-    String endTag = "</" + element + ">";
+    String endTag = "</" + element + ">" + "   ";
     
     if(attribute == null || attribute.isEmpty())
     {
