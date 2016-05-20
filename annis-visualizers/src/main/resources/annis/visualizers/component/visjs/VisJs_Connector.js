@@ -9,7 +9,7 @@ $(container).css({"width": "100%", "height": "100%"});
 var	containerWidth = $(container).width();
 var	containerHeight =  $(container).height();
 
-div.style.border = "thin solid red";
+div.style.border = "thin solid light blue";
 div.style.display = "inline-block";
 
 
