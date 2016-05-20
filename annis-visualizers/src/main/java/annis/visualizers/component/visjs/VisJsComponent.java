@@ -54,7 +54,7 @@ import com.vaadin.ui.Image;
 		  })
 @StyleSheet(
   {
-	  	"vaadin://themes/annis/visjs/vis.min.css"
+	  "vaadin://themes/annis-visualizer-theme/visjs/vis.min.css"
 	  	
   })
 
