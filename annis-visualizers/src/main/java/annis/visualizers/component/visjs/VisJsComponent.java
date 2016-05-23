@@ -24,7 +24,6 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.EventExtractor;
 
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
@@ -45,10 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
-import com.vaadin.annotations.Theme;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractJavaScriptComponent;
-import com.vaadin.ui.Image;
 
 
 
@@ -405,43 +401,43 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		    	{
 		    		SFeature featMatched = node.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
 				    Long matchRaw = featMatched == null ? null : featMatched.getValue_SNUMERIC();				    
-								    
+					// token is matched			    
 				    if (matchRaw != null)
 				    {
 				    	color = MatchedNodeColors.getHTMLColorByMatch(matchRaw);
+				    	//System.out.println("tokens color \t" + color);
 				    	return color;
-				    }			    	
+				    }
+				    // try to find matching feature via spans
+				    else{
+				    	List<SRelation<SNode, SNode>> inRelations =  doc.getDocumentGraph().getInRelations(node.getId());			    		
+			    		for (SRelation<SNode, SNode> relation : inRelations){
+			    			SNode span;
+			    			if ((span = relation.getSource()) instanceof SSpan){
+			    				 featMatched = span.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+			    				 if (featMatched != null)
+			    				 {
+			    					 matchRaw  = featMatched.getValue_SNUMERIC();
+			    					 if (matchRaw != null)
+			    					 {
+			    					 color = MatchedNodeColors.getHTMLColorByMatch(matchRaw);
+			    					// System.out.println("spans color \t" + color);
+			    					 return color;
+			    				 }
+			    			   }
+			    		    				 
+			    			}
+			    			
+			    		}
+			    		
+				    } 	
 		    		
-		    		
-		    		List<SRelation<SNode, SNode>> inRelations =  doc.getDocumentGraph().getInRelations(node.getId());			    		
-		    		for (SRelation<SNode, SNode> relation : inRelations){
-		    			SNode span;
-		    			if ((span = relation.getSource()) instanceof SSpan){
-		    				 featMatched = span.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-		    				 if (featMatched != null)
-		    				 {
-		    					 matchRaw  = featMatched.getValue_SNUMERIC();
-		    					 break;
-		    				 }
-		    		    				 
-		    			}
-		    			
-		    		}
-		    		 if (matchRaw != null)
-					    {
-					    	color = MatchedNodeColors.getHTMLColorByMatch(matchRaw);
-					    	return color;
-					    }	
-		    		
-		    	}
-			    
+		    	}			    
 					return color;
 			    
 			   // String text =  doc.getDocumentGraph().getText(node);		    
 			    //System.out.println(text + "\t" + matchRaw + "\t" + MatchedNodeColors.getHTMLColorByMatch(matchRaw));
-			    
-		
-			   
+			     
 		}
 
 }
