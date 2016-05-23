@@ -1,7 +1,6 @@
 package annis.visualizers.component.visjs;
 
 
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 
 import annis.libgui.VisualizationToggle;
@@ -11,14 +10,14 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 
 @PluginImplementation
-//public class VisJs extends AbstractVisualizer<VisJsComponent>{
 public class VisJs extends AbstractVisualizer<Panel>{
 
 
+	
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 6223666444705431088L;
 
 	@Override
 	public String getShortName() 
@@ -28,13 +27,9 @@ public class VisJs extends AbstractVisualizer<Panel>{
 
 	@Override
 	public Panel createComponent(VisualizerInput visInput,
-	//public VisJsComponent createComponent(VisualizerInput visInput,
 			VisualizationToggle visToggle) 
 	{
 			
-		//VisJsComponent visjsComponent = new VisJsComponent(visInput);	
-		//return visjsComponent;
-
 		VisJsPanel panel = new VisJsPanel(visInput);
 		return panel;
 	}
