@@ -64,9 +64,9 @@ public class VisJsPanel extends Panel{
 		hlayout.addComponent(tfSpan);
 		hlayout.addComponent(tfStruct);
 		
-		hlayout.setExpandRatio(tfToken, 0.2f);
-		hlayout.setExpandRatio(tfSpan, 0.2f);
-		hlayout.setExpandRatio(tfStruct, 0.6f);
+		hlayout.setExpandRatio(tfToken, 0.15f);
+		hlayout.setExpandRatio(tfSpan, 0.15f);
+		hlayout.setExpandRatio(tfStruct, 0.7f);
 		
 		vsplit.addComponent(hlayout);
 		
