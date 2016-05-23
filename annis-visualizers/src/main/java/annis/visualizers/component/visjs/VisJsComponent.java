@@ -1,6 +1,8 @@
 package annis.visualizers.component.visjs;
 
 
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
 
@@ -17,21 +19,26 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.EventExtractor;
 
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SPointingRelation;
+import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SSpanningRelation;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.ExportFilter;
+import org.corpus_tools.salt.util.StyleImporter;
 import org.corpus_tools.salt.util.VisJsVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,7 +73,7 @@ import com.vaadin.ui.Image;
  *
  */
 
-public class VisJsComponent extends AbstractJavaScriptComponent implements ExportFilter{	
+public class VisJsComponent extends AbstractJavaScriptComponent implements ExportFilter, StyleImporter{	
 	
 	private String strNodes;
 	private String strEdges;
@@ -87,6 +94,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	
 	private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
 	
+	SDocument doc;
 	/**
 	 * Creates a new VisJsComponent instance.
 	 * 
@@ -101,8 +109,9 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			fillFilterAnnotations(visInput, 1);
 			
 			SDocument doc =  visInput.getDocument();
+			this.doc = doc;
 			
-			VisJsVisualizer VisJsVisualizer = new VisJsVisualizer(doc, this);
+			VisJsVisualizer VisJsVisualizer = new VisJsVisualizer(doc,this, this);
 			 
 			OutputStream osNodes = new ByteArrayOutputStream();
 			OutputStream osEdges = new ByteArrayOutputStream();
@@ -324,7 +333,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		  }
 		  
 	  @Override
-		public boolean excludeNode(SNode node) {
+		public boolean excludeNode(SNode node) {		  
 			// if node is a token or no configuration set, output the node
 			if (node instanceof SToken || (nodeAnnosConfiguration == null && nodeAnnosRegexConfiguration == null))
 			{
@@ -385,6 +394,54 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 				
 			}
 			return true;
+		}
+
+		@Override
+		public String getFontColor(SNode node) {
+			String color = null;
+			// TODO color for spans too?
+			
+		    	if (node instanceof SToken)
+		    	{
+		    		SFeature featMatched = node.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+				    Long matchRaw = featMatched == null ? null : featMatched.getValue_SNUMERIC();				    
+								    
+				    if (matchRaw != null)
+				    {
+				    	color = MatchedNodeColors.getHTMLColorByMatch(matchRaw);
+				    	return color;
+				    }			    	
+		    		
+		    		
+		    		List<SRelation<SNode, SNode>> inRelations =  doc.getDocumentGraph().getInRelations(node.getId());			    		
+		    		for (SRelation<SNode, SNode> relation : inRelations){
+		    			SNode span;
+		    			if ((span = relation.getSource()) instanceof SSpan){
+		    				 featMatched = span.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+		    				 if (featMatched != null)
+		    				 {
+		    					 matchRaw  = featMatched.getValue_SNUMERIC();
+		    					 break;
+		    				 }
+		    		    				 
+		    			}
+		    			
+		    		}
+		    		 if (matchRaw != null)
+					    {
+					    	color = MatchedNodeColors.getHTMLColorByMatch(matchRaw);
+					    	return color;
+					    }	
+		    		
+		    	}
+			    
+					return color;
+			    
+			   // String text =  doc.getDocumentGraph().getText(node);		    
+			    //System.out.println(text + "\t" + matchRaw + "\t" + MatchedNodeColors.getHTMLColorByMatch(matchRaw));
+			    
+		
+			   
 		}
 
 }
