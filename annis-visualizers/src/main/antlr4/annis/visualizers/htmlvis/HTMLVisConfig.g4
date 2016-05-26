@@ -34,13 +34,14 @@ NEWLINE : '\n';
 COMMENT : '#' ~('\n')+ -> skip;
 ID: [a-zA-Z0-9\_\-*?]+;
 TXT : (.)+?;
-TEMP : '%%value%%';
+TEMPVALUE :'%%value%%';
+TEMPANNO: '%%anno%%';
 
 innervalue: ~(QUOTE)+;
 value : QUOTE innervalue QUOTE;
-
-innertype: ~(QUOTE)+;
-innerhtmltemp: innertype TEMP innertype TEMP innertype; 
+temp: TEMPVALUE|TEMPANNO;
+innertype: ~(QUOTE|TEMPVALUE|TEMPANNO)+;
+innerhtmltemp: (innertype* temp innertype*)+; 
 innermeta: ~(QUOTE|WS|NEWLINE)+;
 
 type

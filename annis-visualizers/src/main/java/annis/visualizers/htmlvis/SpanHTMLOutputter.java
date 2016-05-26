@@ -110,7 +110,9 @@ public class SpanHTMLOutputter
       case HTML_TEMPLATE:
         String original = constant;
         String innerValue = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
-        value = original.replaceAll("%%value%%", innerValue) + "  "; 
+        String innerAnno = matchedAnnotation == null ? "NULL" : matchedAnnotation.getName();
+        value = original.replaceAll("%%value%%", innerValue); 
+        value = value.replaceAll("%%anno%%", innerAnno);
         break;
       case VALUE:
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
@@ -189,7 +191,7 @@ public class SpanHTMLOutputter
       }
     }
     String inner = "";
-    String endTag = "</" + element + ">" + "   ";
+    String endTag = "</" + element + ">";
     
     if(attribute == null || attribute.isEmpty())
     {
