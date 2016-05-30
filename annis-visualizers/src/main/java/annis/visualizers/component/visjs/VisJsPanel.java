@@ -1,17 +1,15 @@
 package annis.visualizers.component.visjs;
 
-import org.corpus_tools.salt.util.VisJsVisualizer;
+import java.util.ArrayList;
+import java.util.List;
 
 import annis.libgui.visualizers.VisualizerInput;
 
 import com.vaadin.annotations.StyleSheet;
-import com.vaadin.server.Page;
-import com.vaadin.server.Page.Styles;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
+import com.vaadin.ui.HorizontalSplitPanel;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalSplitPanel;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.VerticalLayout;
 
 
 @StyleSheet(
@@ -23,6 +21,11 @@ import com.vaadin.ui.VerticalSplitPanel;
 
 public class VisJsPanel extends Panel{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6231027893280529982L;
+	
 	VisJsPanel (VisualizerInput visInput){
 		this.setHeight("700px");
 		this.setWidth("100%");
@@ -30,47 +33,59 @@ public class VisJsPanel extends Panel{
 		//this.setScrollTop(10);
 		
 		
-		VerticalSplitPanel vsplit = new VerticalSplitPanel();
-		VisJsComponent visjsComponent = new VisJsComponent(visInput);		
-		vsplit.setFirstComponent(visjsComponent);
-		vsplit.setSplitPosition((float) 90.0);
-		HorizontalLayout hlayout = new HorizontalLayout();
-		hlayout.setHeight("100%");
-		hlayout.setWidth("100%");
-		//hlayout.setSizeUndefined();
-		hlayout.setSpacing(false);
-
-		TextField tfToken = new TextField();
+		HorizontalSplitPanel hsplit = new HorizontalSplitPanel();		
+		hsplit.setSplitPosition(10.0f);
+		
+		
+		VerticalLayout vlayout = new VerticalLayout();
+		vlayout.setHeight("100%");
+		vlayout.setWidth("100%");
+		vlayout.setSpacing(false);
+		
+		
+		TextArea legendLabel = new TextArea();
+		legendLabel.setValue("Legend:");
+		legendLabel.setReadOnly(true);	
+		legendLabel.addStyleName("borderless");
+		legendLabel.addStyleName("legend");
+		legendLabel.addStyleName("legend-label");				
+		
+		TextArea tfStruct = new TextArea();
+		tfStruct.setValue("structure" + "\n" + "node");
+		tfStruct.setReadOnly(true);			
+		tfStruct.addStyleName("legend");
+		tfStruct.addStyleName("legend-struct");				
+		
+		TextArea tfSpan = new TextArea();
+		tfSpan.setValue("spanning" + "\n" +"node");
+		tfSpan.setReadOnly(true);			
+		tfSpan.addStyleName("legend");
+		tfSpan.addStyleName("legend-span");		
+		
+		TextArea tfToken = new TextArea();
 		tfToken.setValue("token");
-		tfToken.setReadOnly(true);		
+		tfToken.setReadOnly(true);			
 		tfToken.addStyleName("legend");
 		tfToken.addStyleName("legend-token");	
 		
-		TextField tfSpan = new TextField();
-		tfSpan.setValue("spanning node");
-		tfSpan.setReadOnly(true);		
-		tfSpan.addStyleName("legend");
-		tfSpan.addStyleName("legend-span");	
-		
-		TextField tfStruct = new TextField();
-		tfStruct.setValue("structure node");
-		tfStruct.setReadOnly(true);		
-		tfStruct.addStyleName("legend");
-		tfStruct.addStyleName("legend-struct");	
+		vlayout.addComponent(legendLabel);		
+		vlayout.addComponent(tfStruct);		
+		vlayout.addComponent(tfSpan);
+		vlayout.addComponent(tfToken);	
 		
 		
+		vlayout.setExpandRatio(legendLabel, 0.10f);		
+		vlayout.setExpandRatio(tfStruct, 0.10f);		
+		vlayout.setExpandRatio(tfSpan, 0.10f);
+		vlayout.setExpandRatio(tfToken, 0.70f);
 		
-		hlayout.addComponent(tfToken);
-		hlayout.addComponent(tfSpan);
-		hlayout.addComponent(tfStruct);
+		hsplit.setFirstComponent(vlayout);
 		
-		hlayout.setExpandRatio(tfToken, 0.15f);
-		hlayout.setExpandRatio(tfSpan, 0.15f);
-		hlayout.setExpandRatio(tfStruct, 0.7f);
+		VisJsComponent visjsComponent = new VisJsComponent(visInput);		
+		hsplit.addComponent(visjsComponent);
 		
-		vsplit.addComponent(hlayout);
+		this.setContent(hsplit);
 		
-		this.setContent(vsplit);
 	}
 
 }
