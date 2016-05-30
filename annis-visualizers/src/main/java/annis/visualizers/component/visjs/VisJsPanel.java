@@ -1,8 +1,5 @@
 package annis.visualizers.component.visjs;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import annis.libgui.visualizers.VisualizerInput;
 
 import com.vaadin.annotations.StyleSheet;
