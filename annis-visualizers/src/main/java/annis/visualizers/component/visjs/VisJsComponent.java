@@ -39,8 +39,6 @@ import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.ExportFilter;
 import org.corpus_tools.salt.util.StyleImporter;
 import org.corpus_tools.salt.util.VisJsVisualizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
@@ -71,6 +69,10 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 
 public class VisJsComponent extends AbstractJavaScriptComponent implements ExportFilter, StyleImporter{	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9006240832319119407L;
 	private String strNodes;
 	private String strEdges;
 	public static final String MAPPING_EDGES = "edges";
@@ -88,7 +90,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	
 	
 	
-	private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
+	//private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
 	
 	SDocument doc;
 	/**
