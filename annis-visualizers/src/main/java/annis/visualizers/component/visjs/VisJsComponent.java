@@ -10,6 +10,7 @@ import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -75,17 +76,37 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	private static final long serialVersionUID = -9006240832319119407L;
 	private String strNodes;
 	private String strEdges;
-	public static final String MAPPING_EDGES = "edges";
+	//public static final String MAPPING_EDGES = "edges";
+	public static final String POINTING_REL_ANNOS = "pointingRelAnnos";
+	public static final String SPANNING_REL_ANNOS = "spanningRelAnnos";
+	public static final String DOMINANCE_REL_ANNOS = "dominanceRelAnnos";
+	//public static final String EMPTY_NAMESPACE = "";
 	
-	// a HashMap for storage node annotations for export filter with associated namespaces	
+	
+	
+	// a HashMap for storage of node annotations for export filter with associated namespaces	
 	private Map<String, Set<String>> filterNodeAnnotations = new HashMap<String, Set<String>>();
 	// a HashMap for storage edge annotations for export filter with associated namespaces	
-	private Map<String, Set<String>> filterEdgeAnnotations = new HashMap<String, Set<String>>();
+	//private Map<String, Set<String>> filterEdgeAnnotations = new HashMap<String, Set<String>>();
+	
+	// a HashMap to storage of annotations of pointing relations for export filter with associated namespaces	
+	private Map<String, Set<String>> filterPointingRelAnnotations = new HashMap<String, Set<String>>();
+	
+	// a HashMap to storage of annotations of pointing relations for export filter with associated namespaces	
+	private Map<String, Set<String>> filterSpanningRelAnnotations = new HashMap<String, Set<String>>();
+		
+	// a HashMap to storage of annotations of pointing relations for export filter with associated namespaces	
+	private Map<String, Set<String>> filterDominanceRelAnnotations = new HashMap<String, Set<String>>();
 	
 
 	private static String nodeAnnosConfiguration;
-	private static String nodeAnnosRegexConfiguration;
-	private static String edgeAnnosConfiguration;
+	//private static String nodeAnnosRegexConfiguration;
+	//private static String edgeAnnosConfiguration;
+	
+	private static String pointingRelAnnosConfiguration;
+	private static String spanningRelAnnosConfiguration;
+	private static String dominanceRelAnnosConfiguration;
+	
 	
 	
 	
@@ -101,10 +122,20 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	public VisJsComponent(VisualizerInput visInput){
 		
 			nodeAnnosConfiguration = visInput.getMappings().getProperty(MAPPING_ANNOS_KEY);
-			nodeAnnosRegexConfiguration = visInput.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
-			edgeAnnosConfiguration = visInput.getMappings().getProperty(MAPPING_EDGES);
-			fillFilterAnnotations(visInput, 0);
-			fillFilterAnnotations(visInput, 1);
+			//nodeAnnosRegexConfiguration = visInput.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
+			//edgeAnnosConfiguration = visInput.getMappings().getProperty(MAPPING_EDGES);
+			
+			
+			pointingRelAnnosConfiguration = visInput.getMappings().getProperty(POINTING_REL_ANNOS);
+			spanningRelAnnosConfiguration = visInput.getMappings().getProperty(SPANNING_REL_ANNOS);
+			dominanceRelAnnosConfiguration = visInput.getMappings().getProperty(DOMINANCE_REL_ANNOS);
+			
+			
+			
+			for(int i = 0; i < 4; i++){
+				fillFilterAnnotations(visInput, i);
+			}
+						
 			
 			SDocument doc =  visInput.getDocument();
 			this.doc = doc;
@@ -139,18 +170,31 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	
 	}
 	
-	// fills export filter annotations for the specified type (0 -> nodes; 1 -> edges)
+	// fills export filter annotations for the specified type (0 -> nodes; 1 -> pointing relations, 2 -> spanning relations, 3 -> dominance relations)
 	private void fillFilterAnnotations(VisualizerInput visInput, int type){
 		Map<String, Set<String>> myFilterAnnotations;
 		List<String> annotations;
 		if(type == 0) {
 			annotations = EventExtractor.computeDisplayAnnotations(visInput, SNode.class);	
+			System.out.println("NodeAnno all: " + annotations);
 			myFilterAnnotations = filterNodeAnnotations;
 		}
-		else{
-			annotations = computeDisplayedEdgeAnnotations(visInput, SRelation.class);	
-			myFilterAnnotations = filterEdgeAnnotations;
+		else if (type == 1){
+			annotations = computeDisplayedRelAnnotations(visInput, pointingRelAnnosConfiguration, SPointingRelation.class);	
+			System.out.println("PointingAnno all: " + annotations);
+			myFilterAnnotations = filterPointingRelAnnotations;
 		}
+		else if (type == 2){
+			annotations = computeDisplayedRelAnnotations(visInput, spanningRelAnnosConfiguration, SSpanningRelation.class);	
+			System.out.println("SpanningAnno all: " + annotations);
+			myFilterAnnotations = filterSpanningRelAnnotations;
+		}
+		else {
+			annotations = computeDisplayedRelAnnotations(visInput, dominanceRelAnnosConfiguration, SDominanceRelation.class);	
+			System.out.println("DominanceAnno all: " + annotations);
+			myFilterAnnotations = filterDominanceRelAnnotations;
+		}	
+		
 		
 			
 			for(String annotation: annotations)
@@ -196,6 +240,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 				
 				myFilterAnnotations.put(anno, namespaces);
 				
+				System.out.println("myFilterAnnotation: \t" +type + "\t" + myFilterAnnotations);
+				
 			}
 	}
 
@@ -219,6 +265,24 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	      getState().strEdges = strEdges;
 	     
 	    }
+	    
+	    
+	/*   public  List<String> computeDisplayedRelAnnotations(VisualizerInput input){
+	    	 if (input == null) {
+			      return new ArrayList<>();
+			    }
+	    	 
+	    	List<String> relDisplayedAnnotations = new ArrayList<String>();
+		
+	    	
+	    	relDisplayedAnnotations.addAll(computeDisplayedRelAnnotations(input, pointingRelAnnosConfiguration, SPointingRelation.class));
+	   		relDisplayedAnnotations.addAll(computeDisplayedRelAnnotations(input, spanningRelAnnosConfiguration, SSpanningRelation.class));
+	   		relDisplayedAnnotations.addAll(computeDisplayedRelAnnotations(input, dominanceRelAnnosConfiguration, SDominanceRelation.class));
+	    			
+	    	
+	    	return relDisplayedAnnotations;
+	    	
+	    }*/
 		
 		
 		
@@ -233,19 +297,22 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		   * @param type Which type of relations to include
 		   * @return
 		   */
-		  public static List<String> computeDisplayedEdgeAnnotations(VisualizerInput input,  Class<? extends SRelation> type) {
+		  public static List<String> computeDisplayedRelAnnotations(VisualizerInput input, 
+				  								String relAnnosConfiguration, Class<? extends SRelation> type) {
 		    if (input == null) {
 		      return new LinkedList<>();
 		    }
 
 		    SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
-		    Set<String> annotationPool = getEdgeLevelSet(graph, null, type);
+		    Set<String> annotationPool = getRelationLevelSet(graph, null, type);
+		    
+		    System.out.println(relAnnosConfiguration  + "\t annoPool: "+ annotationPool);
 		    List<String> confAnnotations = new LinkedList<>(annotationPool);
 		  
 		    
-		    if (edgeAnnosConfiguration != null && edgeAnnosConfiguration.trim().length() > 0) {
-		      String[] confSplit = edgeAnnosConfiguration.split(",");
+		    if (relAnnosConfiguration != null && relAnnosConfiguration.trim().length() > 0) {
+		      String[] confSplit = relAnnosConfiguration.split(",");
 		      confAnnotations.clear();
 		      for (String entry : confSplit) {
 		        entry = entry.trim();
@@ -270,7 +337,10 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		        	annotationPool.remove(entry);
 		        }
 		      }
-		    }		    
+		    }
+		    
+		    System.out.println(relAnnosConfiguration + " \t" +confAnnotations);
+		    
 		    return confAnnotations;
 		  }
 
@@ -291,7 +361,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		   */
 		
 		// TODO test
-		  public static Set<String> getEdgeLevelSet(SDocumentGraph graph,
+		  public static Set<String> getRelationLevelSet(SDocumentGraph graph,
 		          String namespace, Class<? extends SRelation> type) {
 		    Set<String> result = new TreeSet<>();
 		    
@@ -306,9 +376,9 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		      } else if (type == SSpanningRelation.class){
 		    	  edges = graph.getSpanningRelations();
 		      }
-		      else {
+		     /* else {
 		    	  edges = graph.getRelations();
-		      }
+		      }*/
 		      
 		      
 		      if (edges != null) {
@@ -323,19 +393,19 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		                break;
 		              } // end if namespace equals layer name
 		            } // end for each layer
-		        } // end for each node
+		        } // end for each edge
 		      }
 		    }
-
+		    System.out.println("RelLevelSet \t" + result);
 		    return result;
 		  }
 		  
 	  @Override
-		public boolean excludeNode(SNode node) {		  
+		public boolean includeNode(SNode node) {		  
 			// if node is a token or no configuration set, output the node
-			if (node instanceof SToken || (nodeAnnosConfiguration == null && nodeAnnosRegexConfiguration == null))
+			if (node instanceof SToken || nodeAnnosConfiguration == null)
 			{
-				return false;
+				return true;
 			}
 					
 			Set<SAnnotation> nodeAnnotations =  node.getAnnotations();
@@ -347,29 +417,67 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 				
 				if (filterNodeAnnotations.containsKey(nodeAnno))
 				{
+					// namespace have not to be considered
 					if (filterNodeAnnotations.get(nodeAnno).isEmpty())
 					{
-						return false;
+						return true;
 					}
 					else if (filterNodeAnnotations.get(nodeAnno).contains(nodeNs))
-					{
-						return false;
+					 	{
+							return true;														
+						
+					  }
+					
 					}
+					
 				}
 				
-			}
-			
-			return true;
+			return false;
 		}
 		
 
 
 		@Override
-		public boolean excludeRelation(SRelation relation) {
-			// if no configuration set, output the relation
-			if (edgeAnnosConfiguration == null){
-				return false;
+		public boolean includeRelation(SRelation relation) {
+			Map<String, Set<String>> filterEdgeAnnotations = new HashMap<String, Set<String>> ();
+		
+			// if no configuration set output the relation
+			if (relation instanceof SPointingRelation)
+			{
+				if (pointingRelAnnosConfiguration == null)
+					{
+						return true;
+					}
+				else 
+					{
+						filterEdgeAnnotations = filterPointingRelAnnotations;
+					}
 			}
+			
+			if (relation instanceof SSpanningRelation)
+			{
+				if (spanningRelAnnosConfiguration == null)
+					{
+					    return true;
+					}
+				else
+					{
+						filterEdgeAnnotations = filterSpanningRelAnnotations;
+					}
+			}
+			
+			if (relation instanceof SDominanceRelation)
+				{
+				if (dominanceRelAnnosConfiguration == null)
+					{
+					  return true;
+					}
+				else
+					{
+					filterEdgeAnnotations = filterDominanceRelAnnotations;
+					}
+			}
+					
 			
 			Set<SAnnotation> edgeAnnotations =  relation.getAnnotations();
 			
@@ -380,66 +488,43 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 				
 				if (filterEdgeAnnotations.containsKey(edgeAnno))
 				{
+					//namespace have not to be considered
 					if (filterEdgeAnnotations.get(edgeAnno).isEmpty())
 					{
-						return false;
+						return true;
 					}
 					else if (filterEdgeAnnotations.get(edgeAnno).contains(edgeNs))
 					{
-						return false;
+						return true;
 					}
 				}
 				
 			}
-			return true;
+			return false;
 		}
 
 		@Override
 		public String getFontColor(SNode node) {
 			String color = null;
-			// TODO color for spans too?
-			
-		    	if (node instanceof SToken)
-		    	{
-		    		SFeature featMatched = node.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-				    Long matchRaw = featMatched == null ? null : featMatched.getValue_SNUMERIC();				    
-					// token is matched			    
-				    if (matchRaw != null)
-				    {
-				    	color = MatchedNodeColors.getHTMLColorByMatch(matchRaw);
-				    	//System.out.println("tokens color \t" + color);
-				    	return color;
-				    }
-				    // try to find matching feature via spans
-				    else{
-				    	List<SRelation<SNode, SNode>> inRelations =  doc.getDocumentGraph().getInRelations(node.getId());			    		
-			    		for (SRelation<SNode, SNode> relation : inRelations){
-			    			SNode span;
-			    			if ((span = relation.getSource()) instanceof SSpan){
-			    				 featMatched = span.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-			    				 if (featMatched != null)
-			    				 {
-			    					 matchRaw  = featMatched.getValue_SNUMERIC();
-			    					 if (matchRaw != null)
-			    					 {
-			    					 color = MatchedNodeColors.getHTMLColorByMatch(matchRaw);
-			    					// System.out.println("spans color \t" + color);
-			    					 return color;
-			    				 }
-			    			   }
-			    		    				 
-			    			}
-			    			
-			    		}
-			    		
-				    } 	
-		    		
-		    	}			    
-					return color;
+					    	
+    		SFeature featMatched = node.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+		    Long matchRaw = featMatched == null ? null : featMatched.getValue_SNUMERIC();				    
+			// token is matched			    
+		    if (matchRaw != null)
+		    {
+		    	color = MatchedNodeColors.getHTMLColorByMatch(matchRaw);
+		    	//System.out.println("tokens color \t" + color);
+		    	return color;
+		    }	
+    	
+			return color;
 			    
 			   // String text =  doc.getDocumentGraph().getText(node);		    
 			    //System.out.println(text + "\t" + matchRaw + "\t" + MatchedNodeColors.getHTMLColorByMatch(matchRaw));
 			     
 		}
+
+		
+		
 
 }
