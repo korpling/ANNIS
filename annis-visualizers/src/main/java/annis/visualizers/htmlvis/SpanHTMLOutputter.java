@@ -40,7 +40,7 @@ import annis.model.RelannisNodeFeature;
  */
 public class SpanHTMLOutputter
 {
-  public enum Type {EMPTY, VALUE, ESCAPED_VALUE, ANNO_NAME, CONSTANT, META_NAME};
+  public enum Type {EMPTY, VALUE, ESCAPED_VALUE, ANNO_NAME, CONSTANT, META_NAME,HTML_TEMPLATE};
   
   public static final String NULL_VAL = "NULL";
   
@@ -108,6 +108,13 @@ public class SpanHTMLOutputter
     {
       case CONSTANT:
         value = constant;
+        break;
+      case HTML_TEMPLATE:
+        String original = constant;
+        String innerValue = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
+        String innerAnno = matchedAnnotation == null ? "NULL" : matchedAnnotation.getName();
+        value = original.replaceAll("%%value%%", innerValue); 
+        value = value.replaceAll("%%anno%%", innerAnno);
         break;
       case VALUE:
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();

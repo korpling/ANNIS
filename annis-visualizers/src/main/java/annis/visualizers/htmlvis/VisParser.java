@@ -194,6 +194,13 @@ public class VisParser extends HTMLVisConfigBaseListener
 
   
   @Override
+  public void enterTypeHtmlTemp(HTMLVisConfigParser.TypeHtmlTempContext ctx)
+  {
+    currentOutputter.setType(SpanHTMLOutputter.Type.HTML_TEMPLATE);
+    currentOutputter.setConstant(ctx.innerhtmltemp().getText());
+  }
+  
+  @Override
   public void enterTypeConstant(HTMLVisConfigParser.TypeConstantContext ctx)
   {
     currentOutputter.setType(SpanHTMLOutputter.Type.CONSTANT);
