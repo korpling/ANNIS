@@ -103,7 +103,7 @@ public class IDGenerator
     String id = null;
     if(c != null && fieldName != null && !fieldName.isEmpty())
     {
-      Preconditions.checkArgument(c.isAttached(), "Component " + c.toString() + " must be attached before it can get an automatic ID.");
+      Preconditions.checkArgument(c.isAttached(), "Component " + c.getConnectorId() + " must be attached before it can get an automatic ID.");
       id = c.getId();
       if(id == null)
       {

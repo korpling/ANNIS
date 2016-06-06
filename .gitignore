@@ -16,3 +16,5 @@ rebel.xml
 *.classpath
 .settings/
 *.jrebel_disabled
+/.idea/
+*.iml

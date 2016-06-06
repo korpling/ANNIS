@@ -1,3 +1,76 @@
+Version 3.4.2
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.2+is%3Aclosed
+
+[Fixed Bugs]
+ #511 Embedded visualization keeps loading forever
+ #510 Wrong color in tree visualization for child nodes
+
+Version 3.4.1
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.1+is%3Aclosed
+
+[Fixed Bugs]
+ #509 Link from embedded visualization to search UI is gone in 3.4.0
+
+Version 3.4.0
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0+is%3Aclosed
+
+[Fixed Bugs]
+ #508 "X is not a valid annotation name" error is not removed when "Search" button is clicked.
+ #506 possible problems with Apache Collections library and serialization
+ #497 Can't close match reference window while preview is loading
+ #453 Dependencies not showing in Safari Browser
+
+Version 3.4.0-rc5
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc5+is%3Aclosed
+
+[Fixed Bugs]
+ #499 GraphML output of the Salt type is not using the most specific class/type
+
+Version 3.4.0-rc4
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc4+is%3Aclosed
+
+[Fixed Bugs]
+ #496 speaker icon in grid does nothing when visualization is embedded
+ #495 invalid GraphML
+ #494 fails to parse tok!="..." when used in the  AQL short form
+
+Version 3.4.0-rc3
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc3+is%3Aclosed
+
+[Fixed Bugs]
+ #493 can't set "default-base-text-segmentation" property to token
+ #491 htmlvis won't output spans which have the same annotation name and the same token span
+
+[Enhancements]
+ #492 htmlvis should support a pseudoregion that covers all token
+
+Version 3.4.0-rc2
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-rc2+is%3Aclosed
+
+[Fixed Bugs]
+ #490 LegacyGraphConverter modifies original Salt graph
+
 Version 3.4.0-rc1
 =================
 

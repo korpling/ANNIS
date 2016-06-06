@@ -478,8 +478,6 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			return color;
 			     
 		}
-
-		
 		
 
 }

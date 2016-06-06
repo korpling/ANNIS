@@ -124,9 +124,8 @@ public class JoinListener extends AqlParserBaseListener
     relationIdx++;
   }
 
-
   @Override
-  public void enterRelation(AqlParser.RelationContext ctx)
+  public void enterBindingRelation(AqlParser.BindingRelationContext ctx)
   {
     int numOfReferences = ctx.refOrNode().size();
     relationIdx = 0;
@@ -141,6 +140,27 @@ public class JoinListener extends AqlParserBaseListener
         throw new AnnisQLSemanticsException(
           AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()), 
           "invalid reference to '" + ctx.refOrNode(i).getText() + "'");
+      }
+      relationChain.add(i, n);
+    }
+  }
+
+  @Override
+  public void enterNonBindingRelation(AqlParser.NonBindingRelationContext ctx)
+  {
+    int numOfReferences = ctx.REF().size();
+    relationIdx = 0;
+    relationChain.clear();
+    relationChain.ensureCapacity(numOfReferences);
+    
+    for(int i=0; i < numOfReferences; i++)
+    {
+      QueryNode n = nodeByRef(ctx.REF(i).getSymbol());
+      if(n == null)
+      {
+        throw new AnnisQLSemanticsException(
+          AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()), 
+          "invalid reference to '" + ctx.REF(i).getText() + "'");
       }
       relationChain.add(i, n);
     }

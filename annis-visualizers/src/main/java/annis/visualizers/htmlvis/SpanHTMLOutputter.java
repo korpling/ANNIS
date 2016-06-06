@@ -21,7 +21,9 @@ import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import com.google.common.escape.Escaper;
 import com.google.common.html.HtmlEscapers;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -53,8 +55,9 @@ public class SpanHTMLOutputter
   
   
   public void outputHTML(SNode node, String matchedQName,
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags, String tokenColor)
+    SortedMap<Long, List<OutputItem>> outputStartTags, 
+    SortedMap<Long, List<OutputItem>> outputEndTags, String tokenColor,
+    int priority)
   {
       
     this.tokenColor = tokenColor;
@@ -62,11 +65,11 @@ public class SpanHTMLOutputter
     if(node instanceof SToken && "tok".equals(matchedQName))
     {
         SToken tok = (SToken) node;
-        outputToken(tok, outputStartTags, outputEndTags);
+        outputToken(tok, outputStartTags, outputEndTags, priority);
     }
     else if(node instanceof SSpan || node instanceof SToken)
     {
-        outputAnnotation(node, matchedQName, outputStartTags, outputEndTags);
+        outputAnnotation(node, matchedQName, outputStartTags, outputEndTags,priority);
     }
     else
     {
@@ -75,8 +78,9 @@ public class SpanHTMLOutputter
   }
   
   private void outputAnnotation(SNode span, String matchedQName, 
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
+    SortedMap<Long, List<OutputItem>> outputStartTags, 
+    SortedMap<Long, List<OutputItem>> outputEndTags,
+    int priority)
   {
     long left;
     long right;
@@ -120,12 +124,13 @@ public class SpanHTMLOutputter
         value = "";
         break;
     }
-    outputAny(left, right, matchedQName, value, outputStartTags, outputEndTags);
+    outputAny(left, right, matchedQName, value, outputStartTags, outputEndTags, priority);
   }
   
   private void outputToken(SToken tok,
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
+    SortedMap<Long, List<OutputItem>> outputStartTags, 
+    SortedMap<Long, List<OutputItem>> outputEndTags,
+    int priority)
   {
 
     RelannisNodeFeature feat = 
@@ -153,13 +158,14 @@ public class SpanHTMLOutputter
         value = "";
         break;
     }
-    outputAny(index, index, "tok", value, outputStartTags, outputEndTags);    
+    outputAny(index, index, "tok", value, outputStartTags, outputEndTags, priority);    
   }
   
   public void outputAny(long left, long right, String matchedQName,
     String value,
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
+    SortedMap<Long, List<OutputItem>> outputStartTags, 
+    SortedMap<Long, List<OutputItem>> outputEndTags,
+    int priority)
   {
     
     String startTag = "<" + element;
@@ -195,11 +201,11 @@ public class SpanHTMLOutputter
     // add tags to output
     if(outputStartTags.get(left) == null)
     {
-      outputStartTags.put(left, new TreeSet<OutputItem>());
+      outputStartTags.put(left, new ArrayList<OutputItem>());
     }
     if(outputEndTags.get(right) == null)
     {
-      outputEndTags.put(right, new TreeSet<OutputItem>());
+      outputEndTags.put(right, new ArrayList<OutputItem>());
     }
     
     if(NULL_VAL.equals(element))
@@ -219,6 +225,7 @@ public class SpanHTMLOutputter
     itemStart.setOutputString(startTag);
     itemStart.setLength(right-left);
     itemStart.setqName(matchedQName);
+    itemStart.setPriority(priority);
     
     OutputItem itemEnd = new OutputItem();
     if(endTag.isEmpty())
@@ -231,6 +238,7 @@ public class SpanHTMLOutputter
     }
     itemEnd.setLength(right-left);
     itemEnd.setqName(matchedQName);
+    itemEnd.setPriority(priority);
     
     outputStartTags.get(left).add(itemStart);
     outputEndTags.get(right).add(itemEnd);

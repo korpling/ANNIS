@@ -51,14 +51,19 @@ if (nNodes < 20){
 	sprConstant = 1.2;
 } else if (nNodes >=20 && nNodes < 100){
 	nodeDist = 120;
-	sprConstant = 1.1;
+	sprConstant = 1.0;
 
 } else if (nNodes >= 100 && nNodes < 400) {
 	nodeDist = 150;
-	sprConstant = 0.9;
-} else {
+	sprConstant = 0.8;
+	
+}else if (nNodes >= 400 && nNodes < 600) {
 	nodeDist = 180;
-	sprConstant = 0.7;
+	sprConstant = 0.6;
+}  
+else {
+	nodeDist = 200;
+	sprConstant = 0.4;
 };
 
 

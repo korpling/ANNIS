@@ -115,6 +115,15 @@ public class QueryController implements Serializable
           validateQuery();
         }
       });
+    
+    this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
+    {
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        validateQuery();
+      }
+    });
 
     for (Exporter e : SearchView.EXPORTER)
     {
@@ -387,7 +396,12 @@ public class QueryController implements Serializable
 
       if(config.containsKey(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
       {
-        getState().getVisibleBaseText().setValue(config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION));
+        String configVal = config.getConfig(SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
+        if("".equals(configVal) || "tok".equals(configVal))
+        {
+          configVal = null;
+        }
+        getState().getVisibleBaseText().setValue(configVal);
       }
       else
       {
