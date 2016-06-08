@@ -165,7 +165,7 @@ public class TimelineReconstructor
       TreeSet<Integer> coveredIdx = new TreeSet<>(spans2TimelinePos.get(span));
       if(!coveredIdx.isEmpty())
       {
-        SAnnotation textValueAnno = span.getAnnotation(null, orderName);
+        SAnnotation textValueAnno = span.getAnnotation("annis", orderName);
         if(textValueAnno != null)
         {
           String textValue = textValueAnno.getValue_STEXT();
