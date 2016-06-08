@@ -109,7 +109,17 @@ public class TimelineReconstructor
             {
               if(relation instanceof SOrderRelation && currNode instanceof SSpan)
               {
-                convertSpanToToken((SSpan) currNode, ((SOrderRelation) relation).getType());
+                String orderName = ((SOrderRelation) relation).getType();
+                if(fromNode != null)
+                {
+                  // add a space to the text
+                  StringBuilder t = textDataByName.get(orderName);
+                  if(t != null)
+                  {
+                    t.append(" ");
+                  }
+                }
+                convertSpanToToken((SSpan) currNode, orderName);
               }
             }
             
