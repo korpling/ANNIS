@@ -11,7 +11,9 @@ import java.util.TreeSet;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SOrderRelation;
+import org.corpus_tools.salt.common.SPointingRelation;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SSpanningRelation;
 import org.corpus_tools.salt.common.SStructuredNode;
@@ -185,7 +187,7 @@ public class TimelineReconstructor
     }
   }
   
-  private SToken convertSpanToToken(SStructuredNode span, String orderName)
+  private void convertSpanToToken(SStructuredNode span, String orderName)
   {
     if(!nodesToDelete.contains(span))
     {
@@ -221,13 +223,33 @@ public class TimelineReconstructor
           timeRel.setEnd(coveredIdx.last());
           
           graph.addRelation(timeRel);
-          
-          return newToken;
+         
+          moveRelations(span, newToken);
         }
       }
     }
     
-    return null;
+  }
+  
+  private void moveRelations(SStructuredNode oldNode, SToken newToken)
+  {
+    List<SRelation> inRels = new LinkedList<>(oldNode.getInRelations());
+    List<SRelation> outRels = new LinkedList<>(oldNode.getOutRelations());
+    
+    for(SRelation rel : inRels)
+    {
+      if(rel instanceof SPointingRelation || rel instanceof SDominanceRelation)
+      {
+        rel.setTarget(newToken);
+      }
+    }
+    for(SRelation rel : outRels)
+    {
+      if(rel instanceof SPointingRelation || rel instanceof SDominanceRelation)
+      {
+        rel.setSource(newToken);
+      }
+    }
   }
   
   private void cleanup()
