@@ -2,6 +2,7 @@ package annis;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,12 +21,15 @@ import org.corpus_tools.salt.common.STimelineRelation;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+
+import annis.model.AnnisConstants;
 
 /**
  * Allows to reconstruct a proper {@link SDocumentGraph} with an {@link STimeline} and
@@ -43,7 +47,7 @@ public class TimelineReconstructor
   private final Map<String, StringBuilder> textDataByName = new HashMap<>();
   private final Multimap<SStructuredNode, Integer> spans2TimelinePos = HashMultimap.create();
   
-  private final Set<SStructuredNode> nodesToDelete = new HashSet<>();
+  private final Set<SNode> nodesToDelete = new HashSet<>();
   
   private TimelineReconstructor(SDocumentGraph graph)
   {
@@ -75,75 +79,100 @@ public class TimelineReconstructor
   
   private void createTokenFromSOrder()
   {    
-    List<SNode> orderRelRoots = graph.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
-    if(orderRelRoots != null) 
+    nodesToDelete.add(graph.getTextualDSs().get(0));
+    
+    Map<String, SSpan> rootNodes = new HashMap<>();
+    
+    // also add nodes that are are marked as start by ANNIS even if they don't have an outgoing order rel
+    for(SSpan n : graph.getSpans())
     {
-      // convert all root nodes to span
-      for(SNode root : orderRelRoots)
+      SFeature feat= n.getFeature(AnnisConstants.ANNIS_NS, 
+          AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
+      if (feat != null && feat.getValue_STEXT() != null)
       {
-        if(root instanceof SSpan)
+        rootNodes.put(feat.getValue_STEXT(), n);
+      }
+      else
+      {
+        // check if there is no incoming SOrderRelation but an outgoing
+        boolean isRoot = true;
+        for(SRelation<?, ?> inRel : n.getInRelations())
         {
-          String orderName = null;
-          for(SRelation<?,?> outRel : root.getOutRelations())
+          if(inRel instanceof SOrderRelation)
+          {
+            isRoot = false;
+            break;
+          }
+        }
+        if(isRoot)
+        {
+          for(SRelation<?, ?> outRel : n.getOutRelations())
           {
             if(outRel instanceof SOrderRelation)
             {
-              orderName = ((SOrderRelation) outRel).getType();
+              rootNodes.put(((SOrderRelation) outRel).getType(), n);
+              break;
             }
-          }
-          if(orderName != null)
-          {
-            convertSpanToToken((SSpan) root, orderName);
           }
         }
       }
-      
-      // traverse through all SOrderRelations in order
-      graph.traverse(orderRelRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "TimeReconstructSOrderRelations",
-          new GraphTraverseHandler()
-          {
-            
-            @Override
-            public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
-                SRelation relation, SNode fromNode, long order)
-            {
-              if(relation instanceof SOrderRelation && currNode instanceof SSpan)
-              {
-                String orderName = ((SOrderRelation) relation).getType();
-                if(fromNode != null)
-                {
-                  // add a space to the text
-                  StringBuilder t = textDataByName.get(orderName);
-                  if(t != null)
-                  {
-                    t.append(" ");
-                  }
-                }
-                convertSpanToToken((SSpan) currNode, orderName);
-              }
-            }
-            
-            @Override
-            public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
-                SRelation relation, SNode fromNode, long order)
-            {              
-            }
-            
-            @Override
-            public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                SRelation relation, SNode currNode, long order)
-            {
-              if(relation == null || relation instanceof SOrderRelation)
-              {
-                return true;
-              }
-              else
-              {
-                return false;
-              }
-            }
-          });
     }
+    
+    
+    // convert all root nodes to spans
+    for(Map.Entry<String, SSpan> rootEntry : rootNodes.entrySet())
+    {
+      SNode root = rootEntry.getValue();
+      String orderName = rootEntry.getKey();
+      convertSpanToToken((SSpan) root, orderName);
+    }
+    
+    // traverse through all SOrderRelations in order
+    graph.traverse(new LinkedList<SNode>(rootNodes.values()), GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "TimeReconstructSOrderRelations",
+        new GraphTraverseHandler()
+        {
+          
+          @Override
+          public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
+              SRelation relation, SNode fromNode, long order)
+          {
+            if(relation instanceof SOrderRelation && currNode instanceof SSpan)
+            {
+              String orderName = ((SOrderRelation) relation).getType();
+              if(fromNode != null)
+              {
+                // add a space to the text
+                StringBuilder t = textDataByName.get(orderName);
+                if(t != null)
+                {
+                  t.append(" ");
+                }
+              }
+              convertSpanToToken((SSpan) currNode, orderName);
+            }
+          }
+          
+          @Override
+          public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
+              SRelation relation, SNode fromNode, long order)
+          {              
+          }
+          
+          @Override
+          public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+              SRelation relation, SNode currNode, long order)
+          {
+            if(relation == null || relation instanceof SOrderRelation)
+            {
+              return true;
+            }
+            else
+            {
+              return false;
+            }
+          }
+        });
+  
     
     // update the text of the TextualDSs
     for(Map.Entry<String, StringBuilder> textDataEntry : textDataByName.entrySet())
@@ -175,7 +204,7 @@ public class TimelineReconstructor
       TreeSet<Integer> coveredIdx = new TreeSet<>(spans2TimelinePos.get(span));
       if(!coveredIdx.isEmpty())
       {
-        SAnnotation textValueAnno = span.getAnnotation("annis", orderName);
+        SAnnotation textValueAnno = span.getAnnotation(AnnisConstants.ANNIS_NS, orderName);
         if(textValueAnno != null)
         {
           String textValue = textValueAnno.getValue_STEXT();
@@ -203,7 +232,7 @@ public class TimelineReconstructor
   
   private void cleanup()
   {
-    for(SStructuredNode node : nodesToDelete)
+    for(SNode node : nodesToDelete)
     {
       graph.removeNode(node);
     }

@@ -42,6 +42,26 @@ public class TimelineReconstructorTest
     Assert.assertNotNull(instructorDipl);
     Assert.assertEquals("in Richtung des Toasters gehst ja gehst", instructorDipl.getText());
     
+    STextualDS instructorNorm = findTextualDSByName("instructor_norm", texts);
+    Assert.assertNotNull(instructorNorm);
+    Assert.assertEquals("in Richtung des Toasters gehst ja gehst", instructorNorm.getText());
+    
+    STextualDS instructeeDipl = findTextualDSByName("instructee_dipl", texts);
+    Assert.assertNotNull(instructeeDipl);
+    Assert.assertEquals("mhm ich geh in Richtung des Toasters okay", instructeeDipl.getText());
+    
+    STextualDS instructeeNorm = findTextualDSByName("instructee_norm", texts);
+    Assert.assertNotNull(instructeeNorm);
+    Assert.assertEquals("ich gehe in Richtung des Toasters okay", instructeeNorm.getText());
+    
+    STextualDS instructeeExtra = findTextualDSByName("instructee_extra", texts);
+    Assert.assertNotNull(instructeeExtra);
+    Assert.assertEquals("zeichnet", instructeeExtra.getText());
+    
+    STextualDS breakText = findTextualDSByName("break", texts);
+    Assert.assertNotNull(breakText);
+    Assert.assertEquals("0,7 0,5", breakText.getText());
+    
   }
   
   private STextualDS findTextualDSByName(String name, List<STextualDS> texts)
