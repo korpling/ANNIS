@@ -1,13 +1,18 @@
 package annis;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 import java.util.Objects;
 
+import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.util.DataSourceSequence;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.eclipse.emf.common.util.URI;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,31 +41,46 @@ public class TimelineReconstructorTest
 
     // instructor_dipl, instructor_norm, instructee_dipl, instructee_norm, instructee_extra, break
     List<STextualDS> texts = docGraph.getTextualDSs();
-    Assert.assertEquals(6, texts.size());
+    assertEquals(6, texts.size());
     
     STextualDS instructorDipl = findTextualDSByName("instructor_dipl", texts);
-    Assert.assertNotNull(instructorDipl);
-    Assert.assertEquals("in Richtung des Toasters gehst ja gehst", instructorDipl.getText());
+    assertNotNull(instructorDipl);
+    assertEquals("in Richtung des Toasters gehst ja gehst", instructorDipl.getText());
+    
+    DataSourceSequence<Integer> seq = new DataSourceSequence<>();
+    seq.setDataSource(instructorDipl);
+    seq.setStart(instructorDipl.getStart());
+    seq.setEnd(instructorDipl.getEnd());
+    List<SToken> instructorDiplToken = docGraph.getTokensBySequence(seq);
+    assertEquals(7, instructorDiplToken.size());
+    assertEquals("in", docGraph.getText(instructorDiplToken.get(0)));
+    assertEquals("Richtung", docGraph.getText(instructorDiplToken.get(1)));
+    assertEquals("des", docGraph.getText(instructorDiplToken.get(2)));
+    assertEquals("Toasters", docGraph.getText(instructorDiplToken.get(3)));
+    assertEquals("gehst", docGraph.getText(instructorDiplToken.get(4)));
+    assertEquals("ja", docGraph.getText(instructorDiplToken.get(5)));
+    assertEquals("gehst", docGraph.getText(instructorDiplToken.get(6)));
+    
     
     STextualDS instructorNorm = findTextualDSByName("instructor_norm", texts);
-    Assert.assertNotNull(instructorNorm);
-    Assert.assertEquals("in Richtung des Toasters gehst ja gehst", instructorNorm.getText());
+    assertNotNull(instructorNorm);
+    assertEquals("in Richtung des Toasters gehst ja gehst", instructorNorm.getText());
     
     STextualDS instructeeDipl = findTextualDSByName("instructee_dipl", texts);
-    Assert.assertNotNull(instructeeDipl);
-    Assert.assertEquals("mhm ich geh in Richtung des Toasters okay", instructeeDipl.getText());
+    assertNotNull(instructeeDipl);
+    assertEquals("mhm ich geh in Richtung des Toasters okay", instructeeDipl.getText());
     
     STextualDS instructeeNorm = findTextualDSByName("instructee_norm", texts);
-    Assert.assertNotNull(instructeeNorm);
-    Assert.assertEquals("ich gehe in Richtung des Toasters okay", instructeeNorm.getText());
+    assertNotNull(instructeeNorm);
+    assertEquals("ich gehe in Richtung des Toasters okay", instructeeNorm.getText());
     
     STextualDS instructeeExtra = findTextualDSByName("instructee_extra", texts);
-    Assert.assertNotNull(instructeeExtra);
-    Assert.assertEquals("zeichnet", instructeeExtra.getText());
+    assertNotNull(instructeeExtra);
+    assertEquals("zeichnet", instructeeExtra.getText());
     
     STextualDS breakText = findTextualDSByName("break", texts);
-    Assert.assertNotNull(breakText);
-    Assert.assertEquals("0,7 0,5", breakText.getText());
+    assertNotNull(breakText);
+    assertEquals("0,7 0,5", breakText.getText());
     
   }
   
