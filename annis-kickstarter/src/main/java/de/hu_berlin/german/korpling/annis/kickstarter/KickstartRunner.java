@@ -15,14 +15,15 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.service.internal.AnnisServiceRunner;
-import annis.service.objects.AnnisCorpus;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.webapp.WebAppContext;
+
+import annis.service.internal.AnnisServiceRunner;
+import annis.service.objects.AnnisCorpus;
 
 /**
  *

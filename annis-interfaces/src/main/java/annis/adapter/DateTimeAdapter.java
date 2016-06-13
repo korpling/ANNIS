@@ -17,8 +17,8 @@ package annis.adapter;
 
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
+
 import org.joda.time.DateTime;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -27,9 +27,6 @@ import org.slf4j.LoggerFactory;
 @Provider
 public class DateTimeAdapter extends XmlAdapter<String, DateTime>
 {
-
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    DateTimeAdapter.class);
 
   @Override
   public DateTime unmarshal(String v) throws Exception

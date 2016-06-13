@@ -72,7 +72,6 @@ public class TestTableFormatter {
 		assertEquals(expected, tableFormatter.formatAsTable(Arrays.asList(o1, o2), fields));
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void collection() {
 		// collections with 1 and 2 items
@@ -99,7 +98,6 @@ public class TestTableFormatter {
 		assertThat(tableFormatter.formatAsTable(Arrays.asList(new Object())), is("(no columns to print)"));
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void emptyCollection() {
 		assertThat(tableFormatter.formatAsTable(Arrays.asList(new ArrayList<>())), is("(no columns to print)"));

@@ -15,24 +15,32 @@
  */
 package annis.gui;
 
-import annis.CommonHelper;
-import annis.gui.docbrowser.DocBrowserController;
-import annis.gui.util.ANNISFontIcon;
-import annis.libgui.AnnisUser;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.libgui.IDGenerator;
-import annis.libgui.InstanceConfig;
-import annis.libgui.LoginDataLostException;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.libgui.visualizers.VisualizerPlugin;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-import annis.service.objects.Match;
-import annis.service.objects.Visualizer;
-import annis.visualizers.htmlvis.HTMLVis;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.Callable;
+
+import javax.ws.rs.core.Response;
+
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.FutureCallback;
@@ -49,30 +57,25 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Callable;
-import javax.ws.rs.core.Response;
-import org.corpus_tools.salt.SaltFactory;
-import org.corpus_tools.salt.common.SCorpusGraph;
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SFeature;
-import org.corpus_tools.salt.core.SNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.CommonHelper;
+import annis.gui.docbrowser.DocBrowserController;
+import annis.gui.util.ANNISFontIcon;
+import annis.libgui.AnnisUser;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.libgui.InstanceConfig;
+import annis.libgui.LoginDataLostException;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerPlugin;
+import annis.service.objects.Match;
+import annis.service.objects.Visualizer;
+import annis.visualizers.htmlvis.HTMLVis;
 
 /**
  *
@@ -295,7 +298,7 @@ public class EmbeddedVisUI extends CommonUI
             {
               // enhance the graph with match information from the arguments
               Match match = Match.parseFromString(rawMatch[0]);
-              addMatchToDocumentGraph(match, doc);
+              Helper.addMatchToDocumentGraph(match, doc);
             }
           }
 
@@ -387,44 +390,6 @@ public class EmbeddedVisUI extends CommonUI
         ex.getMessage() == null ? ("An unknown error of type "
           + ex.getClass().getSimpleName()) + " occured." : ex.getMessage());
     }
-  }
-
-  private void addMatchToDocumentGraph(Match match, SDocument document)
-  {
-    List<String> allUrisAsString = new LinkedList<>();
-    long i = 1;
-    for (URI u : match.getSaltIDs())
-    {
-      allUrisAsString.add(u.toASCIIString());
-      SNode matchedNode = document.getDocumentGraph().getNode(u.toASCIIString());
-      // set the feature for this specific node
-      if (matchedNode != null)
-      {
-        SFeature existing = matchedNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        if (existing == null)
-        {
-          SFeature featMatchedNode = SaltFactory.createSFeature();
-          featMatchedNode.setNamespace(ANNIS_NS);
-          featMatchedNode.setName(FEAT_MATCHEDNODE);
-          featMatchedNode.setValue(i);
-          matchedNode.addFeature(featMatchedNode);
-        }
-      }
-      i++;
-    }
-
-    SFeature featIDs = SaltFactory.createSFeature();
-    featIDs.setNamespace(ANNIS_NS);
-    featIDs.setName(FEAT_MATCHEDIDS);
-    featIDs.setValue(Joiner.on(",").join(allUrisAsString));
-    document.addFeature(featIDs);
-
-    SFeature featAnnos = SaltFactory.createSFeature();
-    featAnnos.setNamespace(ANNIS_NS);
-    featAnnos.setName(FEAT_MATCHEDANNOS);
-    featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
-    document.addFeature(featAnnos);
-
   }
 
   private void showHtmlDoc(String corpus, String doc, Map<String, String[]> args)

@@ -16,6 +16,23 @@
 
 package annis.ql.parser;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.TerminalNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.Join;
 import annis.model.QueryAnnotation;
@@ -40,20 +57,6 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Maps;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.TerminalNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -68,7 +71,7 @@ public class JoinListener extends AqlParserBaseListener
   /** An array which has an entry for each alternative. 
    *  Each entry maps node variables to a collection of query nodes.
    */
-  private final Map<String, QueryNode>[] alternativeNodes;
+  private final ArrayList<Map<String, QueryNode>> alternativeNodes;
   /** Maps a token interval to a query nodes.
    */
   private final List<Map<Interval, QueryNode>> tokenPositions;
@@ -86,29 +89,28 @@ public class JoinListener extends AqlParserBaseListener
   public JoinListener(QueryData data, int precedenceBound, List<Map<Interval, QueryNode>> tokenPositionToNode)
   {
     this.precedenceBound = precedenceBound;
-    this.alternativeNodes = new Map[data.getAlternatives().size()];
+    this.alternativeNodes = new ArrayList<>(data.getAlternatives().size());
     this.tokenPositions = tokenPositionToNode;
     
-    int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
     {
-      alternativeNodes[i] = Maps.newHashMap();
+      HashMap<String, QueryNode> m = new HashMap<>();
+      alternativeNodes.add(m);
       for(QueryNode n : alternative)
       {
-        if(alternativeNodes[i].containsKey(n.getVariable()))
+        if(m.containsKey(n.getVariable()))
         {
           throw new AnnisQLSemanticsException(n, "A node variable name is only allowed once per normalized alternative");
         }
-        alternativeNodes[i].put(n.getVariable(), n);
+        m.put(n.getVariable(), n);
       }
-      i++;
     }
   }
 
   @Override
   public void enterAndExpr(AqlParser.AndExprContext ctx)
   {
-    Preconditions.checkArgument(alternativeIndex < alternativeNodes.length);
+    Preconditions.checkArgument(alternativeIndex < alternativeNodes.size());
   }
 
   @Override
@@ -682,13 +684,13 @@ public class JoinListener extends AqlParserBaseListener
       String varDefText = ctx.VAR_DEF().getText();
       // remove trailing #
       varDefText = varDefText.substring(0, varDefText.length()-1);
-      return alternativeNodes[alternativeIndex].get(varDefText);
+      return alternativeNodes.get(alternativeIndex).get(varDefText);
     }
   }
   
   private QueryNode nodeByRef(Token ref)
   {
-    return alternativeNodes[alternativeIndex].get("" + ref.getText().substring(1));
+    return alternativeNodes.get(alternativeIndex).get("" + ref.getText().substring(1));
   }
   
   

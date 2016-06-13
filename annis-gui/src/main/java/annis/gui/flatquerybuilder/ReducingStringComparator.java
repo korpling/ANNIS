@@ -34,7 +34,7 @@ import org.xml.sax.SAXException;
  */
 public class ReducingStringComparator
 {
-  private HashMap<String, HashMap> ALLOGRAPHS;
+  private HashMap<String, HashMap<Character, Character>> ALLOGRAPHS;
   private static final String READING_ERROR_MESSAGE = "ERROR: Unable to load mapping file(s)!";
   private static String MAPPING_FILE = "mapfile.fqb";
   
@@ -44,11 +44,11 @@ public class ReducingStringComparator
     readMappings();
   }
   
-  public HashMap<String, HashMap> getMappings(){
+  public HashMap<String, HashMap<Character, Character>> getMappings(){
     return ALLOGRAPHS;
   }
   
-  private HashMap initAlphabet()
+  private HashMap<Character, Character> initAlphabet()
   {
     HashMap<Character, Character> h = new HashMap<>();
     
@@ -77,7 +77,7 @@ public class ReducingStringComparator
       {
         Element mapping = (Element) mappings.item(i);
         String mappingName = mapping.getAttribute("name");
-        HashMap mappingMap = initAlphabet();
+        HashMap<Character, Character> mappingMap = initAlphabet();
         NodeList variants = mapping.getElementsByTagName("variant");
         for (int j = 0; j < variants.getLength(); j++)
         {

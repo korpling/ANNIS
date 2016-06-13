@@ -15,20 +15,21 @@
  */
 package annis.ql.parser;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.springframework.stereotype.Component;
+
+import com.google.common.base.Splitter;
+
 import annis.dao.QueryDao;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.AqlParseError;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.service.objects.AnnisAttribute;
-import com.google.common.base.Splitter;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  *
@@ -41,9 +42,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class AnnotationExistenceValidator implements QueryDataTransformer
 {
-
-  private final static Logger log = LoggerFactory.getLogger(
-    AnnotationExistenceValidator.class);
 
   private QueryDao queryDao;
 

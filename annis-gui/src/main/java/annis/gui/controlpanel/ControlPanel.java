@@ -15,15 +15,13 @@
  */
 package annis.gui.controlpanel;
 
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
+
 import annis.gui.AnnisUI;
 import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ValoTheme;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This panel allows the user to control and execute queries.
@@ -33,8 +31,6 @@ import org.slf4j.LoggerFactory;
 public class ControlPanel extends VerticalLayout
 {
 
-  private static final Logger log = LoggerFactory.getLogger(ControlPanel.class);
-
   private static final long serialVersionUID = -2220211539424865671L;
 
   private QueryPanel queryPanel;
@@ -42,16 +38,11 @@ public class ControlPanel extends VerticalLayout
 
   private SearchOptionsPanel searchOptions;
   
-  private Tab optionTab;
   private TabSheet optionsTab;
-  private AnnisUI ui;
-
-
+  
   public ControlPanel(InstanceConfig instanceConfig,
     ExampleQueriesPanel autoGenQueries, AnnisUI ui)
   {
-    this.ui = ui;
-    
     setSizeFull();
     setMargin(true);
 
@@ -71,7 +62,7 @@ public class ControlPanel extends VerticalLayout
     searchOptions = new SearchOptionsPanel();
 
     optionsTab.addTab(corpusList, "Corpus List", null);
-    optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
+    optionsTab.addTab(searchOptions, "Search Options", null);
    
     addComponent(queryPanel);
     addComponent(optionsTab);

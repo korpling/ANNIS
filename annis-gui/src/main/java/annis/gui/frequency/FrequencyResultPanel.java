@@ -15,13 +15,24 @@
  */
 package annis.gui.frequency;
 
-import annis.gui.components.FrequencyChart;
-import annis.gui.objects.FrequencyQuery;
-import annis.libgui.Helper;
-import annis.service.objects.FrequencyTable;
-import annis.service.objects.FrequencyTableEntry;
-import annis.service.objects.FrequencyTableEntryType;
-import au.com.bytecode.opencsv.CSVWriter;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
+import java.io.Writer;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
@@ -38,23 +49,13 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Serializable;
-import java.io.Writer;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Locale;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.components.FrequencyChart;
+import annis.gui.objects.FrequencyQuery;
+import annis.libgui.Helper;
+import annis.service.objects.FrequencyTable;
+import annis.service.objects.FrequencyTableEntry;
+import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  *
@@ -133,33 +134,6 @@ public class FrequencyResultPanel extends VerticalLayout
 
   }
   
-  private String createFieldsString()
-  {    
-    StringBuilder sb = new StringBuilder();
-    
-    ListIterator<FrequencyTableEntry> it = query.getFrequencyDefinition().listIterator();
-    while(it.hasNext())
-    {
-      FrequencyTableEntry e = it.next();
-      
-      sb.append(e.getReferencedNode()).append(":");
-      if(e.getType() == FrequencyTableEntryType.span)
-      {
-        sb.append("tok");
-      }
-      else
-      {
-        sb.append(e.getKey());
-      }
-      
-      if(it.hasNext())
-      {
-        sb.append(",");
-      }
-    }
-    
-    return sb.toString();
-  }
   
   private void recreateTable(FrequencyTable table)
   {
@@ -237,7 +211,6 @@ public class FrequencyResultPanel extends VerticalLayout
   {
 
     @Override
-    @SuppressWarnings("unchecked")
     public int compare(Object o1, Object o2)
     {
       if(o1 instanceof String && o2 instanceof String)
@@ -294,9 +267,9 @@ public class FrequencyResultPanel extends VerticalLayout
       {
         File tmpFile = File.createTempFile("annis-frequency", ".txt");
         tmpFile.deleteOnExit();
-        try (Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8))
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
+            CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\'))
         {
-          CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
           
           // write headers
           ArrayList<String> header = new ArrayList<>();

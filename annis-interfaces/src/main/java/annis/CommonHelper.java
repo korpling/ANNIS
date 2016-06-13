@@ -45,6 +45,7 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SGraph;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
@@ -232,7 +233,7 @@ public class CommonHelper
    */
   public static String getSpannedText(SToken tok)
   {
-    SDocumentGraph graph = tok.getGraph();
+    SGraph graph = tok.getGraph();
 
     List<SRelation<SNode,SNode>> edges = graph.getOutRelations(tok.getId());
     for (SRelation<? extends SNode,? extends SNode> e : edges)

@@ -15,18 +15,21 @@
  */
 package annis.sqlgen;
 
-import annis.service.objects.AnnisAttribute;
 import static annis.test.TestUtils.size;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.matchers.JUnitMatchers.hasItems;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
+import annis.service.objects.AnnisAttribute;
 
 public class TestListAnnotationsSqlHelper {
 

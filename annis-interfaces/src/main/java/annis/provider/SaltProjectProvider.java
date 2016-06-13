@@ -15,20 +15,15 @@
  */
 package annis.provider;
 
-import annis.model.AnnisConstants;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -41,6 +36,7 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -49,23 +45,14 @@ import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
-import org.corpus_tools.salt.core.SRelation;
-import org.corpus_tools.salt.util.SaltUtil;
-import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.ATT_XMI_VERSION;
-import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SALTCORE;
-import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_SDOCUMENTSTRUCTURE;
-import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SALTCORE;
-import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_SDOCUMENTSTRUCTURE;
-import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XMI;
-import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_VALUE_XSI;
-import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_XMI;
-import static org.corpus_tools.salt.util.internal.persistence.SaltXML10Dictionary.NS_XSI;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Handler;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+
+import annis.model.AnnisConstants;
 
 /**
  *

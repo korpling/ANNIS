@@ -15,15 +15,21 @@
  */
 package annis.gui.frequency;
 
-import annis.gui.QueryController;
-import annis.gui.admin.PopupTwinColumnSelect;
-import annis.gui.objects.FrequencyQuery;
-import annis.gui.objects.QueryUIState;
-import annis.libgui.Helper;
-import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.FrequencyTable;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.WeakHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -51,19 +57,16 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.WeakHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.QueryController;
+import annis.gui.admin.PopupTwinColumnSelect;
+import annis.gui.objects.FrequencyQuery;
+import annis.gui.objects.QueryUIState;
+import annis.libgui.Helper;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.FrequencyTable;
 
 /**
  *
@@ -85,11 +88,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private FrequencyResultPanel resultPanel;
   private Button btShowQuery;
   private VerticalLayout queryLayout;
-  private final QueryController controller;
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
-  private transient WeakHashMap<Field,Object> field2ItemID;
+  
+  private transient WeakHashMap<Field<?>,Object> field2ItemID;
   
   private final ProgressBar pbQuery = new ProgressBar();
   
@@ -98,7 +101,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   
   public FrequencyQueryPanel(final QueryController controller, QueryUIState state)
   {    
-    this.controller = controller;
     this.state = state;
     
     setWidth("99%");
@@ -255,12 +257,16 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        Set<Object> selected = new HashSet((Set<Object>) tblFrequencyDefinition.getValue());
-        for(Object o : selected)
+        Object rawValue = tblFrequencyDefinition.getValue();
+        if(rawValue instanceof Collection<?>)
         {
-          cbAutomaticMode.setValue(Boolean.FALSE);
-          tblFrequencyDefinition.removeItem(o);
-          
+          Set<Object> selected = new HashSet<>((Collection<?>) rawValue);
+          for(Object o : selected)
+          {
+            cbAutomaticMode.setValue(Boolean.FALSE);
+            tblFrequencyDefinition.removeItem(o);
+            
+          }
         }
       }
     });
@@ -372,7 +378,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         Component c = event.getClickedComponent();
         if(c instanceof Field)
         {
-          Object itemID = getField2ItemID().get((Field) c);
+          Object itemID = getField2ItemID().get((Field<?>) c);
           if(itemID != null)
           {
             if(!event.isCtrlKey() && !event.isShiftKey())
@@ -654,7 +660,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     
     @Override
-    public Field createField(Container container, final Object itemId,
+    public Field<?> createField(Container container, final Object itemId,
       Object propertyId, Component uiContext)
     {
       if ("nr".equals(propertyId) || "annotation".equals(propertyId))
@@ -679,7 +685,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
   }
 
-  private WeakHashMap<Field, Object> getField2ItemID()
+  private WeakHashMap<Field<?>, Object> getField2ItemID()
   {
     if(field2ItemID == null)
     {

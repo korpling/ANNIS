@@ -15,22 +15,24 @@
  */
 package annis.visualizers.htmlvis;
 
-import annis.CommonHelper;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-import annis.model.RelannisNodeFeature;
-import com.google.common.escape.Escaper;
-import com.google.common.html.HtmlEscapers;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
+
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SNode;
+
+import com.google.common.escape.Escaper;
+import com.google.common.html.HtmlEscapers;
+
+import annis.CommonHelper;
+import annis.model.RelannisNodeFeature;
 
 /**
  *
@@ -38,7 +40,7 @@ import org.corpus_tools.salt.core.SNode;
  */
 public class SpanHTMLOutputter
 {
-  public enum Type {EMPTY, VALUE, ESCAPED_VALUE, ANNO_NAME, CONSTANT, META_NAME};
+  public enum Type {EMPTY, VALUE, ESCAPED_VALUE, ANNO_NAME, CONSTANT, META_NAME,HTML_TEMPLATE};
   
   public static final String NULL_VAL = "NULL";
   
@@ -106,6 +108,13 @@ public class SpanHTMLOutputter
     {
       case CONSTANT:
         value = constant;
+        break;
+      case HTML_TEMPLATE:
+        String original = constant;
+        String innerValue = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
+        String innerAnno = matchedAnnotation == null ? "NULL" : matchedAnnotation.getName();
+        value = original.replaceAll("%%value%%", innerValue); 
+        value = value.replaceAll("%%anno%%", innerAnno);
         break;
       case VALUE:
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();

@@ -16,12 +16,12 @@
 
 package annis.service.internal;
 
-import annis.VersionInfo;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Component;
+
+import annis.VersionInfo;
 
 /**
  * This service part only provides a method to get the version of this 
@@ -31,10 +31,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Path("annis/version")
 public class VersionServiceImpl
-{
-  
-  private final static Logger log = LoggerFactory.getLogger(VersionServiceImpl.class);
-  
+{ 
   
   @GET
   public String getFull()

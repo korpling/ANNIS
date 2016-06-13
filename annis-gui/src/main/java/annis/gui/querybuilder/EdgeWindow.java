@@ -82,7 +82,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     btClose.addStyleName(ValoTheme.BUTTON_SMALL);
     btClose.setIcon(FontAwesome.TIMES_CIRCLE);
     btClose.setWidth("-1px");
-    btClose.addListener((Button.ClickListener) this);
+    btClose.addClickListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
     
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);

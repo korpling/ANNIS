@@ -77,8 +77,6 @@ public class SingleResultPanel extends CssLayout implements
 {
   private static final long serialVersionUID = 2L;
 
-  private static final String HIDE_KWIC = "hide_kwic";
-
   private static final String INITIAL_OPEN = "initial_open";
 
   private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
@@ -104,10 +102,6 @@ public class SingleResultPanel extends CssLayout implements
   private String segmentationName;
 
   private final HorizontalLayout infoBar;
-
-  private final String corpusName;
-
-  private final String documentName;
 
   private final QueryController queryController;
 
@@ -203,8 +197,6 @@ public class SingleResultPanel extends CssLayout implements
      */
     path = CommonHelper.getCorpusPath(result.getGraph(), result);
     Collections.reverse(path);
-    corpusName = path.get(0);
-    documentName = path.get(path.size() - 1);
 
     MinMax minMax = getIds(result.getDocumentGraph());
 
@@ -432,7 +424,7 @@ public class SingleResultPanel extends CssLayout implements
         String htmlID = "resolver-" + resultNumber + "_" + i;
 
         VisualizerPanel p = new VisualizerPanel(
-          entries[i], result, corpusName, documentName,
+          entries[i], result, match,
           visibleTokenAnnos, markedAndCovered,
           markedCoveredMap, markedExactMap,
           htmlID, resultID, this, segmentationName, ps, instanceConfig);

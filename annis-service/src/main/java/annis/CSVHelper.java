@@ -19,6 +19,8 @@ import annis.dao.objects.AnnotatedMatch;
 import annis.dao.objects.AnnotatedSpan;
 import annis.model.Annotation;
 import au.com.bytecode.opencsv.CSVWriter;
+
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,8 +72,11 @@ public class CSVHelper
 
       }
     }
-    
+
+    // important: don't close the wrapper CSVWriter!
+    @SuppressWarnings("resource")
     CSVWriter csvWriter = new CSVWriter(w, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
+  
     // print column names and data types
     int count = columnsByNodePos.keySet().size();
     ArrayList<String> headerLine = new ArrayList<>();
@@ -88,7 +93,8 @@ public class CSVHelper
       }
     }
     csvWriter.writeNext(headerLine.toArray(new String[headerLine.size()]));
-        
+     
+    
     return columnsByNodePos;
   }
   

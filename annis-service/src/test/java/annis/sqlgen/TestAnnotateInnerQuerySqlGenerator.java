@@ -61,7 +61,7 @@ public class TestAnnotateInnerQuerySqlGenerator
     int left = uniqueInt(10);
     int right = uniqueInt(20);
     
-    List extensions = new ArrayList<>();
+    List<AnnotateQueryData> extensions = new ArrayList<>();
     extensions.add(annotateQueryData);
 
     given(annotateQueryData.getLeft()).willReturn(left);

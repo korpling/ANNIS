@@ -67,7 +67,7 @@ public abstract class AbstractDao
   {
     // XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
     Map<String, Object> parameters = args != null ? args.getValues()
-      : new HashMap();
+      : new HashMap<String, Object>();
 
     for (Map.Entry<String, Object> placeHolderEntry : parameters.entrySet())
     {

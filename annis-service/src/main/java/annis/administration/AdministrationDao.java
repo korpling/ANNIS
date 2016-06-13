@@ -183,8 +183,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   private Map<String, String> tableInsertFrom;
 
-  // all files have to carry this suffix.
-  private String annisFileSuffix = ".annis";
   /**
    * Optional tab for example queries. If this tab not exist, a dummy file from
    * the resource folder is used.
@@ -320,7 +318,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
       new FileSystemResource(new File(getScriptPath(),
-          FILE_RESOLVER_VIS_MAP + annisFileSuffix)));
+          FILE_RESOLVER_VIS_MAP + ".annis")));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
 
@@ -539,7 +537,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     boolean overwrite,
     ANNISFormatVersion version)
   {
-    this.annisFileSuffix = ".annis";
     createStagingAreaV33(temporaryStagingArea);
     bulkImport(path, version);
 
@@ -622,8 +619,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     boolean overwrite,
     ANNISFormatVersion version)
   {
-    this.annisFileSuffix = ".tab";
-
     createStagingAreaV32(temporaryStagingArea);
     bulkImport(path, version);
 
@@ -770,15 +765,15 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
       {
-        importResolverVisMapTable(path, table);
+        importResolverVisMapTable(path, table, version.getFileSuffix());
       }
       // check if example query exists. If not copy it from the resource folder.
       else if (table.equalsIgnoreCase(EXAMPLE_QUERIES_TAB))
       {
-        File f = new File(path, table + annisFileSuffix);
+        File f = new File(path, table + version.getFileSuffix());
         if (f.exists())
         {
-          log.info(table + annisFileSuffix + " file exists");
+          log.info(table + version.getFileSuffix() + " file exists");
           bulkloadTableFromResource(tableInStagingArea(table),
             new FileSystemResource(f));
 
@@ -794,7 +789,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
             generateExampleQueries = EXAMPLE_QUERIES_CONFIG.TRUE;
           }
 
-          log.info(table + annisFileSuffix + " file not found");
+          log.info(table + version.getFileSuffix() + " file not found");
         }
       }
       else if (table.equalsIgnoreCase("node"))
@@ -804,7 +799,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       else
       {
         bulkloadTableFromResource(tableInStagingArea(table),
-          new FileSystemResource(new File(path, table + annisFileSuffix)));
+          new FileSystemResource(new File(path, table + version.getFileSuffix())));
       }
     }
   }
@@ -812,7 +807,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private void bulkImportNode(String path, ANNISFormatVersion version)
   {
     // check column number by reading first line
-    File nodeTabFile = new File(path, "node" + annisFileSuffix);
+    File nodeTabFile = new File(path, "node" + version.getFileSuffix());
     try (BufferedReader reader
       = new BufferedReader(new InputStreamReader(
           new FileInputStream(nodeTabFile), "UTF-8"));)
@@ -865,7 +860,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       else
       {
         throw new RuntimeException("Illegal number of columns in node"
-          + annisFileSuffix + ", "
+          + version.getFileSuffix() + ", "
           + "should be 13 or 10 but was " + columnNumber);
       }
         }
@@ -1985,7 +1980,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    * @param path The path to the ANNIS file.
    * @param table The final table in the database of the resolver_vis_map table.
    */
-  private void importResolverVisMapTable(String path, String table)
+  private void importResolverVisMapTable(String path, String table, String annisFileSuffix)
   {
     try
     {
@@ -2147,24 +2142,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
    */
   private void writeAmountOfNodesBack(List<ExampleQuery> exampleQueries)
   {
-    StringBuilder sb = new StringBuilder();
 
+    String sqlTemplate = "UPDATE _" + EXAMPLE_QUERIES_TAB + " SET nodes=?, used_ops=CAST(? AS text[]) WHERE example_query=?;";
+    
     for (ExampleQuery eQ : exampleQueries)
     {
-      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES_TAB).append(
-        " SET ");
-      sb.append("nodes=").append(String.valueOf(eQ.getNodes()));
-      sb.append(" WHERE example_query='");
-      sb.append(eQ.getExampleQuery()).append("';\n");
-
-      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES_TAB).append(
-        " SET ");
-      sb.append("used_ops='").append(String.valueOf(eQ.getUsedOperators()));
-      sb.append("' WHERE example_query='");
-      sb.append(eQ.getExampleQuery()).append("';\n");
+      getJdbcTemplate().update(sqlTemplate, eQ.getNodes(), eQ.getUsedOperators(), eQ.getExampleQuery());
     }
-
-    getJdbcTemplate().execute(sb.toString());
   }
 
   /**
