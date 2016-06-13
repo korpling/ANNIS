@@ -90,7 +90,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
-  private static final String QUERY_ERROR_WARNING = "An Error occured. Please check your query.";
 
   private static final String ADD_LING_PARAM = "Add";
   private static final String ADD_SPAN_PARAM = "Add";
@@ -303,7 +302,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
     //addMenuMeta.setDescription(INFO_INIT_META);  
     addMenuMeta.setAutoOpen(false);
     final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
-    int i = 0;
     for (final String annoname : metanames)
     {
       addMeta.addItem(annoname, new MenuBar.Command() {

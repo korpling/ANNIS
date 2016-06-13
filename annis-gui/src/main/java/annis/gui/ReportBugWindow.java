@@ -15,8 +15,22 @@
  */
 package annis.gui;
 
-import annis.VersionInfo;
-import annis.libgui.Helper;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.activation.FileDataSource;
+import javax.mail.util.ByteArrayDataSource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.MultiPartEmail;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItem;
@@ -42,19 +56,9 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.UUID;
-import javax.activation.FileDataSource;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.mail.ByteArrayDataSource;
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.MultiPartEmail;
-import org.slf4j.LoggerFactory;
+
+import annis.VersionInfo;
+import annis.libgui.Helper;
 
 
 /**
@@ -117,7 +121,7 @@ public class ReportBugWindow extends Window
         catch (FieldGroup.CommitException ex)
         {
           List<String> errorFields = new LinkedList<>();
-          for(Field f : form.getFields())
+          for(Field<?> f : form.getFields())
           {
             if (f instanceof AbstractComponent)
             {
@@ -234,15 +238,8 @@ public class ReportBugWindow extends Window
 
       if (screenImage != null)
       { 
-        try
-        {
-          mail.attach(new ByteArrayDataSource(screenImage, imageMimeType),
+        mail.attach(new ByteArrayDataSource(screenImage, imageMimeType),
             "screendump.png", "Screenshot of the browser content at time of problem report");
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
       }
        
       File logfile = new File(VaadinService.getCurrent().getBaseDirectory(), "/WEB-INF/log/annis-gui.log");

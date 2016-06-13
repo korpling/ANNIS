@@ -166,7 +166,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   /**
    * @param graphSqlGenerator the graphSqlGenerator to set
    */
-  public void setGraphSqlGenerator(AnnotateSqlGenerator graphSqlGenerator)
+  public void setGraphSqlGenerator(AnnotateSqlGenerator<SaltProject> graphSqlGenerator)
   {
     this.graphSqlGenerator = graphSqlGenerator;
   }

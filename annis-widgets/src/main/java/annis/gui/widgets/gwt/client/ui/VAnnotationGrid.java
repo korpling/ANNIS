@@ -15,6 +15,11 @@
  */
 package annis.gui.widgets.gwt.client.ui;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gwt.dom.client.Element;
@@ -27,10 +32,7 @@ import com.google.gwt.user.client.ui.HTMLTable.Cell;
 import com.vaadin.client.ApplicationConnection;
 import com.vaadin.client.Paintable;
 import com.vaadin.client.UIDL;
-import com.vaadin.client.Util;
-import com.vaadin.client.VConsole;
-import java.util.HashMap;
-import java.util.Map;
+import com.vaadin.client.WidgetUtil;
 
 /**
  *
@@ -169,7 +171,7 @@ public class VAnnotationGrid extends Composite implements Paintable
     }
     catch (Exception ex)
     {
-      VConsole.log(ex);
+      Logger.getLogger(VAnnotationGrid.class.getName()).log(Level.SEVERE, ex.getMessage(), ex);
     }
   }
 
@@ -206,7 +208,7 @@ public class VAnnotationGrid extends Composite implements Paintable
     
     if(showCaption)
     {
-      table.setHTML(rowNumber, 0, Util.escapeHTML(name));
+      table.setHTML(rowNumber, 0, WidgetUtil.escapeHTML(name));
       formatter.addStyleName(rowNumber, 0, "header");
       startColumn = 1;
     }
@@ -223,7 +225,7 @@ public class VAnnotationGrid extends Composite implements Paintable
       String value = event.getStringAttribute("value");
       if(escapeHTML)
       {
-        value = Util.escapeHTML(value);
+        value = WidgetUtil.escapeHTML(value);
       }
       
 
@@ -299,9 +301,6 @@ public class VAnnotationGrid extends Composite implements Paintable
 
   public void onClick(int row, int col)
   {
-
-    VConsole.log("clicked row " + row + " col " + col);
-    VConsole.log("size of pdfPageNumbers: " + pdfPageNumbers.size());
 
     Position pos = new Position(row, col);
     if (startTimes.containsKey(pos))

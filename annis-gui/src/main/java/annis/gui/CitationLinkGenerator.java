@@ -15,12 +15,10 @@
  */
 package annis.gui;
 
-import annis.gui.beans.CitationProvider;
-import annis.gui.objects.ContextualizedQuery;
-import annis.gui.objects.DisplayedResultQuery;
-import annis.gui.objects.Query;
-import annis.gui.objects.QueryGenerator;
-import annis.libgui.Helper;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
@@ -28,11 +26,14 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+
+import annis.gui.beans.CitationProvider;
+import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.DisplayedResultQuery;
+import annis.gui.objects.Query;
+import annis.gui.objects.QueryGenerator;
+import annis.libgui.Helper;
 
 /**
  *

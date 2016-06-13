@@ -81,7 +81,7 @@ public class ImportWorker extends Thread
     jc.setContext(lc);
 
 
-    Appender appender = new AppenderBase<ILoggingEvent>()
+    Appender<ILoggingEvent> appender = new AppenderBase<ILoggingEvent>()
     {
       @Override
       protected void append(ILoggingEvent event)

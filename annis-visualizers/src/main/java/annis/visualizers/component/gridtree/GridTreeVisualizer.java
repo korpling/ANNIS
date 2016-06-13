@@ -16,18 +16,10 @@
 package annis.visualizers.component.gridtree;
 
 import static annis.CommonHelper.getSpannedText;
-import annis.gui.widgets.grid.AnnotationGrid;
-import annis.gui.widgets.grid.GridEvent;
-import annis.gui.widgets.grid.Row;
-import annis.libgui.Helper;
-import annis.libgui.VisualizationToggle;
-import annis.libgui.visualizers.AbstractVisualizer;
-import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-import annis.model.RelannisNodeFeature;
-import com.vaadin.ui.Panel;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SToken;
@@ -45,7 +37,18 @@ import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
-import org.eclipse.emf.common.util.EList;
+
+import com.vaadin.ui.Panel;
+
+import annis.gui.widgets.grid.AnnotationGrid;
+import annis.gui.widgets.grid.GridEvent;
+import annis.gui.widgets.grid.Row;
+import annis.libgui.Helper;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.model.RelannisNodeFeature;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  * A grid visualizing hierarchical tree annotations as ordered grid layers.
@@ -306,8 +309,6 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         Map<String, ArrayList<Row>> table;
         // tracks all nodes which was visited.
         Set<SNode> visited = new HashSet<SNode>();
-        // the namespace which has triggered the visualiztion
-        private final String namespace;
 
         /**
          * Init a traverse handler for building a tree of topological fields.
@@ -324,7 +325,6 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             this.startIdx = startIdx;
             this.endIdx = endIdx;
             this.annotationKey = nodeKey;
-            this.namespace = namespace;
             this.table = table;
         }
 

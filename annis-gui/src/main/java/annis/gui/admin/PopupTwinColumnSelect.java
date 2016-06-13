@@ -15,9 +15,10 @@
  */
 package annis.gui.admin;
 
-import annis.CaseSensitiveOrder;
-import annis.gui.converter.CommaSeperatedStringConverterSet;
-import annis.gui.converter.TreeSetConverter;
+import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
+
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
@@ -30,9 +31,10 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
-import java.util.Collection;
-import java.util.Set;
-import java.util.TreeSet;
+
+import annis.CaseSensitiveOrder;
+import annis.gui.converter.CommaSeperatedStringConverterSet;
+import annis.gui.converter.TreeSetConverter;
 
 /**
  *
@@ -118,10 +120,16 @@ public class PopupTwinColumnSelect extends CustomField<Set>
   {
     // always use a sorted TreeSet
     if (newFieldValue != null
-      && !(newFieldValue instanceof TreeSet))
+      && !(newFieldValue instanceof TreeSet<?>))
     {
-      TreeSet sortedSet = new TreeSet(CaseSensitiveOrder.INSTANCE);
-      sortedSet.addAll((Collection) newFieldValue);
+      TreeSet<String> sortedSet = new TreeSet<String>(CaseSensitiveOrder.INSTANCE);
+      for(Object v : newFieldValue)
+      {
+        if(v instanceof String)
+        {
+          sortedSet.add((String) v);
+        }
+      }
       newFieldValue = sortedSet;
     }
     super.setValue(newFieldValue);

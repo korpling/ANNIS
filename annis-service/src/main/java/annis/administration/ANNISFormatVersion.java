@@ -21,5 +21,19 @@ package annis.administration;
  */
 public enum ANNISFormatVersion
 {
-  V3_1, V3_2, V3_3, UNKNOWN;
+  V3_1(".tab"), V3_2(".tab"), V3_3(".annis"), UNKNOWN(".x");
+  
+  private final String fileSuffix;
+
+  private ANNISFormatVersion(String fileSuffix)
+  {
+    this.fileSuffix = fileSuffix;
+  }
+
+  public String getFileSuffix()
+  {
+    return fileSuffix;
+  }
+  
+  
 }

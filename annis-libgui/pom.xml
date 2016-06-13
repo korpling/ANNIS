@@ -9,7 +9,6 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   
-  <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-libgui</artifactId>
   <name>annis-libgui</name>
   <packaging>jar</packaging>

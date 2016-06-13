@@ -77,8 +77,6 @@ public class SingleResultPanel extends CssLayout implements
 {
   private static final long serialVersionUID = 2L;
 
-  private static final String HIDE_KWIC = "hide_kwic";
-
   private static final String INITIAL_OPEN = "initial_open";
 
   private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;

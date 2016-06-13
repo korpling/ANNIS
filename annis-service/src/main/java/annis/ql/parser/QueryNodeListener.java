@@ -15,14 +15,6 @@
  */
 package annis.ql.parser;
 
-import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
-import annis.ql.AqlParser;
-import annis.ql.AqlParserBaseListener;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,10 +22,19 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+
+import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.ql.AqlParser;
+import annis.ql.AqlParserBaseListener;
 
 /**
  *
@@ -41,7 +42,6 @@ import org.slf4j.LoggerFactory;
  */
 public class QueryNodeListener extends AqlParserBaseListener
 {
-  private static final Logger log = LoggerFactory.getLogger(QueryNodeListener.class);
 
   private Map<Interval, Long> nodeIntervalToID;
   

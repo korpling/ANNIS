@@ -31,7 +31,6 @@ import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.slf4j.LoggerFactory;
 
 /**
  * A realm for the property based user authentification and authorization
@@ -42,9 +41,6 @@ import org.slf4j.LoggerFactory;
 public class ANNISUserRealm extends AuthorizingRealm implements
   RolePermissionResolverAware
 {
-
-  private final static org.slf4j.Logger log = LoggerFactory.getLogger(
-    ANNISUserRealm.class);
 
   private ANNISUserConfigurationManager confManager;
 

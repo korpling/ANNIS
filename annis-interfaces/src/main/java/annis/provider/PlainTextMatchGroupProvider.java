@@ -15,9 +15,6 @@
  */
 package annis.provider;
 
-import annis.service.objects.MatchGroup;
-import com.google.common.base.Charsets;
-import com.google.common.io.CharStreams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,13 +22,18 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Charsets;
+import com.google.common.io.CharStreams;
+
+import annis.service.objects.MatchGroup;
 
 /**
  *
@@ -42,9 +44,6 @@ public class PlainTextMatchGroupProvider implements
   MessageBodyWriter<MatchGroup>,
   MessageBodyReader<MatchGroup>
 {
-
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    PlainTextMatchGroupProvider.class);
 
   @Override
   public boolean isWriteable(Class<?> type, Type genericType,

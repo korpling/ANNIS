@@ -15,20 +15,6 @@
  */
 package annis.gui.components;
 
-import com.vaadin.annotations.JavaScript;
-import com.vaadin.server.Resource;
-import com.vaadin.ui.AbstractJavaScriptComponent;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.MenuBar.MenuItem;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ValoTheme;
-import elemental.json.JsonArray;
-import elemental.json.JsonType;
-import elemental.json.JsonValue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -39,12 +25,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.json.JSONException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vaadin.annotations.JavaScript;
+import com.vaadin.ui.AbstractJavaScriptComponent;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
+
+import elemental.json.JsonArray;
+import elemental.json.JsonType;
+import elemental.json.JsonValue;
 
 /**
  * Embedds a single HTML page and adds navigation to it's headers (if they have
@@ -270,11 +272,6 @@ public class NavigateableSinglePage extends VerticalLayout
       {
         callFunction("scrollToElement", id);
       }
-    }
-    
-    public void setSource(Resource res)
-    {
-      setResource("content", res);
     }
     
     public void printFrame()

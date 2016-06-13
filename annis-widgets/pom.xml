@@ -9,7 +9,6 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-widgets</artifactId>
   <packaging>jar</packaging>
   <name>annis-widgets</name>

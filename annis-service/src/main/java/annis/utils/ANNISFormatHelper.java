@@ -112,10 +112,10 @@ public class ANNISFormatHelper
   {
     String result = null;
 
-    try
+    try(CSVReader csv = new CSVReader(new InputStreamReader(
+        corpusTabContent, "UTF-8"), '\t'))
     {
-      CSVReader csv = new CSVReader(new InputStreamReader(
-        corpusTabContent, "UTF-8"), '\t');
+      
       String[] line;
       int maxPost = Integer.MIN_VALUE;
       int minPre = Integer.MAX_VALUE;

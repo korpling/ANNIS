@@ -15,16 +15,6 @@
  */
 package annis.libgui.visualizers;
 
-import annis.CommonHelper;
-import annis.gui.FontConfig;
-import annis.libgui.MatchedNodeColors;
-import annis.service.ifaces.AnnisResult;
-import annis.service.objects.AnnisResultImpl;
-import annis.service.objects.RawTextWrapper;
-import annis.utils.LegacyGraphConverter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.HashMap;
@@ -32,10 +22,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SNode;
+
+import annis.CommonHelper;
+import annis.gui.FontConfig;
+import annis.libgui.MatchedNodeColors;
+import annis.service.ifaces.AnnisResult;
+import annis.service.objects.AnnisResultImpl;
+import annis.service.objects.RawTextWrapper;
+import annis.utils.LegacyGraphConverter;
 
 /**
  * Contains all needed data for a visualizer to perform the visualization.

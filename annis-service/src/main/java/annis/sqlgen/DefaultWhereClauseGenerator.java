@@ -731,10 +731,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String componentID1 = tables(node).aliasedColumn(COMPONENT_TABLE, "id");
     String corpusRef1 = tables(node).aliasedColumn(NODE_TABLE, "corpus_ref");
     
-    String parent = tas.column("children", tas.columnName(RANK_TABLE, "parent"));
-    String id = tas.column("children", tas.columnName(RANK_TABLE, "id"));
-    String componentID = tas.column("children", tas.columnName(COMPONENT_TABLE, "id"));;
-    String corpusRef = tas.column("children", tas.columnName(NODE_TABLE, "corpus_ref"));;
+    String parent = TableAccessStrategy.column("children", tas.columnName(RANK_TABLE, "parent"));
+    String id = TableAccessStrategy.column("children", tas.columnName(RANK_TABLE, "id"));
+    String componentID = TableAccessStrategy.column("children", tas.columnName(COMPONENT_TABLE, "id"));;
+    String corpusRef = TableAccessStrategy.column("children", tas.columnName(NODE_TABLE, "corpus_ref"));;
     
     
     StringBuffer sb = new StringBuffer();

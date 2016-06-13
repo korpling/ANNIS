@@ -15,13 +15,8 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.AnnisUI;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.model.Annotation;
-import annis.service.objects.CorpusConfig;
-import annis.service.objects.DocumentBrowserConfig;
-import annis.service.objects.Visualizer;
+import java.util.List;
+
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.WebResource;
@@ -34,9 +29,13 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.AnnisUI;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.model.Annotation;
+import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.Visualizer;
 
 /**
  *
@@ -54,21 +53,10 @@ public class DocBrowserPanel extends Panel
 
   private DocBrowserTable table;
 
-  private Logger log = LoggerFactory.getLogger(DocBrowserPanel.class);
-
-  private CorpusConfig corpusConfig;
-
   final ProgressBar progress;
   
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
-  /**
-   * Normally get the page size from annis-service.properties for the paging
-   * component. If something went wrong this value or the amount of documents
-   * within the corpus is used: min(pageSize, amountOf(documents))
-   */
-  private final int PAGE_SIZE = 20;
-
   private DocBrowserPanel(AnnisUI ui, String corpus)
   {
     this.ui = ui;
