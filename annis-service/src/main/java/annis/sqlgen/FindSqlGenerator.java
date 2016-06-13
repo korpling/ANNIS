@@ -284,9 +284,15 @@ public class FindSqlGenerator extends AbstractSqlGenerator
   {
     StringBuilder sb = new StringBuilder("salt:/");
 
-    for (String dir : path)
+    Iterator<String> itPath = path.iterator();
+    while(itPath.hasNext())
     {
-      sb.append(pathEscaper.escape(dir)).append("/");
+      String dir = itPath.next();
+      sb.append(pathEscaper.escape(dir));
+      if(itPath.hasNext())
+      {
+        sb.append("/");
+      }
     }
     
     sb.append("#").append(fragmentEscaper.escape(saltID));
