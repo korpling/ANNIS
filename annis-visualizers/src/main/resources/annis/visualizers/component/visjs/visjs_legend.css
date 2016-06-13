@@ -12,15 +12,16 @@
  } 
 		
  .legend-token { 
-	 background:#CCFF99 !important;
+	 background:#CCFF99 !important; 
 	 
  }  
 
  .legend-span { 
-	 background:#A9D0F5 !important;
+	 background:#dbdcff !important;
  }
  
  .legend-struct { 
-	 background:#FFCC00 !important;
+	 background:#ffff7d !important;
+	 
  }
 

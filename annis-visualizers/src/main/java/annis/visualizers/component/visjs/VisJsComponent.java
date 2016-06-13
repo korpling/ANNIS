@@ -57,6 +57,8 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 
 
 /**
+ * Visualizer  component visualizes Salt model of visualizer input.
+ * 
  * 
  * @author irina
  *
@@ -105,7 +107,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	
 
 	
-	//list to keep annotation configurations put by user
+	//a list to keep annotation configurations put by user
 	//0th entry for nodes, 1st for pointing relations, 2nd for spanning relations, 3rd for dominance relations
 	private final List<String> configurations = new ArrayList<String>();
 	
