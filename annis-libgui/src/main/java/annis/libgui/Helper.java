@@ -16,6 +16,8 @@
 package annis.libgui;
 
 import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 
@@ -27,6 +29,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +46,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
@@ -85,6 +89,7 @@ import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.Match;
 import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
 import elemental.json.JsonValue;
@@ -1240,4 +1245,43 @@ public class Helper
       return false;
     }
   }
+  
+  public static void addMatchToDocumentGraph(Match match, SDocument document)
+  {
+    List<String> allUrisAsString = new LinkedList<>();
+    long i = 1;
+    for (URI u : match.getSaltIDs())
+    {
+      allUrisAsString.add(u.toASCIIString());
+      SNode matchedNode = document.getDocumentGraph().getNode(u.toASCIIString());
+      // set the feature for this specific node
+      if (matchedNode != null)
+      {
+        SFeature existing = matchedNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        if (existing == null)
+        {
+          SFeature featMatchedNode = SaltFactory.createSFeature();
+          featMatchedNode.setNamespace(ANNIS_NS);
+          featMatchedNode.setName(FEAT_MATCHEDNODE);
+          featMatchedNode.setValue(i);
+          matchedNode.addFeature(featMatchedNode);
+        }
+      }
+      i++;
+    }
+
+    SFeature featIDs = SaltFactory.createSFeature();
+    featIDs.setNamespace(ANNIS_NS);
+    featIDs.setName(FEAT_MATCHEDIDS);
+    featIDs.setValue(Joiner.on(",").join(allUrisAsString));
+    document.addFeature(featIDs);
+
+    SFeature featAnnos = SaltFactory.createSFeature();
+    featAnnos.setNamespace(ANNIS_NS);
+    featAnnos.setName(FEAT_MATCHEDANNOS);
+    featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
+    document.addFeature(featAnnos);
+
+  }
+  
 }

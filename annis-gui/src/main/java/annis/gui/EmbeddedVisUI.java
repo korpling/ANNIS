@@ -298,7 +298,7 @@ public class EmbeddedVisUI extends CommonUI
             {
               // enhance the graph with match information from the arguments
               Match match = Match.parseFromString(rawMatch[0]);
-              addMatchToDocumentGraph(match, doc);
+              Helper.addMatchToDocumentGraph(match, doc);
             }
           }
 
@@ -390,44 +390,6 @@ public class EmbeddedVisUI extends CommonUI
         ex.getMessage() == null ? ("An unknown error of type "
           + ex.getClass().getSimpleName()) + " occured." : ex.getMessage());
     }
-  }
-
-  private void addMatchToDocumentGraph(Match match, SDocument document)
-  {
-    List<String> allUrisAsString = new LinkedList<>();
-    long i = 1;
-    for (URI u : match.getSaltIDs())
-    {
-      allUrisAsString.add(u.toASCIIString());
-      SNode matchedNode = document.getDocumentGraph().getNode(u.toASCIIString());
-      // set the feature for this specific node
-      if (matchedNode != null)
-      {
-        SFeature existing = matchedNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        if (existing == null)
-        {
-          SFeature featMatchedNode = SaltFactory.createSFeature();
-          featMatchedNode.setNamespace(ANNIS_NS);
-          featMatchedNode.setName(FEAT_MATCHEDNODE);
-          featMatchedNode.setValue(i);
-          matchedNode.addFeature(featMatchedNode);
-        }
-      }
-      i++;
-    }
-
-    SFeature featIDs = SaltFactory.createSFeature();
-    featIDs.setNamespace(ANNIS_NS);
-    featIDs.setName(FEAT_MATCHEDIDS);
-    featIDs.setValue(Joiner.on(",").join(allUrisAsString));
-    document.addFeature(featIDs);
-
-    SFeature featAnnos = SaltFactory.createSFeature();
-    featAnnos.setNamespace(ANNIS_NS);
-    featAnnos.setName(FEAT_MATCHEDANNOS);
-    featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
-    document.addFeature(featAnnos);
-
   }
 
   private void showHtmlDoc(String corpus, String doc, Map<String, String[]> args)
