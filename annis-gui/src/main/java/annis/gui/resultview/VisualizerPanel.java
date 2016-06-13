@@ -94,6 +94,8 @@ public class VisualizerPanel extends CssLayout
   private String corpusName;
 
   private String documentName;
+  
+  private Match match;
 
   private Component vis;
 
@@ -161,6 +163,7 @@ public class VisualizerPanel extends CssLayout
     this.visCtxChanger = parent;
 
     this.result = result;
+    this.match = match;
     if(!match.getSaltIDs().isEmpty())
     {
       List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
@@ -322,6 +325,8 @@ public class VisualizerPanel extends CssLayout
 
       SDocument wholeDocument = p.getCorpusGraphs().get(0).getDocuments()
         .get(0);
+      
+      Helper.addMatchToDocumentGraph(match, wholeDocument);
 
       input.setDocument(wholeDocument);
     }
