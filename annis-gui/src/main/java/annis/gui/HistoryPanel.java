@@ -41,7 +41,7 @@ public class HistoryPanel extends Panel
   implements ValueChangeListener, ItemClickListener
 {
 
-  private Table tblHistory = new Table();
+  private Table tblHistory;
   private QueryController controller;
   private final CitationLinkGenerator citationGenerator;
 
