@@ -15,8 +15,7 @@
  */
 package annis.gui;
 
-import annis.gui.objects.Query;
-import annis.libgui.Helper;
+import com.vaadin.annotations.DesignRoot;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -28,16 +27,21 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.declarative.Design;
+
+import annis.gui.objects.Query;
+import annis.libgui.Helper;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
+@DesignRoot
 public class HistoryPanel extends Panel
   implements ValueChangeListener, ItemClickListener
 {
 
-  private final Table tblHistory;
+  private Table tblHistory;
   private QueryController controller;
   private final CitationLinkGenerator citationGenerator;
 
@@ -46,19 +50,8 @@ public class HistoryPanel extends Panel
   {
     this.controller = controller;
     
-    VerticalLayout layout = new VerticalLayout();
-    setContent(layout);
+    Design.read("HistoryPanel.html", this);
     
-    setSizeFull();
-    layout.setSizeFull();
-
-
-    tblHistory = new Table();
-
-    layout.addComponent(tblHistory);
-    tblHistory.setSizeFull();
-    tblHistory.setSelectable(true);
-    tblHistory.setMultiSelect(false);
     tblHistory.setContainerDataSource(containerHistory);
 
     tblHistory.addGeneratedColumn("gennumber", new Table.ColumnGenerator()
@@ -73,14 +66,9 @@ public class HistoryPanel extends Panel
     });
     citationGenerator = new CitationLinkGenerator();
     tblHistory.addGeneratedColumn("genlink", citationGenerator);
+    tblHistory.setVisibleColumns("gennumber", "query", "genlink");
 
     tblHistory.addStyleName(Helper.CORPUS_FONT);
-    tblHistory.setVisibleColumns("gennumber", "query", "genlink");
-    tblHistory.setColumnHeader("gennumber", "#");
-    tblHistory.setColumnHeader("query", "Query");
-    tblHistory.setColumnHeader("genlink", "URL");
-    tblHistory.setColumnExpandRatio("query", 1.0f);
-    tblHistory.setImmediate(true);
     tblHistory.addValueChangeListener((ValueChangeListener) this);
     tblHistory.addItemClickListener((ItemClickListener) this);
 
