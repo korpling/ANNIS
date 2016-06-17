@@ -376,7 +376,10 @@ public class CorpusBrowserPanel extends Panel
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().
         getValue();
       Set<String> corpusNameSet = new HashSet<>();
-      corpusNameSet.add(corpus.getName());
+      if(corpus != null)
+      {
+        corpusNameSet.add(corpus.getName());
+      }
       if (controller != null && cbe != null)
       {
         controller.setQuery(new Query(cbe.getExample(), corpusNameSet));
