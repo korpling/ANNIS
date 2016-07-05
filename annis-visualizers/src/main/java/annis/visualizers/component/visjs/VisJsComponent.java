@@ -465,7 +465,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		}
 
 		@Override
-		public String getFontColor(SNode node) {
+		public String getHighlightingColor(SNode node) {
 			String color = null;
 					    	
     		SFeature featMatched = node.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
