@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.EventExtractor;
@@ -89,8 +90,6 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		    return value;
 		  }
 	}
-
-	
 	
 	
 	// a HashMap for storage of node annotations for export filter with associated namespaces	
@@ -112,9 +111,6 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	private final List<String> configurations = new ArrayList<String>();
 	
 	
-	
-	//private static final Logger log = LoggerFactory.getLogger(VisJsComponent.class);
-	
 	SDocument doc;
 	/**
 	 * Creates a new VisJsComponent instance.
@@ -122,8 +118,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	 * @param visInput The input for the visualizer.
 	 */	
 	public VisJsComponent(VisualizerInput visInput){
-					
-			//put user configurations to the configuration list
+		
+					//put user configurations to the configuration list
 			for(Annos_Keyword kw: Annos_Keyword.values()){
 				configurations.add(visInput.getMappings().getProperty(kw.getValue()));
 				fillFilterAnnotations(visInput, kw.ordinal());
@@ -158,11 +154,11 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	      
 			}catch(IOException e){
 				System.out.println(e.getStackTrace());
-			}     
-		
-	
+			} 
+				
 	}
 	
+		
 	// fills export filter annotations for the specified type (0 -> nodes; 1 -> pointing relations, 2 -> spanning relations, 3 -> dominance relations)
 	//private void fillFilterAnnotations(VisualizerInput visInput, int type){
 		private void fillFilterAnnotations(VisualizerInput visInput, int type){
@@ -254,10 +250,6 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	    @Override
 	    public void attach() {
 	      super.attach();
-	      //set an initial size
-	      //it will be adjusted to the size of panel by VisJs_Connector.js
-	     // setHeight("600px");
-	      //setWidth("1000px");
 	      setHeight("100%");
 	      setWidth("100%");
 	      getState().strNodes = strNodes;
@@ -353,9 +345,6 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		      } else if (type == SSpanningRelation.class){
 		    	  edges = graph.getSpanningRelations();
 		      }
-		     /* else {
-		    	  edges = graph.getRelations();
-		      }*/
 		      
 		      
 		      if (edges != null) {
