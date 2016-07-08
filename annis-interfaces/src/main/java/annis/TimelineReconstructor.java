@@ -218,6 +218,10 @@ public class TimelineReconstructor
       if(!coveredIdx.isEmpty())
       {
         SAnnotation textValueAnno = span.getAnnotation(AnnisConstants.ANNIS_NS, orderName);
+        if(textValueAnno == null)
+        {
+          textValueAnno = span.getAnnotation("default_layer_virtual", orderName);
+        }
         if(textValueAnno != null)
         {
           String textValue = textValueAnno.getValue_STEXT();

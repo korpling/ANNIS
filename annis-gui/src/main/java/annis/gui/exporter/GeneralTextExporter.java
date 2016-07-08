@@ -52,6 +52,7 @@ import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
@@ -66,7 +67,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString,
-    WebResource annisResource, Writer out, EventBus eventBus)
+    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     try
     {

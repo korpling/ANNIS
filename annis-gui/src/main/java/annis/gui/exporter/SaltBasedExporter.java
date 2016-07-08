@@ -41,16 +41,20 @@ import com.google.common.base.Stopwatch;
 import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.UrlEscapers;
+import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
+import annis.CommonHelper;
+import annis.TimelineReconstructor;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
@@ -70,10 +74,11 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString,
-    WebResource annisResource, Writer out, EventBus eventBus)
+    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     try
     {
+      
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       
       if (keys == null || keys.isEmpty())
@@ -167,8 +172,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
               res = res.queryParam("filter", filter.name());
             }
 
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.start();
+            Stopwatch stopwatch = Stopwatch.createStarted();
             SaltProject p = res.post(SaltProject.class, currentMatches);
             stopwatch.stop();
 
@@ -179,7 +183,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
               stepSize += 10;
             }
 
-            convertSaltProject(p, keys, args, offset-currentMatches.getMatches().size(), out);
+            convertSaltProject(p, keys, args, offset-currentMatches.getMatches().size(), corpusConfigs, out);
 
             currentMatches.getMatches().clear();
 
@@ -214,7 +218,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
           }
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
-          convertSaltProject(p, keys, args, offset - currentMatches.getMatches().size() - 1, out);
+          convertSaltProject(p, keys, args, offset - currentMatches.getMatches().size() - 1,
+              corpusConfigs, out);
         }
         offset = 0;
         
@@ -244,17 +249,48 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
    * @param out 
    */
   private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, int offset,
-    Writer out) throws IOException
+      Map<String, CorpusConfig> corpusConfigs, Writer out) throws IOException
   {
     int matchNumber = offset;
     if(p != null && p.getCorpusGraphs() != null)
     {
+      
+      Map<String, String> spanAnno2order = null;
+      
+      Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
+      if(!corpusNames.isEmpty())
+      {
+        CorpusConfig config = corpusConfigs.get(corpusNames.iterator().next());
+        if(config != null)
+        {
+          String mappingRaw = config.getConfig("virtual_tokenization_mapping");
+          if(mappingRaw != null)
+          {
+            spanAnno2order = new HashMap<>();
+            for(String singleMapping : Splitter.on(',').split(mappingRaw))
+            {
+              List<String> mappingParts = Splitter.on('=').splitToList(singleMapping);
+              if(mappingParts.size() >= 2)
+              {
+                spanAnno2order.put(mappingParts.get(0), mappingParts.get(1));
+              }
+            }
+          }
+        }
+      }
+      
       for(SCorpusGraph corpusGraph : p.getCorpusGraphs())
       {
         if(corpusGraph.getDocuments() != null)
         {
           for(SDocument doc : corpusGraph.getDocuments())
           {
+            if(spanAnno2order != null)
+            {
+              // there is a definition how to map the virtual tokenization to a real one
+              TimelineReconstructor.removeVirtualTokenization(doc.getDocumentGraph(), spanAnno2order);
+            }
+            
             convertText(doc.getDocumentGraph(), annoKeys, args, matchNumber, out);
           }
         }

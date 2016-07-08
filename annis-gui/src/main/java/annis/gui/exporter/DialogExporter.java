@@ -33,7 +33,7 @@ import annis.service.objects.SubgraphFilter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- * An exporter that will take all token and segmentation nodes and exports
+ * An exporter that will take all token nodes and exports
  * them in a kind of grid.
  * This is useful for getting references of texts where the normal token based
  * text exporter doesn't work since there are multiple speakers or normalizations.
@@ -70,8 +70,6 @@ public class DialogExporter extends SaltBasedExporter
         columnToWidth.put(i, coveredText.length());
         i++;
       }
-      
-      // TODO: add the segmentation nodes to the output
       
       // actually output the grid
       for(Map.Entry<String, Map<Integer, String>> entry : grid.rowMap().entrySet())

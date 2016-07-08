@@ -20,12 +20,16 @@ import annis.gui.ExportPanel;
 import annis.gui.objects.ExportQuery;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
+import annis.service.objects.CorpusConfig;
+import annis.service.objects.CorpusConfigMap;
 
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -61,13 +65,20 @@ public class ExportBackgroundJob implements Callable<File>
   {
     final File currentTmpFile = File.createTempFile("annis-export", ".txt");
     currentTmpFile.deleteOnExit();
+    
+    final Map<String, CorpusConfig> corpusConfigs = new LinkedHashMap<>();
+    for(String c : query.getCorpora())
+    {
+      corpusConfigs.put(c, ui.getCorpusConfigWithCache(c));
+    }
+    
     try (final OutputStreamWriter outWriter = new OutputStreamWriter(new FileOutputStream(currentTmpFile),
       "UTF-8"))
     {
       exportError = exporter.convertText(query.getQuery(), query.getLeftContext(),
         query.getRightContext(), query.getCorpora(), query.getAnnotationKeys(),
         query.getParameters(), Helper.getAnnisWebResource().path("query"),
-        outWriter, eventBus);
+        outWriter, eventBus, corpusConfigs);
     }
     finally
     {

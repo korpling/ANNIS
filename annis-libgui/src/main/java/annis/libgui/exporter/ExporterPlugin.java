@@ -18,10 +18,12 @@ package annis.libgui.exporter;
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.WebResource;
 
+import annis.service.objects.CorpusConfig;
 import net.xeoh.plugins.base.Plugin;
 
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,7 +34,8 @@ public interface ExporterPlugin extends Plugin
 {
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight, 
    Set<String> corpora, List<String> keys, String args, 
-   WebResource annisResource, Writer out, EventBus eventBus);
+   WebResource annisResource, Writer out, EventBus eventBus,
+   Map<String, CorpusConfig> corpusConfigs);
   
   public boolean isCancelable();
   

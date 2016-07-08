@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -32,6 +33,7 @@ import com.sun.jersey.api.client.WebResource;
 
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
+import annis.service.objects.CorpusConfig;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
@@ -41,7 +43,7 @@ public class WekaExporter implements ExporterPlugin, Serializable
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString,
-    WebResource annisResource, Writer out, EventBus eventBus)
+    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     //this is a full result export
     
