@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -49,7 +51,12 @@ public class TimelineReconstructorTest
   {
     SDocumentGraph docGraph = SaltUtil.loadDocumentGraph(URI.createURI(getClass().getResource("SampleDialog.salt").toString()));
     
-    TimelineReconstructor.removeVirtualTokenization(docGraph);
+    Map<String, String> anno2order = new HashMap<>();
+    anno2order.put("default_ns::instructee_utt", "instructee_dipl");
+    
+    anno2order.put("default_ns::instructor_utt", "instructor_dipl");
+    
+    TimelineReconstructor.removeVirtualTokenization(docGraph, anno2order);
 
     // instructor_dipl, instructor_norm, instructee_dipl, instructee_norm, instructee_extra, break
     List<STextualDS> texts = docGraph.getTextualDSs();

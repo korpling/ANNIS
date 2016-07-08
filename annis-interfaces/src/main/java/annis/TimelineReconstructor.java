@@ -51,9 +51,18 @@ public class TimelineReconstructor
   
   private final Set<SNode> nodesToDelete = new HashSet<>();
   
-  private TimelineReconstructor(SDocumentGraph graph)
+  private final Multimap<String, String> order2spanAnnos = HashMultimap.create();
+  
+  private TimelineReconstructor(SDocumentGraph graph, Map<String, String> spanAnno2order)
   {
     this.graph = graph;
+    if(spanAnno2order != null)
+    {
+      for(Map.Entry<String, String> e : spanAnno2order.entrySet())
+      {
+        order2spanAnnos.put(e.getValue(), e.getKey());
+      }
+    }
   }
   
   private void addTimeline()
@@ -76,6 +85,7 @@ public class TimelineReconstructor
           }
         }
       }
+      nodesToDelete.add(virtualTok);
     }
   }
   
@@ -189,6 +199,7 @@ public class TimelineReconstructor
   
   private void convertSpanToToken(SStructuredNode span, String orderName)
   {
+    final Set<String> validSpanAnnos = new HashSet<>(order2spanAnnos.get(orderName));
     if(!nodesToDelete.contains(span))
     {
       nodesToDelete.add(span);
@@ -224,17 +235,31 @@ public class TimelineReconstructor
           
           graph.addRelation(timeRel);
          
-          moveRelations(span, newToken);
+          moveRelations(span, newToken, validSpanAnnos);
         }
       }
     }
     
   }
   
-  private void moveRelations(SStructuredNode oldNode, SToken newToken)
+  private void moveRelations(SStructuredNode oldSpan, SToken newToken, Set<String> validSpanAnnos)
   {
-    List<SRelation> inRels = new LinkedList<>(oldNode.getInRelations());
-    List<SRelation> outRels = new LinkedList<>(oldNode.getOutRelations());
+    final List<SRelation> inRels = new LinkedList<>(oldSpan.getInRelations());
+    final List<SRelation> outRels = new LinkedList<>(oldSpan.getOutRelations());
+    
+    final List<SToken> coveredByOldSpan = new LinkedList<>();
+    
+    for(SRelation rel : outRels)
+    {
+      if(rel instanceof SPointingRelation || rel instanceof SDominanceRelation)
+      {
+        rel.setSource(newToken);
+      }
+      else if(rel instanceof SSpanningRelation)
+      {
+        coveredByOldSpan.add(((SSpanningRelation) rel).getTarget());
+      }
+    }
     
     for(SRelation rel : inRels)
     {
@@ -243,14 +268,32 @@ public class TimelineReconstructor
         rel.setTarget(newToken);
       }
     }
-    for(SRelation rel : outRels)
+    
+    // find the connected spans and connect them with the new token instead
+    for(SToken tok : coveredByOldSpan)
     {
-      if(rel instanceof SPointingRelation || rel instanceof SDominanceRelation)
+      if(tok.getInRelations() != null)
       {
-        rel.setSource(newToken);
+        for(SRelation<?, ?> rel : tok.getInRelations())
+        {
+          if(rel instanceof SSpanningRelation)
+          {
+            SSpan spanToMap = ((SSpanningRelation) rel).getSource();
+            for(String validAnno : validSpanAnnos)
+            {
+              if(spanToMap.getAnnotation(validAnno) != null)
+              {
+                graph.createRelation(spanToMap, newToken, SALT_TYPE.SSPANNING_RELATION, null);
+                break;
+              }
+            }
+          }
+        }
       }
     }
+    
   }
+  
   
   private void cleanup()
   {
@@ -270,7 +313,7 @@ public class TimelineReconstructor
    * @param orig
    * @return
    */
-  public static void removeVirtualTokenization(SDocumentGraph graph)
+  public static void removeVirtualTokenization(SDocumentGraph graph, Map<String, String> spanAnno2order)
   {
     if(graph.getTimeline() != null)
     {
@@ -278,7 +321,7 @@ public class TimelineReconstructor
       return;
     }
     
-    TimelineReconstructor reconstructor = new TimelineReconstructor(graph);
+    TimelineReconstructor reconstructor = new TimelineReconstructor(graph, spanAnno2order);
     reconstructor.addTimeline();
     reconstructor.createTokenFromSOrder();
     
