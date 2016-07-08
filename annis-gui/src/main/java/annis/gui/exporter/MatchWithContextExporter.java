@@ -15,20 +15,30 @@
  */
 package annis.gui.exporter;
 
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
+
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 
+import annis.service.objects.Match;
 import annis.service.objects.SubgraphFilter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
@@ -41,7 +51,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
-public class DialogExporter extends SaltBasedExporter
+public class MatchWithContextExporter extends SaltBasedExporter
 {
 
   
@@ -52,58 +62,31 @@ public class DialogExporter extends SaltBasedExporter
   {
     if(graph != null)
     {
-      List<SToken> token = graph.getSortedTokenByText();
-      // a map which is used to determine how much space each column will need
-      Map<Integer, Integer> columnToWidth = new HashMap<>();
-      
-      int maxCaptionWidth = 0;
-      
-      // row: annotation name, column: token index, value: the textual output
-      Table<String, Integer, String> grid = TreeBasedTable.create();
-      // add the token with the special empty name as row caption
-      int i=0;
-      for(SToken t : token)
-      {
-        String coveredText = graph.getText(t);
-        grid.put("", i, coveredText);
-        // a token will need at least its own number of characters as width
-        columnToWidth.put(i, coveredText.length());
-        i++;
+      // get matched nodes
+      SFeature featMatchedIDs = graph.getFeature(ANNIS_NS, FEAT_MATCHEDIDS);
+      Match match = new Match();
+      if (featMatchedIDs != null && featMatchedIDs.getValue_STEXT() != null)
+      {    
+         match = Match.parseFromString(featMatchedIDs.getValue_STEXT(), ',');
       }
-      
-      // actually output the grid
-      for(Map.Entry<String, Map<Integer, String>> entry : grid.rowMap().entrySet())
+      List<SNode> matchedNodes = new LinkedList<>();
+      for(URI uri : match.getSaltIDs())
       {
-        String caption = entry.getKey();
-        Map<Integer, String> row = entry.getValue();
-        
-        // add the caption
-        out.append(Strings.padEnd(caption, maxCaptionWidth, ' '));
-        // we separate the entries with tab
-        if(maxCaptionWidth > 0)
+        SNode n = graph.getNode(uri.toASCIIString());
+        if(n != null)
         {
-          out.append("\t");
-        }
-        
-        // we know the row is ordered by the index and that each position is filled
-        Iterator<Map.Entry<Integer, String>> itRowEntry = row.entrySet().iterator();
-        while(itRowEntry.hasNext())
-        {
-          Map.Entry<Integer, String> rowEntry = itRowEntry.next();
-          
-          int index = rowEntry.getKey();
-          int width = columnToWidth.get(index);
-          out.append(Strings.padEnd(rowEntry.getValue(), width, ' '));
-          
-          if(itRowEntry.hasNext())
-          {
-            out.append("\t");
-          }
+          matchedNodes.add(n);
         }
       }
-
+      
+      List<String> line = new LinkedList<>();
+      for(SNode n : matchedNodes)
+      {
+        // TODO: get context left and right of node
+        line.add(graph.getText(n));
+      }
+      out.append(Joiner.on('\t').join(line));
     }
-    
     out.append("\n");
   }
 

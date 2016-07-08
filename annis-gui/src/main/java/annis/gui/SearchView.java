@@ -19,7 +19,7 @@ import annis.VersionInfo;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.exporter.CSVExporter;
-import annis.gui.exporter.DialogExporter;
+import annis.gui.exporter.MatchWithContextExporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TokenExporter;
