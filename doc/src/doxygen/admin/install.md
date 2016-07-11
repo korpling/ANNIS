@@ -40,8 +40,7 @@ export PATH=$PATH:$ANNIS_HOME/bin
 6. Next **initialize** your ANNIS database (only the first time you use the system).
 When the ANNIS service is normally installed, it assumes it can get PostgreSQL super user rights for this step. Thus you need the superuser password.
 \code{.sh}
-annis-admin.sh init -u <username> -d <dbname> --schema <schema> -p <new user password>
--P <postgres superuser password>
+annis-admin.sh init -u <username> -d <dbname> --schema <schema> -p <new user password> -P <postgres superuser password>
 \endcode
 This call will 
 <ul><li>create a new database with the name given by the "-d" parameter</li>
