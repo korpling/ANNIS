@@ -330,6 +330,11 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
     return true;
   }
   
+  @Override
+  public String getFileEnding()
+  {
+    return "txt";
+  }
   
   
   public abstract SubgraphFilter getSubgraphFilter();

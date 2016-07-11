@@ -306,6 +306,12 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
     return true;
   }
   
+  @Override
+  public String getFileEnding()
+  {
+    return "txt";
+  }
+  
   
   public abstract SubgraphFilter getSubgraphFilter();
 

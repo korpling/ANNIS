@@ -93,5 +93,10 @@ public class CSVExporter implements ExporterPlugin, Serializable
         + "<code>metakeys=title,documentname</code>)";
   }
   
+  @Override
+  public String getFileEnding()
+  {
+    return "csv";
+  }
   
 }

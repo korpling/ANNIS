@@ -41,4 +41,6 @@ public interface ExporterPlugin extends Plugin
   
   public String getHelpMessage();
   
+  public String getFileEnding();
+  
 }

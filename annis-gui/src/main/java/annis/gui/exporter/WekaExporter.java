@@ -95,5 +95,10 @@ public class WekaExporter implements ExporterPlugin, Serializable
         + "<code>metakeys=title,documentname</code>)";
   }
   
+  @Override
+  public String getFileEnding()
+  {
+    return "csv";
+  }
   
 }

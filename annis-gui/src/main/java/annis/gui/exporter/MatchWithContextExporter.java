@@ -167,5 +167,10 @@ public class MatchWithContextExporter extends SaltBasedExporter
     return null;
   }
   
+  @Override
+  public String getFileEnding()
+  {
+    return "csv";
+  }
   
 }
