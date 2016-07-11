@@ -66,18 +66,18 @@ public class MatchWithContextExporter extends SaltBasedExporter
     public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
         SRelation<SNode, SNode> relation, SNode fromNode, long order)
     {
-      
+      SFeature matchedAnno = currNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
+      if(matchedAnno != null)
+      {
+        this.result = true;
+      }
     }
 
     @Override
     public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
         SRelation<SNode, SNode> relation, SNode fromNode, long order)
     {
-      SFeature matchedAnno = currNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
-      if(matchedAnno != null)
-      {
-        this.result = true;
-      }
+     
     }
 
     @Override
