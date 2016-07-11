@@ -254,6 +254,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
     {
       
       Map<String, String> spanAnno2order = null;
+      boolean virtualTokenizationFromNamespace = false;
       
       Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
       if(!corpusNames.isEmpty())
@@ -261,19 +262,27 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
         CorpusConfig config = corpusConfigs.get(corpusNames.iterator().next());
         if(config != null)
         {
-          String mappingRaw = config.getConfig("virtual_tokenization_mapping");
-          if(mappingRaw != null)
+          if("true".equalsIgnoreCase(config.getConfig("virtual_tokenization_from_namespace")))
           {
-            spanAnno2order = new HashMap<>();
-            for(String singleMapping : Splitter.on(',').split(mappingRaw))
+            virtualTokenizationFromNamespace = true;
+          }
+          else
+          {
+            String mappingRaw = config.getConfig("virtual_tokenization_mapping");
+            if(mappingRaw != null)
             {
-              List<String> mappingParts = Splitter.on('=').splitToList(singleMapping);
-              if(mappingParts.size() >= 2)
+              spanAnno2order = new HashMap<>();
+              for(String singleMapping : Splitter.on(',').split(mappingRaw))
               {
-                spanAnno2order.put(mappingParts.get(0), mappingParts.get(1));
+                List<String> mappingParts = Splitter.on('=').splitToList(singleMapping);
+                if(mappingParts.size() >= 2)
+                {
+                  spanAnno2order.put(mappingParts.get(0), mappingParts.get(1));
+                }
               }
             }
           }
+         
         }
       }
       
@@ -283,7 +292,11 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
         {
           for(SDocument doc : corpusGraph.getDocuments())
           {
-            if(spanAnno2order != null)
+            if(virtualTokenizationFromNamespace)
+            {
+              TimelineReconstructor.removeVirtualTokenizationUsingNamespace(doc.getDocumentGraph());
+            }
+            else if(spanAnno2order != null)
             {
               // there is a definition how to map the virtual tokenization to a real one
               TimelineReconstructor.removeVirtualTokenization(doc.getDocumentGraph(), spanAnno2order);

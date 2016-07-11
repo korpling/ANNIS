@@ -47,14 +47,22 @@ public class TimelineReconstructor
   
   private final Map<String, STextualDS> textsByName = new HashMap<>();
   private final Map<String, StringBuilder> textDataByName = new HashMap<>();
+  private final boolean virtualTokenizationFromNamespace;
   private final Multimap<SStructuredNode, Integer> spans2TimelinePos = HashMultimap.create();
   
   private final Set<SNode> nodesToDelete = new HashSet<>();
   
   private final Multimap<String, String> order2spanAnnos = HashMultimap.create();
   
+  private TimelineReconstructor(SDocumentGraph graph, boolean virtualTokenizationFromNamespace)
+  {
+    this.virtualTokenizationFromNamespace = virtualTokenizationFromNamespace;
+    this.graph = graph;
+  }
+  
   private TimelineReconstructor(SDocumentGraph graph, Map<String, String> spanAnno2order)
   {
+    this.virtualTokenizationFromNamespace = false;
     this.graph = graph;
     if(spanAnno2order != null)
     {
@@ -217,11 +225,7 @@ public class TimelineReconstructor
       TreeSet<Integer> coveredIdx = new TreeSet<>(spans2TimelinePos.get(span));
       if(!coveredIdx.isEmpty())
       {
-        SAnnotation textValueAnno = span.getAnnotation(AnnisConstants.ANNIS_NS, orderName);
-        if(textValueAnno == null)
-        {
-          textValueAnno = span.getAnnotation("default_layer_virtual", orderName);
-        }
+        SAnnotation textValueAnno = getTextValueAnno(orderName, span);
         if(textValueAnno != null)
         {
           String textValue = textValueAnno.getValue_STEXT();
@@ -239,14 +243,34 @@ public class TimelineReconstructor
           
           graph.addRelation(timeRel);
          
-          moveRelations(span, newToken, validSpanAnnos);
+          moveRelations(span, newToken, validSpanAnnos, orderName);
         }
       }
     }
     
   }
   
-  private void moveRelations(SStructuredNode oldSpan, SToken newToken, Set<String> validSpanAnnos)
+  private SAnnotation getTextValueAnno(String orderName, SNode node)
+  {
+    SAnnotation result = null;
+    
+    Set<SAnnotation> annos = node.getAnnotations();
+    if(annos != null)
+    {
+      for(SAnnotation a : annos)
+      {
+        if(a.getName().equals(orderName))
+        {
+          result = a;
+          break;
+        }
+      }
+    }
+    
+    return result;
+  }
+  
+  private void moveRelations(SStructuredNode oldSpan, SToken newToken, Set<String> validSpanAnnos, String orderName)
   {
     final List<SRelation> inRels = new LinkedList<>(oldSpan.getInRelations());
     final List<SRelation> outRels = new LinkedList<>(oldSpan.getOutRelations());
@@ -282,15 +306,36 @@ public class TimelineReconstructor
         {
           if(rel instanceof SSpanningRelation)
           {
+            boolean valid = false;
             SSpan spanToMap = ((SSpanningRelation) rel).getSource();
-            for(String validAnno : validSpanAnnos)
+            if(virtualTokenizationFromNamespace)
             {
-              if(spanToMap.getAnnotation(validAnno) != null)
+              for(SAnnotation anno : spanToMap.getAnnotations())
               {
-                graph.createRelation(spanToMap, newToken, SALT_TYPE.SSPANNING_RELATION, null);
-                break;
+                if(anno.getNamespace() != null && anno.getNamespace().equals(orderName))
+                {
+                  valid = true;
+                  break;
+                }
               }
             }
+            else
+            {
+              for(String validAnno : validSpanAnnos)
+              {
+                if(spanToMap.getAnnotation(validAnno) != null )
+                {
+                  
+                  break;
+                }
+              }
+            }
+            
+            if(valid)
+            {
+              graph.createRelation(spanToMap, newToken, SALT_TYPE.SSPANNING_RELATION, null);
+            }
+            
           }
         }
       }
@@ -326,6 +371,30 @@ public class TimelineReconstructor
     }
     
     TimelineReconstructor reconstructor = new TimelineReconstructor(graph, spanAnno2order);
+    reconstructor.addTimeline();
+    reconstructor.createTokenFromSOrder();
+    
+    reconstructor.cleanup();
+    
+  }
+  
+  /**
+   * Removes the virtual tokenization from a {@link SDocumentGraph} and replaces it with an
+   * {@link STimeline} and multiple {@link STextualDS}.
+   * 
+   * This alters the original graph.
+   * @param orig
+   * @return
+   */
+  public static void removeVirtualTokenizationUsingNamespace(SDocumentGraph graph)
+  {
+    if(graph.getTimeline() != null)
+    {
+      // do nothing if the graph does not contain any virtual tokenization
+      return;
+    }
+    
+    TimelineReconstructor reconstructor = new TimelineReconstructor(graph, true);
     reconstructor.addTimeline();
     reconstructor.createTokenFromSOrder();
     
