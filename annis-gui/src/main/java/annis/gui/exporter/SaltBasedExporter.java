@@ -226,8 +226,6 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       }
       
       out.append("\n");
-      out.append("\n");
-      out.append("finished");
       
       return null;
 
