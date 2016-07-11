@@ -235,6 +235,17 @@ public class TimelineReconstructor
           int endTextIdx = textData.length();
           SToken newToken = graph.createToken(textDS, startTextIdx, endTextIdx);
           
+          // move all features to the new token
+          if(span.getFeatures() != null)
+          {
+            for(SFeature feat : span.getFeatures())
+            {
+              if(!"salt".equals(feat.getNamespace()))
+              {
+                newToken.addFeature(feat);
+              }
+            }
+          }
           STimelineRelation timeRel = SaltFactory.createSTimelineRelation();
           timeRel.setSource(newToken);
           timeRel.setTarget(graph.getTimeline());
