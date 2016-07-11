@@ -25,7 +25,7 @@ var searchData=
   ['visualizerinput',['VisualizerInput',['../classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html',1,'annis::libgui::visualizers']]],
   ['visualizerisvisible',['visualizerIsVisible',['../classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html#a4529393b851aa469197f845786b01c23',1,'annis.gui.resultview.VisualizerPanel.visualizerIsVisible()'],['../interfaceannis_1_1libgui_1_1_visualization_toggle.html#a5ca520a68d2af6084ed5dcc6fe6c05fc',1,'annis.libgui.VisualizationToggle.visualizerIsVisible()']]],
   ['visualizerpanel',['VisualizerPanel',['../classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html',1,'annis::gui::resultview']]],
-  ['visualizerpanel',['VisualizerPanel',['../classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html#aa607d7b2a7d36fddee8d05db6483aa86',1,'annis::gui::resultview::VisualizerPanel']]],
+  ['visualizerpanel',['VisualizerPanel',['../classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html#a74bc8d8e08dbdffa5d6f9cfbe71cc843',1,'annis::gui::resultview::VisualizerPanel']]],
   ['visualizerplugin',['VisualizerPlugin',['../interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin.html',1,'annis::libgui::visualizers']]],
   ['visualizerplugin_3c_20i_20_3e',['VisualizerPlugin&lt; I &gt;',['../interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin.html',1,'annis::libgui::visualizers']]],
   ['vjitwrapper',['VJITWrapper',['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_v_j_i_t_wrapper.html',1,'annis::gui::widgets::gwt::client::ui']]],

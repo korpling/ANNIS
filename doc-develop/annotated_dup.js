@@ -1,4 +1,4 @@
-var annotated =
+var annotated_dup =
 [
     [ "annis", null, [
       [ "adapter", null, [
@@ -120,7 +120,6 @@ var annotated =
           [ "ControlPanel", "classannis_1_1gui_1_1controlpanel_1_1_control_panel.html", "classannis_1_1gui_1_1controlpanel_1_1_control_panel" ],
           [ "CorpusListPanel", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel" ],
           [ "CorpusSorter", "classannis_1_1gui_1_1controlpanel_1_1_corpus_sorter.html", "classannis_1_1gui_1_1controlpanel_1_1_corpus_sorter" ],
-          [ "ExportOptionsPanel", "classannis_1_1gui_1_1controlpanel_1_1_export_options_panel.html", "classannis_1_1gui_1_1controlpanel_1_1_export_options_panel" ],
           [ "QueryPanel", "classannis_1_1gui_1_1controlpanel_1_1_query_panel.html", "classannis_1_1gui_1_1controlpanel_1_1_query_panel" ],
           [ "SearchOptionsPanel", "classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html", "classannis_1_1gui_1_1controlpanel_1_1_search_options_panel" ]
         ] ],
@@ -261,6 +260,7 @@ var annotated =
         [ "CriticalServiceQueryException", "classannis_1_1gui_1_1_critical_service_query_exception.html", "classannis_1_1gui_1_1_critical_service_query_exception" ],
         [ "EmbeddedVisUI", "classannis_1_1gui_1_1_embedded_vis_u_i.html", "classannis_1_1gui_1_1_embedded_vis_u_i" ],
         [ "ExampleQueriesPanel", "classannis_1_1gui_1_1_example_queries_panel.html", "classannis_1_1gui_1_1_example_queries_panel" ],
+        [ "ExampleTable", "classannis_1_1gui_1_1_example_table.html", "classannis_1_1gui_1_1_example_table" ],
         [ "ExportPanel", "classannis_1_1gui_1_1_export_panel.html", "classannis_1_1gui_1_1_export_panel" ],
         [ "FontConfig", "classannis_1_1gui_1_1_font_config.html", "classannis_1_1gui_1_1_font_config" ],
         [ "HelpPanel", "classannis_1_1gui_1_1_help_panel.html", "classannis_1_1gui_1_1_help_panel" ],
@@ -598,7 +598,9 @@ var annotated =
           [ "TokenMatcher", "classannis_1_1visualizers_1_1htmlvis_1_1_token_matcher.html", "classannis_1_1visualizers_1_1htmlvis_1_1_token_matcher" ],
           [ "VisParser", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser.html", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser" ],
           [ "VisParserException", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser_exception.html", "classannis_1_1visualizers_1_1htmlvis_1_1_vis_parser_exception" ],
-          [ "VisualizationDefinition", "classannis_1_1visualizers_1_1htmlvis_1_1_visualization_definition.html", "classannis_1_1visualizers_1_1htmlvis_1_1_visualization_definition" ]
+          [ "VisualizationDefinition", "classannis_1_1visualizers_1_1htmlvis_1_1_visualization_definition.html", "classannis_1_1visualizers_1_1htmlvis_1_1_visualization_definition" ],
+          [ "WebFont", "classannis_1_1visualizers_1_1htmlvis_1_1_web_font.html", "classannis_1_1visualizers_1_1htmlvis_1_1_web_font" ],
+          [ "WebFontList", "classannis_1_1visualizers_1_1htmlvis_1_1_web_font_list.html", "classannis_1_1visualizers_1_1htmlvis_1_1_web_font_list" ]
         ] ],
         [ "iframe", null, [
           [ "dependency", null, [

@@ -78,7 +78,7 @@ var classannis_1_1dao_1_1_query_dao_impl =
     [ "setFindSqlGenerator", "classannis_1_1dao_1_1_query_dao_impl.html#a54f3578ea21a721980580dd907b102a5", null ],
     [ "setFrequencySqlGenerator", "classannis_1_1dao_1_1_query_dao_impl.html#a660bd36a104d589791e66d6b1c07177f", null ],
     [ "setGraphExtractor", "classannis_1_1dao_1_1_query_dao_impl.html#a6b48a536af641e6d6cdc92838f37f19f", null ],
-    [ "setGraphSqlGenerator", "classannis_1_1dao_1_1_query_dao_impl.html#a390e2456561dec69722b16b867a941a8", null ],
+    [ "setGraphSqlGenerator", "classannis_1_1dao_1_1_query_dao_impl.html#a0bb56f2ef86e384aae338a7cf7417f31", null ],
     [ "setListAnnotationsSqlHelper", "classannis_1_1dao_1_1_query_dao_impl.html#a1707f0cf011bc887c663da6aaf7f40cc", null ],
     [ "setListCorpusAnnotationsSqlHelper", "classannis_1_1dao_1_1_query_dao_impl.html#a38fc72f637408d03c5a68c3fd171883b", null ],
     [ "setListCorpusByNameDaoHelper", "classannis_1_1dao_1_1_query_dao_impl.html#a0208d620c95137c0a070e07a59181582", null ],

@@ -107,7 +107,6 @@ var hierarchy =
     [ "annis.ql.parser.DNFTransformer", "classannis_1_1ql_1_1parser_1_1_d_n_f_transformer.html", null ],
     [ "annis.model.Edge.EdgeType", "enumannis_1_1model_1_1_edge_1_1_edge_type.html", null ],
     [ "annis.visualizers.component.grid.GridComponent.ElementType", "classannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component.html#enumannis_1_1visualizers_1_1component_1_1grid_1_1_grid_component_1_1_element_type", null ],
-    [ "annis.visualizers.iframe.partitur.PartiturVisualizer.ElementType", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_partitur_visualizer.html#enumannis_1_1visualizers_1_1iframe_1_1partitur_1_1_partitur_visualizer_1_1_element_type", null ],
     [ "annis.resolver.ResolverEntry.ElementType", "classannis_1_1resolver_1_1_resolver_entry.html#enumannis_1_1resolver_1_1_resolver_entry_1_1_element_type", null ],
     [ "annis.visualizers.component.grid.EventExtractor", "classannis_1_1visualizers_1_1component_1_1grid_1_1_event_extractor.html", null ],
     [ "annis.administration.AdministrationDao.EXAMPLE_QUERIES_CONFIG", "classannis_1_1administration_1_1_administration_dao.html#enumannis_1_1administration_1_1_administration_dao_1_1_e_x_a_m_p_l_e___q_u_e_r_i_e_s___c_o_n_f_i_g", null ],
@@ -305,7 +304,7 @@ var hierarchy =
       [ "annis.ql.parser.SemanticValidator", "classannis_1_1ql_1_1parser_1_1_semantic_validator.html", null ],
       [ "annis.ql.parser.TransitivePrecedenceOptimizer", "classannis_1_1ql_1_1parser_1_1_transitive_precedence_optimizer.html", null ]
     ] ],
-    [ "annis.gui.objects.QueryGenerator< T extends Query, >", "classannis_1_1gui_1_1objects_1_1_query_generator.html", null ],
+    [ "annis.gui.objects.QueryGenerator< T extends Query, QG extends QueryGenerator< T, QG >", "classannis_1_1gui_1_1objects_1_1_query_generator.html", null ],
     [ "annis.gui.objects.QueryGenerator< FrequencyQuery, FrequencyQueryGenerator >", "classannis_1_1gui_1_1objects_1_1_query_generator.html", null ],
     [ "annis.gui.objects.QueryGenerator< T, QG >", "classannis_1_1gui_1_1objects_1_1_query_generator.html", null ],
     [ "annis.service.QueryService", "interfaceannis_1_1service_1_1_query_service.html", [
@@ -490,6 +489,8 @@ var hierarchy =
     [ "annis.libgui.visualizers.VisualizerPlugin< I >", "interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin.html", [
       [ "annis.libgui.visualizers.AbstractVisualizer< I extends Component >", "classannis_1_1libgui_1_1visualizers_1_1_abstract_visualizer.html", null ]
     ] ],
+    [ "annis.visualizers.htmlvis.WebFont", "classannis_1_1visualizers_1_1htmlvis_1_1_web_font.html", null ],
+    [ "annis.visualizers.htmlvis.WebFontList", "classannis_1_1visualizers_1_1htmlvis_1_1_web_font_list.html", null ],
     [ "annis.WekaHelper", "classannis_1_1_weka_helper.html", null ],
     [ "annis.sqlgen.WhereClauseSqlGenerator< T >", "interfaceannis_1_1sqlgen_1_1_where_clause_sql_generator.html", null ],
     [ "annis.sqlgen.WhereClauseSqlGenerator< QueryData >", "interfaceannis_1_1sqlgen_1_1_where_clause_sql_generator.html", [
@@ -641,7 +642,6 @@ var hierarchy =
       [ "annis.gui.util.ANNISFontIcon", "enumannis_1_1gui_1_1util_1_1_a_n_n_i_s_font_icon.html", null ]
     ] ],
     [ "FormLayout", null, [
-      [ "annis.gui.controlpanel.ExportOptionsPanel", "classannis_1_1gui_1_1controlpanel_1_1_export_options_panel.html", null ],
       [ "annis.gui.controlpanel.SearchOptionsPanel", "classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html", null ]
     ] ],
     [ "GraphTraverseHandler", null, [
@@ -985,7 +985,8 @@ var hierarchy =
       [ "annis.service.ifaces.AnnisResultSet", "interfaceannis_1_1service_1_1ifaces_1_1_annis_result_set.html", null ]
     ] ],
     [ "Table", null, [
-      [ "annis.gui.docbrowser.DocBrowserTable", "classannis_1_1gui_1_1docbrowser_1_1_doc_browser_table.html", null ]
+      [ "annis.gui.docbrowser.DocBrowserTable", "classannis_1_1gui_1_1docbrowser_1_1_doc_browser_table.html", null ],
+      [ "annis.gui.ExampleTable", "classannis_1_1gui_1_1_example_table.html", null ]
     ] ],
     [ "TextChangeListener", null, [
       [ "annis.gui.flatquerybuilder.ValueField", "classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html", null ]

@@ -1,5 +1,8 @@
 var NAVTREEINDEX7 =
 {
+"classannis_1_1model_1_1_annis_node.html#a192eed946af2d7a6c3742da44104a369":[4,0,0,8,1,39],
+"classannis_1_1model_1_1_annis_node.html#a1a498e8d747f2235e8cd6932ffff82df":[4,0,0,8,1,26],
+"classannis_1_1model_1_1_annis_node.html#a1b0d551c3f7b0c9c5786caaea414cf10":[4,0,0,8,1,49],
 "classannis_1_1model_1_1_annis_node.html#a1ba9a3e27635c2d163ffef4f2ec28a51":[4,0,0,8,1,22],
 "classannis_1_1model_1_1_annis_node.html#a1eb7eecb379093cf6704a2d2e5bbf707":[4,0,0,8,1,3],
 "classannis_1_1model_1_1_annis_node.html#a1f29e8af2fabbc0db4b31179cc290d96":[4,0,0,8,1,16],
@@ -246,8 +249,5 @@ var NAVTREEINDEX7 =
 "classannis_1_1model_1_1_relannis_node_feature.html#af921a73f09db6740cefb3438500fd8f8":[4,0,0,8,12,19],
 "classannis_1_1model_1_1_relannis_node_feature.html#aff78be022690be41041f9f79eff2d585":[4,0,0,8,12,3],
 "classannis_1_1provider_1_1_annis_corpus_access_mapper.html":[4,0,0,9,0],
-"classannis_1_1provider_1_1_annis_corpus_access_mapper.html#a93d46459d9bbbc1c150205f10344b457":[4,0,0,9,0,0],
-"classannis_1_1provider_1_1_annis_q_l_semantics_mapper.html":[4,0,0,9,1],
-"classannis_1_1provider_1_1_annis_q_l_semantics_mapper.html#abf2cfb20afe312b334c3149fa15625fa":[4,0,0,9,1,0],
-"classannis_1_1provider_1_1_annis_q_l_syntax_mapper.html":[4,0,0,9,2]
+"classannis_1_1provider_1_1_annis_corpus_access_mapper.html#a93d46459d9bbbc1c150205f10344b457":[4,0,0,9,0,0]
 };

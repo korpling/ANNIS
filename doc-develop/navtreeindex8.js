@@ -1,5 +1,8 @@
 var NAVTREEINDEX8 =
 {
+"classannis_1_1provider_1_1_annis_q_l_semantics_mapper.html":[4,0,0,9,1],
+"classannis_1_1provider_1_1_annis_q_l_semantics_mapper.html#abf2cfb20afe312b334c3149fa15625fa":[4,0,0,9,1,0],
+"classannis_1_1provider_1_1_annis_q_l_syntax_mapper.html":[4,0,0,9,2],
 "classannis_1_1provider_1_1_annis_q_l_syntax_mapper.html#a6227a4f6fb630e0635558ff05ff8554f":[4,0,0,9,2,0],
 "classannis_1_1provider_1_1_graph_m_l_provider.html":[4,0,0,9,3],
 "classannis_1_1provider_1_1_graph_m_l_provider.html#a46165582cc4492d2df5c4dd4dc50a5aa":[4,0,0,9,3,2],
@@ -246,8 +249,5 @@ var NAVTREEINDEX8 =
 "classannis_1_1security_1_1_group.html#aff9038de99e659f8419f09ce84fd7014":[4,0,0,13,5,7],
 "classannis_1_1security_1_1_multiple_ini_web_environment.html":[4,0,0,13,6],
 "classannis_1_1security_1_1_multiple_ini_web_environment.html#ad53ec0c15066061560225cad765c4fe6":[4,0,0,13,6,0],
-"classannis_1_1security_1_1_serializable_byte_source.html":[4,0,0,13,7],
-"classannis_1_1security_1_1_serializable_byte_source.html#a352d425e9ccea081c5b7140239b91320":[4,0,0,13,7,5],
-"classannis_1_1security_1_1_serializable_byte_source.html#a60f160b0e57a2e6a4c32cb66410c092f":[4,0,0,13,7,3],
-"classannis_1_1security_1_1_serializable_byte_source.html#a77b538861de74c4690804fbf04e6bb09":[4,0,0,13,7,1]
+"classannis_1_1security_1_1_serializable_byte_source.html":[4,0,0,13,7]
 };

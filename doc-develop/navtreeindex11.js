@@ -1,5 +1,8 @@
 var NAVTREEINDEX11 =
 {
+"classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a1ba3f3521c37004bd54972e6e6ce2913":[4,0,0,15,22,15],
+"classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a1d13ea8f302d19b846b72a74c07b411b":[4,0,0,15,22,9],
+"classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a27c891e293c42e502a902038cf2c8219":[4,0,0,15,22,8],
 "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a29dae07a216bf864b76dc6bda256850c":[4,0,0,15,22,35],
 "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a2c03544a2477c60497d17e745b70a744":[4,0,0,15,22,24],
 "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a381eb105101f03e7dc02e8f36d956d9c":[4,0,0,15,22,37],
@@ -70,7 +73,7 @@ var NAVTREEINDEX11 =
 "classannis_1_1sqlgen_1_1_islands_policy.html#aee862c55ab6f54a9a66081b8b2890f86":[4,0,0,15,28,1],
 "classannis_1_1sqlgen_1_1_islands_policy.html#enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies":[4,0,0,15,28,0],
 "classannis_1_1sqlgen_1_1_list_annotations_sql_helper.html":[4,0,0,15,30],
-"classannis_1_1sqlgen_1_1_list_annotations_sql_helper.html#aea4a72cfb2d95bc129808ada63bec5aa":[4,0,0,15,30,1],
+"classannis_1_1sqlgen_1_1_list_annotations_sql_helper.html#a0292141f1e0ab6af3b452dbf85b431aa":[4,0,0,15,30,1],
 "classannis_1_1sqlgen_1_1_list_annotations_sql_helper.html#af7609c2aef915921092f724ca82b9f4e":[4,0,0,15,30,0],
 "classannis_1_1sqlgen_1_1_list_corpus_annotations_sql_helper.html":[4,0,0,15,31],
 "classannis_1_1sqlgen_1_1_list_corpus_annotations_sql_helper.html#a2e7ced4bd782823527d30a7c52501ff1":[4,0,0,15,31,1],
@@ -246,8 +249,5 @@ var NAVTREEINDEX11 =
 "classannis_1_1sqlgen_1_1model_1_1_left_alignment.html#a4e9a6bddd27879badd52c1a251665da3":[4,0,0,15,1,6,2],
 "classannis_1_1sqlgen_1_1model_1_1_left_alignment.html#abc7ccabb446f028cde1a8de2ddcfabd3":[4,0,0,15,1,6,1],
 "classannis_1_1sqlgen_1_1model_1_1_left_alignment.html#af26b8d787e6cc7ed090f42941753feef":[4,0,0,15,1,6,0],
-"classannis_1_1sqlgen_1_1model_1_1_left_dominance.html":[4,0,0,15,1,7],
-"classannis_1_1sqlgen_1_1model_1_1_left_dominance.html#a8097fab3c4121ced6dfd7b8db56fe326":[4,0,0,15,1,7,1],
-"classannis_1_1sqlgen_1_1model_1_1_left_dominance.html#a89b49d6b1d89e8006af6ad818f1a8515":[4,0,0,15,1,7,2],
-"classannis_1_1sqlgen_1_1model_1_1_left_dominance.html#ac656ae40828bad2df75233f3f29b4543":[4,0,0,15,1,7,0]
+"classannis_1_1sqlgen_1_1model_1_1_left_dominance.html":[4,0,0,15,1,7]
 };

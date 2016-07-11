@@ -19,8 +19,8 @@ var NAVTREE =
       ] ],
       [ "Examples ", "embed.html#embed-examples", null ]
     ] ],
-    [ "Classes", null, [
-      [ "Class List", "annotated.html", "annotated" ],
+    [ "Classes", "annotated.html", [
+      [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
         [ "All", "functions.html", "functions_dup" ],
@@ -36,19 +36,19 @@ var NAVTREEINDEX =
 ".html",
 "classannis_1_1administration_1_1_administration_dao.html#a34245108dd68ec3d8968ec2536bf8bf9",
 "classannis_1_1dao_1_1_shortener_dao.html#a784b9240903d91c815781ce9c183e273",
-"classannis_1_1gui_1_1_search_view.html#a80949160d34c777f8053e630be72c416",
-"classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor_state.html#a8343c3184887e4eeec0001ba615130ba",
-"classannis_1_1gui_1_1frequency_1_1_frequency_query_panel_1_1_field_factory.html#adddb9f8fc9f5d68a1b969fb7d8b67b70",
-"classannis_1_1gui_1_1widgets_1_1_simple_canvas.html#a8236b519b2a4b2e50526e8e8982daba4",
-"classannis_1_1model_1_1_annis_node.html#a1ba9a3e27635c2d163ffef4f2ec28a51",
-"classannis_1_1provider_1_1_annis_q_l_syntax_mapper.html#a6227a4f6fb630e0635558ff05ff8554f",
-"classannis_1_1security_1_1_serializable_byte_source.html#a7ca65318536596b1e534a4e5bc27d083",
-"classannis_1_1service_1_1objects_1_1_frequency_table.html#a5b929b51c02ae60167b4c48eaccb883c",
-"classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a29dae07a216bf864b76dc6bda256850c",
-"classannis_1_1sqlgen_1_1model_1_1_left_dominance.html#adebe1e9dac52f4465865f317d2247aad",
-"classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html#af5575e66c5a85a24baac0f8a0b2da737",
-"dev-release.html#dev-release-preview-finish",
-"interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html#abb5a6dd2eb7c873d9f713ff8a0ab9c6b"
+"classannis_1_1gui_1_1_search_view.html#a5ca6e587a72c5a54313fda92a7965f86",
+"classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#aeedf25478c27c4d9d761c792f1ca22e3",
+"classannis_1_1gui_1_1frequency_1_1_frequency_query_panel.html#acef9c49879646e428825ff4d2cd78542",
+"classannis_1_1gui_1_1widgets_1_1_j_i_t_wrapper.html#ad1c2f152b537be9a7332a1b3fa1690fd",
+"classannis_1_1model_1_1_annis_node.html#a192eed946af2d7a6c3742da44104a369",
+"classannis_1_1provider_1_1_annis_q_l_semantics_mapper.html",
+"classannis_1_1security_1_1_serializable_byte_source.html#a352d425e9ccea081c5b7140239b91320",
+"classannis_1_1service_1_1objects_1_1_frequency_table.html#a11492563decba2ad8ffbb9a6b10344ff",
+"classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a1ba3f3521c37004bd54972e6e6ce2913",
+"classannis_1_1sqlgen_1_1model_1_1_left_dominance.html#a8097fab3c4121ced6dfd7b8db56fe326",
+"classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html#ab5add7ae783d5faba05cb3d551a5bf66",
+"dev-building.html",
+"interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
