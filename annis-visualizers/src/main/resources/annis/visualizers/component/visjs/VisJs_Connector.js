@@ -41,29 +41,32 @@ var json_edges = JSON.parse(strEdges);
 
 
 var nodeDist;
-var sprLength = 100;
+var sprLength;
 var sprConstant;
 
 var nNodes = json_nodes.length;
 
-if (nNodes < 20){
-	nodeDist = 100;
-	sprConstant = 1.2;
-} else if (nNodes >=20 && nNodes < 100){
-	nodeDist = 120;
-	sprConstant = 1.0;
 
-} else if (nNodes >= 100 && nNodes < 400) {
+if (nNodes < 20){
+	nodeDist = 120;
+	sprConstant = 1.2;
+	sprLength = 120;
+	} else if (nNodes >=20 && nNodes < 100){
 	nodeDist = 150;
-	sprConstant = 0.8;
-	
-}else if (nNodes >= 400 && nNodes < 600) {
+	sprConstant = 1.1;
+	sprLength = 160;
+	} else if (nNodes >= 100 && nNodes < 400) {
 	nodeDist = 180;
-	sprConstant = 0.6;
-}  
-else {
-	nodeDist = 200;
-	sprConstant = 0.4;
+	sprConstant = 0.9;
+	sprLength = 180;
+	} else if (nNodes >= 400 && nNodes < 800) {
+		nodeDist = 200;
+		sprConstant = 0.6;
+		sprLength = 200;
+	} else {
+		nodeDist = 250;
+		sprConstant = 0.3;
+		sprLength = 230;
 };
 
 
