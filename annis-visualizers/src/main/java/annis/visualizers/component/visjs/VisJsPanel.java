@@ -15,19 +15,17 @@ import com.vaadin.ui.VerticalLayout;
 			  	
 		  })
 
-
+/**
+ * {@link VisJsPanel} contains a {@link VisJsComponent}.
+ */
 public class VisJsPanel extends Panel{
 	
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 6231027893280529982L;
 	
 	VisJsPanel (VisualizerInput visInput){
 		this.setHeight("700px");
 		this.setWidth("100%");
-		//this.setScrollLeft(10);
-		//this.setScrollTop(10);
 		
 		
 		HorizontalSplitPanel hsplit = new HorizontalSplitPanel();		

@@ -161,6 +161,8 @@ Short name| Description | Link to documentation | Screenshot
 `audio` | a linked audio file | [AudioVisualizer](@ref annis.visualizers.component.AudioVisualizer) | ![audio](audio.png)
 `rst` and `rstdoc` | imitates the RST-diagrams from the [RST-Tool](http://www.wagsoft.com/RSTTool/) for a match or complete document| [RST](@ref annis.visualizers.component.rst.RST)/[RSTFull](@ref annis.visualizers.component.rst.RSTFull) | ![rst](rst_vis.png)
 `raw_text` | simple and default visualizer for the document browser, shows the content of the text.tab file for a specific document.| [RawTextVisualizer](@ref annis.visualizers.component.RawTextVisualizer) | ![raw text](raw_text_vis.png)
+`visjs`	 | a view of the salt model of context, which contains key words | [VisJs](@ref annis.visualizers.component.visjs.VisJs)|![salt model of context](visjs.png)
+`visjsdoc` | a view of the salt model of the entire document, which contains key words | [VisJsDoc](@ref annis.visualizers.component.visjs.VisJsDoc) | ![salt model of document](visjsdoc.png)
 
 
 
