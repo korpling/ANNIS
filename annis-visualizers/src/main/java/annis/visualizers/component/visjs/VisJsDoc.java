@@ -9,12 +9,8 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 
 @PluginImplementation
-public class VisJsFull extends AbstractVisualizer<Panel>{
+public class VisJsDoc extends AbstractVisualizer<Panel>{
 
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -4818088208741889964L;
 
 	@Override
