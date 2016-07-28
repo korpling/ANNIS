@@ -58,7 +58,7 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 
 
 /**
- * Visualizer  component visualizes Salt model of visualizer input.
+ * {@link VisJsComponent} visualizes Salt model of a specified [VisualizerInput](\ref annis.libgui.visualizers.VisualizerInput).
  * 
  * 
  * @author irina
@@ -111,23 +111,22 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	private final List<String> configurations = new ArrayList<String>();
 	
 	
-	SDocument doc;
 	/**
-	 * Creates a new VisJsComponent instance.
+	 * Creates a new {@link VisJsComponent} instance.
 	 * 
-	 * @param visInput The input for the visualizer.
+	 * @param visInput the specified [VisualizerInput](\ref annis.libgui.visualizers.VisualizerInput)
 	 */	
 	public VisJsComponent(VisualizerInput visInput){
 		
-					//put user configurations to the configuration list
-			for(Annos_Keyword kw: Annos_Keyword.values()){
+			//put user configurations to the configuration list
+			for(Annos_Keyword kw: Annos_Keyword.values())
+			{
 				configurations.add(visInput.getMappings().getProperty(kw.getValue()));
 				fillFilterAnnotations(visInput, kw.ordinal());
 			}
 			
 				
 			SDocument doc =  visInput.getDocument();
-			this.doc = doc;
 			
 			VisJsVisualizer VisJsVisualizer = new VisJsVisualizer(doc,this, this);
 			 
@@ -138,7 +137,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			VisJsVisualizer.setEdgeWriter(osEdges);
 			VisJsVisualizer.buildJSON();				
 			BufferedWriter bw;
-			try {
+			try 
+			{
 				bw = VisJsVisualizer.getNodeWriter();
 				bw.flush();	
 				
@@ -149,10 +149,13 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 				strNodes = osNodes.toString();
 				strEdges = osEdges.toString();
 				
+				osNodes.close();
+				osEdges.close();
 				bw.close();			
 		       
 	      
-			}catch(IOException e){
+			}catch(IOException e)
+			{
 				System.out.println(e.getStackTrace());
 			} 
 				
@@ -270,7 +273,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		   * @param type Which type of relations to include
 		   * @return
 		   */
-		  public static List<String> computeDisplayedRelAnnotations(VisualizerInput input, 
+		  private static List<String> computeDisplayedRelAnnotations(VisualizerInput input, 
 				  								String relAnnosConfiguration, Class<? extends SRelation> type) {
 		    if (input == null) {
 		      return new LinkedList<>();
@@ -329,15 +332,13 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		   *
 		   */
 		
-		// TODO test
-		  public static Set<String> getRelationLevelSet(SDocumentGraph graph,
+		  private static Set<String> getRelationLevelSet(SDocumentGraph graph,
 		          String namespace, Class<? extends SRelation> type) {
 		    Set<String> result = new TreeSet<>();
 		    
 
 		    if (graph != null) {
 		      List<? extends SRelation> edges = null;
-		      // catch most common cases directly
 		      if (type == SDominanceRelation.class) {
 		        edges = graph.getDominanceRelations();
 		      } else if (type == SPointingRelation.class){
@@ -364,7 +365,10 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		    }
 		    return result;
 		  }
-		  
+	
+	/**
+	 * Implements the includeNode method of the org.corpus_tools.salt.util.ExportFilter interface.
+	 */
 	  @Override
 		public boolean includeNode(SNode node) {		  
 			// if node is a token or no configuration set, output the node
@@ -379,6 +383,9 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		}
 		
 
+	  	/**
+		 * Implements the includeRelation method of the org.corpus_tools.salt.util.ExportFilter interface.
+		 */
 
 		@Override
 		public boolean includeRelation(SRelation relation) {
@@ -428,7 +435,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 		}
 		
 		
-		private boolean includeObject (Set<SAnnotation> objectAnnotations, Map<String, Set<String>> displayedAnnotationsMap){
+		private static boolean includeObject (Set<SAnnotation> objectAnnotations, Map<String, Set<String>> displayedAnnotationsMap){
 			
 			for (SAnnotation objectAnnotation : objectAnnotations)
 			{
@@ -453,6 +460,9 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			return false;	
 		}
 
+		/**
+		 * Implements the getHighlightingColor method of the org.corpus_tools.salt.util.StyleImporter interface.
+		 */
 		@Override
 		public String getHighlightingColor(SNode node) {
 			String color = null;
