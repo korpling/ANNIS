@@ -188,7 +188,7 @@ Use `pointingRelAnnos: anno_name1, anno_name2, ..., anno_nameN` to filter pointi
 `spanningRelAnnos: anno_name1, anno_name2, ..., anno_nameN` to filter spanning relations,
 `dominanceRelAnnos: anno_name1, anno_name2, ..., anno_nameN` to filter dominance relations. `anno_nameX` can be written as cleartext or as a regular expression. 
 
-If no filter parameter defined for an object class, all objects of this class will be displayed. For instance, with the following filter parameter    `annos: cat, Topic, ambiguity; dominanceRelationAnnos: func`   we would obtain all tokens, all spanning nodes and structure nodes, whose list of annotation keys contains at least one of the stings  `cat`,  `Topic` or `ambiguity`, all dominance relations, whose list of annotation keys contains string `func`, all spanning relations and all pointing relations.
+If no filter parameter defined for an object class, all objects of this class will be displayed. For instance, with the following filter parameter string   `annos: cat, Topic, ambiguity; dominanceRelationAnnos: func`   we would obtain all tokens, all spanning nodes and structure nodes, whose list of annotation keys contains at least one of the stings  `cat`,  `Topic` or `ambiguity`, all dominance relations, whose list of annotation keys contains string `func`, all spanning relations and all pointing relations.
 
 `visjsdoc` visualizes the entire salt model of document, which contains key words. The filter parameter can be set in the same manner as for `visjs`.
 
