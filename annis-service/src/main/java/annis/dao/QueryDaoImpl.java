@@ -715,7 +715,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     
     return (int) search.count(
         new StringVector(corpusList.toArray(new String[0])), 
-        QueryToJSON.serializeQuery(queryData));
+        QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
    
   }
 
@@ -731,7 +731,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     
     API.Search.CountResult result = search.countExtra(
         new StringVector(corpusList.toArray(new String[0])), 
-        QueryToJSON.serializeQuery(queryData));
+        QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
    
     return new MatchAndDocumentCount((int) result.matchCount(), (int) result.documentCount());
   }
