@@ -27,6 +27,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -118,6 +119,7 @@ import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 
 // FIXME: test and refactor timeout and transaction management
 public class QueryDaoImpl extends AbstractDao implements QueryDao,
@@ -638,99 +640,94 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
         listExampleQueriesHelper);
     }
   }
+  
+  protected StringVector createCorpusVector(QueryData queryData)
+  {
+    List<AnnisCorpus> namedCorpora = listCorpora(queryData.getCorpusList());
+    List<String> corpusList = new LinkedList<>();
+    for(AnnisCorpus c : namedCorpora)
+    {
+      corpusList.add(c.getName());
+    }
+    return new StringVector(corpusList.toArray(new String[corpusList.size()]));
+  }
 
-  @Transactional(readOnly = true)
   @Override
   public List<Match> find(QueryData queryData)
   {
-    return executeQueryFunction(queryData, findSqlGenerator, findSqlGenerator);
+    StringVector corpora = createCorpusVector(queryData);
+    String query = QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData());
+    
+    List<LimitOffsetQueryData> ext = queryData.getExtensions(
+        LimitOffsetQueryData.class);
+    Preconditions.checkArgument(ext != null && !ext.isEmpty(), 
+        "Query data must contain a LimitOffsetQueryData extension");
+    LimitOffsetQueryData extQueryData = ext.get(0);
+    
+    StringVector matchesRaw = search.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
+    
+    ArrayList<Match> result = new ArrayList<>((int) matchesRaw.size());
+    for(long i=0; i < matchesRaw.size(); i++)
+    {
+      result.add(Match.parseFromString(matchesRaw.get(i).getString()));
+    }
+    return result;
   }
 
-  @Transactional(readOnly = true)
   @Override
   public boolean find(final QueryData queryData, final OutputStream out)
   {
-    prepareTransaction(queryData);
-    Boolean finished = getJdbcTemplate().execute(
-      new ConnectionCallback<Boolean>()
+    StringVector corpora = createCorpusVector(queryData);
+    String query = QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData());
+    
+    List<LimitOffsetQueryData> ext = queryData.getExtensions(
+        LimitOffsetQueryData.class);
+    Preconditions.checkArgument(ext != null && !ext.isEmpty(), 
+        "Query data must contain a LimitOffsetQueryData extension");
+    LimitOffsetQueryData extQueryData = ext.get(0);
+    
+    StringVector matchesRaw = search.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
+    
+    try
+    {
+      PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
+      
+      for(long i=0; i < matchesRaw.size(); i++)
       {
-        @Override
-        public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
+        w.print(matchesRaw.get(i).getString());
+        w.print("\n");
+        
+        // flush after every 10th item
+        if (i % 10 == 0)
         {
-          
-          try(Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-            ResultSet.CONCUR_READ_ONLY);)
-          {
-            String sql = findSqlGenerator.toSql(queryData);
-
-            PrintWriter w;
-            try (ResultSet rs = stmt.executeQuery(sql))
-            {
-              w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-              ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<>(
-                rs, findSqlGenerator);
-              int i = 1;
-              while (itMatches.hasNext())
-              {
-                // write single match to output stream
-                Match m = itMatches.next();
-                w.print(m.toString());
-                w.print("\n");
-                
-                // flush after every 10th item
-                if (i % 10 == 0)
-                {
-                  w.flush();
-                }
-                
-                i++;
-              } // end for each match
-            }
-            w.flush();
-            return true;
-          }
-          catch (UnsupportedEncodingException ex)
-          {
-            log.error(
-              "Your system is not able to handle UTF-8 but ANNIS really needs this charset",
-              ex);
-          }
-
-          return false;
+          w.flush();
         }
-      });
-
-    return finished;
+      }
+      
+      w.flush();
+      return true;
+    }
+    catch(Exception ex)
+    {
+      log.error("Could not write find data to stream", ex);
+    }
+    return false;
   }
 
-  @Transactional(readOnly = true)
   @Override
   public int count(QueryData queryData)
-  {
-    List<String> corpusList = new LinkedList<>();
-    for(long id : queryData.getCorpusList())
-    {
-      corpusList.add("" + id);
-    }
-    
-    return (int) search.count(
-        new StringVector(corpusList.toArray(new String[0])), 
+  { 
+    return (int) search.count(createCorpusVector(queryData), 
         QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
    
   }
 
-  @Transactional(readOnly = true)
   @Override
   public MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData)
   {
-    List<String> corpusList = new LinkedList<>();
-    for(long id : queryData.getCorpusList())
-    {
-      corpusList.add("" + id);
-    }
     
     API.Search.CountResult result = search.countExtra(
-        new StringVector(corpusList.toArray(new String[0])), 
+        createCorpusVector(queryData), 
         QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
    
     return new MatchAndDocumentCount((int) result.matchCount(), (int) result.documentCount());

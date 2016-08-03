@@ -569,7 +569,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     importBinaryData(path, toplevelCorpusName);
     
-    convertToGraphANNIS(corpusID, path);
+    convertToGraphANNIS(toplevelCorpusName, path);
 
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
@@ -659,7 +659,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     createNodeIdMapping();
 
     importBinaryData(path, toplevelCorpusName);
-    convertToGraphANNIS(corpusID, path);
+    convertToGraphANNIS(toplevelCorpusName, path);
 
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
@@ -715,10 +715,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   ///// Subtasks of importing a corpus
   
-  protected void convertToGraphANNIS(long corpusID, String path)
+  protected void convertToGraphANNIS(String corpusName, String path)
   {
     log.info("importing corpus into graphANNIS");
-    API.Admin.importRelANNIS(path, new File(getGraphANNISDir(), "" + corpusID).getAbsolutePath());
+    API.Admin.importRelANNIS(path, new File(getGraphANNISDir(), corpusName).getAbsolutePath());
   }
   
   protected void dropIndexes()
