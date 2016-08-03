@@ -47,13 +47,6 @@ limitations under the License.
           scope="prototype">
         <property name="queryDao" ref="queryDao"/>
     </bean>
-    
-    <bean class="annis.ql.parser.ComponentSearchRelationNormalizer" 
-          scope="prototype" />
-    <!--
-		<bean class="annis.ql.parser.TransitivePrecedenceOptimizer" 
-          scope="prototype" />
-          -->
 	</util:list>
   
   <bean id="annisParserAntlr" class="annis.ql.parser.AnnisParserAntlr">
