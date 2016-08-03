@@ -32,6 +32,18 @@ public class MatchAndDocumentCount implements Serializable
   private int matchCount;
   private int documentCount;
 
+  public MatchAndDocumentCount()
+  {
+    
+  }
+  
+  public MatchAndDocumentCount(int matchCount, int documentCount)
+  {
+    super();
+    this.matchCount = matchCount;
+    this.documentCount = documentCount;
+  }
+
   public int getMatchCount()
   {
     return matchCount;

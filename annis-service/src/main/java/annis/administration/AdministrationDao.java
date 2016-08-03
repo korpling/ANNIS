@@ -553,9 +553,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       checkTopLevelCorpus();
     }
     
-    log.info("mporting corpus into graphANNIS");
-    API.Admin.importRelANNIS(path, new File(getGraphANNISDir(), toplevelCorpusName).getAbsolutePath());
-
+    
     applyConstraints();
     createStagingAreaIndexes(version);
 
@@ -570,6 +568,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
     createNodeIdMapping();
 
     importBinaryData(path, toplevelCorpusName);
+    
+    convertToGraphANNIS(corpusID, path);
 
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
@@ -638,9 +638,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
       checkTopLevelCorpus();
     }
     
-    log.info("importing corpus into graphANNIS");
-    API.Admin.importRelANNIS(path, new File(getGraphANNISDir(), toplevelCorpusName).getAbsolutePath());
-    
     createStagingAreaIndexes(version);
 
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(
@@ -662,6 +659,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     createNodeIdMapping();
 
     importBinaryData(path, toplevelCorpusName);
+    convertToGraphANNIS(corpusID, path);
 
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
@@ -716,6 +714,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
   }
 
   ///// Subtasks of importing a corpus
+  
+  protected void convertToGraphANNIS(long corpusID, String path)
+  {
+    log.info("importing corpus into graphANNIS");
+    API.Admin.importRelANNIS(path, new File(getGraphANNISDir(), "" + corpusID).getAbsolutePath());
+  }
+  
   protected void dropIndexes()
   {
     log.info("dropping indexes");

@@ -59,6 +59,9 @@ import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.eclipse.emf.common.util.URI;
+import org.korpling.graphannis.API;
+import org.korpling.graphannis.API.StringVector;
+import org.korpling.graphannis.QueryToJSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -146,6 +149,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   // configuration
   private int timeout;
+  
+  private API.Search search;
 
   @Override
   @Transactional(readOnly = true)
@@ -538,6 +543,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   {
     planRowMapper = new ParameterizedSingleColumnRowMapper<>();
     sqlSessionModifiers = new ArrayList<>();
+    
+    this.search = new API.Search(getGraphANNISDir().getAbsolutePath());
   }
 
   public void init()
@@ -700,15 +707,33 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   @Override
   public int count(QueryData queryData)
   {
-    return executeQueryFunction(queryData, countSqlGenerator, countSqlGenerator);
+    List<String> corpusList = new LinkedList<>();
+    for(long id : queryData.getCorpusList())
+    {
+      corpusList.add("" + id);
+    }
+    
+    return (int) search.count(
+        new StringVector(corpusList.toArray(new String[0])), 
+        QueryToJSON.serializeQuery(queryData));
+   
   }
 
   @Transactional(readOnly = true)
   @Override
   public MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData)
   {
-    return executeQueryFunction(queryData, countMatchesAndDocumentsSqlGenerator,
-      countMatchesAndDocumentsSqlGenerator);
+    List<String> corpusList = new LinkedList<>();
+    for(long id : queryData.getCorpusList())
+    {
+      corpusList.add("" + id);
+    }
+    
+    API.Search.CountResult result = search.countExtra(
+        new StringVector(corpusList.toArray(new String[0])), 
+        QueryToJSON.serializeQuery(queryData));
+   
+    return new MatchAndDocumentCount((int) result.matchCount(), (int) result.documentCount());
   }
 
   @Transactional(readOnly = true)

@@ -184,7 +184,10 @@ public abstract class AbstractDao
     }
   }
   
-  
+  protected File getGraphANNISDir()
+  {
+    return new File(System.getProperty("user.home"), ".annis/graphannis/");
+  }
   
   public DynamicDataSource getDataSource()
   {

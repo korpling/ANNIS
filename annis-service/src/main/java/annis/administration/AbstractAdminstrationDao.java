@@ -75,11 +75,6 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
     return dataDir;
   }
   
-  protected File getGraphANNISDir()
-  {
-    return new File(System.getProperty("user.home"), ".annis/graphannis/");
-  }
-
   /**
    * Checks, if there already exists a top level corpus.
    *
