@@ -63,6 +63,7 @@ import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.korpling.graphannis.API;
 import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -551,6 +552,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       checkTopLevelCorpus();
     }
+    
+    log.info("mporting corpus into graphANNIS");
+    API.Admin.importRelANNIS(path, new File(getGraphANNISDir(), toplevelCorpusName).getAbsolutePath());
 
     applyConstraints();
     createStagingAreaIndexes(version);
@@ -633,7 +637,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       checkTopLevelCorpus();
     }
-
+    
+    log.info("importing corpus into graphANNIS");
+    API.Admin.importRelANNIS(path, new File(getGraphANNISDir(), toplevelCorpusName).getAbsolutePath());
+    
     createStagingAreaIndexes(version);
 
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(

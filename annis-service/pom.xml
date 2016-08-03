@@ -15,6 +15,20 @@
 
   <dependencies>
 
+	<dependency>
+      <groupId>org.korpling</groupId>
+      <artifactId>graphannis-api</artifactId>
+      <version>0.1-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.korpling</groupId>
+      <artifactId>graphannis-api</artifactId>
+      <version>0.1-SNAPSHOT</version>
+      <classifier>linux-x86_64</classifier>
+      <scope>compile</scope>
+    </dependency>
+    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
