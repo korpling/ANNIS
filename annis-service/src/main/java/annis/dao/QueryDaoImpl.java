@@ -82,7 +82,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.escape.Escaper;
 import com.google.common.io.ByteStreams;
+import com.google.common.net.UrlEscapers;
 
 import annis.CSVHelper;
 import annis.CommonHelper;
@@ -161,6 +163,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   private API.Search search;
   
   private final ExecutorService exec = Executors.newCachedThreadPool();
+  
+  private final Escaper corpusNameEscaper = UrlEscapers.urlPathSegmentEscaper();
   
 
   @Override
@@ -656,7 +660,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     List<String> corpusList = new LinkedList<>();
     for(AnnisCorpus c : namedCorpora)
     {
-      corpusList.add(c.getName());
+      corpusList.add(corpusNameEscaper.escape(c.getName()));
     }
     return new StringVector(corpusList.toArray(new String[corpusList.size()]));
   }

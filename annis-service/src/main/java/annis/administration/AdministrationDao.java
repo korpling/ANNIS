@@ -718,7 +718,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   protected void convertToGraphANNIS(String corpusName, String path)
   {
     log.info("importing corpus into graphANNIS");
-    API.Admin.importRelANNIS(path, new File(getGraphANNISDir(), corpusName).getAbsolutePath());
+    API.Admin.importRelANNIS(path, getGraphANNISDir(corpusName).getAbsolutePath());
   }
   
   protected void dropIndexes()

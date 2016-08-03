@@ -40,6 +40,9 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
+import com.google.common.escape.Escapers;
+import com.google.common.net.UrlEscapers;
+
 /**
  * Common functions used by all data access objects.
  * @author Thomas Krause <krauseto@hu-berlin.de>
@@ -186,7 +189,13 @@ public abstract class AbstractDao
   
   protected File getGraphANNISDir()
   {
-    return new File(System.getProperty("user.home"), ".annis/graphannis/");
+    return new File(System.getProperty("user.home"), ".annis/graphannis");
+  }
+  
+  protected File getGraphANNISDir(String corpusName)
+  {
+    String escapedCorpusName = UrlEscapers.urlPathSegmentEscaper().escape(corpusName);
+    return new File(getGraphANNISDir(), escapedCorpusName);
   }
   
   public DynamicDataSource getDataSource()
