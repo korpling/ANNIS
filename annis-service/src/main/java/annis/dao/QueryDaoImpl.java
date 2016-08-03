@@ -45,6 +45,12 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -83,6 +89,7 @@ import annis.CommonHelper;
 import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
+import annis.exceptions.AnnisTimeoutException;
 import annis.model.AnnisConstants;
 import annis.model.Annotation;
 import annis.ql.parser.AnnisParserAntlr;
@@ -115,7 +122,6 @@ import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.RawTextSqlHelper;
-import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
@@ -153,6 +159,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   private int timeout;
   
   private API.Search search;
+  
+  private final ExecutorService exec = Executors.newCachedThreadPool();
+  
 
   @Override
   @Transactional(readOnly = true)
@@ -664,14 +673,29 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
         "Query data must contain a LimitOffsetQueryData extension");
     LimitOffsetQueryData extQueryData = ext.get(0);
     
-    StringVector matchesRaw = search.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
-    
-    ArrayList<Match> result = new ArrayList<>((int) matchesRaw.size());
-    for(long i=0; i < matchesRaw.size(); i++)
+    Future<List<Match>> result = exec.submit(() -> 
     {
-      result.add(Match.parseFromString(matchesRaw.get(i).getString()));
+      StringVector matchesRaw = search.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
+      
+      ArrayList<Match> data = new ArrayList<>((int) matchesRaw.size());
+      for(long i=0; i < matchesRaw.size(); i++)
+      {
+        data.add(Match.parseFromString(matchesRaw.get(i).getString()));
+      }
+      return data;
+    });
+   
+    try
+    {
+      return result.get(getTimeout(), TimeUnit.MILLISECONDS);
     }
-    return result;
+    catch(InterruptedException | ExecutionException | TimeoutException ex)
+    {
+      result.cancel(true);
+    }
+    
+    throw(new AnnisTimeoutException());
+
   }
 
   @Override
@@ -685,52 +709,96 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     Preconditions.checkArgument(ext != null && !ext.isEmpty(), 
         "Query data must contain a LimitOffsetQueryData extension");
     LimitOffsetQueryData extQueryData = ext.get(0);
-    
-    StringVector matchesRaw = search.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
-    
+   
+    Future<Boolean> result = exec.submit(() -> 
+    {
+      StringVector matchesRaw = search.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
+      
+      try
+      {
+        PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
+        
+        for(long i=0; i < matchesRaw.size(); i++)
+        {
+          w.print(matchesRaw.get(i).getString());
+          w.print("\n");
+          
+          // flush after every 10th item
+          if (i % 10 == 0)
+          {
+            w.flush();
+          }
+        }
+        
+        w.flush();
+        return true;
+      }
+      catch(Exception ex)
+      {
+        log.error("Could not write find data to stream", ex);
+      }
+      return false;
+    });
+   
     try
     {
-      PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
-      
-      for(long i=0; i < matchesRaw.size(); i++)
-      {
-        w.print(matchesRaw.get(i).getString());
-        w.print("\n");
-        
-        // flush after every 10th item
-        if (i % 10 == 0)
-        {
-          w.flush();
-        }
-      }
-      
-      w.flush();
-      return true;
+      return result.get(getTimeout(), TimeUnit.MILLISECONDS);
     }
-    catch(Exception ex)
+    catch(InterruptedException | ExecutionException | TimeoutException ex)
     {
-      log.error("Could not write find data to stream", ex);
+      result.cancel(true);
     }
-    return false;
+    
+    throw(new AnnisTimeoutException());
+    
   }
 
   @Override
   public int count(QueryData queryData)
   { 
-    return (int) search.count(createCorpusVector(queryData), 
-        QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
+    Future<Integer> result = exec.submit(() -> 
+    {
+      return (int) search.count(createCorpusVector(queryData), 
+          QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
+    });
    
+    try
+    {
+      return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+    }
+    catch(InterruptedException | ExecutionException | TimeoutException ex)
+    {
+      result.cancel(true);
+    }
+    
+    throw(new AnnisTimeoutException());
   }
 
   @Override
   public MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData)
   {
     
-    API.Search.CountResult result = search.countExtra(
-        createCorpusVector(queryData), 
-        QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
+    Future<MatchAndDocumentCount> result = exec.submit(() -> 
+    {
+      API.Search.CountResult data = search.countExtra(
+          createCorpusVector(queryData), 
+          QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
+     
+      return new MatchAndDocumentCount((int) data.matchCount(), (int) data.documentCount());
+    });
    
-    return new MatchAndDocumentCount((int) result.matchCount(), (int) result.documentCount());
+    try
+    {
+      return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+    }
+    catch(InterruptedException | ExecutionException | TimeoutException ex)
+    {
+      result.cancel(true);
+    }
+    
+    throw(new AnnisTimeoutException());
+    
+    
   }
 
   @Transactional(readOnly = true)
