@@ -336,7 +336,7 @@ public class TimelineReconstructor
               {
                 if(spanToMap.getAnnotation(validAnno) != null )
                 {
-                  
+                  valid = true;
                   break;
                 }
               }
