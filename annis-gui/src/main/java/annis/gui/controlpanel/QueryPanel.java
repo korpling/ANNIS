@@ -484,7 +484,7 @@ public class QueryPanel extends GridLayout implements
       if(panel == null)
       {
         panel = new ExportPanel(QueryPanel.this, 
-          ui.getQueryController(), state);
+          ui.getQueryController(), state, ui);
       }
       
       final TabSheet tabSheet = ui.getSearchView().getMainTab();

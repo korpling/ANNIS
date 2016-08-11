@@ -31,38 +31,45 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
+import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.UrlEscapers;
+import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
+import annis.CommonHelper;
+import annis.TimelineReconstructor;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
-import annis.utils.LegacyGraphConverter;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
 
-public abstract class GeneralTextExporter implements ExporterPlugin, Serializable
+/**
+ * An abstract base class for exporters that use Salt subgraphs to produce
+ * some kind of textual output.
+ * @author Thomas Krause <thomaskrause@posteo.de>
+ */
+public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 {
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltBasedExporter.class);
+
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
@@ -71,6 +78,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   {
     try
     {
+      
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       
       if (keys == null || keys.isEmpty())
@@ -164,8 +172,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
               res = res.queryParam("filter", filter.name());
             }
 
-            Stopwatch stopwatch = Stopwatch.createUnstarted();
-            stopwatch.start();
+            Stopwatch stopwatch = Stopwatch.createStarted();
             SaltProject p = res.post(SaltProject.class, currentMatches);
             stopwatch.stop();
 
@@ -176,8 +183,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
               stepSize += 10;
             }
 
-            convertText(LegacyGraphConverter.convertToResultSet(p), 
-              keys, args, out, offset-currentMatches.getMatches().size());
+            convertSaltProject(p, keys, args, offset-currentMatches.getMatches().size(), corpusConfigs, out);
 
             currentMatches.getMatches().clear();
 
@@ -212,16 +218,14 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
           }
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
-          convertText(LegacyGraphConverter.convertToResultSet(p),
-            keys, args, out, offset - currentMatches.getMatches().size() - 1);
+          convertSaltProject(p, keys, args, offset - currentMatches.getMatches().size() - 1,
+              corpusConfigs, out);
         }
         offset = 0;
         
       }
       
       out.append("\n");
-      out.append("\n");
-      out.append("finished");
       
       return null;
 
@@ -232,98 +236,83 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
       return ex;
     }
   }
-
-  public void convertText(AnnisResultSet queryResult, List<String> keys,
-    Map<String, String> args, Writer out, int offset) throws IOException
-  {
-    Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
-    
-    List<String> metaKeys = new LinkedList<>();
-    if(args.containsKey("metakeys"))
-    {
-      Iterable<String> it = 
-        Splitter.on(",").trimResults().split(args.get("metakeys"));
-      for(String s : it)
-      {
-        metaKeys.add(s);
-      }
-    }
-    
-    int counter = 0;
-
-    for (AnnisResult annisResult : queryResult)
-    {
-      Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
-
-      counter++;
-      out.append((counter + offset) + ". ");
-      List<AnnisNode> tok = annisResult.getGraph().getTokens();
-
-      for (AnnisNode annisNode : tok)
-      {
-        Long tokID = annisNode.getId();
-        if (matchedNodeIds.contains(tokID))
-        {
-          out.append("[");
-          out.append(annisNode.getSpannedText());
-          out.append("]");
-        }
-        else
-        {
-          out.append(annisNode.getSpannedText());
-        }
-
-        //for (Annotation annotation : annisNode.getNodeAnnotations()){
-        //      out.append("/"+annotation.getValue());
-        //}
-
-        out.append(" ");
-
-      }
-      out.append("\n");
-    
-      if(!metaKeys.isEmpty())
-      {
-        String[] path = annisResult.getPath();
-        appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
-      }
-      out.append("\n");
-    }
-
-  }
-
-  public void appendMetaData(Writer out, 
-    List<String> metaKeys,
-    String toplevelCorpus, String documentName,
-    Map<String, Map<String, Annotation>> metadataCache)
-    throws IOException
-  {
-    Map<String, Annotation> metaData = new HashMap<>();
-    if(metadataCache.containsKey(toplevelCorpus + ":" + documentName))
-    {
-      metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
-    }
-    else
-    {
-      List<Annotation> asList = Helper.getMetaData(toplevelCorpus, documentName);
-      for(Annotation anno : asList)
-      {
-        metaData.put(anno.getQualifiedName(), anno);
-        metaData.put(anno.getName(), anno);
-      }
-      metadataCache.put(toplevelCorpus + ":" + documentName, metaData);
-    }
-    
-    for(String key : metaKeys)
-    {
-      Annotation anno = metaData.get(key);
-      if(anno != null)
-      {
-        out.append("\tmeta::" + key + "\t" + anno.getValue()).append("\n");
-      }
-    }
-  }
   
+  /**
+   * Iterates over all matches (modelled as corpus graphs) and calls {@link #convertText(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph, java.util.List, java.util.Map, int, java.io.Writer) } for
+   * the single document graph.
+   * @param p
+   * @param annoKeys
+   * @param args
+   * @param offset
+   * @param out 
+   */
+  private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, int offset,
+      Map<String, CorpusConfig> corpusConfigs, Writer out) throws IOException
+  {
+    int matchNumber = offset;
+    if(p != null && p.getCorpusGraphs() != null)
+    {
+      
+      Map<String, String> spanAnno2order = null;
+      boolean virtualTokenizationFromNamespace = false;
+      
+      Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
+      if(!corpusNames.isEmpty())
+      {
+        CorpusConfig config = corpusConfigs.get(corpusNames.iterator().next());
+        if(config != null)
+        {
+          if("true".equalsIgnoreCase(config.getConfig("virtual_tokenization_from_namespace")))
+          {
+            virtualTokenizationFromNamespace = true;
+          }
+          else
+          {
+            String mappingRaw = config.getConfig("virtual_tokenization_mapping");
+            if(mappingRaw != null)
+            {
+              spanAnno2order = new HashMap<>();
+              for(String singleMapping : Splitter.on(',').split(mappingRaw))
+              {
+                List<String> mappingParts = Splitter.on('=').splitToList(singleMapping);
+                if(mappingParts.size() >= 2)
+                {
+                  spanAnno2order.put(mappingParts.get(0), mappingParts.get(1));
+                }
+              }
+            }
+          }
+         
+        }
+      }
+      
+      for(SCorpusGraph corpusGraph : p.getCorpusGraphs())
+      {
+        if(corpusGraph.getDocuments() != null)
+        {
+          for(SDocument doc : corpusGraph.getDocuments())
+          {
+            if(virtualTokenizationFromNamespace)
+            {
+              TimelineReconstructor.removeVirtualTokenizationUsingNamespace(doc.getDocumentGraph());
+            }
+            else if(spanAnno2order != null)
+            {
+              // there is a definition how to map the virtual tokenization to a real one
+              TimelineReconstructor.removeVirtualTokenization(doc.getDocumentGraph(), spanAnno2order);
+            }
+            
+            convertText(doc.getDocumentGraph(), annoKeys, args, matchNumber, out);
+          }
+        }
+      }
+      matchNumber++;
+    }
+  }
+
+  public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, int matchNumber,
+    Writer out) throws IOException;
+
   @Override
   public boolean isCancelable()
   {

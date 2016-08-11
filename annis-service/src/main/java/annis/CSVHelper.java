@@ -15,12 +15,6 @@
  */
 package annis;
 
-import annis.dao.objects.AnnotatedMatch;
-import annis.dao.objects.AnnotatedSpan;
-import annis.model.Annotation;
-import au.com.bytecode.opencsv.CSVWriter;
-
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,9 +25,15 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import annis.dao.objects.AnnotatedMatch;
+import annis.dao.objects.AnnotatedSpan;
+import annis.model.Annotation;
+import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  *
