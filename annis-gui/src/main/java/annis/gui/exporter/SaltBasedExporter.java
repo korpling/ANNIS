@@ -62,7 +62,7 @@ import annis.service.objects.SubgraphFilter;
 /**
  * An abstract base class for exporters that use Salt subgraphs to produce
  * some kind of textual output.
- * @author thomas
+ * @author Thomas Krause <thomaskrause@posteo.de>
  */
 public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 {
