@@ -34,7 +34,6 @@ import com.vaadin.shared.ui.ui.Transport;
 
 import annis.gui.components.ExceptionDialog;
 import annis.gui.exporter.CSVExporter;
-import annis.gui.exporter.MatchWithContextExporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TokenExporter;
@@ -207,7 +206,6 @@ public class AnnisUI extends CommonUI
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(GridExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(MatchWithContextExporter.class));
   }
 
   /**
