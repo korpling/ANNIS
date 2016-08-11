@@ -20,20 +20,17 @@ import java.io.File;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.MutableClassToInstanceMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Property;
-import com.vaadin.data.Container.Sortable;
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.data.util.ItemSorter;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
@@ -74,7 +71,7 @@ public class ExportPanel extends GridLayout
 
   private final TextField txtParameters;
 
-  private final IndexedContainer exporterClassContainer = new IndexedContainer();
+  private final BeanItemContainer<Class> exporterClassContainer = new BeanItemContainer<>(Class.class);
 
   private final ComboBox cbExporter;
 
@@ -134,7 +131,7 @@ public class ExportPanel extends GridLayout
     cbExporter.setImmediate(true);
     cbExporter.setPropertyDataSource(controller.getState().getExporter());
     cbExporter.setContainerDataSource(exporterClassContainer);
-
+  
     
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
 
@@ -236,32 +233,21 @@ public class ExportPanel extends GridLayout
     super.attach();
     this.ui = UI.getCurrent();
     
-    ExporterPlugin firstExporter = null;
     if (this.ui instanceof AnnisBaseUI)
     {
       PluginManagerUtil util = new PluginManagerUtil(((AnnisBaseUI) getUI()).getPluginManager());
       for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class))
       {
-        if (firstExporter == null)
-        {
-          firstExporter = e;
-        }
-
-        cbExporter.setItemCaption(e.getClass(), e.getClass().getSimpleName());
         exporterClassContainer.addItem(e.getClass());
-
       }
     }
     exporterClassContainer.sort(new Object[] {"simpleName"}, new boolean[] {true});
+    cbExporter.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+    cbExporter.setItemCaptionPropertyId("simpleName");
     
-    if (firstExporter != null)
+    if(exporterClassContainer.size() > 0)
     {
-      cbExporter.setValue(firstExporter.getClass());
-      btCancel.setVisible(firstExporter.isCancelable());
-      if(state != null)
-      {
-        state.getExporter().setValue(firstExporter.getClass());
-      }
+      cbExporter.setValue(exporterClassContainer.getIdByIndex(0));
     }
     
   }
