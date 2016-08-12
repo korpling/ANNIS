@@ -18,11 +18,15 @@ package annis.dao;
 import annis.administration.FileAccessException;
 import annis.administration.StatementController;
 import annis.utils.DynamicDataSource;
+import au.com.bytecode.opencsv.CSVReader;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -43,6 +47,8 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.sqlite.jdbc4.JDBC4Connection;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
 
@@ -185,6 +191,43 @@ public abstract class AbstractDao
   {
     checkSqliteConnectionValid();
     return sqliteConnection.prepareStatement(sql);
+  }
+  
+  
+  public void importSQLiteTable(String tableName, File csvFile) throws SQLException
+  {
+    checkSqliteConnectionValid();
+    try(CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(csvFile), StandardCharsets.UTF_8)))
+    {
+      String[] firstLine = csvReader.readNext();
+      
+      if(firstLine != null && firstLine.length >= 1)
+      {
+        // TODO: use an enum for the table names to avoid any user supplied strings.
+        try(PreparedStatement insertStatement = sqliteConnection.prepareStatement(
+            "INSERT INTO " + tableName + " VALUES(" + Strings.repeat("?, ", firstLine.length -1)  + "?)"))
+        {
+          String[] line = firstLine;
+          while(line != null)
+          {
+            for(int i=0; i < line.length; i++)
+            {
+              insertStatement.setString(i+1, line[i]);
+            }
+            line = csvReader.readNext();
+          }
+        }
+      }
+      
+    }
+    catch(FileNotFoundException ex)
+    {
+      log.error("Could not find file", ex);
+    }
+    catch(IOException ex)
+    {
+      log.error("Could not read SQLite table", ex);
+    }
   }
   
   
