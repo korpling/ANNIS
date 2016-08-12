@@ -98,7 +98,7 @@ public class WekaExporter implements ExporterPlugin, Serializable
   @Override
   public String getFileEnding()
   {
-    return "csv";
+    return "arff";
   }
   
 }
