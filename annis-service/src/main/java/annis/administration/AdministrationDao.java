@@ -726,7 +726,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     
     try
     {
-      importSQLiteTable("node", new File(importDir, "node" + version.getFileSuffix()));
+      importSQLiteTable(version.getNodeTable(), new File(importDir, "node" + version.getFileSuffix()));
     }
     catch(SQLException ex)
     {

@@ -15,11 +15,6 @@
  */
 package annis.dao;
 
-import annis.administration.FileAccessException;
-import annis.administration.StatementController;
-import annis.utils.DynamicDataSource;
-import au.com.bytecode.opencsv.CSVReader;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,10 +27,13 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
+
 import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -45,12 +43,19 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.sqlite.jdbc4.JDBC4Connection;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
+
+import annis.administration.FileAccessException;
+import annis.administration.StatementController;
+import annis.tabledefs.Column;
+import annis.tabledefs.Table;
+import annis.utils.DynamicDataSource;
+import au.com.bytecode.opencsv.CSVParser;
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Common functions used by all data access objects.
@@ -65,8 +70,6 @@ public abstract class AbstractDao
   private DynamicDataSource dataSource;
   private StatementController statementController;
   private String scriptPath;
-  
-  private Connection sqliteConnection;
 
   /**
    * executes an SQL string, substituting the
@@ -178,44 +181,57 @@ public abstract class AbstractDao
     this.statementController = statementCon;
   }
   
-  
-  private void checkSqliteConnectionValid() throws SQLException
+  public Connection createSQLiteConnection() throws SQLException
   {
-    if(sqliteConnection == null || sqliteConnection.isClosed())
-    {
-      sqliteConnection = DriverManager.getConnection("jdbc:sqlite:annis.db");
-    }
-  }
-  
-  public PreparedStatement createStatement(String sql) throws SQLException
-  {
-    checkSqliteConnectionValid();
-    return sqliteConnection.prepareStatement(sql);
+    // TODO: make the dataase location configurable and maybe use a connection pool.
+    return DriverManager.getConnection("jdbc:sqlite:annis.db");
   }
   
   
-  public void importSQLiteTable(String tableName, File csvFile) throws SQLException
+  public void importSQLiteTable(Table table, File csvFile) throws SQLException
   {
-    checkSqliteConnectionValid();
-    try(CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(csvFile), StandardCharsets.UTF_8)))
+   
+    try(CSVReader csvReader = 
+        new CSVReader(new InputStreamReader(new FileInputStream(csvFile), StandardCharsets.UTF_8),
+            '\t'))
     {
       String[] firstLine = csvReader.readNext();
       
       if(firstLine != null && firstLine.length >= 1)
       {
         // TODO: use an enum for the table names to avoid any user supplied strings.
-        try(PreparedStatement insertStatement = sqliteConnection.prepareStatement(
-            "INSERT INTO " + tableName + " VALUES(" + Strings.repeat("?, ", firstLine.length -1)  + "?)"))
+        try(Connection conn = createSQLiteConnection();  
+            Statement stmt = conn.createStatement())
         {
+          conn.setAutoCommit(false);
+          
+          // drop any old version of the table
+          stmt.execute("DROP TABLE IF EXISTS " + table.getName());
+          
+          ArrayList<Column> columns = table.getColumns();
+          stmt.execute("CREATE TABLE " + table.getName() 
+            +  " (" + Joiner.on(", ").join(columns) +  ")");
+          
+          Preconditions.checkArgument(table.getColumns().size() == firstLine.length, "Import of table %s failed. "
+              + "File '%s' should have %s columns but has %s.", table.getName(), csvFile.getAbsolutePath(),
+              columns.size(), firstLine.length);
+          
           String[] line = firstLine;
-          while(line != null)
+          try(PreparedStatement insertStmt = conn.prepareStatement(
+            "INSERT INTO " + table.getName() + " VALUES(" + Strings.repeat("?, ", firstLine.length-1)  + "?)"))
           {
-            for(int i=0; i < line.length; i++)
+            while(line != null)
             {
-              insertStatement.setString(i+1, line[i]);
+              for(int i=0; i < line.length; i++)
+              {
+                insertStmt.setString(i+1, line[i]);
+              }
+              insertStmt.execute();
+              line = csvReader.readNext();
             }
-            line = csvReader.readNext();
           }
+          
+          conn.commit();
         }
       }
       

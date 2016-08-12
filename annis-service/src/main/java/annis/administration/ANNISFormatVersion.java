@@ -15,19 +15,43 @@
  */
 package annis.administration;
 
+import annis.tabledefs.Table;
+
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public enum ANNISFormatVersion
 {
-  V3_1(".tab"), V3_2(".tab"), V3_3(".annis"), UNKNOWN(".x");
+  V3_1(".tab", new Table("node")
+      .c("id").c("text_ref").c("corpus_ref")
+      .c("layer").c("name").c("left").c("right")
+      .c("token_index")
+      .c("continuous").c("span")
+      ),
+  V3_2(".tab", new Table("node")
+      .c("id").c("text_ref").c("corpus_ref")
+      .c("layer").c("name").c("left").c("right")
+      .c("token_index").c("seg_name").c("seg_index").c("seg_right")
+      .c("continuous").c("span")
+  ), 
+  V3_3(".annis", new Table("node")
+      .c("id").c("text_ref").c("corpus_ref")
+      .c("layer").c("name")
+      .c("left").c("right")
+      .c("token_index").c("left_token").c("right_token")
+      .c("seg_index").c("seg_name")
+      .c("span").c("root")
+  ), 
+  UNKNOWN(".x", new Table("node"));
   
   private final String fileSuffix;
+  private final Table nodeTable;
 
-  private ANNISFormatVersion(String fileSuffix)
+  private ANNISFormatVersion(String fileSuffix, Table nodeTable)
   {
     this.fileSuffix = fileSuffix;
+    this.nodeTable = nodeTable;
   }
 
   public String getFileSuffix()
@@ -35,5 +59,9 @@ public enum ANNISFormatVersion
     return fileSuffix;
   }
   
+  public Table getNodeTable()
+  {
+    return nodeTable;
+  }
   
 }
