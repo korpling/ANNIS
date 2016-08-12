@@ -79,8 +79,6 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
     try
     {
       
-      // int count = service.getCount(corpusIdList, queryAnnisQL);
-      
       if (keys == null || keys.isEmpty())
       {
         // auto set
@@ -302,11 +300,10 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
               TimelineReconstructor.removeVirtualTokenization(doc.getDocumentGraph(), spanAnno2order);
             }
             
-            convertText(doc.getDocumentGraph(), annoKeys, args, matchNumber, out);
+            convertText(doc.getDocumentGraph(), annoKeys, args, matchNumber++, out);
           }
         }
       }
-      matchNumber++;
     }
   }
 
