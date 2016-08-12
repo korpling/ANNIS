@@ -24,8 +24,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -39,6 +41,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.sqlite.jdbc4.JDBC4Connection;
 
 import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
@@ -56,6 +59,8 @@ public abstract class AbstractDao
   private DynamicDataSource dataSource;
   private StatementController statementController;
   private String scriptPath;
+  
+  private Connection sqliteConnection;
 
   /**
    * executes an SQL string, substituting the
@@ -166,6 +171,22 @@ public abstract class AbstractDao
   {
     this.statementController = statementCon;
   }
+  
+  
+  private void checkSqliteConnectionValid() throws SQLException
+  {
+    if(sqliteConnection == null || sqliteConnection.isClosed())
+    {
+      sqliteConnection = DriverManager.getConnection("jdbc:sqlite:annis.db");
+    }
+  }
+  
+  public PreparedStatement createStatement(String sql) throws SQLException
+  {
+    checkSqliteConnectionValid();
+    return sqliteConnection.prepareStatement(sql);
+  }
+  
   
   public JdbcTemplate getJdbcTemplate()
   {
