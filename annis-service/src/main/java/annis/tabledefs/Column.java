@@ -10,8 +10,14 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Column implements Serializable
 {
+  
+  public enum Type
+  {
+    NULL, INTEGER, REAL, TEXT, BLOB
+  }
+  
   private final String name;
-  private String type = "TEXT";
+  private Type type = Type.TEXT;
   private boolean unique = false;
   
   public Column(String name)
@@ -31,7 +37,7 @@ public class Column implements Serializable
   }
 
   
-  public Column type(String type)
+  public Column type(Type type)
   {
     Column copy = new Column(this);
     copy.type = type;
@@ -50,7 +56,7 @@ public class Column implements Serializable
     return name;
   }
   
-  public String getType()
+  public Type getType()
   {
     return type;
   }
@@ -63,6 +69,6 @@ public class Column implements Serializable
   @Override
   public String toString()
   {
-    return name + " " + type + (unique ? " UNIQUE" : "");
+    return name + " " + type.name() + (unique ? " UNIQUE" : "");
   }
 }

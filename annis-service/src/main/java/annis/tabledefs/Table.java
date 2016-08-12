@@ -35,14 +35,19 @@ public class Table implements Serializable
     return copy;
   }
   
-  public Table c(String name, String type)
+  public Table c(String name, Column.Type type)
   {
     Table copy = new Table(this);
     copy.columns.add(new Column(name).type(type));
     return copy;
   }
   
-  public Table c(String name, String type, boolean isUnique)
+  public Table c_int(String name)
+  {
+    return c(name, Column.Type.INTEGER);
+  }
+  
+  public Table c(String name, Column.Type type, boolean isUnique)
   {
     Table copy = new Table(this);
     Column newColumn = new Column(name).type(type);
@@ -52,6 +57,11 @@ public class Table implements Serializable
     }
     copy.columns.add(newColumn);
     return copy;
+  }
+  
+  public Table c_int_uniq(String name)
+  {
+    return c(name, Column.Type.INTEGER, true);
   }
   
   public ArrayList<Column> getColumns()
