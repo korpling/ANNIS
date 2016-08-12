@@ -97,7 +97,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   private transient PluginManager pluginManager;
   
-  private final ClassToInstanceMap<ExporterPlugin> exporterRegistry = MutableClassToInstanceMap.create();
+  private transient ClassToInstanceMap<ExporterPlugin> exporterRegistryCache;
   
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
@@ -350,11 +350,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       visualizerRegistry.put(vis.getShortName(), vis);
       resourceAddedDate.put(vis.getShortName(), new Date());
     }
-    
-    for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class))
-    {
-      exporterRegistry.put(e.getClass(), e);
-    }
   }
   
   private static void checkIfRemoteLoggedIn(VaadinRequest request)
@@ -458,7 +453,16 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   @Override
   public ExporterPlugin getExporter(Class<? extends ExporterPlugin> clazz)
   {
-    return exporterRegistry.get(clazz);
+    if(exporterRegistryCache == null)
+    {
+      exporterRegistryCache = MutableClassToInstanceMap.create();
+      PluginManagerUtil util = new PluginManagerUtil(getPluginManager());
+      for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class))
+      {
+        exporterRegistryCache.put(e.getClass(), e);
+      }
+    }
+    return exporterRegistryCache.get(clazz);
   }
 
   public ObjectMapper getJsonMapper()
