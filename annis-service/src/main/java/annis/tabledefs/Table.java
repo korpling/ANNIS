@@ -47,6 +47,11 @@ public class Table implements Serializable
     return c(name, Column.Type.INTEGER);
   }
   
+  public Table c_blob(String name)
+  {
+    return c(name, Column.Type.BLOB);
+  }
+  
   public Table c(String name, Column.Type type, boolean isUnique)
   {
     Table copy = new Table(this);

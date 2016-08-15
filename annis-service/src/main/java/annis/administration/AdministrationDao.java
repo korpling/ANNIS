@@ -15,22 +15,8 @@
  */
 package annis.administration;
 
-import annis.dao.autogenqueries.QueriesGenerator;
-import annis.examplequeries.ExampleQuery;
-import annis.exceptions.AnnisException;
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
-import annis.security.UserConfig;
-import annis.sql.mapping.SDocumentGraphMapper;
-import annis.tabledefs.ANNISFormatVersion;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
-import com.google.common.io.Files;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -40,6 +26,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -56,7 +44,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.sql.DataSource;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.apache.commons.io.FilenameUtils;
@@ -68,6 +61,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.korpling.graphannis.API;
 import org.postgresql.PGConnection;
 import org.slf4j.Logger;
@@ -84,6 +78,23 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ctc.wstx.stax.WstxOutputFactory;
+import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
+import com.google.common.io.Files;
+
+import annis.dao.autogenqueries.QueriesGenerator;
+import annis.examplequeries.ExampleQuery;
+import annis.exceptions.AnnisException;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
+import annis.security.UserConfig;
+import annis.sql.mapping.SDocumentGraphMapper;
+import annis.tabledefs.ANNISFormatVersion;
 
 /**
  *
@@ -680,11 +691,34 @@ public class AdministrationDao extends AbstractAdminstrationDao
   }
 
   ///// Subtasks of importing a corpus
+  
+  /**
+   * Makes sure all tables needed by SQLite are available.
+   */
+  protected void initSQLiteSchema()
+  {
+    try(Connection conn = createSQLiteConnection();
+        Statement stmt = conn.createStatement())
+    {
+      conn.setAutoCommit(false);
+      
+      stmt.execute("CREATE TABLE IF NOT EXISTS documents (salt_id UNIQUE, salt_xml)");
+      
+      conn.commit();
+    }
+    catch(SQLException ex)
+    {
+      log.error("Can't create database connection", ex);
+    }
+  }
 
   protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version)
   {
     File importDir = new File(path);
 
+    log.info("ensure SQLite database schema is initialized");
+    initSQLiteSchema();
+    
     log.info("importing corpus into graphANNIS");
     API.Admin.importRelANNIS(path, getGraphANNISDir(corpusName).getAbsolutePath());
 
@@ -705,18 +739,24 @@ public class AdministrationDao extends AbstractAdminstrationDao
       importSQLiteTable(version.getEdgeAnnotationTable(),
           new File(importDir, "edge_annotation" + version.getFileSuffix()));
 
-      String factsSQL = version.getFactsSQL();
+      final String factsSQL = version.getFactsSQL();
+      final String insertDocSQL = "INSERT INTO documents(salt_id, salt_xml) VALUES(?,?)";
       if(factsSQL == null)
       {
         log.warn("Can't import documents because this version of the ANNIS format is incompletly defined.");
       }
       else
       {
+        final XMLOutputFactory xmlFactory = new WstxOutputFactory();
+        
+        org.eclipse.emf.common.util.URI corpusURI = org.eclipse.emf.common.util.URI.createURI("salt:/").appendSegment(corpusName);
         // find all documents, map them to Salt and add the serialized Salt to a special table
         try (Connection conn = createSQLiteConnection();
             Statement stmt = conn.createStatement();
-            PreparedStatement psFacts = conn.prepareStatement(factsSQL))
+            PreparedStatement psFacts = conn.prepareStatement(factsSQL);
+            PreparedStatement psInsertDoc = conn.prepareStatement(insertDocSQL))
         {
+          conn.setAutoCommit(false);
           try (ResultSet rsDocs = 
               stmt.executeQuery("SELECT DISTINCT id, name FROM corpus WHERE type='DOCUMENT'"))
           {
@@ -725,16 +765,45 @@ public class AdministrationDao extends AbstractAdminstrationDao
               
               psFacts.setLong(1, rsDocs.getLong(1));
               String docName = rsDocs.getString(2);
+              org.eclipse.emf.common.util.URI docURI = corpusURI.appendSegment(docName);
               
               try(ResultSet rsSingleDoc = psFacts.executeQuery())
               {
-                SDocumentGraphMapper mapper = new SDocumentGraphMapper(
-                    org.eclipse.emf.common.util.URI.createURI("salt:/").appendSegment(corpusName).appendSegment(docName));
+                SDocumentGraphMapper mapper = new SDocumentGraphMapper(docURI);
                 SDocumentGraph graph = mapper.extractData(rsSingleDoc);
-                log.info("Successfully extracted " + graph.getNodes().size() + " nodes for document " + docName);
+                
+                // serialization fails with nullpointer exception if there is no label
+                graph.createAnnotation("test", "test", "");
+                
+                psInsertDoc.setString(1, docURI.toString());
+                
+                
+                try(ByteArrayOutputStream outStream = new ByteArrayOutputStream(32*1024))
+                {
+                  XMLStreamWriter xml = xmlFactory.createXMLStreamWriter(outStream, 
+                      "UTF-8");
+                  
+                  xml.writeStartDocument("1.0");
+                  xml.writeCharacters("\n");
+                  SaltXML10Writer writer = new SaltXML10Writer();
+                  writer.setPrettyPrint(false);
+                  writer.writeDocumentGraph(xml, graph);
+                  
+                  psInsertDoc.setString(2, new String(outStream.toByteArray(), StandardCharsets.UTF_8));
+                  
+                  psInsertDoc.execute();
+                  
+                  log.info("Successfully extracted " + graph.getNodes().size() + " nodes for document " + docName);
+                }
+                catch(XMLStreamException | IOException ex)
+                {
+                  log.error("Can't serialize the document XML", ex);
+                }
+                
               }
             }
           }
+          conn.commit();
         }
       }
 
