@@ -90,7 +90,7 @@ public class SDocumentGraphMapper
   public SDocumentGraph extractData(ResultSet resultSet)
     throws SQLException
   {
-    SDocumentGraph graph = SaltFactory.createSDocumentGraph();
+    SDocumentGraph graph = null;
  
 
     // fn: parent information (pre and component) id to node
@@ -112,6 +112,11 @@ public class SDocumentGraphMapper
     int counter = 0;
     while (resultSet.next())
     {
+      if(graph == null)
+      {
+        graph = SaltFactory.createSDocumentGraph();
+      }
+      
       if (counter % 1000 == 0)
       {
         log.debug("handling resultset row {}", counter);

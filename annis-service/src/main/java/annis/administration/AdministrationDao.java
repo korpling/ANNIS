@@ -16,6 +16,7 @@
 package annis.administration;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
@@ -781,7 +782,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
                 SDocumentGraphMapper mapper = new SDocumentGraphMapper(docURI);
                 SDocumentGraph graph = mapper.extractData(rsSingleDoc);
                 
-                // serialization fails with nullpointer exception if there is no label
+                // TODO: serialization fails with nullpointer exception if there is no label
                 graph.createAnnotation("test", "test", "");
                 
                 psInsertDoc.setString(1, docURI.toString());
@@ -797,6 +798,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
                   SaltXML10Writer writer = new SaltXML10Writer();
                   writer.setPrettyPrint(false);
                   writer.writeDocumentGraph(xml, graph);
+                  xml.writeEndDocument();
+                  
+                  outStream.flush();
+                  outStream.close();
                   
                   psInsertDoc.setString(2, new String(outStream.toByteArray(), StandardCharsets.UTF_8));
                   
