@@ -100,7 +100,7 @@ centralGravity: 0.8,
 springLength: sprLength,
 springConstant: sprConstant,
 nodeDistance: nodeDist,
-damping: 0.4
+damping: 0.2
 },
 maxVelocity: 50,
 minVelocity: 1,
