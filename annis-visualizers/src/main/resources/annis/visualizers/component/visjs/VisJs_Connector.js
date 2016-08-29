@@ -112,7 +112,6 @@ iterations: 1000
 }
 }
 ;
-//$(container).remove("canvas");
 
 
 visjscomponent = new vis.Network(container, data, options); 
