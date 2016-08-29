@@ -1,26 +1,23 @@
 //Connector
 window.annis_visualizers_component_visjs_VisJsComponent = function() {
 
-var div = this.getElement(); 
-
-var container = div;
+var container = this.getElement(); 
 
 $(container).css({"width": "100%", "height": "100%"});
 var	containerWidth = $(container).width();
 var	containerHeight =  $(container).height();
 
-div.style.border = "thin solid light blue";
-div.style.display = "inline-block";
 
+container.style.border = "thin solid light blue";
+container.style.display = "inline-block";
 
-//$(container).css({"width": containerWidth, "height": containerHeight});
 
 var strNodes =  this.getState().strNodes;
 var strEdges = this.getState().strEdges;
 var visjscomponent = null;
 
 
-// Handle changes from the server-side
+// handle changes from the server-side
 this.onStateChange = function(){
 		
 	// cleanup old graph
@@ -115,7 +112,7 @@ iterations: 1000
 }
 }
 ;
-$(container).remove("canvas");
+//$(container).remove("canvas");
 
 
 visjscomponent = new vis.Network(container, data, options); 
@@ -130,6 +127,7 @@ $("div.vis-network div.vis-navigation div.vis-button.vis-right").css({"bottom": 
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomIn").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "15px"});
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomOut").css({"bottom": "auto", "top": "50px", "left": "auto", "right": "15px"});
 $("div.vis-network div.vis-navigation div.vis-button.vis-zoomExtends").css({"bottom": "auto", "top": "10px", "left": "auto", "right": "55px"});
+
   
 };
 
