@@ -63,12 +63,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
 	private static final String TRAV_SPEAKER_HAS_MATCHES = "SpeakerHasMatches";
 	private static HashMap <String, Boolean> speakerHasMatches = new HashMap<String, Boolean>();
-	private static String currSpeakerName;
-	private static String prevSpeakerName;
-	
-	
-	
-	
+	private static String speakerName;
+	// TODO reset of global counter for every new query
+	private int counter = 1;
   
   private static class IsDominatedByMatch implements GraphTraverseHandler
   {
@@ -79,23 +76,15 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
         SRelation<SNode, SNode> relation, SNode fromNode, long order)
     {
-	    if (traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH))
-	    {
-	      SFeature matchedAnno = currNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
+    	 SFeature matchedAnno = currNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
 	      if(matchedAnno != null)
 	      {
 	        matchedNode = matchedAnno.getValue_SNUMERIC();
+	        if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
+	        {
+	        speakerHasMatches.put(speakerName, true);
+	        }
 	      }
-	    }
-	    else if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES)){
-	    	 SFeature matchedAnno = currNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
-		      if(matchedAnno != null)
-		      {
-		        matchedNode = matchedAnno.getValue_SNUMERIC();
-		        speakerHasMatches.put(currSpeakerName, true);
-		        
-		      }
-	    }
     }
 
     @Override
@@ -136,7 +125,10 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   public void convertText(SDocumentGraph graph, List<String> annoKeys,
     Map<String, String> args, int matchNumber, Writer out)
     throws IOException
-  {
+  { 
+  	String currSpeakerName = "";
+	String prevSpeakerName = "";
+	    
     if(graph != null)
     {
       List<SToken> orderedToken = graph.getSortedTokenByText();
@@ -146,16 +138,16 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	  speakerHasMatches = new HashMap<String, Boolean>();
     	  for(SToken token : orderedToken){
     		  
-    		  //System.out.println(token +"\t" + graph.getText(token)+ "---" );
+    		 // System.out.println(token +"\t" + graph.getText(token)+ "---" );
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
              // System.out.println(textualDS.getName() + "\t" + textualDS.getText());
-              currSpeakerName = textualDS.getName();
+              speakerName = textualDS.getName();
               
-              if (!speakerHasMatches.containsKey(currSpeakerName))
+              if (!speakerHasMatches.containsKey(speakerName))
               {
-            	  speakerHasMatches.put(currSpeakerName, false);
+            	  speakerHasMatches.put(speakerName, false);
               }
-              else if (speakerHasMatches.get(currSpeakerName) == true)
+              else if (speakerHasMatches.get(speakerName) == true)
               {
             	  continue;
               }
@@ -169,82 +161,90 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	  
     	 // System.out.println(speakerHasMatches);
     	  
-    	 
+    	  
     	 //iterate again 
         ListIterator<SToken> it = orderedToken.listIterator();
         long lastTokenWasMatched = -1;
+            
         while(it.hasNext())
         {    	
-          SToken tok = it.next();
-           
-          // check, whether the speaker has matches
+          SToken tok = it.next();         
+          //get current speaker name
           currSpeakerName = CommonHelper.getTextualDSForNode(tok, graph).getName();
+                    
+          //System.out.print(graph.getText(tok) + "\t");
           
-          
-          if(it.hasPrevious())
-          {
-        	
-              if (speakerHasMatches.get(currSpeakerName) == false)
-              {
-            	  continue;
-              }
-              else{
-            	  String seperator = " "; // default to space as separator
-                  
-                  List<SNode> root = new LinkedList<>();
-                  root.add(tok);
-                  IsDominatedByMatch traverser = new IsDominatedByMatch();
-                  graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, "IsDominatedByMatch", traverser);
-                  if(traverser.matchedNode != null)
-                  {
-                    // is dominated by a (new) matched node, thus use tab to seperate the non-matches from the matches
-                    if(lastTokenWasMatched < 0)
-                    {
-                      seperator = "\t";                  
-                    }
-                    else if(lastTokenWasMatched != (long) traverser.matchedNode)
-                    {
-                      // always leave an empty column between two matches, even if there is no actual context
-                      seperator = "\t\t";
-                    }
-                    lastTokenWasMatched = traverser.matchedNode;
-                  }
-                  else if(lastTokenWasMatched >= 0)
-                  {
-                    // also mark the end of a match with the tab
-                    seperator = "\t";
-                    lastTokenWasMatched = -1;
-                  }
-                  out.append(seperator);
-                  
-                  if (!currSpeakerName.equals(prevSpeakerName)){
-                	  prevSpeakerName = currSpeakerName;
-                	  out.append("\n");
-                  }  
-            	  
-              }
-        	  
-           
-          } // end if has previous
-          else // has no previous token and thus no previous speaker
+          // if speaker has no matches, skip token
+          if (speakerHasMatches.get(currSpeakerName) == false)
           {
         	  prevSpeakerName = currSpeakerName;
+        	  continue;
           }
           
+          //if speaker has matches
+          else
+          {
+	        	  //if current speaker is new, append his name 
+	        	 if (!currSpeakerName.equals(prevSpeakerName))
+	        	 { 
+	        		 // TODO no newline before first line 
+	        		 out.append("\n");
+	        		
+	        		   		
+	        		 	        		 
+	        		 out.append(String.valueOf(counter) + "\t");
+	        		 out.append(currSpeakerName + "\t");
+	        		 lastTokenWasMatched = -1;
+	        		
+	        	 }
+	        	 
+	        	  String separator = " "; // default to space as separator
+	        	  // TODO consider the following case: token has no previous for current speaker -> no default separator
+	        	  
+		        //  if(it.hasPrevious())
+		          //{                        
+		                  List<SNode> root = new LinkedList<>();
+		                  root.add(tok);
+		                  IsDominatedByMatch traverser = new IsDominatedByMatch();
+		                  graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, "IsDominatedByMatch", traverser);
+		                  if(traverser.matchedNode != null)
+		                  {
+		                    // is dominated by a (new) matched node, thus use tab to separate the non-matches from the matches
+		                    if(lastTokenWasMatched < 0)
+		                    {
+		                      separator = "\t";                  
+		                    }
+		                    else if(lastTokenWasMatched != (long) traverser.matchedNode)
+		                    {
+		                      // always leave an empty column between two matches, even if there is no actual context
+		                      separator = "\t\t";
+		                    }
+		                    lastTokenWasMatched = traverser.matchedNode;
+		                  }
+		                  else if(lastTokenWasMatched >= 0)
+		                  {
+		                    // also mark the end of a match with the tab
+		                    separator = "\t";
+		                    lastTokenWasMatched = -1;
+		                  }
+		                  out.append(separator);
+		           
+		        //  }
+		        	          
+		          
           // append the actual token
           out.append(graph.getText(tok));
-         // System.out.println("appended: " + tok +"\t" + graph.getText(tok)+ "+++");
+          prevSpeakerName = currSpeakerName;
+               
+         }              
           
         }
-      }
-    //  System.out.println("\n -----------------------------");
       
+        counter++;
+      }
+       
     }
-    
-   // if (!speakerHasMatches.containsKey(currSpeakerName))
-   // {
-    out.append("\n");
-   // }
+
   }
 
   
