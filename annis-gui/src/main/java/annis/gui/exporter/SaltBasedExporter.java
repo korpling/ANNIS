@@ -37,11 +37,11 @@ import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.UrlEscapers;
-import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
