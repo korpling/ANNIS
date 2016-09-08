@@ -16,6 +16,8 @@
 package annis.libgui;
 
 import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 
@@ -27,6 +29,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +46,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
@@ -58,6 +62,7 @@ import org.eclipse.emf.common.util.BasicEList;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
@@ -84,6 +89,7 @@ import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.Match;
 import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
 import elemental.json.JsonValue;
@@ -1088,50 +1094,49 @@ public class Helper
 
     private Map<String, Long> matchedAndCovered;
 
-    private long currentMatchPos;
+    private final static Comparator<SNode> comp = new Comparator<SNode>()
+    {
+      
+      @Override
+      public int compare(SNode o1, SNode o2)
+      {
+        // generate several helper variables we want to compare
+        RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getFeature(
+            ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getFeature(
+          ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+        long leftTokIdxO1 = feat1.getLeftToken();
+        long rightTokIdxO1 = feat1.getRightToken();
+        long leftTokIdxO2 = feat2.getLeftToken();
+        long rightTokIdxO2 = feat2.getRightToken();
+
+        int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
+        int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);
+
+        SFeature featMatch1 = o1.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        SFeature featMatch2 = o2.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        long matchNode1 = featMatch1 == null ? Long.MAX_VALUE : featMatch1.getValue_SNUMERIC();
+        long matchNode2 = featMatch2 == null ? Long.MAX_VALUE : featMatch2.getValue_SNUMERIC();
+        
+        // use a comparison chain which is much less verbose and better readable
+        return ComparisonChain.start()
+            .compare(intervallO1, intervallO2)
+            .compare(feat1.getLeftToken(),  feat2.getLeftToken())
+            .compare(feat1.getRightToken(), feat2.getRightToken())
+            .compare(matchNode1, matchNode2)
+            .compare(feat1.getInternalID(), feat2.getInternalID())
+            .result();
+
+      }
+    };
 
     public CoveredMatchesCalculator(SDocumentGraph graph,
       Map<String, Long> initialMatches)
     {
       this.matchedAndCovered = initialMatches;
 
-      Map<SNode, Long> sortedMatchedNodes = new TreeMap<>(
-        new Comparator<SNode>()
-        {
-          @Override
-          public int compare(SNode o1, SNode o2)
-          {
-            RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getFeature(
-              ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-            RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getFeature(
-              ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-
-            long leftTokIdxO1 = feat1.getLeftToken();
-            long rightTokIdxO1 = feat1.getRightToken();
-            long leftTokIdxO2 = feat2.getLeftToken();
-            long rightTokIdxO2 = feat2.getRightToken();
-
-            int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
-            int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);
-
-            if (intervallO1 - intervallO2 != 0)
-            {
-              return intervallO1 - intervallO2;
-            }
-            else if (feat1.getLeftToken() - feat2.getRightToken() != 0)
-            {
-              return (int) (feat1.getLeftToken() - feat2.getRightToken());
-            }
-            else if (feat1.getRightToken() - feat2.getRightToken() != 0)
-            {
-              return (int) (feat1.getRightToken() - feat2.getRightToken());
-            }
-            else
-            {
-              return (int) (feat1.getInternalID() - feat2.getInternalID());
-            }
-          }
-        });
+      Map<SNode, Long> sortedMatchedNodes = new TreeMap<>(comp);
 
       for (Map.Entry<String, Long> entry : initialMatches.entrySet())
       {
@@ -1139,7 +1144,6 @@ public class Helper
         sortedMatchedNodes.put(n, entry.getValue());
       }
 
-      currentMatchPos = 1;
       if (initialMatches.size() > 0)
       {
         graph.traverse(new BasicEList<>(sortedMatchedNodes.
@@ -1158,11 +1162,11 @@ public class Helper
         && matchedAndCovered.containsKey(fromNode.getId())
         && currNode != null)
       {
-        currentMatchPos = matchedAndCovered.get(fromNode.getId());
+        long currentMatchPos = matchedAndCovered.get(fromNode.getId());
         
         // only update the map when there is no entry yet or if the new index/position is smaller
         Long oldMatchPos = matchedAndCovered.get(currNode.getId());
-        if(oldMatchPos == null || currentMatchPos < oldMatchPos)
+        if(oldMatchPos == null)
         {          
           matchedAndCovered.put(currNode.getId(), currentMatchPos);
         }
@@ -1241,4 +1245,43 @@ public class Helper
       return false;
     }
   }
+  
+  public static void addMatchToDocumentGraph(Match match, SDocument document)
+  {
+    List<String> allUrisAsString = new LinkedList<>();
+    long i = 1;
+    for (URI u : match.getSaltIDs())
+    {
+      allUrisAsString.add(u.toASCIIString());
+      SNode matchedNode = document.getDocumentGraph().getNode(u.toASCIIString());
+      // set the feature for this specific node
+      if (matchedNode != null)
+      {
+        SFeature existing = matchedNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        if (existing == null)
+        {
+          SFeature featMatchedNode = SaltFactory.createSFeature();
+          featMatchedNode.setNamespace(ANNIS_NS);
+          featMatchedNode.setName(FEAT_MATCHEDNODE);
+          featMatchedNode.setValue(i);
+          matchedNode.addFeature(featMatchedNode);
+        }
+      }
+      i++;
+    }
+
+    SFeature featIDs = SaltFactory.createSFeature();
+    featIDs.setNamespace(ANNIS_NS);
+    featIDs.setName(FEAT_MATCHEDIDS);
+    featIDs.setValue(Joiner.on(",").join(allUrisAsString));
+    document.addFeature(featIDs);
+
+    SFeature featAnnos = SaltFactory.createSFeature();
+    featAnnos.setNamespace(ANNIS_NS);
+    featAnnos.setName(FEAT_MATCHEDANNOS);
+    featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
+    document.addFeature(featAnnos);
+
+  }
+  
 }

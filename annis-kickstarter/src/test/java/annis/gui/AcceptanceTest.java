@@ -15,9 +15,13 @@
  */
 package annis.gui;
 
-import annis.service.objects.AnnisCorpus;
-import de.hu_berlin.german.korpling.annis.kickstarter.KickstartRunner;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -25,17 +29,23 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Set;
-import java.util.LinkedHashSet;
-import java.util.List;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
+
+import com.google.common.io.Files;
+
+import annis.service.objects.AnnisCorpus;
+import de.hu_berlin.german.korpling.annis.kickstarter.KickstartRunner;
 
 /**
  *
@@ -71,7 +81,13 @@ public class AcceptanceTest
         corpora.add(c.getName());
       }
       
-      driver = new FirefoxDriver();
+      DesiredCapabilities caps = new DesiredCapabilities();
+      caps.setCapability("takesScreenshot", true);
+      
+      
+      driver = new PhantomJSDriver(caps);
+      driver.manage().window().setSize(new Dimension(1024, 768));
+      
     }
     catch (Exception ex)
     {
@@ -92,6 +108,21 @@ public class AcceptanceTest
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("v-app")));
   }
   
+  protected void takeScreenshot(File outputFile) {
+    if(driver instanceof TakesScreenshot)
+    {
+      File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+      try
+      {
+        Files.copy(screenshot, outputFile);
+      }
+      catch (IOException ex)
+      {
+        log.error("Could not create screenshot", ex);
+      }
+    }
+  }
+  
   @Test
   public void testAboutWindow()
   {
@@ -109,7 +140,7 @@ public class AcceptanceTest
   }
   
   @Test
-  public void testTokenSearchPcc2()
+  public void testTokenSearchPcc2() throws IOException
   {
     JavascriptExecutor js = (JavascriptExecutor) driver;
 
@@ -123,6 +154,7 @@ public class AcceptanceTest
     codeMirror.click();
     // set text by javascript
     js.executeScript("arguments[0].CodeMirror.setValue('tok');", codeMirror);
+    
     
     List<WebElement> corpusTableElements = driver.findElements(By.xpath("//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']//table[contains(@class, 'v-table-table')]//tr"));
     WebElement tdPcc = null;

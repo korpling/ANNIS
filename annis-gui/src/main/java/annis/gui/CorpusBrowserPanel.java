@@ -15,31 +15,6 @@
  */
 package annis.gui;
 
-import annis.gui.beans.CorpusBrowserEntry;
-import annis.gui.objects.Query;
-import annis.libgui.Helper;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisCorpus;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.DefaultItemSorter;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -47,11 +22,39 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import org.slf4j.LoggerFactory;
+
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.DesignRoot;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.DefaultItemSorter;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.declarative.Design;
+
+import annis.gui.beans.CorpusBrowserEntry;
+import annis.gui.objects.Query;
+import annis.libgui.Helper;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisCorpus;
 /**
  *
  * @author thomas
  */
+@DesignRoot
 public class CorpusBrowserPanel extends Panel
 {
 
@@ -67,26 +70,41 @@ public class CorpusBrowserPanel extends Panel
 
   private AnnisCorpus corpus;
 
-  private Table tblNodeAnno;
+  private ExampleTable tblNodeAnno;
 
   private BeanItemContainer<CorpusBrowserEntry> containerNodeAnno;
+  
+  private Label lblNoNodeAnno;
 
-  private Table tblEdgeTypes;
+  private ExampleTable tblEdgeTypes;
 
   private BeanItemContainer<CorpusBrowserEntry> containerEdgeType;
+  
+  private Label lblNoEdgeTypes;
 
-  private Table tblEdgeAnno;
+  private ExampleTable tblEdgeAnno;
 
   private BeanItemContainer<CorpusBrowserEntry> containerEdgeAnno;
+  
+  private Label lblNoEdgeAnno;
 
-  private Table tblMetaAnno;
+  private ExampleTable tblMetaAnno;
 
   private BeanItemContainer<CorpusBrowserEntry> containerMetaAnno;
+  
+  private Label lblNoMetaAnno;
 
   private CitationLinkGenerator citationGenerator;
 
   private QueryController controller;
+  
+  private Accordion accordion;
 
+  public CorpusBrowserPanel()
+  {
+    this(null, null);
+  }
+  
   public CorpusBrowserPanel(final AnnisCorpus corpus,
     QueryController controller)
   {
@@ -94,11 +112,8 @@ public class CorpusBrowserPanel extends Panel
     this.corpus = corpus;
     this.controller = controller;
 
-    setSizeFull();
+    Design.read("CorpusBrowserPanel.html", this);
 
-    Accordion accordion = new Accordion();
-    setContent(accordion);
-    accordion.setSizeFull();
 
     containerNodeAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
@@ -118,21 +133,20 @@ public class CorpusBrowserPanel extends Panel
 
     citationGenerator = new CitationLinkGenerator();
 
-    tblNodeAnno = new ExampleTable(citationGenerator, containerNodeAnno);
     tblNodeAnno.addValueChangeListener(new ExampleListener());
-    tblNodeAnno.addStyleName(ChameleonTheme.TABLE_STRIPED);
-
-    tblEdgeTypes = new ExampleTable(citationGenerator, containerEdgeType);
     tblEdgeTypes.addValueChangeListener(new ExampleListener());
-    tblEdgeTypes.addStyleName(ChameleonTheme.TABLE_STRIPED);
-
-    tblEdgeAnno = new ExampleTable(citationGenerator, containerEdgeAnno);
     tblEdgeAnno.addValueChangeListener(new ExampleListener());
-    tblEdgeAnno.addStyleName(ChameleonTheme.TABLE_STRIPED);
-
-    tblMetaAnno = new ExampleTable(citationGenerator, containerMetaAnno);
     tblMetaAnno.addValueChangeListener(new ExampleListener());
-    tblMetaAnno.addStyleName(ChameleonTheme.TABLE_STRIPED);
+    
+    tblNodeAnno.setContainerDataSource(containerNodeAnno);
+    tblEdgeAnno.setContainerDataSource(containerEdgeAnno);
+    tblEdgeTypes.setContainerDataSource(containerEdgeType);
+    tblMetaAnno.setContainerDataSource(containerMetaAnno);
+    
+    tblNodeAnno.setCitationLinkGenerator(citationGenerator);
+    tblEdgeAnno.setCitationLinkGenerator(citationGenerator);
+    tblEdgeTypes.setCitationLinkGenerator(citationGenerator);
+    tblMetaAnno.setCitationLinkGenerator(citationGenerator);
 
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
@@ -144,7 +158,8 @@ public class CorpusBrowserPanel extends Panel
     boolean hasDominance = false;
     boolean hasEmptyDominance = false;
 
-    List<AnnisAttribute> attributes = fetchAnnos(corpus.getName());
+    List<AnnisAttribute> attributes = corpus == null ? new LinkedList<AnnisAttribute>() 
+        : fetchAnnos(corpus.getName());
 
     // do some preparations first
     for (AnnisAttribute a : attributes)
@@ -291,39 +306,31 @@ public class CorpusBrowserPanel extends Panel
 
     if (containerNodeAnno.size() == 0)
     {
-      placeEmptyLabel(accordion, "Node Annotations");
+      lblNoNodeAnno.setVisible(true);
+      tblNodeAnno.setVisible(false);;
     }
-    else
-    {
-      accordion.addTab(tblNodeAnno, "Node Annotations", null);
-    }
+    
 
     if (tblEdgeAnno.getContainerDataSource().size() == 0)
     {
-      placeEmptyLabel(accordion, "Edge Annotations");
+      lblNoEdgeAnno.setVisible(true);
+      tblEdgeAnno.setVisible(false);
     }
-    else
-    {
-      accordion.addTab(tblEdgeAnno, "Edge Annotations", null);
-    }
+    
 
     if (tblEdgeTypes.getContainerDataSource().size() == 0)
     {
-      placeEmptyLabel(accordion, "Edge Types");
+      lblNoEdgeTypes.setVisible(true);
+      tblEdgeTypes.setVisible(false);
     }
-    else
-    {
-      accordion.addTab(tblEdgeTypes, "Edge Types", null);
-    }
+    
 
     if (tblMetaAnno.getContainerDataSource().size() == 0)
     {
-      placeEmptyLabel(accordion, "Meta Annotations");
+      lblNoMetaAnno.setVisible(true);
+      tblMetaAnno.setVisible(false);
     }
-    else
-    {
-      accordion.addTab(tblMetaAnno, "Meta Annotations", null);
-    }
+    
   }
 
   private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)
@@ -359,45 +366,6 @@ public class CorpusBrowserPanel extends Panel
     return new LinkedList<>(result);
   }
 
-  public static class ExampleTable extends Table
-  {
-
-    public ExampleTable(CitationLinkGenerator citationGenerator,
-      BeanItemContainer<CorpusBrowserEntry> container)
-    {
-      setContainerDataSource(container);
-      addGeneratedColumn("genlink", citationGenerator);
-      setSizeFull();
-      setSelectable(true);
-      setMultiSelect(false);
-
-      addGeneratedColumn("example", new ColumnGenerator()
-      {
-        @Override
-        public Object generateCell(Table source, Object itemId, Object columnId)
-        {
-          CorpusBrowserEntry corpusBrowserEntry = (CorpusBrowserEntry) itemId;
-          Label l = new Label(corpusBrowserEntry.getExample());
-          l.setContentMode(ContentMode.TEXT);
-          l.addStyleName(Helper.CORPUS_FONT_FORCE);
-          return l;
-        }
-      });
-
-      setVisibleColumns(new String[]
-      {
-        "name", "example", "genlink"
-      });
-      setColumnHeaders(new String[]
-      {
-        "Name", "Example (click to use query)", "URL"
-      });
-      setColumnExpandRatio("name", 0.3f);
-      setColumnExpandRatio("example", 0.7f);
-      setImmediate(true);
-    }
-  }
-
   public class ExampleListener implements ValueChangeListener
   {
 
@@ -408,7 +376,10 @@ public class CorpusBrowserPanel extends Panel
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().
         getValue();
       Set<String> corpusNameSet = new HashSet<>();
-      corpusNameSet.add(corpus.getName());
+      if(corpus != null)
+      {
+        corpusNameSet.add(corpus.getName());
+      }
       if (controller != null && cbe != null)
       {
         controller.setQuery(new Query(cbe.getExample(), corpusNameSet));
@@ -467,24 +438,5 @@ public class CorpusBrowserPanel extends Panel
     public AnnisAttributeListType()
     {
     }
-  }
-
-  /**
-   * Places a label with the text "(No <caption>)" in the centered middle of the accordion
-   * tab.
-   *
-   * @param accordion the target accordion
-   * @param caption is set as caption of the accordion tab
-   */
-  private void placeEmptyLabel(Accordion accordion, String caption)
-  {
-    VerticalLayout v = new VerticalLayout();
-    v.setSizeFull();
-    Label l = new Label("(No " + caption + ")");
-    v.addComponent(l);
-    l.setSizeUndefined();
-    v.setComponentAlignment(l, Alignment.MIDDLE_CENTER);
-    accordion.addTab(v, caption, null);
-    l.setSizeUndefined();
   }
 }

@@ -55,7 +55,6 @@ import annis.gui.controller.FrequencyBackgroundJob;
 import annis.gui.controller.SpecificPagingCallback;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.controlpanel.SearchOptionsPanel;
-import annis.gui.exporter.Exporter;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.gui.objects.ContextualizedQuery;
@@ -72,6 +71,7 @@ import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Background;
 import annis.libgui.Helper;
+import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.model.AqlParseError;
@@ -99,8 +99,6 @@ public class QueryController implements Serializable
 
   private final QueryUIState state;
 
-  private final Map<String, Exporter> exporterMap = new HashMap<>();
-
   public QueryController(SearchView searchView, AnnisUI ui)
   {
     this.searchView = searchView;
@@ -126,12 +124,6 @@ public class QueryController implements Serializable
         validateQuery();
       }
     });
-
-    for (Exporter e : SearchView.EXPORTER)
-    {
-      String name = e.getClass().getSimpleName();
-      exporterMap.put(name, e);
-    }
     
     this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
     {
@@ -329,7 +321,7 @@ public class QueryController implements Serializable
     }
     if (q instanceof ExportQuery)
     {
-      setIfNew(state.getExporterName(), ((ExportQuery) q).getExporterName());
+      setIfNew(state.getExporter(), ((ExportQuery) q).getExporter());
       setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).
         getAnnotationKeys());
       setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
@@ -371,7 +363,7 @@ public class QueryController implements Serializable
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
       .segmentation(state.getVisibleBaseText().getValue())
-      .exporter(state.getExporterName().getValue())
+      .exporter(state.getExporter().getValue())
       .annotations(state.getExportAnnotationKeys().getValue())
       .param(state.getExportParameters().getValue())
       .build();
@@ -513,9 +505,11 @@ public class QueryController implements Serializable
     ExportQuery query = getExportQuery();
 
     addHistoryEntry(query);
-
+    
+    ExporterPlugin exporterImpl = ui.getExporter(query.getExporter());
+    
     exportFuture = Background.call(new ExportBackgroundJob(query,
-      getExporterByName(query.getExporterName()), ui, eventBus, panel));
+      exporterImpl, ui, eventBus, panel));
     state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
   }
 
@@ -586,11 +580,6 @@ public class QueryController implements Serializable
 
     freqFuture = Background.call(job);
     state.getExecutedTasks().put(QueryUIState.QueryType.FREQUENCY, freqFuture);
-  }
-
-  public Exporter getExporterByName(String name)
-  {
-    return exporterMap.get(name);
   }
 
   private List<ResultViewPanel> getResultPanels()

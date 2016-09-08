@@ -23,9 +23,11 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.Annotation;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.google.gwt.thirdparty.guava.common.base.Objects;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -52,6 +54,13 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig;
+import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SToken;
@@ -134,47 +143,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       String labelClass = vi.getMappings().getProperty("class", "htmlvis");
       lblResult.addStyleName(labelClass);
 
-      InputStream inStreamCSSRaw = null;
-      if (visConfigName == null)
-      {
-        inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
-      }
-      else
-      {
-        WebResource resBinary = Helper.getAnnisWebResource().path(
-          "query/corpora/").path(corpusName).path(corpusName)
-          .path("binary").path(visConfigName + ".css");
-
-        ClientResponse response = resBinary.get(ClientResponse.class);
-        if (response.getStatus() == ClientResponse.Status.OK.getStatusCode())
-        {
-          inStreamCSSRaw = response.getEntityInputStream();
-        }
-      }
-      if (inStreamCSSRaw != null)
-      {
-        try (InputStream inStreamCSS = inStreamCSSRaw)
-        {
-          String cssContent = IOUtils.toString(inStreamCSS);
-          UI currentUI = UI.getCurrent();
-          if (currentUI instanceof AnnisBaseUI)
-          {
-            // do not add identical CSS files
-            ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent,
-              wrapperClassName);
-          }
-        }
-        catch (IOException ex)
-        {
-          log.error("Could not parse the HTML visualizer CSS file",
-            ex);
-          Notification.show(
-            "Could not parse the HTML visualizer CSS file", ex.
-            getMessage(),
-            Notification.Type.ERROR_MESSAGE);
-        }
-      }
-
+      injectWebFonts(visConfigName, corpusName);
+      injectCSS(visConfigName, corpusName, wrapperClassName);
+ 
+      
     }
 
     if (vi.getMappings().containsKey("debug"))
@@ -287,6 +259,132 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
     }
     return null;
+  }
+  
+  private void injectCSS(String visConfigName, String corpusName, String wrapperClassName)
+  {
+    InputStream inStreamCSSRaw = null;
+    if (visConfigName == null)
+    {
+      inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
+    }
+    else
+    {
+      WebResource resBinary = Helper.getAnnisWebResource().path(
+        "query/corpora/").path(corpusName).path(corpusName)
+        .path("binary").path(visConfigName + ".css");
+
+      ClientResponse response = resBinary.get(ClientResponse.class);
+      if (response.getStatus() == ClientResponse.Status.OK.getStatusCode())
+      {
+        inStreamCSSRaw = response.getEntityInputStream();
+      }
+    }
+    if (inStreamCSSRaw != null)
+    {
+      try (InputStream inStreamCSS = inStreamCSSRaw)
+      {
+        String cssContent = IOUtils.toString(inStreamCSS);
+        UI currentUI = UI.getCurrent();
+        if (currentUI instanceof AnnisBaseUI)
+        {
+          // do not add identical CSS files
+          ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent,
+            wrapperClassName);
+        }
+      }
+      catch (IOException ex)
+      {
+        log.error("Could not parse the HTML visualizer CSS file",
+          ex);
+        Notification.show(
+          "Could not parse the HTML visualizer CSS file", ex.
+          getMessage(),
+          Notification.Type.ERROR_MESSAGE);
+      }
+    }
+  }
+  
+  private void injectWebFonts(String visConfigName, String corpusName)
+  {
+    InputStream inStreamJSONRaw = null;
+    if (visConfigName != null)
+    {
+      WebResource resBinary = Helper.getAnnisWebResource().path(
+        "query/corpora/").path(corpusName).path(corpusName)
+        .path("binary").path(visConfigName + ".fonts.json");
+
+      ClientResponse response = resBinary.get(ClientResponse.class);
+      if (response.getStatus() == ClientResponse.Status.OK.getStatusCode())
+      {
+        inStreamJSONRaw = response.getEntityInputStream();
+      }
+    }
+    if (inStreamJSONRaw != null)
+    {
+      try (InputStream inStreamJSON = inStreamJSONRaw)
+      {
+        ObjectMapper mapper = createJsonMapper();
+        WebFontList fontConfigList = mapper.readValue(inStreamJSON, WebFontList.class);
+       
+        for(WebFont fontConfig : fontConfigList.getWebFonts())
+        {
+        
+          if(fontConfig != null && fontConfig.getName() != null) {
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("@font-face {\n");
+            sb.append("  font-family: '" + fontConfig.getName() + "';\n");
+            sb.append("  font-weight: '" + fontConfig.getWeight() + "';\n");
+            sb.append("  font-style: '" + fontConfig.getStyle() + "';\n");
+            
+            List<String> sourceDefs = new LinkedList<>();
+            for(Map.Entry<String, String> src : fontConfig.getSources().entrySet()) {
+              sourceDefs.add("url('" + src.getValue() + "') format('" + src.getKey() + "')");
+            }
+            
+            if(!sourceDefs.isEmpty())
+            {
+              sb.append("  src: ");
+              sb.append(Joiner.on(",\n    ").join(sourceDefs));
+              sb.append(";\n");
+            }
+            
+            sb.append("}\n");
+            
+            UI currentUI = UI.getCurrent();
+            if (currentUI instanceof AnnisBaseUI)
+            {
+              // do not add identical CSS files
+              ((AnnisBaseUI) currentUI).injectUniqueCSS(sb.toString());
+            }
+          }
+        }
+        
+      }
+      catch (IOException ex)
+      {
+        log.error("Could not parse the HTML visualizer web-font configuration file",
+          ex);
+        Notification.show(
+          "Could not parse the HTML visualizer web-font configuration file", ex.
+          getMessage(),
+          Notification.Type.ERROR_MESSAGE);
+      }
+    }
+  }
+  
+  private ObjectMapper createJsonMapper()
+  {
+    ObjectMapper jsonMapper = new ObjectMapper();
+    // configure json object mapper
+    AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
+    jsonMapper.setAnnotationIntrospector(introspector);
+    // the json should be human readable
+    jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
+      true);
+    jsonMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES , false);
+    return jsonMapper;
   }
 
   public String createHTML(SDocumentGraph graph,

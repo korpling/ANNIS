@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,6 +56,7 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ChameleonTheme;
 
+import annis.CommonHelper;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
@@ -67,6 +69,7 @@ import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
+import annis.service.objects.Match;
 import annis.visualizers.LoadableVisualizer;
 
 /**
@@ -91,6 +94,8 @@ public class VisualizerPanel extends CssLayout
   private String corpusName;
 
   private String documentName;
+  
+  private Match match;
 
   private Component vis;
 
@@ -138,8 +143,7 @@ public class VisualizerPanel extends CssLayout
   public VisualizerPanel(
     final ResolverEntry entry,
     SDocument result,
-    String corpusName,
-    String documentName,
+    Match match,
     Set<String> visibleTokenAnnos,
     Map<String, Long> markedAndCovered,
     @Deprecated Map<String, String> markedAndCoveredMap,
@@ -159,8 +163,13 @@ public class VisualizerPanel extends CssLayout
     this.visCtxChanger = parent;
 
     this.result = result;
-    this.corpusName = corpusName;
-    this.documentName = documentName;
+    this.match = match;
+    if(!match.getSaltIDs().isEmpty())
+    {
+      List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
+      this.corpusName = corpusPath.get(0);
+      this.documentName = corpusPath.get(corpusPath.size()-1);
+    }
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
     this.segmentationName = segmentationName;
@@ -316,6 +325,8 @@ public class VisualizerPanel extends CssLayout
 
       SDocument wholeDocument = p.getCorpusGraphs().get(0).getDocuments()
         .get(0);
+      
+      Helper.addMatchToDocumentGraph(match, wholeDocument);
 
       input.setDocument(wholeDocument);
     }

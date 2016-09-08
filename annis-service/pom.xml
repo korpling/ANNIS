@@ -405,7 +405,7 @@
       	<version>1.4.0</version>
       	<configuration>
       		<systemProperties>
-      			<!-- whatever main class we are executing alway set the annis.home variable to target distribution directory -->
+      			<!-- whatever main class we are executing always set the annis.home variable to target distribution directory -->
       			<systemProperty>
       				<key>annis.home</key>
       				<value>${project.build.directory}/annis-service-${project.version}-distribution/annis-service-${project.version}/</value>
