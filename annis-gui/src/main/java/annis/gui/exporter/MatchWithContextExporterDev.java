@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SPointingRelation;
 import org.corpus_tools.salt.common.SSpanningRelation;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;
@@ -64,8 +65,11 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
 	private static final String TRAV_SPEAKER_HAS_MATCHES = "SpeakerHasMatches";
 	private static HashMap <String, Boolean> speakerHasMatches = new HashMap<String, Boolean>();
+	private static HashMap <String, Boolean> speakerMatches = new HashMap<String, Boolean>();
 	private static String speakerName;
 	boolean isFirstSpeakerWithMatch = true;   
+	static long maxHeight;
+	static int currHeight;
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
@@ -78,20 +82,49 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         SRelation<SNode, SNode> relation, SNode fromNode, long order)
     {
     	 SFeature matchedAnno = currNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
-	      if(matchedAnno != null)
+    	 
+    	 if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
+	        {
+	    	  if (relation!= null)
+				{			
+						currHeight++;
+						if (maxHeight < currHeight)
+						{
+							maxHeight = currHeight;
+						}
+						
+				}	
+			    	  
+	        } 
+    	 
+    	 if(matchedAnno != null)
 	      {
 	        matchedNode = matchedAnno.getValue_SNUMERIC();
+	       
+	        
 	        if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
 	        {
+	        System.out.println("Height:\t" + currHeight + "\t" + "MC\t" +  matchedNode + "\t" + currNode.getName());
 	        speakerHasMatches.put(speakerName, true);
 	        }
 	      }
+	      
+	     
+	      
+	      
     }
 
     @Override
     public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
         SRelation<SNode, SNode> relation, SNode fromNode, long order)
     {
+    	 if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
+	        {
+    		 if (relation!= null)
+    		 {
+    		 currHeight--;	  
+	        }
+	        }
      
     }
 
@@ -99,7 +132,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
         SRelation relation, SNode currNode, long order)
     {
-    	if(traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH) || traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
+    	if(traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH))
     	{	
 	      if(this.matchedNode != null)
 	      { // don't traverse any further if matched node was found 
@@ -113,6 +146,12 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	            || relation instanceof SDominanceRelation 
 	            || relation instanceof SSpanningRelation;
 	      }
+    	}
+    	else if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES)){
+    		return 
+    	            relation == null
+    	            || relation instanceof SDominanceRelation 
+    	            || relation instanceof SSpanningRelation;
     	}
     	else{
     		return true;
@@ -134,12 +173,26 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     if(graph != null)
     {
       List<SToken> orderedToken = graph.getSortedTokenByText();
+      
+      if(orderedToken != null)
+      {
+    	  for(SToken token : orderedToken){
+    		  System.out.print(graph.getText(token) + "\t");
+    	  }
+    	  System.out.println("\n");
+      }
+      
+      
       if(orderedToken != null)
       {    	   
     	 //reset the hash map for new graph
     	  speakerHasMatches = new HashMap<String, Boolean>();
     	// iterate first time over tokens to figure out which speaker has matches
     	  for(SToken token : orderedToken){
+    		  System.out.println("Token:\t" + graph.getText(token));
+              maxHeight = 0;
+              currHeight = 0;
+    		  
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
              // System.out.println(textualDS.getName() + "\t" + textualDS.getText());
               speakerName = textualDS.getName();
@@ -150,14 +203,22 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
               }
               else if (speakerHasMatches.get(speakerName) == true)
               {
-            	  continue;
+            	  //TODO 
+            	 // continue;
               }
         
               
     		  List<SNode> root = new LinkedList<>();
               root.add(token);
               IsDominatedByMatch traverserSpeakerSearch = new IsDominatedByMatch();
-              graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch);      	  
+              
+              /*System.out.println("Token:\t" + graph.getText(token));
+              maxHeight = 0;
+              currHeight = 0;*/
+              
+              graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch);   
+              System.out.println("MaxHeight \t"+ maxHeight + "\n ----------------------------------------------------");
+                        
     	  }
     	  
      	  
