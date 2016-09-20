@@ -21,6 +21,7 @@ import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -64,10 +65,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static final String TRAV_SPEAKER_HAS_MATCHES = "SpeakerHasMatches";
 	private static HashMap <String, Boolean> speakerHasMatches = new HashMap<String, Boolean>();
 	private static String speakerName;
-	// TODO reset of global counter, isFirstSpeakerWithMatch for every new query
-	//private int counter = 1;
-	boolean isFirstSpeakerWithMatch = true;
-    //int writerHashCode; 
+	boolean isFirstSpeakerWithMatch = true;   
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
@@ -104,8 +102,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	if(traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH) || traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
     	{	
 	      if(this.matchedNode != null)
-	      {
-	        // don't traverse any further if matched node was found 
+	      { // don't traverse any further if matched node was found 
 	        return false;
 	      }
 	      else
@@ -132,24 +129,17 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   	String currSpeakerName = "";
 	String prevSpeakerName = "";
 	
-	
-	
-	//System.out.println("match Number: " +matchNumber);
-	
-	
-	
+		
 	    
     if(graph != null)
     {
       List<SToken> orderedToken = graph.getSortedTokenByText();
       if(orderedToken != null)
-      {
+      {    	   
     	 //reset the hash map for new graph
     	  speakerHasMatches = new HashMap<String, Boolean>();
     	// iterate first time over tokens to figure out which speaker has matches
     	  for(SToken token : orderedToken){
-    		  
-    		 // System.out.println(token +"\t" + graph.getText(token)+ "---" );
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
              // System.out.println(textualDS.getName() + "\t" + textualDS.getText());
               speakerName = textualDS.getName();
@@ -170,18 +160,15 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
               graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch);      	  
     	  }
     	  
-    	 // System.out.println(speakerHasMatches);
-    	  
-    	  
+     	  
     	 //iterate again 
         ListIterator<SToken> it = orderedToken.listIterator();
         long lastTokenWasMatched = -1;
         boolean noPreviousTokenInLine = false;
         
-      //TODO why match number starts with -1? 
+      //TODO why does match number start with -1? 
     	//if match number == -1, reset global variables 
     	if (matchNumber == -1){
-    		//counter = 1;
     		isFirstSpeakerWithMatch = true;
     	}
     	
@@ -192,7 +179,6 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
           //get current speaker name
           currSpeakerName = CommonHelper.getTextualDSForNode(tok, graph).getName();
                     
-         // System.out.print(graph.getText(tok) + "\t");
           
           // if speaker has no matches, skip token
           if (speakerHasMatches.get(currSpeakerName) == false)
@@ -205,7 +191,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
           else
           {			
         	  
-	        	  //if current speaker is new, append his name 
+	        	  //if the current speaker is new, append his name 
 	        	 if (!currSpeakerName.equals(prevSpeakerName))
 	        	 { 
 	        		
@@ -216,9 +202,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        			 out.append("\n");
 	        		 } 
 	            		   		
-	        		 	        		 
-	        		// out.append(String.valueOf(counter) + "\t");
-	        		 // TODO why matchNumber starts with -1?
+	        		 	        		
+	        		 // TODO why does matchNumber start with -1?
 	        		 out.append(String.valueOf(matchNumber + 2) + "\t");
 	        		 out.append(currSpeakerName + "\t");
 	        		 lastTokenWasMatched = -1;
@@ -229,9 +214,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        	 
 	        	  String separator = " "; // default to space as separator
 	        	       	  
-		        //  if(it.hasPrevious())
-		          //{                        
-		                  List<SNode> root = new LinkedList<>();
+	        	  		  List<SNode> root = new LinkedList<>();
 		                  root.add(tok);
 		                  IsDominatedByMatch traverser = new IsDominatedByMatch();
 		                  graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, "IsDominatedByMatch", traverser);
@@ -256,15 +239,14 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                    lastTokenWasMatched = -1;
 		                  }
 		                  
-		                  //if tok is first token in line and not matched, set separator to empty string
+		                  //if tok is the first token in the line and not matched, set separator to empty string
 		                  if (noPreviousTokenInLine && separator.equals(" "))
 		                  {
 		                	 separator = "";
 		                  }
 		                  out.append(separator);
 		           
-		        //  }
-		        	          
+		       	          
 		          
           // append the actual token
           out.append(graph.getText(tok));
@@ -275,7 +257,6 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
           
         }
       
-        //counter++;
       }
        
     }
