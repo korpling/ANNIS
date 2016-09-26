@@ -22,7 +22,10 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,12 +73,17 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	boolean isFirstSpeakerWithMatch = true;   
 	static long maxHeight;
 	static int currHeight;
+	static List <Long> dominatedMatchedCodes = new ArrayList<Long>();
+	static Map <Integer, List<Long>> dominanceLists = new HashMap <Integer, List<Long>>();
+	static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
+	static Set<Long> inDominanceRel = new HashSet<Long>();
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
   {
    
     Long matchedNode = null;
+    
 
     @Override
     public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
@@ -105,6 +113,12 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
 	        {
 	        System.out.println("Height:\t" + currHeight + "\t" + "MC\t" +  matchedNode + "\t" + currNode.getName());
+	        dominatedMatchedCodes.add(matchedNode);
+	        
+	        if (dominatedMatchedCodes.size() > 1){
+	        	inDominanceRel.add(matchedNode);
+	        }
+	       
 	        speakerHasMatches.put(speakerName, true);
 	        }
 	      }
@@ -187,6 +201,11 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
       {    	   
     	 //reset the hash map for new graph
     	  speakerHasMatches = new HashMap<String, Boolean>();
+    	  
+    	  inDominanceRel = new HashSet<Long>();
+    	 
+    	  int number = 0;
+    
     	// iterate first time over tokens to figure out which speaker has matches
     	  for(SToken token : orderedToken){
     		  System.out.println("Token:\t" + graph.getText(token));
@@ -216,7 +235,17 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
               maxHeight = 0;
               currHeight = 0;*/
               
-              graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch);   
+              //reset list
+        	  dominatedMatchedCodes = new ArrayList<Long>();
+        	  
+              
+              graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch); 
+              if (!dominatedMatchedCodes.isEmpty()){
+            	  dominanceListsWithHead.put(dominatedMatchedCodes.get(0), dominatedMatchedCodes);
+                  dominanceLists.put(number++, dominatedMatchedCodes);
+              }
+              
+             
               System.out.println("MaxHeight \t"+ maxHeight + "\n ----------------------------------------------------");
                         
     	  }
@@ -226,6 +255,31 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         ListIterator<SToken> it = orderedToken.listIterator();
         long lastTokenWasMatched = -1;
         boolean noPreviousTokenInLine = false;
+        
+        Iterator<Long> inDomIt = inDominanceRel.iterator();
+        
+        while(inDomIt.hasNext()){
+        	Long matchingCode = inDomIt.next();
+        	if (dominanceListsWithHead.containsKey(matchingCode)){
+        		dominanceListsWithHead.remove(matchingCode);
+        	}
+        }
+        
+        Set<Map.Entry<Integer, List<Long>>> entries = dominanceLists.entrySet();
+        Map <Integer, List<Long>> dominanceListsWithoutDoubles = new HashMap<Integer, List<Long>>();
+        
+        for(Map.Entry<Integer, List<Long>> entry : entries){
+        	if (dominanceListsWithHead.containsValue(entry.getValue())){
+        		dominanceListsWithoutDoubles.put(entry.getKey(), entry.getValue());
+        	}
+        }
+        
+        
+        
+        System.out.println(dominanceLists);
+        System.out.println(dominanceListsWithHead);
+        System.out.println(dominanceListsWithoutDoubles);
+        
         
       //TODO why does match number start with -1? 
     	//if match number == -1, reset global variables 
@@ -252,11 +306,47 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
           else
           {			
         	  
-	        	  //if the current speaker is new, append his name 
+	        	  //if the current speaker is new, append his name and write the first line
 	        	 if (!currSpeakerName.equals(prevSpeakerName))
 	        	 { 
 	        		
 	        		 if (isFirstSpeakerWithMatch){
+	        			 
+	        			 out.append("match_number\t");
+	        			 out.append("speaker\t");
+	        			 
+	        			 out.append("left_context\t");
+		        		 
+		        		 String prefix = "M_";
+		        		 
+		        		 List <Map.Entry<Integer, List<Long>>> domListsSorted =  sortByKey(dominanceListsWithoutDoubles);
+		        		 int listCount = domListsSorted.size();
+		        		 int count = 0;
+		        		 
+		        		 for ( Map.Entry <Integer, List<Long>> entry : domListsSorted){
+		        			 count++;
+		        			 List <Long> dominanceChain = entry.getValue();
+		        			 
+		        			 for ( int i = dominanceChain.size() - 1; i >= 0; i--){
+		        				 out.append(prefix + dominanceChain.get(i) + "\t");
+		        			 }
+		        			 
+		        			 if (dominanceChain.size() > 1){
+		        				 for ( int i = 1; i < dominanceChain.size(); i++){
+			        				 out.append(prefix + dominanceChain.get(i) + "\t");
+			        			 }
+		        			 }
+		        			 
+		        			 if (count < listCount){
+		        				 out.append("middle_context_" +  count + "\t"); 
+		        			 }
+		        			 
+		        			 
+		        		 }
+		        		 
+		        		 out.append("right_context");
+		        		 out.append("\n");
+	        			 
 	        			 isFirstSpeakerWithMatch = false;
 	        		 }
 	        		 else {
@@ -267,6 +357,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        		 // TODO why does matchNumber start with -1?
 	        		 out.append(String.valueOf(matchNumber + 2) + "\t");
 	        		 out.append(currSpeakerName + "\t");
+	        		 
+	        		 
 	        		 lastTokenWasMatched = -1;
 	        		 noPreviousTokenInLine = true;
 	        		 
@@ -343,5 +435,24 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   {
     return "csv";
   }
+  
+  private static <K, V> List<Map.Entry<K, V>> sortByKey(Map<K, V> map) {
+		List<Map.Entry<K, V>> entries = new ArrayList<Map.Entry<K, V>>(map.size());
+
+		for (Map.Entry<K, V> e : map.entrySet()) {
+			entries.add(e);
+		}
+
+		Comparator<Map.Entry<K, V>> comparator = new Comparator<Map.Entry<K, V>>() {
+			public int compare(Map.Entry<K, V> e1, Map.Entry<K, V> e2) {
+				return e1.getKey().toString().compareToIgnoreCase(e2.getKey().toString());
+
+			}
+		};
+		// sort key values lexicographically
+		Collections.sort(entries, comparator);
+
+		return entries;
+	}
   
 }
