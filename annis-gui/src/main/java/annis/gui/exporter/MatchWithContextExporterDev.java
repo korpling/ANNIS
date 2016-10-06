@@ -61,6 +61,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * text exporter doesn't work since there are multiple speakers or normalizations.
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author irina
  */
 @PluginImplementation
 public class MatchWithContextExporterDev extends SaltBasedExporter
@@ -68,15 +69,14 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
 	private static final String TRAV_SPEAKER_HAS_MATCHES = "SpeakerHasMatches";
 	private static HashMap <String, Boolean> speakerHasMatches = new HashMap<String, Boolean>();
-	private static HashMap <String, Boolean> speakerMatches = new HashMap<String, Boolean>();
 	private static String speakerName;
-	boolean isFirstSpeakerWithMatch = true;   
-	static long maxHeight;
-	static int currHeight;
-	static List <Long> dominatedMatchedCodes = new ArrayList<Long>();
-	static Map <Integer, List<Long>> dominanceLists = new HashMap <Integer, List<Long>>();
-	static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
-	static Set<Long> inDominanceRel = new HashSet<Long>();
+	private boolean isFirstSpeakerWithMatch = true;   
+	private static long maxHeight;
+	private static int currHeight;
+	private static List <Long> dominatedMatchedCodes = new ArrayList<Long>();
+	private static Map <Integer, List<Long>> dominanceLists = new HashMap <Integer, List<Long>>();
+	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
+	private static Set<Long> inDominanceRelation = new HashSet<Long>();
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
@@ -99,24 +99,21 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 						if (maxHeight < currHeight)
 						{
 							maxHeight = currHeight;
-						}
-						
+						}						
 				}	
 			    	  
 	        } 
     	 
     	 if(matchedAnno != null)
 	      {
-	        matchedNode = matchedAnno.getValue_SNUMERIC();
-	       
+	        matchedNode = matchedAnno.getValue_SNUMERIC();	       
 	        
 	        if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
 	        {
-	        System.out.println("Height:\t" + currHeight + "\t" + "MC\t" +  matchedNode + "\t" + currNode.getName());
 	        dominatedMatchedCodes.add(matchedNode);
 	        
 	        if (dominatedMatchedCodes.size() > 1){
-	        	inDominanceRel.add(matchedNode);
+	        	inDominanceRelation.add(matchedNode);
 	        }
 	       
 	        speakerHasMatches.put(speakerName, true);
@@ -135,9 +132,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	 if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
 	        {
     		 if (relation!= null)
-    		 {
-    		 currHeight--;	  
-	        }
+	    		 {
+	    		 currHeight--;	  
+		        }
 	        }
      
     }
@@ -199,14 +196,15 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
       
       if(orderedToken != null)
       {    	   
-    	 //reset the hash map for new graph
-    	  speakerHasMatches = new HashMap<String, Boolean>();
-    	  
-    	  inDominanceRel = new HashSet<Long>();
-    	 
-    	  int number = 0;
+    	 //reset the data structures for new graph
+    	  speakerHasMatches.clear();    	  
+    	  inDominanceRelation.clear();    	  
+    	  dominanceLists.clear();    	  
+    	  dominanceListsWithHead.clear();
+    	 // counter over dominance lists
+    	  int counter = 0;
     
-    	// iterate first time over tokens to figure out which speaker has matches
+    	// iterate first time over tokens to figure out which speaker has matches and to recognize the hierarchical structure of matches as well
     	  for(SToken token : orderedToken){
     		  System.out.println("Token:\t" + graph.getText(token));
               maxHeight = 0;
@@ -222,7 +220,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
               }
               else if (speakerHasMatches.get(speakerName) == true)
               {
-            	  //TODO 
+            	  //TODO
             	 // continue;
               }
         
@@ -231,10 +229,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
               root.add(token);
               IsDominatedByMatch traverserSpeakerSearch = new IsDominatedByMatch();
               
-              /*System.out.println("Token:\t" + graph.getText(token));
-              maxHeight = 0;
-              currHeight = 0;*/
-              
+                          
               //reset list
         	  dominatedMatchedCodes = new ArrayList<Long>();
         	  
@@ -242,12 +237,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
               graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch); 
               if (!dominatedMatchedCodes.isEmpty()){
             	  dominanceListsWithHead.put(dominatedMatchedCodes.get(0), dominatedMatchedCodes);
-                  dominanceLists.put(number++, dominatedMatchedCodes);
+                  dominanceLists.put(counter++, dominatedMatchedCodes);
               }
-              
-             
-              System.out.println("MaxHeight \t"+ maxHeight + "\n ----------------------------------------------------");
-                        
+                                      
     	  }
     	  
      	  
@@ -256,8 +248,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         long lastTokenWasMatched = -1;
         boolean noPreviousTokenInLine = false;
         
-        Iterator<Long> inDomIt = inDominanceRel.iterator();
-        
+        Iterator<Long> inDomIt = inDominanceRelation.iterator();        
+        //eliminate entries whose key (matching code) dominate other matching codes  
         while(inDomIt.hasNext()){
         	Long matchingCode = inDomIt.next();
         	if (dominanceListsWithHead.containsKey(matchingCode)){
@@ -266,6 +258,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         }
         
         Set<Map.Entry<Integer, List<Long>>> entries = dominanceLists.entrySet();
+        // a helping data structure to eliminate duplicates of dominance lists
         Map <Integer, List<Long>> dominanceListsWithoutDoubles = new HashMap<Integer, List<Long>>();
         
         for(Map.Entry<Integer, List<Long>> entry : entries){
@@ -274,21 +267,20 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         	}
         }
         
-        
-        
+                
         System.out.println(dominanceLists);
         System.out.println(dominanceListsWithHead);
         System.out.println(dominanceListsWithoutDoubles);
         
                
-        // create adjacency matrix
+        // create adjacency matrix for storing of max distances between matching codes
         List <Map.Entry<Integer, List<Long>>> domListsSorted =  sortByKey(dominanceListsWithoutDoubles);
         int elementCount = 0;
         for ( Map.Entry <Integer, List<Long>> entry : domListsSorted){
 			 elementCount += entry.getValue().size();
         }
         
-        // TODO this approach works only if match codes is a sequence 1,2,3, ... 
+        // TODO this approach works only if sorted match codes are a sequence 1,2,3, ... 
         int [][] adjacencyMatrix = new int [elementCount][elementCount];
         Map <Long, Integer> maxDistances = new HashMap<Long, Integer>();
         // set initial values
@@ -317,16 +309,15 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 				}
 			}
        }
-        
-        for (int i = 0; i < adjacencyMatrix.length; i++){
+       
+        /*for (int i = 0; i < adjacencyMatrix.length; i++){
         	for (int j = 0; j < adjacencyMatrix[0].length; j++){
         		System.out.print(adjacencyMatrix[i][j] + "\t");
         	}
         	System.out.print("\n");
-        }
-        
+        }        
         System.out.println("maxDist: " +maxDistances);
-        
+        */
         
         
         
@@ -368,6 +359,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        			 out.append("left_context\t");
 		        		 
 		        		 String prefix = "M_";
+		        		 
+		        		 System.out.println("dominanceListsWithoutDoubles: " +  dominanceListsWithoutDoubles);
 		        		 
 		        		 domListsSorted =  sortByKey(dominanceListsWithoutDoubles);
 		        		 int listCount = domListsSorted.size();
@@ -504,7 +497,6 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     }
 
   }
-
   
 
   @Override
