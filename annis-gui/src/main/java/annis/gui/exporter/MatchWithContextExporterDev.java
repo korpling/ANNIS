@@ -77,6 +77,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static Map <Integer, List<Long>> dominanceLists = new HashMap <Integer, List<Long>>();
 	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
 	private static Set<Long> inDominanceRelation = new HashSet<Long>();
+	private static Map <Integer, List<Long>> dominanceListsAllToken = new HashMap <Integer, List<Long>>();
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
@@ -206,9 +207,12 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     
     	// iterate first time over tokens to figure out which speaker has matches and to recognize the hierarchical structure of matches as well
     	  for(SToken token : orderedToken){
-    		  System.out.println("Token:\t" + graph.getText(token));
+    		  counter++;
+    		  System.out.println(counter + ". Token:\t" + graph.getText(token));
               maxHeight = 0;
               currHeight = 0;
+             
+              
     		  
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
              // System.out.println(textualDS.getName() + "\t" + textualDS.getText());
@@ -235,9 +239,11 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         	  
               
               graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch); 
+              
+              
               if (!dominatedMatchedCodes.isEmpty()){
             	  dominanceListsWithHead.put(dominatedMatchedCodes.get(0), dominatedMatchedCodes);
-                  dominanceLists.put(counter++, dominatedMatchedCodes);
+                  dominanceLists.put(counter, dominatedMatchedCodes);
               }
                                       
     	  }
@@ -247,6 +253,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         ListIterator<SToken> it = orderedToken.listIterator();
         long lastTokenWasMatched = -1;
         boolean noPreviousTokenInLine = false;
+       
         
         Iterator<Long> inDomIt = inDominanceRelation.iterator();        
         //eliminate entries whose key (matching code) dominate other matching codes  
@@ -328,10 +335,13 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     		isFirstSpeakerWithMatch = true;
     	}
     	
-            
+         
+    	 //reset counter
+        counter = 0;
         while(it.hasNext())
         {    	
-          SToken tok = it.next();         
+          SToken tok = it.next();    
+          counter++;
           //get current speaker name
           currSpeakerName = CommonHelper.getTextualDSForNode(tok, graph).getName();
                     
@@ -340,17 +350,17 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
           if (speakerHasMatches.get(currSpeakerName) == false)
           {
         	  prevSpeakerName = currSpeakerName;
-        	  continue;
+        	 // continue;
           }
           
           //if speaker has matches
           else
           {			
         	  
-	        	  //if the current speaker is new, append his name and write the first line
+	        	  //if the current speaker is new, append his name and write header
 	        	 if (!currSpeakerName.equals(prevSpeakerName))
 	        	 { 
-	        		
+	   
 	        		 if (isFirstSpeakerWithMatch){
 	        			 
 	        			 out.append("match_number\t");
@@ -406,7 +416,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        		 noPreviousTokenInLine = true;
 	        		 
 	        		
-	        	 }
+	        	 }// header ready
 	        	 
 	        	  String separator = " "; // default to space as separator
 	        	       	  
@@ -444,8 +454,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 				                    	  separator += "\t";
 				                      }
 		                    	}
-		                    	else{
-		                    		separator = "\t";
+		                    	else{		                    		
+		                    			separator = "\t";
+		                    			                    		
 		                    	}
 		                    	
 		                    }
@@ -455,23 +466,76 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                  {
 		                    // also mark the end of a match with the tab
 		                    //separator = "\t";
-		                	  
-		                	  separator= "";
-		                	  
-		                	  if (maxDistances.containsKey(lastTokenWasMatched - 1)){
-		                		  Integer tabCount = maxDistances.get(lastTokenWasMatched - 1) + 1;			                     
-			                    	  for (int i = 0; i < tabCount; i++){
-				                    	  separator += "\t";
-				                      }			                      
-		                	  }
-		                      
-		                      else{
-		                    	  separator = "\t";
-		                      }
+		                	  if(graph.getText(tok).equals(",") && !dominanceLists.containsKey(counter) && 
+		                			  dominanceLists.containsKey(counter-1) && dominanceLists.containsKey(counter+1)){
+		                		    
+		                		  
+	                    			if (dominanceLists.get(counter-1).size() > dominanceLists.get(counter+1).size() &&
+	                    					dominanceLists.get(counter-1).contains(dominanceLists.get(counter+1).get(0))){
+	                    				separator = "";
+	                    				//
+	                    				System.out.println(counter + ": " + graph.getText(tok) + " -- " +lastTokenWasMatched);
+	                    				int tabCount = adjacencyMatrix[(int) (dominanceLists.get(counter+1).get(0)- 1)][(int) lastTokenWasMatched -1];
+	    		                    	if (tabCount != -1){
+	    		                    		for (int i = 0; i < tabCount; i++){
+	    				                    	  separator += "\t";
+	    				                      }
+	    		                    	}
+	  			                      
+	  			                      else{
+	  			                    	  separator = "\t";
+	  			                      }
+	    		                    	lastTokenWasMatched = dominanceLists.get(counter+1).get(0);
+	                    			}
+                    				else if (dominanceLists.get(counter-1).size() <= dominanceLists.get(counter+1).size() &&
+	                    					dominanceLists.get(counter+1).contains(dominanceLists.get(counter-1).get(0))){
+                    					separator = " ";
+                    				}
+                    				else{
+                    					// TODO this part identical with next one 
+                    					separator= "";
+       			                	  
+       			                	  if (maxDistances.containsKey(lastTokenWasMatched - 1)){
+       			                		  Integer tabCount = maxDistances.get(lastTokenWasMatched - 1) + 1;			                     
+       				                    	  for (int i = 0; i < tabCount; i++){
+       					                    	  separator += "\t";
+       					                      }			                      
+       			                	  }
+       			                      
+       			                      else{
+       			                    	  separator = "\t";
+       			                      }
+       				                      
+       			                	  
+       			                	  
+       			                    lastTokenWasMatched = -1;
+                    				}
+	                    				
+	                    				
+	                    			}
+	                    		
+		                	  else{ // if no comma handling necessary, only this part remains
+		                		  separator= "";
+			                	  
+			                	  if (maxDistances.containsKey(lastTokenWasMatched - 1)){
+			                		  Integer tabCount = maxDistances.get(lastTokenWasMatched - 1) + 1;			                     
+				                    	  for (int i = 0; i < tabCount; i++){
+					                    	  separator += "\t";
+					                      }			                      
+			                	  }
 			                      
+			                      else{
+			                    	  separator = "\t";
+			                      }
+				                      
+			                	  
+			                	  
+			                    lastTokenWasMatched = -1;
+		                	  }
+	                    				 
+	                
 		                	  
-		                	  
-		                    lastTokenWasMatched = -1;
+		                	 
 		                  }
 		                  
 		                  //if tok is the first token in the line and not matched, set separator to empty string
