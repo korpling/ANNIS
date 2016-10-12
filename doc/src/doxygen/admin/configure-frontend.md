@@ -161,6 +161,8 @@ Short name| Description | Link to documentation | Screenshot
 `audio` | a linked audio file | [AudioVisualizer](@ref annis.visualizers.component.AudioVisualizer) | ![audio](audio.png)
 `rst` and `rstdoc` | imitates the RST-diagrams from the [RST-Tool](http://www.wagsoft.com/RSTTool/) for a match or complete document| [RST](@ref annis.visualizers.component.rst.RST)/[RSTFull](@ref annis.visualizers.component.rst.RSTFull) | ![rst](rst_vis.png)
 `raw_text` | simple and default visualizer for the document browser, shows the content of the text.tab file for a specific document.| [RawTextVisualizer](@ref annis.visualizers.component.RawTextVisualizer) | ![raw text](raw_text_vis.png)
+`visjs`	 | A view of the salt model of context, which contains key words. Note, spanning nodes will be divided into classes according to their annotation keys. All spanning nodes belonging to the same class appear in the same level. | [VisJs](@ref annis.visualizers.component.visjs.VisJs)|![salt model of context](visjs.png)
+`visjsdoc` | A view of the salt model of the entire document, which contains key words.  Note, spanning nodes will be divided into classes according to their annotation keys. All spanning nodes belonging to the same class appear in the same level. | [VisJsDoc](@ref annis.visualizers.component.visjs.VisJsDoc) | ![salt model of document](visjsdoc.png)
 
 
 
@@ -174,6 +176,21 @@ visualizations require an installation of the freely available software GraphViz
 the general [dot](@ref annis.visualizers.component.graph.DebugVisualizer) visualization. To use these, install GraphViz on the server (or
 your local machine for Kickstarter) and make sure it is available in your system
 path (check this by calling e.g. the program `dot` on the command line).
+
+## Configure filter options for visjs and visjsdoc visualizers
+ 
+How already mentioned `visjs`  visualizes the salt model of context, which contains key words.
+Furthermore it provides a possibility to filter nodes (spans and structures) and/or relations (pointing, spanning, dominance)  according to their salt annotations. The latter can be filtered also according to their type. Therefore the filter parameter must be set by an 
+entry in the `mappings` column of the `resolver_vis_map` table. Note, tokens will always be displayed.
+
+Use `annos: anno_name1, anno_name2, ... ,anno_nameN` to specify nodes, which must be displayed. All spanning nodes and structure nodes, which contain listed annotation names will be displayed. The relations can be filtered according to their type and annotation. 
+Use `pointingRelAnnos: anno_name1, anno_name2, ..., anno_nameN` to filter pointing relations,
+`spanningRelAnnos: anno_name1, anno_name2, ..., anno_nameN` to filter spanning relations,
+`dominanceRelAnnos: anno_name1, anno_name2, ..., anno_nameN` to filter dominance relations. `anno_nameX` can be written as cleartext or as a regular expression. 
+
+If no filter parameter defined for an object class, all objects of this class will be displayed. For instance, with the following filter parameter string   `annos: cat, Topic, ambiguity; dominanceRelationAnnos: func`   we would obtain all tokens, all spanning nodes and structure nodes, whose list of annotation keys contains at least one of the stings  `cat`,  `Topic` or `ambiguity`, all dominance relations, whose list of annotation keys contains string `func`, all spanning relations and all pointing relations.
+
+`visjsdoc` visualizes the entire salt model of document, which contains key words. The filter parameter can be set in the same manner as for `visjs`.
 
 
 # Document Browser # {#document-visualizer}
