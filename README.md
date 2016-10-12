@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/korpling/ANNIS.svg?branch=develop)](https://travis-ci.org/korpling/ANNIS)
+
 ANNIS is an open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.
 
 ANNIS, which stands for ANNotation of Information Structure, has been designed to provide access to the data of the SFB 632 - "Information Structure: The Linguistic Means for Structuring Utterances, Sentences and Texts".

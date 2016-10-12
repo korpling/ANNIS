@@ -15,22 +15,22 @@
  */
 package annis.gui;
 
-import annis.gui.components.HelpButton;
-import annis.gui.controlpanel.QueryPanel;
-import annis.gui.controlpanel.SearchOptionsPanel;
-import annis.gui.converter.CommaSeperatedStringConverterList;
-import annis.gui.exporter.Exporter;
-import annis.gui.objects.QueryUIState;
+import java.io.File;
+
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
@@ -43,10 +43,16 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.components.HelpButton;
+import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
+import annis.gui.converter.CommaSeperatedStringConverterList;
+import annis.gui.objects.QueryUIState;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.PluginSystem;
+import annis.libgui.exporter.ExporterPlugin;
+import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  *
@@ -55,8 +61,7 @@ import org.slf4j.LoggerFactory;
 public class ExportPanel extends GridLayout
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    ExportPanel.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ExportPanel.class);
 
   private final ComboBox cbLeftContext;
 
@@ -66,7 +71,7 @@ public class ExportPanel extends GridLayout
 
   private final TextField txtParameters;
 
-  private final Map<String, String> help4Exporter = new HashMap<>();
+  private final BeanItemContainer<Class> exporterClassContainer = new BeanItemContainer<>(Class.class);
 
   private final ComboBox cbExporter;
 
@@ -94,53 +99,49 @@ public class ExportPanel extends GridLayout
 
   private UI ui;
   private final QueryUIState state;
-  
+
   private final FormLayout formLayout;
   private final Label lblHelp;
   
-  public ExportPanel(QueryPanel queryPanel,
-    QueryController controller, QueryUIState state)
+  private final PluginSystem ps;
+
+  public ExportPanel(QueryPanel queryPanel, QueryController controller, QueryUIState state, PluginSystem ps)
   {
     super(2, 3);
     this.queryPanel = queryPanel;
     this.controller = controller;
     this.state = state;
+    this.ps = ps;
 
     this.eventBus = new EventBus();
     this.eventBus.register(ExportPanel.this);
-    
+
     this.formLayout = new FormLayout();
     formLayout.setWidth("-1px");
-    
+
     setWidth("99%");
     setHeight("-1px");
 
-    initHelpMessages();
-
     setColumnExpandRatio(0, 0.0f);
     setColumnExpandRatio(1, 1.0f);
-    
     
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
+    cbExporter.setPropertyDataSource(controller.getState().getExporter());
+    cbExporter.setContainerDataSource(exporterClassContainer);
+  
     
-    for(Exporter e : SearchView.EXPORTER)
-    {
-      cbExporter.addItem(e.getClass().getSimpleName());
-    }
-    
-    cbExporter.setValue(SearchView.EXPORTER[0].getClass().getSimpleName());
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
 
     formLayout.addComponent(cbExporter);
     addComponent(formLayout, 0, 0);
-    
-    
-    lblHelp = new Label(help4Exporter.get((String) cbExporter.getValue()));
+
+    lblHelp = new Label();
     lblHelp.setContentMode(ContentMode.HTML);
     addComponent(lblHelp, 1, 0);
+    
 
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -151,10 +152,10 @@ public class ExportPanel extends GridLayout
     cbLeftContext.setNewItemsAllowed(true);
     cbRightContext.setNewItemsAllowed(true);
 
-    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
-      Integer.MIN_VALUE, Integer.MAX_VALUE));
-    cbRightContext.addValidator(new IntegerRangeValidator("must be a number",
-      Integer.MIN_VALUE, Integer.MAX_VALUE));
+    cbLeftContext.addValidator(
+        new IntegerRangeValidator("must be a number", Integer.MIN_VALUE, Integer.MAX_VALUE));
+    cbRightContext.addValidator(
+        new IntegerRangeValidator("must be a number", Integer.MIN_VALUE, Integer.MAX_VALUE));
 
     for (Integer i : SearchOptionsPanel.PREDEFINED_CONTEXTS)
     {
@@ -164,20 +165,20 @@ public class ExportPanel extends GridLayout
 
     cbLeftContext.setValue(5);
     cbRightContext.setValue(5);
-    
+
     formLayout.addComponent(cbLeftContext);
     formLayout.addComponent(cbRightContext);
 
     txtAnnotationKeys = new TextField("Annotation Keys");
     txtAnnotationKeys.setDescription("Some exporters will use this comma "
-      + "seperated list of annotation keys to limit the exported data to these "
-      + "annotations.");
+        + "seperated list of annotation keys to limit the exported data to these "
+        + "annotations.");
     formLayout.addComponent(new HelpButton<String>(txtAnnotationKeys));
 
     txtParameters = new TextField("Parameters");
     txtParameters.setDescription("You can input special parameters "
-      + "for certain exporters. See the description of each exporter "
-      + "(‘?’ button above) for specific parameter settings.");
+        + "for certain exporters. See the description of each exporter "
+        + "(‘?’ button above) for specific parameter settings.");
     formLayout.addComponent(new HelpButton<String>(txtParameters));
 
     btExport = new Button("Perform Export");
@@ -189,7 +190,7 @@ public class ExportPanel extends GridLayout
     btCancel.setIcon(FontAwesome.TIMES_CIRCLE);
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
-    btCancel.setVisible(SearchView.EXPORTER[0].isCancelable());
+    
 
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
@@ -197,9 +198,7 @@ public class ExportPanel extends GridLayout
     btDownload.setDisableOnClick(true);
     btDownload.setEnabled(false);
 
-    HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport,
-      btCancel,
-      btDownload);
+    HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport, btCancel, btDownload);
     addComponent(layoutExportButtons, 0, 1, 1, 1);
 
     VerticalLayout vLayout = new VerticalLayout();
@@ -212,22 +211,20 @@ public class ExportPanel extends GridLayout
 
     progressLabel = new Label();
     vLayout.addComponent(progressLabel);
-    
-    if(state != null)
+
+    if (state != null)
     {
       cbLeftContext.setPropertyDataSource(state.getLeftContext());
       cbRightContext.setPropertyDataSource(state.getRightContext());
-      cbExporter.setPropertyDataSource(state.getExporterName());
-      
-      state.getExporterName().setValue(SearchView.EXPORTER[0].getClass().getSimpleName());
-      
+      cbExporter.setPropertyDataSource(state.getExporter());
+
       txtAnnotationKeys.setConverter(new CommaSeperatedStringConverterList());
       txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
-      
+
       txtParameters.setPropertyDataSource(state.getExportParameters());
-      
+
     }
-    
+
   }
 
   @Override
@@ -235,98 +232,60 @@ public class ExportPanel extends GridLayout
   {
     super.attach();
     this.ui = UI.getCurrent();
-  }
-  
-  
-
-  private void initHelpMessages()
-  {
-    help4Exporter.put(SearchView.EXPORTER[0].getClass().getSimpleName(),
-      "The WEKA Exporter exports only the "
-      + "values of the elements searched for by the user, ignoring the context "
-      + "around search results. The values for all annotations of each of the "
-      + "found nodes is given in a comma-separated table (CSV). At the top of "
-      + "the export, the names of the columns are given in order according to "
-      + "the WEKA format.<br/><br/>"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>)");
-
-    help4Exporter.put(SearchView.EXPORTER[1].getClass().getSimpleName(),
-      "The CSV Exporter exports only the "
-      + "values of the elements searched for by the user, ignoring the context "
-      + "around search results. The values for all annotations of each of the "
-      + "found nodes is given in a comma-separated table (CSV). <br/><br/>"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>)");
-
-    help4Exporter.put(SearchView.EXPORTER[2].getClass().getSimpleName(),
-      "The Token Exporter exports the token covered by the matched nodes of every search result and "
-      + "its context, one line per result. "
-      + "Beside the text of the token it also contains all token annotations separated by \"/\"."
-      + "<p>"
-      + "<strong>This exporter does not work well with dialog data "
-      + "(corpora that have more than one primary text). "
-      + "Use the GridExporter instead.</strong>"
-      + "</p>");
-
-    help4Exporter.put(SearchView.EXPORTER[3].getClass().getSimpleName(),
-      "The Grid Exporter can export all annotations of a search result and its "
-      + "context. Each annotation layer is represented in a separate line, and the "
-      + "tokens covered by each annotation are given as number ranges after each "
-      + "annotation in brackets. To suppress token numbers, input numbers=false "
-      + "into the parameters box below. To display only a subset of annotations "
-      + "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
-      + "to show tokens and the "
-      + "annotations pos and cat.<br /><br />"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>) <br />"
-      + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
-      + "<code>numbers=false</code>)");
     
-    help4Exporter.put(SearchView.EXPORTER[4].getClass().getSimpleName(),
-      "The SimpleTextExporter exports only the plain text of every search result. "
-      + "<p>"
-      + "<strong>This exporter does not work well with dialog data "
-      + "(corpora that have more than one primary text). "
-      + "Use the GridExporter instead.</strong>"
-      + "</p>"    
-    );
+    if (this.ui instanceof AnnisBaseUI)
+    {
+      PluginManagerUtil util = new PluginManagerUtil(((AnnisBaseUI) getUI()).getPluginManager());
+      for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class))
+      {
+        exporterClassContainer.addItem(e.getClass());
+      }
+    }
+    exporterClassContainer.sort(new Object[] {"simpleName"}, new boolean[] {true});
+    cbExporter.setItemCaptionMode(ItemCaptionMode.PROPERTY);
+    cbExporter.setItemCaptionPropertyId("simpleName");
+    
+    if(exporterClassContainer.size() > 0)
+    {
+      cbExporter.setValue(exporterClassContainer.getIdByIndex(0));
+    }
+    
   }
 
-  public class ExporterSelectionHelpListener implements
-    Property.ValueChangeListener
+  public class ExporterSelectionHelpListener implements Property.ValueChangeListener
   {
 
     @Override
     public void valueChange(ValueChangeEvent event)
     {
-      String helpMessage = help4Exporter.get((String) event.getProperty().
-        getValue());
-      if (helpMessage != null)
+      @SuppressWarnings("unchecked")
+      ExporterPlugin exporter = ps.getExporter((Class<? extends ExporterPlugin>) event.getProperty().getValue());
+      if (exporter != null)
       {
-        lblHelp.setValue(helpMessage);
+        btCancel.setVisible(exporter.isCancelable());
+
+        String helpMessage = exporter.getHelpMessage();
+        if (helpMessage != null)
+        {
+          lblHelp.setValue(helpMessage);
+        }
+        else
+        {
+          lblHelp.setValue("No help available for this exporter");
+        }
       }
       else
       {
-        lblHelp.setValue("No help available for this exporter");
+        btCancel.setVisible(false);
+        lblHelp.setValue("No valid exporter selected");
       }
-      
-      Exporter exporter = controller.getExporterByName((String) event.getProperty().getValue());
-      if(exporter != null)
-      {
-        btCancel.setVisible(exporter.isCancelable());
-      }
-      
     }
   }
 
   @Subscribe
   public void handleExportProgress(final Integer exports)
   {
-    if(ui != null)
+    if (ui != null)
     {
       // if we ui access() here it seems to confuse the isInterrupted() flag
       // of the parent thread and cancelling won't work any longer
@@ -337,8 +296,7 @@ public class ExportPanel extends GridLayout
         {
           if (exportTime != null && exportTime.isRunning())
           {
-            progressLabel.setValue(
-              "exported " + exports + " items in " + exportTime.toString());
+            progressLabel.setValue("exported " + exports + " items in " + exportTime.toString());
           }
           else
           {
@@ -362,7 +320,7 @@ public class ExportPanel extends GridLayout
       }
     }
   }
-  
+
   public void showResult(File currentTmpFile, boolean manuallyCancelled)
   {
     btExport.setEnabled(true);
@@ -377,32 +335,29 @@ public class ExportPanel extends GridLayout
     if (tmpOutputFile == null)
     {
       Notification.show("Could not create the Exporter",
-        "The server logs might contain more information about this "
-        + "so you should contact the provider of this ANNIS installation "
-        + "for help.", Notification.Type.ERROR_MESSAGE);
+          "The server logs might contain more information about this "
+              + "so you should contact the provider of this ANNIS installation " + "for help.",
+          Notification.Type.ERROR_MESSAGE);
     }
     else if (manuallyCancelled)
     {
       // we were aborted, don't do anything
-      Notification.show("Export cancelled",
-        Notification.Type.WARNING_MESSAGE);
+      Notification.show("Export cancelled", Notification.Type.WARNING_MESSAGE);
     }
     else
     {
-      if (downloader != null && btDownload.getExtensions().contains(
-        downloader))
+      if (downloader != null && btDownload.getExtensions().contains(downloader))
       {
         btDownload.removeExtension(downloader);
       }
-      downloader = new FileDownloader(new FileResource(
-        tmpOutputFile));
+      downloader = new FileDownloader(new FileResource(tmpOutputFile));
 
       downloader.extend(btDownload);
       btDownload.setEnabled(true);
 
       Notification.show("Export finished",
-        "Click on the button right to the export button to actually download the file.",
-        Notification.Type.HUMANIZED_MESSAGE);
+          "Click on the button right to the export button to actually download the file.",
+          Notification.Type.HUMANIZED_MESSAGE);
     }
   }
 
@@ -421,23 +376,20 @@ public class ExportPanel extends GridLayout
         }
       }
       tmpOutputFile = null;
-      
-      
-      String exporterName = (String) cbExporter.getValue();
-      final Exporter exporter = controller.getExporterByName(exporterName);
+
+      @SuppressWarnings("unchecked")
+      final ExporterPlugin exporter = ps.getExporter((Class<? extends ExporterPlugin>) cbExporter.getValue());
       if (exporter != null)
       {
-        if("".equals(queryPanel.getQuery()))
+        if ("".equals(queryPanel.getQuery()))
         {
-          Notification.show("Empty query",
-            Notification.Type.WARNING_MESSAGE);
+          Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
           btExport.setEnabled(true);
           return;
         }
         else if (state.getSelectedCorpora().getValue().isEmpty())
         {
-          Notification.show("Please select a corpus",
-            Notification.Type.WARNING_MESSAGE);
+          Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
           btExport.setEnabled(true);
           return;
         }
@@ -451,17 +403,16 @@ public class ExportPanel extends GridLayout
           btCancel.setEnabled(true);
           btCancel.setDisableOnClick(true);
         }
-        
+
         controller.executeExport(ExportPanel.this, eventBus);
 
-        
         if (exportTime == null)
         {
           exportTime = Stopwatch.createUnstarted();
         }
         exportTime.reset();
         exportTime.start();
-        
+
       }
     }
   }

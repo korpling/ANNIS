@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -31,14 +32,18 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
 import annis.libgui.Helper;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.service.objects.CorpusConfig;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
-public class CSVExporter implements Exporter, Serializable
+@PluginImplementation
+public class CSVExporter implements ExporterPlugin, Serializable
 {
 
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys,String argsAsString,
-    WebResource annisResource, Writer out, EventBus eventBus)
+    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     
     try
@@ -76,5 +81,22 @@ public class CSVExporter implements Exporter, Serializable
     return false;
   }
   
+  @Override
+  public String getHelpMessage()
+  {
+    return "The CSV Exporter exports only the "
+        + "values of the elements searched for by the user, ignoring the context "
+        + "around search results. The values for all annotations of each of the "
+        + "found nodes is given in a comma-separated table (CSV). <br/><br/>"
+        + "Parameters: <br/>"
+        + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+        + "<code>metakeys=title,documentname</code>)";
+  }
+  
+  @Override
+  public String getFileEnding()
+  {
+    return "csv";
+  }
   
 }

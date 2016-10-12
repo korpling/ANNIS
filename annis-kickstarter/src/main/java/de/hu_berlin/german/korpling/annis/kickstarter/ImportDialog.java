@@ -473,6 +473,7 @@ public class ImportDialog extends javax.swing.JDialog
     lblCurrentCorpus.setText("Please select corpus for import!");
 
     jCheckBox1.setText("overwrite");
+    jCheckBox1.setMnemonic('w');
     jCheckBox1.addActionListener(new java.awt.event.ActionListener()
     {
       public void actionPerformed(java.awt.event.ActionEvent evt)

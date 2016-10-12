@@ -25,9 +25,9 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.model.Annotation;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.google.gwt.thirdparty.guava.common.base.Objects;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;

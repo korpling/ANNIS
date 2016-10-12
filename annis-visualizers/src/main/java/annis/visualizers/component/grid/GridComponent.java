@@ -15,9 +15,24 @@
  */
 package annis.visualizers.component.grid;
 
+import annis.CommonHelper;
+import annis.gui.widgets.grid.AnnotationGrid;
+import annis.gui.widgets.grid.GridEvent;
+import annis.gui.widgets.grid.Row;
+import annis.libgui.Helper;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.PDFController;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.model.AnnisConstants;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-
+import annis.model.RelannisNodeFeature;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,7 +43,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
-
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.STextualDS;
@@ -36,24 +50,8 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
-
-import annis.CommonHelper;
-import annis.gui.widgets.grid.AnnotationGrid;
-import annis.gui.widgets.grid.GridEvent;
-import annis.gui.widgets.grid.Row;
-import annis.libgui.Helper;
-import annis.libgui.media.MediaController;
-import annis.libgui.media.PDFController;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.model.AnnisConstants;
-import annis.model.RelannisNodeFeature;
+import org.eclipse.emf.common.util.EList;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -62,12 +60,15 @@ import annis.model.RelannisNodeFeature;
 public class GridComponent extends Panel
 {
 
+  private static final org.slf4j.Logger log
+    = LoggerFactory.getLogger(GridComponent.class);
   public static final String MAPPING_ANNOS_KEY = "annos";
   public static final String MAPPING_ANNO_REGEX_KEY = "anno_regex";
   public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
   public static final String MAPPING_TOK_ANNOS_KEY = "tok_anno";
   public static final String MAPPING_ESCAPE_HTML = "escape_html";
   public static final String MAPPING_SHOW_NAMESPACE = "show_ns";
+  public static final String MAPPING_GRID_TEMPLATES = "templates";
   
   private AnnotationGrid grid;
   private final transient VisualizerInput input;
@@ -149,6 +150,9 @@ public class GridComponent extends Panel
     layout.addComponent(grid);
     SDocumentGraph graph = input.getDocument().getDocumentGraph();
     
+    
+    
+    
     List<SNode> tokens = CommonHelper.getSortedSegmentationNodes(segmentationName,
       graph);
     Preconditions.checkArgument(!tokens.isEmpty(), "Token list must be non-empty");
@@ -165,6 +169,81 @@ public class GridComponent extends Panel
     
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
       computeAnnotationRows(startIndex, endIndex);
+    
+    
+    
+    
+    //Get Mappings
+    String gridTemplates = input.getMappings().getProperty(MAPPING_GRID_TEMPLATES, "");
+    
+    
+    //Parse Mappings
+    if (!gridTemplates.equals("")){
+    String[] split = gridTemplates.split("\\|\\|");
+    for (String s : split) {
+      //example of s: entity="person"==>:), or infstat==><b>%%value%%</b>
+      String[] unit_split = s.split("==>");
+      Set set = rowsByAnnotation.entrySet();
+      // Displaying elements of LinkedHashMap
+      Iterator iterator = set.iterator();
+      while(iterator.hasNext()) {
+        //iterate over rows
+         Map.Entry me = (Map.Entry)iterator.next();
+         String rowKey=(String) me.getKey();
+         ArrayList<Row> rowValue = (ArrayList<Row>) me.getValue();
+        for (Row rowValue1 : rowValue)
+        {
+          ArrayList<GridEvent> rowEvents = rowValue1.getEvents();
+        
+        
+         if (unit_split[0].indexOf('=')<0){
+           //unit_split[0] is a single instruction, e.g., infstat
+           //check if the key of a row in rowsByAnnotation is unit_split[0]
+           //if it is, we need to change every value of this row, else we dont do anything
+           String rowName = rowKey.split("::")[1];
+           if (rowName.equals(unit_split[0])){
+             //iterate over all values and replace the value with the unit_split[1]
+             for (GridEvent ev:rowEvents){
+               String origValue = ev.getValue();
+               String newValue = unit_split[1].replaceAll("%%value%%",origValue);
+               ev.setValue(newValue);
+             }
+           }
+         }
+         else{
+           //its a instruction like entity='person'
+           //first break this split into entity and person
+           // check if rowKey is entity, then when iterating over events, check if value is person
+           String rowName = rowKey.split("::")[1];
+           String targetRow = unit_split[0].split("=")[0];
+           String targetValue = unit_split[0].split("=")[1].replaceAll("\"","");
+           if (rowName.equals(targetRow)){
+             //iterate over all values and replace the value with the unit_split[1]
+             for (GridEvent ev:rowEvents){
+               String origValue = ev.getValue();
+               if (origValue.equals(targetValue)){
+                 ev.setValue(unit_split[1]);
+               }
+               //String newValue = unit_split[1].replaceAll("%%value%%",origValue);
+               
+             }
+        
+         }
+      
+         
+           
+        }
+      
+       }
+      }
+     }
+    }
+      
+    
+    
+    
+    
+    
     
     // add tokens as row
     AtomicInteger tokenOffsetForText = new AtomicInteger(-1);

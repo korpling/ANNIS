@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.MutableClassToInstanceMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
@@ -58,6 +60,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 import annis.VersionInfo;
+import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -93,6 +96,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
 
   private transient PluginManager pluginManager;
+  
+  private transient ClassToInstanceMap<ExporterPlugin> exporterRegistryCache;
   
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
@@ -443,6 +448,21 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   public VisualizerPlugin getVisualizer(String shortName)
   {
     return visualizerRegistry.get(shortName);
+  }
+  
+  @Override
+  public ExporterPlugin getExporter(Class<? extends ExporterPlugin> clazz)
+  {
+    if(exporterRegistryCache == null)
+    {
+      exporterRegistryCache = MutableClassToInstanceMap.create();
+      PluginManagerUtil util = new PluginManagerUtil(getPluginManager());
+      for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class))
+      {
+        exporterRegistryCache.put(e.getClass(), e);
+      }
+    }
+    return exporterRegistryCache.get(clazz);
   }
 
   public ObjectMapper getJsonMapper()
