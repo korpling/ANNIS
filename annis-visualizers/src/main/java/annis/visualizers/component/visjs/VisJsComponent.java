@@ -6,7 +6,6 @@ import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +31,10 @@ import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.ExportFilter;
 import org.corpus_tools.salt.util.StyleImporter;
 import org.corpus_tools.salt.util.VisJsVisualizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Charsets;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
@@ -69,6 +71,9 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 	 * 
 	 */
 	private static final long serialVersionUID = -9006240832319119407L;
+	
+	private final static Logger log = LoggerFactory.getLogger(VisJsComponent.class);
+	
 	private String strNodes;
 	private String strEdges;
 	
@@ -126,8 +131,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 				
 			SDocument doc =  visInput.getDocument();
 			
-    try(OutputStream osNodes = new ByteArrayOutputStream();
-      OutputStream osEdges = new ByteArrayOutputStream())
+    try(ByteArrayOutputStream osNodes = new ByteArrayOutputStream();
+        ByteArrayOutputStream osEdges = new ByteArrayOutputStream())
     {
       VisJsVisualizer visualizer = new VisJsVisualizer(doc, this, this);
 
@@ -136,8 +141,8 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
       visualizer.setEdgeWriter(osEdges);
       visualizer.buildJSON();
       
-      strNodes = osNodes.toString();
-      strEdges = osEdges.toString();
+      strNodes = osNodes.toString(Charsets.UTF_8.name());
+      strEdges = osEdges.toString(Charsets.UTF_8.name());
 
       osNodes.close();
       osEdges.close();
@@ -145,7 +150,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
     }
     catch (IOException e)
     {
-      System.out.println(e.getStackTrace());
+      log.error("Could not write the VisJS output", e);
     } 
 				
 	}
