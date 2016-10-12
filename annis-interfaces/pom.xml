@@ -57,7 +57,7 @@
     <dependency>
       <groupId>org.corpus-tools</groupId>
       <artifactId>salt-api</artifactId>
-     <version>3.0.4-SNAPSHOT</version>
+     <version>3.3.0</version>
       <exclusions>
         <exclusion>  
           <groupId>org.apache.felix</groupId>  

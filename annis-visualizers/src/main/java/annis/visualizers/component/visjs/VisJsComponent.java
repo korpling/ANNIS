@@ -4,7 +4,6 @@ package annis.visualizers.component.visjs;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
-import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,11 +16,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
-
-
-import annis.libgui.MatchedNodeColors;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.component.grid.EventExtractor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SDocument;
@@ -42,6 +36,10 @@ import org.corpus_tools.salt.util.VisJsVisualizer;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
+
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.visualizers.component.grid.EventExtractor;
 
 
 @JavaScript(
@@ -128,36 +126,27 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 				
 			SDocument doc =  visInput.getDocument();
 			
-			VisJsVisualizer VisJsVisualizer = new VisJsVisualizer(doc,this, this);
-			 
-			OutputStream osNodes = new ByteArrayOutputStream();
-			OutputStream osEdges = new ByteArrayOutputStream();
-						
-			VisJsVisualizer.setNodeWriter(osNodes);
-			VisJsVisualizer.setEdgeWriter(osEdges);
-			VisJsVisualizer.buildJSON();				
-			BufferedWriter bw;
-			try 
-			{
-				bw = VisJsVisualizer.getNodeWriter();
-				bw.flush();	
-				
-				bw = VisJsVisualizer.getEdgeWriter();	
-				bw.flush();		
-		
-				
-				strNodes = osNodes.toString();
-				strEdges = osEdges.toString();
-				
-				osNodes.close();
-				osEdges.close();
-				bw.close();			
-		       
-	      
-			}catch(IOException e)
-			{
-				System.out.println(e.getStackTrace());
-			} 
+    try(OutputStream osNodes = new ByteArrayOutputStream();
+      OutputStream osEdges = new ByteArrayOutputStream())
+    {
+      VisJsVisualizer visualizer = new VisJsVisualizer(doc, this, this);
+
+      
+      visualizer.setNodeWriter(osNodes);
+      visualizer.setEdgeWriter(osEdges);
+      visualizer.buildJSON();
+      
+      strNodes = osNodes.toString();
+      strEdges = osEdges.toString();
+
+      osNodes.close();
+      osEdges.close();
+
+    }
+    catch (IOException e)
+    {
+      System.out.println(e.getStackTrace());
+    } 
 				
 	}
 	
@@ -200,7 +189,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			{ 	String anno = null;
 				String ns = null;
 				Set<String> namespaces = null;
-			
+			 
 				if (annotation.contains("::"))
 				{
 					String [] annotationParts = annotation.split("::");
@@ -459,12 +448,12 @@ public class VisJsComponent extends AbstractJavaScriptComponent implements Expor
 			
 			return false;	
 		}
-
+		
 		/**
 		 * Implements the getHighlightingColor method of the org.corpus_tools.salt.util.StyleImporter interface.
 		 */
 		@Override
-		public String getHighlightingColor(SNode node) {
+		public String setHighlightingColor(SNode node) {
 			String color = null;
 					    	
     		SFeature featMatched = node.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
