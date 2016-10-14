@@ -138,11 +138,7 @@ public class TigerQueryBuilderCanvas extends Panel
         }
 
       }
-      catch(UniformInterfaceException ex)
-      {
-        log.error(null, ex);
-      }
-      catch(ClientHandlerException ex)
+      catch(UniformInterfaceException | ClientHandlerException ex)
       {
         log.error(null, ex);
       }

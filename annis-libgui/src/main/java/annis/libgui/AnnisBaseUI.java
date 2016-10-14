@@ -372,6 +372,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   /**
    * Handle common errors like database/service connection problems and display a unified
    * error message.
+   * 
+   * This will not log the exception, only display information to the user.
+   * 
    * @param ex
    * @return True if error was handled, false otherwise.
    */
@@ -391,8 +394,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
         
         if(uniEx.getResponse() != null)
         {
-          if(uniEx.getResponse().getStatus() == 503
-              || uniEx.getResponse().getStatus() == 504)
+          if(uniEx.getResponse().getStatus() == 503)
           {
             // database connection error
             Notification n = new Notification(
