@@ -99,7 +99,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
   
-  public final static Resource DONKEY_IMAGE = new ClassResource("/annis/libgui/donkey.jpg");
+  public final static Resource PINGUIN_IMAGE = new ClassResource("/annis/libgui/penguins.png");
 
   private transient PluginManager pluginManager;
   
@@ -401,8 +401,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
                 + "There might be too many users using this service right now.", 
                 Notification.Type.WARNING_MESSAGE);
             n.setDescription("<p><strong>Please try again later.</strong> If the error persists inform the administrator of this server.</p>"
-                + "<p>Click on this message to close it.</p>");
-            n.setIcon(DONKEY_IMAGE);
+                + "<p>Click on this message to close it.</p>"
+                + "<p style=\"font-size:9pt;color:gray;\">Pinguin picture by Polar Cruises [CC BY 2.0 (http://creativecommons.org/licenses/by/2.0)], via Wikimedia Commons</p>");
+            n.setIcon(PINGUIN_IMAGE);
             n.setHtmlContentAllowed(true);
             n.setDelayMsec(15000);
            
