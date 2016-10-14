@@ -260,7 +260,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         Object rawValue = tblFrequencyDefinition.getValue();
         if(rawValue instanceof Collection<?>)
         {
-          Set<Object> selected = new HashSet<>((Collection<?>) rawValue);
+          Set<Object> selected = new HashSet<Object>((Collection<?>) rawValue);
           for(Object o : selected)
           {
             cbAutomaticMode.setValue(Boolean.FALSE);
