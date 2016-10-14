@@ -48,15 +48,18 @@ import com.google.common.collect.MutableClassToInstanceMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.annotations.Theme;
 import com.vaadin.sass.internal.ScssStylesheet;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.RequestHandler;
+import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
 import annis.VersionInfo;
@@ -94,6 +97,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   public final static String WEBSERVICEURL_KEY = "annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY";
 
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
+  
+  public final static Resource CAT_IN_BOX_IMAGE = new ClassResource("/annis/libgui/catinbox.jpg");
 
   private transient PluginManager pluginManager;
   
@@ -361,6 +366,52 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       { 
         Helper.setUser(new AnnisUser(remoteUser, null, true));
       }
+  }
+  
+  /**
+   * Handle common errors like database/service connection problems and display a unified
+   * error message.
+   * @param ex
+   * @return True if error was handled, false otherwise.
+   */
+  public static boolean handleCommonError(Throwable ex)
+  {
+    if(ex != null)
+    {
+      Throwable rootCause = ex;
+      while(rootCause.getCause() != null)
+      {
+        rootCause = rootCause.getCause();
+      }
+
+      if(rootCause instanceof UniformInterfaceException)
+      {
+        UniformInterfaceException uniEx = (UniformInterfaceException) rootCause;
+        
+        if(uniEx.getResponse() != null)
+        {
+          if(uniEx.getResponse().getStatus() == 503
+              || uniEx.getResponse().getStatus() == 504)
+          {
+            // database connection error
+            Notification n = new Notification(
+                "Can't execute action because database server is not responding.", 
+                Notification.Type.ERROR_MESSAGE);
+            n.setDescription("There might be too many users using this service right now<br /> "
+                + "<strong>Please try again later.</strong><br />"
+                + "If the error persists inform the administrator of this server.");
+            n.setIcon(CAT_IN_BOX_IMAGE);
+            n.setHtmlContentAllowed(true);
+           
+            n.show(Page.getCurrent());
+            
+            return true;
+          }
+        }
+       
+      }
+    }
+    return false;
   }
   
   /**

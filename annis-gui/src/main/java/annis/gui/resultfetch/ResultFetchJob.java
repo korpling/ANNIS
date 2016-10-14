@@ -213,6 +213,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           {
             PagingComponent paging = resultPanel.getPaging();
             Throwable cause = root.getCause();
+            
             if (cause instanceof UniformInterfaceException)
             {
               UniformInterfaceException ex = (UniformInterfaceException) cause;

@@ -665,9 +665,12 @@ public class Helper
     }
     catch (UniformInterfaceException | ClientHandlerException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
+      if(!AnnisBaseUI.handleCommonError(ex))
+      {
+        new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+          ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+          .show(Page.getCurrent());
+      }
     }
 
     return corpusConfig;
@@ -685,15 +688,21 @@ public class Helper
     }
     catch (UniformInterfaceException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
+      if(!AnnisBaseUI.handleCommonError(ex))
+      {
+        new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+          ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+          .show(Page.getCurrent());
+      }
     }
     catch (ClientHandlerException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
+      if(!AnnisBaseUI.handleCommonError(ex))
+      {
+        new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+          ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+          .show(Page.getCurrent());
+      }
     }
 
     return defaultCorpusConfig;
@@ -726,9 +735,12 @@ public class Helper
         @Override
         public void run()
         {
-          new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-            ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true).
-            show(Page.getCurrent());
+          if(!AnnisBaseUI.handleCommonError(ex))
+          {
+            new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+              ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true).
+              show(Page.getCurrent());
+          }
         }
       });
     }
@@ -823,14 +835,17 @@ public class Helper
   public static String convertExceptionToMessage(Throwable ex)
   {
     StringBuilder sb = new StringBuilder();
-    sb.append("Exception type: ").append(ex.getClass().getName()).append("\n");
-    sb.append("Message: ").append(ex.getLocalizedMessage()).append("\n");
-    sb.append("Stacktrace: \n");
-    StackTraceElement[] st = ex.getStackTrace();
-    for (int i = 0; i < st.length; i++)
+    if(ex != null)
     {
-      sb.append(st[i].toString());
-      sb.append("\n");
+      sb.append("Exception type: ").append(ex.getClass().getName()).append("\n");
+      sb.append("Message: ").append(ex.getLocalizedMessage()).append("\n");
+      sb.append("Stacktrace: \n");
+      StackTraceElement[] st = ex.getStackTrace();
+      for (int i = 0; i < st.length; i++)
+      {
+        sb.append(st[i].toString());
+        sb.append("\n");
+      }
     }
     return sb.toString();
   }
