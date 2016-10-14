@@ -190,7 +190,7 @@ public class QueryController implements Serializable
         }
         catch (ExecutionException ex)
         {
-          if(AnnisBaseUI.handleCommonError(ex))
+          if(AnnisBaseUI.handleCommonError(ex, "validate query"))
           {
             log.error(null, ex);
           }

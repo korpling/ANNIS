@@ -99,7 +99,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
   
-  public final static Resource CAT_IN_BOX_IMAGE = new ClassResource("/annis/libgui/catinbox.jpg");
+  public final static Resource DONKEY_IMAGE = new ClassResource("/annis/libgui/donkey.jpg");
 
   private transient PluginManager pluginManager;
   
@@ -375,7 +375,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    * @param ex
    * @return True if error was handled, false otherwise.
    */
-  public static boolean handleCommonError(Throwable ex)
+  public static boolean handleCommonError(Throwable ex, String action)
   {
     if(ex != null)
     {
@@ -396,13 +396,15 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
           {
             // database connection error
             Notification n = new Notification(
-                "Can't execute action because database server is not responding.", 
-                Notification.Type.ERROR_MESSAGE);
-            n.setDescription("<p>There might be too many users using this service right now</p> "
-                + "<p><strong>Please try again later.</strong> If the error persists inform the administrator of this server.</p>"
+                "Can't execute " + (action == null ? "" : "\"" + action + "\"" ) 
+                + " action because database server is not responding.<br/>"
+                + "There might be too many users using this service right now.", 
+                Notification.Type.WARNING_MESSAGE);
+            n.setDescription("<p><strong>Please try again later.</strong> If the error persists inform the administrator of this server.</p>"
                 + "<p>Click on this message to close it.</p>");
-            n.setIcon(CAT_IN_BOX_IMAGE);
+            n.setIcon(DONKEY_IMAGE);
             n.setHtmlContentAllowed(true);
+            n.setDelayMsec(15000);
            
             n.show(Page.getCurrent());
             

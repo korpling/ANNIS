@@ -665,7 +665,7 @@ public class Helper
     }
     catch (UniformInterfaceException | ClientHandlerException ex)
     {
-      if(!AnnisBaseUI.handleCommonError(ex))
+      if(!AnnisBaseUI.handleCommonError(ex, "get corpus configuration"))
       {
         new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
           ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
@@ -688,7 +688,7 @@ public class Helper
     }
     catch (UniformInterfaceException ex)
     {
-      if(!AnnisBaseUI.handleCommonError(ex))
+      if(!AnnisBaseUI.handleCommonError(ex, "get default corpus configuration"))
       {
         new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
           ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
@@ -697,7 +697,7 @@ public class Helper
     }
     catch (ClientHandlerException ex)
     {
-      if(!AnnisBaseUI.handleCommonError(ex))
+      if(!AnnisBaseUI.handleCommonError(ex, "get default corpus configuration"))
       {
         new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
           ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
@@ -735,7 +735,7 @@ public class Helper
         @Override
         public void run()
         {
-          if(!AnnisBaseUI.handleCommonError(ex))
+          if(!AnnisBaseUI.handleCommonError(ex, "get corpus configurations"))
           {
             new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
               ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true).

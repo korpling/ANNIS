@@ -181,7 +181,7 @@ public class AnnisUI extends CommonUI
       event.getThrowable());
     // get the source throwable (thus the one that triggered the error)
     Throwable source = event.getThrowable();
-    if (!AnnisBaseUI.handleCommonError(source) && source != null)
+    if (!AnnisBaseUI.handleCommonError(source, null) && source != null)
     {
       while (source.getCause() != null)
       {

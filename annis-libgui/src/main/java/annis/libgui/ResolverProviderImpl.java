@@ -136,7 +136,7 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable
           }
           catch (UniformInterfaceException | ClientHandlerException ex)
           {
-            if(!AnnisBaseUI.handleCommonError(ex))
+            if(!AnnisBaseUI.handleCommonError(ex, "query resolver entries"))
             {
               log.error("could not query resolver entries: "
                 + res.toString(), ex);
