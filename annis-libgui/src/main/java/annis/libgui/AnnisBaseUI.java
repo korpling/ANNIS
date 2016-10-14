@@ -48,6 +48,7 @@ import com.google.common.collect.MutableClassToInstanceMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.annotations.Theme;
 import com.vaadin.sass.internal.ScssStylesheet;
@@ -397,9 +398,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
             Notification n = new Notification(
                 "Can't execute action because database server is not responding.", 
                 Notification.Type.ERROR_MESSAGE);
-            n.setDescription("There might be too many users using this service right now<br /> "
-                + "<strong>Please try again later.</strong><br />"
-                + "If the error persists inform the administrator of this server.");
+            n.setDescription("<p>There might be too many users using this service right now</p> "
+                + "<p><strong>Please try again later.</strong> If the error persists inform the administrator of this server.</p>"
+                + "<p>Click on this message to close it.</p>");
             n.setIcon(CAT_IN_BOX_IMAGE);
             n.setHtmlContentAllowed(true);
            

@@ -69,6 +69,7 @@ import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
+import annis.libgui.AnnisBaseUI;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
@@ -189,7 +190,11 @@ public class QueryController implements Serializable
         }
         catch (ExecutionException ex)
         {
-          if (ex.getCause() instanceof UniformInterfaceException)
+          if(AnnisBaseUI.handleCommonError(ex))
+          {
+            log.error(null, ex);
+          }
+          else if (ex.getCause() instanceof UniformInterfaceException)
           {
             reportServiceException((UniformInterfaceException) ex.getCause(),
               false);
