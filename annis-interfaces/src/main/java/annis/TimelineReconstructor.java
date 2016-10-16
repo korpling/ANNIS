@@ -246,6 +246,17 @@ public class TimelineReconstructor
               }
             }
           }
+          // move all annotations to the new token
+          if(span.getAnnotations() != null)
+          {
+            for(SAnnotation annot : span.getAnnotations())
+            {
+              if(!"salt".equals(annot.getNamespace()) && !orderName.equals(annot.getName()))
+              {
+                newToken.addAnnotation(annot);
+              }
+            }
+          }
           STimelineRelation timeRel = SaltFactory.createSTimelineRelation();
           timeRel.setSource(newToken);
           timeRel.setTarget(graph.getTimeline());
