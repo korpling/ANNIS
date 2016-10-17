@@ -1,6 +1,9 @@
 package annis.gui.exporter;
 
+import annis.CommonHelper;
+import annis.libgui.Helper;
 import annis.model.AnnisConstants;
+import annis.model.Annotation;
 import annis.model.RelannisNodeFeature;
 import java.io.IOException;
 import java.io.Writer;
@@ -10,6 +13,8 @@ import java.util.Map;
 import annis.service.objects.SubgraphFilter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -32,11 +37,10 @@ public class CSVMultiTokExporter extends SaltBasedExporter
       + "found nodes is given in a comma-separated table (CSV). <br/><br/>"
       + "This exporter will take more time than the normal CSV Exporter "
       + "but it is able to export the underlying text for spans "
-      + "if the corpus contains multiple tokenizations. <br/><br/>";
-// // TODO output metadata
-//      + "Parameters: <br/>"
-//      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-//      + "<code>metakeys=title,documentname</code>)";
+      + "if the corpus contains multiple tokenizations. <br/><br/>"
+      + "Parameters: <br/>"
+      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+      + "<code>metakeys=title,documentname</code>)";
   }
 
   @Override
@@ -50,16 +54,29 @@ public class CSVMultiTokExporter extends SaltBasedExporter
   {
     return "csv";
   }
-  
+
+  private int number_of_matched_nodes;
+  private Set<String> metakeys;
+
   @Override
   public void convertText(SDocumentGraph graph, List<String> annoKeys,
     Map<String, String> args, int matchNumber,
     Writer out) throws IOException
   {
-    // get number of match nodes
-    int number_of_matched_nodes = graph
-      .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
-      .getValue_STEXT().split(",").length;
+    // first match - collect some data
+    if (matchNumber == -1) {
+      // get list of metakeys to export
+      metakeys = new HashSet<>();
+      if (args.containsKey("metakeys")) {
+        for (String meta: args.get("metakeys").split(","))
+        metakeys.add(meta);
+      }
+
+      // get number of match nodes
+      number_of_matched_nodes = graph
+        .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
+        .getValue_STEXT().split(",").length;
+    }
 
     // collect matched nodes
     SNode[] matches = new SNode[number_of_matched_nodes];
@@ -92,10 +109,13 @@ public class CSVMultiTokExporter extends SaltBasedExporter
             + annot.getNamespace() + "::" + annot.getName());
         }
       }
-    out.append(StringUtils.join(headerLine, "\t"));
-    out.append("\n");
+      for (String key: metakeys) {
+        headerLine.add("meta_" + key);
+      }
+      out.append(StringUtils.join(headerLine, "\t"));
+      out.append("\n");
     }
-    
+
     // output nodes in the order of the matches
     List<String> contentLine = new ArrayList<>();
     for (SNode node: matches) {
@@ -122,6 +142,19 @@ public class CSVMultiTokExporter extends SaltBasedExporter
         contentLine.add(annot.getValue_STEXT());
       }
     }
+    // export Metadata
+    // TODO cache the metadata
+    if(!metakeys.isEmpty()) {
+      // TODO is this the best way to get the corpus name?
+      String corpus_name = CommonHelper.getCorpusPath(java.net.URI.create(graph.getDocument().getId())).get(0);
+      List<Annotation> asList = Helper.getMetaData(corpus_name, graph.getDocument().getName());
+      for(Annotation anno : asList)
+      {
+        if (metakeys.contains(anno.getName()))
+          contentLine.add(anno.getValue());
+      }
+    }
+
     out.append(StringUtils.join(contentLine, "\t"));
     out.append("\n");
   }
