@@ -143,6 +143,10 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
           target.addAttribute("caption", anno.getKey());
           target.addAttribute("show-caption", showCaption);
           target.addAttribute("show-namespace", showNamespaceForAnno(anno.getKey()));
+          if(row.getStyle() != null)
+          {
+            target.addAttribute("style", row.getStyle());
+          }
 
           ArrayList<GridEvent> rowEvents = row.getEvents();
           // sort the events by their natural order

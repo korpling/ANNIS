@@ -32,6 +32,8 @@ public class Row implements Serializable
   private final ArrayList<GridEvent> events;
   private final BitSet occupancySet;
   private final Set<String> textIDs;
+  
+  private String style;
 
   /**
    * Default constructor.
@@ -194,6 +196,17 @@ public class Row implements Serializable
     return (BitSet) occupancySet.clone();
   }
 
+  public String getStyle()
+  {
+    return style;
+  }
 
+  public void setStyle(String style)
+  {
+    this.style = style;
+  }
+
+  
+  
 
 }

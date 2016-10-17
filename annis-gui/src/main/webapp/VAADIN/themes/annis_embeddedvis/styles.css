@@ -13477,6 +13477,14 @@ div.v-layout.v-horizontal.v-widget {
 	background-color: #c8c8c8;
 }
 
+.annis_embeddedvis .partitur_table tr.invisible_token {
+	visibility: collapse;
+}
+
+.annis_embeddedvis .partitur_table tr.invisible_token td {
+	min-width: 10px;
+}
+
 .annis_embeddedvis .checkedItem:before {
 	content: url(../annis/check.gif);
 }

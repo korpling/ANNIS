@@ -191,6 +191,8 @@ public class VAnnotationGrid extends Composite implements Paintable
     
     String caption = row.getStringAttribute("caption");
     boolean showNamespace = row.getBooleanAttribute("show-namespace");
+    String style = row.hasAttribute("style") ? row.getStringAttribute("style") : null;
+    
     String name;
     if(showNamespace)
     {
@@ -211,6 +213,11 @@ public class VAnnotationGrid extends Composite implements Paintable
       table.setHTML(rowNumber, 0, WidgetUtil.escapeHTML(name));
       formatter.addStyleName(rowNumber, 0, "header");
       startColumn = 1;
+    }
+    
+    if(style != null && !style.isEmpty())
+    {
+      table.getRowFormatter().addStyleName(rowNumber, style);
     }
     
     int colspanOffset = 0;
