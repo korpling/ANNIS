@@ -19,7 +19,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.core.SAnnotation;
-import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
 
 /**
@@ -55,7 +54,6 @@ public class CSVMultiTokExporter extends SaltBasedExporter
     return "csv";
   }
 
-  private int number_of_matched_nodes;
   private Set<String> metakeys;
 
   @Override
@@ -71,31 +69,20 @@ public class CSVMultiTokExporter extends SaltBasedExporter
         for (String meta: args.get("metakeys").split(","))
         metakeys.add(meta);
       }
-
-      // get number of match nodes
-      number_of_matched_nodes = graph
-        .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
-        .getValue_STEXT().split(",").length;
     }
 
-    // collect matched nodes
-    SNode[] matches = new SNode[number_of_matched_nodes];
-    for(SNode node: graph.getNodes())
-    {
-      SFeature match_number = node.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
-      if(match_number != null)
-      {
-        matches[match_number.getValue_SNUMERIC().intValue()-1] = node;
-      }
-    }
     // first match - output header
     // TODO should iterate over all matches to compute the header
     if (matchNumber == -1) {
       List<String> headerLine = new ArrayList<>();
-      for (int i=0; i < matches.length; i++) {
-        headerLine.add(String.valueOf(i+1) + "_id");
-        headerLine.add(String.valueOf(i+1) + "_span");
-        List<SAnnotation> annots = new ArrayList<>(matches[i].getAnnotations());
+      int i = 1;
+      for(String matchid: graph
+        .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
+        .getValue_STEXT().split(","))
+      {
+        headerLine.add(String.valueOf(i) + "_id");
+        headerLine.add(String.valueOf(i) + "_span");
+        List<SAnnotation> annots = new ArrayList<>(graph.getNode(matchid).getAnnotations());
         java.util.Collections.sort(annots, new Comparator<SAnnotation>() {
           @Override
           public int compare(SAnnotation a, SAnnotation b)
@@ -105,9 +92,10 @@ public class CSVMultiTokExporter extends SaltBasedExporter
         });
         for (SAnnotation annot: annots)
         {
-          headerLine.add(String.valueOf(i+1) + "_anno_"
+          headerLine.add(String.valueOf(i) + "_anno_"
             + annot.getNamespace() + "::" + annot.getName());
         }
+        i++;
       }
       for (String key: metakeys) {
         headerLine.add("meta_" + key);
@@ -118,7 +106,11 @@ public class CSVMultiTokExporter extends SaltBasedExporter
 
     // output nodes in the order of the matches
     List<String> contentLine = new ArrayList<>();
-    for (SNode node: matches) {
+    for(String matchid: graph
+      .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
+      .getValue_STEXT().split(","))
+    {
+      SNode node = graph.getNode(matchid);
       // export id
       RelannisNodeFeature feats = RelannisNodeFeature.extract(node);
       contentLine.add(String.valueOf(feats.getInternalID()));     
