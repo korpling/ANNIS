@@ -12,6 +12,7 @@ import java.util.Map;
 
 import annis.service.objects.SubgraphFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -55,6 +56,7 @@ public class CSVMultiTokExporter extends SaltBasedExporter
   }
 
   private Set<String> metakeys;
+  private List<List<String>> annotationsForMatchedNodes;
 
   @Override
   public void convertText(SDocumentGraph graph, List<String> annoKeys,
@@ -62,26 +64,22 @@ public class CSVMultiTokExporter extends SaltBasedExporter
     Writer out) throws IOException
   {
     // first match - collect some data
-    if (matchNumber == -1) {
+    if (matchNumber == -1)
+    {
       // get list of metakeys to export
       metakeys = new HashSet<>();
-      if (args.containsKey("metakeys")) {
-        for (String meta: args.get("metakeys").split(","))
-        metakeys.add(meta);
+      if (args.containsKey("metakeys"))
+      {
+        metakeys.addAll(Arrays.asList(args.get("metakeys").split(",")));
       }
-    }
 
-    // first match - output header
-    // TODO should iterate over all matches to compute the header
-    if (matchNumber == -1) {
-      List<String> headerLine = new ArrayList<>();
-      int i = 1;
+      // get list of annotations for the matched nodes
+      // TODO should iterate over all matches to compute
+      annotationsForMatchedNodes = new ArrayList<>();
       for(String matchid: graph
         .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
         .getValue_STEXT().split(","))
       {
-        headerLine.add(String.valueOf(i) + "_id");
-        headerLine.add(String.valueOf(i) + "_span");
         List<SAnnotation> annots = new ArrayList<>(graph.getNode(matchid).getAnnotations());
         java.util.Collections.sort(annots, new Comparator<SAnnotation>() {
           @Override
@@ -90,12 +88,23 @@ public class CSVMultiTokExporter extends SaltBasedExporter
             return a.getName().compareTo(b.getName());
           }
         });
-        for (SAnnotation annot: annots)
-        {
-          headerLine.add(String.valueOf(i) + "_anno_"
-            + annot.getNamespace() + "::" + annot.getName());
+        List<String> annoNames = new ArrayList<>();
+        for (SAnnotation annot: annots) {
+          annoNames.add(annot.getNamespace() + "::" + annot.getName());
         }
-        i++;
+        annotationsForMatchedNodes.add(annoNames);
+      }
+
+      // output header
+      List<String> headerLine = new ArrayList<>();
+      for(int i=0; i < annotationsForMatchedNodes.size(); i++)
+      {
+        headerLine.add(String.valueOf(i+1) + "_id");
+        headerLine.add(String.valueOf(i+1) + "_span");
+        for (String annoName: annotationsForMatchedNodes.get(i))
+        {
+          headerLine.add(String.valueOf(i+1) + "_anno_" + annoName);
+        }
       }
       for (String key: metakeys) {
         headerLine.add("meta_" + key);
@@ -106,10 +115,12 @@ public class CSVMultiTokExporter extends SaltBasedExporter
 
     // output nodes in the order of the matches
     List<String> contentLine = new ArrayList<>();
-    for(String matchid: graph
+    String[] matchIDs = graph
       .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
-      .getValue_STEXT().split(","))
+      .getValue_STEXT().split(",");
+    for (int i=0; i < matchIDs.length; i++)
     {
+      String matchid = matchIDs[i];
       SNode node = graph.getNode(matchid);
       // export id
       RelannisNodeFeature feats = RelannisNodeFeature.extract(node);
@@ -121,17 +132,13 @@ public class CSVMultiTokExporter extends SaltBasedExporter
       else
         contentLine.add("");
       // export annotations
-      List<SAnnotation> annots = new ArrayList<>(node.getAnnotations());
-      java.util.Collections.sort(annots, new Comparator<SAnnotation>() {
-        @Override
-        public int compare(SAnnotation a, SAnnotation b)
-        {
-          return a.getName().compareTo(b.getName());
-        }
-      });
-      for (SAnnotation annot: annots)
+      for (String annoName: annotationsForMatchedNodes.get(i))
       {
-        contentLine.add(annot.getValue_STEXT());
+        SAnnotation anno = node.getAnnotation(annoName);
+        if (anno != null)
+          contentLine.add(anno.getValue_STEXT());
+        else
+          contentLine.add("'NULL'");
       }
     }
     // export Metadata
