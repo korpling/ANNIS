@@ -41,6 +41,7 @@ import annis.gui.exporter.WekaExporter;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
+import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.service.objects.CorpusConfig;
 import net.xeoh.plugins.base.PluginManager;
@@ -180,7 +181,7 @@ public class AnnisUI extends CommonUI
       event.getThrowable());
     // get the source throwable (thus the one that triggered the error)
     Throwable source = event.getThrowable();
-    if (source != null)
+    if (!AnnisBaseUI.handleCommonError(source, null) && source != null)
     {
       while (source.getCause() != null)
       {

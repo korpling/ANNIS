@@ -539,19 +539,15 @@ public class Helper
       {
       });
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
       log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
+      if(!AnnisBaseUI.handleCommonError(ex, "retrieve metadata"))
+      {
+        Notification.show(
+          "Remote exception: " + ex.getLocalizedMessage(),
+          Notification.Type.WARNING_MESSAGE);
+      }
     }
     return result;
   }
@@ -589,19 +585,15 @@ public class Helper
       {
       });
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
       log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
+      if(!AnnisBaseUI.handleCommonError(ex, "retrieve metada"))
+      {
+        Notification.show(
+          "Remote exception: " + ex.getLocalizedMessage(),
+          Notification.Type.WARNING_MESSAGE);
+      }
     }
     return result;
   }
@@ -618,19 +610,15 @@ public class Helper
 
       return docBrowserConfig;
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
-      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
-        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
-        true).show(Page.getCurrent());
       log.error("problems with fetching document browsing", ex);
-    }
-    catch (ClientHandlerException ex)
-    {
-      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
-        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
-        true).show(Page.getCurrent());
-      log.error("problems with fetching document browsing", ex);
+      if(!AnnisBaseUI.handleCommonError(ex, "get document browser configuration"))
+      {
+        new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
+          ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
+          true).show(Page.getCurrent());
+      }
     }
 
     return null;
@@ -665,9 +653,12 @@ public class Helper
     }
     catch (UniformInterfaceException | ClientHandlerException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
+      if(!AnnisBaseUI.handleCommonError(ex, "get corpus configuration"))
+      {
+        new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+          ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+          .show(Page.getCurrent());
+      }
     }
 
     return corpusConfig;
@@ -683,17 +674,14 @@ public class Helper
       defaultCorpusConfig = Helper.getAnnisWebResource().path("query")
         .path("corpora").path(DEFAULT_CONFIG).get(CorpusConfig.class);
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
-    }
-    catch (ClientHandlerException ex)
-    {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
+      if(!AnnisBaseUI.handleCommonError(ex, "get default corpus configuration"))
+      {
+        new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+          ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+          .show(Page.getCurrent());
+      }
     }
 
     return defaultCorpusConfig;
@@ -726,9 +714,12 @@ public class Helper
         @Override
         public void run()
         {
-          new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-            ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true).
-            show(Page.getCurrent());
+          if(!AnnisBaseUI.handleCommonError(ex, "get corpus configurations"))
+          {
+            new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+              ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true).
+              show(Page.getCurrent());
+          }
         }
       });
     }
@@ -823,14 +814,17 @@ public class Helper
   public static String convertExceptionToMessage(Throwable ex)
   {
     StringBuilder sb = new StringBuilder();
-    sb.append("Exception type: ").append(ex.getClass().getName()).append("\n");
-    sb.append("Message: ").append(ex.getLocalizedMessage()).append("\n");
-    sb.append("Stacktrace: \n");
-    StackTraceElement[] st = ex.getStackTrace();
-    for (int i = 0; i < st.length; i++)
+    if(ex != null)
     {
-      sb.append(st[i].toString());
-      sb.append("\n");
+      sb.append("Exception type: ").append(ex.getClass().getName()).append("\n");
+      sb.append("Message: ").append(ex.getLocalizedMessage()).append("\n");
+      sb.append("Stacktrace: \n");
+      StackTraceElement[] st = ex.getStackTrace();
+      for (int i = 0; i < st.length; i++)
+      {
+        sb.append(st[i].toString());
+        sb.append("\n");
+      }
     }
     return sb.toString();
   }
@@ -846,15 +840,14 @@ public class Helper
       texts = webResource.get(RawTextWrapper.class);
     }
 
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
-      Notification.show("can not retrieve raw text", ex.
-        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-    }
-    catch (ClientHandlerException ex)
-    {
-      Notification.show("can not retrieve raw text", ex.
-        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+      log.error("can not retrieve raw text");
+      if(!AnnisBaseUI.handleCommonError(ex, "retrieve raw text"))
+      {
+        Notification.show("can not retrieve raw text", ex.
+          getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+      }
     }
 
     return texts;
