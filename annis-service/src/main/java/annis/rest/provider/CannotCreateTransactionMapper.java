@@ -15,9 +15,12 @@
  */
 package annis.rest.provider;
 
+import java.sql.SQLException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.CannotCreateTransactionException;
 
 /**
@@ -28,12 +31,25 @@ import org.springframework.transaction.CannotCreateTransactionException;
 public class CannotCreateTransactionMapper
   implements ExceptionMapper<CannotCreateTransactionException>
 {
+  private final Logger log = LoggerFactory.getLogger(CannotCreateTransactionMapper.class);
 
   @Override
   public Response toResponse(CannotCreateTransactionException exception)
   {
-    return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("database error: "
-      + exception.getMessage()).type("text/plain").build();
+    log.error("Cannot create transaction", exception);
+   
+    String errorMsg;
+    if(exception.getCause() instanceof SQLException)
+    {
+      errorMsg = "database error " + ((SQLException) exception.getCause()).getSQLState() + ": "
+      + exception.getMessage();
+    }
+    else
+    {
+      errorMsg = "database error: " + exception.getMessage();
+    }
+    
+    return Response.status(Response.Status.SERVICE_UNAVAILABLE).entity(errorMsg).type("text/plain").build();
   }
   
 }
