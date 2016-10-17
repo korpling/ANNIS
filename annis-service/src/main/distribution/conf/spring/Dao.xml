@@ -43,6 +43,7 @@
     
     <property name="validationQuery" value="SELECT 1;" />
     <property name="accessToUnderlyingConnectionAllowed" value="true" />
+    <property name="fastFailValidation" value="true" />
     
     <property name="connectionInitSqls" ref="schemaInitSQL"/>
   </bean>
