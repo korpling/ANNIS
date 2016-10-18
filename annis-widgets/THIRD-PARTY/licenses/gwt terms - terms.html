@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+        <title>GWT Project</title>
+
+        <link rel="stylesheet" href='./assets/build/css/style.css'>
+        <link rel="stylesheet" href='./assets/build/fonts/icons/icons.css'>
+        <link rel="shortcut icon" type="image/x-icon" href='./images/favicon.png'>
+
+        <script type="text/javascript" src="https://use.typekit.net/wwv3dxt.js"></script>
+        <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+
+        <script type="text/javascript" src='./gwtproject/gwtproject.nocache.js'></script>
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-40673139-1']);
+            _gaq.push(['_setDomainName', 'gwtproject.org']);
+            _gaq.push(['_setAllowLinker', true]);
+            _gaq.push(['_trackPageview']);
+
+            (function () {
+                var ga = document.createElement('script');
+                ga.type = 'text/javascript';
+                ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(ga, s);
+            })();
+
+        </script>
+        <script>
+            (function () {
+                var cx = '008698606704604874043:or32ypbnrfu';
+                var gcse = document.createElement('script');
+                gcse.type = 'text/javascript';
+                gcse.async = true;
+                gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                        '//www.google.com/cse/cse.js?cx=' + cx;
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(gcse, s);
+            })();
+        </script>
+    </head>
+
+    <body>
+
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <nav role="navigation" id="nav" class="closed">
+            <div class="wrapper">
+                <ul>
+                    <li class="logo"><a href='./'>GWT homepage</a></li>
+                    <li><a href='./overview.html'><i class="icon_overview"></i>Overview</a></li>
+                    <li class="sep"><a href='./gettingstarted.html'><i class="icon_getstarted"></i>Get started</a></li>
+                    <li><a href='./doc/latest/tutorial/index.html' class="active"><i class="icon_tutorials"></i>Tutorials</a></li>
+                    <li><a href='./doc/latest/DevGuide.html'><i class="icon_doc"></i>Docs</a></li>
+                    <li><a href='./examples.html'><i class="icon_ressources"></i>Resources</a></li>
+                    <li><a href='./makinggwtbetter.html'><i class="icon_makeGWTBetter"></i>Make GWT Better</a></li>
+                    <li class="sep"><a href='./terms.html'><i class="icon_terms"></i>Terms</a></li>
+                    <li class="btn"><a href='./download.html'><i class="icon_download"></i>Download</a></li>
+                    <li class="btn"><a href="http://www.gwtproject.org/javadoc/latest/"><i class="icon_jd"></i>Java Doc</a></li>
+                </ul>
+                <div id="social">
+                    <a class="googleplus" href="https://plus.google.com/communities/116543000751323604177" target="_blank">
+                        <i class="icon_google"></i><span>Access our Google+ community</span>
+                    </a>
+                </div>
+                <a id="cc" href="#">Creative Commons Attribution 3.0 License.</a>
+            </div>
+        </nav>
+
+        <div class="holder">
+            <aside id="submenu">
+                <nav>
+                    <ul>
+  <li><a href='./gettingstarted.html'>Get Started</a>
+  <ul>
+    <li><a href='./gettingstarted.html' title="Getting Started with GWT SDK">Overview</a></li>
+    <li><a href='./learnmore-sdk.html' title="Learn more about the GWT SDK">SDK Learn More</a></li>
+    <li><a href='./usingeclipse.html'>Configure Eclipse</a></li>
+  </ul></li>
+  <li><a href='./doc/latest/tutorial/index.html'>Tutorials</a>
+  <ul>
+    <li><a href='./doc/latest/tutorial/index.html'>Overview</a></li>
+    <li><a href="#" title="Create, build and run a GWT application">Build a GWT App.</a>
+    <ul>
+      <li><a href='./doc/latest/tutorial/gettingstarted.html'>Introduction</a></li>
+      <li><a href='./doc/latest/tutorial/create.html'>Create</a></li>
+      <li><a href='./doc/latest/tutorial/design.html'>Design</a></li>
+      <li><a href='./doc/latest/tutorial/buildui.html'>Build the UI</a></li>
+      <li><a href='./doc/latest/tutorial/manageevents.html'>Manage Events</a></li>
+      <li><a href='./doc/latest/tutorial/codeclient.html'>Coding Client side</a></li>
+      <li><a href='./doc/latest/tutorial/debug.html'>Debugging</a></li>
+      <li><a href='./doc/latest/tutorial/style.html'>Styling</a></li>
+      <li><a href='./doc/latest/tutorial/compile.html'>Compilation</a></li>
+    </ul></li>
+    <li><a href="#">AJAX Communication</a>
+    <ul>
+      <li><a href='./doc/latest/tutorial/clientserver.html'>Introduction</a></li>
+      <li><a href='./doc/latest/tutorial/RPC.html'>Using GWT RPC</a></li>
+      <li><a href='./doc/latest/tutorial/JSON.html'>Retrieving JSON</a></li>
+      <li><a href='./doc/latest/tutorial/Xsite.html'>Cross-site Requests</a></li>
+      <li><a href='./doc/latest/tutorial/JSONphp.html'>JSON php</a></li>
+    </ul></li>
+    <li><a href='./doc/latest/tutorial/i18n.html'>Internationalization</a></li>
+    <li><a href='./doc/latest/tutorial/JUnit.html'>JUnit Testing</a></li>
+    <li><a href='./doc/latest/tutorial/appengine.html' title="Deploy to Google App Engine">Deploy to GAE</a></li>
+    <li><a href='./doc/latest/polymer-tutorial/introduction.html'>GWT &amp; Polymer</a>
+    <ul>
+      <li><a href='./doc/latest/polymer-tutorial/create.html'>Create Project</a></li>
+      <li><a href="#">Opt A: Widgets UI</a>
+      <ul>
+        <li><a href='./doc/latest/polymer-tutorial/widgets-buildui.html'>Build the UI</a></li>
+        <li><a href='./doc/latest/polymer-tutorial/widgets-applogic.html'>Events &amp; Logic</a></li>
+      </ul></li>
+      <li><a href="#">Opt B: Elements UI</a>
+      <ul>
+        <li><a href='./doc/latest/polymer-tutorial/elements-buildui.html'>Build the UI</a></li>
+        <li><a href='./doc/latest/polymer-tutorial/elements-applogic.html'>Events &amp; Logic</a></li>
+      </ul></li>
+    </ul></li>
+  </ul></li>
+  <li><a href='./doc/latest/DevGuide.html'>Documentation</a>
+  <ul>
+    <li><a href='./doc/latest/DevGuide.html'>Overview</a></li>
+    <li><a href="#">Coding Basics</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideCodingBasics.html'>Introduction</a></li>
+      <li><a href='./doc/latest/DevGuideOrganizingProjects.html'>Organize Projects</a></li>
+      <li><a href='./doc/latest/DevGuideCompilingAndDebugging.html'>Compile &amp; Debug</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsClient.html'>Client-side</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsCompatibility.html'>JRE Compatibility</a></li>
+      <li><a href='./doc/latest/DevGuideServerCommunication.html' title="Communicate with a server">Ajax Communication</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsHistory.html'>History Mechanism</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsFormatting.html' title="Number and Date Formating">Formatting</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsDelayed.html'>Delayed Logic</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsJSON.html'>Working with JSON</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsXML.html'>Working with XML</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsJSNI.html' title="JavaScript Native Interface">JavaScript: JSNI</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsOverlay.html'>Overlay Types</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsDeferred.html'>Deferred Binding</a></li>
+    </ul></li>
+    <li><a href="#">Build User Interfaces</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideUi.html'>Contents</a></li>
+      <li><a href='./doc/latest/DevGuideUiBrowser.html'>Cross-Browser Support</a></li>
+      <li><a href='./doc/latest/DevGuideUiPanels.html'>Layout with Panels</a></li>
+      <li><a href='./doc/latest/DevGuideUiWidgets.html'>Widgets</a></li>
+      <li><a href='./doc/latest/DevGuideUiCustomWidgets.html'>Custom Widgets</a></li>
+      <li><a href='./doc/latest/DevGuideUiCellWidgets.html'>Cell Widgets</a></li>
+      <li><a href='./doc/latest/DevGuideUiCellTable.html'>Cell Tables</a></li>
+      <li><a href='./doc/latest/DevGuideUiCustomCells.html'>Custom Cells</a></li>
+      <li><a href='./doc/latest/DevGuideUiEditors.html'>Editors</a></li>
+      <li><a href='./doc/latest/DevGuideUiDom.html'>Using the DOM</a></li>
+      <li><a href='./doc/latest/DevGuideUiHandlers.html'>Events &amp; Handlers</a></li>
+      <li><a href='./doc/latest/DevGuideUiCss.html'>Css Styling</a></li>
+      <li><a href='./doc/latest/DevGuideUiBinder.html'>UIBinder</a></li>
+      <li><a href='./doc/latest/DevGuideUiImageBundles.html'>Image Bundles</a></li>
+    </ul></li>
+    <li><a href="#">Html5 Support</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideHtml5.html'>Contents</a></li>
+      <li><a href='./doc/latest/DevGuideHtml5Storage.html'>Html5 Storage</a></li>
+    </ul></li>
+    <li><a href="#">Test with JUnit</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideTesting.html'>Guide</a></li>
+      <li><a href='./doc/latest/DevGuideTestingHtmlUnit.html'>HtmlUnit</a></li>
+      <li><a href='./doc/latest/DevGuideTestingRemoteTesting.html'>Remote Testing</a></li>
+      <li><a href='./doc/latest/DevGuideTestingCoverage.html'>Code Coverage</a></li>
+    </ul></li>
+    <li><a href='./doc/latest/DevGuideDeploying.html'>Deploy</a></li>
+    <li><a href="#">Advanced Topics</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideLogging.html'>Logging</a></li>
+      <li><a href="#">Security</a>
+      <ul>
+        <li><a href='./doc/latest/DevGuideSecurity.html'>Contents</a></li>
+        <li><a href='./doc/latest/DevGuideSecuritySafeHtml.html'>Using SafeHtml</a></li>
+        <li><a href='./doc/latest/DevGuideSecurityRpcXsrf.html'>XSRF Protection</a></li>
+      </ul></li>
+      <li><a href='./doc/latest/DevGuideAutoBeans.html'>AutoBeans</a></li>
+      <li><a href='./doc/latest/DevGuideRequestFactory.html'>Request Factory</a></li>
+      <li><a href='./doc/latest/DevGuideMvpActivitiesAndPlaces.html'>Activities And Places</a></li>
+      <li><a href='./doc/latest/DevGuideValidation.html'>Validation</a></li>
+      <li><a href="#">Internationalization</a>
+      <ul>
+        <li><a href='./doc/latest/DevGuideI18n.html' title="I18N">Introduction</a></li>
+        <li><a href='./doc/latest/DevGuideI18nLocale.html'>Locale</a></li>
+        <li><a href='./doc/latest/DevGuideI18nConstants.html'>Constants</a></li>
+        <li><a href='./doc/latest/DevGuideI18nMessages.html'>Messages</a></li>
+        <li><a href='./doc/latest/DevGuideI18nPluralForms.html'>Plural Forms</a></li>
+        <li><a href='./doc/latest/DevGuideUiBinderI18n.html'>UI Binder</a></li>
+      </ul></li>
+      <li><a href='./doc/latest/DevGuideA11y.html'>Accessibility</a></li>
+      <li><a href="#">Optimize</a>
+      <ul>
+        <li><a href='./doc/latest/DevGuideOptimizing.html'>Overview</a></li>
+        <li><a href='./doc/latest/DevGuideCodeSplitting.html'>Code Splitting</a></li>
+        <li><a href='./doc/latest/DevGuideCompileReport.html'>Compile Report</a></li>
+        <li><a href='./doc/latest/DevGuideClientBundle.html'>Client Bundle</a></li>
+        <li><a href='./doc/latest/DevGuideGssVsCss.html'>GSS vs CSS Syntax</a></li>
+        <li><a href='./doc/latest/DevGuideLightweightMetrics.html'>Lightweight Metrics</a></li>
+      </ul></li>
+      <li><a href='./doc/latest/DevGuideLinkers.html'>Linkers</a></li>
+    </ul></li>
+    <li><a href="#">Reference</a>
+    <ul>
+      <li><a href='./doc/latest/RefCommandLineTools.html'>Command Line Tools</a></li>
+      <li><a href='./doc/latest/RefGWTClassAPI.html'>GWT Class API</a></li>
+      <li><a href='./doc/latest/RefJreEmulation.html'>Jre Emulation</a></li>
+      <li><a href='./doc/latest/RefWidgetGallery.html'>Widgets Gallery</a></li>
+    </ul></li>
+    <li><a href="#">FAQ</a>
+    <ul>
+      <li><a href='./doc/latest/FAQ.html'>Contents</a></li>
+      <li><a href='./doc/latest/FAQ_GettingStarted.html'>Getting Started</a></li>
+      <li><a href='./doc/latest/FAQ_DebuggingAndCompiling.html'>Debug &amp; Compile</a></li>
+      <li><a href='./doc/latest/FAQ_UI.html'>Build UI</a></li>
+      <li><a href='./doc/latest/FAQ_Client.html'>Client</a></li>
+      <li><a href='./doc/latest/FAQ_Server.html'>Server</a></li>
+      <li><a href='./doc/latest/FAQ_Troubleshooting.html'>Troubleshooting</a></li>
+    </ul></li>
+    <li><a href='./doc/latest/DevGuideGlossary.html'>Glossary</a></li>
+  </ul></li>
+  <li><a href='./examples.html'>Resources</a>
+  <ul>
+    <li><a href='./examples.html'>Examples</a></li>
+    <li><a href='./presentations.html' title="Different Presentations on GWT">Presentations</a></li>
+    <li><a href="#">Articles</a>
+    <ul>
+      <li><a href='./articles/articles.html'>Overview</a></li>
+      <li><a href='./articles/fragment_merging.html'>Fragment Merging</a></li>
+      <li><a href='./articles/superdevmode.html'>Super Dev Mode</a></li>
+      <li><a href='./articles/elemental.html'>Elemental</a></li>
+      <li><a href='./articles/dynamic_host_page.html' title="Running GWT in dynamic host pages">Dynamic Host Page</a></li>
+      <li><a href="#">Building MVP apps</a>
+      <ul>
+        <li><a href='./articles/mvp-architecture.html'>MVP Part I</a></li>
+        <li><a href='./articles/mvp-architecture-2.html'>MVP Part II</a></li>
+      </ul></li>
+      <li><a href='./articles/using_gwt_with_hibernate.html'>GWT &amp; Hibernate</a></li>
+      <li><a href='./articles/testing_methodologies_using_gwt.html' title="Best practices on Testing GWT applications">Testing</a></li>
+      <li><a href='./articles/dom_events_memory_leaks_and_you.html' title="How GWT tackles memory leaks">DOM Memory Leaks</a></li>
+      <li><a href='./articles/security_for_gwt_applications.html' title="Security for GWT applications">Security</a></li>
+      <li><a href='./articles/using_gwt_for_json_mashups.html' title="Using GWT for JSON Mashups">JSON &amp; Mashups</a></li>
+      <li><a href='./articles/gwt-iphone.html'>GWT iPhone</a></li>
+    </ul></li>
+    <li><a href='./books.html' title="GWT Books">Books</a></li>
+    <li><a href='./casestudies.html' title="Case Studies for using GWT">Case Studies</a></li>
+    <li><a href="#">Community</a>
+    <ul>
+      <li><a href='./community.html'>Community &amp; Forums</a></li>
+      <li><a href='./community-group-charter.html' title="Community Group Charter">Community Group</a></li>
+      <li><a href='./developer_spotlight.html'>Developer Spotlight</a></li>
+    </ul></li>
+    <li><a href='./gwt_surveys.html'>GWT surveys</a></li>
+  </ul></li>
+  <li><a href='./makinggwtbetter.html'>Making GWT Better</a>
+  <ul>
+    <li><a href='./makinggwtbetter.html' title="Learn how to contribute to GWT">Contributing</a></li>
+    <li><a href='./lifeofanissue.html' title="Learn about GWT and the issue tracker">Life of an Issue</a></li>
+    <li><a href='./steering.html' title="The GWT Steering Committee">Steering Committee</a></li>
+  </ul></li>
+  <li><a href='./terms.html'>Terms</a>
+  <ul>
+    <li><a href='./terms.html'>GWT License</a></li>
+    <li><a href='./GWTPolicy.html'>GWT Name Use Policy</a></li>
+    <li><a href='./privacy.html'>Privacy</a></li>
+  </ul></li>
+</ul>
+                </nav>
+            </aside>
+
+            <a id="logo-mobile" href="#"><span>>Back to GWT homepage</span></a>
+
+            <div class="menu-button">Menu</div>
+
+            <nav id="nav-mobile" class="flexnav">
+                <ul>
+  <li><a href='./gettingstarted.html'>Get Started</a>
+  <ul>
+    <li><a href='./gettingstarted.html' title="Getting Started with GWT SDK">Overview</a></li>
+    <li><a href='./learnmore-sdk.html' title="Learn more about the GWT SDK">SDK Learn More</a></li>
+    <li><a href='./usingeclipse.html'>Configure Eclipse</a></li>
+  </ul></li>
+  <li><a href='./doc/latest/tutorial/index.html'>Tutorials</a>
+  <ul>
+    <li><a href='./doc/latest/tutorial/index.html'>Overview</a></li>
+    <li><a href="#" title="Create, build and run a GWT application">Build a GWT App.</a>
+    <ul>
+      <li><a href='./doc/latest/tutorial/gettingstarted.html'>Introduction</a></li>
+      <li><a href='./doc/latest/tutorial/create.html'>Create</a></li>
+      <li><a href='./doc/latest/tutorial/design.html'>Design</a></li>
+      <li><a href='./doc/latest/tutorial/buildui.html'>Build the UI</a></li>
+      <li><a href='./doc/latest/tutorial/manageevents.html'>Manage Events</a></li>
+      <li><a href='./doc/latest/tutorial/codeclient.html'>Coding Client side</a></li>
+      <li><a href='./doc/latest/tutorial/debug.html'>Debugging</a></li>
+      <li><a href='./doc/latest/tutorial/style.html'>Styling</a></li>
+      <li><a href='./doc/latest/tutorial/compile.html'>Compilation</a></li>
+    </ul></li>
+    <li><a href="#">AJAX Communication</a>
+    <ul>
+      <li><a href='./doc/latest/tutorial/clientserver.html'>Introduction</a></li>
+      <li><a href='./doc/latest/tutorial/RPC.html'>Using GWT RPC</a></li>
+      <li><a href='./doc/latest/tutorial/JSON.html'>Retrieving JSON</a></li>
+      <li><a href='./doc/latest/tutorial/Xsite.html'>Cross-site Requests</a></li>
+      <li><a href='./doc/latest/tutorial/JSONphp.html'>JSON php</a></li>
+    </ul></li>
+    <li><a href='./doc/latest/tutorial/i18n.html'>Internationalization</a></li>
+    <li><a href='./doc/latest/tutorial/JUnit.html'>JUnit Testing</a></li>
+    <li><a href='./doc/latest/tutorial/appengine.html' title="Deploy to Google App Engine">Deploy to GAE</a></li>
+    <li><a href='./doc/latest/polymer-tutorial/introduction.html'>GWT &amp; Polymer</a>
+    <ul>
+      <li><a href='./doc/latest/polymer-tutorial/create.html'>Create Project</a></li>
+      <li><a href="#">Opt A: Widgets UI</a>
+      <ul>
+        <li><a href='./doc/latest/polymer-tutorial/widgets-buildui.html'>Build the UI</a></li>
+        <li><a href='./doc/latest/polymer-tutorial/widgets-applogic.html'>Events &amp; Logic</a></li>
+      </ul></li>
+      <li><a href="#">Opt B: Elements UI</a>
+      <ul>
+        <li><a href='./doc/latest/polymer-tutorial/elements-buildui.html'>Build the UI</a></li>
+        <li><a href='./doc/latest/polymer-tutorial/elements-applogic.html'>Events &amp; Logic</a></li>
+      </ul></li>
+    </ul></li>
+  </ul></li>
+  <li><a href='./doc/latest/DevGuide.html'>Documentation</a>
+  <ul>
+    <li><a href='./doc/latest/DevGuide.html'>Overview</a></li>
+    <li><a href="#">Coding Basics</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideCodingBasics.html'>Introduction</a></li>
+      <li><a href='./doc/latest/DevGuideOrganizingProjects.html'>Organize Projects</a></li>
+      <li><a href='./doc/latest/DevGuideCompilingAndDebugging.html'>Compile &amp; Debug</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsClient.html'>Client-side</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsCompatibility.html'>JRE Compatibility</a></li>
+      <li><a href='./doc/latest/DevGuideServerCommunication.html' title="Communicate with a server">Ajax Communication</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsHistory.html'>History Mechanism</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsFormatting.html' title="Number and Date Formating">Formatting</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsDelayed.html'>Delayed Logic</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsJSON.html'>Working with JSON</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsXML.html'>Working with XML</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsJSNI.html' title="JavaScript Native Interface">JavaScript: JSNI</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsOverlay.html'>Overlay Types</a></li>
+      <li><a href='./doc/latest/DevGuideCodingBasicsDeferred.html'>Deferred Binding</a></li>
+    </ul></li>
+    <li><a href="#">Build User Interfaces</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideUi.html'>Contents</a></li>
+      <li><a href='./doc/latest/DevGuideUiBrowser.html'>Cross-Browser Support</a></li>
+      <li><a href='./doc/latest/DevGuideUiPanels.html'>Layout with Panels</a></li>
+      <li><a href='./doc/latest/DevGuideUiWidgets.html'>Widgets</a></li>
+      <li><a href='./doc/latest/DevGuideUiCustomWidgets.html'>Custom Widgets</a></li>
+      <li><a href='./doc/latest/DevGuideUiCellWidgets.html'>Cell Widgets</a></li>
+      <li><a href='./doc/latest/DevGuideUiCellTable.html'>Cell Tables</a></li>
+      <li><a href='./doc/latest/DevGuideUiCustomCells.html'>Custom Cells</a></li>
+      <li><a href='./doc/latest/DevGuideUiEditors.html'>Editors</a></li>
+      <li><a href='./doc/latest/DevGuideUiDom.html'>Using the DOM</a></li>
+      <li><a href='./doc/latest/DevGuideUiHandlers.html'>Events &amp; Handlers</a></li>
+      <li><a href='./doc/latest/DevGuideUiCss.html'>Css Styling</a></li>
+      <li><a href='./doc/latest/DevGuideUiBinder.html'>UIBinder</a></li>
+      <li><a href='./doc/latest/DevGuideUiImageBundles.html'>Image Bundles</a></li>
+    </ul></li>
+    <li><a href="#">Html5 Support</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideHtml5.html'>Contents</a></li>
+      <li><a href='./doc/latest/DevGuideHtml5Storage.html'>Html5 Storage</a></li>
+    </ul></li>
+    <li><a href="#">Test with JUnit</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideTesting.html'>Guide</a></li>
+      <li><a href='./doc/latest/DevGuideTestingHtmlUnit.html'>HtmlUnit</a></li>
+      <li><a href='./doc/latest/DevGuideTestingRemoteTesting.html'>Remote Testing</a></li>
+      <li><a href='./doc/latest/DevGuideTestingCoverage.html'>Code Coverage</a></li>
+    </ul></li>
+    <li><a href='./doc/latest/DevGuideDeploying.html'>Deploy</a></li>
+    <li><a href="#">Advanced Topics</a>
+    <ul>
+      <li><a href='./doc/latest/DevGuideLogging.html'>Logging</a></li>
+      <li><a href="#">Security</a>
+      <ul>
+        <li><a href='./doc/latest/DevGuideSecurity.html'>Contents</a></li>
+        <li><a href='./doc/latest/DevGuideSecuritySafeHtml.html'>Using SafeHtml</a></li>
+        <li><a href='./doc/latest/DevGuideSecurityRpcXsrf.html'>XSRF Protection</a></li>
+      </ul></li>
+      <li><a href='./doc/latest/DevGuideAutoBeans.html'>AutoBeans</a></li>
+      <li><a href='./doc/latest/DevGuideRequestFactory.html'>Request Factory</a></li>
+      <li><a href='./doc/latest/DevGuideMvpActivitiesAndPlaces.html'>Activities And Places</a></li>
+      <li><a href='./doc/latest/DevGuideValidation.html'>Validation</a></li>
+      <li><a href="#">Internationalization</a>
+      <ul>
+        <li><a href='./doc/latest/DevGuideI18n.html' title="I18N">Introduction</a></li>
+        <li><a href='./doc/latest/DevGuideI18nLocale.html'>Locale</a></li>
+        <li><a href='./doc/latest/DevGuideI18nConstants.html'>Constants</a></li>
+        <li><a href='./doc/latest/DevGuideI18nMessages.html'>Messages</a></li>
+        <li><a href='./doc/latest/DevGuideI18nPluralForms.html'>Plural Forms</a></li>
+        <li><a href='./doc/latest/DevGuideUiBinderI18n.html'>UI Binder</a></li>
+      </ul></li>
+      <li><a href='./doc/latest/DevGuideA11y.html'>Accessibility</a></li>
+      <li><a href="#">Optimize</a>
+      <ul>
+        <li><a href='./doc/latest/DevGuideOptimizing.html'>Overview</a></li>
+        <li><a href='./doc/latest/DevGuideCodeSplitting.html'>Code Splitting</a></li>
+        <li><a href='./doc/latest/DevGuideCompileReport.html'>Compile Report</a></li>
+        <li><a href='./doc/latest/DevGuideClientBundle.html'>Client Bundle</a></li>
+        <li><a href='./doc/latest/DevGuideGssVsCss.html'>GSS vs CSS Syntax</a></li>
+        <li><a href='./doc/latest/DevGuideLightweightMetrics.html'>Lightweight Metrics</a></li>
+      </ul></li>
+      <li><a href='./doc/latest/DevGuideLinkers.html'>Linkers</a></li>
+    </ul></li>
+    <li><a href="#">Reference</a>
+    <ul>
+      <li><a href='./doc/latest/RefCommandLineTools.html'>Command Line Tools</a></li>
+      <li><a href='./doc/latest/RefGWTClassAPI.html'>GWT Class API</a></li>
+      <li><a href='./doc/latest/RefJreEmulation.html'>Jre Emulation</a></li>
+      <li><a href='./doc/latest/RefWidgetGallery.html'>Widgets Gallery</a></li>
+    </ul></li>
+    <li><a href="#">FAQ</a>
+    <ul>
+      <li><a href='./doc/latest/FAQ.html'>Contents</a></li>
+      <li><a href='./doc/latest/FAQ_GettingStarted.html'>Getting Started</a></li>
+      <li><a href='./doc/latest/FAQ_DebuggingAndCompiling.html'>Debug &amp; Compile</a></li>
+      <li><a href='./doc/latest/FAQ_UI.html'>Build UI</a></li>
+      <li><a href='./doc/latest/FAQ_Client.html'>Client</a></li>
+      <li><a href='./doc/latest/FAQ_Server.html'>Server</a></li>
+      <li><a href='./doc/latest/FAQ_Troubleshooting.html'>Troubleshooting</a></li>
+    </ul></li>
+    <li><a href='./doc/latest/DevGuideGlossary.html'>Glossary</a></li>
+  </ul></li>
+  <li><a href='./examples.html'>Resources</a>
+  <ul>
+    <li><a href='./examples.html'>Examples</a></li>
+    <li><a href='./presentations.html' title="Different Presentations on GWT">Presentations</a></li>
+    <li><a href="#">Articles</a>
+    <ul>
+      <li><a href='./articles/articles.html'>Overview</a></li>
+      <li><a href='./articles/fragment_merging.html'>Fragment Merging</a></li>
+      <li><a href='./articles/superdevmode.html'>Super Dev Mode</a></li>
+      <li><a href='./articles/elemental.html'>Elemental</a></li>
+      <li><a href='./articles/dynamic_host_page.html' title="Running GWT in dynamic host pages">Dynamic Host Page</a></li>
+      <li><a href="#">Building MVP apps</a>
+      <ul>
+        <li><a href='./articles/mvp-architecture.html'>MVP Part I</a></li>
+        <li><a href='./articles/mvp-architecture-2.html'>MVP Part II</a></li>
+      </ul></li>
+      <li><a href='./articles/using_gwt_with_hibernate.html'>GWT &amp; Hibernate</a></li>
+      <li><a href='./articles/testing_methodologies_using_gwt.html' title="Best practices on Testing GWT applications">Testing</a></li>
+      <li><a href='./articles/dom_events_memory_leaks_and_you.html' title="How GWT tackles memory leaks">DOM Memory Leaks</a></li>
+      <li><a href='./articles/security_for_gwt_applications.html' title="Security for GWT applications">Security</a></li>
+      <li><a href='./articles/using_gwt_for_json_mashups.html' title="Using GWT for JSON Mashups">JSON &amp; Mashups</a></li>
+      <li><a href='./articles/gwt-iphone.html'>GWT iPhone</a></li>
+    </ul></li>
+    <li><a href='./books.html' title="GWT Books">Books</a></li>
+    <li><a href='./casestudies.html' title="Case Studies for using GWT">Case Studies</a></li>
+    <li><a href="#">Community</a>
+    <ul>
+      <li><a href='./community.html'>Community &amp; Forums</a></li>
+      <li><a href='./community-group-charter.html' title="Community Group Charter">Community Group</a></li>
+      <li><a href='./developer_spotlight.html'>Developer Spotlight</a></li>
+    </ul></li>
+    <li><a href='./gwt_surveys.html'>GWT surveys</a></li>
+  </ul></li>
+  <li><a href='./makinggwtbetter.html'>Making GWT Better</a>
+  <ul>
+    <li><a href='./makinggwtbetter.html' title="Learn how to contribute to GWT">Contributing</a></li>
+    <li><a href='./lifeofanissue.html' title="Learn about GWT and the issue tracker">Life of an Issue</a></li>
+    <li><a href='./steering.html' title="The GWT Steering Committee">Steering Committee</a></li>
+  </ul></li>
+  <li><a href='./terms.html'>Terms</a>
+  <ul>
+    <li><a href='./terms.html'>GWT License</a></li>
+    <li><a href='./GWTPolicy.html'>GWT Name Use Policy</a></li>
+    <li><a href='./privacy.html'>Privacy</a></li>
+  </ul></li>
+</ul>
+            </nav>
+
+            <div id="search">
+                <form onsubmit="javascript:void(0)">
+                    <input type="text"/>
+                    <button type="submit"><i class="icon_search"></i> <span>Search</span></button>
+                </form>
+            </div>
+
+            <div style="visibility:hidden">
+                <gcse:searchresults-only gname="searchresults"></gcse:searchresults-only>
+            </div>
+
+            <div id="content" role="main">
+                <div class="container">
+                    <span id="editLink" title="Edit this page on GitHub">
+                        <a class="icon_editGithub" href="https://github.com/gwtproject/gwt-site/edit/master/src/main/markdown/terms.md"></a>
+                    </span>
+                    <h1>Terms of Service</h1><p>Google is a member of the GWT Open Source Project and operates this GWT website as a contribution to GWT. The <a href="http://www.google.com/intl/en/policies/terms/">Google Terms of Service</a> apply to Google&rsquo;s operation of this website.</p><p>The GWT software and sample code developed by Google is licensed under the Apache License, v. 2.0. Other software included in this distribution is provided under other licenses, as listed in the Included Software and Licenses section at the bottom of this page. Source code for software included in this distribution is available from the <a href="http://code.google.com/p/google-web-toolkit/">GWT</a> project or as otherwise indicated at the bottom of this page.</p><p>Please note that the executable version of the GWT distributed by Google will communicate with Google&rsquo;s servers to check for available updates. If updates are available, you will receive the option to install them.</p><h2>Apache License, Version 2.0</h2><p>Apache License</p><p>Version 2.0, January 2004</p><p><a href="http://www.apache.org/licenses/">http://www.apache.org/licenses/</a></p><p><strong><a id="definitions">1. Definitions</a></strong></p><p>&ldquo;License&rdquo; shall mean the terms and conditions for use, reproduction, and distribution as defined by Sections 1 through 9 of this document.</p><p>&ldquo;Licensor&rdquo; shall mean the copyright owner or entity authorized by the copyright owner that is granting the License.</p><p>&ldquo;Legal Entity&rdquo; shall mean the union of the acting entity and all other entities that control, are controlled by, or are under common control with that entity. For the purposes of this definition, &ldquo;control&rdquo; means (i) the power, direct or indirect, to cause the direction or management of such entity, whether by contract or otherwise, or (ii) ownership of fifty percent (50%) or more of the outstanding shares, or (iii) beneficial ownership of such entity.</p><p>&ldquo;You&rdquo; (or &ldquo;Your&rdquo;) shall mean an individual or Legal Entity exercising permissions granted by this License.</p><p>&ldquo;Source&rdquo; form shall mean the preferred form for making modifications, including but not limited to software source code, documentation source, and configuration files.</p><p>&ldquo;Object&rdquo; form shall mean any form resulting from mechanical transformation or translation of a Source form, including but not limited to compiled object code, generated documentation, and conversions to other media types.</p><p>&ldquo;Work&rdquo; shall mean the work of authorship, whether in Source or Object form, made available under the License, as indicated by a copyright notice that is included in or attached to the work (an example is provided in the Appendix below).</p><p>&ldquo;Derivative Works&rdquo; shall mean any work, whether in Source or Object form, that is based on (or derived from) the Work and for which the editorial revisions, annotations, elaborations, or other modifications represent, as a whole, an original work of authorship. For the purposes of this License, Derivative Works shall not include works that remain separable from, or merely link (or bind by name) to the interfaces of, the Work and Derivative Works thereof.</p><p>&ldquo;Contribution&rdquo; shall mean any work of authorship, including the original version of the Work and any modifications or additions to that Work or Derivative Works thereof, that is intentionally submitted to Licensor for inclusion in the Work by the copyright owner or by an individual or Legal Entity authorized to submit on behalf of the copyright owner. For the purposes of this definition, &ldquo;submitted&rdquo; means any form of electronic, verbal, or written communication sent to the Licensor or its representatives, including but not limited to communication on electronic mailing lists, source code control systems, and issue tracking systems that are managed by, or on behalf of, the Licensor for the purpose of discussing and improving the Work, but excluding communication that is conspicuously marked or otherwise designated in writing by the copyright owner as &ldquo;Not a Contribution.&rdquo;</p><p>&ldquo;Contributor&rdquo; shall mean Licensor and any individual or Legal Entity on behalf of whom a Contribution has been received by Licensor and subsequently incorporated within the Work.</p><p><strong><a id="copyright">2. Grant of Copyright License</a></strong></p><p>Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable copyright license to reproduce, prepare Derivative Works of, publicly display, publicly perform, sublicense, and distribute the Work and such Derivative Works in Source or Object form.</p><p><strong><a id="patent">3. Grant of Patent License</a></strong></p><p>Subject to the terms and conditions of this License, each Contributor hereby grants to You a perpetual, worldwide, non-exclusive, no-charge, royalty-free, irrevocable (except as stated in this section) patent license to make, have made, use, offer to sell, sell, import, and otherwise transfer the Work, where such license applies only to those patent claims licensable by such Contributor that are necessarily infringed by their Contribution(s) alone or by combination of their Contribution(s) with the Work to which such Contribution(s) was submitted. If You institute patent litigation against any entity (including a cross-claim or counterclaim in a lawsuit) alleging that the Work or a Contribution incorporated within the Work constitutes direct or contributory patent infringement, then any patent licenses granted to You under this License for that Work shall terminate as of the date such litigation is filed.</p><p><strong><a id="redistribution">4. Redistribution</a></strong></p><p>You may reproduce and distribute copies of the Work or Derivative Works thereof in any medium, with or without modifications, and in Source or Object form, provided that You meet the following conditions:</p>
+<ol style="list-style-type: lower-alpha">
+    <li>You must give any other recipients of the Work or Derivative Works a copy of this License; and
+<br><br></li>
+
+<li>You must cause any modified files to carry prominent notices
+    stating that You changed the files; and
+<br> <br></li>
+
+<li>You must retain, in the Source form of any Derivative Works
+    that You distribute, all copyright, patent, trademark, and
+    attribution notices from the Source form of the Work,
+    excluding those notices that do not pertain to any part of
+    the Derivative Works; and
+<br> <br></li>
+
+<li>If the Work includes a "NOTICE" text file as part of its
+    distribution, then any Derivative Works that You distribute must
+    include a readable copy of the attribution notices contained
+    within such NOTICE file, excluding those notices that do not
+    pertain to any part of the Derivative Works, in at least one
+    of the following places: within a NOTICE text file distributed
+    as part of the Derivative Works; within the Source form or
+    documentation, if provided along with the Derivative Works; or,
+    within a display generated by the Derivative Works, if and
+    wherever such third-party notices normally appear. The contents
+    of the NOTICE file are for informational purposes only and
+    do not modify the License. You may add Your own attribution
+    notices within Derivative Works that You distribute, alongside
+    or as an addendum to the NOTICE text from the Work, provided
+    that such additional attribution notices cannot be construed
+    as modifying the License.</li>
+</ol><p>You may add Your own copyright statement to Your modifications and may provide additional or different license terms and conditions for use, reproduction, or distribution of Your modifications, or for any such Derivative Works as a whole, provided Your use, reproduction, and distribution of the Work otherwise complies with the conditions stated in this License.</p><p><strong><a id="contributions">5. Submission of Contributions</a></strong></p><p>Unless You explicitly state otherwise, any Contribution intentionally submitted for inclusion in the Work by You to the Licensor shall be under the terms and conditions of this License, without any additional terms or conditions. Notwithstanding the above, nothing herein shall supersede or modify the terms of any separate license agreement you may have executed with Licensor regarding such Contributions.</p><p><strong><a id="trademarks">6. Trademarks</a></strong></p><p>This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file.</p><p><strong><a id="no-warranty">7. Disclaimer of Warranty</a></strong></p><p>Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its Contributions) on an &ldquo;AS IS&rdquo; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE. You are solely responsible for determining the appropriateness of using or redistributing the Work and assume any risks associated with Your exercise of permissions under this License.</p><p><strong><a id="no-liability">8. Limitation of Liability</a></strong></p><p>In no event and under no legal theory, whether in tort (including negligence), contract, or otherwise, unless required by applicable law (such as deliberate and grossly negligent acts) or agreed to in writing, shall any Contributor be liable to You for damages, including any direct, indirect, special, incidental, or consequential damages of any character arising as a result of this License or out of the use or inability to use the Work (including but not limited to damages for loss of goodwill, work stoppage, computer failure or malfunction, or any and all other commercial damages or losses), even if such Contributor has been advised of the possibility of such damages.</p><p><strong><a id="additional">9. Accepting Warranty or Additional Liability</a></strong></p><p>While redistributing the Work or Derivative Works thereof, You may choose to offer, and charge a fee for, acceptance of support, warranty, indemnity, or other liability obligations and/or rights consistent with this License. However, in accepting such obligations, You may act only on Your own behalf and on Your sole responsibility, not on behalf of any other Contributor, and only if You agree to indemnify, defend, and hold each Contributor harmless for any liability incurred by, or claims asserted against, such Contributor by reason of your accepting any such warranty or additional liability.</p><h2>License Information regarding Bundled Third-Party Software <a id="licenses"></a></h2><p>The following third party software is distributed with GWT and is provided under other licenses and/or has source available from other locations. (Please note that gwt-servlet.jar is not derived from any third-party libraries and is licensed under the Apache License, Version 2.0 above.)</p>
+<table>
+  <thead>
+    <tr>
+      <th>Package </th>
+      <th>License </th>
+      <th>Source Code Availability </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Apache Tomcat </td>
+      <td>Apache License v. 2.0 (above) </td>
+      <td><a href="http://tomcat.apache.org/">tomcat.apache.org</a> modifications are at org/apache/tomcat within gwt-dev.jar </td>
+    </tr>
+    <tr>
+      <td>Browser Detect v2.1.6 </td>
+      <td><a href="http://creativecommons.org/licenses/by/1.0/">Creative Commons Attribution 1.0</a> </td>
+      <td><a href="http://google-web-toolkit.googlecode.com/">google-web-toolkit.googlecode.com</a> transliterated into Java source </td>
+    </tr>
+    <tr>
+      <td>Eclipse Java Development Tools (JDT) </td>
+      <td><a href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License v. 1.0</a> </td>
+      <td><a href="http://archive.eclipse.org/eclipse/downloads/drops/R-3.1.1-200509290840/download.php?dropFile=eclipse-JDT-SDK-3.1.1.zip">eclipse.org</a> </td>
+    </tr>
+    <tr>
+      <td>Eclipse Standard Widget Toolkit (SWT) </td>
+      <td><a href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License v. 1.0</a> </td>
+      <td>modifications are at org/eclipse/swt within gwt-dev.jar </td>
+    </tr>
+    <tr>
+      <td>HtmlUnit </td>
+      <td>Apache License v. 2.0 (above) </td>
+      <td><a href="http://htmlunit.sourceforge.net/">htmlunit.sourceforge.net</a> </td>
+    </tr>
+    <tr>
+      <td>JFreeChart </td>
+      <td><a href="http://www.gnu.org/licenses/lgpl.html">GNU Lesser General Public License v. 2.1</a> </td>
+      <td><a href="http://jfree.org/jfreechart/download.html">jfree.org</a> </td>
+    </tr>
+    <tr>
+      <td>Mozilla Rhino </td>
+      <td><a href="http://www.mozilla.org/MPL/MPL-1.1.txt">Mozilla Public License v. 1.1</a> </td>
+      <td>com/google/gwt/dev/js/rhino/ within gwt-dev.jar </td>
+    </tr>
+    <tr>
+      <td>Mozilla 1.7.12 (Linux only) </td>
+      <td><a href="http://www.mozilla.org/MPL/MPL-1.1.txt">Mozilla Public License v. 1.1</a> </td>
+      <td><a href="http://developer.mozilla.org/en/docs/Download_Mozilla_Source_Code">mozilla.org</a> </td>
+    </tr>
+    <tr>
+      <td>Protocol Buffers </td>
+      <td><a href="http://www.opensource.org/licenses/bsd-license.php">New BSD License</a> </td>
+      <td><a href="http://code.google.com/p/protobuf/">code.google.com/p/protobuf</a> </td>
+    </tr>
+    <tr>
+      <td>WebKit 418.9 (Mac only) </td>
+      <td><a href="http://www.gnu.org/licenses/lgpl.html">GNU Lesser General Public License v. 2.1</a> </td>
+      <td><a href="http://webkit.org/building/checkout.html">webkit.org</a> </td>
+    </tr>
+  </tbody>
+</table>
+
+                </div>
+            </div>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script>window.jQuery || document.write("<script src='./assets/build/js/vendor/jquery-1.11.0.min.js'><\/script>")</script>
+
+        <script src='./assets/build/js/vendor/jquery.flexnav.js'></script>
+        <script src='./assets/build/js/global.min.js'></script>
+
+    </body>
+</html>
