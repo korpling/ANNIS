@@ -1,3 +1,23 @@
+Version 3.5.0-preview1
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/51?closed=1
+
+[Fixed Bugs]
+ #536 Queries violating non-reflexivity constraint result in "Client response status: 500"
+ #533 Left context not displayed when number not pre-defined
+ #528 Can't use CSV exporter for OR-queries with different numbers of nodes in clauses.
+ #524 Rendering overlaps in grid view not always shown in Firefox
+
+[Enhancements]
+ #537 Better handling of concurrent users.
+ #535 Use new interactive VisJS visualization from Salt in ANNIS
+ #531 update to Vaadin 7.7.x
+ #529 Refactor exporter infrastructure and add the possibility to recreate the timeline in Salt
+ #526 Set mnemonic on "overwrite" checkbox in ImportDialog to "w"
+ #522 HTML Template support Issue #513 Master
+
 Version 3.4.4
 =============
 
