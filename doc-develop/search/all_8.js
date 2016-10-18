@@ -16,6 +16,8 @@ var searchData=
   ['importpanel',['ImportPanel',['../classannis_1_1gui_1_1admin_1_1_import_panel.html',1,'annis::gui::admin']]],
   ['importstatus',['ImportStatus',['../interfaceannis_1_1administration_1_1_import_status.html',1,'annis::administration']]],
   ['importworker',['ImportWorker',['../classannis_1_1service_1_1internal_1_1_import_worker.html',1,'annis::service::internal']]],
+  ['includenode',['includeNode',['../classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_component.html#a1796758e96d77901cd8f046f248cfa59',1,'annis::visualizers::component::visjs::VisJsComponent']]],
+  ['includerelation',['includeRelation',['../classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_component.html#a84646459a11e2ba38809b66286e88ad3',1,'annis::visualizers::component::visjs::VisJsComponent']]],
   ['inclusion',['Inclusion',['../classannis_1_1sqlgen_1_1model_1_1_inclusion.html',1,'annis::sqlgen::model']]],
   ['infogenerator',['InfoGenerator',['../classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_info_generator.html',1,'annis::gui::controlpanel::CorpusListPanel']]],
   ['init',['init',['../classannis_1_1administration_1_1_administration_dao.html#ab56007106166110030a8a7be6d254e82',1,'annis.administration.AdministrationDao.init()'],['../classannis_1_1service_1_1internal_1_1_metadata_service_impl.html#a0a03b8be54fc1d002dc0d64f4b820473',1,'annis.service.internal.MetadataServiceImpl.init()'],['../classannis_1_1service_1_1internal_1_1_query_service_impl.html#a1b9d8687dbbf9ecf874271eb2fd1f3b1',1,'annis.service.internal.QueryServiceImpl.init()']]],

@@ -17,10 +17,10 @@ var searchData=
   ['examplequeriespanel',['ExampleQueriesPanel',['../classannis_1_1gui_1_1_example_queries_panel.html',1,'annis::gui']]],
   ['examplequery',['ExampleQuery',['../classannis_1_1examplequeries_1_1_example_query.html',1,'annis::examplequeries']]],
   ['exampletable',['ExampleTable',['../classannis_1_1gui_1_1_example_table.html',1,'annis::gui']]],
-  ['exceptiondialog',['ExceptionDialog',['../classannis_1_1gui_1_1components_1_1_exception_dialog.html',1,'annis::gui::components']]],
   ['exceptiondialog',['ExceptionDialog',['../classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_exception_dialog.html',1,'de::hu_berlin::german::korpling::annis::kickstarter']]],
+  ['exceptiondialog',['ExceptionDialog',['../classannis_1_1gui_1_1components_1_1_exception_dialog.html',1,'annis::gui::components']]],
   ['exportbackgroundjob',['ExportBackgroundJob',['../classannis_1_1gui_1_1controller_1_1_export_background_job.html',1,'annis::gui::controller']]],
-  ['exporter',['Exporter',['../interfaceannis_1_1gui_1_1exporter_1_1_exporter.html',1,'annis::gui::exporter']]],
+  ['exporterplugin',['ExporterPlugin',['../interfaceannis_1_1libgui_1_1exporter_1_1_exporter_plugin.html',1,'annis::libgui::exporter']]],
   ['exporterselectionhelplistener',['ExporterSelectionHelpListener',['../classannis_1_1gui_1_1_export_panel_1_1_exporter_selection_help_listener.html',1,'annis::gui::ExportPanel']]],
   ['exportpanel',['ExportPanel',['../classannis_1_1gui_1_1_export_panel.html',1,'annis::gui']]],
   ['exportquery',['ExportQuery',['../classannis_1_1gui_1_1objects_1_1_export_query.html',1,'annis::gui::objects']]]

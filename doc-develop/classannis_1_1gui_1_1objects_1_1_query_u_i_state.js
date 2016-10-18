@@ -12,7 +12,7 @@ var classannis_1_1gui_1_1objects_1_1_query_u_i_state =
     [ "getContextSegmentation", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a1fca7489d15f45b1d7faf15973804d37", null ],
     [ "getExecutedTasks", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a3e29d716677de142d83d94082fe01ddb", null ],
     [ "getExportAnnotationKeys", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#ad4c6d2c2612fd6ce815eb9ee093a08f0", null ],
-    [ "getExporterName", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a2ef485f66e0df0a87ebdd89129cd3da6", null ],
+    [ "getExporter", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#af756458b557486094a11bd5da63142a0", null ],
     [ "getExportParameters", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a640e420ba043fa956e815ba148517861", null ],
     [ "getFrequencyMetaData", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a848107a68ac28fd5d56653ddb1a43f38", null ],
     [ "getFrequencyTableDefinition", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a4fc387b8b481c6c596fa8d2a575a1b9b", null ],

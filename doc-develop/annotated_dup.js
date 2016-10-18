@@ -137,9 +137,9 @@ var annotated_dup =
         ] ],
         [ "exporter", null, [
           [ "CSVExporter", "classannis_1_1gui_1_1exporter_1_1_c_s_v_exporter.html", "classannis_1_1gui_1_1exporter_1_1_c_s_v_exporter" ],
-          [ "Exporter", "interfaceannis_1_1gui_1_1exporter_1_1_exporter.html", "interfaceannis_1_1gui_1_1exporter_1_1_exporter" ],
           [ "GeneralTextExporter", "classannis_1_1gui_1_1exporter_1_1_general_text_exporter.html", "classannis_1_1gui_1_1exporter_1_1_general_text_exporter" ],
           [ "GridExporter", "classannis_1_1gui_1_1exporter_1_1_grid_exporter.html", "classannis_1_1gui_1_1exporter_1_1_grid_exporter" ],
+          [ "SaltBasedExporter", "classannis_1_1gui_1_1exporter_1_1_salt_based_exporter.html", "classannis_1_1gui_1_1exporter_1_1_salt_based_exporter" ],
           [ "SimpleTextExporter", "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter.html", "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter" ],
           [ "TokenExporter", "classannis_1_1gui_1_1exporter_1_1_token_exporter.html", "classannis_1_1gui_1_1exporter_1_1_token_exporter" ],
           [ "WekaExporter", "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html", "classannis_1_1gui_1_1exporter_1_1_weka_exporter" ]
@@ -280,6 +280,9 @@ var annotated_dup =
         [ "SidebarState", "enumannis_1_1gui_1_1_sidebar_state.html", "enumannis_1_1gui_1_1_sidebar_state" ]
       ] ],
       [ "libgui", null, [
+        [ "exporter", null, [
+          [ "ExporterPlugin", "interfaceannis_1_1libgui_1_1exporter_1_1_exporter_plugin.html", "interfaceannis_1_1libgui_1_1exporter_1_1_exporter_plugin" ]
+        ] ],
         [ "media", null, [
           [ "MediaController", "interfaceannis_1_1libgui_1_1media_1_1_media_controller.html", "interfaceannis_1_1libgui_1_1media_1_1_media_controller" ],
           [ "MediaControllerImpl", "classannis_1_1libgui_1_1media_1_1_media_controller_impl.html", "classannis_1_1libgui_1_1media_1_1_media_controller_impl" ],
@@ -579,6 +582,13 @@ var annotated_dup =
             [ "TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler" ],
             [ "VerticalOrientation", "enumannis_1_1visualizers_1_1component_1_1tree_1_1_vertical_orientation.html", "enumannis_1_1visualizers_1_1component_1_1tree_1_1_vertical_orientation" ]
           ] ],
+          [ "visjs", null, [
+            [ "VisJs", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js.html", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js" ],
+            [ "VisJsComponent", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_component.html", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_component" ],
+            [ "VisJsDoc", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_doc.html", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_doc" ],
+            [ "VisJsPanel", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_panel.html", null ],
+            [ "VisJsState", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_state.html", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_state" ]
+          ] ],
           [ "AbstractDotVisualizer", "classannis_1_1visualizers_1_1component_1_1_abstract_dot_visualizer.html", "classannis_1_1visualizers_1_1component_1_1_abstract_dot_visualizer" ],
           [ "AbstractImageVisualizer", "classannis_1_1visualizers_1_1component_1_1_abstract_image_visualizer.html", "classannis_1_1visualizers_1_1component_1_1_abstract_image_visualizer" ],
           [ "AudioVisualizer", "classannis_1_1visualizers_1_1component_1_1_audio_visualizer.html", "classannis_1_1visualizers_1_1component_1_1_audio_visualizer" ],
@@ -629,6 +639,7 @@ var annotated_dup =
       [ "CSVHelper", "classannis_1_1_c_s_v_helper.html", null ],
       [ "GraphHelper", "classannis_1_1_graph_helper.html", null ],
       [ "TableFormatter", "classannis_1_1_table_formatter.html", "classannis_1_1_table_formatter" ],
+      [ "TimelineReconstructor", "classannis_1_1_timeline_reconstructor.html", null ],
       [ "UsageException", "classannis_1_1_usage_exception.html", "classannis_1_1_usage_exception" ],
       [ "VersionInfo", "classannis_1_1_version_info.html", null ],
       [ "WekaHelper", "classannis_1_1_weka_helper.html", null ]
