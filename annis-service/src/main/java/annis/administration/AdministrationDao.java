@@ -62,7 +62,7 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
-import org.korpling.graphannis.API;
+import org.corpus_tools.graphannis.API;
 import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
