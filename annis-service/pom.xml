@@ -16,13 +16,13 @@
   <dependencies>
 
 	<dependency>
-      <groupId>org.korpling</groupId>
+      <groupId>org.corpus-tools</groupId>
       <artifactId>graphannis-api</artifactId>
       <version>0.1-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.korpling</groupId>
+      <groupId>org.corpus-tools</groupId>
       <artifactId>graphannis-api</artifactId>
       <version>0.1-SNAPSHOT</version>
       <classifier>linux-x86_64</classifier>
