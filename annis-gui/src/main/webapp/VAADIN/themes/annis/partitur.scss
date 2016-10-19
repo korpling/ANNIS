@@ -63,6 +63,14 @@
     td.highlight-source {
       background-color:rgb(200,200,200);
     }
+    
+    tr.invisible_token  {
+      visibility: collapse;
+    }
+
+    tr.invisible_token td  {
+      min-width: 10px;
+    }
 
   }
 

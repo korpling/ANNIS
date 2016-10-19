@@ -244,7 +244,7 @@ public class SingleResultPanel extends CssLayout implements
     }
 
     int lftContextIdx = query == null ? 0 : query.getLeftContext();
-    lftCtxContainer.addItemAt(lftContextIdx, lftContextIdx);
+    lftCtxContainer.addItem(lftContextIdx);
     lftCtxContainer.sort(new Object[]
     {
       "number"

@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.google.common.collect.ComparisonChain;
@@ -280,19 +281,15 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       });
       
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
       log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
+      if(!AnnisBaseUI.handleCommonError(ex, "get documents"))
+      {
+        Notification.show(
+          "Remote exception: " + ex.getLocalizedMessage(),
+          Notification.Type.WARNING_MESSAGE);
+      }
     }
 
     return result;

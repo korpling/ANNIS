@@ -19,7 +19,14 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.AqlParseError;
 import annis.model.Join;
 import annis.model.QueryNode;
+import annis.sqlgen.model.Inclusion;
+import annis.sqlgen.model.LeftAlignment;
+import annis.sqlgen.model.LeftOverlap;
 import annis.sqlgen.model.NonBindingJoin;
+import annis.sqlgen.model.Overlap;
+import annis.sqlgen.model.RightAlignment;
+import annis.sqlgen.model.RightOverlap;
+import annis.sqlgen.model.SameSpan;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -140,6 +147,23 @@ public class SemanticValidator implements QueryDataTransformer
         + "used for more than one node: " + Joiner.on(", ").join(invalidNames)
         + "\nNormalized Query is: \n"
         + data.toAQL());
+    }
+    
+    // check no non-reflexive operator is used with the same operands
+    for(QueryNode source : alternative)
+    {
+      for(Join join : source.getOutgoingJoins())
+      {
+        if(join instanceof Inclusion || join instanceof SameSpan
+          || join instanceof  Overlap || join instanceof RightOverlap || join instanceof LeftOverlap 
+          || join instanceof RightAlignment || join instanceof LeftAlignment)
+        {
+          if(source.equals(join.getTarget()))
+          {
+            throw new AnnisQLSemanticsException(join, "Not-reflexive operator used with the same node as argument.");
+          }
+        }
+      }
     }
   }
   

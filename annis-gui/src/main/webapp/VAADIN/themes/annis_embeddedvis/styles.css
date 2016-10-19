@@ -999,7 +999,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.6.8";
+	content: "7.7.3";
 }
 
 .v-widget {
@@ -3869,21 +3869,20 @@ div.v-layout.v-horizontal.v-widget {
 	-ms-backface-visibility: hidden;
 	backface-visibility: hidden;
 	padding: 4px 4px;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	position: relative;
-	z-index: 1;
-}
-
-.annis_embeddedvis .v-filterselect-suggestpopup [class$="suggestmenu"][style*="height"] {
 	-webkit-box-sizing: content-box;
 	-moz-box-sizing: content-box;
 	box-sizing: content-box;
+	position: relative;
+	z-index: 1;
+	display: block;
 }
 
 .annis_embeddedvis .v-filterselect-suggestpopup table, .annis_embeddedvis .v-filterselect-suggestpopup tbody, .annis_embeddedvis .v-filterselect-suggestpopup tr, .annis_embeddedvis .v-filterselect-suggestpopup td {
 	display: block;
+	width: 100%;
+	overflow-y: hidden;
+	float: left;
+	clear: both;
 }
 
 .annis_embeddedvis .v-filterselect-suggestpopup .gwt-MenuItem {
@@ -3894,6 +3893,10 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: 400;
 	white-space: nowrap;
 	position: relative;
+	height: 27px;
+	box-sizing: border-box;
+	text-overflow: ellipsis;
+	overflow-x: hidden;
 }
 
 .annis_embeddedvis .v-filterselect-suggestpopup .gwt-MenuItem:active:before {
@@ -9776,6 +9779,11 @@ div.v-layout.v-horizontal.v-widget {
 	display: inline;
 }
 
+.annis_embeddedvis .v-on.v-disabled, .annis_embeddedvis .v-off.v-disabled {
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
+}
+
 .annis_embeddedvis .v-off:before {
 	visibility: hidden;
 }
@@ -11484,6 +11492,12 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f054";
 }
 
+.annis_embeddedvis .v-select-twincol-error .v-select-twincol-options, .annis_embeddedvis .v-select-twincol-error .v-select-twincol-selections {
+	border-color: #ed473b !important;
+	background: #fffbfb;
+	color: #6c2621;
+}
+
 .annis_embeddedvis .v-select select {
 	border: 1px solid #c5c5c5;
 	background-color: #fafafa;
@@ -11510,6 +11524,12 @@ div.v-layout.v-horizontal.v-widget {
 .annis_embeddedvis .v-select-select  + .v-textfield  + .v-nativebutton {
 	margin-top: 6px;
 	margin-left: 6px;
+}
+
+.annis_embeddedvis .v-select-error .v-select-select {
+	border-color: #ed473b !important;
+	background: #fffbfb;
+	color: #6c2621;
 }
 
 .annis_embeddedvis .v-calendar-header-day {
@@ -11952,6 +11972,11 @@ div.v-layout.v-horizontal.v-widget {
 	user-select: text;
 }
 
+.annis_embeddedvis .v-label.v-disabled {
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
+}
+
 .annis_embeddedvis .v-label-undef-w {
 	white-space: nowrap;
 }
@@ -12231,6 +12256,12 @@ div.v-layout.v-horizontal.v-widget {
 .annis_embeddedvis .v-select-select  + .v-textfield  + .v-nativebutton {
 	margin-top: 6px;
 	margin-left: 6px;
+}
+
+.annis_embeddedvis .v-select-error .v-select-select {
+	border-color: #ed473b !important;
+	background: #fffbfb;
+	color: #6c2621;
 }
 
 .annis_embeddedvis .v-popupview {
@@ -13444,6 +13475,14 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .partitur_table td.highlight-source {
 	background-color: #c8c8c8;
+}
+
+.annis_embeddedvis .partitur_table tr.invisible_token {
+	visibility: collapse;
+}
+
+.annis_embeddedvis .partitur_table tr.invisible_token td {
+	min-width: 10px;
 }
 
 .annis_embeddedvis .checkedItem:before {
