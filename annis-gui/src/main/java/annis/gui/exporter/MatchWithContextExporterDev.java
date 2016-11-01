@@ -500,7 +500,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                  {
 		                    // also mark the end of a match with the tab
 		                    //separator = "\t";
-		                	  if(graph.getText(tok).equals(",") && !dominanceLists.containsKey(counter) && 
+		                	  if(!dominanceLists.containsKey(counter) && 
 		                			  dominanceLists.containsKey(counter-1) && dominanceLists.containsKey(counter+1)){
 		                		    
 		                		  
