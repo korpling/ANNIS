@@ -68,6 +68,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 {
 	private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
 	private static final String TRAV_SPEAKER_HAS_MATCHES = "SpeakerHasMatches";
+	public static final String FILTER_PARAMETER_KEYWORD = "filter";
+	public static final String FILTER_PARAMETER_SEPARATOR = ",";
 	private static HashMap <String, Boolean> speakerHasMatches = new HashMap<String, Boolean>();
 	private static String speakerName;
 	private boolean isFirstSpeakerWithMatch = true;   
@@ -78,6 +80,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
 	private static Set<Long> inDominanceRelation = new HashSet<Long>();
 	private static Map <Integer, List<Long>> dominanceListsAllToken = new HashMap <Integer, List<Long>>();
+	
+	private static Set<Long> filterNumbers = new HashSet<Long>(); 
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
@@ -179,12 +183,33 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   { 
   	String currSpeakerName = "";
 	String prevSpeakerName = "";
+	filterNumbers.clear();
 	
 		
 	    
     if(graph != null)
     {
       List<SToken> orderedToken = graph.getSortedTokenByText();
+      
+      //extract filter numbers
+      if (args.containsKey(FILTER_PARAMETER_KEYWORD)){
+    	     	 
+    	  String parameters = args.get(FILTER_PARAMETER_KEYWORD);
+    	  String [] numbers = parameters.split(",");
+        	  for (int i=0; i< numbers.length; i++){
+    		  try {
+    			 Long number = Long.parseLong(numbers[i]);
+    			 filterNumbers.add(number);
+     			 
+    		  }
+    		  catch(NumberFormatException e){
+    			 ;
+    		  }
+    		  
+    	  }
+    	  
+      }
+      
       
       if(orderedToken != null)
       {
@@ -449,14 +474,23 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                      // separator = "\t\t";
 		                    	separator= "";
 		                    	int tabCount = adjacencyMatrix[(int) (lastTokenWasMatched - 1)][(int) ((long) traverser.matchedNode - 1)];
+		                    	int maxTabCount = 2;
+		                    	if (maxDistances.containsKey(lastTokenWasMatched -1)){
+			                    	  maxTabCount += maxDistances.get(lastTokenWasMatched -1);	
+		                    	}
+		                    	
+		                    	//matches are coherent
 		                    	if (tabCount != -1){
 		                    		for (int i = 0; i < tabCount; i++){
 				                    	  separator += "\t";
 				                      }
 		                    	}
 		                    	else{		                    		
-		                    			separator = "\t";
-		                    			                    		
+		                    		// matches are independent			                    		                   	        	             	
+			                    	  for (int i = 0; i < maxTabCount; i++){
+				                    	  separator += "\t";							                    	  
+				                      }  						                    	  						                    	 
+				                                        			                    			                    		
 		                    	}
 		                    	
 		                    }
