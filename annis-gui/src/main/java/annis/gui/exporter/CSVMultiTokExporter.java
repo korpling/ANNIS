@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
@@ -61,7 +63,7 @@ public class CSVMultiTokExporter extends SaltBasedExporter
   }
 
   private Set<String> metakeys;
-  private List<TreeSet<String>> annotationsForMatchedNodes;
+  private SortedMap<Integer,TreeSet<String>> annotationsForMatchedNodes;
 
   private boolean firstIteration;
 
@@ -115,18 +117,23 @@ public class CSVMultiTokExporter extends SaltBasedExporter
         metakeys.addAll(Arrays.asList(args.get("metakeys").split(",")));
       }
       // initialize list of annotations for the matched nodes
-      annotationsForMatchedNodes = new ArrayList<>();
+      annotationsForMatchedNodes = new TreeMap<>();
     }
     // get list of annotations for the nodes in the current match
-    String[] matchIDs = graph
+    Set<String> matchIDs = new HashSet<>(Arrays.asList(
+      graph
       .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
-      .getValue_STEXT().split(",");
-    for (int i=0; i < matchIDs.length; i++)
+      .getValue_STEXT().split(",")));
+    for (String matchID: matchIDs)
     {
-      if(i >= annotationsForMatchedNodes.size())
-        annotationsForMatchedNodes.add(i, new TreeSet<String>());
-      List<SAnnotation> annots = new ArrayList<>(graph.getNode(matchIDs[i]).getAnnotations());
-      Set<String> annoNames = annotationsForMatchedNodes.get(i);
+      SNode node = graph.getNode(matchID);
+      int node_id = node
+          .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE)
+          .getValue_SNUMERIC().intValue();
+      if(!annotationsForMatchedNodes.containsKey(node_id))
+        annotationsForMatchedNodes.put(node_id, new TreeSet<String>());
+      List<SAnnotation> annots = new ArrayList<>(node.getAnnotations());
+      Set<String> annoNames = annotationsForMatchedNodes.get(node_id);
       for (SAnnotation annot: annots) {
         annoNames.add(annot.getNamespace() + "::" + annot.getName());
       }
@@ -142,13 +149,14 @@ public class CSVMultiTokExporter extends SaltBasedExporter
     {
       // output header
       List<String> headerLine = new ArrayList<>();
-      for(int i=0; i < annotationsForMatchedNodes.size(); i++)
+      for(Map.Entry<Integer, TreeSet<String>> match: annotationsForMatchedNodes.entrySet())
       {
-        headerLine.add(String.valueOf(i+1) + "_id");
-        headerLine.add(String.valueOf(i+1) + "_span");
-        for (String annoName: annotationsForMatchedNodes.get(i))
+        int node_id = match.getKey();
+        headerLine.add(String.valueOf(node_id) + "_id");
+        headerLine.add(String.valueOf(node_id) + "_span");
+        for (String annoName: match.getValue())
         {
-          headerLine.add(String.valueOf(i+1) + "_anno_" + annoName);
+          headerLine.add(String.valueOf(node_id) + "_anno_" + annoName);
         }
       }
       for (String key: metakeys) {
@@ -159,33 +167,44 @@ public class CSVMultiTokExporter extends SaltBasedExporter
     }
 
     // output nodes in the order of the matches
-    List<String> contentLine = new ArrayList<>();
-    String[] matchIDs = graph
+    SortedMap<Integer, String> contentLine = new TreeMap<>();
+    Set<String> matchIDs = new HashSet<>(Arrays.asList(
+      graph
       .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
-      .getValue_STEXT().split(",");
-    for (int i=0; i < matchIDs.length; i++)
+      .getValue_STEXT().split(",")));
+    for (String matchID: matchIDs)
     {
-      String matchid = matchIDs[i];
-      SNode node = graph.getNode(matchid);
+      List<String> nodeLine = new ArrayList<>();
+      SNode node = graph.getNode(matchID);
       // export id
       RelannisNodeFeature feats = RelannisNodeFeature.extract(node);
-      contentLine.add(String.valueOf(feats.getInternalID()));     
+      nodeLine.add(String.valueOf(feats.getInternalID()));
       // export spanned text
       String span = graph.getText(node);
       if (span != null)
-        contentLine.add(graph.getText(node));
+        nodeLine.add(graph.getText(node));
       else
-        contentLine.add("");
+        nodeLine.add("");
       // export annotations
-      for (String annoName: annotationsForMatchedNodes.get(i))
+      int node_id = node
+        .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE)
+        .getValue_SNUMERIC().intValue();
+      for (String annoName: annotationsForMatchedNodes.get(node_id))
       {
         SAnnotation anno = node.getAnnotation(annoName);
         if (anno != null)
-          contentLine.add(anno.getValue_STEXT());
+        {
+          nodeLine.add(anno.getValue_STEXT());
+        }
         else
-          contentLine.add("'NULL'");
+          nodeLine.add("'NULL'");
+        // add everything to line
+        contentLine.put(node_id, StringUtils.join(nodeLine, "\t"));
       }
     }
+
+    out.append(StringUtils.join(contentLine.values(), "\t"));
+
     // export Metadata
     // TODO cache the metadata
     if(!metakeys.isEmpty()) {
@@ -195,11 +214,10 @@ public class CSVMultiTokExporter extends SaltBasedExporter
       for(Annotation anno : asList)
       {
         if (metakeys.contains(anno.getName()))
-          contentLine.add(anno.getValue());
+          out.append("\t" + anno.getValue());
       }
     }
 
-    out.append(StringUtils.join(contentLine, "\t"));
     out.append("\n");
   }
 }
