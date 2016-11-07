@@ -77,12 +77,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static int currHeight;
 	private static List <Long> dominatedMatchedCodes = new ArrayList<Long>();
 	private static Map <Integer, List<Long>> dominanceLists = new HashMap <Integer, List<Long>>();
+	private static Map <Integer, Long> tokenToMatchNumber = new HashMap <Integer, Long>();
 	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
 	private static Set<Long> inDominanceRelation = new HashSet<Long>();
-	//private static Map <Integer, List<Long>> dominanceListsAllToken = new HashMap <Integer, List<Long>>();
-	
-	private static Map <Long, Integer> ordinalNumbers = new HashMap<Long, Integer>();
-	
 	private static Set<Long> filterNumbers = new HashSet<Long>(); 
   
 	
@@ -229,8 +226,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	  inDominanceRelation.clear();    	  
     	  dominanceLists.clear();    	  
     	  dominanceListsWithHead.clear();
+    	  tokenToMatchNumber.clear();
     	  
-    	  ordinalNumbers.clear();
+ 
     	 // counter over dominance lists
     	  int counter = 0;
     
@@ -273,6 +271,20 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
               if (!dominatedMatchedCodes.isEmpty()){
             	  dominanceListsWithHead.put(dominatedMatchedCodes.get(0), dominatedMatchedCodes);
                   dominanceLists.put(counter, dominatedMatchedCodes);
+                  
+                  // filter numbers not set, take the number of the highest match node
+                  if (filterNumbers.isEmpty()){
+                	  tokenToMatchNumber.put(counter, dominatedMatchedCodes.get(dominatedMatchedCodes.size() - 1));
+                  }
+                  else{
+                	  for (int i = 0; i < dominatedMatchedCodes.size(); i++){
+                    	  if (filterNumbers.contains(dominatedMatchedCodes.get(i))){
+                    		  tokenToMatchNumber.put(counter, dominatedMatchedCodes.get(i));
+                    	  }
+                      }
+                  }
+                  
+                 
               }
                                       
     	  }
@@ -302,84 +314,35 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         	if (dominanceListsWithHead.containsValue(entry.getValue()) && !dominanceListsWithoutDoubles.containsValue(entry.getValue())){
         		dominanceListsWithoutDoubles.put(entry.getKey(), entry.getValue());
         	}
-        }
+         }
+        
+        
         
                 
         System.out.println(dominanceLists);
+        System.out.println(tokenToMatchNumber);
         System.out.println(dominanceListsWithHead);
         System.out.println(dominanceListsWithoutDoubles);
-        
                
-        // create adjacency matrix for storing of max distances between matching codes
+               
         List <Map.Entry<Integer, List<Long>>> domListsSorted =  sortByKey(dominanceListsWithoutDoubles);
-        int elementCount = 0;
-        int ordinalNumberCounter = 0;
+     
         
+        boolean filterNumbersEmpty = true;
+        if (!filterNumbers.isEmpty())
+        {
+        	filterNumbersEmpty = false;
+        	
+        }
+        
+        // if filter numbers aren't set, set default filter numbers (always the root of a match hierarchy)
         for ( Map.Entry <Integer, List<Long>> entry : domListsSorted){
-			 elementCount += entry.getValue().size();
 			 List<Long>  domList = entry.getValue();
-			 
-			 List<Long> domListReversed = new ArrayList<Long>();
-			 //domListReversed.addAll(domList);	
-			 for (Long element : domList){
-				 domListReversed.add(element);
-			 }
-			 Collections.reverse(domListReversed);
-			 
-			 for (int i=0; i < domListReversed.size(); i++){
-				 ordinalNumbers.put(domListReversed.get(i), ordinalNumberCounter++);
-			 }
-			 
-        }
-        
-        // TODO this approach works only if sorted match codes are a sequence 1,2,3, ... 
-        int [][] adjacencyMatrix = new int [elementCount][elementCount];
-        Map <Long, Integer> maxDistances = new HashMap<Long, Integer>();
-        // set initial values
-        for (int i=0; i < elementCount; i++){
-        	for (int j=0; j < elementCount; j++){
-        		adjacencyMatrix[i][j] = -1;
-        	}
-        }
-        
-       
-        
-        
-        for ( Map.Entry <Integer, List<Long>> entry : domListsSorted){
-			 List<Long> doms = entry.getValue();
-			for (int i = 0; i< doms.size(); i++){
-				int maxDist = 0;
-												
-				for (int j = 0; j < doms.size(); j++){
-					int dist =  Math.abs(i - j);					
-					//adjacencyMatrix[Integer.valueOf(String.valueOf(doms.get(i))) - 1][Integer.valueOf(String.valueOf(doms.get(j))) - 1] = dist;
-					adjacencyMatrix[ordinalNumbers.get(doms.get(i))][ordinalNumbers.get(doms.get(j))] = dist;
-					if (maxDist < dist){
-						maxDist = dist;						
-					}
-					/*if (doms.get(i) > doms.get(j)){
-						maxDistances.put(doms.get(i) - 1, maxDist);
-					}*/
-					
-					if (doms.get(i) > doms.get(j)){
-						maxDistances.put((long) ordinalNumbers.get(doms.get(i)), maxDist);
-					}
-					
-				}
-			}
+			 if (filterNumbersEmpty){
+				 filterNumbers.add(domList.get(domList.size() - 1));
+			 }			 
        }
-       
-        for (int i = 0; i < adjacencyMatrix.length; i++){
-        	for (int j = 0; j < adjacencyMatrix[0].length; j++){
-        		System.out.print(adjacencyMatrix[i][j] + "\t");
-        	}
-        	System.out.print("\n");
-        }       
-        System.out.println("maxDist: " +maxDistances);
-        System.out.println(ordinalNumbers);
-        
-        
-        
+            
         
         
       //TODO why does match number start with -1? 
@@ -423,31 +386,11 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		        		 
 		        		 String prefix = "M_";
 		        		 
-		        		 System.out.println("dominanceListsWithoutDoubles: " +  dominanceListsWithoutDoubles);
-		        		 
-		        		 domListsSorted =  sortByKey(dominanceListsWithoutDoubles);
-		        		 int listCount = domListsSorted.size();
-		        		 int count = 0;
-		        		 
-		        		 for ( Map.Entry <Integer, List<Long>> entry : domListsSorted){
-		        			 count++;
-		        			 List <Long> dominanceChain = entry.getValue();
-		        			 
-		        			 for ( int i = dominanceChain.size() - 1; i >= 0; i--){
-		        				 out.append(prefix + dominanceChain.get(i) + "\t");
-		        			 }
-		        			 
-		        			 if (dominanceChain.size() > 1){
-		        				 for ( int i = 1; i < dominanceChain.size(); i++){
-			        				 out.append(prefix + dominanceChain.get(i) + "\t");
-			        			 }
-		        			 }
-		        			 
-		        			 if (count < listCount){
-		        				 out.append("middle_context_" +  count + "\t"); 
-		        			 }
-		        			 
-		        			 
+		        		for (int i = 0; i < filterNumbers.size(); i++){		        			
+		        			out.append(prefix + (i + 1) + "\t");		        			        
+		        			 if (i < filterNumbers.size() - 1){
+		        				 out.append("middle_context_" +  (i + 1) + "\t"); 
+		        			 }      			 
 		        		 }
 		        		 
 		        		 out.append("right_context");
@@ -482,49 +425,15 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                    // is dominated by a (new) matched node, thus use tab to separate the non-matches from the matches
 		                    if(lastTokenWasMatched < 0)
 		                    {
-		                      //separator = "\t"; 
-		                      separator= "";
-		                     
-		                      
-		                      System.out.println("MatchCode: " + traverser.matchedNode + "\t OrdinalNumber: " + ordinalNumbers.get(traverser.matchedNode));
-		                      if (maxDistances.containsKey((long) ordinalNumbers.get(traverser.matchedNode))){
-		                    	  Integer tabCount = maxDistances.get((long) ordinalNumbers.get(traverser.matchedNode)) + 1;	
-		                    	 
-			                    	  for (int i = 0; i < tabCount; i++){
-				                    	  separator += "\t";
-				                      }                     
-		                      }
-		                      else{
-		                    	  separator = "\t";  
-		                      }
-		                      
+		                       separator = "\t"; 
+		                                                     
 		                			                      
 		                    }
 		                    else if(lastTokenWasMatched != (long) traverser.matchedNode)
 		                    {
 		                      // always leave an empty column between two matches, even if there is no actual context
-		                      // separator = "\t\t";
-		                    	separator= "";
-		                    	int tabCount = adjacencyMatrix[ordinalNumbers.get(lastTokenWasMatched)][ordinalNumbers.get(traverser.matchedNode)];
-		                    	int maxTabCount = 2;
-		                    	if (maxDistances.containsKey((long) ordinalNumbers.get(lastTokenWasMatched))){
-			                    	  maxTabCount += maxDistances.get((long) ordinalNumbers.get(lastTokenWasMatched));	
-		                    	}
-		                    	
-		                    	//matches are coherent
-		                    	if (tabCount != -1){
-		                    		for (int i = 0; i < tabCount; i++){
-				                    	  separator += "\t";
-				                      }
-		                    	}
-		                    	else{		                    		
-		                    		// matches are independent			                    		                   	        	             	
-			                    	  for (int i = 0; i < maxTabCount; i++){
-				                    	  separator += "\t";							                    	  
-				                      }  						                    	  						                    	 
-				                                        			                    			                    		
-		                    	}
-		                    	
+		                    	separator = "\t\t";
+		                    			                    	
 		                    }
 		                    lastTokenWasMatched = traverser.matchedNode;
 		                  }
@@ -532,70 +441,34 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                  {
 		                    // also mark the end of a match with the tab
 		                    //separator = "\t";
+		                	  
+		                	  //handle crossing edges
 		                	  if(!dominanceLists.containsKey(counter) && 
 		                			  dominanceLists.containsKey(counter - 1) && dominanceLists.containsKey(counter + 1)){
 		                		    
 		                		  
-	                    			if (dominanceLists.get(counter - 1).size() > dominanceLists.get(counter + 1).size() &&
-	                    					dominanceLists.get(counter - 1).contains(dominanceLists.get(counter + 1).get(0))){
-	                    				separator = "";
-	                    				//
-	                    				System.out.println(counter + ": " + graph.getText(tok) + " -- " +lastTokenWasMatched);
-	                    				int tabCount = adjacencyMatrix[(int) (ordinalNumbers.get(dominanceLists.get(counter + 1).get(0)))][ordinalNumbers.get(lastTokenWasMatched)];
-	    		                    	if (tabCount != -1){
-	    		                    		for (int i = 0; i < tabCount; i++){
-	    				                    	  separator += "\t";
-	    				                      }
-	    		                    	}
-	  			                      
-	  			                      else{
-	  			                    	  separator = "\t";
-	  			                      }
-	    		                    	lastTokenWasMatched = dominanceLists.get(counter + 1).get(0);
-	                    			}
-                    				else if (dominanceLists.get(counter - 1).size() <= dominanceLists.get(counter + 1).size() &&
-	                    					dominanceLists.get(counter + 1).contains(dominanceLists.get(counter - 1).get(0))){
-                    					separator = " ";
-                    				}
-                    				else{
-                    					// TODO this part identical with next one 
-                    					separator= "";
-       			                	  
-       			                	  if (maxDistances.containsKey((long) ordinalNumbers.get(lastTokenWasMatched))){
-       			                		  Integer tabCount = maxDistances.get((long) ordinalNumbers.get(lastTokenWasMatched)) + 1;			                     
-       				                    	  for (int i = 0; i < tabCount; i++){
-       					                    	  separator += "\t";
-       					                      }			                      
-       			                	  }
-       			                      
-       			                      else{
-       			                    	  separator = "\t";
-       			                      }
-       				                      
-       			                	  
-       			                	  
-       			                    lastTokenWasMatched = -1;
-                    				}
+		                    			if (dominanceLists.get(counter - 1).size() > dominanceLists.get(counter + 1).size() &&
+		                    					dominanceLists.get(counter - 1).contains(dominanceLists.get(counter + 1).get(0))){
+		                    				
+		                    				separator = "\t";	  			                      
+		    		                    	lastTokenWasMatched = dominanceLists.get(counter + 1).get(0);
+		                    			}
+	                    				else if (dominanceLists.get(counter - 1).size() <= dominanceLists.get(counter + 1).size() &&
+		                    					dominanceLists.get(counter + 1).contains(dominanceLists.get(counter - 1).get(0))){
+	                    					separator = " ";
+	                    				}
+	                    				else{
+	                    					             						                    
+	       			                    	  separator = "\t";           			                	  
+	       			                    	  lastTokenWasMatched = -1;
+	                    				}
 	                    				
 	                    				
 	                    			}
 	                    		
-		                	  else{ // if no comma handling necessary, only this part remains
-		                		  separator= "";
-			                	  
-			                	  if (maxDistances.containsKey((long) ordinalNumbers.get(lastTokenWasMatched))){
-			                		  Integer tabCount = maxDistances.get((long) ordinalNumbers.get(lastTokenWasMatched)) + 1;			                     
-				                    	  for (int i = 0; i < tabCount; i++){
-					                    	  separator += "\t";
-					                      }			                      
-			                	  }
-			                      
-			                      else{
-			                    	  separator = "\t";
-			                      }
-				                      
-			                	  
-			                	  
+		                	  else{
+		                		            
+			                    separator = "\t";		                	  
 			                    lastTokenWasMatched = -1;
 		                	  }
 	                    				 
@@ -660,7 +533,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 
 			}
 		};
-		// sort key values lexicographically
+		// sort key values numerical
 		Collections.sort(entries, comparator);
 
 		return entries;
