@@ -320,7 +320,10 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 			 List<Long>  domList = entry.getValue();
 			 
 			 List<Long> domListReversed = new ArrayList<Long>();
-			 domListReversed.addAll(domList);			 
+			 //domListReversed.addAll(domList);	
+			 for (Long element : domList){
+				 domListReversed.add(element);
+			 }
 			 Collections.reverse(domListReversed);
 			 
 			 for (int i=0; i < domListReversed.size(); i++){
@@ -481,7 +484,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                    {
 		                      //separator = "\t"; 
 		                      separator= "";
-		                      long ordinalNu = ordinalNumbers.get(traverser.matchedNode);
+		                     
 		                      
 		                      System.out.println("MatchCode: " + traverser.matchedNode + "\t OrdinalNumber: " + ordinalNumbers.get(traverser.matchedNode));
 		                      if (maxDistances.containsKey((long) ordinalNumbers.get(traverser.matchedNode))){
@@ -653,7 +656,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 
 		Comparator<Map.Entry<K, V>> comparator = new Comparator<Map.Entry<K, V>>() {
 			public int compare(Map.Entry<K, V> e1, Map.Entry<K, V> e2) {
-				return e1.getKey().toString().compareToIgnoreCase(e2.getKey().toString());
+				return (Integer.valueOf(e1.getKey().toString()) - Integer.valueOf(e2.getKey().toString()));
 
 			}
 		};
