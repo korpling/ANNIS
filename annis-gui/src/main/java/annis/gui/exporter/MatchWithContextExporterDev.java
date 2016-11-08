@@ -47,6 +47,7 @@ import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 
 import com.google.common.base.Joiner;
+import com.vaadin.ui.Notification;
 
 import annis.CommonHelper;
 import annis.model.AnnisConstants;
@@ -73,9 +74,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static HashMap <String, Boolean> speakerHasMatches = new HashMap<String, Boolean>();
 	private static String speakerName;
 	private boolean isFirstSpeakerWithMatch = true;   
-	private static long maxHeight;
-	private static int currHeight;
-	private static List <Long> dominatedMatchedCodes = new ArrayList<Long>();
+	private static List <Long> dominatedMatchCodes = new ArrayList<Long>();
 	private static Map <Integer, List<Long>> dominanceLists = new HashMap <Integer, List<Long>>();
 	private static Map <Integer, Long> tokenToMatchNumber = new HashMap <Integer, Long>();
 	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
@@ -95,28 +94,15 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     {
     	 SFeature matchedAnno = currNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
     	 
-    	 if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
-	        {
-	    	  if (relation!= null)
-				{			
-						currHeight++;
-						if (maxHeight < currHeight)
-						{
-							maxHeight = currHeight;
-						}						
-				}	
-			    	  
-	        } 
-    	 //
     	 if(matchedAnno != null && (filterNumbers.contains(matchedAnno.getValue_SNUMERIC()) || filterNumbers.isEmpty()))
 	      {
 	        matchedNode = matchedAnno.getValue_SNUMERIC();	       
 	        //
 	        if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES) )
 	        {
-	        dominatedMatchedCodes.add(matchedNode);
+	        dominatedMatchCodes.add(matchedNode);
 	        
-	        if (dominatedMatchedCodes.size() > 1){
+	        if (dominatedMatchCodes.size() > 1){
 	        	inDominanceRelation.add(matchedNode);
 	        }
 	       
@@ -133,13 +119,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
         SRelation<SNode, SNode> relation, SNode fromNode, long order)
     {
-    	 if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES))
-	        {
-    		 if (relation!= null)
-	    		 {
-	    		 currHeight--;	  
-		        }
-	        }
+   
      
     }
 
@@ -148,29 +128,18 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         SRelation relation, SNode currNode, long order)
     {
     	if(traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH))
-    	{	//
-	      if(this.matchedNode != null && (filterNumbers.contains(this.matchedNode) || filterNumbers.isEmpty()))
-	      { // don't traverse any further if matched node was found 
-	        return false;
-	      }
-	      else
-	      {
-	        // only iterate over text-coverage relations
-	        return 
+    	{	
+		      if(this.matchedNode != null && (filterNumbers.contains(this.matchedNode) || filterNumbers.isEmpty()))
+		      { // don't traverse any further if matched node was found 
+		        return false;
+		      }
+    	}
+    	
+		return 
 	            relation == null
 	            || relation instanceof SDominanceRelation 
 	            || relation instanceof SSpanningRelation;
-	      }
-    	}
-    	else if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES)){
-    		return 
-    	            relation == null
-    	            || relation instanceof SDominanceRelation 
-    	            || relation instanceof SSpanningRelation;
-    	}
-    	else{
-    		return true;
-    	}
+   
     } 
   }
 
@@ -236,25 +205,17 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	  for(SToken token : orderedToken){
     		  counter++;
     		  System.out.println(counter + ". Token:\t" + graph.getText(token));
-              maxHeight = 0;
-              currHeight = 0;
              
               
     		  
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
-             // System.out.println(textualDS.getName() + "\t" + textualDS.getText());
               speakerName = textualDS.getName();
               
               if (!speakerHasMatches.containsKey(speakerName))
               {
             	  speakerHasMatches.put(speakerName, false);
               }
-              else if (speakerHasMatches.get(speakerName) == true)
-              {
-            	  //TODO
-            	 // continue;
-              }
-        
+                  
               
     		  List<SNode> root = new LinkedList<>();
               root.add(token);
@@ -262,28 +223,27 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
               
                           
               //reset list
-        	  dominatedMatchedCodes = new ArrayList<Long>();
+        	  dominatedMatchCodes = new ArrayList<Long>();
         	  
               
               graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch); 
               
               
-              if (!dominatedMatchedCodes.isEmpty()){
-            	  dominanceListsWithHead.put(dominatedMatchedCodes.get(0), dominatedMatchedCodes);
-                  dominanceLists.put(counter, dominatedMatchedCodes);
+              if (!dominatedMatchCodes.isEmpty()){
+            	  dominanceListsWithHead.put(dominatedMatchCodes.get(0), dominatedMatchCodes);
+                  dominanceLists.put(counter, dominatedMatchCodes);
                   
                   // filter numbers not set, take the number of the highest match node
                   if (filterNumbers.isEmpty()){
-                	  tokenToMatchNumber.put(counter, dominatedMatchedCodes.get(dominatedMatchedCodes.size() - 1));
+                	  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
                   }
                   else{
-                	  for (int i = 0; i < dominatedMatchedCodes.size(); i++){
-                    	  if (filterNumbers.contains(dominatedMatchedCodes.get(i))){
-                    		  tokenToMatchNumber.put(counter, dominatedMatchedCodes.get(i));
+                	  for (int i = 0; i < dominatedMatchCodes.size(); i++){
+                    	  if (filterNumbers.contains(dominatedMatchCodes.get(i))){
+                    		  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(i));
                     	  }
                       }
-                  }
-                  
+                  }                  
                  
               }
                                       
@@ -297,7 +257,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
        
         
         Iterator<Long> inDomIt = inDominanceRelation.iterator();        
-        //eliminate entries whose key (matching code) dominate other matching codes  
+        //eliminate entries, whose key (matching code) dominate other matching codes  
         while(inDomIt.hasNext()){
         	Long matchingCode = inDomIt.next();
         	if (dominanceListsWithHead.containsKey(matchingCode)){
@@ -310,15 +270,12 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         Map <Integer, List<Long>> dominanceListsWithoutDoubles = new HashMap<Integer, List<Long>>();
         
         for(Map.Entry<Integer, List<Long>> entry : entries){
-        	//if (dominanceListsWithHead.containsValue(entry.getValue())){
         	if (dominanceListsWithHead.containsValue(entry.getValue()) && !dominanceListsWithoutDoubles.containsValue(entry.getValue())){
         		dominanceListsWithoutDoubles.put(entry.getKey(), entry.getValue());
         	}
          }
         
-        
-        
-                
+                       
         System.out.println(dominanceLists);
         System.out.println(tokenToMatchNumber);
         System.out.println(dominanceListsWithHead);
@@ -335,13 +292,45 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         	
         }
         
-        // if filter numbers aren't set, set default filter numbers (always the root of a match hierarchy)
-        for ( Map.Entry <Integer, List<Long>> entry : domListsSorted){
-			 List<Long>  domList = entry.getValue();
-			 if (filterNumbersEmpty){
+        // if filter numbers not set, set default filter numbers (always the root of a match hierarchy)
+        if (filterNumbersEmpty){
+        	
+	        for (Map.Entry <Integer, List<Long>> entry : domListsSorted){
+				 List<Long>  domList = entry.getValue();			 
 				 filterNumbers.add(domList.get(domList.size() - 1));
-			 }			 
-       }
+				 }			 
+        }
+        //if filter numbers set, validate them
+        else{
+        	Set<List<Long>> usedDominanceLists = new HashSet<List<Long>>();
+        	for (Long filterNumber : filterNumbers){
+        		
+        		boolean filterNumberIsValid = false;
+        		for (List<Long> dominanceList : dominanceListsWithoutDoubles.values()){
+        			if (dominanceList.contains(filterNumber)){
+        				if (usedDominanceLists.contains(dominanceList)){
+        					filterNumberIsValid = false;
+        					Notification.show("Please use one filter number per match hierarchy only. "
+        							+ "\n Data could not be exported.", Notification.Type.WARNING_MESSAGE);
+        					return;
+        				}
+        				else{
+        					usedDominanceLists.add(dominanceList);
+        					filterNumberIsValid = true;
+        					
+        				}
+        			}
+        		}
+        		
+        		//filter number was not found in dominance lists, thus it is not valid
+        		if (!filterNumberIsValid){
+        			Notification.show("The filter number " + filterNumber + " is not valid. "
+        					+ "\n Data could not be exported.", Notification.Type.WARNING_MESSAGE);
+        			return;        			       			
+        		}
+        		
+        	}
+        }
             
         
         
@@ -352,7 +341,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	}
     	
          
-    	 //reset counter
+    	//reset counter
         counter = 0;
         while(it.hasNext())
         {    	
@@ -420,6 +409,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                  root.add(tok);
 		                  IsDominatedByMatch traverser = new IsDominatedByMatch();
 		                  graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, "IsDominatedByMatch", traverser);
+		               
+		                  // token matched
 		                  if(traverser.matchedNode != null)
 		                  {
 		                    // is dominated by a (new) matched node, thus use tab to separate the non-matches from the matches
@@ -437,26 +428,20 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                    }
 		                    lastTokenWasMatched = traverser.matchedNode;
 		                  }
+		                  // token not matched, but last token matched
 		                  else if(lastTokenWasMatched >= 0)
 		                  {
-		                    // also mark the end of a match with the tab
-		                    //separator = "\t";
-		                	  
+		                                    	  
 		                	  //handle crossing edges
-		                	  if(!dominanceLists.containsKey(counter) && 
-		                			  dominanceLists.containsKey(counter - 1) && dominanceLists.containsKey(counter + 1)){
+		                	  if(!tokenToMatchNumber.containsKey(counter) && 
+		                			  tokenToMatchNumber.containsKey(counter - 1) && tokenToMatchNumber.containsKey(counter + 1)){
 		                		    
 		                		  
-		                    			if (dominanceLists.get(counter - 1).size() > dominanceLists.get(counter + 1).size() &&
-		                    					dominanceLists.get(counter - 1).contains(dominanceLists.get(counter + 1).get(0))){
+		                    			if (tokenToMatchNumber.get(counter - 1) == tokenToMatchNumber.get(counter + 1)){
 		                    				
-		                    				separator = "\t";	  			                      
-		    		                    	lastTokenWasMatched = dominanceLists.get(counter + 1).get(0);
-		                    			}
-	                    				else if (dominanceLists.get(counter - 1).size() <= dominanceLists.get(counter + 1).size() &&
-		                    					dominanceLists.get(counter + 1).contains(dominanceLists.get(counter - 1).get(0))){
-	                    					separator = " ";
-	                    				}
+		                    				separator = " ";                     
+		    		                    	lastTokenWasMatched = tokenToMatchNumber.get(counter + 1);
+		                    			}	                    				
 	                    				else{
 	                    					             						                    
 	       			                    	  separator = "\t";           			                	  
@@ -465,15 +450,13 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	                    				
 	                    				
 	                    			}
-	                    		
-		                	  else{
+		                	// mark the end of a match with the tab
+			           	  else{
 		                		            
 			                    separator = "\t";		                	  
 			                    lastTokenWasMatched = -1;
 		                	  }
-	                    				 
-	                
-		                	  
+	                    			 	  
 		                	 
 		                  }
 		                  
@@ -511,7 +494,13 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   @Override
   public String getHelpMessage()
   {
-    return null;
+	  return "The MatchWithContext-Exporter exports matches surrounded by the context."
+		        + "The matches as well as the context will be aligned. <br/>"
+		        + "This exporter doesn't work yet for results of aql-queries with <em>overlap</em> or <em>or</em> operators.<br/><br/>"
+		        + "Parameters: <br/>"
+		        + "<em>filter</em> - comma separated list of all match numbers to be represented in the result as a separated column (e.g. "
+		        + "<code>filter=1,2</code>) <br/>"
+		        + "Please note, if some matched nodes build a hierarchy, you can use one match number per hierarchy only.";
   }
   
   @Override
