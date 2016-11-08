@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.lang.Exception;
 
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
@@ -47,9 +48,13 @@ import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 
 import com.google.common.base.Joiner;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.ui.Notification;
 
 import annis.CommonHelper;
+import annis.exceptions.AnnisCorpusAccessException;
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.AnnisConstants;
 import annis.service.objects.Match;
 import annis.service.objects.SubgraphFilter;
@@ -145,10 +150,12 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 
   
   @Override
-  public void convertText(SDocumentGraph graph, List<String> annoKeys,
+  public Exception convertText(SDocumentGraph graph, List<String> annoKeys,
     Map<String, String> args, int matchNumber, Writer out)
-    throws IOException
-  { 
+    // throws IOException, IllegalArgumentException
+  {
+  try
+  {
   	String currSpeakerName = "";
 	String prevSpeakerName = "";
 	filterNumbers.clear();
@@ -179,13 +186,13 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
       }
       
       
-      if(orderedToken != null)
+   /*   if(orderedToken != null)
       {
     	  for(SToken token : orderedToken){
     		  System.out.print(graph.getText(token) + "\t");
     	  }
     	  System.out.println("\n");
-      }
+      }*/
       
       
       if(orderedToken != null)
@@ -204,7 +211,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	// iterate first time over tokens to figure out which speaker has matches and to recognize the hierarchical structure of matches as well
     	  for(SToken token : orderedToken){
     		  counter++;
-    		  System.out.println(counter + ". Token:\t" + graph.getText(token));
+    		//  System.out.println(counter + ". Token:\t" + graph.getText(token));
              
               
     		  
@@ -276,10 +283,10 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
          }
         
                        
-        System.out.println(dominanceLists);
+      /*  System.out.println(dominanceLists);
         System.out.println(tokenToMatchNumber);
         System.out.println(dominanceListsWithHead);
-        System.out.println(dominanceListsWithoutDoubles);
+        System.out.println(dominanceListsWithoutDoubles);*/
                
                
         List <Map.Entry<Integer, List<Long>>> domListsSorted =  sortByKey(dominanceListsWithoutDoubles);
@@ -310,9 +317,10 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         			if (dominanceList.contains(filterNumber)){
         				if (usedDominanceLists.contains(dominanceList)){
         					filterNumberIsValid = false;
-        					Notification.show("Please use one filter number per match hierarchy only. "
-        							+ "\n Data could not be exported.", Notification.Type.WARNING_MESSAGE);
-        					return;
+        					throw new IllegalArgumentException("Please use one filter number per match hierarchy only. "
+        							+ "\n Data could not be exported.");
+        					
+        					
         				}
         				else{
         					usedDominanceLists.add(dominanceList);
@@ -324,9 +332,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         		
         		//filter number was not found in dominance lists, thus it is not valid
         		if (!filterNumberIsValid){
-        			Notification.show("The filter number " + filterNumber + " is not valid. "
-        					+ "\n Data could not be exported.", Notification.Type.WARNING_MESSAGE);
-        			return;        			       			
+        			throw new IllegalArgumentException("The filter number " + filterNumber + " is not valid. "
+        					+ "\n Data could not be exported.");     			
+        					       			
         		}
         		
         	}
@@ -481,6 +489,11 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
       }
        
     }
+    return null;
+  }
+  catch(IllegalArgumentException | IOException ex){
+	  return ex;
+  }
 
   }
   
@@ -494,7 +507,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   @Override
   public String getHelpMessage()
   {
-	  return "The MatchWithContext-Exporter exports matches surrounded by the context."
+	  return "The MatchWithContext-Exporter exports matches surrounded by the context as csv file."
 		        + "The matches as well as the context will be aligned. <br/>"
 		        + "This exporter doesn't work yet for results of aql-queries with <em>overlap</em> or <em>or</em> operators.<br/><br/>"
 		        + "Parameters: <br/>"

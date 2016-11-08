@@ -307,8 +307,9 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
     }
   }
 
-  public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, int matchNumber,
-    Writer out) throws IOException;
+  public abstract Exception convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, int matchNumber,
+    Writer out);
+  //throws IOException, IllegalArgumentException;
 
   @Override
   public boolean isCancelable()
