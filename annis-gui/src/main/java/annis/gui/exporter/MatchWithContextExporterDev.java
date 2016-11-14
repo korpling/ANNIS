@@ -15,12 +15,8 @@
  */
 package annis.gui.exporter;
 
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -32,31 +28,20 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.lang.Exception;
 
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
-import org.corpus_tools.salt.common.SPointingRelation;
 import org.corpus_tools.salt.common.SSpanningRelation;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
-import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 
-import com.google.common.base.Joiner;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.ui.Notification;
-
 import annis.CommonHelper;
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.AnnisConstants;
-import annis.service.objects.Match;
 import annis.service.objects.SubgraphFilter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
