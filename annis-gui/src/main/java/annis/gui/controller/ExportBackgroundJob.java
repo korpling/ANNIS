@@ -89,7 +89,7 @@ public class ExportBackgroundJob implements Callable<File>
         {
           if (panel != null)
           {
-            panel.showResult(currentTmpFile, exportError instanceof InterruptedException);
+            panel.showResult(currentTmpFile,  exportError);
           }
           if(exportError instanceof UniformInterfaceException)
           {

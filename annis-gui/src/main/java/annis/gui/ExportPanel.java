@@ -321,7 +321,7 @@ public class ExportPanel extends GridLayout
     }
   }
 
-  public void showResult(File currentTmpFile, boolean manuallyCancelled)
+  public void showResult(File currentTmpFile, Exception exportError)
   {
     btExport.setEnabled(true);
     btCancel.setEnabled(false);
@@ -331,19 +331,26 @@ public class ExportPanel extends GridLayout
     // copy the result to the class member in order to delete if
     // when not longer needed
     tmpOutputFile = currentTmpFile;
-
-    if (tmpOutputFile == null)
+    //
+    if (exportError instanceof IllegalArgumentException)
+    {
+      // wrong filter numbers
+      Notification.show(exportError.getMessage(), Notification.Type.WARNING_MESSAGE);
+    } //
+    
+    else  if (tmpOutputFile == null)
     {
       Notification.show("Could not create the Exporter",
           "The server logs might contain more information about this "
               + "so you should contact the provider of this ANNIS installation " + "for help.",
           Notification.Type.ERROR_MESSAGE);
     }
-    else if (manuallyCancelled)
+    else if (exportError instanceof InterruptedException)
     {
       // we were aborted, don't do anything
       Notification.show("Export cancelled", Notification.Type.WARNING_MESSAGE);
     }
+    
     else
     {
       if (downloader != null && btDownload.getExtensions().contains(downloader))

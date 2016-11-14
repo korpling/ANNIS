@@ -180,9 +180,9 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
             {
               stepSize += 10;
             }
-
+           
             convertSaltProject(p, keys, args, offset-currentMatches.getMatches().size(), corpusConfigs, out);
-
+           
             currentMatches.getMatches().clear();
 
             if(eventBus != null)
@@ -216,8 +216,10 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
           }
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
+                      
           convertSaltProject(p, keys, args, offset - currentMatches.getMatches().size() - 1,
               corpusConfigs, out);
+          
         }
         offset = 0;
         
@@ -228,7 +230,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       return null;
 
     }
-    catch (AnnisQLSemanticsException | AnnisQLSyntaxException 
+    catch (AnnisQLSemanticsException | AnnisQLSyntaxException | IllegalArgumentException
       | AnnisCorpusAccessException | UniformInterfaceException| IOException ex)
     {
       return ex;
@@ -245,7 +247,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
    * @param out 
    */
   private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, int offset,
-      Map<String, CorpusConfig> corpusConfigs, Writer out) throws IOException
+      Map<String, CorpusConfig> corpusConfigs, Writer out) throws IOException, IllegalArgumentException
   {
     int matchNumber = offset;
     if(p != null && p.getCorpusGraphs() != null)
@@ -305,11 +307,11 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
         }
       }
     }
+       
   }
 
-  public abstract Exception convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, int matchNumber,
-    Writer out);
-  //throws IOException, IllegalArgumentException;
+  public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, int matchNumber,
+    Writer out) throws IOException, IllegalArgumentException;
 
   @Override
   public boolean isCancelable()

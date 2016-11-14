@@ -150,12 +150,10 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 
   
   @Override
-  public Exception convertText(SDocumentGraph graph, List<String> annoKeys,
-    Map<String, String> args, int matchNumber, Writer out)
-    // throws IOException, IllegalArgumentException
+  public void convertText(SDocumentGraph graph, List<String> annoKeys,
+    Map<String, String> args, int matchNumber, Writer out) throws IOException, IllegalArgumentException
   {
-  try
-  {
+ 
   	String currSpeakerName = "";
 	String prevSpeakerName = "";
 	filterNumbers.clear();
@@ -489,11 +487,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
       }
        
     }
-    return null;
-  }
-  catch(IllegalArgumentException | IOException ex){
-	  return ex;
-  }
+    
 
   }
   
