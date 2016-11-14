@@ -272,7 +272,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         System.out.println(dominanceListsWithoutDoubles);*/
                
                
-        List <Map.Entry<Integer, List<Long>>> domListsSorted =  sortByKey(dominanceListsWithoutDoubles);
+        Set <Map.Entry<Integer, List<Long>>> domLists = dominanceListsWithoutDoubles.entrySet();
      
         
         boolean filterNumbersEmpty = true;
@@ -285,7 +285,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         // if filter numbers not set, set default filter numbers (always the root of a match hierarchy)
         if (filterNumbersEmpty){
         	
-	        for (Map.Entry <Integer, List<Long>> entry : domListsSorted){
+	        for (Map.Entry <Integer, List<Long>> entry : domLists){
 				 List<Long>  domList = entry.getValue();			 
 				 filterNumbers.add(domList.get(domList.size() - 1));
 				 }			 
@@ -500,24 +500,5 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   {
     return "csv";
   }
-  
-  private static <K, V> List<Map.Entry<K, V>> sortByKey(Map<K, V> map) {
-		List<Map.Entry<K, V>> entries = new ArrayList<Map.Entry<K, V>>(map.size());
-
-		for (Map.Entry<K, V> e : map.entrySet()) {
-			entries.add(e);
-		}
-
-		Comparator<Map.Entry<K, V>> comparator = new Comparator<Map.Entry<K, V>>() {
-			public int compare(Map.Entry<K, V> e1, Map.Entry<K, V> e2) {
-				return (Integer.valueOf(e1.getKey().toString()) - Integer.valueOf(e2.getKey().toString()));
-
-			}
-		};
-		// sort key values numerical
-		Collections.sort(entries, comparator);
-
-		return entries;
-	}
-  
+ 
 }
