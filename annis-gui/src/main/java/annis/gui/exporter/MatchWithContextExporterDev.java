@@ -37,6 +37,7 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 
@@ -60,7 +61,11 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
 	private static final String TRAV_SPEAKER_HAS_MATCHES = "SpeakerHasMatches";
 	public static final String FILTER_PARAMETER_KEYWORD = "filter";
-	public static final String FILTER_PARAMETER_SEPARATOR = ",";
+	public static final String PARAMETER_SEPARATOR = ",";
+	public static final String METAKEYS_KEYWORD = "metakeys";
+	private static final String NEWLINE = System.lineSeparator();    
+	private static final String TAB_MARK = "\t"; 
+	private static final String SPACE = " ";    
 	private static HashMap <String, Boolean> speakerHasMatches = new HashMap<String, Boolean>();
 	private static String speakerName;
 	private boolean isFirstSpeakerWithMatch = true;   
@@ -70,6 +75,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
 	private static Set<Long> inDominanceRelation = new HashSet<Long>();
 	private static Set<Long> filterNumbers = new HashSet<Long>(); 
+	private static Set<String> setOfMetakeys = new HashSet<String>(); 
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
@@ -142,8 +148,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   	String currSpeakerName = "";
 	String prevSpeakerName = "";
 	filterNumbers.clear();
+	setOfMetakeys.clear();
 	
-		
+
 	    
     if(graph != null)
     {
@@ -153,7 +160,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
       if (args.containsKey(FILTER_PARAMETER_KEYWORD)){
     	     	 
     	  String parameters = args.get(FILTER_PARAMETER_KEYWORD);
-    	  String [] numbers = parameters.split(",");
+    	  String [] numbers = parameters.split(PARAMETER_SEPARATOR);
         	  for (int i=0; i< numbers.length; i++){
     		  try {
     			 Long number = Long.parseLong(numbers[i]);
@@ -168,16 +175,17 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	  
       }
       
+      if (args.containsKey(METAKEYS_KEYWORD)){
+    	  String parameters = args.get(METAKEYS_KEYWORD);
+    	  String [] metakeys = parameters.split(PARAMETER_SEPARATOR);
+    	  for (int i=0; i< metakeys.length; i++){    	
+    			 String metakey = metakeys[i].trim();
+    			 setOfMetakeys.add(metakey);  		  
+    	  }    	  
+    	  
+      }
       
-   /*   if(orderedToken != null)
-      {
-    	  for(SToken token : orderedToken){
-    		  System.out.print(graph.getText(token) + "\t");
-    	  }
-    	  System.out.println("\n");
-      }*/
-      
-      
+
       if(orderedToken != null)
       {    	   
     	 //reset the data structures for new graph
@@ -194,12 +202,14 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	// iterate first time over tokens to figure out which speaker has matches and to recognize the hierarchical structure of matches as well
     	  for(SToken token : orderedToken){
     		  counter++;
-    		//  System.out.println(counter + ". Token:\t" + graph.getText(token));
-             
-              
+    		             
     		  
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
               speakerName = textualDS.getName();
+            
+            // output document name 
+            //System.out.println(graph.getDocument().getName() + "\t" + annoKeys);
+             
               
               if (!speakerHasMatches.containsKey(speakerName))
               {
@@ -300,8 +310,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         			if (dominanceList.contains(filterNumber)){
         				if (usedDominanceLists.contains(dominanceList)){
         					filterNumberIsValid = false;
-        					throw new IllegalArgumentException("Please use one filter number per match hierarchy only. "
-        							+ "\n Data could not be exported.");
+        					throw new IllegalArgumentException("Please use one filter number per match hierarchy only."
+        							+ NEWLINE + "Data could not be exported.");
         					
         					
         				}
@@ -315,8 +325,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         		
         		//filter number was not found in dominance lists, thus it is not valid
         		if (!filterNumberIsValid){
-        			throw new IllegalArgumentException("The filter number " + filterNumber + " is not valid. "
-        					+ "\n Data could not be exported.");     			
+        			throw new IllegalArgumentException("The filter number " + filterNumber + " is not valid."
+        					+ NEWLINE + "Data could not be exported.");     			
         					       			
         		}
         		
@@ -359,33 +369,33 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	   
 	        		 if (isFirstSpeakerWithMatch){
 	        			 
-	        			 out.append("match_number\t");
-	        			 out.append("speaker\t");
+	        			 out.append("match_number" + TAB_MARK);
+	        			 out.append("speaker" + TAB_MARK);
 	        			 
-	        			 out.append("left_context\t");
+	        			 out.append("left_context" + TAB_MARK);
 		        		 
 		        		 String prefix = "M_";
 		        		 
 		        		for (int i = 0; i < filterNumbers.size(); i++){		        			
-		        			out.append(prefix + (i + 1) + "\t");		        			        
+		        			out.append(prefix + (i + 1) + TAB_MARK);		        			        
 		        			 if (i < filterNumbers.size() - 1){
-		        				 out.append("middle_context_" +  (i + 1) + "\t"); 
+		        				 out.append("middle_context_" +  (i + 1) + TAB_MARK); 
 		        			 }      			 
 		        		 }
 		        		 
 		        		 out.append("right_context");
-		        		 out.append("\n");
+		        		 out.append(NEWLINE);
 	        			 
 	        			 isFirstSpeakerWithMatch = false;
 	        		 }
 	        		 else {
-	        			 out.append("\n");
+	        			 out.append(NEWLINE);
 	        		 } 
 	            		   		
 	        		 	        		
 	        		 // TODO why does matchNumber start with -1?
-	        		 out.append(String.valueOf(matchNumber + 2) + "\t");
-	        		 out.append(currSpeakerName + "\t");
+	        		 out.append(String.valueOf(matchNumber + 2) + TAB_MARK);
+	        		 out.append(currSpeakerName + TAB_MARK);
 	        		 
 	        		 
 	        		 lastTokenWasMatched = -1;
@@ -394,7 +404,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        		
 	        	 }// header ready
 	        	 
-	        	  String separator = " "; // default to space as separator
+	        	  String separator = SPACE; // default to space as separator
 	        	       	  
 	        	  		  List<SNode> root = new LinkedList<>();
 		                  root.add(tok);
@@ -407,14 +417,14 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                    // is dominated by a (new) matched node, thus use tab to separate the non-matches from the matches
 		                    if(lastTokenWasMatched < 0)
 		                    {
-		                       separator = "\t"; 
+		                       separator = TAB_MARK; 
 		                                                     
 		                			                      
 		                    }
 		                    else if(lastTokenWasMatched != (long) traverser.matchedNode)
 		                    {
 		                      // always leave an empty column between two matches, even if there is no actual context
-		                    	separator = "\t\t";
+		                    	separator = TAB_MARK + TAB_MARK;
 		                    			                    	
 		                    }
 		                    lastTokenWasMatched = traverser.matchedNode;
@@ -430,12 +440,12 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                		  
 		                    			if (tokenToMatchNumber.get(counter - 1) == tokenToMatchNumber.get(counter + 1)){
 		                    				
-		                    				separator = " ";                     
+		                    				separator = SPACE;                     
 		    		                    	lastTokenWasMatched = tokenToMatchNumber.get(counter + 1);
 		                    			}	                    				
 	                    				else{
 	                    					             						                    
-	       			                    	  separator = "\t";           			                	  
+	       			                    	  separator = TAB_MARK;           			                	  
 	       			                    	  lastTokenWasMatched = -1;
 	                    				}
 	                    				
@@ -444,7 +454,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                	// mark the end of a match with the tab
 			           	  else{
 		                		            
-			                    separator = "\t";		                	  
+			                    separator = TAB_MARK;		                	  
 			                    lastTokenWasMatched = -1;
 		                	  }
 	                    			 	  
@@ -452,7 +462,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                  }
 		                  
 		                  //if tok is the first token in the line and not matched, set separator to empty string
-		                  if (noPreviousTokenInLine && separator.equals(" "))
+		                  if (noPreviousTokenInLine && separator.equals(SPACE))
 		                  {
 		                	 separator = "";
 		                  }
@@ -486,13 +496,25 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   @Override
   public String getHelpMessage()
   {
-	  return "The MatchWithContext-Exporter exports matches surrounded by the context as csv file."
-		        + "The matches as well as the context will be aligned. <br/>"
+	  return "The MatchWithContext-Exporter exports matches surrounded by the context as a csv file. "
+	  			+ "The columns will be separated by tab mark. <br/>"
 		        + "This exporter doesn't work yet for results of aql-queries with <em>overlap</em> or <em>or</em> operators.<br/><br/>"
 		        + "Parameters: <br/>"
+		        + "<em>metakeys</em> - comma separated list of all meta data to include in the result (e.g. "
+		        + "<code>metakeys=title,documentname</code>)  <br/>"
 		        + "<em>filter</em> - comma separated list of all match numbers to be represented in the result as a separated column (e.g. "
 		        + "<code>filter=1,2</code>) <br/>"
-		        + "Please note, if some matched nodes build a hierarchy, you can use one match number per hierarchy only.";
+		        + "</br>"
+		        + "Please note, if some matched nodes build a hierarchy, you can use one match number per hierarchy only. "
+		        + "For instance, the matched nodes of the aql-query <br/>"
+		        + "<em>cat=\"SIMPX\" > cat = \"FRAG\" >* SPK101 = \"UNINTERPRETABLE\" </em> "
+		        + "build a hierarchy by definition. "
+		        + "There are three matching numbers 1, 2  and 3. "
+		        + "However, only one of them can be used for export. "
+		        + "By default it is the highest node in the hierarchy, which determine the relevant matching number. "
+		        + "In our example it is the node with the matching number 1. "
+		        + "That means, all tokens covered by matched node with the matching number 1 will appeare in the match column. "
+		        + "If desired, by filter option you can choose an other matching number from a hierarchy. In our case it could be 2 or 3.";
   }
   
   @Override
