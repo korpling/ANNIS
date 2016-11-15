@@ -41,8 +41,13 @@ import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+
 import annis.CommonHelper;
+import annis.libgui.Helper;
 import annis.model.AnnisConstants;
+import annis.model.Annotation;
 import annis.service.objects.SubgraphFilter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
@@ -58,6 +63,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 @PluginImplementation
 public class MatchWithContextExporterDev extends SaltBasedExporter
 {
+	 private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 	private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
 	private static final String TRAV_SPEAKER_HAS_MATCHES = "SpeakerHasMatches";
 	public static final String FILTER_PARAMETER_KEYWORD = "filter";
@@ -75,7 +81,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
 	private static Set<Long> inDominanceRelation = new HashSet<Long>();
 	private static Set<Long> filterNumbers = new HashSet<Long>(); 
-	private static Set<String> setOfMetakeys = new HashSet<String>(); 
+	private static List<String> listOfMetakeys = new ArrayList<String>(); 
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
@@ -148,7 +154,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   	String currSpeakerName = "";
 	String prevSpeakerName = "";
 	filterNumbers.clear();
-	setOfMetakeys.clear();
+	listOfMetakeys.clear();
+	
 	
 
 	    
@@ -180,7 +187,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	  String [] metakeys = parameters.split(PARAMETER_SEPARATOR);
     	  for (int i=0; i< metakeys.length; i++){    	
     			 String metakey = metakeys[i].trim();
-    			 setOfMetakeys.add(metakey);  		  
+    			 listOfMetakeys.add(metakey);  		  
     	  }    	  
     	  
       }
@@ -206,11 +213,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     		  
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
               speakerName = textualDS.getName();
-            
-            // output document name 
-            //System.out.println(graph.getDocument().getName() + "\t" + annoKeys);
-             
-              
+           
+                        
               if (!speakerHasMatches.containsKey(speakerName))
               {
             	  speakerHasMatches.put(speakerName, false);
@@ -372,6 +376,15 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        			 out.append("match_number" + TAB_MARK);
 	        			 out.append("speaker" + TAB_MARK);
 	        			 
+	        			 // write header for meta data columns
+	        			 if (!listOfMetakeys.isEmpty()){
+	        				 for(String metakey : listOfMetakeys){
+	        					 out.append(metakey + TAB_MARK);
+	        				 }
+	        			 }
+	        			 
+	        			 
+	        			 
 	        			 out.append("left_context" + TAB_MARK);
 		        		 
 		        		 String prefix = "M_";
@@ -397,12 +410,66 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        		 out.append(String.valueOf(matchNumber + 2) + TAB_MARK);
 	        		 out.append(currSpeakerName + TAB_MARK);
 	        		 
+	        		 //write meta data
+	        		 if (!listOfMetakeys.isEmpty()){
+	        			 // get metadata
+	        			  String docName = graph.getDocument().getName();
+	                      List<String> corpusPath = CommonHelper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
+	                      String corpusName = corpusPath.get(corpusPath.size() - 1);
+	                      corpusName = urlPathEscape.escape(corpusName);	                      
+	                      List<Annotation> metadata = Helper.getMetaData(corpusName, docName);
+	                      
+	                      Map <String, String> annosWithoutNamespace = new HashMap<String, String>();
+	                      Map <String, Map<String, String>> annosWithNamespace = new HashMap<String, Map<String, String>>();
+	                      
+	                      // put metadata annotations into hash maps for better access
+	                      for (Annotation metaAnno : metadata){
+	                    	  String ns;
+	                    	  Map<String, String> data = new HashMap<String, String>();
+	                    	  data.put(metaAnno.getName(), metaAnno.getValue());
+	                    	  
+	                    	  // a namespace is present
+	                    	  if ((ns = metaAnno.getNamespace()) != null && !ns.isEmpty()){
+	                    		 Map <String, String> nsMetadata = new HashMap<String, String>();
+	                    		 
+	                    		 if (annosWithNamespace.get(ns) != null){
+	                    			 nsMetadata = annosWithNamespace.get(ns);
+	                    		 }
+	                    		 nsMetadata.putAll(data);
+	                    		 annosWithNamespace.put(ns, nsMetadata);
+	                    	  }
+	                    	  else{
+	                    		  annosWithoutNamespace.putAll(data);
+	                    	  }
+	                    	  
+	                      }
+	                      
+	                            			 
+	        			 for (String metakey : listOfMetakeys){
+	        				 String metaValue = "";
+	        				 //try to get meta value specific for current speaker
+	        				if (annosWithNamespace.containsKey(currSpeakerName)){
+	        					Map<String, String> speakerAnnos = annosWithNamespace.get(currSpeakerName);
+	        					if (speakerAnnos.containsKey(metakey)){
+	        						metaValue = speakerAnnos.get(metakey);
+	        					}
+	        				}
+	        				
+	        				// try to get meta value 
+	        				if (metaValue.isEmpty() && annosWithoutNamespace.containsKey(metakey)){
+	        					metaValue = annosWithoutNamespace.get(metakey);
+	        				}
+	        				out.append(metaValue + TAB_MARK);
+	        			 }
+	        		 }
+	        			 
+	        		 
 	        		 
 	        		 lastTokenWasMatched = -1;
 	        		 noPreviousTokenInLine = true;
 	        		 
 	        		
-	        	 }// header ready
+	        	 }// header  and speaker name ready
 	        	 
 	        	  String separator = SPACE; // default to space as separator
 	        	       	  
@@ -514,7 +581,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		        + "By default it is the highest node in the hierarchy, which determine the relevant matching number. "
 		        + "In our example it is the node with the matching number 1. "
 		        + "That means, all tokens covered by matched node with the matching number 1 will appeare in the match column. "
-		        + "If desired, by filter option you can choose an other matching number from a hierarchy. In our case it could be 2 or 3.";
+		        + "If desired, by filter option you can choose an other matching number from the hierarchy. In our case it could be 2 or 3.";
   }
   
   @Override
