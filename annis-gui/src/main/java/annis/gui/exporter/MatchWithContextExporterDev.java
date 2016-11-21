@@ -69,6 +69,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	public static final String FILTER_PARAMETER_KEYWORD = "filter";
 	public static final String PARAMETER_SEPARATOR = ",";
 	public static final String METAKEYS_KEYWORD = "metakeys";
+	public static final String ALIGN_MATCHCODE_KEYWORD = "alignmc";
+	private static boolean alignmc = false;
 	private static final String NEWLINE = System.lineSeparator();    
 	private static final String TAB_MARK = "\t"; 
 	private static final String SPACE = " ";    
@@ -155,6 +157,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	String prevSpeakerName = "";
 	filterNumbers.clear();
 	listOfMetakeys.clear();
+	alignmc = false;
+	
+	List <Long> filterNumbersOrdered = new ArrayList<Long>();
 	
 	
 
@@ -191,6 +196,11 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	  }    	  
     	  
       }
+      
+      if (args.containsKey(ALIGN_MATCHCODE_KEYWORD)){
+    	alignmc = true;  
+      }
+      
       
 
       if(orderedToken != null)
@@ -337,6 +347,15 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         	}
         }
             
+       
+        for (Long filterNumber : filterNumbers){
+        	filterNumbersOrdered.add(filterNumber);
+        }
+        
+        Collections.sort(filterNumbersOrdered);
+        
+      //  System.out.println(filterNumbers);
+        System.out.println(filterNumbersOrdered);
         
         
       //TODO why does match number start with -1? 
@@ -348,14 +367,16 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
          
     	//reset counter
         counter = 0;
+        int matchesWrittenForSpeaker = 0;
+        
         while(it.hasNext())
         {    	
           SToken tok = it.next();    
           counter++;
           //get current speaker name
           currSpeakerName = CommonHelper.getTextualDSForNode(tok, graph).getName();
-                    
           
+           
           // if speaker has no matches, skip token
           if (speakerHasMatches.get(currSpeakerName) == false)
           {
@@ -365,11 +386,14 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
           
           //if speaker has matches
           else
-          {			
+          {	 
+   	 
         	  
 	        	  //if the current speaker is new, append his name and write header
 	        	 if (!currSpeakerName.equals(prevSpeakerName))
-	        	 { 
+	        	 { 	
+	        		 //reset the counter of matches, which were written for this speaker	
+	        		 matchesWrittenForSpeaker = 0;
 	   
 	        		 if (isFirstSpeakerWithMatch){
 	        			 
@@ -389,9 +413,16 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		        		 
 		        		 String prefix = "M_";
 		        		 
-		        		for (int i = 0; i < filterNumbers.size(); i++){		        			
-		        			out.append(prefix + (i + 1) + TAB_MARK);		        			        
-		        			 if (i < filterNumbers.size() - 1){
+		        		for (int i = 0; i < filterNumbersOrdered.size(); i++){		   
+		        			if (alignmc){
+		        				out.append(prefix + filterNumbersOrdered.get(i) + TAB_MARK);
+		        			}
+		        			else{
+		        				out.append(prefix + (i + 1) + TAB_MARK);
+		        			}
+		        			
+		        			
+		        			 if (i < filterNumbersOrdered.size() - 1){
 		        				 out.append("middle_context_" +  (i + 1) + TAB_MARK); 
 		        			 }      			 
 		        		 }
@@ -484,14 +515,54 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                    // is dominated by a (new) matched node, thus use tab to separate the non-matches from the matches
 		                    if(lastTokenWasMatched < 0)
 		                    {
-		                       separator = TAB_MARK; 
+		                       if (!alignmc){
+		                    	   separator = TAB_MARK; 
+		                       }
+		                       else{
+		                    	   int orderInList = filterNumbersOrdered.indexOf(traverser.matchedNode);
+		                    	   if (orderInList >= matchesWrittenForSpeaker){
+		                    		   int diff = orderInList - matchesWrittenForSpeaker;
+		                    		   separator = TAB_MARK; 
+		                    		   System.out.println(orderInList + "\t" + matchesWrittenForSpeaker + "\t" + diff); 
+		                    		   matchesWrittenForSpeaker++; 		                    		   
+		                    		   for (int i = 0; i < diff; i++){
+		                    			   separator += (TAB_MARK + TAB_MARK);
+		                    			   matchesWrittenForSpeaker++; 
+		                    		   }
+		                    		  
+		                    	   }
+		                    	   else{
+		                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned via matching codes.");
+		                    	   }
+		                       }
+		                    	
 		                                                     
 		                			                      
 		                    }
 		                    else if(lastTokenWasMatched != (long) traverser.matchedNode)
 		                    {
 		                      // always leave an empty column between two matches, even if there is no actual context
+		                    	 if (!alignmc){
 		                    	separator = TAB_MARK + TAB_MARK;
+		                    	 }
+		                    	 else{
+		                    		 int orderInList = filterNumbersOrdered.indexOf(traverser.matchedNode);
+			                    	   if (orderInList >= matchesWrittenForSpeaker){
+			                    		   int diff = orderInList - matchesWrittenForSpeaker;
+			                    		   System.out.println(orderInList + "\t" + matchesWrittenForSpeaker + "\t" + diff); 
+			                    		   separator = TAB_MARK + TAB_MARK; 
+			                    		   matchesWrittenForSpeaker++; 
+			                    		   for (int i = 0; i < diff; i++){
+			                    			   separator += (TAB_MARK + TAB_MARK);
+			                    			   matchesWrittenForSpeaker++; 
+			                    		   }
+			                    		  
+			                    	   }
+			                    	   else{
+			                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned via matching codes.");
+			                    	   }
+		                    		 
+		                    	 }
 		                    			                    	
 		                    }
 		                    lastTokenWasMatched = traverser.matchedNode;
