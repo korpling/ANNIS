@@ -66,7 +66,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, List<String> keys, String argsAsString,
+    Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc, 
     WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     try

@@ -33,6 +33,7 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.GridLayout;
@@ -104,6 +105,8 @@ public class ExportPanel extends GridLayout
   private final Label lblHelp;
   
   private final PluginSystem ps;
+  
+  private final CheckBox cbAlignmc;
 
   public ExportPanel(QueryPanel queryPanel, QueryController controller, QueryUIState state, PluginSystem ps)
   {
@@ -180,6 +183,12 @@ public class ExportPanel extends GridLayout
         + "for certain exporters. See the description of each exporter "
         + "(‘?’ button above) for specific parameter settings.");
     formLayout.addComponent(new HelpButton<String>(txtParameters));
+    
+  //check box for match-with-context exporter
+    cbAlignmc = new CheckBox("Align matches" + System.lineSeparator() + "by match code");
+    cbAlignmc.setDescription("Click here to align export result by match code.");
+    cbAlignmc.setEnabled(true);
+    formLayout.addComponent(cbAlignmc);
 
     btExport = new Button("Perform Export");
     btExport.setIcon(FontAwesome.PLAY);
@@ -197,6 +206,8 @@ public class ExportPanel extends GridLayout
     btDownload.setIcon(FontAwesome.DOWNLOAD);
     btDownload.setDisableOnClick(true);
     btDownload.setEnabled(false);
+    
+    
 
     HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport, btCancel, btDownload);
     addComponent(layoutExportButtons, 0, 1, 1, 1);
@@ -222,6 +233,8 @@ public class ExportPanel extends GridLayout
       txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
 
       txtParameters.setPropertyDataSource(state.getExportParameters());
+      
+      cbAlignmc.setPropertyDataSource(state.getAlignmc());
 
     }
 
@@ -263,6 +276,8 @@ public class ExportPanel extends GridLayout
       if (exporter != null)
       {
         btCancel.setVisible(exporter.isCancelable());
+        
+        cbAlignmc.setVisible(exporter.isAlignable());
 
         String helpMessage = exporter.getHelpMessage();
         if (helpMessage != null)
@@ -277,6 +292,7 @@ public class ExportPanel extends GridLayout
       else
       {
         btCancel.setVisible(false);
+        cbAlignmc.setVisible(false);
         lblHelp.setValue("No valid exporter selected");
       }
     }

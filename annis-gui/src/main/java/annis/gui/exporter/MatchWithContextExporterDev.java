@@ -69,8 +69,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	public static final String FILTER_PARAMETER_KEYWORD = "filter";
 	public static final String PARAMETER_SEPARATOR = ",";
 	public static final String METAKEYS_KEYWORD = "metakeys";
-	public static final String ALIGN_MATCHCODE_KEYWORD = "alignmc";
-	private static boolean alignmc = false;
+	//public static final String ALIGN_MATCHCODE_KEYWORD = "alignmc";
+	//private static boolean alignmc = false;
 	private static final String NEWLINE = System.lineSeparator();    
 	private static final String TAB_MARK = "\t"; 
 	private static final String SPACE = " ";    
@@ -150,14 +150,14 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   
   @Override
   public void convertText(SDocumentGraph graph, List<String> annoKeys,
-    Map<String, String> args, int matchNumber, Writer out) throws IOException, IllegalArgumentException
+    Map<String, String> args, boolean alignmc, int matchNumber, Writer out) throws IOException, IllegalArgumentException
   {
  
   	String currSpeakerName = "";
 	String prevSpeakerName = "";
 	filterNumbers.clear();
 	listOfMetakeys.clear();
-	alignmc = false;
+	//alignmc = false;
 	
 	List <Long> filterNumbersOrdered = new ArrayList<Long>();
 	
@@ -197,9 +197,9 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	  
       }
       
-      if (args.containsKey(ALIGN_MATCHCODE_KEYWORD)){
+    /*  if (args.containsKey(ALIGN_MATCHCODE_KEYWORD)){
     	alignmc = true;  
-      }
+      }*/
       
       
 
@@ -660,5 +660,12 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   {
     return "csv";
   }
+
+
+@Override
+public boolean isAlignable()  
+ {
+	return true;
+ }
  
 }

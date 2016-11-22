@@ -73,7 +73,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
   
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, List<String> keys, String argsAsString,
+    Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc,
     WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     try
@@ -181,7 +181,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
               stepSize += 10;
             }
            
-            convertSaltProject(p, keys, args, offset-currentMatches.getMatches().size(), corpusConfigs, out);
+            convertSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out);
            
             currentMatches.getMatches().clear();
 
@@ -217,7 +217,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
                       
-          convertSaltProject(p, keys, args, offset - currentMatches.getMatches().size() - 1,
+          convertSaltProject(p, keys, args, alignmc, offset - currentMatches.getMatches().size() - 1,
               corpusConfigs, out);
           
         }
@@ -243,10 +243,11 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
    * @param p
    * @param annoKeys
    * @param args
+   * @param alignmc
    * @param offset
    * @param out 
    */
-  private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, int offset,
+  private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc, int offset,
       Map<String, CorpusConfig> corpusConfigs, Writer out) throws IOException, IllegalArgumentException
   {
     int matchNumber = offset;
@@ -302,7 +303,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
               TimelineReconstructor.removeVirtualTokenization(doc.getDocumentGraph(), spanAnno2order);
             }
             
-            convertText(doc.getDocumentGraph(), annoKeys, args, matchNumber++, out);
+            convertText(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out);
           }
         }
       }
@@ -310,7 +311,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
        
   }
 
-  public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, int matchNumber,
+  public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
     Writer out) throws IOException, IllegalArgumentException;
 
   @Override
