@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,7 +36,6 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
-import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 
@@ -69,8 +67,6 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	public static final String FILTER_PARAMETER_KEYWORD = "filter";
 	public static final String PARAMETER_SEPARATOR = ",";
 	public static final String METAKEYS_KEYWORD = "metakeys";
-	//public static final String ALIGN_MATCHCODE_KEYWORD = "alignmc";
-	//private static boolean alignmc = false;
 	private static final String NEWLINE = System.lineSeparator();    
 	private static final String TAB_MARK = "\t"; 
 	private static final String SPACE = " ";    
@@ -157,8 +153,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	String prevSpeakerName = "";
 	filterNumbers.clear();
 	listOfMetakeys.clear();
-	//alignmc = false;
-	
+		
 	List <Long> filterNumbersOrdered = new ArrayList<Long>();
 	
 	
@@ -197,13 +192,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     	  
       }
       
-    /*  if (args.containsKey(ALIGN_MATCHCODE_KEYWORD)){
-    	alignmc = true;  
-      }*/
-      
-      
-
-      if(orderedToken != null)
+     if(orderedToken != null)
       {    	   
     	 //reset the data structures for new graph
     	  speakerHasMatches.clear();    	  
@@ -354,8 +343,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         
         Collections.sort(filterNumbersOrdered);
         
-      //  System.out.println(filterNumbers);
-        System.out.println(filterNumbersOrdered);
+    
+     // System.out.println(filterNumbersOrdered);
         
         
       //TODO why does match number start with -1? 
@@ -523,7 +512,6 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                    	   if (orderInList >= matchesWrittenForSpeaker){
 		                    		   int diff = orderInList - matchesWrittenForSpeaker;
 		                    		   separator = TAB_MARK; 
-		                    		   System.out.println(orderInList + "\t" + matchesWrittenForSpeaker + "\t" + diff); 
 		                    		   matchesWrittenForSpeaker++; 		                    		   
 		                    		   for (int i = 0; i < diff; i++){
 		                    			   separator += (TAB_MARK + TAB_MARK);
@@ -532,7 +520,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                    		  
 		                    	   }
 		                    	   else{
-		                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned via matching codes.");
+		                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned by match code.");
 		                    	   }
 		                       }
 		                    	
@@ -549,7 +537,6 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 		                    		 int orderInList = filterNumbersOrdered.indexOf(traverser.matchedNode);
 			                    	   if (orderInList >= matchesWrittenForSpeaker){
 			                    		   int diff = orderInList - matchesWrittenForSpeaker;
-			                    		   System.out.println(orderInList + "\t" + matchesWrittenForSpeaker + "\t" + diff); 
 			                    		   separator = TAB_MARK + TAB_MARK; 
 			                    		   matchesWrittenForSpeaker++; 
 			                    		   for (int i = 0; i < diff; i++){
