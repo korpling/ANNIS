@@ -15,6 +15,7 @@
  */
 package annis.visualizers.component;
 
+import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
@@ -126,6 +127,11 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
                     lblText = new Label(s, ContentMode.TEXT);
                 }
                 
+                if(!Helper.isRTLDisabled() && CommonHelper.containsRTLText(s))
+                {
+                  lblText.addStyleName("rtl");
+                }
+                
                 lblText.setCaption("text " + (i + 1));
                 lblText.addStyleName(LABEL_CLASS);
                 lblText.setWidth(98, Sizeable.Unit.PERCENTAGE);
@@ -141,6 +147,12 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
         Label lblText;
         if (texts.hasTexts() && !hasOnlyWhiteSpace(texts.getFirstText())) {
             lblText = new Label(texts.getFirstText(), ContentMode.TEXT);
+            
+            if(!Helper.isRTLDisabled() && CommonHelper.containsRTLText(texts.getFirstText()))
+            {
+              lblText.addStyleName("rtl");
+            }
+            
         } else {
             lblText = new Label(NO_TEXT);
         }
