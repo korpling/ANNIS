@@ -79,6 +79,8 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
 	private static Set<Long> inDominanceRelation = new HashSet<Long>();
 	private static Set<Long> filterNumbers = new HashSet<Long>(); 
+	private static boolean filterNumbersEmpty = true;
+	List <Long> filterNumbersOrdered = new ArrayList<Long>();
 	private static List<String> listOfMetakeys = new ArrayList<String>(); 
   
 	
@@ -151,10 +153,16 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
  
   	String currSpeakerName = "";
 	String prevSpeakerName = "";
-	filterNumbers.clear();
-	listOfMetakeys.clear();
+	//if new search
+	if (matchNumber == -1){
+		filterNumbers.clear();
+		listOfMetakeys.clear();
+		filterNumbersOrdered.clear();
+		filterNumbersEmpty = true;
+	}
+	
 		
-	List <Long> filterNumbersOrdered = new ArrayList<Long>();
+	//List <Long> filterNumbersOrdered = new ArrayList<Long>();
 	
 	
 
@@ -163,33 +171,44 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
     {
       List<SToken> orderedToken = graph.getSortedTokenByText();
       
-      //extract filter numbers
-      if (args.containsKey(FILTER_PARAMETER_KEYWORD)){
-    	     	 
-    	  String parameters = args.get(FILTER_PARAMETER_KEYWORD);
-    	  String [] numbers = parameters.split(PARAMETER_SEPARATOR);
-        	  for (int i=0; i< numbers.length; i++){
-    		  try {
-    			 Long number = Long.parseLong(numbers[i]);
-    			 filterNumbers.add(number);
-     			 
-    		  }
-    		  catch(NumberFormatException e){
-    			 ;
-    		  }
-    		  
-    	  }
-    	  
-      }
-      
-      if (args.containsKey(METAKEYS_KEYWORD)){
-    	  String parameters = args.get(METAKEYS_KEYWORD);
-    	  String [] metakeys = parameters.split(PARAMETER_SEPARATOR);
-    	  for (int i=0; i< metakeys.length; i++){    	
-    			 String metakey = metakeys[i].trim();
-    			 listOfMetakeys.add(metakey);  		  
-    	  }    	  
-    	  
+      // if new search
+      if (matchNumber == -1){
+	      //extract filter numbers
+	      if (args.containsKey(FILTER_PARAMETER_KEYWORD)){
+	    	     	 
+	    	  String parameters = args.get(FILTER_PARAMETER_KEYWORD);
+	    	  String [] numbers = parameters.split(PARAMETER_SEPARATOR);
+	        	  for (int i=0; i< numbers.length; i++){
+	    		  try {
+	    			 Long number = Long.parseLong(numbers[i]);
+	    			 filterNumbers.add(number);
+	     			 
+	    		  }
+	    		  catch(NumberFormatException e){
+	    			 ;
+	    		  }
+	    		  
+	    	  }
+	    	  
+	      }
+	      
+	      
+	      if (!filterNumbers.isEmpty())
+	        {
+	        	filterNumbersEmpty = false;
+	        	
+	        }
+	      
+	      // extract metakeys
+	      if (args.containsKey(METAKEYS_KEYWORD)){
+	    	  String parameters = args.get(METAKEYS_KEYWORD);
+	    	  String [] metakeys = parameters.split(PARAMETER_SEPARATOR);
+	    	  for (int i=0; i< metakeys.length; i++){    	
+	    			 String metakey = metakeys[i].trim();
+	    			 listOfMetakeys.add(metakey);  		  
+	    	  }    	  
+	    	  
+	      }
       }
       
      if(orderedToken != null)
@@ -231,19 +250,39 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
               
               graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch); 
               
+             // System.out.println("MatchCodes: " + dominatedMatchCodes);
               
               if (!dominatedMatchCodes.isEmpty()){
             	  dominanceListsWithHead.put(dominatedMatchCodes.get(0), dominatedMatchCodes);
                   dominanceLists.put(counter, dominatedMatchCodes);
                   
-                  // filter numbers not set, take the number of the highest match node
-                  if (filterNumbers.isEmpty()){
+                  // if filter numbers not set, take the number of the highest match node
+                  if (filterNumbersEmpty){
                 	  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
+                	  
+                	  
+                	 // filterNumbers.add(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
+                	  
+                	  
+                	  
+                	  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1))){
+                		  filterNumbersOrdered.add(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
+                		  System.out.println("filterNumbersOrdered 1: " + filterNumbersOrdered);
+                	  }
                   }
                   else{
-                	  for (int i = 0; i < dominatedMatchCodes.size(); i++){
+                	  // take the highest match code, which is present in filterNumbers
+                	  for (int i = dominatedMatchCodes.size() - 1; i >= 0; i--){
                     	  if (filterNumbers.contains(dominatedMatchCodes.get(i))){
                     		  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(i));
+                    		  
+                    		 // filterNumbers.add(dominatedMatchCodes.get(i));
+                    		  
+                    		  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(i))){
+                        		  filterNumbersOrdered.add(dominatedMatchCodes.get(i));
+                        		  System.out.println("filterNumbersOrdered 2: " + filterNumbersOrdered);
+                        	  }
+                    		  break;
                     	  }
                       }
                   }                  
@@ -288,12 +327,12 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         Set <Map.Entry<Integer, List<Long>>> domLists = dominanceListsWithoutDoubles.entrySet();
      
         
-        boolean filterNumbersEmpty = true;
-        if (!filterNumbers.isEmpty())
+        //boolean filterNumbersEmpty = true;
+       /* if (!filterNumbers.isEmpty())
         {
         	filterNumbersEmpty = false;
         	
-        }
+        }*/
         
         // if filter numbers not set, set default filter numbers (always the root of a match hierarchy)
         if (filterNumbersEmpty){
@@ -301,7 +340,7 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        for (Map.Entry <Integer, List<Long>> entry : domLists){
 				 List<Long>  domList = entry.getValue();			 
 				 filterNumbers.add(domList.get(domList.size() - 1));
-				 }			 
+				 }	
         }
         //if filter numbers set, validate them
         else{
@@ -337,14 +376,14 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         }
             
        
-        for (Long filterNumber : filterNumbers){
+      /*  for (Long filterNumber : filterNumbers){
         	filterNumbersOrdered.add(filterNumber);
         }
         
-        Collections.sort(filterNumbersOrdered);
+        Collections.sort(filterNumbersOrdered);*/
         
-    
-     // System.out.println(filterNumbersOrdered);
+      //System.out.println(filterNumbers); 
+      //System.out.println(filterNumbersOrdered);
         
         
       //TODO why does match number start with -1? 
@@ -471,13 +510,13 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        				if (annosWithNamespace.containsKey(currSpeakerName)){
 	        					Map<String, String> speakerAnnos = annosWithNamespace.get(currSpeakerName);
 	        					if (speakerAnnos.containsKey(metakey)){
-	        						metaValue = speakerAnnos.get(metakey);
+	        						metaValue = speakerAnnos.get(metakey).trim();
 	        					}
 	        				}
 	        				
 	        				// try to get meta value 
 	        				if (metaValue.isEmpty() && annosWithoutNamespace.containsKey(metakey)){
-	        					metaValue = annosWithoutNamespace.get(metakey);
+	        					metaValue = annosWithoutNamespace.get(metakey).trim();
 	        				}
 	        				out.append(metaValue + TAB_MARK);
 	        			 }
