@@ -78,9 +78,11 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	private static Map <Integer, Long> tokenToMatchNumber = new HashMap <Integer, Long>();
 	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
 	private static Set<Long> inDominanceRelation = new HashSet<Long>();
+	//contains filter numbers from ui or automatic determined filter numbers from the first record of search result
 	private static Set<Long> filterNumbers = new HashSet<Long>(); 
 	private static boolean filterNumbersEmpty = true;
-	List <Long> filterNumbersOrdered = new ArrayList<Long>();
+	//contains filter numbers from the first record of search result (if applicable, according to filterNumbers) ordered by occurrence in text
+	private static List <Long> filterNumbersOrdered = new ArrayList<Long>();
 	private static List<String> listOfMetakeys = new ArrayList<String>(); 
   
 	
@@ -162,10 +164,6 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	}
 	
 		
-	//List <Long> filterNumbersOrdered = new ArrayList<Long>();
-	
-	
-
 	    
     if(graph != null)
     {
@@ -259,15 +257,11 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
                   // if filter numbers not set, take the number of the highest match node
                   if (filterNumbersEmpty){
                 	  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
-                	  
-                	  
-                	 // filterNumbers.add(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
-                	  
-                	  
-                	  
+                	               	  
+                	  //set filter number to the ordered list
                 	  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1))){
                 		  filterNumbersOrdered.add(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
-                		  System.out.println("filterNumbersOrdered 1: " + filterNumbersOrdered);
+                		 // System.out.println("filterNumbersOrdered 1: " + filterNumbersOrdered);
                 	  }
                   }
                   else{
@@ -276,11 +270,10 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
                     	  if (filterNumbers.contains(dominatedMatchCodes.get(i))){
                     		  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(i));
                     		  
-                    		 // filterNumbers.add(dominatedMatchCodes.get(i));
-                    		  
+                    		  		  
                     		  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(i))){
                         		  filterNumbersOrdered.add(dominatedMatchCodes.get(i));
-                        		  System.out.println("filterNumbersOrdered 2: " + filterNumbersOrdered);
+                        		//  System.out.println("filterNumbersOrdered 2: " + filterNumbersOrdered);
                         	  }
                     		  break;
                     	  }
@@ -323,69 +316,52 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
         System.out.println(dominanceListsWithHead);
         System.out.println(dominanceListsWithoutDoubles);*/
                
-               
-        Set <Map.Entry<Integer, List<Long>>> domLists = dominanceListsWithoutDoubles.entrySet();
-     
-        
-        //boolean filterNumbersEmpty = true;
-       /* if (!filterNumbers.isEmpty())
-        {
-        	filterNumbersEmpty = false;
-        	
-        }*/
-        
-        // if filter numbers not set, set default filter numbers (always the root of a match hierarchy)
-        if (filterNumbersEmpty){
-        	
-	        for (Map.Entry <Integer, List<Long>> entry : domLists){
-				 List<Long>  domList = entry.getValue();			 
-				 filterNumbers.add(domList.get(domList.size() - 1));
-				 }	
-        }
-        //if filter numbers set, validate them
-        else{
-        	Set<List<Long>> usedDominanceLists = new HashSet<List<Long>>();
-        	for (Long filterNumber : filterNumbers){
-        		
-        		boolean filterNumberIsValid = false;
-        		for (List<Long> dominanceList : dominanceListsWithoutDoubles.values()){
-        			if (dominanceList.contains(filterNumber)){
-        				if (usedDominanceLists.contains(dominanceList)){
-        					filterNumberIsValid = false;
-        					throw new IllegalArgumentException("Please use one filter number per match hierarchy only."
-        							+ NEWLINE + "Data could not be exported.");
-        					
-        					
-        				}
-        				else{
-        					usedDominanceLists.add(dominanceList);
-        					filterNumberIsValid = true;
-        					
-        				}
-        			}
-        		}
-        		
-        		//filter number was not found in dominance lists, thus it is not valid
-        		if (!filterNumberIsValid){
-        			throw new IllegalArgumentException("The filter number " + filterNumber + " is not valid."
-        					+ NEWLINE + "Data could not be exported.");     			
-        					       			
-        		}
-        		
-        	}
-        }
+                  
+        // if filter numbers not set by user, set default filter numbers (taken from filterNumbersOrdered)
+       if (matchNumber == -1){
+    	   
+	        if (filterNumbersEmpty){
+	        	        		
+	        		for (Long filterNumber: filterNumbersOrdered){   				  
+	        			filterNumbers.add(filterNumber);
+	   				 }
+	        		       	
+	        }
+	        //if filter numbers set, validate them
+	        else{
+	        	Set<List<Long>> usedDominanceLists = new HashSet<List<Long>>();
+	        	for (Long filterNumber : filterNumbers){
+	        		
+	        		boolean filterNumberIsValid = false;
+	        		for (List<Long> dominanceList : dominanceListsWithoutDoubles.values()){
+	        			if (dominanceList.contains(filterNumber)){
+	        				if (usedDominanceLists.contains(dominanceList)){
+	        					filterNumberIsValid = false;
+	        					throw new IllegalArgumentException("Please use one filter number per match hierarchy only."
+	        							+ NEWLINE + "Data could not be exported.");
+	        					
+	        					
+	        				}
+	        				else{
+	        					usedDominanceLists.add(dominanceList);
+	        					filterNumberIsValid = true;
+	        					
+	        				}
+	        			}
+	        		}
+	        		
+	        		//filter number was not found in dominance lists, thus it is not valid
+	        		if (!filterNumberIsValid){
+	        			throw new IllegalArgumentException("The filter number " + filterNumber + " is not valid."
+	        					+ NEWLINE + "Data could not be exported.");     			
+	        					       			
+	        		}
+	        		
+	        	}
+	        }
             
+       } 
        
-      /*  for (Long filterNumber : filterNumbers){
-        	filterNumbersOrdered.add(filterNumber);
-        }
-        
-        Collections.sort(filterNumbersOrdered);*/
-        
-      //System.out.println(filterNumbers); 
-      //System.out.println(filterNumbersOrdered);
-        
-        
       //TODO why does match number start with -1? 
     	//if match number == -1, reset global variables 
     	if (matchNumber == -1){
@@ -439,14 +415,15 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
 	        			 
 	        			 out.append("left_context" + TAB_MARK);
 		        		 
-		        		 String prefix = "M_";
+		        		 String prefixAlignmc = "match_";
+		        		 String prefix = "match_column";
 		        		 
 		        		for (int i = 0; i < filterNumbersOrdered.size(); i++){		   
 		        			if (alignmc){
-		        				out.append(prefix + filterNumbersOrdered.get(i) + TAB_MARK);
+		        				out.append(prefixAlignmc + filterNumbersOrdered.get(i) + TAB_MARK);
 		        			}
 		        			else{
-		        				out.append(prefix + (i + 1) + TAB_MARK);
+		        				out.append(prefix + TAB_MARK);
 		        			}
 		        			
 		        			
