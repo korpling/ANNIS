@@ -248,7 +248,6 @@ public class TextColumnExporter extends SaltBasedExporter
               
               graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch); 
               
-             // System.out.println("MatchCodes: " + dominatedMatchCodes);
               
               if (!dominatedMatchCodes.isEmpty()){
             	  dominanceListsWithHead.put(dominatedMatchCodes.get(0), dominatedMatchCodes);
@@ -261,7 +260,7 @@ public class TextColumnExporter extends SaltBasedExporter
                 	  //set filter number to the ordered list
                 	  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1))){
                 		  filterNumbersOrdered.add(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
-                		 // System.out.println("filterNumbersOrdered 1: " + filterNumbersOrdered);
+              
                 	  }
                   }
                   else{
@@ -273,7 +272,7 @@ public class TextColumnExporter extends SaltBasedExporter
                     		  		  
                     		  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(i))){
                         		  filterNumbersOrdered.add(dominatedMatchCodes.get(i));
-                        		//  System.out.println("filterNumbersOrdered 2: " + filterNumbersOrdered);
+       
                         	  }
                     		  break;
                     	  }
@@ -310,12 +309,7 @@ public class TextColumnExporter extends SaltBasedExporter
         	}
          }
         
-                       
-      /*  System.out.println(dominanceLists);
-        System.out.println(tokenToMatchNumber);
-        System.out.println(dominanceListsWithHead);
-        System.out.println(dominanceListsWithoutDoubles);*/
-               
+  
                   
         // if filter numbers not set by user, set default filter numbers (taken from filterNumbersOrdered)
        if (matchNumber == -1){
@@ -536,7 +530,9 @@ public class TextColumnExporter extends SaltBasedExporter
 		                    		  
 		                    	   }
 		                    	   else{
-		                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned by match code.");
+		                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned by node number." 
+		                    				   + NEWLINE
+		                    				   +"Please uncheck the alignment-checkbox.");
 		                    	   }
 		                       }
 		                    	
@@ -562,7 +558,9 @@ public class TextColumnExporter extends SaltBasedExporter
 			                    		  
 			                    	   }
 			                    	   else{
-			                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned via matching codes.");
+			                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned by node number." 
+			                    				   + NEWLINE
+			                    				   +"Please uncheck the alignment-checkbox.");
 			                    	   }
 		                    		 
 		                    	 }
