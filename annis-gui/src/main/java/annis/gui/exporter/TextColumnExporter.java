@@ -59,7 +59,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * @author irina
  */
 @PluginImplementation
-public class MatchWithContextExporterDev extends SaltBasedExporter
+public class TextColumnExporter extends SaltBasedExporter
 {
 	 private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 	private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
@@ -637,25 +637,25 @@ public class MatchWithContextExporterDev extends SaltBasedExporter
   @Override
   public String getHelpMessage()
   {
-	  return "The MatchWithContext-Exporter exports matches surrounded by the context as a csv file. "
+	  return "The TextColumnExporter exports matches surrounded by the context as a csv file. "
 	  			+ "The columns will be separated by tab mark. <br/>"
-		        + "This exporter doesn't work yet for results of aql-queries with <em>overlap</em> or <em>or</em> operators.<br/><br/>"
+		        + "This exporter doesn't work well for results of aql-queries with <em>overlap</em> or <em>or</em> operators.<br/><br/>"
 		        + "Parameters: <br/>"
 		        + "<em>metakeys</em> - comma separated list of all meta data to include in the result (e.g. "
-		        + "<code>metakeys=title,documentname</code>)  <br/>"
-		        + "<em>filter</em> - comma separated list of all match numbers to be represented in the result as a separated column (e.g. "
+		        + "<code>metakeys=title,comment</code>)  <br/>"
+		        + "<em>filter</em> - comma separated list of all node numbers to be represented in the result as a separated column (e.g. "
 		        + "<code>filter=1,2</code>) <br/>"
 		        + "</br>"
-		        + "Please note, if some matched nodes build a hierarchy, you can use one match number per hierarchy only. "
+		        + "Please note, if some matched nodes build a hierarchy, you can use one node number per hierarchy only. "
 		        + "For instance, the matched nodes of the aql-query <br/>"
 		        + "<em>cat=\"SIMPX\" > cat = \"FRAG\" >* SPK101 = \"UNINTERPRETABLE\" </em> "
 		        + "build a hierarchy by definition. "
-		        + "There are three matching numbers 1, 2  and 3. "
+		        + "There are three node numbers 1, 2  and 3. "
 		        + "However, only one of them can be used for export. "
-		        + "By default it is the highest node in the hierarchy, which determine the relevant matching number. "
-		        + "In our example it is the node with the matching number 1. "
-		        + "That means, all tokens covered by matched node with the matching number 1 will appeare in the match column. "
-		        + "If desired, by filter option you can choose an other matching number from the hierarchy. In our case it could be 2 or 3.";
+		        + "By default it is the highest node in the hierarchy, which determine the relevant node number. "
+		        + "In our example it is the node with the node number 1. "
+		        + "That means, all tokens covered by node with the node number 1 will appeare in the match column. "
+		        + "If desired, by filter option you can choose an other node number from the hierarchy. In our case it could be 2 or 3.";
   }
   
   @Override

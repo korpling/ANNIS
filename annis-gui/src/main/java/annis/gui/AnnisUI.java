@@ -36,7 +36,7 @@ import annis.gui.components.ExceptionDialog;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.GridExporter;
 //import annis.gui.exporter.MatchWithContextExporter;
-import annis.gui.exporter.MatchWithContextExporterDev;
+import annis.gui.exporter.TextColumnExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TokenExporter;
 import annis.gui.exporter.WekaExporter;
@@ -208,8 +208,7 @@ public class AnnisUI extends CommonUI
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(GridExporter.class));
-    //pluginManager.addPluginsFrom(ClassURI.PLUGIN(MatchWithContextExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(MatchWithContextExporterDev.class));
+    pluginManager.addPluginsFrom(ClassURI.PLUGIN(TextColumnExporter.class));
   }
 
   /**

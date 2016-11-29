@@ -185,8 +185,9 @@ public class ExportPanel extends GridLayout
     formLayout.addComponent(new HelpButton<String>(txtParameters));
     
   //check box for match-with-context exporter
-    cbAlignmc = new CheckBox("Align matches" + System.lineSeparator() + "by match code");
-    cbAlignmc.setDescription("Click here to align export result by match code.");
+    cbAlignmc = new CheckBox("align matches" +"<br/>" + "by node number");
+    cbAlignmc.setCaptionAsHtml(true);
+    cbAlignmc.setDescription("Click here to align export result by node number.");
     cbAlignmc.setEnabled(true);
     formLayout.addComponent(cbAlignmc);
 
