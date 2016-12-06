@@ -998,7 +998,7 @@ var VKI_attach, VKI_show, VKI_close;
   this.VKI_layout['Ethiopic transcription'] = {
     'name': "Ethiopic transcription", 'keys': [
       [["\u0101"],["\u1e25"],["\u015b"],["\u1e2b"],["\u02be"],["\u02bf"], ["\u1e6d"],["\u1e57"],["\u1e63"],["\u1e0d"],["q\u02b7"],["\u1e2b\u02b7"], ["k\u02b7"]],
-      [["g\u02b7"],["\u0161"],["\u010D"],["\u00F1"],["\u1E35 "],["\u017E"],["\u01E7"],["\u1E09"],["ERROR:\ u25A"],["\u010D\u0323"]]
+      [["g\u02b7"],["\u0161"],["\u010D"],["\u00F1"],["\u1E35 "],["\u017E"],["\u01E7"],["\u1E09"],["\u010D\u0323"],["\u01DD"]]
     ], 'lang': ["et"]};
 
   // Ethiopic unicode virtual keyboard
