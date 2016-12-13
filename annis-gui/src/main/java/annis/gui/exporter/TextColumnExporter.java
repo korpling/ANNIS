@@ -862,7 +862,7 @@ public void createMatchNumberList(SDocumentGraph graph, List<String> annoKeys,
                         		 
        
                         	  }
-                    		  break;
+                    		//  break;
                     	  }
                       }
                   }                  
