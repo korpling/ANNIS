@@ -44,6 +44,10 @@ import annis.AnnisBaseRunner;
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
 import annis.utils.Utils;
+import java.awt.Font;
+import java.awt.Toolkit;
+import javax.swing.UIDefaults;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 /**
  *
@@ -176,16 +180,22 @@ public class MainFrame extends javax.swing.JFrame
 
     try
     {
-      for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
+      UIManager.setLookAndFeel(new NimbusLookAndFeel()
       {
-        if ("Nimbus".equals(info.getName()))
+        @Override
+        public UIDefaults getDefaults()
         {
-          UIManager.setLookAndFeel(info.getClassName());
-          break;
+          UIDefaults defaults = super.getDefaults();
+          if(Toolkit.getDefaultToolkit().getScreenSize().width > 2000)
+          {
+            defaults.put("defaultFont", new Font(Font.SANS_SERIF, Font.PLAIN, 18));
+          }
+          return defaults;
         }
-      }
+        
+      });
     }
-    catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ex)
+    catch (UnsupportedLookAndFeelException ex)
     {
       log.error(null, ex);
     }
