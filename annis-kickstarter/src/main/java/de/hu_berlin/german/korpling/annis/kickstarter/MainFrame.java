@@ -148,7 +148,16 @@ public class MainFrame extends javax.swing.JFrame
       {
        URL classLocation = getClass().getProtectionDomain().getCodeSource().getLocation();
        File jarFile = new File(classLocation.toURI());
-       System.setProperty("annis.home", jarFile.getParent());
+       // check if this is an actual jar file or only a folder
+       if(jarFile.isFile())
+       {
+         System.setProperty("annis.home", jarFile.getParent());
+       }
+       else
+       {
+         // fallback to current working directory
+         System.setProperty("annis.home", ".");
+       }
       }
       catch(SecurityException | URISyntaxException ex)
       {
