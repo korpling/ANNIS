@@ -53,6 +53,7 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
+import annis.model.QueryNode;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
@@ -85,6 +86,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
         keys = new LinkedList<>();
         keys.add("tok");
         List<AnnisAttribute> attributes = new LinkedList<>();
+        
+       
         
         for(String corpus : corpora)
         {
@@ -137,6 +140,17 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
         .accept(MediaType.TEXT_PLAIN_TYPE)
         .get(InputStream.class);
       
+      //get node count for the query
+      WebResource resource = Helper.getAnnisWebResource();
+      List<QueryNode> nodes = resource.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(queryAnnisQL))
+      	      .get(new GenericType<List<QueryNode>>() {});
+      int nodeCount = nodes.size();
+           
+    /*  for (QueryNode node : nodes){
+    	  System.out.println(node.getId() + "\t" +  node.toString());
+       }*/
+     
+      
      
       try(BufferedReader inReader = new BufferedReader(new InputStreamReader(
         matchStream, "UTF-8")))
@@ -158,6 +172,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
             WebResource res = subgraphRes
               .queryParam("left", "" + contextLeft)
               .queryParam("right","" + contextRight);
+            
+           
             
             if(args.containsKey("segmentation"))
             {
@@ -181,7 +197,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
               stepSize += 10;
             }
            
-            convertSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out);
+            convertSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out, nodeCount);
            
             currentMatches.getMatches().clear();
 
@@ -218,7 +234,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
           SaltProject p = res.post(SaltProject.class, currentMatches);
                       
           convertSaltProject(p, keys, args, alignmc, offset - currentMatches.getMatches().size() - 1,
-              corpusConfigs, out);
+              corpusConfigs, out, nodeCount);
           
         }
         offset = 0;
@@ -248,7 +264,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
    * @param out 
    */
   private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc, int offset,
-      Map<String, CorpusConfig> corpusConfigs, Writer out) throws IOException, IllegalArgumentException
+      Map<String, CorpusConfig> corpusConfigs, Writer out, int nodeCount) throws IOException, IllegalArgumentException
   {
     int matchNumber = offset;
     if(p != null && p.getCorpusGraphs() != null)
@@ -303,7 +319,9 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
               TimelineReconstructor.removeVirtualTokenization(doc.getDocumentGraph(), spanAnno2order);
             }
             
-            convertText(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out);
+          //  convertText(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out);
+            
+            createMatchNumberList(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out, nodeCount);
           }
         }
       }
@@ -313,6 +331,10 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 
   public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
     Writer out) throws IOException, IllegalArgumentException;
+  
+  public abstract void createMatchNumberList(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
+		    Writer out, int nodeCount) throws IOException, IllegalArgumentException;
+
 
   @Override
   public boolean isCancelable()

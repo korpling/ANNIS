@@ -38,11 +38,14 @@ import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 
 import annis.CommonHelper;
+import annis.gui.QueryController;
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
 import annis.model.Annotation;
@@ -75,15 +78,33 @@ public class TextColumnExporter extends SaltBasedExporter
 	private boolean isFirstSpeakerWithMatch = true;   
 	private static List <Long> dominatedMatchCodes = new ArrayList<Long>();
 	private static Map <Integer, List<Long>> dominanceLists = new HashMap <Integer, List<Long>>();
+	// a helping structure to handle crossing edges, must be global over all query results
 	private static Map <Integer, Long> tokenToMatchNumber = new HashMap <Integer, Long>();
 	private static Map <Long, List<Long>> dominanceListsWithHead = new HashMap <Long, List<Long>>();
 	private static Set<Long> inDominanceRelation = new HashSet<Long>();
-	//contains filter numbers from ui or automatic determined filter numbers from the first record of search result
+	// contains filter numbers from ui, global over all query results
+	private static Set<Long> filterNumbersSetByUser = new HashSet<Long>(); 
+	// indicate, whether filter numbers were set by user, global over all query results
+	private static boolean filterNumbersIsEmpty = true;
+	// contains automatic determined filter numbers, global over all query results
 	private static Set<Long> filterNumbers = new HashSet<Long>(); 
-	private static boolean filterNumbersEmpty = true;
-	//contains filter numbers from the first record of search result (if applicable, according to filterNumbers) ordered by occurrence in text
-	private static List <Long> filterNumbersOrdered = new ArrayList<Long>();
+	
+	// contains metakeys, set by user, global over all query results
 	private static List<String> listOfMetakeys = new ArrayList<String>(); 
+	// contains filter numbers for each speaker of a search result (if applicable, according to filterNumbers) ordered by occurrence in text
+	private static List <Long> filterNumbersOrdered = new ArrayList<Long>();
+	// contains filter numbers over all records and speakers
+	// will be created at the begin of convertText-Method, as far as adjacencyMatrix is filled completely
+	// global over all query results
+	private static List <Long> filterNumbersOrderedGlobal = new ArrayList<Long>();
+	
+	// a helping structure to determine the right order of match nodes over all records
+	private int [][] adjacencyMatrix;
+	// contains single match codes per speaker, global over all query results
+	private Set <Long> singleMatches = new HashSet <Long>();
+	
+	 private static final Logger log = LoggerFactory.getLogger(TextColumnExporter.class);
+	 
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
@@ -98,7 +119,7 @@ public class TextColumnExporter extends SaltBasedExporter
     {
     	 SFeature matchedAnno = currNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
     	 
-    	 if(matchedAnno != null && (filterNumbers.contains(matchedAnno.getValue_SNUMERIC()) || filterNumbers.isEmpty()))
+    	 if(matchedAnno != null && (filterNumbersSetByUser.contains(matchedAnno.getValue_SNUMERIC()) || filterNumbersIsEmpty))
 	      {
 	        matchedNode = matchedAnno.getValue_SNUMERIC();	       
 	        //
@@ -152,7 +173,7 @@ public class TextColumnExporter extends SaltBasedExporter
   public void convertText(SDocumentGraph graph, List<String> annoKeys,
     Map<String, String> args, boolean alignmc, int matchNumber, Writer out) throws IOException, IllegalArgumentException
   {
- 
+	 
   	String currSpeakerName = "";
 	String prevSpeakerName = "";
 	//if new search
@@ -160,7 +181,7 @@ public class TextColumnExporter extends SaltBasedExporter
 		filterNumbers.clear();
 		listOfMetakeys.clear();
 		filterNumbersOrdered.clear();
-		filterNumbersEmpty = true;
+		filterNumbersIsEmpty = true;
 	}
 	
 		
@@ -193,7 +214,7 @@ public class TextColumnExporter extends SaltBasedExporter
 	      
 	      if (!filterNumbers.isEmpty())
 	        {
-	        	filterNumbersEmpty = false;
+	        	filterNumbersIsEmpty = false;
 	        	
 	        }
 	      
@@ -254,7 +275,7 @@ public class TextColumnExporter extends SaltBasedExporter
                   dominanceLists.put(counter, dominatedMatchCodes);
                   
                   // if filter numbers not set, take the number of the highest match node
-                  if (filterNumbersEmpty){
+                  if (filterNumbersIsEmpty){
                 	  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
                 	               	  
                 	  //set filter number to the ordered list
@@ -283,6 +304,11 @@ public class TextColumnExporter extends SaltBasedExporter
                                       
     	  }
     	  
+    	 log.debug("filterNumbers: " + filterNumbers);
+    	 log.debug("filterNumbersOrdered: " + filterNumbersOrdered);
+    	//  System.out.println("filterNumbers: " + filterNumbers);
+    //	  System.out.println("filterNumbersOrdered: " + filterNumbersOrdered);
+    	  
      	  
     	 //iterate again 
         ListIterator<SToken> it = orderedToken.listIterator();
@@ -309,12 +335,18 @@ public class TextColumnExporter extends SaltBasedExporter
         	}
          }
         
+     
+        	/*	System.out.println(dominanceLists);
+        		System.out.println(tokenToMatchNumber);
+                System.out.println(dominanceListsWithHead);
+                System.out.println(dominanceListsWithoutDoubles);*/
+        
   
                   
         // if filter numbers not set by user, set default filter numbers (taken from filterNumbersOrdered)
        if (matchNumber == -1){
     	   
-	        if (filterNumbersEmpty){
+	        if (filterNumbersIsEmpty){
 	        	        		
 	        		for (Long filterNumber: filterNumbersOrdered){   				  
 	        			filterNumbers.add(filterNumber);
@@ -354,7 +386,7 @@ public class TextColumnExporter extends SaltBasedExporter
 	        	}
 	        }
             
-       } 
+      } 
        
       //TODO why does match number start with -1? 
     	//if match number == -1, reset global variables 
@@ -668,5 +700,218 @@ public boolean isAlignable()
  {
 	return true;
  }
+
+
+@Override
+public void createMatchNumberList(SDocumentGraph graph, List<String> annoKeys,
+		Map<String, String> args, boolean alignmc, int matchNumber, Writer out,
+		int nodeCount) throws IOException, IllegalArgumentException {
+	String currSpeakerName = "";
+	String prevSpeakerName = "";
+	//if new search, reset adjacencyMatrix, extract parameters, set by user
+	if (matchNumber == -1){
+		
+		listOfMetakeys.clear();
+	
+		adjacencyMatrix = new int [nodeCount][nodeCount];
+		
+		//initialize adjacency matrix
+		for (int i = 0; i < adjacencyMatrix.length; i++){
+			for (int j = 0; j < adjacencyMatrix[0].length; j++){
+				adjacencyMatrix[i][j] = -1;
+			}
+		}
+		
+	
+	      //extract filter numbers, if set
+	      if (args.containsKey(FILTER_PARAMETER_KEYWORD)){
+	    	     	 
+	    	  String parameters = args.get(FILTER_PARAMETER_KEYWORD);
+	    	  String [] numbers = parameters.split(PARAMETER_SEPARATOR);
+	        	  for (int i=0; i< numbers.length; i++){
+	    		  try {
+	    			 Long number = Long.parseLong(numbers[i]);
+	    			 filterNumbersSetByUser.add(number);
+	     			 
+	    		  }
+	    		  catch(NumberFormatException e){
+	    			 ;
+	    		  }
+	    		  
+	    	  }
+	    	  
+	      }
+	      
+	      
+	      if (!filterNumbersSetByUser.isEmpty())
+	        {
+	        	filterNumbersIsEmpty = false;
+	        	
+	        }
+	    
+	      // extract metakeys
+	      if (args.containsKey(METAKEYS_KEYWORD)){
+	    	  String parameters = args.get(METAKEYS_KEYWORD);
+	    	  String [] metakeys = parameters.split(PARAMETER_SEPARATOR);
+	    	  for (int i=0; i< metakeys.length; i++){    	
+	    			 String metakey = metakeys[i].trim();
+	    			 listOfMetakeys.add(metakey);  		  
+	    	  }    	  
+	    	  
+	      }      
+	      
+	} // end extraction of parameter set by user
+	
+	
+	
+		
+	    
+    if(graph != null)
+    {
+      List<SToken> orderedToken = graph.getSortedTokenByText();      
+      
+     //iterate over all token
+     if(orderedToken != null)
+      {    	   
+    	
+    	  
+ 
+    	 // counter over dominance lists
+    	  int counter = 0;
+    
+    	// iterate first time over tokens to figure out which speaker has matches and to recognize the hierarchical structure of matches as well
+    	  for(SToken token : orderedToken){
+    		  counter++;
+    		             
+    		  
+              STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
+             // speakerName = textualDS.getName();
+              
+              currSpeakerName = textualDS.getName();
+             
+              
+              // reset data structures for new speaker
+              if (!currSpeakerName.equals(prevSpeakerName)){
+            	
+            	  speakerHasMatches.clear();    	  
+            	  inDominanceRelation.clear();    	  
+            	  dominanceLists.clear();    	  
+            	  dominanceListsWithHead.clear();
+            	  tokenToMatchNumber.clear(); 
+            	  
+	       
+	        		filterNumbersOrdered.clear();
+              }
+           
+              // TODO make  speakerHasMatches suitable for global speaker names, 
+              // TODO make currSpeakerName unique over all query results and put it into     speakerHasMatches
+              /*if (!speakerHasMatches.containsKey(currSpeakerName))
+              {
+            	  speakerHasMatches.put(currSpeakerName, false);
+              }*/
+                  
+              
+    		  List<SNode> root = new LinkedList<>();
+              root.add(token);
+              IsDominatedByMatch traverserSpeakerSearch = new IsDominatedByMatch();
+              
+                          
+              //reset list
+        	  dominatedMatchCodes.clear();
+        	  
+              
+              graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch); 
+              
+              
+              if (!dominatedMatchCodes.isEmpty()){
+            	  
+            	  System.out.println(dominatedMatchCodes);
+            	  
+            	  dominanceListsWithHead.put(dominatedMatchCodes.get(0), dominatedMatchCodes);
+                  dominanceLists.put(counter, dominatedMatchCodes);
+                  
+                  // if filter numbers not set by user, take the number of the highest match node
+                  if (filterNumbersIsEmpty){
+                	  // TODO make tokenToMatchNumber global over all query results
+                	//  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
+                	               	  
+                	  //set filter number to the ordered list
+                	  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1))){
+                		  filterNumbersOrdered.add(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
+              
+                	  }
+                  }
+                  else{
+                	  // take the highest match code, which is present in filterNumbers
+                	  boolean filterNumberFound = false;
+                	  for (int i = dominatedMatchCodes.size() - 1; i >= 0; i--){
+                    	  if (filterNumbersSetByUser.contains(dominatedMatchCodes.get(i))){
+                    		  // TODO make tokenToMatchNumber global over all query results
+                    		//  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(i));
+                    		  
+                    		  		  
+                    		  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(i))){
+                    			  if (!filterNumberFound){
+                    				  filterNumbersOrdered.add(dominatedMatchCodes.get(i));
+                    				  filterNumberFound = true;
+                    			  }
+                    			  else{
+                    				 //TODO output warning 
+                    			  }
+                        		  
+                        		 
+       
+                        	  }
+                    		  break;
+                    	  }
+                      }
+                  }                  
+                 
+                  // fill the adjacency matrix
+                  
+                  if (filterNumbersOrdered.size() > 1){
+                	  Iterator<Long> it = filterNumbersOrdered.iterator();
+                	  
+                	  int prev = Integer.parseInt(String.valueOf((Long) it.next()));
+                	  
+                	  while (it.hasNext()){                		  
+                		  int curr = Integer.parseInt(String.valueOf((Long) it.next()));               		  
+                		  adjacencyMatrix[prev - 1][curr - 1] = 1;
+                		  prev = curr;
+                		  
+                	  }                	 
+                  }
+                  else{
+                	  singleMatches.add(filterNumbersOrdered.get(0));
+                  }
+                 
+                  
+                  
+              }
+              
+              // set previous speaker name
+              prevSpeakerName = currSpeakerName;
+             
+                                      
+    	  }
+    	  
+    	  
+	 /* for (int i = 0; i < adjacencyMatrix.length; i++){
+			for (int j = 0; j < adjacencyMatrix[0].length; j++){
+				System.out.print(adjacencyMatrix[i][j] + "\t");
+			}
+			System.out.print("\n");
+		}*/
+	  
+	//  System.out.println(singleMatches);
+   //   System.out.println("filterNumbersOrdered: " + filterNumbersOrdered);
+            
+   
+      
+      }
+       
+    }
+	
+}
  
 }
