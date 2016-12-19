@@ -243,6 +243,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       
       out.append("\n");
       
+      getOrderedMatchNumbers();
+      
       return null;
 
     }
@@ -329,11 +331,13 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
        
   }
 
-  public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
-    Writer out) throws IOException, IllegalArgumentException;
+ /* public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
+    Writer out) throws IOException, IllegalArgumentException;*/
   
   public abstract void createMatchNumberList(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
 		    Writer out, int nodeCount) throws IOException, IllegalArgumentException;
+  
+  public abstract void getOrderedMatchNumbers();
 
 
   @Override
