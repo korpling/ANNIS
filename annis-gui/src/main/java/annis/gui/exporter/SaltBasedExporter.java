@@ -323,7 +323,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
             
           //  convertText(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out);
             
-            createMatchNumberList(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out, nodeCount);
+            createAdjacencyMatrix(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out, nodeCount);
           }
         }
       }
@@ -331,10 +331,10 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
        
   }
 
- /* public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
-    Writer out) throws IOException, IllegalArgumentException;*/
+  public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
+    Writer out) throws IOException, IllegalArgumentException;
   
-  public abstract void createMatchNumberList(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
+  public abstract void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
 		    Writer out, int nodeCount) throws IOException, IllegalArgumentException;
   
   public abstract void getOrderedMatchNumbers();
