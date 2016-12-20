@@ -74,7 +74,7 @@ public class TextColumnExporter extends SaltBasedExporter
 	private static final String TAB_MARK = "\t"; 
 	private static final String SPACE = " ";    
 	private static HashMap <String, Boolean> speakerHasMatches = new HashMap<String, Boolean>();
-	private static String speakerName;
+	private static String speakerName = "";
 	private boolean isFirstSpeakerWithMatch = true;   
 	private static List <Long> dominatedMatchCodes = new ArrayList<Long>();
 	// a helping structure to handle crossing edges, must be global over all query results
@@ -99,6 +99,8 @@ public class TextColumnExporter extends SaltBasedExporter
 	// indicates, whether data is alignable or not
 	private static boolean dataIsAlignable = true;
 	
+	private static int counterGlobal;
+	
 	 
 	
 	 private static final Logger log = LoggerFactory.getLogger(TextColumnExporter.class);
@@ -117,7 +119,8 @@ public class TextColumnExporter extends SaltBasedExporter
     {
     	 SFeature matchedAnno = currNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
     	 
-    	 if(matchedAnno != null && (filterNumbersSetByUser.contains(matchedAnno.getValue_SNUMERIC()) || filterNumbersIsEmpty))
+    	 if(matchedAnno != null && (filterNumbersSetByUser.contains(matchedAnno.getValue_SNUMERIC()) 
+    			 || filterNumbersIsEmpty || orderedMatchNumbersGlobal.contains(matchedAnno.getValue_SNUMERIC())))
 	      {
 	        matchedNode = matchedAnno.getValue_SNUMERIC();	       
 	        //
@@ -147,7 +150,8 @@ public class TextColumnExporter extends SaltBasedExporter
     {
     	if(traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH))
     	{	
-		      if(this.matchedNode != null && (filterNumbersSetByUser.contains(this.matchedNode) || filterNumbersIsEmpty))
+		      if(this.matchedNode != null && (filterNumbersSetByUser.contains(this.matchedNode) 
+		    		  								|| orderedMatchNumbersGlobal.contains(this.matchedNode)))
 		      { // don't traverse any further if matched node was found 
 		        return false;
 		      }
@@ -668,11 +672,7 @@ public class TextColumnExporter extends SaltBasedExporter
     
    if(orderedToken != null)
     {    	   
-  	// counter over dominance lists
-  	  int counter = 0;
-  
-
-   	  
+  	  	  
   	 //iterate over token
       ListIterator<SToken> it = orderedToken.listIterator();
       long lastTokenWasMatched = -1;
@@ -683,19 +683,19 @@ public class TextColumnExporter extends SaltBasedExporter
   	//if match number == -1, reset global variables 
   	if (matchNumber == -1){
   		isFirstSpeakerWithMatch = true;
+  		counterGlobal = 0;
   	}
   	
        
-  	//reset counter
-      counter = 0;
       int matchesWrittenForSpeaker = 0;
       
       while(it.hasNext())
       {    	
         SToken tok = it.next();    
-        counter++;
+     //   counter++;
+        counterGlobal++;
         //get current speaker name
-        currSpeakerName = CommonHelper.getTextualDSForNode(tok, graph).getName();
+        currSpeakerName = (matchNumber + 2) + "_" + CommonHelper.getTextualDSForNode(tok, graph).getName();
         
          
         // if speaker has no matches, skip token
@@ -736,7 +736,7 @@ public class TextColumnExporter extends SaltBasedExporter
 		        		 String prefix = "match_column";
 		        		 String middle_context = "middle_context_";
 		        		 
-		        		 if (orderedMatchNumbersGlobal.size() > 0){
+		        		 if (alignmc && dataIsAlignable){
 		        			 			 
 		        			 for (int i = 0; i < orderedMatchNumbersGlobal.size(); i++){
 		        				 out.append(prefixAlignmc + orderedMatchNumbersGlobal.get(i) + TAB_MARK); 
@@ -908,14 +908,14 @@ public class TextColumnExporter extends SaltBasedExporter
 		                  {
 		                                    	  
 		                	  //handle crossing edges
-		                	  if(!tokenToMatchNumber.containsKey(counter) && 
-		                			  tokenToMatchNumber.containsKey(counter - 1) && tokenToMatchNumber.containsKey(counter + 1)){
+		                	  if(!tokenToMatchNumber.containsKey(counterGlobal) && 
+		                			  tokenToMatchNumber.containsKey(counterGlobal - 1) && tokenToMatchNumber.containsKey(counterGlobal + 1)){
 		                		    
 		                		  
-		                    			if (tokenToMatchNumber.get(counter - 1) == tokenToMatchNumber.get(counter + 1)){
+		                    			if (tokenToMatchNumber.get(counterGlobal - 1) == tokenToMatchNumber.get(counterGlobal + 1)){
 		                    				
 		                    				separator = SPACE;                     
-		    		                    	lastTokenWasMatched = tokenToMatchNumber.get(counter + 1);
+		    		                    	lastTokenWasMatched = tokenToMatchNumber.get(counterGlobal + 1);
 		                    			}	                    				
 	                    				else{
 	                    					             						                    
@@ -1017,6 +1017,9 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 	
 	//if new search, reset adjacencyMatrix, extract parameters, set by user
 	if (matchNumber == -1){
+		speakerHasMatches.clear();
+		speakerName = "";
+		tokenToMatchNumber.clear();
 		filterNumbersSetByUser.clear();
 		filterNumbersIsEmpty = true;		
 		listOfMetakeys.clear();		
@@ -1084,38 +1087,38 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
       
      //iterate over all token
      if(orderedToken != null)
-      {    	   
+      {  
+    	 // reset counter over all the tokens
+    	 if (matchNumber == -1){
+    		 counterGlobal = 0;
+    	 }
     	
-    	  
- 
-    	 // counter over dominance lists
-    	  int counter = 0;
     
     	// iterate first time over tokens to figure out which speaker has matches and to recognize the hierarchical structure of matches as well
     	  for(SToken token : orderedToken){
-    		  counter++;
+    		  counterGlobal++;
     		             
     		  
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
              // speakerName = textualDS.getName();
               //TODO make speaker name global unique
-              currSpeakerName = textualDS.getName();
+              speakerName =  (matchNumber + 2) + "_" +textualDS.getName();
+              currSpeakerName = speakerName;
          
                         
               // reset data structures for new speaker
               if (!currSpeakerName.equals(prevSpeakerName)){
             	
-            	  speakerHasMatches.clear();    	  
-            	  tokenToMatchNumber.clear();        
+            	 // speakerHasMatches.clear();    	  
+            	 // tokenToMatchNumber.clear();        
 	        	  matchNumbersOrdered.clear();
               }
            
-              // TODO make  speakerHasMatches suitable for global speaker names, 
-              // TODO make currSpeakerName unique over all query results and put it into     speakerHasMatches
-              /*if (!speakerHasMatches.containsKey(currSpeakerName))
+              
+              if (!speakerHasMatches.containsKey(currSpeakerName))
               {
             	  speakerHasMatches.put(currSpeakerName, false);
-              }*/
+              }
                   
               
     		  List<SNode> root = new LinkedList<>();
@@ -1135,7 +1138,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
                   // if filter numbers not set by user, take the number of the highest match node
                   if (filterNumbersIsEmpty){
                 	  // TODO make tokenToMatchNumber global over all query results
-                	//  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
+                	  tokenToMatchNumber.put(counterGlobal, dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
                 	               	  
                 	  //set filter number to the ordered list
                 	  if (!matchNumbersOrdered.contains(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1))){
@@ -1149,7 +1152,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
                 	  for (int i = dominatedMatchCodes.size() - 1; i >= 0; i--){
                     	  if (filterNumbersSetByUser.contains(dominatedMatchCodes.get(i))){
                     		  // TODO make tokenToMatchNumber global over all query results
-                    		//  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(i));
+                    		  tokenToMatchNumber.put(counterGlobal, dominatedMatchCodes.get(i));
                     		  
                     		  		  
                     		  if (!matchNumbersOrdered.contains(dominatedMatchCodes.get(i))){
@@ -1210,21 +1213,21 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 }
 
 public void getOrderedMatchNumbers (){
-	 for (int i = 0; i < adjacencyMatrix.length; i++){
+	/* for (int i = 0; i < adjacencyMatrix.length; i++){
 			for (int j = 0; j < adjacencyMatrix[0].length; j++){
 				System.out.print(adjacencyMatrix[i][j] + "\t");
 			}
 			System.out.print("\n");
 		}
 	  
-	  System.out.println("singleMatches: " + singleMatchesGlobal);      
+	  System.out.println("singleMatches: " + singleMatchesGlobal);      */
 	 
 	  
 	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobal(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
 	  
-	 System.out.println("orderedMatchNumbers: "  +orderedMatchNumbersGlobal);
+	/* System.out.println("orderedMatchNumbers: "  +orderedMatchNumbersGlobal);
 	 System.out.println("matchNumbersGlobal: " + matchNumbersGlobal);      
-	 System.out.println("dataIsAlignable: " + dataIsAlignable);      
+	 System.out.println("dataIsAlignable: " + dataIsAlignable);      */
 	
 }
 
