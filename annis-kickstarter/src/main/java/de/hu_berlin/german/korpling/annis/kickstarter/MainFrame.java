@@ -35,7 +35,6 @@ import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,8 @@ import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
 import annis.utils.Utils;
 import java.awt.Font;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import javax.swing.UIDefaults;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
@@ -186,7 +187,8 @@ public class MainFrame extends javax.swing.JFrame
         public UIDefaults getDefaults()
         {
           UIDefaults defaults = super.getDefaults();
-          if(Toolkit.getDefaultToolkit().getScreenSize().width > 2000)
+          GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+          if(gd.getDisplayMode().getWidth() > 2000)
           {
             defaults.put("defaultFont", new Font(Font.SANS_SERIF, Font.PLAIN, 18));
           }
