@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -46,6 +48,7 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
+import net.sf.ehcache.*;
 import annis.CommonHelper;
 import annis.TimelineReconstructor;
 import annis.exceptions.AnnisCorpusAccessException;
@@ -133,6 +136,16 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 
       int stepSize = 10;
       
+      int pCounter = 1;
+      
+      
+      CacheManager singletonManager = CacheManager.create();
+      Cache saltProjectsCache = new Cache("saltProjectsCache", 500, true, true, 0, 0);    
+      singletonManager.addCache(saltProjectsCache);    
+      Cache cache = singletonManager.getCache("saltProjectsCache");     
+      Map <Integer, Integer> offsets = new HashMap <Integer, Integer>();
+   
+      
       // 1. Get all the matches as Salt ID
       InputStream matchStream = annisResource.path("search/find/")
         .queryParam("q", Helper.encodeJersey(queryAnnisQL))
@@ -191,7 +204,9 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
             {
               stepSize += 10;
             }
-           
+            offsets.put(pCounter, offset-currentMatches.getMatches().size());
+            cache.put(new Element (pCounter++, p));
+            
             convertSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out, nodeCount);
            
             currentMatches.getMatches().clear();
@@ -227,7 +242,9 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
           }
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
-                      
+          
+          offsets.put(pCounter, offset - currentMatches.getMatches().size() - 1);
+          cache.put(new Element (pCounter++, p));         
           convertSaltProject(p, keys, args, alignmc, offset - currentMatches.getMatches().size() - 1,
               corpusConfigs, out, nodeCount);
           
@@ -237,11 +254,51 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       }
       
      /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/ 
+      //build the list of ordered match numbers (ordering by occurrence in text)
       getOrderedMatchNumbers();
+      
+    @SuppressWarnings("unchecked")
+	List <Integer> cacheKeys = cache.getKeys();
+    List <Integer> listOfKeys = new ArrayList<Integer>();
+    
+
+    
+    for (Integer key : cacheKeys){
+    	listOfKeys.add(key);
+    }
+     
+    
+    System.out.println(cacheKeys.size() + "\t, " +listOfKeys.size());
+    Collections.sort(listOfKeys);
+    
+    for (Integer i : listOfKeys){
+    	System.out.println(i);
+    }
+    
+   try{
+         for (Integer key : listOfKeys){
+        	
+       	 SaltProject p = (SaltProject) cache.get(key).getObjectValue();
+       	
+       	 System.out.println(key  +  "\t" + p.getName());
+       	  exportSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out);
+         }      
+    }
+   catch(Exception e)
+    {
+	  e.printStackTrace();
+    }
+    finally{
+    	singletonManager.removalAll();
+        singletonManager.shutdown();
+    }
+      
+      
+      
 
       
       // TODO to cache salt projects
-      if (keys == null || keys.isEmpty())
+     /* if (keys == null || keys.isEmpty())
       {
         // auto set
         keys = new LinkedList<>();
@@ -353,7 +410,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
               stepSize += 10;
             }
            
-            exportSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out, nodeCount);
+            exportSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out);
            
             currentMatches.getMatches().clear();
 
@@ -390,12 +447,12 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
           SaltProject p = res.post(SaltProject.class, currentMatches);
                       
           exportSaltProject(p, keys, args, alignmc, offset - currentMatches.getMatches().size() - 1,
-              corpusConfigs, out, nodeCount);
+              corpusConfigs, out);
           
         }
         offset = 0;
         
-      }
+      } */
            
       
       out.append("\n");
@@ -409,6 +466,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
     {
       return ex;
     }
+    
   }
   
   /**
@@ -421,6 +479,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
    * @param offset
    * @param out 
    */
+  
+  // invokes the createAdjacencyMatrix method
   private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc, int offset,
       Map<String, CorpusConfig> corpusConfigs, Writer out, int nodeCount) throws IOException, IllegalArgumentException
   {
@@ -487,8 +547,9 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
        
   }
   
+  //invokes the convertText method (export)
   private void exportSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc, int offset,
-	      Map<String, CorpusConfig> corpusConfigs, Writer out, int nodeCount) throws IOException, IllegalArgumentException
+	      Map<String, CorpusConfig> corpusConfigs, Writer out) throws IOException, IllegalArgumentException
 	  {
 	    int matchNumber = offset;
 	    if(p != null && p.getCorpusGraphs() != null)
