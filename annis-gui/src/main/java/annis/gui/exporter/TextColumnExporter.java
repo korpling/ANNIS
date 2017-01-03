@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
+import com.vaadin.ui.Notification;
 
 import annis.CommonHelper;
 import annis.gui.QueryController;
@@ -94,10 +95,10 @@ public class TextColumnExporter extends SaltBasedExporter
 	private static Set <Long> singleMatchesGlobal = new HashSet <Long>();
 	// contains a  sequence of match numbers per speaker ordered according to their occurrence in text, globally over all query results
 	private static List <Long> orderedMatchNumbersGlobal = new ArrayList <Long>();
-	// contains a set of match numbers occurred in text, globally over all query results
-	private static Set <Long> matchNumbersGlobal = new HashSet<Long>();
 	// indicates, whether data is alignable or not
 	private static boolean dataIsAlignable = true;
+	
+	private static int maxMatchesPerLine = 0;
 	
 	private static int counterGlobal;
 	
@@ -165,494 +166,6 @@ public class TextColumnExporter extends SaltBasedExporter
     } 
   }
 
-  
-//  @Override
- /* public void convertText(SDocumentGraph graph, List<String> annoKeys,
-    Map<String, String> args, boolean alignmc, int matchNumber, Writer out) throws IOException, IllegalArgumentException
-  {
-	 
-  	String currSpeakerName = "";
-	String prevSpeakerName = "";
-	//if new search
-	if (matchNumber == -1){
-		filterNumbers.clear();
-		listOfMetakeys.clear();
-		filterNumbersOrdered.clear();
-		filterNumbersIsEmpty = true;
-	}
-	
-		
-	    
-    if(graph != null)
-    {
-      List<SToken> orderedToken = graph.getSortedTokenByText();
-      
-      // if new search
-      if (matchNumber == -1){
-	      //extract filter numbers
-	      if (args.containsKey(FILTER_PARAMETER_KEYWORD)){
-	    	     	 
-	    	  String parameters = args.get(FILTER_PARAMETER_KEYWORD);
-	    	  String [] numbers = parameters.split(PARAMETER_SEPARATOR);
-	        	  for (int i=0; i< numbers.length; i++){
-	    		  try {
-	    			 Long number = Long.parseLong(numbers[i]);
-	    			 filterNumbers.add(number);
-	     			 
-	    		  }
-	    		  catch(NumberFormatException e){
-	    			 ;
-	    		  }
-	    		  
-	    	  }
-	    	  
-	      }
-	      
-	      
-	      if (!filterNumbers.isEmpty())
-	        {
-	        	filterNumbersIsEmpty = false;
-	        	
-	        }
-	      
-	      // extract metakeys
-	      if (args.containsKey(METAKEYS_KEYWORD)){
-	    	  String parameters = args.get(METAKEYS_KEYWORD);
-	    	  String [] metakeys = parameters.split(PARAMETER_SEPARATOR);
-	    	  for (int i=0; i< metakeys.length; i++){    	
-	    			 String metakey = metakeys[i].trim();
-	    			 listOfMetakeys.add(metakey);  		  
-	    	  }    	  
-	    	  
-	      }
-      }
-      
-     if(orderedToken != null)
-      {    	   
-    	 //reset the data structures for new graph
-    	  speakerHasMatches.clear();    	  
-    	  inDominanceRelation.clear();    	  
-    	  dominanceLists.clear();    	  
-    	  dominanceListsWithHead.clear();
-    	  tokenToMatchNumber.clear();
-    	  
- 
-    	 // counter over dominance lists
-    	  int counter = 0;
-    
-    	// iterate first time over tokens to figure out which speaker has matches and to recognize the hierarchical structure of matches as well
-    	  for(SToken token : orderedToken){
-    		  counter++;
-    		             
-    		  
-              STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
-              speakerName = textualDS.getName();
-           
-                        
-              if (!speakerHasMatches.containsKey(speakerName))
-              {
-            	  speakerHasMatches.put(speakerName, false);
-              }
-                  
-              
-    		  List<SNode> root = new LinkedList<>();
-              root.add(token);
-              IsDominatedByMatch traverserSpeakerSearch = new IsDominatedByMatch();
-              
-                          
-              //reset list
-        	  dominatedMatchCodes = new ArrayList<Long>();
-        	  
-              
-              graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch); 
-              
-              
-              if (!dominatedMatchCodes.isEmpty()){
-            	  dominanceListsWithHead.put(dominatedMatchCodes.get(0), dominatedMatchCodes);
-                  dominanceLists.put(counter, dominatedMatchCodes);
-                  
-                  // if filter numbers not set, take the number of the highest match node
-                  if (filterNumbersIsEmpty){
-                	  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
-                	               	  
-                	  //set filter number to the ordered list
-                	  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1))){
-                		  filterNumbersOrdered.add(dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
-              
-                	  }
-                  }
-                  else{
-                	  // take the highest match code, which is present in filterNumbers
-                	  for (int i = dominatedMatchCodes.size() - 1; i >= 0; i--){
-                    	  if (filterNumbers.contains(dominatedMatchCodes.get(i))){
-                    		  tokenToMatchNumber.put(counter, dominatedMatchCodes.get(i));
-                    		  
-                    		  		  
-                    		  if (!filterNumbersOrdered.contains(dominatedMatchCodes.get(i))){
-                        		  filterNumbersOrdered.add(dominatedMatchCodes.get(i));
-       
-                        	  }
-                    		  break;
-                    	  }
-                      }
-                  }                  
-                 
-              }
-                                      
-    	  }
-    	  
-    	 log.debug("filterNumbers: " + filterNumbers);
-    	 log.debug("filterNumbersOrdered: " + filterNumbersOrdered);
-    	//  System.out.println("filterNumbers: " + filterNumbers);
-    //	  System.out.println("filterNumbersOrdered: " + filterNumbersOrdered);
-    	  
-     	  
-    	 //iterate again 
-        ListIterator<SToken> it = orderedToken.listIterator();
-        long lastTokenWasMatched = -1;
-        boolean noPreviousTokenInLine = false;
-       
-        
-        Iterator<Long> inDomIt = inDominanceRelation.iterator();        
-        //eliminate entries, whose key (matching code) dominate other matching codes  
-        while(inDomIt.hasNext()){
-        	Long matchingCode = inDomIt.next();
-        	if (dominanceListsWithHead.containsKey(matchingCode)){
-        		dominanceListsWithHead.remove(matchingCode);
-        	}
-        }
-        
-        Set<Map.Entry<Integer, List<Long>>> entries = dominanceLists.entrySet();
-        // a helping data structure to eliminate duplicates of dominance lists
-        Map <Integer, List<Long>> dominanceListsWithoutDoubles = new HashMap<Integer, List<Long>>();
-        
-        for(Map.Entry<Integer, List<Long>> entry : entries){
-        	if (dominanceListsWithHead.containsValue(entry.getValue()) && !dominanceListsWithoutDoubles.containsValue(entry.getValue())){
-        		dominanceListsWithoutDoubles.put(entry.getKey(), entry.getValue());
-        	}
-         }
-        
-     
-        	/*	System.out.println(dominanceLists);
-        		System.out.println(tokenToMatchNumber);
-                System.out.println(dominanceListsWithHead);
-                System.out.println(dominanceListsWithoutDoubles);*/
-        
-  
-                  
-        // if filter numbers not set by user, set default filter numbers (taken from filterNumbersOrdered)
-    /*   if (matchNumber == -1){
-    	   
-	        if (filterNumbersIsEmpty){
-	        	        		
-	        		for (Long filterNumber: filterNumbersOrdered){   				  
-	        			filterNumbers.add(filterNumber);
-	   				 }
-	        		       	
-	        }
-	        //if filter numbers set, validate them
-	        else{
-	        	Set<List<Long>> usedDominanceLists = new HashSet<List<Long>>();
-	        	for (Long filterNumber : filterNumbers){
-	        		
-	        		boolean filterNumberIsValid = false;
-	        		for (List<Long> dominanceList : dominanceListsWithoutDoubles.values()){
-	        			if (dominanceList.contains(filterNumber)){
-	        				if (usedDominanceLists.contains(dominanceList)){
-	        					filterNumberIsValid = false;
-	        					throw new IllegalArgumentException("Please use one filter number per match hierarchy only."
-	        							+ NEWLINE + "Data could not be exported.");
-	        					
-	        					
-	        				}
-	        				else{
-	        					usedDominanceLists.add(dominanceList);
-	        					filterNumberIsValid = true;
-	        					
-	        				}
-	        			}
-	        		}
-	        		
-	        		//filter number was not found in dominance lists, thus it is not valid
-	        		if (!filterNumberIsValid){
-	        			throw new IllegalArgumentException("The filter number " + filterNumber + " is not valid."
-	        					+ NEWLINE + "Data could not be exported.");     			
-	        					       			
-	        		}
-	        		
-	        	}
-	        }
-            
-      } 
-       
-      //TODO why does match number start with -1? 
-    	//if match number == -1, reset global variables 
-    	if (matchNumber == -1){
-    		isFirstSpeakerWithMatch = true;
-    	}
-    	
-         
-    	//reset counter
-        counter = 0;
-        int matchesWrittenForSpeaker = 0;
-        
-        while(it.hasNext())
-        {    	
-          SToken tok = it.next();    
-          counter++;
-          //get current speaker name
-          currSpeakerName = CommonHelper.getTextualDSForNode(tok, graph).getName();
-          
-           
-          // if speaker has no matches, skip token
-          if (speakerHasMatches.get(currSpeakerName) == false)
-          {
-        	  prevSpeakerName = currSpeakerName;
-        	 // continue;
-          }
-          
-          //if speaker has matches
-          else
-          {	 
-   	 
-        	  
-	        	  //if the current speaker is new, append his name and write header
-	        	 if (!currSpeakerName.equals(prevSpeakerName))
-	        	 { 	
-	        		 //reset the counter of matches, which were written for this speaker	
-	        		 matchesWrittenForSpeaker = 0;
-	   
-	        		 if (isFirstSpeakerWithMatch){
-	        			 
-	        			 out.append("match_number" + TAB_MARK);
-	        			 out.append("speaker" + TAB_MARK);
-	        			 
-	        			 // write header for meta data columns
-	        			 if (!listOfMetakeys.isEmpty()){
-	        				 for(String metakey : listOfMetakeys){
-	        					 out.append(metakey + TAB_MARK);
-	        				 }
-	        			 }
-	        			 
-	        			 
-	        			 
-	        			 out.append("left_context" + TAB_MARK);
-		        		 
-		        		 String prefixAlignmc = "match_";
-		        		 String prefix = "match_column";
-		        		 
-		        		for (int i = 0; i < filterNumbersOrdered.size(); i++){		   
-		        			if (alignmc){
-		        				out.append(prefixAlignmc + filterNumbersOrdered.get(i) + TAB_MARK);
-		        			}
-		        			else{
-		        				out.append(prefix + TAB_MARK);
-		        			}
-		        			
-		        			
-		        			 if (i < filterNumbersOrdered.size() - 1){
-		        				 out.append("middle_context_" +  (i + 1) + TAB_MARK); 
-		        			 }      			 
-		        		 }
-		        		 
-		        		 out.append("right_context");
-		        		 out.append(NEWLINE);
-	        			 
-	        			 isFirstSpeakerWithMatch = false;
-	        		 }
-	        		 else {
-	        			 out.append(NEWLINE);
-	        		 } 
-	            		   		
-	        		 	        		
-	        		 // TODO why does matchNumber start with -1?
-	        		 out.append(String.valueOf(matchNumber + 2) + TAB_MARK);
-	        		 out.append(currSpeakerName + TAB_MARK);
-	        		 
-	        		 //write meta data
-	        		 if (!listOfMetakeys.isEmpty()){
-	        			 // get metadata
-	        			  String docName = graph.getDocument().getName();
-	                      List<String> corpusPath = CommonHelper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
-	                      String corpusName = corpusPath.get(corpusPath.size() - 1);
-	                      corpusName = urlPathEscape.escape(corpusName);	                      
-	                      List<Annotation> metadata = Helper.getMetaData(corpusName, docName);
-	                      
-	                      Map <String, String> annosWithoutNamespace = new HashMap<String, String>();
-	                      Map <String, Map<String, String>> annosWithNamespace = new HashMap<String, Map<String, String>>();
-	                      
-	                      // put metadata annotations into hash maps for better access
-	                      for (Annotation metaAnno : metadata){
-	                    	  String ns;
-	                    	  Map<String, String> data = new HashMap<String, String>();
-	                    	  data.put(metaAnno.getName(), metaAnno.getValue());
-	                    	  
-	                    	  // a namespace is present
-	                    	  if ((ns = metaAnno.getNamespace()) != null && !ns.isEmpty()){
-	                    		 Map <String, String> nsMetadata = new HashMap<String, String>();
-	                    		 
-	                    		 if (annosWithNamespace.get(ns) != null){
-	                    			 nsMetadata = annosWithNamespace.get(ns);
-	                    		 }
-	                    		 nsMetadata.putAll(data);
-	                    		 annosWithNamespace.put(ns, nsMetadata);
-	                    	  }
-	                    	  else{
-	                    		  annosWithoutNamespace.putAll(data);
-	                    	  }
-	                    	  
-	                      }
-	                      
-	                            			 
-	        			 for (String metakey : listOfMetakeys){
-	        				 String metaValue = "";
-	        				 //try to get meta value specific for current speaker
-	        				if (annosWithNamespace.containsKey(currSpeakerName)){
-	        					Map<String, String> speakerAnnos = annosWithNamespace.get(currSpeakerName);
-	        					if (speakerAnnos.containsKey(metakey)){
-	        						metaValue = speakerAnnos.get(metakey).trim();
-	        					}
-	        				}
-	        				
-	        				// try to get meta value 
-	        				if (metaValue.isEmpty() && annosWithoutNamespace.containsKey(metakey)){
-	        					metaValue = annosWithoutNamespace.get(metakey).trim();
-	        				}
-	        				out.append(metaValue + TAB_MARK);
-	        			 }
-	        		 }
-	        			 
-	        		 
-	        		 
-	        		 lastTokenWasMatched = -1;
-	        		 noPreviousTokenInLine = true;
-	        		 
-	        		
-	        	 }// header  and speaker name ready
-	        	 
-	        	  String separator = SPACE; // default to space as separator
-	        	       	  
-	        	  		  List<SNode> root = new LinkedList<>();
-		                  root.add(tok);
-		                  IsDominatedByMatch traverser = new IsDominatedByMatch();
-		                  graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, "IsDominatedByMatch", traverser);
-		               
-		                  // token matched
-		                  if(traverser.matchedNode != null)
-		                  {
-		                    // is dominated by a (new) matched node, thus use tab to separate the non-matches from the matches
-		                    if(lastTokenWasMatched < 0)
-		                    {
-		                       if (!alignmc){
-		                    	   separator = TAB_MARK; 
-		                       }
-		                       else{
-		                    	   int orderInList = filterNumbersOrdered.indexOf(traverser.matchedNode);
-		                    	   if (orderInList >= matchesWrittenForSpeaker){
-		                    		   int diff = orderInList - matchesWrittenForSpeaker;
-		                    		   separator = TAB_MARK; 
-		                    		   matchesWrittenForSpeaker++; 		                    		   
-		                    		   for (int i = 0; i < diff; i++){
-		                    			   separator += (TAB_MARK + TAB_MARK);
-		                    			   matchesWrittenForSpeaker++; 
-		                    		   }
-		                    		  
-		                    	   }
-		                    	   else{
-		                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned by node number." 
-		                    				   + NEWLINE
-		                    				   +"Please uncheck the alignment-checkbox.");
-		                    	   }
-		                       }
-		                    	
-		                                                     
-		                			                      
-		                    }
-		                    else if(lastTokenWasMatched != (long) traverser.matchedNode)
-		                    {
-		                      // always leave an empty column between two matches, even if there is no actual context
-		                    	 if (!alignmc){
-		                    	separator = TAB_MARK + TAB_MARK;
-		                    	 }
-		                    	 else{
-		                    		 int orderInList = filterNumbersOrdered.indexOf(traverser.matchedNode);
-			                    	   if (orderInList >= matchesWrittenForSpeaker){
-			                    		   int diff = orderInList - matchesWrittenForSpeaker;
-			                    		   separator = TAB_MARK + TAB_MARK; 
-			                    		   matchesWrittenForSpeaker++; 
-			                    		   for (int i = 0; i < diff; i++){
-			                    			   separator += (TAB_MARK + TAB_MARK);
-			                    			   matchesWrittenForSpeaker++; 
-			                    		   }
-			                    		  
-			                    	   }
-			                    	   else{
-			                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned by node number." 
-			                    				   + NEWLINE
-			                    				   +"Please uncheck the alignment-checkbox.");
-			                    	   }
-		                    		 
-		                    	 }
-		                    			                    	
-		                    }
-		                    lastTokenWasMatched = traverser.matchedNode;
-		                  }
-		                  // token not matched, but last token matched
-		                  else if(lastTokenWasMatched >= 0)
-		                  {
-		                                    	  
-		                	  //handle crossing edges
-		                	  if(!tokenToMatchNumber.containsKey(counter) && 
-		                			  tokenToMatchNumber.containsKey(counter - 1) && tokenToMatchNumber.containsKey(counter + 1)){
-		                		    
-		                		  
-		                    			if (tokenToMatchNumber.get(counter - 1) == tokenToMatchNumber.get(counter + 1)){
-		                    				
-		                    				separator = SPACE;                     
-		    		                    	lastTokenWasMatched = tokenToMatchNumber.get(counter + 1);
-		                    			}	                    				
-	                    				else{
-	                    					             						                    
-	       			                    	  separator = TAB_MARK;           			                	  
-	       			                    	  lastTokenWasMatched = -1;
-	                    				}
-	                    				
-	                    				
-	                    			}
-		                	// mark the end of a match with the tab
-			           	  else{
-		                		            
-			                    separator = TAB_MARK;		                	  
-			                    lastTokenWasMatched = -1;
-		                	  }
-	                    			 	  
-		                	 
-		                  }
-		                  
-		                  //if tok is the first token in the line and not matched, set separator to empty string
-		                  if (noPreviousTokenInLine && separator.equals(SPACE))
-		                  {
-		                	 separator = "";
-		                  }
-		                  out.append(separator);
-		           
-		       	          
-		          
-          // append the actual token
-          out.append(graph.getText(tok));
-          noPreviousTokenInLine = false; 
-          prevSpeakerName = currSpeakerName;
-               
-         }              
-          
-        }
-      
-      }
-       
-    }
-    
-
-  }*/
   
   
 @Override
@@ -747,14 +260,16 @@ public class TextColumnExporter extends SaltBasedExporter
 		        			 }
 		        		 }
 		        		 else{
-		        			 // TODO  message, that data are not alignable
-		        			 for (int i = 0; i < matchNumbersGlobal.size(); i++){
+		        			
+		        			 for (int i = 0; i < maxMatchesPerLine; i++){
 		        				 out.append(prefix + TAB_MARK); 
 		        				 
-		        				 if (i < matchNumbersGlobal.size() - 1){
+		        				 if (i < (maxMatchesPerLine - 1)){
 			        				 out.append(middle_context +  (i + 1) + TAB_MARK); 
 			        			 }      	
 		        			 }
+		        			 
+		        			 Notification.show("Data couldn't be aligned.", Notification.Type.WARNING_MESSAGE);
 		        			 
 		        		 }		 
 		        
@@ -771,7 +286,7 @@ public class TextColumnExporter extends SaltBasedExporter
 	        		 	        		
 	        		 // TODO why does matchNumber start with -1?
 	        		 out.append(String.valueOf(matchNumber + 2) + TAB_MARK);
-	        		 out.append(currSpeakerName + TAB_MARK);
+	        		 out.append(currSpeakerName.substring(currSpeakerName.indexOf("_") + 1) + TAB_MARK);
 	        		 
 	        		 //write meta data
 	        		 if (!listOfMetakeys.isEmpty()){
@@ -1027,8 +542,8 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 		matrixIsFilled = false;	
 		singleMatchesGlobal.clear();
 		orderedMatchNumbersGlobal.clear();
-		matchNumbersGlobal.clear();
 		dataIsAlignable = true;
+		maxMatchesPerLine = 0;
 		
 		//initialize adjacency matrix
 		for (int i = 0; i < adjacencyMatrix.length; i++){
@@ -1100,17 +615,13 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
     		             
     		  
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
-             // speakerName = textualDS.getName();
-              //TODO make speaker name global unique
               speakerName =  (matchNumber + 2) + "_" +textualDS.getName();
               currSpeakerName = speakerName;
          
                         
               // reset data structures for new speaker
               if (!currSpeakerName.equals(prevSpeakerName)){
-            	
-            	 // speakerHasMatches.clear();    	  
-            	 // tokenToMatchNumber.clear();        
+             
 	        	  matchNumbersOrdered.clear();
               }
            
@@ -1151,7 +662,6 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
                 	  boolean filterNumberFound = false;
                 	  for (int i = dominatedMatchCodes.size() - 1; i >= 0; i--){
                     	  if (filterNumbersSetByUser.contains(dominatedMatchCodes.get(i))){
-                    		  // TODO make tokenToMatchNumber global over all query results
                     		  tokenToMatchNumber.put(counterGlobal, dominatedMatchCodes.get(i));
                     		  
                     		  		  
@@ -1172,17 +682,21 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
                       }
                   }                  
                  
+                  // reset maxMatchesPerLine
+                  if (maxMatchesPerLine < matchNumbersOrdered.size()){
+                	  maxMatchesPerLine = matchNumbersOrdered.size();
+                  }
+                  
+                  
                   // fill the adjacency matrix
                     
                   if (matchNumbersOrdered.size() > 1){
                 	  Iterator<Long> it = matchNumbersOrdered.iterator();
                 	  
                 	  int prev = Integer.parseInt(String.valueOf((Long) it.next()));
-                	  matchNumbersGlobal.add((long) prev);
                 	  
                 	  while (it.hasNext()){                		  
-                		  int curr = Integer.parseInt(String.valueOf((Long) it.next()));   
-                		  matchNumbersGlobal.add((long) curr);
+                		  int curr = Integer.parseInt(String.valueOf((Long) it.next()));              
                 		  adjacencyMatrix[prev - 1][curr - 1] = 1;
                 		  matrixIsFilled = true;
                 		  prev = curr;
@@ -1191,7 +705,6 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
                   }
                   else{
                 	  singleMatchesGlobal.add(matchNumbersOrdered.get(0));
-                	  matchNumbersGlobal.add(matchNumbersOrdered.get(0));
                   }
                  
                   
@@ -1219,15 +732,15 @@ public void getOrderedMatchNumbers (){
 			}
 			System.out.print("\n");
 		}
-	  
-	  System.out.println("singleMatches: " + singleMatchesGlobal);      */
+	      */
 	 
 	  
 	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobal(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
 	  
 	/* System.out.println("orderedMatchNumbers: "  +orderedMatchNumbersGlobal);
-	 System.out.println("matchNumbersGlobal: " + matchNumbersGlobal);      
-	 System.out.println("dataIsAlignable: " + dataIsAlignable);      */
+	 System.out.println("singleMatchesGlobal: " + singleMatchesGlobal);
+	 System.out.println("maxMatchesPerLine: " + maxMatchesPerLine);      
+	 System.out.println("dataIsAlignable: " + dataIsAlignable);    */  
 	
 }
 

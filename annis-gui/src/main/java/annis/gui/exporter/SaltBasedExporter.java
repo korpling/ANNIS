@@ -140,8 +140,6 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       
       
       CacheManager cacheManager = CacheManager.create();
-      //Cache saltProjectsCache = new Cache("saltProjectsCache", 10000, true, true, 0, 0);    
-      //cacheManager.addCache(saltProjectsCache);    
       Cache cache = cacheManager.getCache("saltProjectsCache");     
       Map <Integer, Integer> offsets = new HashMap <Integer, Integer>();
    
@@ -157,7 +155,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       WebResource resource = Helper.getAnnisWebResource();
       List<QueryNode> nodes = resource.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(queryAnnisQL))
       	      .get(new GenericType<List<QueryNode>>() {});
-      int nodeCount = nodes.size();
+      Integer nodeCount = nodes.size();
                 
      
       try(BufferedReader inReader = new BufferedReader(new InputStreamReader(
@@ -281,7 +279,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
        	 SaltProject p = (SaltProject) cache.get(key).getObjectValue();
        	
        	 //System.out.println(key  +  "\t" + p.getName() + "\t" + offsets.get(key));
-         exportSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out);
+       	 convertSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out, null);
          }  
          
          
@@ -321,9 +319,9 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
    * @param out 
    */
   
-  // invokes the createAdjacencyMatrix method
+  // invokes the createAdjacencyMatrix method, if nodeCount != null and convertText otherwise
   private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc, int offset,
-      Map<String, CorpusConfig> corpusConfigs, Writer out, int nodeCount) throws IOException, IllegalArgumentException
+      Map<String, CorpusConfig> corpusConfigs, Writer out, Integer nodeCount) throws IOException, IllegalArgumentException
   {
     int matchNumber = offset;
     if(p != null && p.getCorpusGraphs() != null)
@@ -379,8 +377,14 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
             }
             
           
+            if (nodeCount != null){
+            	 createAdjacencyMatrix(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out, nodeCount);
+            }
+            else{
+            	 convertText(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out);
+            }
             
-            createAdjacencyMatrix(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out, nodeCount);
+           
           }
         }
       }
@@ -388,71 +392,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
        
   }
   
-  //invokes the convertText method (export)
-  private void exportSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc, int offset,
-	      Map<String, CorpusConfig> corpusConfigs, Writer out) throws IOException, IllegalArgumentException
-	  {
-	    int matchNumber = offset;
-	    if(p != null && p.getCorpusGraphs() != null)
-	    {
-	      
-	      Map<String, String> spanAnno2order = null;
-	      boolean virtualTokenizationFromNamespace = false;
-	      
-	      Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
-	      if(!corpusNames.isEmpty())
-	      {
-	        CorpusConfig config = corpusConfigs.get(corpusNames.iterator().next());
-	        if(config != null)
-	        {
-	          if("true".equalsIgnoreCase(config.getConfig("virtual_tokenization_from_namespace")))
-	          {
-	            virtualTokenizationFromNamespace = true;
-	          }
-	          else
-	          {
-	            String mappingRaw = config.getConfig("virtual_tokenization_mapping");
-	            if(mappingRaw != null)
-	            {
-	              spanAnno2order = new HashMap<>();
-	              for(String singleMapping : Splitter.on(',').split(mappingRaw))
-	              {
-	                List<String> mappingParts = Splitter.on('=').splitToList(singleMapping);
-	                if(mappingParts.size() >= 2)
-	                {
-	                  spanAnno2order.put(mappingParts.get(0), mappingParts.get(1));
-	                }
-	              }
-	            }
-	          }
-	         
-	        }
-	      }
-	      
-	      for(SCorpusGraph corpusGraph : p.getCorpusGraphs())
-	      {
-	        if(corpusGraph.getDocuments() != null)
-	        {
-	          for(SDocument doc : corpusGraph.getDocuments())
-	          {
-	            if(virtualTokenizationFromNamespace)
-	            {
-	              TimelineReconstructor.removeVirtualTokenizationUsingNamespace(doc.getDocumentGraph());
-	            }
-	            else if(spanAnno2order != null)
-	            {
-	              // there is a definition how to map the virtual tokenization to a real one
-	              TimelineReconstructor.removeVirtualTokenization(doc.getDocumentGraph(), spanAnno2order);
-	            }
-	            
-	          
-	            convertText(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out);
-	          }
-	        }
-	      }
-	    }
-	       
-	  }
+
 
   public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
     Writer out) throws IOException, IllegalArgumentException;
