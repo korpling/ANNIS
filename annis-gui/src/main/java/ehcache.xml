@@ -15,19 +15,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <ehcache> 
-  <diskStore path="java.io.tmpdir"/> 
-  
 
+<diskStore path="java.io.tmpdir"/>  
+
+<cache name="saltProjectsCache"
+maxEntriesLocalHeap="10000"
+eternal="true"
+overflowToDisk="true"
+/>
   
  <defaultCache
-maxEntriesLocalHeap="1000"
+maxEntriesLocalHeap="10000"
 eternal="true"
 timeToIdleSeconds="0"
 timeToLiveSeconds="0"
 overflowToDisk="true"
-diskPersistent="false"
-maxEntriesLocalDisk="100000"
-diskExpiryThreadIntervalSeconds="360"
 memoryStoreEvictionPolicy="LRU" 
 /> 
   

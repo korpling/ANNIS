@@ -139,10 +139,10 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       int pCounter = 1;
       
       
-      CacheManager singletonManager = CacheManager.create();
-      Cache saltProjectsCache = new Cache("saltProjectsCache", 500, true, true, 0, 0);    
-      singletonManager.addCache(saltProjectsCache);    
-      Cache cache = singletonManager.getCache("saltProjectsCache");     
+      CacheManager cacheManager = CacheManager.create();
+      //Cache saltProjectsCache = new Cache("saltProjectsCache", 10000, true, true, 0, 0);    
+      //cacheManager.addCache(saltProjectsCache);    
+      Cache cache = cacheManager.getCache("saltProjectsCache");     
       Map <Integer, Integer> offsets = new HashMap <Integer, Integer>();
    
       
@@ -196,6 +196,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 
             Stopwatch stopwatch = Stopwatch.createStarted();
             SaltProject p = res.post(SaltProject.class, currentMatches);
+            
             stopwatch.stop();
 
             // dynamically adjust the number of items to fetch if single subgraph
@@ -204,10 +205,12 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
             {
               stepSize += 10;
             }
-            offsets.put(pCounter, offset-currentMatches.getMatches().size());
-            cache.put(new Element (pCounter++, p));
+                
             
             convertSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out, nodeCount);
+            
+            offsets.put(pCounter, offset-currentMatches.getMatches().size());
+            cache.put(new Element (pCounter++, p));
            
             currentMatches.getMatches().clear();
 
@@ -243,10 +246,11 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
           
-          offsets.put(pCounter, offset - currentMatches.getMatches().size() - 1);
-          cache.put(new Element (pCounter++, p));         
           convertSaltProject(p, keys, args, alignmc, offset - currentMatches.getMatches().size() - 1,
               corpusConfigs, out, nodeCount);
+          
+          offsets.put(pCounter, offset - currentMatches.getMatches().size() - 1);
+          cache.put(new Element (pCounter++, p));   
           
         }
         offset = 0;
@@ -257,7 +261,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       //build the list of ordered match numbers (ordering by occurrence in text)
       getOrderedMatchNumbers();
       
-    @SuppressWarnings("unchecked")
+    
+	@SuppressWarnings("unchecked")
 	List <Integer> cacheKeys = cache.getKeys();
     List <Integer> listOfKeys = new ArrayList<Integer>();
     
@@ -267,192 +272,28 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
     	listOfKeys.add(key);
     }
      
-    
-    System.out.println(cacheKeys.size() + "\t, " +listOfKeys.size());
     Collections.sort(listOfKeys);
     
-    for (Integer i : listOfKeys){
-    	System.out.println(i);
-    }
     
    try{
          for (Integer key : listOfKeys){
         	
        	 SaltProject p = (SaltProject) cache.get(key).getObjectValue();
        	
-       	 System.out.println(key  +  "\t" + p.getName());
-       	  exportSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out);
-         }      
+       	 //System.out.println(key  +  "\t" + p.getName() + "\t" + offsets.get(key));
+         exportSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out);
+         }  
+         
+         
     }
    catch(Exception e)
     {
 	  e.printStackTrace();
     }
     finally{
-    	singletonManager.removalAll();
-        singletonManager.shutdown();
+    	cacheManager.removalAll();
+    	cacheManager.shutdown();
     }
-      
-      
-      
-
-      
-      // TODO to cache salt projects
-     /* if (keys == null || keys.isEmpty())
-      {
-        // auto set
-        keys = new LinkedList<>();
-        keys.add("tok");
-        List<AnnisAttribute> attributes = new LinkedList<>();
-        
-       
-        
-        for(String corpus : corpora)
-        {
-          attributes.addAll(
-            annisResource.path("corpora")
-              .path(urlPathEscape.escape(corpus))
-              .path("annotations")
-              .queryParam("fetchvalues", "false")
-              .queryParam("onlymostfrequentvalues", "false")
-              .get(new AnnisAttributeListType())
-          );
-        }
-        
-        for (AnnisAttribute a : attributes)
-        {
-          if (a.getName() != null)
-          {
-            String[] namespaceAndName = a.getName().split(":", 2);
-            if (namespaceAndName.length > 1)
-            {
-              keys.add(namespaceAndName[1]);
-            }
-            else
-            {
-              keys.add(namespaceAndName[0]);
-            }
-          }
-        }
-      }
-
-      args = new HashMap<>();
-      for (String s : argsAsString.split("&|;"))
-      {
-        String[] splitted = s.split("=", 2);
-        String key = splitted[0];
-        String val = "";
-        if (splitted.length > 1)
-        {
-          val = splitted[1];
-        }
-        args.put(key, val);
-      }
-
-      stepSize = 10;
-      
-      // 1. Get all the matches as Salt ID
-      matchStream = annisResource.path("search/find/")
-        .queryParam("q", Helper.encodeJersey(queryAnnisQL))
-        .queryParam("corpora", StringUtils.join(corpora, ","))
-        .accept(MediaType.TEXT_PLAIN_TYPE)
-        .get(InputStream.class);
-      
-      //get node count for the query
-       resource = Helper.getAnnisWebResource();
-       nodes = resource.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(queryAnnisQL))
-      	      .get(new GenericType<List<QueryNode>>() {});
-       nodeCount = nodes.size();
-                
-     
-      try(BufferedReader inReader = new BufferedReader(new InputStreamReader(
-        matchStream, "UTF-8")))
-      {
-        WebResource subgraphRes = annisResource.path("search/subgraph");
-        MatchGroup currentMatches = new MatchGroup();
-        String currentLine;
-        int offset=0;
-        // 2. iterate over all matches and get the sub-graph for a group of matches
-        while(!Thread.currentThread().isInterrupted() 
-          && (currentLine = inReader.readLine()) != null)
-        { 
-          Match match = Match.parseFromString(currentLine);
-
-          currentMatches.getMatches().add(match);
-
-          if(currentMatches.getMatches().size() >= stepSize)
-          {
-            WebResource res = subgraphRes
-              .queryParam("left", "" + contextLeft)
-              .queryParam("right","" + contextRight);
-            
-           
-            
-            if(args.containsKey("segmentation"))
-            {
-              res = res.queryParam("segmentation", args.get("segmentation"));
-            }
-
-            SubgraphFilter filter = getSubgraphFilter();
-            if(filter != null)
-            {
-              res = res.queryParam("filter", filter.name());
-            }
-
-            Stopwatch stopwatch = Stopwatch.createStarted();
-            SaltProject p = res.post(SaltProject.class, currentMatches);
-            stopwatch.stop();
-
-            // dynamically adjust the number of items to fetch if single subgraph
-            // export was fast enough
-            if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500 && stepSize < 50)
-            {
-              stepSize += 10;
-            }
-           
-            exportSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out);
-           
-            currentMatches.getMatches().clear();
-
-            if(eventBus != null)
-            {
-              eventBus.post(offset+1);
-            }
-          }
-          offset++;
-        } // end for each line
-        
-        if (Thread.interrupted())
-        {
-          return new InterruptedException("Exporter job was interrupted");
-        }
-        
-        // query the left over matches
-        if (!currentMatches.getMatches().isEmpty())
-        {
-          WebResource res = subgraphRes
-            .queryParam("left", "" + contextLeft)
-            .queryParam("right", "" + contextRight);
-          if(args.containsKey("segmentation"))
-          {
-            res = res.queryParam("segmentation", args.get("segmentation"));
-          }
-
-          SubgraphFilter filter = getSubgraphFilter();
-          if (filter != null)
-          {
-            res = res.queryParam("filter", filter.name());
-          }
-
-          SaltProject p = res.post(SaltProject.class, currentMatches);
-                      
-          exportSaltProject(p, keys, args, alignmc, offset - currentMatches.getMatches().size() - 1,
-              corpusConfigs, out);
-          
-        }
-        offset = 0;
-        
-      } */
            
       
       out.append("\n");
