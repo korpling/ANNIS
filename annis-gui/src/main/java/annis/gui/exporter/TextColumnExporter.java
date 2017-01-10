@@ -95,6 +95,8 @@ public class TextColumnExporter extends SaltBasedExporter
 	private static Set <Long> singleMatchesGlobal = new HashSet <Long>();
 	// contains a  sequence of match numbers per speaker ordered according to their occurrence in text, globally over all query results
 	private static List <Long> orderedMatchNumbersGlobal = new ArrayList <Long>();
+	// set of match numbers, globally over all query results
+	private static Set <Integer> matchNumbersGlobal = new HashSet <Integer>();	
 	// indicates, whether data is alignable or not
 	private static boolean dataIsAlignable = true;
 	
@@ -150,12 +152,15 @@ public class TextColumnExporter extends SaltBasedExporter
         SRelation relation, SNode currNode, long order)
     {
     	if(traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH))
-    	{	
-		      if(this.matchedNode != null && (filterNumbersSetByUser.contains(this.matchedNode) 
-		    		  								|| orderedMatchNumbersGlobal.contains(this.matchedNode)))
-		      { // don't traverse any further if matched node was found 
-		        return false;
+    	{	// don't traverse any further if matched node was found 
+		      if(this.matchedNode != null && (orderedMatchNumbersGlobal.contains(this.matchedNode) 
+		    		  || matchNumbersGlobal.contains(this.matchedNode))) {
+		    	
+		    		  return false; 
+		    	  
 		      }
+		    		  							
+		  
     	}
     	
 		return 
@@ -205,7 +210,6 @@ public class TextColumnExporter extends SaltBasedExporter
       while(it.hasNext())
       {    	
         SToken tok = it.next();    
-     //   counter++;
         counterGlobal++;
         //get current speaker name
         currSpeakerName = (matchNumber + 2) + "_" + CommonHelper.getTextualDSForNode(tok, graph).getName();
@@ -223,7 +227,7 @@ public class TextColumnExporter extends SaltBasedExporter
         {	 
  	 
       	  
-	        	  //if the current speaker is new, append his name and write header
+	        	  //if the current speaker is new, write header and append his name 
 	        	 if (!currSpeakerName.equals(prevSpeakerName))
 	        	 { 	
 	        		 //reset the counter of matches, which were written for this speaker	
@@ -241,6 +245,23 @@ public class TextColumnExporter extends SaltBasedExporter
 	        				 }
 	        			 }
 	        			 
+	        			 Set <Integer> copyOfFilterNumbersSetByUser = new HashSet <Integer>();
+	        			 for (Long mn : filterNumbersSetByUser){
+	        				 copyOfFilterNumbersSetByUser.add(Integer.parseInt(String.valueOf(mn)));
+	        			 }
+	        			 copyOfFilterNumbersSetByUser.removeAll(matchNumbersGlobal);
+	        			 
+	        			 if (!copyOfFilterNumbersSetByUser.isEmpty()){
+	        				 String unusedFilterNumbers = "";
+	        				 for (Integer fn : copyOfFilterNumbersSetByUser){
+	        					 unusedFilterNumbers += (fn + ", ");
+	        				 }
+	        				
+	        				 Notification.show("Filter numbers " 
+	        						 	+ unusedFilterNumbers.substring(0, unusedFilterNumbers.lastIndexOf(",")) 
+	        						 	+ "\ncouldn't be represented.", Notification.Type.WARNING_MESSAGE);
+	        			 }
+	        			 
 	        			 
 	        			 
 	        			 out.append("left_context" + TAB_MARK);
@@ -248,6 +269,7 @@ public class TextColumnExporter extends SaltBasedExporter
 		        		 String prefixAlignmc = "match_";
 		        		 String prefix = "match_column";
 		        		 String middle_context = "middle_context_";
+		        		 
 		        		 
 		        		 if (alignmc && dataIsAlignable){
 		        			 			 
@@ -373,13 +395,7 @@ public class TextColumnExporter extends SaltBasedExporter
 		                    			   matchesWrittenForSpeaker++; 
 		                    		   }	                    		   
 		                    	   }
-		                    	   // TODO
-		                    	/*   else{
-		                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned by node number." 
-		                    				   + NEWLINE
-		                    				   +"Please uncheck the alignment-checkbox.");
-		                    	   }*/
-		                    	   
+		            		                    	   
 		                       }
 		                       else{		                    	   
 		                    	   separator = TAB_MARK; 		                    	   
@@ -403,12 +419,7 @@ public class TextColumnExporter extends SaltBasedExporter
 			                    		   }
 			                    		  
 			                    	   }
-			                    	   //TODO
-			                    	  /* else{
-			                    		   throw new IllegalArgumentException("The result of this aql-query cannot be aligned by node number." 
-			                    				   + NEWLINE
-			                    				   +"Please uncheck the alignment-checkbox.");
-			                    	   }*/
+			                    	  
 		                    	 }
 		                    	 else{
 		                    		
@@ -542,6 +553,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 		matrixIsFilled = false;	
 		singleMatchesGlobal.clear();
 		orderedMatchNumbersGlobal.clear();
+		matchNumbersGlobal.clear();
 		dataIsAlignable = true;
 		maxMatchesPerLine = 0;
 		
@@ -648,7 +660,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
             	                    
                   // if filter numbers not set by user, take the number of the highest match node
                   if (filterNumbersIsEmpty){
-                	  // TODO make tokenToMatchNumber global over all query results
+               
                 	  tokenToMatchNumber.put(counterGlobal, dominatedMatchCodes.get(dominatedMatchCodes.size() - 1));
                 	               	  
                 	  //set filter number to the ordered list
@@ -669,15 +681,10 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
                     			  if (!filterNumberFound){
                     				  matchNumbersOrdered.add(dominatedMatchCodes.get(i));
                     				  filterNumberFound = true;
-                    			  }
-                    			  else{
-                    				 //TODO output warning 
-                    			  }
-                        		  
-                        		 
+                    			  }            		 
        
                         	  }
-                    		//  break;
+                    		  break;
                     	  }
                       }
                   }                  
@@ -694,9 +701,11 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
                 	  Iterator<Long> it = matchNumbersOrdered.iterator();
                 	  
                 	  int prev = Integer.parseInt(String.valueOf((Long) it.next()));
+                	  matchNumbersGlobal.add(prev);
                 	  
                 	  while (it.hasNext()){                		  
-                		  int curr = Integer.parseInt(String.valueOf((Long) it.next()));              
+                		  int curr = Integer.parseInt(String.valueOf((Long) it.next()));  
+                		  matchNumbersGlobal.add(curr);
                 		  adjacencyMatrix[prev - 1][curr - 1] = 1;
                 		  matrixIsFilled = true;
                 		  prev = curr;
@@ -704,6 +713,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
                 	  }                	 
                   }
                   else{
+                	  matchNumbersGlobal.add(Integer.parseInt(String.valueOf(matchNumbersOrdered.get(0))));
                 	  singleMatchesGlobal.add(matchNumbersOrdered.get(0));
                   }
                  
@@ -726,21 +736,22 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 }
 
 public void getOrderedMatchNumbers (){
-	/* for (int i = 0; i < adjacencyMatrix.length; i++){
+/*	 for (int i = 0; i < adjacencyMatrix.length; i++){
 			for (int j = 0; j < adjacencyMatrix[0].length; j++){
 				System.out.print(adjacencyMatrix[i][j] + "\t");
 			}
 			System.out.print("\n");
-		}
-	      */
+		}*/
+	      
 	 
 	  
 	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobal(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
 	  
 	/* System.out.println("orderedMatchNumbers: "  +orderedMatchNumbersGlobal);
+	 System.out.println("matchNumbers: "  + matchNumbersGlobal);
 	 System.out.println("singleMatchesGlobal: " + singleMatchesGlobal);
 	 System.out.println("maxMatchesPerLine: " + maxMatchesPerLine);      
-	 System.out.println("dataIsAlignable: " + dataIsAlignable);    */  
+	 System.out.println("dataIsAlignable: " + dataIsAlignable);   */ 
 	
 }
 
@@ -754,83 +765,87 @@ private static List <Long> calculateOrderedMatchNumbersGlobal(int [][] adjacency
 		int second = -1;
 		
 		//iterate first over columns and get the first pair of match numbers
-outerFor: for (int i = 0; i< adjacencyMatrix[0].length; i ++){
-			for (int j = 0; j < adjacencyMatrix.length; j++){
-				//first pair found
-				if (adjacencyMatrix[j][i] == 1){
-					if (adjacencyMatrix[i][j] != 1){
-						first = j + 1;
-						second = i + 1;
-						orderedMatchNumbers.add((long) first);
-						orderedMatchNumbers.add((long)second);	
-						break outerFor;
-					}
-					else{
-						// TODO warning or pass a parameter through
-						dataIsAlignable = false;
-						
-						System.out.println("Data not alignable.");
-						break outerFor;
-					}
-						
-					
-					
-				}
-			}
-		}
-		
-		
-		first = second;
-		second = -1;
-		int i = 0;
-		// get all remained match numbers
-		if (dataIsAlignable){			
-		
-		outerDo: do{
-			
-					//iterate over rows
-					for (i = 0; i < adjacencyMatrix.length; i++){
-						if (adjacencyMatrix[first - 1][i] == 1){
-							if (adjacencyMatrix[i][first - 1] != 1 ){
+		outerFor: for (int i = 0; i< adjacencyMatrix[0].length; i ++){
+					for (int j = 0; j < adjacencyMatrix.length; j++){
+						//first pair found
+						if (adjacencyMatrix[j][i] == 1){
+							if (adjacencyMatrix[i][j] != 1){
+								first = j + 1;
 								second = i + 1;
-								orderedMatchNumbers.add((long) (second));
-								first = second;
-								second = -1;
-								break;
+								orderedMatchNumbers.add((long) first);
+								orderedMatchNumbers.add((long)second);	
+								break outerFor;
 							}
 							else{
-								// TODO warning or pass a parameter through
-								System.out.println("Data not alignable.");
-								break outerDo;
+								dataIsAlignable = false;						
+								break outerFor;
 							}
+								
+							
 							
 						}
 					}
-			}
-			while((i != adjacencyMatrix.length - 1) && (second != -1));
+				}
+		
+		
+			first = second;
+			second = -1;
+			int i = 0;
+			// get all remained match numbers
+			if (dataIsAlignable){			
 			
-			// merge single matches into the list
-		//TODO test this case
-			for (Long match : singleMatches){
-				if (!orderedMatchNumbers.contains(match)){
-					Iterator <Long> it = orderedMatchNumbers.iterator();
+				outerDo: do{
 					
-					while (it.hasNext()){
-						Long next = it.next();
-						if ( next > match){
-							int index = orderedMatchNumbers.indexOf(next);
-							if (index > 0){
-								orderedMatchNumbers.add(index - 1, match);
+							//iterate over rows
+							for (i = 0; i < adjacencyMatrix.length; i++){
+								if (adjacencyMatrix[first - 1][i] == 1){
+									if (adjacencyMatrix[i][first - 1] != 1 ){
+										second = i + 1;
+										orderedMatchNumbers.add((long) (second));
+										first = second;
+										second = -1;
+										break;
+									}
+									else{
+										
+										dataIsAlignable = false; // 
+										break outerDo;
+									}
+									
+								}
 							}
-							else{
-								orderedMatchNumbers.add(0, match);
+					}
+					while((i != adjacencyMatrix.length - 1) && (second != -1));
+					
+			// merge single matches into the list
+			//TODO test this case
+			if (dataIsAlignable){
+				for (Long match : singleMatches){
+				
+					if (!orderedMatchNumbers.contains(match)){
+						System.out.println(match);
+						Iterator <Long> it = orderedMatchNumbers.iterator();
+						
+						while (it.hasNext()){
+							Long next = it.next();
+							if ( next > match){
+								System.out.println("next" + next);
+								int index = orderedMatchNumbers.indexOf(next);
+								System.out.println("index" + index);
+								if (index > 0){
+									orderedMatchNumbers.add(index, match);
+								}
+								else{
+									orderedMatchNumbers.add(0, match);
+								}
+								break;
 							}
-							break;
 						}
 					}
 				}
 			}
-	}
+	
+		}
 		
 		
 		

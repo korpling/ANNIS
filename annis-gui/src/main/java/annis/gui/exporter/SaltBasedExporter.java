@@ -319,7 +319,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
    * @param out 
    */
   
-  // invokes the createAdjacencyMatrix method, if nodeCount != null and convertText otherwise
+  // invokes the createAdjacencyMatrix method, if nodeCount != null or convertText otherwise
   private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc, int offset,
       Map<String, CorpusConfig> corpusConfigs, Writer out, Integer nodeCount) throws IOException, IllegalArgumentException
   {
