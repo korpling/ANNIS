@@ -291,7 +291,11 @@ public class TextColumnExporter extends SaltBasedExporter
 			        			 }      	
 		        			 }
 		        			 
-		        			 Notification.show("Data couldn't be aligned.", Notification.Type.WARNING_MESSAGE);
+		        			 if (alignmc){
+		        				 Notification.show("Data couldn't be aligned.", Notification.Type.WARNING_MESSAGE);
+		        			 }
+		        			 
+		        			 
 		        			 
 		        		 }		 
 		        
@@ -348,14 +352,15 @@ public class TextColumnExporter extends SaltBasedExporter
 	        			 for (String metakey : listOfMetakeys){
 	        				 String metaValue = "";
 	        				 //try to get meta value specific for current speaker
-	        				if (annosWithNamespace.containsKey(currSpeakerName)){
-	        					Map<String, String> speakerAnnos = annosWithNamespace.get(currSpeakerName);
+	        				if (annosWithNamespace.containsKey(currSpeakerName.substring(currSpeakerName.indexOf("_") + 1))){
+	        					
+	        					Map<String, String> speakerAnnos = annosWithNamespace.get(currSpeakerName.substring(currSpeakerName.indexOf("_") + 1));
 	        					if (speakerAnnos.containsKey(metakey)){
 	        						metaValue = speakerAnnos.get(metakey).trim();
 	        					}
 	        				}
 	        				
-	        				// try to get meta value 
+	        				// try to get meta value, if metaValue is not set 	        				
 	        				if (metaValue.isEmpty() && annosWithoutNamespace.containsKey(metakey)){
 	        					metaValue = annosWithoutNamespace.get(metakey).trim();
 	        				}
@@ -376,16 +381,19 @@ public class TextColumnExporter extends SaltBasedExporter
 	        	  		  List<SNode> root = new LinkedList<>();
 		                  root.add(tok);
 		                  IsDominatedByMatch traverser = new IsDominatedByMatch();
-		                  graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, "IsDominatedByMatch", traverser);
+		                 // graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, "IsDominatedByMatch", traverser);
 		               
+		                  Long matchedNode;
 		                  // token matched
-		                  if(traverser.matchedNode != null)
+		                  //if(traverser.matchedNode != null)
+		                  if ((matchedNode =tokenToMatchNumber.get(counterGlobal)) != null)
 		                  {
 		                    // is dominated by a (new) matched node, thus use tab to separate the non-matches from the matches
 		                    if(lastTokenWasMatched < 0)
 		                    {
 		                       if (alignmc && dataIsAlignable){
-		                    	   int orderInList = orderedMatchNumbersGlobal.indexOf(traverser.matchedNode);
+		                    	  // int orderInList = orderedMatchNumbersGlobal.indexOf(traverser.matchedNode);
+		                    	   int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
 		                    	   if (orderInList >= matchesWrittenForSpeaker){
 		                    		   int diff = orderInList - matchesWrittenForSpeaker;
 		                    		   separator = TAB_MARK; 
@@ -404,11 +412,13 @@ public class TextColumnExporter extends SaltBasedExporter
 		                                                     
 		                			                      
 		                    }
-		                    else if(lastTokenWasMatched != (long) traverser.matchedNode)
+		                   // else if(lastTokenWasMatched != (long) traverser.matchedNode)
+		                    else if(lastTokenWasMatched != matchedNode)
 		                    {
 		                      // always leave an empty column between two matches, even if there is no actual context
 		                    	 if (alignmc && dataIsAlignable){
-		                    		 int orderInList = orderedMatchNumbersGlobal.indexOf(traverser.matchedNode);
+		                    		// int orderInList = orderedMatchNumbersGlobal.indexOf(traverser.matchedNode);
+		                    		 int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
 			                    	   if (orderInList >= matchesWrittenForSpeaker){
 			                    		   int diff = orderInList - matchesWrittenForSpeaker;
 			                    		   separator = TAB_MARK + TAB_MARK; 
@@ -427,7 +437,8 @@ public class TextColumnExporter extends SaltBasedExporter
 		                    	 }
 		                    			                    	
 		                    }
-		                    lastTokenWasMatched = traverser.matchedNode;
+		                    //lastTokenWasMatched = traverser.matchedNode;
+		                    lastTokenWasMatched = matchedNode;
 		                  }
 		                  // token not matched, but last token matched
 		                  else if(lastTokenWasMatched >= 0)
@@ -751,7 +762,7 @@ public void getOrderedMatchNumbers (){
 	 System.out.println("matchNumbers: "  + matchNumbersGlobal);
 	 System.out.println("singleMatchesGlobal: " + singleMatchesGlobal);
 	 System.out.println("maxMatchesPerLine: " + maxMatchesPerLine);      
-	 System.out.println("dataIsAlignable: " + dataIsAlignable);   */ 
+	 System.out.println("dataIsAlignable: " + dataIsAlignable);   */
 	
 }
 
@@ -818,28 +829,29 @@ private static List <Long> calculateOrderedMatchNumbersGlobal(int [][] adjacency
 					while((i != adjacencyMatrix.length - 1) && (second != -1));
 					
 			// merge single matches into the list
-			//TODO test this case
+			//TODO test this case for multiple single matches
+			boolean matchIsMerged = false;
+			
 			if (dataIsAlignable){
 				for (Long match : singleMatches){
 				
 					if (!orderedMatchNumbers.contains(match)){
-						System.out.println(match);
+						
 						Iterator <Long> it = orderedMatchNumbers.iterator();
 						
 						while (it.hasNext()){
 							Long next = it.next();
 							if ( next > match){
-								System.out.println("next" + next);
+							
 								int index = orderedMatchNumbers.indexOf(next);
-								System.out.println("index" + index);
-								if (index > 0){
-									orderedMatchNumbers.add(index, match);
-								}
-								else{
-									orderedMatchNumbers.add(0, match);
-								}
+								orderedMatchNumbers.add(index, match);
+								matchIsMerged = true;								
 								break;
 							}
+						}
+						
+						if (!matchIsMerged){
+							orderedMatchNumbers.add(match);
 						}
 					}
 				}
