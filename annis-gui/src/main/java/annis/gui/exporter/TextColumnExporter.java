@@ -44,12 +44,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.vaadin.server.Page;
-import com.vaadin.shared.Position;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
 
 import annis.CommonHelper;
-import annis.gui.QueryController;
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
 import annis.model.Annotation;
@@ -69,8 +66,8 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 public class TextColumnExporter extends SaltBasedExporter
 {
 	 private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-	private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
-	private static final String TRAV_SPEAKER_HAS_MATCHES = "SpeakerHasMatches";
+	//private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
+	private static final String TRAV_PREPROCESSING = "travPreprocessing";
 	public static final String FILTER_PARAMETER_KEYWORD = "filter";
 	public static final String PARAMETER_SEPARATOR = ",";
 	public static final String METAKEYS_KEYWORD = "metakeys";
@@ -129,12 +126,12 @@ public class TextColumnExporter extends SaltBasedExporter
     			 || filterNumbersIsEmpty || orderedMatchNumbersGlobal.contains(matchedAnno.getValue_SNUMERIC())))
 	      {
 	        matchedNode = matchedAnno.getValue_SNUMERIC();	       
-	        //
-	        if (traversalId.equals(TRAV_SPEAKER_HAS_MATCHES) )
-	        {
+	        
+	       // if (traversalId.equals(TRAV_PREPROCESSING) )
+	       // {
 	        dominatedMatchCodes.add(matchedNode);
 	        speakerHasMatches.put(speakerName, true);
-	        }
+	       // }
 	      }
 	      
 	     
@@ -154,17 +151,14 @@ public class TextColumnExporter extends SaltBasedExporter
     public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
         SRelation relation, SNode currNode, long order)
     {
-    	if(traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH))
+    	/*if(traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH))
     	{	// don't traverse any further if matched node was found 
 		      if(this.matchedNode != null && (orderedMatchNumbersGlobal.contains(this.matchedNode) 
 		    		  || matchNumbersGlobal.contains(this.matchedNode))) {
 		    	
-		    		  return false; 
-		    	  
+		    		  return false; 		    	  
 		      }
-		    		  							
-		  
-    	}
+    	}*/
     	
 		return 
 	            relation == null
@@ -180,6 +174,8 @@ public class TextColumnExporter extends SaltBasedExporter
  public void convertText(SDocumentGraph graph, List<String> annoKeys,
   Map<String, String> args, boolean alignmc, int matchNumber, Writer out) throws IOException, IllegalArgumentException
 {
+	
+	
 	 
 	String currSpeakerName = "";
 	String prevSpeakerName = "";
@@ -189,8 +185,7 @@ public class TextColumnExporter extends SaltBasedExporter
   {
     List<SToken> orderedToken = graph.getSortedTokenByText();
     
-   
-    
+       
    if(orderedToken != null)
     {    	   
   	  	  
@@ -200,11 +195,64 @@ public class TextColumnExporter extends SaltBasedExporter
       boolean noPreviousTokenInLine = false;
      
      
-    //TODO why does match number start with -1? 
-  	//if match number == -1, reset global variables 
-  	if (matchNumber == -1){
+  	//if match number == 0, reset global variables and output warning, if necessary
+  	if (matchNumber == 0){
   		isFirstSpeakerWithMatch = true;
   		counterGlobal = 0;
+  		
+  		// create warning message
+		 String numbersString = "";        				
+		 String warnMessage = "";
+		 StringBuilder sb = new StringBuilder();
+		 
+		 List <Integer> copyOfFilterNumbersSetByUser = new ArrayList <Integer>();
+		 
+		 for (Long filterNumber : filterNumbersSetByUser){
+			 copyOfFilterNumbersSetByUser.add(Integer.parseInt(String.valueOf(filterNumber)));
+		 }
+		 
+		 for (Integer matchNumberGlobal : matchNumbersGlobal){
+			 copyOfFilterNumbersSetByUser.remove(matchNumberGlobal);
+		 }
+		 
+		 Collections.sort(copyOfFilterNumbersSetByUser);
+		 
+		 if (!copyOfFilterNumbersSetByUser.isEmpty()){
+			 for (Integer filterNumber : copyOfFilterNumbersSetByUser){	        					
+				 sb.append(filterNumber + ", ");
+			 }
+			
+			
+			 if (copyOfFilterNumbersSetByUser.size() == 1){
+				numbersString = "number";
+			 }
+			 else {
+				 numbersString = "numbers";
+			 }
+			
+			 warnMessage =  "Filter " + numbersString + " " + sb.toString().substring(0, sb.lastIndexOf(",")) 
+					 	+ " couldn't be represented.";
+			        				 
+			
+		 }
+		 
+		 if (alignmc && !dataIsAlignable){
+			if (!warnMessage.isEmpty()){
+				warnMessage += "\n\n\n";
+			}
+			
+			warnMessage += "You have tried to align matches by node number via check box."
+					+ "\n\nUnfortunately this option is not applicable for this data set, "
+					+ "\n\nso the data couldn't be aligned.";
+
+		 }
+		 
+		 if (!warnMessage.isEmpty()){
+			 
+			 Notification warn = new Notification(warnMessage, Notification.Type.WARNING_MESSAGE);	        	     			
+			 warn.setDelayMsec(20000);
+			 warn.show(Page.getCurrent());
+		 }
   	}
   	
        
@@ -215,7 +263,7 @@ public class TextColumnExporter extends SaltBasedExporter
         SToken tok = it.next();    
         counterGlobal++;
         //get current speaker name
-        currSpeakerName = (matchNumber + 2) + "_" + CommonHelper.getTextualDSForNode(tok, graph).getName();
+        currSpeakerName = (matchNumber + 1) + "_" + CommonHelper.getTextualDSForNode(tok, graph).getName();
         
          
         // if speaker has no matches, skip token
@@ -248,56 +296,7 @@ public class TextColumnExporter extends SaltBasedExporter
 	        				 }
 	        			 }
 	        			 
-	        			 // create warning message
-	        			 String numbersString = "";        				
-        				 String warnMessage = "";
-        				 StringBuilder sb = new StringBuilder();
-        				 
-	        			 List <Integer> copyOfFilterNumbersSetByUser = new ArrayList <Integer>();
-	        			 
-	        			 for (Long filterNumber : filterNumbersSetByUser){
-	        				 copyOfFilterNumbersSetByUser.add(Integer.parseInt(String.valueOf(filterNumber)));
-	        			 }
-	        			 copyOfFilterNumbersSetByUser.removeAll(matchNumbersGlobal);
-	        			 Collections.sort(copyOfFilterNumbersSetByUser);
-	        			 
-	        			 if (!copyOfFilterNumbersSetByUser.isEmpty()){
-	        				 for (Integer filterNumber : copyOfFilterNumbersSetByUser){	        					
-	        					 sb.append(filterNumber + ", ");
-	        				 }
-	        				
-	        				
-	        				 if (copyOfFilterNumbersSetByUser.size() == 1){
-	        					numbersString = "number";
-	        				 }
-	        				 else {
-	        					 numbersString = "numbers";
-	        				 }
-	        				
-	        				 warnMessage =  "Filter " + numbersString + " " 
-	        						 	+ sb.toString().substring(0, sb.lastIndexOf(",")) 
-	        						 	+ "couldn't be represented.";
-	        				        				 
-	        				
-	        			 }
-	        			 
-	        			 if (alignmc && !dataIsAlignable){
-	        				if (!warnMessage.isEmpty()){
-	        					warnMessage += "\n\n\n";
-	        				}
-	        				
-	        				warnMessage += "You tried to align matches by node number via check box."
-	        						+ "\nUnfortunately this option is not applicable for this data set, "
-	        						+ "\nso the data couldn't be aligned.";
-	        	
-	        			 }
-	        			 
-	        			 if (!warnMessage.isEmpty()){
-	        				 
-	        				 Notification warn = new Notification(warnMessage, Notification.Type.WARNING_MESSAGE);	        	     			
-		     				 warn.setDelayMsec(20000);
-		     				 warn.show(Page.getCurrent());
-	        			 }
+	        			
 	        			 
 	        			 
 	        			
@@ -343,8 +342,8 @@ public class TextColumnExporter extends SaltBasedExporter
 	        		 } 
 	            		   		
 	        		 	        		
-	        		 // TODO why does matchNumber start with -1?
-	        		 out.append(String.valueOf(matchNumber + 2) + TAB_MARK);
+	        		 
+	        		 out.append(String.valueOf(matchNumber + 1) + TAB_MARK);
 	        		 out.append(currSpeakerName.substring(currSpeakerName.indexOf("_") + 1) + TAB_MARK);
 	        		 
 	        		 //write meta data
@@ -413,8 +412,8 @@ public class TextColumnExporter extends SaltBasedExporter
 	        	       	  
 	        	  		  List<SNode> root = new LinkedList<>();
 		                  root.add(tok);
-		                  IsDominatedByMatch traverser = new IsDominatedByMatch();
-		                 // graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, "IsDominatedByMatch", traverser);
+		                  //IsDominatedByMatch traverser = new IsDominatedByMatch();
+		                 // graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_IS_DOMINATED_BY_MATCH, traverser);
 		               
 		                  Long matchedNode;
 		                  // token matched
@@ -543,7 +542,6 @@ public class TextColumnExporter extends SaltBasedExporter
   {
 	  return "The TextColumnExporter exports matches surrounded by the context as a csv file. "
 	  			+ "The columns will be separated by tab mark. <br/>"
-		        + "This exporter doesn't work well for results of aql-queries with <em>overlap</em> or <em>or</em> operators.<br/><br/>"
 		        + "Parameters: <br/>"
 		        + "<em>metakeys</em> - comma separated list of all meta data to include in the result (e.g. "
 		        + "<code>metakeys=title,comment</code>)  <br/>"
@@ -586,7 +584,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 	
 	
 	//if new search, reset adjacencyMatrix, extract parameters, set by user
-	if (matchNumber == -1){
+	if (matchNumber == 0){
 		speakerHasMatches.clear();
 		speakerName = "";
 		tokenToMatchNumber.clear();
@@ -660,7 +658,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
      if(orderedToken != null)
       {  
     	 // reset counter over all the tokens
-    	 if (matchNumber == -1){
+    	 if (matchNumber == 0){
     		 counterGlobal = 0;
     	 }
     	
@@ -671,7 +669,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
     		             
     		  
               STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
-              speakerName =  (matchNumber + 2) + "_" +textualDS.getName();
+              speakerName =  (matchNumber + 1) + "_" +textualDS.getName();
               currSpeakerName = speakerName;
          
                         
@@ -697,7 +695,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
         	  dominatedMatchCodes.clear();
         	  
               
-              graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_SPEAKER_HAS_MATCHES, traverserSpeakerSearch); 
+              graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_PREPROCESSING, traverserSpeakerSearch); 
               
               
               if (!dominatedMatchCodes.isEmpty()){
