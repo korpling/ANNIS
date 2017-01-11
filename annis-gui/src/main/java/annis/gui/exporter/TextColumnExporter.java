@@ -43,7 +43,10 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
+import com.vaadin.server.Page;
+import com.vaadin.shared.Position;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 
 import annis.CommonHelper;
 import annis.gui.QueryController;
@@ -245,24 +248,59 @@ public class TextColumnExporter extends SaltBasedExporter
 	        				 }
 	        			 }
 	        			 
-	        			 Set <Integer> copyOfFilterNumbersSetByUser = new HashSet <Integer>();
-	        			 for (Long mn : filterNumbersSetByUser){
-	        				 copyOfFilterNumbersSetByUser.add(Integer.parseInt(String.valueOf(mn)));
+	        			 // create warning message
+	        			 String numbersString = "";        				
+        				 String warnMessage = "";
+        				 StringBuilder sb = new StringBuilder();
+        				 
+	        			 List <Integer> copyOfFilterNumbersSetByUser = new ArrayList <Integer>();
+	        			 
+	        			 for (Long filterNumber : filterNumbersSetByUser){
+	        				 copyOfFilterNumbersSetByUser.add(Integer.parseInt(String.valueOf(filterNumber)));
 	        			 }
 	        			 copyOfFilterNumbersSetByUser.removeAll(matchNumbersGlobal);
+	        			 Collections.sort(copyOfFilterNumbersSetByUser);
 	        			 
 	        			 if (!copyOfFilterNumbersSetByUser.isEmpty()){
-	        				 String unusedFilterNumbers = "";
-	        				 for (Integer fn : copyOfFilterNumbersSetByUser){
-	        					 unusedFilterNumbers += (fn + ", ");
+	        				 for (Integer filterNumber : copyOfFilterNumbersSetByUser){	        					
+	        					 sb.append(filterNumber + ", ");
 	        				 }
 	        				
-	        				 Notification.show("Filter numbers " 
-	        						 	+ unusedFilterNumbers.substring(0, unusedFilterNumbers.lastIndexOf(",")) 
-	        						 	+ "\ncouldn't be represented.", Notification.Type.WARNING_MESSAGE);
+	        				
+	        				 if (copyOfFilterNumbersSetByUser.size() == 1){
+	        					numbersString = "number";
+	        				 }
+	        				 else {
+	        					 numbersString = "numbers";
+	        				 }
+	        				
+	        				 warnMessage =  "Filter " + numbersString + " " 
+	        						 	+ sb.toString().substring(0, sb.lastIndexOf(",")) 
+	        						 	+ "couldn't be represented.";
+	        				        				 
+	        				
+	        			 }
+	        			 
+	        			 if (alignmc && !dataIsAlignable){
+	        				if (!warnMessage.isEmpty()){
+	        					warnMessage += "\n\n\n";
+	        				}
+	        				
+	        				warnMessage += "You tried to align matches by node number via check box."
+	        						+ "\nUnfortunately this option is not applicable for this data set, "
+	        						+ "\nso the data couldn't be aligned.";
+	        	
+	        			 }
+	        			 
+	        			 if (!warnMessage.isEmpty()){
+	        				 
+	        				 Notification warn = new Notification(warnMessage, Notification.Type.WARNING_MESSAGE);	        	     			
+		     				 warn.setDelayMsec(20000);
+		     				 warn.show(Page.getCurrent());
 	        			 }
 	        			 
 	        			 
+	        			
 	        			 
 	        			 out.append("left_context" + TAB_MARK);
 		        		 
@@ -290,12 +328,7 @@ public class TextColumnExporter extends SaltBasedExporter
 			        				 out.append(middle_context +  (i + 1) + TAB_MARK); 
 			        			 }      	
 		        			 }
-		        			 
-		        			 if (alignmc){
-		        				 Notification.show("Data couldn't be aligned.", Notification.Type.WARNING_MESSAGE);
-		        			 }
-		        			 
-		        			 
+		        				        			 
 		        			 
 		        		 }		 
 		        

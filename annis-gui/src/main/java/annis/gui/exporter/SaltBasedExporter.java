@@ -48,7 +48,10 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
-import net.sf.ehcache.*;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 import annis.CommonHelper;
 import annis.TimelineReconstructor;
 import annis.exceptions.AnnisCorpusAccessException;
@@ -68,20 +71,22 @@ import annis.service.objects.SubgraphFilter;
  * some kind of textual output.
  * @author Thomas Krause <thomaskrause@posteo.de>
  */
+
+@IgnoreSizeOf 
 public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltBasedExporter.class);
 
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-  
+
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc,
     WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     try
-    {
+    {   
       
       if (keys == null || keys.isEmpty())
       {
@@ -138,7 +143,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       
       int pCounter = 1;
       
-      
+
       CacheManager cacheManager = CacheManager.create();
       Cache cache = cacheManager.getCache("saltProjectsCache");     
       Map <Integer, Integer> offsets = new HashMap <Integer, Integer>();
@@ -255,44 +260,43 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
         
       }
       
-     /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/ 
       //build the list of ordered match numbers (ordering by occurrence in text)
       getOrderedMatchNumbers();
       
     
-	@SuppressWarnings("unchecked")
-	List <Integer> cacheKeys = cache.getKeys();
-    List <Integer> listOfKeys = new ArrayList<Integer>();
-    
-
-    
-    for (Integer key : cacheKeys){
-    	listOfKeys.add(key);
-    }
-     
-    Collections.sort(listOfKeys);
-    
-    
-   try{
-         for (Integer key : listOfKeys){
-        	
-       	 SaltProject p = (SaltProject) cache.get(key).getObjectValue();
-       	
-       	 //System.out.println(key  +  "\t" + p.getName() + "\t" + offsets.get(key));
-       	 convertSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out, null);
-         }  
-         
-         
-    }
-   catch(Exception e)
-    {
-	  e.printStackTrace();
-    }
-    finally{
-    	cacheManager.removalAll();
-    	cacheManager.shutdown();
-    }
-           
+		@SuppressWarnings("unchecked")
+		List <Integer> cacheKeys = cache.getKeys();
+	    List <Integer> listOfKeys = new ArrayList<Integer>();
+	    
+	   // System.out.println(cache.getCacheManager().getActiveConfigurationText());
+	    
+	
+	    
+	    for (Integer key : cacheKeys){
+	    	listOfKeys.add(key);
+	    }
+	     
+	    Collections.sort(listOfKeys);
+	    
+	    
+	   try{
+	         for (Integer key : listOfKeys){
+	        	
+	       	 SaltProject p = (SaltProject) cache.get(key).getObjectValue();
+	       	 convertSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out, null);
+	         }  
+	         
+	         
+	    }
+	   catch(Exception e)
+	    {
+		  e.printStackTrace();
+	    }
+	    finally{
+	    	cacheManager.removalAll();
+	    	cacheManager.shutdown();
+	    }
+	           
       
       out.append("\n");
       
