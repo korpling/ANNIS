@@ -143,7 +143,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       
       int pCounter = 1;
       
-
+      
       CacheManager cacheManager = CacheManager.create();
       Cache cache = cacheManager.getCache("saltProjectsCache");     
       Map <Integer, Integer> offsets = new HashMap <Integer, Integer>();
@@ -169,7 +169,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
         WebResource subgraphRes = annisResource.path("search/subgraph");
         MatchGroup currentMatches = new MatchGroup();
         String currentLine;
-        int offset=0;
+        //int offset=0;
+        int offset=1;
         // 2. iterate over all matches and get the sub-graph for a group of matches
         while(!Thread.currentThread().isInterrupted() 
           && (currentLine = inReader.readLine()) != null)
@@ -256,7 +257,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
           cache.put(new Element (pCounter++, p));   
           
         }
-        offset = 0;
+        //offset = 0;
+         offset=1;
         
       }
       
