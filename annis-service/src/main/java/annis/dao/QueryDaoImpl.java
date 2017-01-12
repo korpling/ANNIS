@@ -160,7 +160,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   // configuration
   private int timeout;
   
-  private API.Search search;
+  private API.CorpusStorageManager corpusStorageMgr;
   
   private final ExecutorService exec = Executors.newCachedThreadPool();
   
@@ -559,7 +559,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     planRowMapper = new ParameterizedSingleColumnRowMapper<>();
     sqlSessionModifiers = new ArrayList<>();
     
-    this.search = new API.Search(getGraphANNISDir().getAbsolutePath());
+    this.corpusStorageMgr = new API.CorpusStorageManager(getGraphANNISDir().getAbsolutePath());
   }
 
   public void init()
@@ -679,7 +679,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     
     Future<List<Match>> result = exec.submit(() -> 
     {
-      StringVector matchesRaw = search.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
+      StringVector matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
       
       ArrayList<Match> data = new ArrayList<>((int) matchesRaw.size());
       for(long i=0; i < matchesRaw.size(); i++)
@@ -716,7 +716,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
    
     Future<Boolean> result = exec.submit(() -> 
     {
-      StringVector matchesRaw = search.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
+      StringVector matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
       
       try
       {
@@ -762,7 +762,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   { 
     Future<Integer> result = exec.submit(() -> 
     {
-      return (int) search.count(createCorpusVector(queryData), 
+      return (int) corpusStorageMgr.count(createCorpusVector(queryData), 
           QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
     });
    
@@ -784,7 +784,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     
     Future<MatchAndDocumentCount> result = exec.submit(() -> 
     {
-      API.Search.CountResult data = search.countExtra(
+      API.CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(
           createCorpusVector(queryData), 
           QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
      
