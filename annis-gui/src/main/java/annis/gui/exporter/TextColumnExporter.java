@@ -31,7 +31,6 @@ import java.util.Set;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SSpanningRelation;
-import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SFeature;
@@ -126,12 +125,8 @@ public class TextColumnExporter extends SaltBasedExporter
     			 || filterNumbersIsEmpty || orderedMatchNumbersGlobal.contains(matchedAnno.getValue_SNUMERIC())))
 	      {
 	        matchedNode = matchedAnno.getValue_SNUMERIC();	       
-	        
-	       // if (traversalId.equals(TRAV_PREPROCESSING) )
-	       // {
 	        dominatedMatchCodes.add(matchedNode);
 	        speakerHasMatches.put(speakerName, true);
-	       // }
 	      }
 	      
 	     
@@ -150,16 +145,7 @@ public class TextColumnExporter extends SaltBasedExporter
     @Override
     public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
         SRelation relation, SNode currNode, long order)
-    {
-    	/*if(traversalId.equals(TRAV_IS_DOMINATED_BY_MATCH))
-    	{	// don't traverse any further if matched node was found 
-		      if(this.matchedNode != null && (orderedMatchNumbersGlobal.contains(this.matchedNode) 
-		    		  || matchNumbersGlobal.contains(this.matchedNode))) {
-		    	
-		    		  return false; 		    	  
-		      }
-    	}*/
-    	
+    {    	
 		return 
 	            relation == null
 	            || relation instanceof SDominanceRelation 
@@ -230,7 +216,7 @@ public class TextColumnExporter extends SaltBasedExporter
 				 numbersString = "numbers";
 			 }
 			
-			 warnMessage =  "Filter " + numbersString + " " + sb.toString().substring(0, sb.lastIndexOf(",")) 
+			 warnMessage =  "1. Filter " + numbersString + " " + sb.toString().substring(0, sb.lastIndexOf(",")) 
 					 	+ " couldn't be represented.";
 			        				 
 			
@@ -238,18 +224,22 @@ public class TextColumnExporter extends SaltBasedExporter
 		 
 		 if (alignmc && !dataIsAlignable){
 			if (!warnMessage.isEmpty()){
-				warnMessage += "\n\n\n";
+				warnMessage += "\n\n2. ";
+			}
+			else{
+				warnMessage += "1. ";
 			}
 			
 			warnMessage += "You have tried to align matches by node number via check box."
-					+ "\n\nUnfortunately this option is not applicable for this data set, "
-					+ "\n\nso the data couldn't be aligned.";
+					+ "Unfortunately this option is not applicable for this data set, "
+					+ "so the data couldn't be aligned.";
 
 		 }
 		 
 		 if (!warnMessage.isEmpty()){
 			 
-			 Notification warn = new Notification(warnMessage, Notification.Type.WARNING_MESSAGE);	        	     			
+			 String warnCaption = "Some export options count't be realized.";
+			 Notification warn = new Notification(warnCaption, warnMessage, Notification.Type.WARNING_MESSAGE);	        	     			
 			 warn.setDelayMsec(20000);
 			 warn.show(Page.getCurrent());
 		 }
@@ -349,7 +339,13 @@ public class TextColumnExporter extends SaltBasedExporter
 	        		 	        		
 	        		 
 	        		 out.append(String.valueOf(matchNumber + 1) + TAB_MARK);
-	        		 out.append(currSpeakerName.substring(currSpeakerName.indexOf("_") + 1) + TAB_MARK);
+	        		 
+	        		 String trimmedName = "";
+	        		 if (currSpeakerName.indexOf("_") <  currSpeakerName.length()){
+    					 trimmedName = currSpeakerName.substring(currSpeakerName.indexOf("_") + 1);
+    				 }
+	        		 
+	        		 out.append(trimmedName + TAB_MARK);
 	        		 
 	        		 //write meta data
 	        		 if (!listOfMetakeys.isEmpty()){
@@ -388,13 +384,8 @@ public class TextColumnExporter extends SaltBasedExporter
 	                            			 
 	        			 for (String metakey : listOfMetakeys){
 	        				 String metaValue = "";
-	        				 String trimmedName = "";
-	        				 //try to get meta value specific for current speaker	        				 
-	        				 if (currSpeakerName.indexOf("_") <  currSpeakerName.length()){
-	        					 trimmedName = currSpeakerName.substring(currSpeakerName.indexOf("_") + 1);
-	        				 }
 	        				 
-	        				 
+	        				 //try to get meta value specific for current speaker	         				 
 	        				if (!trimmedName.isEmpty() && annosWithNamespace.containsKey(trimmedName)){
 	        					
 	        					Map<String, String> speakerAnnos = annosWithNamespace.get(trimmedName);
@@ -423,19 +414,15 @@ public class TextColumnExporter extends SaltBasedExporter
 	        	       	  
 	        	  		  List<SNode> root = new LinkedList<>();
 		                  root.add(tok);
-		                  //IsDominatedByMatch traverser = new IsDominatedByMatch();
-		                 // graph.traverse(root, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, TRAV_IS_DOMINATED_BY_MATCH, traverser);
-		               
+		                		               
 		                  Long matchedNode;
 		                  // token matched
-		                  //if(traverser.matchedNode != null)
 		                  if ((matchedNode =tokenToMatchNumber.get(counterGlobal)) != null)
 		                  {
 		                    // is dominated by a (new) matched node, thus use tab to separate the non-matches from the matches
 		                    if(lastTokenWasMatched < 0)
 		                    {
 		                       if (alignmc && dataIsAlignable){
-		                    	  // int orderInList = orderedMatchNumbersGlobal.indexOf(traverser.matchedNode);
 		                    	   int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
 		                    	   if (orderInList >= matchesWrittenForSpeaker){
 		                    		   int diff = orderInList - matchesWrittenForSpeaker;
@@ -455,13 +442,11 @@ public class TextColumnExporter extends SaltBasedExporter
 		                                                     
 		                			                      
 		                    }
-		                   // else if(lastTokenWasMatched != (long) traverser.matchedNode)
 		                    else if(lastTokenWasMatched != matchedNode)
 		                    {
 		                      // always leave an empty column between two matches, even if there is no actual context
 		                    	 if (alignmc && dataIsAlignable){
-		                    		// int orderInList = orderedMatchNumbersGlobal.indexOf(traverser.matchedNode);
-		                    		 int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
+		                    	   	   int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
 			                    	   if (orderInList >= matchesWrittenForSpeaker){
 			                    		   int diff = orderInList - matchesWrittenForSpeaker;
 			                    		   separator = TAB_MARK + TAB_MARK; 
@@ -480,7 +465,6 @@ public class TextColumnExporter extends SaltBasedExporter
 		                    	 }
 		                    			                    	
 		                    }
-		                    //lastTokenWasMatched = traverser.matchedNode;
 		                    lastTokenWasMatched = matchedNode;
 		                  }
 		                  // token not matched, but last token matched
@@ -524,7 +508,7 @@ public class TextColumnExporter extends SaltBasedExporter
 		           
 		       	          
 		          
-        // append the actual token
+        // append the current token
         out.append(graph.getText(tok));
         noPreviousTokenInLine = false; 
         prevSpeakerName = currSpeakerName;
@@ -677,11 +661,9 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
     	// iterate first time over tokens to figure out which speaker has matches and to recognize the hierarchical structure of matches as well
     	  for(SToken token : orderedToken){
     		  counterGlobal++;
-    		             
-    		  
-             // STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
               
               String name;
+              
               if ((name = CommonHelper.getTextualDSForNode(token, graph).getName()) == null){
               	name = "";
               }
@@ -794,7 +776,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 }
 
 public void getOrderedMatchNumbers (){
-/*	 for (int i = 0; i < adjacencyMatrix.length; i++){
+	/* for (int i = 0; i < adjacencyMatrix.length; i++){
 			for (int j = 0; j < adjacencyMatrix[0].length; j++){
 				System.out.print(adjacencyMatrix[i][j] + "\t");
 			}
@@ -803,7 +785,7 @@ public void getOrderedMatchNumbers (){
 	      
 	 
 	  
-	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobal(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
+	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobally(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
 	  
 	/* System.out.println("orderedMatchNumbers: "  +orderedMatchNumbersGlobal);
 	 System.out.println("matchNumbers: "  + matchNumbersGlobal);
@@ -814,7 +796,7 @@ public void getOrderedMatchNumbers (){
 }
 
 // this method returns a list with match numbers ordered according to their occurrence, if data are alignable or empty list, if not
-private static List <Long> calculateOrderedMatchNumbersGlobal(int [][] adjacencyMatrix, boolean matrixIsFilled, Set<Long> singleMatches){
+private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacencyMatrix, boolean matrixIsFilled, Set<Long> singleMatches){
 	
 	List <Long> orderedMatchNumbers = new ArrayList<Long>();
 	
@@ -876,14 +858,12 @@ private static List <Long> calculateOrderedMatchNumbersGlobal(int [][] adjacency
 					while((i != adjacencyMatrix.length - 1) && (second != -1));
 					
 			// merge single matches into the list
-			//TODO test this case for multiple single matches
-			boolean matchIsMerged = false;
-			
 			if (dataIsAlignable){
-				for (Long match : singleMatches){
-				
+				for (Long match : singleMatches){					
+					
 					if (!orderedMatchNumbers.contains(match)){
 						
+						boolean matchIsMerged = false;						
 						Iterator <Long> it = orderedMatchNumbers.iterator();
 						
 						while (it.hasNext()){
