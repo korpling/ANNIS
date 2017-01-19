@@ -172,7 +172,7 @@ public class TextColumnExporter extends SaltBasedExporter
   
 @Override
  public void convertText(SDocumentGraph graph, List<String> annoKeys,
-  Map<String, String> args, boolean alignmc, int matchNumber, Writer out) throws IOException, IllegalArgumentException
+  Map<String, String> args, boolean alignmc, int matchNumber, Writer out) throws IOException
 {
 	
 	
@@ -253,7 +253,7 @@ public class TextColumnExporter extends SaltBasedExporter
 			 warn.setDelayMsec(20000);
 			 warn.show(Page.getCurrent());
 		 }
-  	}
+  	} // global variables reset; warning issued
   	
        
       int matchesWrittenForSpeaker = 0;
@@ -263,7 +263,12 @@ public class TextColumnExporter extends SaltBasedExporter
         SToken tok = it.next();    
         counterGlobal++;
         //get current speaker name
-        currSpeakerName = (matchNumber + 1) + "_" + CommonHelper.getTextualDSForNode(tok, graph).getName();
+        String name;
+        if ((name = CommonHelper.getTextualDSForNode(tok, graph).getName()) == null){
+        	name = "";
+        }
+         
+        currSpeakerName = (matchNumber + 1) + "_" + name;
         
          
         // if speaker has no matches, skip token
@@ -383,10 +388,16 @@ public class TextColumnExporter extends SaltBasedExporter
 	                            			 
 	        			 for (String metakey : listOfMetakeys){
 	        				 String metaValue = "";
-	        				 //try to get meta value specific for current speaker
-	        				if (annosWithNamespace.containsKey(currSpeakerName.substring(currSpeakerName.indexOf("_") + 1))){
+	        				 String trimmedName = "";
+	        				 //try to get meta value specific for current speaker	        				 
+	        				 if (currSpeakerName.indexOf("_") <  currSpeakerName.length()){
+	        					 trimmedName = currSpeakerName.substring(currSpeakerName.indexOf("_") + 1);
+	        				 }
+	        				 
+	        				 
+	        				if (!trimmedName.isEmpty() && annosWithNamespace.containsKey(trimmedName)){
 	        					
-	        					Map<String, String> speakerAnnos = annosWithNamespace.get(currSpeakerName.substring(currSpeakerName.indexOf("_") + 1));
+	        					Map<String, String> speakerAnnos = annosWithNamespace.get(trimmedName);
 	        					if (speakerAnnos.containsKey(metakey)){
 	        						metaValue = speakerAnnos.get(metakey).trim();
 	        					}
@@ -577,7 +588,7 @@ public boolean isAlignable()
 @Override
 public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 		Map<String, String> args, boolean alignmc, int matchNumber, Writer out,
-		int nodeCount) throws IOException, IllegalArgumentException {
+		int nodeCount) throws IOException {
 	String currSpeakerName = "";
 	String prevSpeakerName = "";
 	List <Long> matchNumbersOrdered = new ArrayList<Long>();
@@ -668,8 +679,13 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
     		  counterGlobal++;
     		             
     		  
-              STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
-              speakerName =  (matchNumber + 1) + "_" +textualDS.getName();
+             // STextualDS textualDS = CommonHelper.getTextualDSForNode(token, graph);
+              
+              String name;
+              if ((name = CommonHelper.getTextualDSForNode(token, graph).getName()) == null){
+              	name = "";
+              }
+              speakerName =  (matchNumber + 1) + "_" + name;
               currSpeakerName = speakerName;
          
                         

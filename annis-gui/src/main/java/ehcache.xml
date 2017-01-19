@@ -20,15 +20,15 @@ limitations under the License.
 
 
 <cache name="saltProjectsCache"
-maxBytesLocalHeap="50m"
+maxEntriesLocalHeap="5" 
 eternal="true"
 overflowToDisk="true"
 >
-<sizeOfPolicy maxDepth="10000" maxDepthExceededBehavior="abort"></sizeOfPolicy>
+<sizeOfPolicy maxDepth="100" maxDepthExceededBehavior="abort"></sizeOfPolicy>
 </cache>
   
  <defaultCache
-maxBytesLocalHeap="50m"
+maxEntriesLocalHeap="5" 
 eternal="true"
 timeToIdleSeconds="0"
 timeToLiveSeconds="0"

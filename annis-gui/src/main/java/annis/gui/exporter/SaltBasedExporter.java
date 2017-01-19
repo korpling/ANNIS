@@ -48,6 +48,7 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
+import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
@@ -85,6 +86,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
     Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc,
     WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
+	  CacheManager cacheManager = CacheManager.create();
+      Cache cache = cacheManager.getCache("saltProjectsCache");     
     try
     {   
       
@@ -144,8 +147,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       int pCounter = 1;
       
       
-      CacheManager cacheManager = CacheManager.create();
-      Cache cache = cacheManager.getCache("saltProjectsCache");     
+      //CacheManager cacheManager = CacheManager.create();
+     // Cache cache = cacheManager.getCache("saltProjectsCache");     
       Map <Integer, Integer> offsets = new HashMap <Integer, Integer>();
    
       
@@ -281,7 +284,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 	    Collections.sort(listOfKeys);
 	    
 	    
-	   try{
+	  // try{
 	         for (Integer key : listOfKeys){
 	        	
 	       	 SaltProject p = (SaltProject) cache.get(key).getObjectValue();
@@ -289,15 +292,15 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 	         }  
 	         
 	         
-	    }
+	  /*  }
 	   catch(Exception e)
 	    {
 		  e.printStackTrace();
-	    }
-	    finally{
+	    }*/
+	  /*  finally{
 	    	cacheManager.removalAll();
 	    	cacheManager.shutdown();
-	    }
+	    }*/
 	           
       
       out.append("\n");
@@ -306,11 +309,17 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       return null;
 
     }
-    catch (AnnisQLSemanticsException | AnnisQLSyntaxException | IllegalArgumentException
-      | AnnisCorpusAccessException | UniformInterfaceException| IOException ex)
+    catch (AnnisQLSemanticsException | AnnisQLSyntaxException 
+      | AnnisCorpusAccessException | UniformInterfaceException| IOException 
+      | CacheException | IllegalStateException | ClassCastException ex)
     {
       return ex;
     }
+    finally{
+    	cacheManager.removalAll();
+    	cacheManager.shutdown();
+    }
+           
     
   }
   

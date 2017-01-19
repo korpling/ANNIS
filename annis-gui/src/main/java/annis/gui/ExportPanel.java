@@ -53,6 +53,7 @@ import annis.gui.objects.QueryUIState;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.PluginSystem;
 import annis.libgui.exporter.ExporterPlugin;
+import net.sf.ehcache.CacheException;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
@@ -349,12 +350,11 @@ public class ExportPanel extends GridLayout
     // when not longer needed
     tmpOutputFile = currentTmpFile;
     //
-    if (exportError instanceof IllegalArgumentException)
+    if (exportError instanceof CacheException | exportError instanceof IllegalStateException 
+    		| exportError instanceof  ClassCastException)
     {
-      // wrong filter numbers
-      Notification.show(exportError.getMessage(), Notification.Type.WARNING_MESSAGE);
-    } //
-    
+    	 Notification.show(exportError.getMessage(), Notification.Type.ERROR_MESSAGE);
+    }
     else  if (tmpOutputFile == null)
     {
       Notification.show("Could not create the Exporter",
