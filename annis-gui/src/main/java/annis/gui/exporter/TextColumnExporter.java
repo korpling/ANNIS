@@ -238,7 +238,7 @@ public class TextColumnExporter extends SaltBasedExporter
 		 
 		 if (!warnMessage.isEmpty()){
 			 
-			 String warnCaption = "Some export options count't be realized.";
+			 String warnCaption = "Some export options couldn't be realized.";
 			 Notification warn = new Notification(warnCaption, warnMessage, Notification.Type.WARNING_MESSAGE);	        	     			
 			 warn.setDelayMsec(20000);
 			 warn.show(Page.getCurrent());
