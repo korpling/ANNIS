@@ -775,24 +775,10 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 	
 }
 
-public void getOrderedMatchNumbers (){
-	/* for (int i = 0; i < adjacencyMatrix.length; i++){
-			for (int j = 0; j < adjacencyMatrix[0].length; j++){
-				System.out.print(adjacencyMatrix[i][j] + "\t");
-			}
-			System.out.print("\n");
-		}*/
-	      
-	 
+public void getOrderedMatchNumbers (){	 
 	  
 	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobally(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
-	  
-	/* System.out.println("orderedMatchNumbers: "  +orderedMatchNumbersGlobal);
-	 System.out.println("matchNumbers: "  + matchNumbersGlobal);
-	 System.out.println("singleMatchesGlobal: " + singleMatchesGlobal);
-	 System.out.println("maxMatchesPerLine: " + maxMatchesPerLine);      
-	 System.out.println("dataIsAlignable: " + dataIsAlignable);   */
-	
+	  	
 }
 
 // this method returns a list with match numbers ordered according to their occurrence, if data are alignable or empty list, if not

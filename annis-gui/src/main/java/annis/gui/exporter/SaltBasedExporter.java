@@ -87,9 +87,10 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
     WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
 	  CacheManager cacheManager = CacheManager.create();
-      Cache cache = cacheManager.getCache("saltProjectsCache");     
+        
     try
     {   
+      Cache cache = cacheManager.getCache("saltProjectsCache");   
       
       if (keys == null || keys.isEmpty())
       {
@@ -146,9 +147,6 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       
       int pCounter = 1;
       
-      
-      //CacheManager cacheManager = CacheManager.create();
-     // Cache cache = cacheManager.getCache("saltProjectsCache");     
       Map <Integer, Integer> offsets = new HashMap <Integer, Integer>();
    
       
@@ -172,7 +170,6 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
         WebResource subgraphRes = annisResource.path("search/subgraph");
         MatchGroup currentMatches = new MatchGroup();
         String currentLine;
-        //int offset=0;
         int offset=1;
         // 2. iterate over all matches and get the sub-graph for a group of matches
         while(!Thread.currentThread().isInterrupted() 
@@ -260,7 +257,6 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
           cache.put(new Element (pCounter++, p));   
           
         }
-        //offset = 0;
          offset=1;
         
       }
@@ -283,25 +279,13 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 	     
 	    Collections.sort(listOfKeys);
 	    
-	    
-	  // try{
-	         for (Integer key : listOfKeys){
-	        	
-	       	 SaltProject p = (SaltProject) cache.get(key).getObjectValue();
-	       	 convertSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out, null);
-	         }  
-	         
-	         
-	  /*  }
-	   catch(Exception e)
-	    {
-		  e.printStackTrace();
-	    }*/
-	  /*  finally{
-	    	cacheManager.removalAll();
-	    	cacheManager.shutdown();
-	    }*/
-	           
+
+	     for (Integer key : listOfKeys)
+	     {	    	
+	   	 SaltProject p = (SaltProject) cache.get(key).getObjectValue();
+	   	 convertSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out, null);
+	     }  
+	              
       
       out.append("\n");
       
