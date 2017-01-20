@@ -269,10 +269,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
 		List <Integer> cacheKeys = cache.getKeys();
 	    List <Integer> listOfKeys = new ArrayList<Integer>();
 	    
-	   // System.out.println(cache.getCacheManager().getActiveConfigurationText());
-	    
-	
-	    
+    
 	    for (Integer key : cacheKeys){
 	    	listOfKeys.add(key);
 	    }

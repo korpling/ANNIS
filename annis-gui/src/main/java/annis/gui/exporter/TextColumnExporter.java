@@ -776,8 +776,23 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 }
 
 public void getOrderedMatchNumbers (){	 
+	 for (int i = 0; i < adjacencyMatrix.length; i++){
+	for (int j = 0; j < adjacencyMatrix[0].length; j++){
+		System.out.print(adjacencyMatrix[i][j] + "\t");
+	}
+	System.out.print("\n");
+	 }
+  
+  
+  
+
 	  
 	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobally(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
+	  System.out.println("orderedMatchNumbers: "  +orderedMatchNumbersGlobal);
+	 System.out.println("matchNumbers: "  + matchNumbersGlobal);
+	 System.out.println("singleMatchesGlobal: " + singleMatchesGlobal);
+	 System.out.println("maxMatchesPerLine: " + maxMatchesPerLine);      
+	 System.out.println("dataIsAlignable: " + dataIsAlignable);   
 	  	
 }
 
@@ -789,6 +804,11 @@ private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacen
 	if (matrixIsFilled){
 		int first = -1;
 		int second = -1;
+		int firstFound = -1;
+		int secondFound = -1;
+		
+		int lastVisitedRow = 0;
+		int lastVisitedColumn = 0;
 		
 		//iterate first over columns and get the first pair of match numbers
 		outerFor: for (int i = 0; i< adjacencyMatrix[0].length; i ++){
@@ -797,7 +817,9 @@ private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacen
 						if (adjacencyMatrix[j][i] == 1){
 							if (adjacencyMatrix[i][j] != 1){
 								first = j + 1;
+								firstFound = first;
 								second = i + 1;
+								secondFound = second;
 								orderedMatchNumbers.add((long) first);
 								orderedMatchNumbers.add((long)second);	
 								break outerFor;
@@ -811,7 +833,7 @@ private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacen
 							
 						}
 					}
-				}
+				} // first match pair found
 		
 		
 			first = second;
@@ -819,11 +841,11 @@ private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacen
 			int i = 0;
 			// get all remained match numbers
 			if (dataIsAlignable){			
-			
-				outerDo: do{
+				// get all successor
+			outerDo: do{
 					
-							//iterate over rows
-							for (i = 0; i < adjacencyMatrix.length; i++){
+							//iterate over row
+							for (i = first; i < adjacencyMatrix[0].length; i++){
 								if (adjacencyMatrix[first - 1][i] == 1){
 									if (adjacencyMatrix[i][first - 1] != 1 ){
 										second = i + 1;
@@ -840,12 +862,49 @@ private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacen
 									
 								}
 							}
-					}
-					while((i != adjacencyMatrix.length - 1) && (second != -1));
-					
+					}				
+			while((i != adjacencyMatrix[0].length - 1) && (second != -1));
+			
+			//get all predecessor			
+			first = -1;
+			second = firstFound;			
+			outerDo: do{				
+						//iterate over column
+						for (i = 0; i < adjacencyMatrix.length; i++){
+							if (adjacencyMatrix[i][second -1] == 1){
+								if (adjacencyMatrix[second - 1][i] != 1 ){
+									first = i + 1;
+									orderedMatchNumbers.add(0, (long) (first));
+									second = first;
+									first = -1;
+									break;
+								}
+								else{
+									
+									dataIsAlignable = false; // 
+									break outerDo;
+								}
+								
+							}
+						}
+				}				
+				while((i != adjacencyMatrix.length - 1) && (first != -1));
+			
+			
+			
+			
+			
+			//TODO get further independent match sequences
+			
+			
+			
+			
+			
+			System.out.println(orderedMatchNumbers.size());
 			// merge single matches into the list
 			if (dataIsAlignable){
-				for (Long match : singleMatches){					
+				for (Long match : singleMatches){		
+					System.out.println("match: " + match);
 					
 					if (!orderedMatchNumbers.contains(match)){
 						
@@ -858,6 +917,7 @@ private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacen
 							
 								int index = orderedMatchNumbers.indexOf(next);
 								orderedMatchNumbers.add(index, match);
+								System.out.println("match: " + match + " merged on: " + index);
 								matchIsMerged = true;								
 								break;
 							}
@@ -865,6 +925,7 @@ private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacen
 						
 						if (!matchIsMerged){
 							orderedMatchNumbers.add(match);
+							System.out.println("match: " + match + " merged");
 						}
 					}
 				}
