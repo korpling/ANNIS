@@ -65,7 +65,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 public class TextColumnExporter extends SaltBasedExporter
 {
 	 private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-	//private static final String TRAV_IS_DOMINATED_BY_MATCH = "IsDominatedByMatch";
 	private static final String TRAV_PREPROCESSING = "travPreprocessing";
 	public static final String FILTER_PARAMETER_KEYWORD = "filter";
 	public static final String PARAMETER_SEPARATOR = ",";
@@ -735,8 +734,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
                   }
                   
                   
-                  // fill the adjacency matrix
-                    
+                  // fill the adjacency matrix                    
                   if (matchNumbersOrdered.size() > 1){
                 	  Iterator<Long> it = matchNumbersOrdered.iterator();
                 	  
