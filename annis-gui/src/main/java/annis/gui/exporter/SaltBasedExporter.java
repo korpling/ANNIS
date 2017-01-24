@@ -315,11 +315,11 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
    * @param out 
    */
   
-  // invokes the createAdjacencyMatrix method, if nodeCount != null or convertText otherwise
+  // invokes the createAdjacencyMatrix method, if nodeCount != null or outputText otherwise
   private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc, int offset,
       Map<String, CorpusConfig> corpusConfigs, Writer out, Integer nodeCount) throws IOException, IllegalArgumentException
   {
-    int matchNumber = offset;
+    int recordNumber = offset;
     if(p != null && p.getCorpusGraphs() != null)
     {
       
@@ -374,10 +374,10 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
             
           
             if (nodeCount != null){
-            	 createAdjacencyMatrix(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out, nodeCount);
+            	 createAdjacencyMatrix(doc.getDocumentGraph(), args, recordNumber++, nodeCount);
             }
             else{
-            	 convertText(doc.getDocumentGraph(), annoKeys, args, alignmc, matchNumber++, out);
+            	 outputText(doc.getDocumentGraph(),  alignmc, recordNumber++, out);
             }
             
            
@@ -390,21 +390,27 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
   
 
 
-  public abstract void convertText(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
-    Writer out) throws IOException, IllegalArgumentException;
+  public abstract void outputText(SDocumentGraph graph,	  boolean alignmc, int recordNumber,  Writer out) throws IOException, IllegalArgumentException;
   
-  public abstract void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys, Map<String, String> args, boolean alignmc, int matchNumber,
-		    Writer out, int nodeCount) throws IOException, IllegalArgumentException;
+  
+  public abstract void createAdjacencyMatrix(SDocumentGraph graph, 
+		  Map<String, String> args, int recordNumber, int nodeCount) throws IOException, IllegalArgumentException;
+  
   
   public abstract void getOrderedMatchNumbers();
 
-
+  /**
+   * Indicates, whether the export can be cancelled or not.
+   */
   @Override
   public boolean isCancelable()
   {
     return true;
   }
   
+  /**
+   * Specifies the ending of export file.
+   */
   @Override
   public String getFileEnding()
   {

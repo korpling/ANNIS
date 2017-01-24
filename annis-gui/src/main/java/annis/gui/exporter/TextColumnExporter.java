@@ -77,7 +77,7 @@ public class TextColumnExporter extends SaltBasedExporter
 	private boolean isFirstSpeakerWithMatch = true;   
 	private static List <Long> dominatedMatchCodes = new ArrayList<Long>();
 	// a helping structure to handle crossing edges, must be global over all query results
-	private static Map <Integer, Long> tokenToMatchNumber = new HashMap <Integer, Long>();
+	private static Map <Long, Long> tokenToMatchNumber = new HashMap <Long, Long>();
 	// contains filter numbers from ui, global over all query results
 	private static Set<Long> filterNumbersSetByUser = new HashSet<Long>(); 
 	// indicate, whether filter numbers were set by user, global over all query results
@@ -97,15 +97,12 @@ public class TextColumnExporter extends SaltBasedExporter
 	private static Set <Integer> matchNumbersGlobal = new HashSet <Integer>();	
 	// indicates, whether data is alignable or not
 	private static boolean dataIsAlignable = true;
-	
+	//max. count of matches per line
 	private static int maxMatchesPerLine = 0;
+	//counter over token, globally over all query results
+	private static long counterGlobal;
 	
-	private static int counterGlobal;
-	
-	 
-	
-	 private static final Logger log = LoggerFactory.getLogger(TextColumnExporter.class);
-	 
+	 	 
   
 	
   private static class IsDominatedByMatch implements GraphTraverseHandler
@@ -113,7 +110,9 @@ public class TextColumnExporter extends SaltBasedExporter
    
     Long matchedNode = null;
     
-
+    /**
+	 * Implements the nodeReached method of the {@link org.corpus_tools.salt.core.GraphTraverseHandler} interface.
+	 */
     @Override
     public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
         SRelation<SNode, SNode> relation, SNode fromNode, long order)
@@ -132,7 +131,10 @@ public class TextColumnExporter extends SaltBasedExporter
 	      
 	      
     }
-
+    
+    /**
+	 * Implements the nodeLeft method of the {@link org.corpus_tools.salt.core.GraphTraverseHandler} interface.
+	 */
     @Override
     public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
         SRelation<SNode, SNode> relation, SNode fromNode, long order)
@@ -141,6 +143,9 @@ public class TextColumnExporter extends SaltBasedExporter
      
     }
 
+    /**
+	 * Implements the checkConstraint method of the {@link org.corpus_tools.salt.core.GraphTraverseHandler} interface.
+	 */
     @Override
     public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
         SRelation relation, SNode currNode, long order)
@@ -154,10 +159,20 @@ public class TextColumnExporter extends SaltBasedExporter
   }
 
   
+  /**
+   * Writes the specified record (if applicable, as multiple result lines) from query result set to the output file.
+   * 
+   * @param graph the org.corpus_tools.salt.common.SDocumentGraph representation of a specified record
+   * @param alignmc a boolean, which indicates, whether the data should be aligned by match numbers or not
+   * @param recordNumber the number of record within  the record set
+   * @param out the specified Writer
+   * 
+   * @throws IOException, if an I/O error occurs
+   *  
+   */
   
 @Override
- public void convertText(SDocumentGraph graph, List<String> annoKeys,
-  Map<String, String> args, boolean alignmc, int matchNumber, Writer out) throws IOException
+ public void outputText(SDocumentGraph graph, boolean alignmc, int recordNumber, Writer out) throws IOException
 {
 	
 	
@@ -181,7 +196,7 @@ public class TextColumnExporter extends SaltBasedExporter
      
      
   	//if match number == 0, reset global variables and output warning, if necessary
-  	if (matchNumber == 0){
+  	if (recordNumber == 0){
   		isFirstSpeakerWithMatch = true;
   		counterGlobal = 0;
   		
@@ -257,7 +272,7 @@ public class TextColumnExporter extends SaltBasedExporter
         	name = "";
         }
          
-        currSpeakerName = (matchNumber + 1) + "_" + name;
+        currSpeakerName = (recordNumber + 1) + "_" + name;
         
          
         // if speaker has no matches, skip token
@@ -337,7 +352,7 @@ public class TextColumnExporter extends SaltBasedExporter
 	            		   		
 	        		 	        		
 	        		 
-	        		 out.append(String.valueOf(matchNumber + 1) + TAB_MARK);
+	        		 out.append(String.valueOf(recordNumber + 1) + TAB_MARK);
 	        		 
 	        		 String trimmedName = "";
 	        		 if (currSpeakerName.indexOf("_") <  currSpeakerName.length()){
@@ -531,6 +546,9 @@ public class TextColumnExporter extends SaltBasedExporter
     return SubgraphFilter.all;
   }
   
+  /**
+   * @return a String, that represents a short description of this exporter 
+   */
   @Override
   public String getHelpMessage()
   {
@@ -554,31 +572,51 @@ public class TextColumnExporter extends SaltBasedExporter
 		        + "If desired, by filter option you can choose an other node number from the hierarchy. In our case it could be 2 or 3.";
   }
   
+
+  /**
+   * @see annis.gui.exporter.SaltBasedExporter#getFileEnding()
+   * 
+   * @return a constant String  ("csv") for file ending
+   */
   @Override
   public String getFileEnding()
   {
     return "csv";
   }
 
-
+/**
+ * Indicates, that this exporter is alignable, so the check box will appear in the [ExportPanel](\ref annis.gui.ExportPanel), 
+ * if this exporter is chosen.
+ * 
+ * @return always true, since this exporter is alignable
+ */
 @Override
 public boolean isAlignable()  
  {
 	return true;
  }
 
-
+/**
+ * Implements the abstract method of the [SaltBasedExporter](\ref annis.gui.exporter.SaltBasedExporter).
+ * This method creates and fills an adjacency matrix of dimension (nodeCount x nodeCount), which keeps the relative order 
+ * of match numbers to each other of each query result line. A result line is a part of a record, which belongs to a speaker.
+ * 
+ * The adjacency matrix is a global two-dimensional array of integers, which allows to recognize the valid order of match numbers globally, after all query results are processed. 
+ *
+ * @param graph  an org.corpus_tools.salt.common.SDocumentGraph representation of a record 
+ * @param args a map containing parameters like 'filter' or 'metakeys', set by user
+ * @param recordNumber the number of record within  the record set returned for the user query 
+ * @param nodeCount the count of distinct match numbers in the whole record set returned for the user query
+ */
 @Override
-public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
-		Map<String, String> args, boolean alignmc, int matchNumber, Writer out,
-		int nodeCount) throws IOException {
+public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args, int recordNumber, int nodeCount) throws IOException {
 	String currSpeakerName = "";
 	String prevSpeakerName = "";
 	List <Long> matchNumbersOrdered = new ArrayList<Long>();
 	
 	
 	//if new search, reset adjacencyMatrix, extract parameters, set by user
-	if (matchNumber == 0){
+	if (recordNumber == 0){
 		speakerHasMatches.clear();
 		speakerName = "";
 		tokenToMatchNumber.clear();
@@ -652,7 +690,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
      if(orderedToken != null)
       {  
     	 // reset counter over all the tokens
-    	 if (matchNumber == 0){
+    	 if (recordNumber == 0){
     		 counterGlobal = 0;
     	 }
     	
@@ -666,7 +704,7 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
               if ((name = CommonHelper.getTextualDSForNode(token, graph).getName()) == null){
               	name = "";
               }
-              speakerName =  (matchNumber + 1) + "_" + name;
+              speakerName =  (recordNumber + 1) + "_" + name;
               currSpeakerName = speakerName;
          
                         
@@ -773,13 +811,25 @@ public void createAdjacencyMatrix(SDocumentGraph graph, List<String> annoKeys,
 	
 }
 
+/**
+ * Invokes the private static method {@link #calculateOrderedMatchNumbersGlobally}.
+ */
 public void getOrderedMatchNumbers (){	 
 		  
 	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobally(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
 	 	  	
 }
 
-// this method returns a list with match numbers ordered according to their occurrence, if data are alignable or empty list, if not
+/**
+ *  This method determine a valid order of match numbers and returns them as a list. 
+ *  If the underlying result set is not alignable,  it returns an empty list.
+ *  
+ * @param adjacencyMatrix 
+ * @param matrixIsFilled a boolean, which indicates, whether the adjacency is filled or not 
+ * @param singleMatches a list of singleton match numbers
+ * 
+ * @return a list of globally ordered match numbers, if data alignable or an empty list otherwise
+ */
 private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacencyMatrix, boolean matrixIsFilled, Set<Long> singleMatches){
 	
 	List <Long> orderedMatchNumbers = new ArrayList<Long>();
@@ -859,7 +909,9 @@ private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacen
 		
 	// if adjacency matrix empty, just sort single matches numerically
 	else{
-		orderedMatchNumbers.addAll(singleMatches);
+		for (Long match : singleMatches){
+			orderedMatchNumbers.add(match);
+		}
 		Collections.sort(orderedMatchNumbers);
 		
 	}
