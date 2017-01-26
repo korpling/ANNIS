@@ -441,12 +441,14 @@ public class TextColumnExporter extends SaltBasedExporter
 		                    	   int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
 		                    	   if (orderInList >= matchesWrittenForSpeaker){
 		                    		   int diff = orderInList - matchesWrittenForSpeaker;
-		                    		   separator = TAB_MARK; 
-		                    		   matchesWrittenForSpeaker++; 		                    		   
+		                    		   matchesWrittenForSpeaker++; 		
+                               
+                               StringBuilder sb = new StringBuilder(TAB_MARK);
 		                    		   for (int i = 0; i < diff; i++){
-		                    			   separator += (TAB_MARK + TAB_MARK);
+                                 sb.append(TAB_MARK + TAB_MARK);
 		                    			   matchesWrittenForSpeaker++; 
 		                    		   }	                    		   
+                               separator = sb.toString();
 		                    	   }
 		            		                    	   
 		                       }
@@ -464,12 +466,16 @@ public class TextColumnExporter extends SaltBasedExporter
 		                    	   	   int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
 			                    	   if (orderInList >= matchesWrittenForSpeaker){
 			                    		   int diff = orderInList - matchesWrittenForSpeaker;
-			                    		   separator = TAB_MARK + TAB_MARK; 
 			                    		   matchesWrittenForSpeaker++; 
+                                 
+                                 StringBuilder sb = new StringBuilder(TAB_MARK + TAB_MARK);
 			                    		   for (int i = 0; i < diff; i++){
-			                    			   separator += (TAB_MARK + TAB_MARK);
+                                   sb.append(TAB_MARK + TAB_MARK);
 			                    			   matchesWrittenForSpeaker++; 
 			                    		   }
+                                 
+                                 separator = sb.toString(); 
+			                    		   
 			                    		  
 			                    	   }
 			                    	  
