@@ -37,8 +37,6 @@ import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -73,40 +71,40 @@ public class TextColumnExporter extends SaltBasedExporter
 	private static final String NEWLINE = System.lineSeparator();    
 	private static final String TAB_MARK = "\t"; 
 	private static final String SPACE = " ";    
-	private static HashMap <String, Boolean> speakerHasMatches = new HashMap<String, Boolean>();
-	private static String speakerName = "";
+	private final HashMap <String, Boolean> speakerHasMatches = new HashMap<>();
+	private String speakerName = "";
 	private boolean isFirstSpeakerWithMatch = true;   
-	private static List <Long> dominatedMatchCodes = new ArrayList<Long>();
+	private final List <Long> dominatedMatchCodes = new ArrayList<>();
 	// a helping structure to handle crossing edges, must be global over all query results
-	private static Map <Long, Long> tokenToMatchNumber = new HashMap <Long, Long>();
+	private final Map <Long, Long> tokenToMatchNumber = new HashMap <>();
 	// contains filter numbers from ui, global over all query results
-	private static Set<Long> filterNumbersSetByUser = new HashSet<Long>(); 
+	private final Set<Long> filterNumbersSetByUser = new HashSet<>(); 
 	// indicate, whether filter numbers were set by user, global over all query results
-	private static boolean filterNumbersIsEmpty = true;		
+	private boolean filterNumbersIsEmpty = true;		
 	// contains metakeys, set by user, global over all query results
-	private static List<String> listOfMetakeys = new ArrayList<String>(); 
+	private final List<String> listOfMetakeys = new ArrayList<>(); 
 
 	// a helping structure to determine the right order of match nodes over all records
-	private static int [][] adjacencyMatrix;
+	private int [][] adjacencyMatrix;
 	//indicates, whether the adjacency matrix is filled or not
-	private static boolean matrixIsFilled = false;
+	private boolean matrixIsFilled = false;
 	// contains single match codes per speaker, globally over all query results
-	private static Set <Long> singleMatchesGlobal = new HashSet <Long>();
+	private final Set <Long> singleMatchesGlobal = new HashSet <>();
 	// contains a  sequence of match numbers per speaker ordered according to their occurrence in text, globally over all query results
-	private static List <Long> orderedMatchNumbersGlobal = new ArrayList <Long>();
+	private List <Long> orderedMatchNumbersGlobal = new ArrayList <>();
 	// set of match numbers, globally over all query results
-	private static Set <Integer> matchNumbersGlobal = new HashSet <Integer>();	
+	private final  Set <Integer> matchNumbersGlobal = new HashSet <>();	
 	// indicates, whether data is alignable or not
-	private static boolean dataIsAlignable = true;
+	private boolean dataIsAlignable = true;
 	//max. count of matches per line
-	private static int maxMatchesPerLine = 0;
+	private int maxMatchesPerLine = 0;
 	//counter over token, globally over all query results
-	private static long counterGlobal;
+	private long counterGlobal;
 	
 	 	 
   
 	
-  private static class IsDominatedByMatch implements GraphTraverseHandler
+  private class IsDominatedByMatch implements GraphTraverseHandler
   {
    
     Long matchedNode = null;
@@ -838,7 +836,7 @@ public void getOrderedMatchNumbers (){
  * 
  * @return a list of globally ordered match numbers, if data alignable or an empty list otherwise
  */
-private static List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacencyMatrix, boolean matrixIsFilled, Set<Long> singleMatches){
+private List <Long> calculateOrderedMatchNumbersGlobally(int [][] adjacencyMatrix, boolean matrixIsFilled, Set<Long> singleMatches){
 	
 	List <Long> orderedMatchNumbers = new ArrayList<Long>();
 	
