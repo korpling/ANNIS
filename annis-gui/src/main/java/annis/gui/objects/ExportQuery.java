@@ -32,6 +32,7 @@ public class ExportQuery extends ContextualizedQuery
   
   private List<String> annotationKeys;
   private String parameters;
+  private boolean alignmc;
 
   public List<String> getAnnotationKeys()
   {
@@ -51,7 +52,17 @@ public class ExportQuery extends ContextualizedQuery
   public void setParameters(String parameters)
   {
     this.parameters = parameters;
-  }  
+  } 
+  
+  public boolean getAlignmc()
+  {
+	  return alignmc;
+  }
+  
+  public void setAlignmc (boolean alignmc)
+  {
+	  this.alignmc = alignmc;
+  }
 
   
   public Class<? extends ExporterPlugin> getExporter()
@@ -74,6 +85,12 @@ public class ExportQuery extends ContextualizedQuery
   public ExportQuery params(String parameters)
   {
     this.parameters = parameters;
+    return this;
+  }
+  
+  public ExportQuery alignmc(boolean alignmc)
+  {
+    this.alignmc = alignmc;
     return this;
   }
   

@@ -77,7 +77,7 @@ public class ExportBackgroundJob implements Callable<File>
     {
       exportError = exporter.convertText(query.getQuery(), query.getLeftContext(),
         query.getRightContext(), query.getCorpora(), query.getAnnotationKeys(),
-        query.getParameters(), Helper.getAnnisWebResource().path("query"),
+        query.getParameters(), query.getAlignmc(), Helper.getAnnisWebResource().path("query"),
         outWriter, eventBus, corpusConfigs);
     }
     finally
@@ -89,7 +89,7 @@ public class ExportBackgroundJob implements Callable<File>
         {
           if (panel != null)
           {
-            panel.showResult(currentTmpFile, exportError instanceof InterruptedException);
+            panel.showResult(currentTmpFile,  exportError);
           }
           if(exportError instanceof UniformInterfaceException)
           {

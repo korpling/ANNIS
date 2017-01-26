@@ -42,7 +42,7 @@ public class CSVExporter implements ExporterPlugin, Serializable
 
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, List<String> keys,String argsAsString,
+    Set<String> corpora, List<String> keys,String argsAsString, boolean alignmc,
     WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     
@@ -98,5 +98,11 @@ public class CSVExporter implements ExporterPlugin, Serializable
   {
     return "csv";
   }
+
+@Override
+public boolean isAlignable() 
+ {
+	return false;
+ }
   
 }
