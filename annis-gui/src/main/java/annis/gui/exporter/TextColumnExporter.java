@@ -50,6 +50,7 @@ import annis.libgui.Helper;
 import annis.model.AnnisConstants;
 import annis.model.Annotation;
 import annis.service.objects.SubgraphFilter;
+import java.util.Objects;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -490,7 +491,8 @@ public class TextColumnExporter extends SaltBasedExporter
 		                			  tokenToMatchNumber.containsKey(counterGlobal - 1) && tokenToMatchNumber.containsKey(counterGlobal + 1)){
 		                		    
 		                		  
-		                    			if (tokenToMatchNumber.get(counterGlobal - 1) == tokenToMatchNumber.get(counterGlobal + 1)){
+		                    			if (Objects.equals(tokenToMatchNumber.get(counterGlobal - 1), 
+                                    tokenToMatchNumber.get(counterGlobal + 1))){
 		                    				
 		                    				separator = SPACE;                     
 		    		                    	lastTokenWasMatched = tokenToMatchNumber.get(counterGlobal + 1);
