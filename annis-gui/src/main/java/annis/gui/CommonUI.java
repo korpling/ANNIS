@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.gui.components.SettingsStorage;
 import annis.gui.requesthandler.BinaryRequestHandler;
+import annis.gui.requesthandler.HTMLCorpusList;
 import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.requesthandler.ResourceRequestHandler;
 import annis.gui.servlets.ResourceServlet;
@@ -63,6 +64,7 @@ public class CommonUI extends AnnisBaseUI
     getSession().addRequestHandler(new LoginServletRequestHandler(urlPrefix));    
     getSession().addRequestHandler(new ResourceRequestHandler(urlPrefix));
     getSession().addRequestHandler(new BinaryRequestHandler(urlPrefix));
+    getSession().addRequestHandler(new HTMLCorpusList(urlPrefix));
     
     settings = new SettingsStorage(this);
     
