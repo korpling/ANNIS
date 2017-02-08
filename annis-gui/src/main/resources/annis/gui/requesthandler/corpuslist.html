@@ -16,11 +16,14 @@ limitations under the License.
 -->
 <html>
   <head>
-    <title>TODO supply a title</title>
+    <title>{{title}}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
   <body>
-    <div>TODO write content</div>
+    <h1>List of corpora</h1>
+    {{#corpus}}
+    <div>{{name}} ({{textCount}} texts and {{tokenCount}} token)</div>
+    {{/corpus}}
   </body>
 </html>

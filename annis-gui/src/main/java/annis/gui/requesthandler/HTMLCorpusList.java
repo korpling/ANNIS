@@ -15,10 +15,14 @@
  */
 package annis.gui.requesthandler;
 
+import annis.libgui.Helper;
+import annis.service.objects.AnnisCorpus;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import com.google.common.base.Charsets;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
@@ -27,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Creates a single HTML page which lists all available corpora.
@@ -50,8 +55,19 @@ public class HTMLCorpusList implements RequestHandler
     if (request.getPathInfo() != null && request.getPathInfo().
       startsWith(prefix))
     {
-      HashMap<String, Object> scopes = new HashMap<String, Object>();
+      HashMap<String, Object> scopes = new HashMap<>();
+      
+      scopes.put("title", "ANNIS corpora");
 
+      
+      WebResource rootRes = Helper.getAnnisWebResource();
+      List<AnnisCorpus> corporaList = rootRes.path("query").path("corpora")
+        .get(new GenericType<List<AnnisCorpus>>()
+          {
+        });
+      scopes.put("corpus", corporaList);
+
+      
       MustacheFactory mustacheFactory = new DefaultMustacheFactory();
       
       try(InputStream is = getClass().getResourceAsStream("corpuslist.html"))
