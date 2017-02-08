@@ -306,7 +306,7 @@ public class CorpusListPanel extends VerticalLayout implements
   public void attach()
   {
     super.attach();
-    IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora);
+    IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
   }
   
   
