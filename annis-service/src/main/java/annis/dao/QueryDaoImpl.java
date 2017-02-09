@@ -127,7 +127,17 @@ import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Handler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 // FIXME: test and refactor timeout and transaction management
 public class QueryDaoImpl extends AbstractDao implements QueryDao,
@@ -166,6 +176,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   
   private final Escaper corpusNameEscaper = UrlEscapers.urlPathSegmentEscaper();
   
+  private final SAXParserFactory factory = SAXParserFactory.newInstance();
+  
 
   @Override
   @Transactional(readOnly = true)
@@ -176,6 +188,128 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     SaltAnnotateExtractor.addMatchInformation(p, matchGroupExt.get(0));
     
     return p;
+  }
+  
+  public SaltProject graph_graphANNIS(QueryData data)
+  {
+    SaltProject p = SaltFactory.createSaltProject();
+    
+    List<MatchGroup> matchGroupList = data.getExtensions(MatchGroup.class);
+    List<AnnotateQueryData> annoExtList = data.getExtensions(AnnotateQueryData.class);
+    if(!matchGroupList.isEmpty() && !annoExtList.isEmpty())
+    {
+      MatchGroup mg = matchGroupList.get(0);
+      AnnotateQueryData annoExt = annoExtList.get(0);
+      
+      
+      for(Match m : mg.getMatches())
+      {
+        
+      }
+      
+      
+
+    }
+    
+    return p;
+  }
+  
+  private SDocumentGraph fetchDocumentWithContext(Match m, AnnotateQueryData annoExt)
+  {
+    
+    URI docID = null;
+    
+    // find all covered token
+    Multimap<Match, java.net.URI> contextByMatch = HashMultimap.create();
+    for(java.net.URI id : m.getSaltIDs())
+    {
+      
+      if(docID == null)
+      {
+        // use first node as template for the document ID
+        docID = URI.createURI(id.toASCIIString()).trimFragment();
+      }
+      
+      String corpusName = id.getHost();
+
+
+      String coveredAQLDirect = "tok _o_ annis:node_name=\"" + id.getFragment() + "\"";
+      String coveredAQLLeft = "tok .1," + annoExt.getLeft() 
+        + " tok _o_ annis:node_name=\"" + id.getFragment() + "\"";
+      String coveredAQLRight = "annis:node_name=\"" + id.getFragment() + 
+        " _o_ tok " + "\" .1," + annoExt.getRight() + " tok";
+
+      StringVector coveredIDsDirect = 
+        corpusStorageMgr.find(new StringVector(corpusName), QueryToJSON.aqlToJSON(coveredAQLDirect));
+      StringVector coveredIDsLeft = 
+        corpusStorageMgr.find(new StringVector(corpusName), QueryToJSON.aqlToJSON(coveredAQLLeft));
+      StringVector coveredIDsRight = 
+        corpusStorageMgr.find(new StringVector(corpusName), QueryToJSON.aqlToJSON(coveredAQLRight));
+
+      for(long i=0; i < coveredIDsDirect.size(); i++)
+      {
+        contextByMatch.putAll(m, Match.parseFromString(coveredIDsDirect.get(i).getString()).getSaltIDs());
+      }
+      for(long i=0; i < coveredIDsLeft.size(); i++)
+      {
+        contextByMatch.putAll(m, Match.parseFromString(coveredIDsLeft.get(i).getString()).getSaltIDs());
+      }
+      for(long i=0; i < coveredIDsRight.size(); i++)
+      {
+        contextByMatch.putAll(m, Match.parseFromString(coveredIDsRight.get(i).getString()).getSaltIDs());
+      }
+    }
+    
+    // extract the complete salt document from the database
+    // TODO: use a cache
+    if(docID != null)
+    {
+      SDocumentGraph docGraph = getSaltDocumentFromDB(docID.toString());
+      if(docGraph != null)
+      {
+        // TODO: extract the sub-graph
+        
+        return docGraph;
+      }
+    }
+    return null;
+  }
+  
+  private SDocumentGraph getSaltDocumentFromDB(String docID)
+  {
+    if(docID != null)
+    {
+      try(Connection conn = createSQLiteConnection();  
+            PreparedStatement stmt = conn.prepareStatement("SELECT salt_xml FROM documents WHERE salt_id=?"))
+      {
+        conn.setReadOnly(true);
+
+        stmt.setString(1, docID);
+        try(ResultSet rs = stmt.executeQuery())
+        {
+          SaltXML10Handler saltXMLHandler = new SaltXML10Handler();
+          
+          SAXParser parser = factory.newSAXParser();
+          XMLReader xmlReader = parser.getXMLReader();
+          xmlReader.setContentHandler(saltXMLHandler);
+          InputSource source = new InputSource(rs.getCharacterStream(1));
+          source.setEncoding("UTF-8");
+          xmlReader.parse(source);
+          
+          Object loadedObj = saltXMLHandler.getSaltObject();
+          
+          if(loadedObj instanceof SDocumentGraph)
+          {
+            return (SDocumentGraph) loadedObj;
+          }
+        }
+      }
+      catch(SQLException | IOException | SAXException | ParserConfigurationException ex)
+      {
+        log.error(null, ex);
+      }
+    }
+    return null;
   }
 
   /**
