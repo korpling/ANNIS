@@ -160,7 +160,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   // configuration
   private int timeout;
   
-  private API.CorpusStorageManager corpusStorageMgr;
+  private final API.CorpusStorageManager corpusStorageMgr;
   
   private final ExecutorService exec = Executors.newCachedThreadPool();
   
@@ -352,21 +352,15 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
     String sql = "SELECT filename FROM media_files "
       + "WHERE corpus_ref=" + corpusID + " AND title = " + "'corpus.properties'";
-    String fileName = getJdbcTemplate().query(sql,
-      new ResultSetExtractor<String>()
+    String fileName = getJdbcTemplate().query(sql, (ResultSet rs) ->
+    {
+      while (rs.next())
       {
-
-        @Override
-        public String extractData(ResultSet rs) throws SQLException, DataAccessException
-        {
-          while (rs.next())
-          {
-            return rs.getString("filename");
-          }
-
-          return null;
-        }
-      });
+        return rs.getString("filename");
+      }
+      
+      return null;
+    });
 
 
     File dir = getRealDataDir();
@@ -559,7 +553,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     planRowMapper = new ParameterizedSingleColumnRowMapper<>();
     sqlSessionModifiers = new ArrayList<>();
     
-    this.corpusStorageMgr = new API.CorpusStorageManager(getGraphANNISDir().getAbsolutePath());
+    this.corpusStorageMgr = new API.CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath());
   }
 
   public void init()
