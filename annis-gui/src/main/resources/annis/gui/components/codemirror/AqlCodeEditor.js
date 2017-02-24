@@ -70,9 +70,24 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       }
     };
     
+    
+    
+    
     this.onStateChange = function() 
     {
       var cursor = cmTextArea.getCursor();
+
+      //test changes on current text
+      var current = cmTextArea.getValue();
+
+      if (current.charAt(current.length - 1) == "\"")
+      {
+       var isBorder = true;
+       var modifiedText = current.substring(0, current.length - 1).concat('\u200E', "\"");
+
+      }
+
+      //end test
       
       var newMode = {
         name: 'aql',
