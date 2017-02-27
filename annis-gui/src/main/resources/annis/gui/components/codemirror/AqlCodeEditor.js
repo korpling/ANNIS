@@ -70,24 +70,33 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       }
     };
     
-    
-    
+      
     
     this.onStateChange = function() 
-    {
-      var cursor = cmTextArea.getCursor();
-
-      //test changes on current text
+    {    
+     
+      // test
+      // TODO set direction parameter to cmTextArea
+     
       var current = cmTextArea.getValue();
-
-      if (current.charAt(current.length - 1) == "\"")
+      if (current.charAt(current.length - 1) == "\"" & current.charAt(current.length - 2 ) != '\u200E')
       {
-       var isBorder = true;
        var modifiedText = current.substring(0, current.length - 1).concat('\u200E', "\"");
+       // add the LRM control character before \" 
+       cmTextArea.setValue(modifiedText);
+       
+       // TODO get last line anstead of current cursor
+       var currCursor = cmTextArea.getCursor();
+       var cursorPos = cmTextArea.getLine(currCursor.line).length;       
+       var lastLine  = currCursor.line;
+       cmTextArea.setCursor({line: lastLine, ch: cursorPos});
+    
+   // test ende
+      } 
 
-      }
-
-      //end test
+    
+     
+       var cursor = cmTextArea.getCursor();
       
       var newMode = {
         name: 'aql',
