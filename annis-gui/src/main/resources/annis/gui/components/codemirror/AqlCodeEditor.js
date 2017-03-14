@@ -48,7 +48,9 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         
     this.sendTextIfNecessary = function() 
     {
-      var current = cmTextArea.getValue();
+      //var current = cmTextArea.getValue();
+      //trim the LRM
+      var current = cmTextArea.getValue().replace(/\u200e/g, "");
             
       if(changeDelayTimerID)
       {
@@ -85,7 +87,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
        // add the LRM control character before \" 
        cmTextArea.setValue(modifiedText);
        
-       // TODO get last line anstead of current cursor
+       // TODO get last line instead of current cursor
        var currCursor = cmTextArea.getCursor();
        var cursorPos = cmTextArea.getLine(currCursor.line).length;       
        var lastLine  = currCursor.line;
