@@ -42,6 +42,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       gutters: ["CodeMirror-lint-markers"],
       lint: true,
       placeholder: "",
+      specialChars: /[\t\u0000-\u0019\u00ad\u200b\u200c\200d\u200f\u2028\u2029\ufeff]/g,
       inputStyle: 'textarea'
     });
         
@@ -76,8 +77,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     {    
      
       // test
-      // TODO set direction parameter to cmTextArea
-     
+         
       var current = cmTextArea.getValue();
       if (current.charAt(current.length - 1) == "\"" & current.charAt(current.length - 2 ) != '\u200E')
       {
