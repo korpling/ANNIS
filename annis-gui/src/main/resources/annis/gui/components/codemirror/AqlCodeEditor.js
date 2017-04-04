@@ -49,7 +49,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     this.sendTextIfNecessary = function() 
     {
       //var current = cmTextArea.getValue();
-      //trim the LRM
       var current = cmTextArea.getValue().replace(/\u200e/g, "");
             
       if(changeDelayTimerID)
@@ -73,6 +72,25 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       }
     };
     
+    this.changeCursorPosition = function()
+    {
+    	 var cursor = cmTextArea.getCursor();
+    	 var cursorLine = cursor.line;
+    	 var cursorPos = cursor.ch;
+    	 var charAfterCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos}, {line: cursorLine, ch: cursorPos + 1});
+    	 var charBeforeCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos});
+    	 var nextToCharBeforeCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 2}, {line: cursorLine, ch: cursorPos - 1});
+    	 var markArray = cmTextArea.findMarksAt({line: cursorLine, ch: cursorPos });
+    	 
+    	 
+    	 
+    	 if (charAfterCursor == "\"" & charBeforeCursor == '\u200E' &  markArray.length == 0){
+    		 cmTextArea.setCursor({line: cursorLine, ch: cursorPos - 1});
+    		 cmTextArea.markText({line: cursorLine, ch: cursorPos}, {line: cursorLine, ch: cursorPos + 1});
+    	 }
+    	 
+    };
+    
       
     
     this.onStateChange = function() 
@@ -81,17 +99,32 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       // test
          
       var current = cmTextArea.getValue();
-      if (current.charAt(current.length - 1) == "\"" & current.charAt(current.length - 2 ) != '\u200E')
+      var currentCursor = cmTextArea.getCursor();
+      
+       
+      var cursorLine  = currentCursor.line;
+      var cursorPos = currentCursor.ch;    
+
+      var lastChar = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 2}, {line: cursorLine, ch: cursorPos - 1});
+      var currentChar = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos});
+
+
+      //if (current.charAt(current.length - 1) == "\"" & current.charAt(current.length - 2 ) != '\u200E')
+      if (currentChar == "\"" & lastChar != '\u200E')
       {
-       var modifiedText = current.substring(0, current.length - 1).concat('\u200E', "\"");
+      // var modifiedText = current.substring(0, current.length - 1).concat('\u200E', "\"");
+       var modifiedText = cmTextArea.getValue().replace(/([^\u200E])\"/gm, '$1'.concat("\u200E\""));
        // add the LRM control character before \" 
        cmTextArea.setValue(modifiedText);
        
-       // TODO get last line instead of current cursor
-       var currCursor = cmTextArea.getCursor();
+      /* var currCursor = cmTextArea.getCursor();
        var cursorPos = cmTextArea.getLine(currCursor.line).length;       
        var lastLine  = currCursor.line;
-       cmTextArea.setCursor({line: lastLine, ch: cursorPos});
+       cmTextArea.setCursor({line: lastLine, ch: cursorPos});*/
+
+       cmTextArea.setCursor({line: cursorLine, ch: cursorPos + 1});
+
+       
     
    // test ende
       } 
@@ -164,6 +197,11 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     {
       connector.sendTextIfNecessary();
     });
+    
+    cmTextArea.on("keyup", function(instance)
+   {
+	  connector.changeCursorPosition();
+	});
     
 };
 
