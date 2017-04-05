@@ -72,26 +72,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       }
     };
     
-    this.changeCursorPosition = function()
-    {
-    	 var cursor = cmTextArea.getCursor();
-    	 var cursorLine = cursor.line;
-    	 var cursorPos = cursor.ch;
-    	 var charAfterCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos}, {line: cursorLine, ch: cursorPos + 1});
-    	 var charBeforeCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos});
-    	 var nextToCharBeforeCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 2}, {line: cursorLine, ch: cursorPos - 1});
-    	 var markArray = cmTextArea.findMarksAt({line: cursorLine, ch: cursorPos });
-    	 
-    	 
-    	 
-    	 if (charAfterCursor == "\"" & charBeforeCursor == '\u200E' &  markArray.length == 0){
-    		 cmTextArea.setCursor({line: cursorLine, ch: cursorPos - 1});
-    		 cmTextArea.markText({line: cursorLine, ch: cursorPos}, {line: cursorLine, ch: cursorPos + 1});
-    	 }
-    	 
-    };
-    
-      
+       
     
     this.onStateChange = function() 
     {    
@@ -198,9 +179,23 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       connector.sendTextIfNecessary();
     });
     
-    cmTextArea.on("keyup", function(instance)
+    cmTextArea.on("keyup", function(cm, err)
    {
-	  connector.changeCursorPosition();
+	  //connector.changeCursorPosition();
+	 var cursor = cmTextArea.getCursor();
+ 	 var cursorLine = cursor.line;
+ 	 var cursorPos = cursor.ch;
+ 	 var charAfterCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos}, {line: cursorLine, ch: cursorPos + 1});
+     var charBeforeCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos});
+ 	 var markArray = cmTextArea.findMarksAt({line: cursorLine, ch: cursorPos });
+ 	 
+ 	 
+ 	 
+ 	 if (charAfterCursor == "\"" & charBeforeCursor == '\u200E' &  markArray.length == 0){
+ 		 cm.execCommand("goCharLeft");
+ 		 //cmTextArea.setCursor({line: cursorLine, ch: cursorPos - 1});
+ 		 cmTextArea.markText({line: cursorLine, ch: cursorPos}, {line: cursorLine, ch: cursorPos + 1});
+ 	 }
 	});
     
 };
