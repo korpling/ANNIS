@@ -43,7 +43,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       lint: true,
       placeholder: "",
       specialChars: /[\t\u0000-\u0019\u00ad\u200b\u200c\200d\u200f\u2028\u2029\ufeff]/g,
-      inputStyle: 'textarea'
+      inputStyle: 'textarea',
+      rtlMoveVisually : true
     });
         
     this.sendTextIfNecessary = function() 
@@ -77,11 +78,11 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     this.onStateChange = function() 
     {    
      
+    	//TODO mark LRM and " as atomic (see CodeMirror mark method)
       // test
          
       var current = cmTextArea.getValue();
-      var currentCursor = cmTextArea.getCursor();
-      
+      var currentCursor = cmTextArea.getCursor();      
        
       var cursorLine  = currentCursor.line;
       var cursorPos = currentCursor.ch;    
@@ -90,22 +91,18 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       var currentChar = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos});
 
 
-      //if (current.charAt(current.length - 1) == "\"" & current.charAt(current.length - 2 ) != '\u200E')
+      
       if (currentChar == "\"" & lastChar != '\u200E')
       {
-      // var modifiedText = current.substring(0, current.length - 1).concat('\u200E', "\"");
-       var modifiedText = cmTextArea.getValue().replace(/([^\u200E])\"/gm, '$1'.concat("\u200E\""));
+       //var modifiedText = current.substring(0, current.length - 1).concat('\u200E', "\"");
+      // var modifiedText = cmTextArea.getValue().replace(/([^\u200E])\"/gm, '$1'.concat("\u200E\""));
        // add the LRM control character before \" 
-       cmTextArea.setValue(modifiedText);
+       //cmTextArea.setValue(modifiedText);
        
-      /* var currCursor = cmTextArea.getCursor();
-       var cursorPos = cmTextArea.getLine(currCursor.line).length;       
-       var lastLine  = currCursor.line;
-       cmTextArea.setCursor({line: lastLine, ch: cursorPos});*/
-
-       cmTextArea.setCursor({line: cursorLine, ch: cursorPos + 1});
-
-       
+       var replacement = '\u200E';
+       cmTextArea.replaceRange(replacement, {line: cursorLine, ch: cursorPos - 1});      
+       cmTextArea.markText({line: cursorLine, ch: cursorPos - 2}, {line: cursorLine, ch: cursorPos + 0}, {atomic: true});
+       cmTextArea.setCursor({line: cursorLine, ch: cursorPos + 1});  
     
    // test ende
       } 
@@ -164,7 +161,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     cmTextArea.on("change", function(instance, changeObj)
     {       
-      if(changeDelayTimerID)
+      	
+    	if(changeDelayTimerID)
       {
         window.clearTimeout(changeDelayTimerID);
       }
@@ -179,7 +177,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       connector.sendTextIfNecessary();
     });
     
-    cmTextArea.on("keyup", function(cm, err)
+    
+   /* cmTextArea.on("keyup", function(cm, err)
    {
 	  //connector.changeCursorPosition();
 	 var cursor = cmTextArea.getCursor();
@@ -196,7 +195,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
  		 //cmTextArea.setCursor({line: cursorLine, ch: cursorPos - 1});
  		 cmTextArea.markText({line: cursorLine, ch: cursorPos}, {line: cursorLine, ch: cursorPos + 1});
  	 }
-	});
+	});*/
     
 };
 
