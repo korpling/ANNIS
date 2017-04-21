@@ -77,31 +77,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     this.onStateChange = function() 
     {    
-     
-    	//TODO mark LRM and " as atomic (see CodeMirror mark method)
-      // test         
-     /* var current = cmTextArea.getValue();
-      var currentCursor = cmTextArea.getCursor();      
-       
-      var cursorLine  = currentCursor.line;
-      var cursorPos = currentCursor.ch;    
-
-      var lastChar = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 2}, {line: cursorLine, ch: cursorPos - 1});
-      var currentChar = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos});
-           
-      if (currentChar == "\"" & lastChar != '\u200E')
-      {       
-       // add the LRM control character before \"    
-       var replacement = '\u200E';
-       cmTextArea.replaceRange(replacement, {line: cursorLine, ch: cursorPos - 1});           
-       cmTextArea.markText({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos + 1}, {atomic: true});
-       //cmTextArea.setCursor({line: cursorLine, ch: cursorPos + 1});    
-   
-      } // test ende*/
-      
-           
-    
-            
+             
+     // TODO test behavior, cursor position, display of token
 	  var lineCount = cmTextArea.lineCount();
 	  var j = 0;
 	  var pos = 0;
@@ -199,25 +176,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       connector.sendTextIfNecessary();
     });
     
-    
-   /* cmTextArea.on("keyup", function(cm, err)
-   {
-	  //connector.changeCursorPosition();
-	 var cursor = cmTextArea.getCursor();
- 	 var cursorLine = cursor.line;
- 	 var cursorPos = cursor.ch;
- 	 var charAfterCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos}, {line: cursorLine, ch: cursorPos + 1});
-     var charBeforeCursor = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos});
- 	 var markArray = cmTextArea.findMarksAt({line: cursorLine, ch: cursorPos });
- 	 
- 	 
- 	 
- 	 if (charAfterCursor == "\"" & charBeforeCursor == '\u200E' &  markArray.length == 0){
- 		 cm.execCommand("goCharLeft");
- 		 //cmTextArea.setCursor({line: cursorLine, ch: cursorPos - 1});
- 		 cmTextArea.markText({line: cursorLine, ch: cursorPos}, {line: cursorLine, ch: cursorPos + 1});
- 	 }
-	});*/
     
 };
 
