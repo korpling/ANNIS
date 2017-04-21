@@ -79,9 +79,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     {    
      
     	//TODO mark LRM and " as atomic (see CodeMirror mark method)
-      // test
-         
-      var current = cmTextArea.getValue();
+      // test         
+     /* var current = cmTextArea.getValue();
       var currentCursor = cmTextArea.getCursor();      
        
       var cursorLine  = currentCursor.line;
@@ -89,27 +88,50 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
 
       var lastChar = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 2}, {line: cursorLine, ch: cursorPos - 1});
       var currentChar = cmTextArea.getRange({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos});
-
-
-      
+           
       if (currentChar == "\"" & lastChar != '\u200E')
-      {
-       //var modifiedText = current.substring(0, current.length - 1).concat('\u200E', "\"");
-      // var modifiedText = cmTextArea.getValue().replace(/([^\u200E])\"/gm, '$1'.concat("\u200E\""));
-       // add the LRM control character before \" 
-       //cmTextArea.setValue(modifiedText);
-       
+      {       
+       // add the LRM control character before \"    
        var replacement = '\u200E';
-       cmTextArea.replaceRange(replacement, {line: cursorLine, ch: cursorPos - 1});      
-       cmTextArea.markText({line: cursorLine, ch: cursorPos - 2}, {line: cursorLine, ch: cursorPos + 0}, {atomic: true});
-       cmTextArea.setCursor({line: cursorLine, ch: cursorPos + 1});  
+       cmTextArea.replaceRange(replacement, {line: cursorLine, ch: cursorPos - 1});           
+       cmTextArea.markText({line: cursorLine, ch: cursorPos - 1}, {line: cursorLine, ch: cursorPos + 1}, {atomic: true});
+       //cmTextArea.setCursor({line: cursorLine, ch: cursorPos + 1});    
+   
+      } // test ende*/
+      
+           
     
-   // test ende
-      } 
-
+            
+	  var lineCount = cmTextArea.lineCount();
+	  var j = 0;
+	  var pos = 0;
+	  
+	  for (var i = 0; i < lineCount; i++) 
+	  {
+		  var lineValue = cmTextArea.getLine(i);
+		  //find all occurrences of \"
+		  while ((pos = lineValue.indexOf("\"", j)) != -1)
+		  {
+			  j = pos + 1;
+			  if (lineValue.charAt(pos - 1) == undefined || lineValue.charAt(pos - 1) != '\u200e'){				
+		    	 var replacement = '\u200E';
+		         cmTextArea.replaceRange(replacement, {line: i, ch: pos});   
+		         cmTextArea.markText({line: i, ch: pos}, {line: i, ch: (pos + 2)}, {atomic: true});
+		         j += 1;
+			 }
+			  else
+			  {
+				  cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});  
+			  }
+			
+	      }
+	        
+		  
+	  }
+    	
     
      
-       var cursor = cmTextArea.getCursor();
+      var cursor = cmTextArea.getCursor();
       
       var newMode = {
         name: 'aql',
