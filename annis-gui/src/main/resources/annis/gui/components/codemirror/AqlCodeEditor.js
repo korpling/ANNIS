@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+//JavaScript-connector, communicates between server-side (AqlCodeEditor) and JavaScript-code (codemirror) 
 window.annis_gui_components_codemirror_AqlCodeEditor = function() {
   
     var connector = this;
@@ -74,41 +76,11 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     };
     
        
-    
+    //handle changes from the server-side
     this.onStateChange = function() 
     {    
              
-     // TODO test behavior, cursor position, display of token
-	  var lineCount = cmTextArea.lineCount();
-	  var j = 0;
-	  var pos = 0;
-	  
-	  for (var i = 0; i < lineCount; i++) 
-	  {
-		  var lineValue = cmTextArea.getLine(i);
-		  //find all occurrences of \"
-		  while ((pos = lineValue.indexOf("\"", j)) != -1)
-		  {
-			  j = pos + 1;
-			  if (lineValue.charAt(pos - 1) == undefined || lineValue.charAt(pos - 1) != '\u200e'){				
-		    	 var replacement = '\u200E';
-		         cmTextArea.replaceRange(replacement, {line: i, ch: pos});   
-		         cmTextArea.markText({line: i, ch: pos}, {line: i, ch: (pos + 2)}, {atomic: true});
-		         j += 1;
-			 }
-			  else
-			  {
-				  cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});  
-			  }
-			
-	      }
-	        
-		  
-	  }
-    	
-    
-     
-      var cursor = cmTextArea.getCursor();
+     var cursor = cmTextArea.getCursor();
       
       var newMode = {
         name: 'aql',
@@ -158,8 +130,48 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       changeDelayTime = newDelayTime;
     };
     
+    //pass user interaction to the server-side
     cmTextArea.on("change", function(instance, changeObj)
-    {       
+    {  
+    	
+     // TODO test behavior, cursor position, display of token, especially with u0627 at the and
+  	  var lineCount = cmTextArea.lineCount();   	  
+  	  for (var i = 0; i < lineCount; i++) 
+  	  {
+  		  var lineValue = cmTextArea.getLine(i);
+  		  var j = 0;
+  		  var pos = 0;
+  		  
+  		  //find all occurrences of \"
+  		  while ((pos = lineValue.indexOf("\"", j)) != -1)
+  		  {
+  			  j = pos + 1;
+  			  // if LRM already inserted, bind LRM and \" together
+  			  if (lineValue.charAt(pos - 1) == '\u200e')
+  			  {	  textMarker = cmTextArea.findMarksAt({line: i, ch: pos -1});
+  				  if (textMarker.length == 0)
+  				  {
+  					  cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});  
+  				  }
+  				 
+  		    	 
+  			 }
+  			  //else insert LRM and bind together
+  			  else if (lineValue.charAt(pos - 1) != '\u200e' || lineValue.charAt(pos - 1) == undefined)
+  			  {				  
+  				     var replacement = '\u200E';
+  			         cmTextArea.replaceRange(replacement, {line: i, ch: pos});   
+  			         cmTextArea.markText({line: i, ch: pos}, {line: i, ch: (pos + 2)}, {atomic: true});
+  			         j += 1;
+  			         
+  			  }
+  			  
+  			  lineValue = cmTextArea.getLine(i);
+  			
+  	      }
+  	        
+  		  
+  	  }
       	
     	if(changeDelayTimerID)
       {

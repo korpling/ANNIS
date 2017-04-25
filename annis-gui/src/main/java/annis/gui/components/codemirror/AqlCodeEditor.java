@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
     "lib/lint/lint.css",
     "AqlCodeEditor.css"
   })
+//basic server-side component
 public class AqlCodeEditor extends AbstractJavaScriptComponent
   implements FieldEvents.TextChangeNotifier, Property.Viewer,
   Property.ValueChangeListener
