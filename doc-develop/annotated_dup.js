@@ -141,6 +141,7 @@ var annotated_dup =
           [ "GridExporter", "classannis_1_1gui_1_1exporter_1_1_grid_exporter.html", "classannis_1_1gui_1_1exporter_1_1_grid_exporter" ],
           [ "SaltBasedExporter", "classannis_1_1gui_1_1exporter_1_1_salt_based_exporter.html", "classannis_1_1gui_1_1exporter_1_1_salt_based_exporter" ],
           [ "SimpleTextExporter", "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter.html", "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter" ],
+          [ "TextColumnExporter", "classannis_1_1gui_1_1exporter_1_1_text_column_exporter.html", "classannis_1_1gui_1_1exporter_1_1_text_column_exporter" ],
           [ "TokenExporter", "classannis_1_1gui_1_1exporter_1_1_token_exporter.html", "classannis_1_1gui_1_1exporter_1_1_token_exporter" ],
           [ "WekaExporter", "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html", "classannis_1_1gui_1_1exporter_1_1_weka_exporter" ]
         ] ],

@@ -450,15 +450,15 @@ var hierarchy =
     [ "Thread", null, [
       [ "annis.service.internal.ImportWorker", "classannis_1_1service_1_1internal_1_1_import_worker.html", null ]
     ] ],
-    [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
     [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
+    [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
     [ "annis.TimelineReconstructor", "classannis_1_1_timeline_reconstructor.html", null ],
     [ "annis.visualizers.component.tree.TreeElementLabeler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_labeler.html", null ],
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
     ] ],
-    [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
     [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
+    [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
     [ "UriFragmentChangedListener", null, [
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
     ] ],
@@ -472,7 +472,7 @@ var hierarchy =
       [ "annis.gui.MetaDataPanel", "classannis_1_1gui_1_1_meta_data_panel.html", null ],
       [ "annis.gui.querybuilder.QueryBuilderChooser", "classannis_1_1gui_1_1querybuilder_1_1_query_builder_chooser.html", null ]
     ] ],
-    [ "annis.gui.flatquerybuilder.ValueField.ValueMode", "classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode", null ],
+    [ "annis.gui.flatquerybuilder.ValueField.ValueMode", "enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode.html", null ],
     [ "annis.visualizers.iframe.dependency.Vector2", "classannis_1_1visualizers_1_1iframe_1_1dependency_1_1_vector2.html", null ],
     [ "annis.VersionInfo", "classannis_1_1_version_info.html", null ],
     [ "annis.service.internal.VersionServiceImpl", "classannis_1_1service_1_1internal_1_1_version_service_impl.html", null ],
@@ -785,7 +785,9 @@ var hierarchy =
           [ "annis.gui.exporter.SimpleTextExporter", "classannis_1_1gui_1_1exporter_1_1_simple_text_exporter.html", null ],
           [ "annis.gui.exporter.TokenExporter", "classannis_1_1gui_1_1exporter_1_1_token_exporter.html", null ]
         ] ],
-        [ "annis.gui.exporter.SaltBasedExporter", "classannis_1_1gui_1_1exporter_1_1_salt_based_exporter.html", null ],
+        [ "annis.gui.exporter.SaltBasedExporter", "classannis_1_1gui_1_1exporter_1_1_salt_based_exporter.html", [
+          [ "annis.gui.exporter.TextColumnExporter", "classannis_1_1gui_1_1exporter_1_1_text_column_exporter.html", null ]
+        ] ],
         [ "annis.gui.exporter.WekaExporter", "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html", null ]
       ] ],
       [ "annis.libgui.media.MediaController", "interfaceannis_1_1libgui_1_1media_1_1_media_controller.html", [

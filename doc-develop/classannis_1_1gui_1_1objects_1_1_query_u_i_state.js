@@ -7,6 +7,7 @@ var classannis_1_1gui_1_1objects_1_1_query_u_i_state =
       [ "FREQUENCY", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a20b40c87fc99576ece463a9aed1192f6", null ]
     ] ],
     [ "QueryUIState", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a8e172d53a0f11af0f648b4b31d52eef1", null ],
+    [ "getAlignmc", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#aecaa7331f29e6eaf9a641389696d4758", null ],
     [ "getAql", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a0fcae076c07a9e6bbc39d47fd97f5da8", null ],
     [ "getAvailableCorpora", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#aef78a3a3150c0e0ee52fe88c0360e16a", null ],
     [ "getContextSegmentation", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a1fca7489d15f45b1d7faf15973804d37", null ],

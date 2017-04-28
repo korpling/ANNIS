@@ -18,7 +18,7 @@ var searchData=
   ['flatquerybuilderplugin',['FlatQueryBuilderPlugin',['../classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder_plugin.html',1,'annis::gui::flatquerybuilder']]],
   ['font',['Font',['../interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_graphics_backend_1_1_font.html',1,'annis::visualizers::component::tree::GraphicsBackend']]],
   ['fontconfig',['FontConfig',['../classannis_1_1gui_1_1_font_config.html',1,'annis::gui']]],
-  ['frequency',['frequency',['../classannis_1_1service_1_1internal_1_1_query_service_impl.html#a9b6d820042260dd26d826823870e2b68',1,'annis::service::internal::QueryServiceImpl']]],
+  ['frequency',['frequency',['../classannis_1_1service_1_1internal_1_1_query_service_impl.html#a4d8071f38ebbe8f67276134dcf1daf9a',1,'annis::service::internal::QueryServiceImpl']]],
   ['frequencybackgroundjob',['FrequencyBackgroundJob',['../classannis_1_1gui_1_1controller_1_1_frequency_background_job.html',1,'annis::gui::controller']]],
   ['frequencychart',['FrequencyChart',['../classannis_1_1gui_1_1components_1_1_frequency_chart.html',1,'annis::gui::components']]],
   ['frequencyquery',['FrequencyQuery',['../classannis_1_1gui_1_1objects_1_1_frequency_query.html',1,'annis::gui::objects']]],
