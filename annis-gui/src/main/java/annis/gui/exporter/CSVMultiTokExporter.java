@@ -5,17 +5,12 @@ import annis.libgui.Helper;
 import annis.model.AnnisConstants;
 import annis.model.Annotation;
 import annis.model.RelannisNodeFeature;
-import annis.service.objects.CorpusConfig;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
 import annis.service.objects.SubgraphFilter;
-import com.google.common.eventbus.EventBus;
-import com.sun.jersey.api.client.WebResource;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -65,50 +60,13 @@ public class CSVMultiTokExporter extends SaltBasedExporter
   private Set<String> metakeys;
   private SortedMap<Integer,TreeSet<String>> annotationsForMatchedNodes;
 
-  private boolean firstIteration;
 
-  @Override
-  public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, List<String> keys, String argsAsString,
-    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
-  {
-    this.firstIteration = true;
-    Writer nullWriter = new OutputStreamWriter(
-        new OutputStream()
-        {
-          @Override
-          public void write(int b)
-          {}
-        });
-    Exception ex = super.convertText(queryAnnisQL, contextLeft, contextRight, corpora,
-      keys, argsAsString, annisResource,
-      nullWriter,  // avoid empty line at the beginning
-      null,  // don't show export update during the first iteration
-      corpusConfigs);
-    if (ex != null)
-      return ex;
-    this.firstIteration = false;
-    return super.convertText(queryAnnisQL, contextLeft, contextRight, corpora,
-      keys, argsAsString, annisResource, out, eventBus, corpusConfigs);
-  }
-
-  @Override
-  public void convertText(SDocumentGraph graph, List<String> annoKeys,
-    Map<String, String> args, int matchNumber,
-    Writer out) throws IOException
-  {
-    if(this.firstIteration)
-      this.collectHeader(graph, annoKeys, args, matchNumber, out);
-    else
-      this.writeText(graph, annoKeys, args, matchNumber, out);
-  }
-
-  private void collectHeader(SDocumentGraph graph, List<String> annoKeys,
-    Map<String, String> args, int matchNumber,
-    Writer out) throws IOException
+  @ Override
+  public void createAdjacencyMatrix(SDocumentGraph graph,
+    Map<String, String> args, int matchNumber, int nodeCount) throws IOException, IllegalArgumentException
   {
     // first match
-    if (matchNumber == -1)
+    if (matchNumber == 0)
     {
       // get list of metakeys to export
       metakeys = new HashSet<>();
@@ -139,13 +97,14 @@ public class CSVMultiTokExporter extends SaltBasedExporter
       }
     }
   }
-  private void writeText(SDocumentGraph graph, List<String> annoKeys,
-    Map<String, String> args, int matchNumber,
-    Writer out) throws IOException
+
+  @Override
+  public void outputText(SDocumentGraph graph, boolean alignmc, int matchNumber,
+    Writer out) throws IOException, IllegalArgumentException
   {
 
     // first match
-    if (matchNumber == -1)
+    if (matchNumber == 0)
     {
       // output header
       List<String> headerLine = new ArrayList<>();
@@ -219,5 +178,17 @@ public class CSVMultiTokExporter extends SaltBasedExporter
     }
 
     out.append("\n");
+  }
+
+  @Override
+  public void getOrderedMatchNumbers()
+  {
+    // TODO
+  }
+
+  @Override
+  public boolean isAlignable()
+  {
+    return false;
   }
 }
