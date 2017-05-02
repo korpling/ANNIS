@@ -50,7 +50,6 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -238,37 +237,33 @@ public class GridComponent extends Panel
       }
      }
     }
-      
-    
-    
-    
-    
-    
     
     // add tokens as row
     AtomicInteger tokenOffsetForText = new AtomicInteger(-1);
     Row tokenRow = computeTokenRow(tokens, graph,
       rowsByAnnotation, startIndex, tokenOffsetForText);
-    if (isHidingToken() == false)
-    {
-      
-      if(isTokenFirst())
-      {
-        // copy original list but add token row at the beginning
-        LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<>();
-        
-        newList.put("tok", Lists.newArrayList(tokenRow));
-        newList.putAll(rowsByAnnotation);
-        rowsByAnnotation = newList;
-        
-      }
-      else
-      {
-        // just add the token row to the end of the list
-        rowsByAnnotation.put("tok", Lists.newArrayList(tokenRow));
-      }
-    }
     
+    if(isHidingToken())
+    {
+      tokenRow.setStyle("invisible_token");
+    }
+      
+    if(isTokenFirst())
+    {
+      // copy original list but add token row at the beginning
+      LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<>();
+
+      newList.put("tok", Lists.newArrayList(tokenRow));
+      newList.putAll(rowsByAnnotation);
+      rowsByAnnotation = newList;
+
+    }
+    else
+    {
+      // just add the token row to the end of the list
+      rowsByAnnotation.put("tok", Lists.newArrayList(tokenRow));
+    }
+
     EventExtractor.removeEmptySpace(rowsByAnnotation, tokenRow);
     
     // check if the token row only contains empty values

@@ -472,7 +472,16 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
     result.setUsername(user);
     result.setPassword(password);
-    result.setValidationQuery("SELECT 1;");
+    
+    result.setValidationQuery("SELECT 1;");   
+    result.setTestOnCreate(true);
+    result.setTestOnBorrow(true);
+    result.setTestOnReturn(true);
+    result.setTestWhileIdle(true);
+    result.setFastFailValidation(true);
+    result.setDisconnectionSqlCodes(Arrays.asList("53000","53300","53400","08000","08003","08006","08001","08004",
+      "08007","08P01"));
+    
     result.setAccessToUnderlyingConnectionAllowed(true);
     if (schema == null)
     {

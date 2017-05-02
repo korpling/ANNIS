@@ -66,6 +66,7 @@ import annis.gui.CorpusBrowserPanel;
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.MetaDataPanel;
 import annis.gui.filter.SetFilter;
+import annis.libgui.AnnisBaseUI;
 import annis.libgui.Background;
 import annis.libgui.CorpusSet;
 import annis.libgui.Helper;
@@ -305,7 +306,7 @@ public class CorpusListPanel extends VerticalLayout implements
   public void attach()
   {
     super.attach();
-    IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora);
+    IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
   }
   
   
@@ -435,8 +436,11 @@ public class CorpusListPanel extends VerticalLayout implements
       else
       {
         log.error(null, ex);
-        Notification.show("Remote exception: " + ex.getLocalizedMessage(),
-          Notification.Type.TRAY_NOTIFICATION);
+        if(!AnnisBaseUI.handleCommonError(ex, "get corpus list"))
+        {
+          Notification.show("Remote exception: " + ex.getLocalizedMessage(),
+            Notification.Type.TRAY_NOTIFICATION);
+        }
       }
     }
     return null;

@@ -42,5 +42,11 @@ public class SimpleTextExporter extends GeneralTextExporter
     + "Use the GridExporter instead.</strong>"
     + "</p>" ;
   }
+
+@Override
+public boolean isAlignable() 
+	{
+		return false;
+	}
   
 }

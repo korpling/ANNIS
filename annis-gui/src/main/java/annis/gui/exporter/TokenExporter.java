@@ -121,6 +121,13 @@ public class TokenExporter extends GeneralTextExporter
   {
     return SubgraphFilter.token;
   }
+
+
+@Override
+public boolean isAlignable() 
+	{
+		return false;
+	}
   
   
 }

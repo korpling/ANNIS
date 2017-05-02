@@ -33,11 +33,13 @@ import java.util.Set;
 public interface ExporterPlugin extends Plugin
 {
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight, 
-   Set<String> corpora, List<String> keys, String args, 
+   Set<String> corpora, List<String> keys, String args, boolean alignmc,
    WebResource annisResource, Writer out, EventBus eventBus,
    Map<String, CorpusConfig> corpusConfigs);
   
   public boolean isCancelable();
+  
+  public boolean isAlignable();
   
   public String getHelpMessage();
   

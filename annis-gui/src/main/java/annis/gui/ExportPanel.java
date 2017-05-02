@@ -33,6 +33,7 @@ import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.GridLayout;
@@ -52,6 +53,7 @@ import annis.gui.objects.QueryUIState;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.PluginSystem;
 import annis.libgui.exporter.ExporterPlugin;
+import net.sf.ehcache.CacheException;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
@@ -104,6 +106,8 @@ public class ExportPanel extends GridLayout
   private final Label lblHelp;
   
   private final PluginSystem ps;
+  
+  private final CheckBox cbAlignmc;
 
   public ExportPanel(QueryPanel queryPanel, QueryController controller, QueryUIState state, PluginSystem ps)
   {
@@ -180,6 +184,13 @@ public class ExportPanel extends GridLayout
         + "for certain exporters. See the description of each exporter "
         + "(‘?’ button above) for specific parameter settings.");
     formLayout.addComponent(new HelpButton<String>(txtParameters));
+    
+  //check box for match-with-context exporter
+    cbAlignmc = new CheckBox("align matches" +"<br/>" + "by node number");
+    cbAlignmc.setCaptionAsHtml(true);
+    cbAlignmc.setDescription("Click here to align export result by node number.");
+    cbAlignmc.setEnabled(true);
+    formLayout.addComponent(cbAlignmc);
 
     btExport = new Button("Perform Export");
     btExport.setIcon(FontAwesome.PLAY);
@@ -197,6 +208,8 @@ public class ExportPanel extends GridLayout
     btDownload.setIcon(FontAwesome.DOWNLOAD);
     btDownload.setDisableOnClick(true);
     btDownload.setEnabled(false);
+    
+    
 
     HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport, btCancel, btDownload);
     addComponent(layoutExportButtons, 0, 1, 1, 1);
@@ -222,6 +235,8 @@ public class ExportPanel extends GridLayout
       txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
 
       txtParameters.setPropertyDataSource(state.getExportParameters());
+      
+      cbAlignmc.setPropertyDataSource(state.getAlignmc());
 
     }
 
@@ -263,6 +278,8 @@ public class ExportPanel extends GridLayout
       if (exporter != null)
       {
         btCancel.setVisible(exporter.isCancelable());
+        
+        cbAlignmc.setVisible(exporter.isAlignable());
 
         String helpMessage = exporter.getHelpMessage();
         if (helpMessage != null)
@@ -277,6 +294,7 @@ public class ExportPanel extends GridLayout
       else
       {
         btCancel.setVisible(false);
+        cbAlignmc.setVisible(false);
         lblHelp.setValue("No valid exporter selected");
       }
     }
@@ -321,7 +339,7 @@ public class ExportPanel extends GridLayout
     }
   }
 
-  public void showResult(File currentTmpFile, boolean manuallyCancelled)
+  public void showResult(File currentTmpFile, Exception exportError)
   {
     btExport.setEnabled(true);
     btCancel.setEnabled(false);
@@ -331,19 +349,25 @@ public class ExportPanel extends GridLayout
     // copy the result to the class member in order to delete if
     // when not longer needed
     tmpOutputFile = currentTmpFile;
-
-    if (tmpOutputFile == null)
+    //
+    if (exportError instanceof CacheException | exportError instanceof IllegalStateException 
+    		| exportError instanceof  ClassCastException)
+    {
+    	 Notification.show(exportError.getMessage(), Notification.Type.ERROR_MESSAGE);
+    }
+    else  if (tmpOutputFile == null)
     {
       Notification.show("Could not create the Exporter",
           "The server logs might contain more information about this "
               + "so you should contact the provider of this ANNIS installation " + "for help.",
           Notification.Type.ERROR_MESSAGE);
     }
-    else if (manuallyCancelled)
+    else if (exportError instanceof InterruptedException)
     {
       // we were aborted, don't do anything
       Notification.show("Export cancelled", Notification.Type.WARNING_MESSAGE);
     }
+    
     else
     {
       if (downloader != null && btDownload.getExtensions().contains(downloader))

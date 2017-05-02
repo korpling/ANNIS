@@ -69,6 +69,7 @@ import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
+import annis.libgui.AnnisBaseUI;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
@@ -189,7 +190,11 @@ public class QueryController implements Serializable
         }
         catch (ExecutionException ex)
         {
-          if (ex.getCause() instanceof UniformInterfaceException)
+          if(AnnisBaseUI.handleCommonError(ex, "validate query"))
+          {
+            log.error(null, ex);
+          }
+          else if (ex.getCause() instanceof UniformInterfaceException)
           {
             reportServiceException((UniformInterfaceException) ex.getCause(),
               false);
@@ -230,54 +235,54 @@ public class QueryController implements Serializable
     String caption = null;
     String description = null;
 
-    if (ex.getResponse().getStatus() == 400)
+    if(!AnnisBaseUI.handleCommonError(ex, "execute query"))
     {
-      List<AqlParseError> errors
-        = ex.getResponse().getEntity(
-          new GenericType<List<AqlParseError>>()
+      switch (ex.getResponse().getStatus())
+      {
+        case 400:
+          List<AqlParseError> errors
+            = ex.getResponse().getEntity(
+              new GenericType<List<AqlParseError>>()
+              {
+              });
+          caption = "Parsing error";
+          description = Joiner.on("\n").join(errors);
+          qp.setStatus(description);
+          qp.setErrors(errors);
+          break;
+        case 504:
+          caption = "Timeout";
+          description = "Query execution took too long.";
+          qp.setStatus(caption + ": " + description);
+          break;
+        case 403:
+          if(Helper.getUser() == null)
           {
-          });
-      caption = "Parsing error";
-      description = Joiner.on("\n").join(errors);
-      qp.setStatus(description);
-      qp.setErrors(errors);
-    }
-    else if (ex.getResponse().getStatus() == 504)
-    {
-      caption = "Timeout";
-      description = "Query execution took too long.";
-      qp.setStatus(caption + ": " + description);
-    }
-    else if (ex.getResponse().getStatus() == 403)
-    {
-      
-      if(Helper.getUser() == null)
-      {
-        // not logged in
-        qp.setStatus("You don't have the access rights to query this corpus. " 
-        + "You might want to login to access more corpora.");
-        searchView.getMainToolbar().showLoginWindow(true);
+            // not logged in
+            qp.setStatus("You don't have the access rights to query this corpus. "
+              + "You might want to login to access more corpora.");
+            searchView.getMainToolbar().showLoginWindow(true);
+          }
+          else
+          {
+            // logged in but wrong user
+            caption = "You don't have the access rights to query this corpus. "
+              + "You might want to login as another user to access more corpora.";
+            qp.setStatus(caption);
+          } break;
+        default:
+          log.error(
+            "Exception when communicating with service", ex);
+          qp.setStatus("Unexpected exception:  " + ex.getMessage());
+          ExceptionDialog.show(ex,
+            "Exception when communicating with service.");
+          break;
       }
-      else
-      {
-        // logged in but wrong user
-        caption = "You don't have the access rights to query this corpus. " 
-        + "You might want to login as another user to access more corpora.";
-        qp.setStatus(caption);
-      }
-    }
-    else
-    {
-      log.error(
-        "Exception when communicating with service", ex);
-      qp.setStatus("Unexpected exception:  " + ex.getMessage());
-      ExceptionDialog.show(ex,
-        "Exception when communicating with service.");
-    }
 
-    if (showNotification && caption != null)
-    {
-      Notification.show(caption, description, Notification.Type.WARNING_MESSAGE);
+      if (showNotification && caption != null)
+      {
+        Notification.show(caption, description, Notification.Type.WARNING_MESSAGE);
+      }
     }
 
   }
@@ -325,6 +330,7 @@ public class QueryController implements Serializable
       setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).
         getAnnotationKeys());
       setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
+      setIfNew(state.getAlignmc(), ((ExportQuery) q).getAlignmc());
     }
   }
   
@@ -366,6 +372,7 @@ public class QueryController implements Serializable
       .exporter(state.getExporter().getValue())
       .annotations(state.getExportAnnotationKeys().getValue())
       .param(state.getExportParameters().getValue())
+      .alignmc(state.getAlignmc().getValue())
       .build();
   }
 

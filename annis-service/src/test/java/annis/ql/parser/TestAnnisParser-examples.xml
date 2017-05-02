@@ -119,6 +119,21 @@
     <value><![CDATA[tok & tok & #1 .2, #2]]></value>
     <value><![CDATA[pos == lemma]]></value>
     <value><![CDATA[pos != lemma]]></value>
+    <!-- catch invalid reflexivity already when parsing the query --> 
+    <value><![CDATA[tok . tok & #1 _o_ #1]]></value>
+    <value><![CDATA[tok . tok & #2 _o_ #2]]></value>
+    <value><![CDATA[tok . tok & #1 _or_ #1]]></value>
+    <value><![CDATA[tok . tok & #2 _or_ #2]]></value>
+    <value><![CDATA[tok . tok & #1 _ol_ #1]]></value>
+    <value><![CDATA[tok . tok & #2 _ol_ #2]]></value>
+    <value><![CDATA[tok . tok & #1 _i_ #1]]></value>
+    <value><![CDATA[tok . tok & #2 _i_ #2]]></value>
+    <value><![CDATA[tok . tok & #1 _l_ #1]]></value>
+    <value><![CDATA[tok . tok & #2 _l_ #2]]></value>
+    <value><![CDATA[tok . tok & #1 _r_ #1]]></value>
+    <value><![CDATA[tok . tok & #2 _r_ #2]]></value>
+    <value><![CDATA[tok . tok & #1 _o_ #1]]></value>
+    <value><![CDATA[tok . tok & #2 _=_ #2]]></value>
 	</util:list>
 	
 </beans>

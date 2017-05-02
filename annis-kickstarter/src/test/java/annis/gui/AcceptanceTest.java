@@ -146,7 +146,7 @@ public class AcceptanceTest
 
     // only execute this test if pcc2 corpus is imported
     Assume.assumeTrue(corpora.contains("pcc2"));
-    
+      
     // execute a "tok" search on pcc2
     WebElement codeMirror = driver.findElement(By.xpath("//div[@id='SearchView:ControlPanel:QueryPanel']//div[contains(@class,'CodeMirror')]"));
     
@@ -155,9 +155,18 @@ public class AcceptanceTest
     // set text by javascript
     js.executeScript("arguments[0].CodeMirror.setValue('tok');", codeMirror);
     
+    // filter pcc2 corpus via text field to ensure it is visible in the table
+    WebElement filterInput = driver.findElement(By.id("SearchView:ControlPanel:TabSheet:CorpusListPanel:txtFilter"));
+    filterInput.click();
+    filterInput.sendKeys("pcc2");
+    
+    wait.until(ExpectedConditions.textToBePresentInElementLocated(By.xpath(
+      "//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']"
+        + "//table[contains(@class, 'v-table-table')]//tr"), "pcc2"));
     
     List<WebElement> corpusTableElements = driver.findElements(By.xpath("//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']//table[contains(@class, 'v-table-table')]//tr"));
     WebElement tdPcc = null;
+    
     for(WebElement elem : corpusTableElements)
     {
       // get div

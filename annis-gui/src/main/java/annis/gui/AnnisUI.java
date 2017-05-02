@@ -36,12 +36,15 @@ import annis.gui.components.ExceptionDialog;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.CSVMultiTokExporter;
+//import annis.gui.exporter.MatchWithContextExporter;
+import annis.gui.exporter.TextColumnExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TokenExporter;
 import annis.gui.exporter.WekaExporter;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
+import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.service.objects.CorpusConfig;
 import net.xeoh.plugins.base.PluginManager;
@@ -181,7 +184,7 @@ public class AnnisUI extends CommonUI
       event.getThrowable());
     // get the source throwable (thus the one that triggered the error)
     Throwable source = event.getThrowable();
-    if (source != null)
+    if (!AnnisBaseUI.handleCommonError(source, null) && source != null)
     {
       while (source.getCause() != null)
       {
@@ -208,6 +211,7 @@ public class AnnisUI extends CommonUI
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(GridExporter.class));
+    pluginManager.addPluginsFrom(ClassURI.PLUGIN(TextColumnExporter.class));
   }
 
   /**

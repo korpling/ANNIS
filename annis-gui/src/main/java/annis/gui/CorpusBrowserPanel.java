@@ -47,6 +47,7 @@ import com.vaadin.ui.declarative.Design;
 
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.objects.Query;
+import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
@@ -349,19 +350,15 @@ public class CorpusBrowserPanel extends Panel
         result = query.get(new AnnisAttributeListType());
       }
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
       log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
+      if(!AnnisBaseUI.handleCommonError(ex, "fetch example annotations"))
+      {
+        Notification.show(
+          "Remote exception: " + ex.getLocalizedMessage(),
+          Notification.Type.WARNING_MESSAGE);
+      }
     }
     return new LinkedList<>(result);
   }

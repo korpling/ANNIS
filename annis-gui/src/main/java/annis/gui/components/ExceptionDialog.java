@@ -55,7 +55,6 @@ public class ExceptionDialog extends Window implements Button.ClickListener
   public ExceptionDialog(Throwable ex, String caption)
   {
     this.cause = ex;
-    Preconditions.checkNotNull(ex);
     
     layout = new VerticalLayout();
     setContent(layout);
@@ -78,7 +77,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     layout.addComponent(lblInfo);
     lblInfo.addStyleName("exception-message-caption");
     
-    String message = ex.getMessage();
+    String message = ex != null ? ex.getMessage() : null;
     if(message == null || message.isEmpty())
     {
       message = "<no message>";

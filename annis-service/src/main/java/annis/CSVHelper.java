@@ -60,16 +60,18 @@ public class CSVHelper
         {
           columnsByNodePos.put(j, new TreeSet<String>());
         }
-        for(Annotation annotation : span.getAnnotations())
+        if(span != null)
         {
-          columnsByNodePos.get(j).add("anno_" + annotation.getQualifiedName());
-        }
+          for(Annotation annotation : span.getAnnotations())
+          {
+            columnsByNodePos.get(j).add("anno_" + annotation.getQualifiedName());
+          }
 
-        for(Annotation meta : span.getMetadata())
-        {
-          columnsByNodePos.get(j).add("meta_" + meta.getQualifiedName());
+          for(Annotation meta : span.getMetadata())
+          {
+            columnsByNodePos.get(j).add("meta_" + meta.getQualifiedName());
+          }
         }
-
       }
     }
 
