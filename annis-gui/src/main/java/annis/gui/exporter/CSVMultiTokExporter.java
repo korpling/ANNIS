@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import annis.service.objects.SubgraphFilter;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -84,6 +85,7 @@ public class CSVMultiTokExporter extends SaltBasedExporter
       .getValue_STEXT().split(",")));
     for (String matchID: matchIDs)
     {
+      matchID = URLDecoder.decode(matchID, "UTF-8");
       SNode node = graph.getNode(matchID);
       int node_id = node
           .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE)
@@ -133,6 +135,7 @@ public class CSVMultiTokExporter extends SaltBasedExporter
       .getValue_STEXT().split(",")));
     for (String matchID: matchIDs)
     {
+      matchID = URLDecoder.decode(matchID, "UTF-8");
       List<String> nodeLine = new ArrayList<>();
       SNode node = graph.getNode(matchID);
       // export id
