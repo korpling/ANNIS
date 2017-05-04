@@ -1,3 +1,18 @@
+/*
+ * Copyright 2016-2017 Referenzkorpus Mittelniederdeutsch/Niederrheinisch (1200-1650).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.gui.exporter;
 
 import annis.CommonHelper;
@@ -26,7 +41,12 @@ import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SNode;
 
 /**
- * @author barteld
+ * A csv-exporter that will export the text of the underlying token
+ * instead of the base text.
+ * This is useful for getting text spans where the normal csv-exporter
+ * doesn't work since there are multiple speakers or normalizations.
+ *
+ * @author Fabian Barteld
  */
 @PluginImplementation
 public class CSVMultiTokExporter extends SaltBasedExporter
@@ -61,8 +81,19 @@ public class CSVMultiTokExporter extends SaltBasedExporter
   private Set<String> metakeys;
   private SortedMap<Integer,TreeSet<String>> annotationsForMatchedNodes;
 
-
-  @ Override
+  /**
+   * Takes a match and stores annotation names to construct the header in
+   * {@link #outputText(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph, boolean, int, java.io.Writer) }
+   *
+   * @param graph
+   * @param args
+   * @param matchNumber
+   * @param nodeCount
+   *
+   * @throws java.io.IOException
+   *
+   */
+  @Override
   public void createAdjacencyMatrix(SDocumentGraph graph,
     Map<String, String> args, int matchNumber, int nodeCount) throws IOException, IllegalArgumentException
   {
@@ -100,6 +131,17 @@ public class CSVMultiTokExporter extends SaltBasedExporter
     }
   }
 
+  /**
+   * Takes a match and outputs a csv-line
+   *
+   * @param graph
+   * @param alignmc
+   * @param matchNumber
+   * @param out
+   *
+   * @throws java.io.IOException
+   *
+   */
   @Override
   public void outputText(SDocumentGraph graph, boolean alignmc, int matchNumber,
     Writer out) throws IOException, IllegalArgumentException
