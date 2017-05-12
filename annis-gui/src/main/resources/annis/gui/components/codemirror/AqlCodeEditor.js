@@ -141,27 +141,35 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
   		  var lineValue = cmTextArea.getLine(i);
   		  var j = 0;
   		  var pos = 0;
+  		  var textMarker;
+  		  var LRM = '\u200e';
   		  
   		  //find all occurrences of \"
   		  while ((pos = lineValue.indexOf("\"", j)) != -1)
   		  {
   			  j = pos + 1;
   			  // if LRM already inserted, bind LRM and \" together
-  			  if (lineValue.charAt(pos - 1) == '\u200e')
+  			  if (lineValue.charAt(pos - 1) == LRM)
   			  {	  textMarker = cmTextArea.findMarksAt({line: i, ch: pos -1});
+  			  
   				  if (textMarker.length == 0)
   				  {
-  					  cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});  
+  					  //cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});  
   				  }
   				 
   		    	 
   			 }
   			  //else insert LRM and bind together
-  			  else if (lineValue.charAt(pos - 1) != '\u200e' || lineValue.charAt(pos - 1) == undefined)
+  			  else if (lineValue.charAt(pos - 1) != LRM || lineValue.charAt(pos - 1) == undefined)
   			  {				  
-  				     var replacement = '\u200E';
-  			         cmTextArea.replaceRange(replacement, {line: i, ch: pos});   
-  			         cmTextArea.markText({line: i, ch: pos}, {line: i, ch: (pos + 2)}, {atomic: true});
+  				    
+                          //TODO find out why the cursor stays before Alif
+  			               cmTextArea.replaceRange(LRM, {line: i, ch: pos}); 
+  			              //instance.execCommand("goCharRight");
+  			              
+                          //cmTextArea.markText({line: i, ch: pos}, {line: i, ch: (pos + 2)}, {atomic: true});
+                      
+  			         
   			         j += 1;
   			         
   			  }
@@ -169,10 +177,11 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
   			  lineValue = cmTextArea.getLine(i);
   			
   	      }
-  	        
+  		       
   		  
   	  }
-      	
+  	  
+  	  	
     	if(changeDelayTimerID)
       {
         window.clearTimeout(changeDelayTimerID);
