@@ -160,7 +160,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
   		    	 
   			 }
   			  //else insert LRM and bind together
-  			  else if (lineValue.charAt(pos - 1) != LRM || lineValue.charAt(pos - 1) == undefined)
+  			  else if (lineValue.charAt(pos - 1) != LRM || lineValue.charAt(pos - 1) === undefined)
   			  {				  
   				    
                           //TODO find out why the cursor stays before Alif
