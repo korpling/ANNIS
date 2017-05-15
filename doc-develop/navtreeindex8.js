@@ -1,5 +1,13 @@
 var NAVTREEINDEX8 =
 {
+"classannis_1_1model_1_1_query_node.html#aea512fa92d34c5b77f978286ab001b62":[4,0,0,8,10,14],
+"classannis_1_1model_1_1_query_node.html#aebed76fa75ca1a38bccf42a840a6273e":[4,0,0,8,10,4],
+"classannis_1_1model_1_1_query_node.html#aecba8c1198784a28f7f380e30c306032":[4,0,0,8,10,3],
+"classannis_1_1model_1_1_query_node.html#af38e74f4f8f02f483efd88e140694e5b":[4,0,0,8,10,38],
+"classannis_1_1model_1_1_query_node.html#af64bbaa9dfe91324668f62aa10614c6a":[4,0,0,8,10,30],
+"classannis_1_1model_1_1_query_node.html#af88f8df697e98322cbe50500c4282916":[4,0,0,8,10,15],
+"classannis_1_1model_1_1_query_node.html#af8b14248b748f76a36f78693510489f9":[4,0,0,8,10,34],
+"classannis_1_1model_1_1_query_node.html#afd60224eefc4ce3913ce4db7c81eb682":[4,0,0,8,10,11],
 "classannis_1_1model_1_1_relannis_edge_feature.html":[4,0,0,8,11],
 "classannis_1_1model_1_1_relannis_edge_feature.html#a0cdb5974b15b33ae6446b293785604ca":[4,0,0,8,11,7],
 "classannis_1_1model_1_1_relannis_edge_feature.html#a14a2c6e3b1f1000527c613a2423f8bf2":[4,0,0,8,11,2],
@@ -241,13 +249,5 @@ var NAVTREEINDEX8 =
 "classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#a97ceca6a3982984d82655be80be5c94c":[4,0,0,13,0,0],
 "classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#ab766cd581972184f7aad1821625f8579":[4,0,0,13,0,1],
 "classannis_1_1security_1_1_a_n_n_i_s_security_manager.html":[4,0,0,13,1],
-"classannis_1_1security_1_1_a_n_n_i_s_security_manager.html#a51857e49ea5c6519dd0e4f76fd56edb6":[4,0,0,13,1,1],
-"classannis_1_1security_1_1_a_n_n_i_s_security_manager.html#a5cd355fa88cfee7adb0cbadd8fd055f6":[4,0,0,13,1,0],
-"classannis_1_1security_1_1_a_n_n_i_s_security_manager.html#aa1bce19a42b6ad61b17332a9db2e24b2":[4,0,0,13,1,2],
-"classannis_1_1security_1_1_a_n_n_i_s_user_configuration_manager.html":[4,0,0,13,2],
-"classannis_1_1security_1_1_a_n_n_i_s_user_configuration_manager.html#a34a7142a0118ccf91688a1ec53adad38":[4,0,0,13,2,0],
-"classannis_1_1security_1_1_a_n_n_i_s_user_configuration_manager.html#a37a178b672e8bf348c1b5832e50a0214":[4,0,0,13,2,8],
-"classannis_1_1security_1_1_a_n_n_i_s_user_configuration_manager.html#a37c936b9f70451569b97e299aab7acf4":[4,0,0,13,2,1],
-"classannis_1_1security_1_1_a_n_n_i_s_user_configuration_manager.html#a5d68ebf070ffa30d9f79fe9695112bc7":[4,0,0,13,2,3],
-"classannis_1_1security_1_1_a_n_n_i_s_user_configuration_manager.html#a6cd06e11e5c3b88c4fca9d8e539da04e":[4,0,0,13,2,4]
+"classannis_1_1security_1_1_a_n_n_i_s_security_manager.html#a51857e49ea5c6519dd0e4f76fd56edb6":[4,0,0,13,1,1]
 };

@@ -8,7 +8,7 @@ var searchData=
   ['tigerquerybuildercanvas',['TigerQueryBuilderCanvas',['../classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_canvas.html',1,'annis::gui::querybuilder']]],
   ['tigerquerybuilderplugin',['TigerQueryBuilderPlugin',['../classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_plugin.html',1,'annis::gui::querybuilder']]],
   ['tigertreevisualizer',['TigerTreeVisualizer',['../classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer.html',1,'annis::visualizers::component::tree']]],
-  ['timehelper',['TimeHelper',['../classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html',1,'annis.visualizers.iframe.partitur.TimeHelper'],['../classannis_1_1libgui_1_1media_1_1_time_helper.html',1,'annis.libgui.media.TimeHelper']]],
+  ['timehelper',['TimeHelper',['../classannis_1_1libgui_1_1media_1_1_time_helper.html',1,'annis.libgui.media.TimeHelper'],['../classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html',1,'annis.visualizers.iframe.partitur.TimeHelper']]],
   ['timelinereconstructor',['TimelineReconstructor',['../classannis_1_1_timeline_reconstructor.html',1,'annis']]],
   ['tokenexporter',['TokenExporter',['../classannis_1_1gui_1_1exporter_1_1_token_exporter.html',1,'annis::gui::exporter']]],
   ['tokenmatcher',['TokenMatcher',['../classannis_1_1visualizers_1_1htmlvis_1_1_token_matcher.html',1,'annis::visualizers::htmlvis']]],

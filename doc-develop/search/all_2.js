@@ -61,7 +61,7 @@ var searchData=
   ['countmatchesanddocumentssqlgenerator',['CountMatchesAndDocumentsSqlGenerator',['../classannis_1_1sqlgen_1_1_count_matches_and_documents_sql_generator.html',1,'annis::sqlgen']]],
   ['countsqlgenerator',['CountSqlGenerator',['../classannis_1_1sqlgen_1_1_count_sql_generator.html',1,'annis::sqlgen']]],
   ['coveredtextscalculator',['CoveredTextsCalculator',['../classannis_1_1_covered_texts_calculator.html',1,'annis']]],
-  ['createadjacencymatrix',['createAdjacencyMatrix',['../classannis_1_1gui_1_1exporter_1_1_text_column_exporter.html#a21f19482f41866e6b004a94bff0a4bc9',1,'annis::gui::exporter::TextColumnExporter']]],
+  ['createadjacencymatrix',['createAdjacencyMatrix',['../classannis_1_1gui_1_1exporter_1_1_c_s_v_multi_tok_exporter.html#aeb5d52173a25ffe9b1068264a38b8b6c',1,'annis.gui.exporter.CSVMultiTokExporter.createAdjacencyMatrix()'],['../classannis_1_1gui_1_1exporter_1_1_text_column_exporter.html#a21f19482f41866e6b004a94bff0a4bc9',1,'annis.gui.exporter.TextColumnExporter.createAdjacencyMatrix()']]],
   ['createcomponent',['createComponent',['../classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder_plugin.html#a5996824d425a4cf477bc3d0096c651fa',1,'annis.gui.flatquerybuilder.FlatQueryBuilderPlugin.createComponent()'],['../interfaceannis_1_1gui_1_1querybuilder_1_1_query_builder_plugin.html#a4afcc0e046a4884ce8a2e978b5c46790',1,'annis.gui.querybuilder.QueryBuilderPlugin.createComponent()'],['../interfaceannis_1_1libgui_1_1visualizers_1_1_visualizer_plugin.html#ae42ff54b6178a8cab02f1ecd17a9b80b',1,'annis.libgui.visualizers.VisualizerPlugin.createComponent()']]],
   ['createinput',['createInput',['../classannis_1_1gui_1_1docbrowser_1_1_doc_browser_controller.html#a229bc8f89a04aa211772aa0d36d113ab',1,'annis::gui::docbrowser::DocBrowserController']]],
   ['createquerydata',['createQueryData',['../classannis_1_1_graph_helper.html#a56a14a62fbe6019adf58a7270f22107e',1,'annis::GraphHelper']]],
@@ -72,6 +72,7 @@ var searchData=
   ['cssrenderinfo',['CssRenderInfo',['../classannis_1_1gui_1_1components_1_1_css_render_info.html',1,'annis::gui::components']]],
   ['csvexporter',['CSVExporter',['../classannis_1_1gui_1_1exporter_1_1_c_s_v_exporter.html',1,'annis::gui::exporter']]],
   ['csvhelper',['CSVHelper',['../classannis_1_1_c_s_v_helper.html',1,'annis']]],
+  ['csvmultitokexporter',['CSVMultiTokExporter',['../classannis_1_1gui_1_1exporter_1_1_c_s_v_multi_tok_exporter.html',1,'annis::gui::exporter']]],
   ['cubiccurve',['cubicCurve',['../classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_java2d_backend.html#aec35fcc5dbc384119946dde38e1dfa37',1,'annis.visualizers.component.tree.backends.staticimg.Java2dBackend.cubicCurve()'],['../interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_graphics_backend.html#afb2e181154737865170d4af55a621b87',1,'annis.visualizers.component.tree.GraphicsBackend.cubicCurve()']]],
   ['currentimports',['currentImports',['../interfaceannis_1_1service_1_1_admin_service.html#a40c9b2d35cc3cacca0ea0934570f8310',1,'annis.service.AdminService.currentImports()'],['../classannis_1_1service_1_1internal_1_1_admin_service_impl.html#aa571f18001da459cf96088dce425362a',1,'annis.service.internal.AdminServiceImpl.currentImports()']]],
   ['create_20new_20query_20builder',['Create new query builder',['../dev-querybuilder.html',1,'dev']]]

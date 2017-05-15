@@ -1,5 +1,13 @@
 var NAVTREEINDEX7 =
 {
+"classannis_1_1libgui_1_1visualizers_1_1_i_frame_resource_map.html":[4,0,0,7,2,4],
+"classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html":[4,0,0,7,2,6],
+"classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#a01431f43dae01aacab91e1da51290f0c":[4,0,0,7,2,6,17],
+"classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#a1f904878deff408cd3e63e5843aad945":[4,0,0,7,2,6,9],
+"classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#a2106bcf33c06b53e08acff4148a8137b":[4,0,0,7,2,6,12],
+"classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#a2bccb54fd8d9c94e262153204cf7c7ae":[4,0,0,7,2,6,22],
+"classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#a2f51b3d435527b6956bf9f00103e9c63":[4,0,0,7,2,6,25],
+"classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#a386ceacb6cfaefe12528ee0e2a58011a":[4,0,0,7,2,6,7],
 "classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#a3ccd80fe8ffb683ec5434247610ba94f":[4,0,0,7,2,6,20],
 "classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#a41dc5519840ecf692b9bbaa3d5804405":[4,0,0,7,2,6,21],
 "classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#a451c31432c7638dbf9b9cbc3d19d7ef5":[4,0,0,7,2,6,33],
@@ -241,13 +249,5 @@ var NAVTREEINDEX7 =
 "classannis_1_1model_1_1_query_node.html#ad523fb44a7e2b236d5b630b32c7d38cc":[4,0,0,8,10,22],
 "classannis_1_1model_1_1_query_node.html#adc6e0d8a8359af8bb52d6d11707a7cc5":[4,0,0,8,10,33],
 "classannis_1_1model_1_1_query_node.html#adceb184ae03aa82d268869e95fdadc2a":[4,0,0,8,10,12],
-"classannis_1_1model_1_1_query_node.html#ae9762ee7950c43631e7521ce5b8a0b2a":[4,0,0,8,10,5],
-"classannis_1_1model_1_1_query_node.html#aea512fa92d34c5b77f978286ab001b62":[4,0,0,8,10,14],
-"classannis_1_1model_1_1_query_node.html#aebed76fa75ca1a38bccf42a840a6273e":[4,0,0,8,10,4],
-"classannis_1_1model_1_1_query_node.html#aecba8c1198784a28f7f380e30c306032":[4,0,0,8,10,3],
-"classannis_1_1model_1_1_query_node.html#af38e74f4f8f02f483efd88e140694e5b":[4,0,0,8,10,38],
-"classannis_1_1model_1_1_query_node.html#af64bbaa9dfe91324668f62aa10614c6a":[4,0,0,8,10,30],
-"classannis_1_1model_1_1_query_node.html#af88f8df697e98322cbe50500c4282916":[4,0,0,8,10,15],
-"classannis_1_1model_1_1_query_node.html#af8b14248b748f76a36f78693510489f9":[4,0,0,8,10,34],
-"classannis_1_1model_1_1_query_node.html#afd60224eefc4ce3913ce4db7c81eb682":[4,0,0,8,10,11]
+"classannis_1_1model_1_1_query_node.html#ae9762ee7950c43631e7521ce5b8a0b2a":[4,0,0,8,10,5]
 };

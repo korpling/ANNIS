@@ -450,8 +450,8 @@ var hierarchy =
     [ "Thread", null, [
       [ "annis.service.internal.ImportWorker", "classannis_1_1service_1_1internal_1_1_import_worker.html", null ]
     ] ],
-    [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
     [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
+    [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
     [ "annis.TimelineReconstructor", "classannis_1_1_timeline_reconstructor.html", null ],
     [ "annis.visualizers.component.tree.TreeElementLabeler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_labeler.html", null ],
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
@@ -786,6 +786,7 @@ var hierarchy =
           [ "annis.gui.exporter.TokenExporter", "classannis_1_1gui_1_1exporter_1_1_token_exporter.html", null ]
         ] ],
         [ "annis.gui.exporter.SaltBasedExporter", "classannis_1_1gui_1_1exporter_1_1_salt_based_exporter.html", [
+          [ "annis.gui.exporter.CSVMultiTokExporter", "classannis_1_1gui_1_1exporter_1_1_c_s_v_multi_tok_exporter.html", null ],
           [ "annis.gui.exporter.TextColumnExporter", "classannis_1_1gui_1_1exporter_1_1_text_column_exporter.html", null ]
         ] ],
         [ "annis.gui.exporter.WekaExporter", "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html", null ]

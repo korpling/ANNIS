@@ -1,5 +1,13 @@
 var NAVTREEINDEX10 =
 {
+"classannis_1_1service_1_1objects_1_1_annis_result_set_impl.html":[4,0,0,14,2,5],
+"classannis_1_1service_1_1objects_1_1_annis_result_set_impl.html#a28fe6f3b88e0b6d4adca594db7413e32":[4,0,0,14,2,5,2],
+"classannis_1_1service_1_1objects_1_1_annis_result_set_impl.html#a92828fc8dc10080c414a0fa10e2a926b":[4,0,0,14,2,5,0],
+"classannis_1_1service_1_1objects_1_1_annis_result_set_impl.html#abe9d09ec5d58a2e744bfea322c42473f":[4,0,0,14,2,5,1],
+"classannis_1_1service_1_1objects_1_1_annis_result_set_impl.html#aec76e6a9b42e698ff8db1c1851a2e0b6":[4,0,0,14,2,5,3],
+"classannis_1_1service_1_1objects_1_1_annis_token_impl.html":[4,0,0,14,2,6],
+"classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a0dfb9de3e12b1ff6a8b138c77d861fff":[4,0,0,14,2,6,9],
+"classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a18eb746a1bfb80a262a1782efb4894ea":[4,0,0,14,2,6,13],
 "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a1d8af58eac377d33453cb708e7c0b028":[4,0,0,14,2,6,7],
 "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a3cd5a2c238724efe0e5f13143b0db37c":[4,0,0,14,2,6,4],
 "classannis_1_1service_1_1objects_1_1_annis_token_impl.html#a4e1290b369e0fefa9746610352b5434b":[4,0,0,14,2,6,5],
@@ -241,13 +249,5 @@ var NAVTREEINDEX10 =
 "classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a25c6b23d651a313f598b46c4868a3920":[4,0,0,15,8,0],
 "classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a5895a7a2f66f8b90fb2328bd8f2da208":[4,0,0,15,8,2],
 "classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a6545130eec7c93f78c9931adeec67649":[4,0,0,15,8,4],
-"classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a93ed52e7fce8c7b7129a550a223e57eb":[4,0,0,15,8,3],
-"classannis_1_1sqlgen_1_1_annotated_span_extractor.html":[4,0,0,15,9],
-"classannis_1_1sqlgen_1_1_annotated_span_extractor.html#a73fa90f91f74bf876f4891448f3934f9":[4,0,0,15,9,0],
-"classannis_1_1sqlgen_1_1_annotation_condition_provider.html":[4,0,0,15,13],
-"classannis_1_1sqlgen_1_1_annotation_condition_provider.html#a4aa5ec1d06648679a24a5717367bdcc1":[4,0,0,15,13,3],
-"classannis_1_1sqlgen_1_1_annotation_condition_provider.html#abb1640292e6891e7c3dc252f2090c43b":[4,0,0,15,13,0],
-"classannis_1_1sqlgen_1_1_annotation_condition_provider.html#ac7d63b4d3c10a62e9011fd87a968bf24":[4,0,0,15,13,2],
-"classannis_1_1sqlgen_1_1_annotation_condition_provider.html#ad1b7230d3d44636fb19fd27a06662c38":[4,0,0,15,13,1],
-"classannis_1_1sqlgen_1_1_aom_annotate_extractor.html":[4,0,0,15,14]
+"classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a93ed52e7fce8c7b7129a550a223e57eb":[4,0,0,15,8,3]
 };

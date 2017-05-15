@@ -14,6 +14,6 @@ var searchData=
   ['ordertype',['OrderType',['../enumannis_1_1service_1_1objects_1_1_order_type.html',1,'annis::service::objects']]],
   ['os',['OS',['../classannis_1_1_annis_runner.html#enumannis_1_1_annis_runner_1_1_o_s',1,'annis::AnnisRunner']]],
   ['outputitem',['OutputItem',['../classannis_1_1visualizers_1_1htmlvis_1_1_output_item.html',1,'annis::visualizers::htmlvis']]],
-  ['outputtext',['outputText',['../classannis_1_1gui_1_1exporter_1_1_text_column_exporter.html#a6ba7b069e8065a10dbdea7610f32a705',1,'annis::gui::exporter::TextColumnExporter']]],
+  ['outputtext',['outputText',['../classannis_1_1gui_1_1exporter_1_1_c_s_v_multi_tok_exporter.html#aba61ac92997d8e00c2dfb55829d82456',1,'annis.gui.exporter.CSVMultiTokExporter.outputText()'],['../classannis_1_1gui_1_1exporter_1_1_text_column_exporter.html#a6ba7b069e8065a10dbdea7610f32a705',1,'annis.gui.exporter.TextColumnExporter.outputText()']]],
   ['overlap',['Overlap',['../classannis_1_1sqlgen_1_1model_1_1_overlap.html',1,'annis::sqlgen::model']]]
 ];

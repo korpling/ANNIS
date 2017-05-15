@@ -137,6 +137,7 @@ var annotated_dup =
         ] ],
         [ "exporter", null, [
           [ "CSVExporter", "classannis_1_1gui_1_1exporter_1_1_c_s_v_exporter.html", "classannis_1_1gui_1_1exporter_1_1_c_s_v_exporter" ],
+          [ "CSVMultiTokExporter", "classannis_1_1gui_1_1exporter_1_1_c_s_v_multi_tok_exporter.html", "classannis_1_1gui_1_1exporter_1_1_c_s_v_multi_tok_exporter" ],
           [ "GeneralTextExporter", "classannis_1_1gui_1_1exporter_1_1_general_text_exporter.html", "classannis_1_1gui_1_1exporter_1_1_general_text_exporter" ],
           [ "GridExporter", "classannis_1_1gui_1_1exporter_1_1_grid_exporter.html", "classannis_1_1gui_1_1exporter_1_1_grid_exporter" ],
           [ "SaltBasedExporter", "classannis_1_1gui_1_1exporter_1_1_salt_based_exporter.html", "classannis_1_1gui_1_1exporter_1_1_salt_based_exporter" ],

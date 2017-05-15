@@ -40,5 +40,6 @@ var searchData=
   ['criticalservicequeryexception',['CriticalServiceQueryException',['../classannis_1_1gui_1_1_critical_service_query_exception.html',1,'annis::gui']]],
   ['cssrenderinfo',['CssRenderInfo',['../classannis_1_1gui_1_1components_1_1_css_render_info.html',1,'annis::gui::components']]],
   ['csvexporter',['CSVExporter',['../classannis_1_1gui_1_1exporter_1_1_c_s_v_exporter.html',1,'annis::gui::exporter']]],
-  ['csvhelper',['CSVHelper',['../classannis_1_1_c_s_v_helper.html',1,'annis']]]
+  ['csvhelper',['CSVHelper',['../classannis_1_1_c_s_v_helper.html',1,'annis']]],
+  ['csvmultitokexporter',['CSVMultiTokExporter',['../classannis_1_1gui_1_1exporter_1_1_c_s_v_multi_tok_exporter.html',1,'annis::gui::exporter']]]
 ];

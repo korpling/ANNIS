@@ -1,5 +1,13 @@
 var NAVTREEINDEX5 =
 {
+"classannis_1_1gui_1_1flatquerybuilder_1_1_sensitive_combo_box.html#af9a7d22f391744adc65ca66ea7a37c0c":[4,0,0,6,9,7,1],
+"classannis_1_1gui_1_1flatquerybuilder_1_1_span_box.html":[4,0,0,6,9,8],
+"classannis_1_1gui_1_1flatquerybuilder_1_1_span_box.html#a0ce8d811fdabfb875d804279993ad4c0":[4,0,0,6,9,8,7],
+"classannis_1_1gui_1_1flatquerybuilder_1_1_span_box.html#a197f5f08853eb4e59cda1472e2d01efd":[4,0,0,6,9,8,4],
+"classannis_1_1gui_1_1flatquerybuilder_1_1_span_box.html#a26bb804968c0f9f08fa8f6c6b4d4ec85":[4,0,0,6,9,8,1],
+"classannis_1_1gui_1_1flatquerybuilder_1_1_span_box.html#a9a57f92bc0b237a9b38291f68ec52381":[4,0,0,6,9,8,0],
+"classannis_1_1gui_1_1flatquerybuilder_1_1_span_box.html#aa43ec4e7f11f243fded9a2a19bb9658f":[4,0,0,6,9,8,3],
+"classannis_1_1gui_1_1flatquerybuilder_1_1_span_box.html#aab4526f80efafc7e40c4e6e19a196434":[4,0,0,6,9,8,2],
 "classannis_1_1gui_1_1flatquerybuilder_1_1_span_box.html#ab1ed4585a7efea1139720ff6a2228850":[4,0,0,6,9,8,6],
 "classannis_1_1gui_1_1flatquerybuilder_1_1_span_box.html#ad195b45e5da5c92ad1c88156eb24f130":[4,0,0,6,9,8,5],
 "classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html":[4,0,0,6,9,9],
@@ -241,13 +249,5 @@ var NAVTREEINDEX5 =
 "classannis_1_1gui_1_1resultview_1_1_single_result_panel.html":[4,0,0,6,16,1],
 "classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a6fc5c9b5a12c6fdf59a4ef6f82b1d47d":[4,0,0,6,16,1,4],
 "classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a72aa8594c23ceea595cc7b56a0d8cf6a":[4,0,0,6,16,1,8],
-"classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a7c70e63598fe48cfd7ae695128e59366":[4,0,0,6,16,1,0],
-"classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a832803a75288dd4afdd00789f17f3fbb":[4,0,0,6,16,1,5],
-"classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a97a9a9215cf0d485db362e2a5537a89a":[4,0,0,6,16,1,1],
-"classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#aba6cc080e443c382c7f56c255b164df7":[4,0,0,6,16,1,7],
-"classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#ad8bc78aa204a3fca676307e478c066d8":[4,0,0,6,16,1,6],
-"classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#aeb8ed76864680a34e7e97629266c7dce":[4,0,0,6,16,1,2],
-"classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#afc53f385f9450dbcc8fae317559e9c44":[4,0,0,6,16,1,3],
-"classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html":[4,0,0,6,16,3],
-"classannis_1_1gui_1_1resultview_1_1_visualizer_panel.html#a0d7a38f7ade68853fb9379850b683414":[4,0,0,6,16,3,3]
+"classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a7c70e63598fe48cfd7ae695128e59366":[4,0,0,6,16,1,0]
 };

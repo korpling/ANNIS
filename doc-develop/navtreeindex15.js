@@ -1,5 +1,13 @@
 var NAVTREEINDEX15 =
 {
+"functions_v.html":[4,2,0,20],
+"functions_vars.html":[4,2,2],
+"functions_w.html":[4,2,0,21],
+"hierarchy.html":[4,1],
+"index.html":[],
+"interfaceannis_1_1administration_1_1_import_status.html":[4,0,0,1,9],
+"interfaceannis_1_1administration_1_1_import_status.html#a2681903c4616868e4b53cbf8ce11581e":[4,0,0,1,9,9],
+"interfaceannis_1_1administration_1_1_import_status.html#a494527a349405c60b4e7b6145bac1ff1":[4,0,0,1,9,8],
 "interfaceannis_1_1administration_1_1_import_status.html#a956408590e488ff3ae71bad904519c11":[4,0,0,1,9,7],
 "interfaceannis_1_1administration_1_1_import_status.html#a9a5032e83b3eaa17047e0d38624f1e4c":[4,0,0,1,9,2],
 "interfaceannis_1_1administration_1_1_import_status.html#ab18e22b2dec04333bab6397078d94688":[4,0,0,1,9,1],
@@ -241,13 +249,5 @@ var NAVTREEINDEX15 =
 "interfaceannis_1_1sqlgen_1_1_solution_key.html#a0a275fc5f26d57fb490d956f7946f264":[4,0,0,15,48,0],
 "interfaceannis_1_1sqlgen_1_1_solution_key.html#a2828fa3246e5c2e0dcedd31f9ee0a68f":[4,0,0,15,48,5],
 "interfaceannis_1_1sqlgen_1_1_solution_key.html#a337cae58bdf81f2dbf447f8c89bed597":[4,0,0,15,48,4],
-"interfaceannis_1_1sqlgen_1_1_solution_key.html#a47fdc16d4d4246f05cce1382661145e6":[4,0,0,15,48,3],
-"interfaceannis_1_1sqlgen_1_1_solution_key.html#a5f0a2ee2e3cf5ff5dde2db9063a703ec":[4,0,0,15,48,1],
-"interfaceannis_1_1sqlgen_1_1_solution_key.html#a66cf2c8f93c821dbc01580b82a53fffa":[4,0,0,15,48,8],
-"interfaceannis_1_1sqlgen_1_1_solution_key.html#a6836785b16111d7a30961e32b984aa88":[4,0,0,15,48,2],
-"interfaceannis_1_1sqlgen_1_1_solution_key.html#a825090eaf727958043837f707bd6b465":[4,0,0,15,48,6],
-"interfaceannis_1_1sqlgen_1_1_solution_key.html#a9d1c4fde57993ca7746bff5203e3cd46":[4,0,0,15,48,7],
-"interfaceannis_1_1sqlgen_1_1_sql_generator.html":[4,0,0,15,51],
-"interfaceannis_1_1sqlgen_1_1_sql_generator.html#a70d5d69379ba1fc32bfcfe23c15a83c5":[4,0,0,15,51,1],
-"interfaceannis_1_1sqlgen_1_1_sql_generator.html#a9c340e072d5268a7e8e87816a5aa345d":[4,0,0,15,51,0]
+"interfaceannis_1_1sqlgen_1_1_solution_key.html#a47fdc16d4d4246f05cce1382661145e6":[4,0,0,15,48,3]
 };
