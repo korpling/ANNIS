@@ -35,6 +35,7 @@ import com.vaadin.shared.ui.ui.Transport;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.GridExporter;
+import annis.gui.exporter.CSVMultiTokExporter;
 //import annis.gui.exporter.MatchWithContextExporter;
 import annis.gui.exporter.TextColumnExporter;
 import annis.gui.exporter.SimpleTextExporter;
@@ -205,6 +206,7 @@ public class AnnisUI extends CommonUI
     pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
       toURI());
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVExporter.class));
+    pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVMultiTokExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(WekaExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
