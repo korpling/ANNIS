@@ -1,3 +1,16 @@
+Version 3.5.0-preview3
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/53?closed=1
+
+[Fixed Bugs]
+ #558 Update Vaadin Version to avoid Denial of Service attack vector
+ #557 Inserting an unknown context leads to NullPointerException
+
+[Enhancements]
+ #523 Exporting spans from corpora with more than one primary text
+
 Version 3.5.0-preview2
 ======================
 
