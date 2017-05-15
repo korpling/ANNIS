@@ -202,9 +202,9 @@ public class CSVMultiTokExporter extends SaltBasedExporter
         }
         else
           nodeLine.add("'NULL'");
-        // add everything to line
-        contentLine.put(node_id, StringUtils.join(nodeLine, "\t"));
       }
+      // add everything to line
+      contentLine.put(node_id, StringUtils.join(nodeLine, "\t"));
     }
 
     out.append(StringUtils.join(contentLine.values(), "\t"));
