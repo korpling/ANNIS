@@ -32,8 +32,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import annis.model.AnnisConstants;
+import com.google.common.base.Joiner;
 import java.util.Arrays;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Allows to reconstruct a proper {@link SDocumentGraph} with an {@link STimeline} and
@@ -408,7 +408,7 @@ public class TimelineReconstructor
         if (this.oldID2newID.containsKey(ids[i]))
           ids[i] = this.oldID2newID.get(ids[i]);
       }
-      matchids.setValue(StringUtils.join(ids, ","));
+      matchids.setValue(Joiner.on(',').join(ids));
     }
   }
   
