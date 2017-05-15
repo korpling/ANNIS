@@ -825,7 +825,8 @@ public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args
 /**
  * Invokes the private static method {@link #calculateOrderedMatchNumbersGlobally}.
  */
-public void getOrderedMatchNumbers (){	 
+   @Override	 
+   public void getOrderedMatchNumbers (){	 
 		  
 	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobally(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
 	 	  	
