@@ -21,27 +21,6 @@
       <version>${graphannis.version}</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>org.corpus-tools</groupId>
-      <artifactId>graphannis-api</artifactId>
-      <version>${graphannis.version}</version>
-      <classifier>linux-x86_64</classifier>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.corpus-tools</groupId>
-      <artifactId>graphannis-api</artifactId>
-      <version>${graphannis.version}</version>
-      <classifier>macosx-x86_64</classifier>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.corpus-tools</groupId>
-      <artifactId>graphannis-api</artifactId>
-      <version>${graphannis.version}</version>
-      <classifier>windows-x86_64</classifier>
-      <scope>runtime</scope>
-    </dependency>
     
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -469,6 +448,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <annis.userconfig>/etc/annis/user_config/</annis.userconfig>
-    <graphannis.version>0.1.0</graphannis.version>
+    <graphannis.version>0.3.0-SNAPSHOT</graphannis.version>
   </properties>
 </project>
