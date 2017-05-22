@@ -33,6 +33,7 @@ import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
@@ -531,22 +532,26 @@ public class SingleResultPanel extends CssLayout implements
         else
         {
 
-          combobox.getContainerDataSource().addItem(i).
-            getItemProperty("number").setValue(i);
-
-          if (combobox.getContainerDataSource() instanceof IndexedContainer)
+          Item it = combobox.getContainerDataSource().addItem(i);
+          // check if the item was actually added or might have been available before.
+          if(it != null)
           {
-            ((IndexedContainer) combobox.getContainerDataSource()).sort(
-              new Object[]
-              {
-                "number"
-              }, new boolean[]
-              {
-                true
-              });
-          }
+            it.getItemProperty("number").setValue(i);
 
-          combobox.select(i);
+            if (combobox.getContainerDataSource() instanceof IndexedContainer)
+            {
+              ((IndexedContainer) combobox.getContainerDataSource()).sort(
+                new Object[]
+                {
+                  "number"
+                }, new boolean[]
+                {
+                  true
+                });
+            }
+
+            combobox.select(i);
+          }
         }
       }
       catch (NumberFormatException ex)

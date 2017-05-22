@@ -174,6 +174,12 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
       getCurrent().setParameters(parameters);
       return this;
     }
+    
+    public ExportQueryGenerator alignmc(boolean alignmc)
+    {
+      getCurrent().setAlignmc(alignmc);
+      return this;
+    }
   }
   
   public static class FrequencyQueryGenerator

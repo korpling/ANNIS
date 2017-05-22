@@ -198,4 +198,11 @@ public class GridExporter extends GeneralTextExporter
     }
 
   }
+
+
+@Override
+	public boolean isAlignable() 
+	{
+		return false;
+	}
 }

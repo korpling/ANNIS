@@ -42,7 +42,7 @@ public class CSVExporter implements ExporterPlugin, Serializable
 
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, List<String> keys,String argsAsString,
+    Set<String> corpora, List<String> keys,String argsAsString, boolean alignmc,
     WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     
@@ -96,7 +96,18 @@ public class CSVExporter implements ExporterPlugin, Serializable
   @Override
   public String getFileEnding()
   {
-    return "csv";
+    /* 
+      On Windows and Excel "csv" won't trigger the configuration dialog and will
+      use different defaults for importing the data depending on the locale of Windows.
+      Thus use the more general "txt" ending which will trigger a configuration dialog.
+    */
+    return "txt";
   }
+
+@Override
+public boolean isAlignable() 
+ {
+	return false;
+ }
   
 }

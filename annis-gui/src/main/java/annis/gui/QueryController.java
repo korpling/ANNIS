@@ -330,6 +330,7 @@ public class QueryController implements Serializable
       setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).
         getAnnotationKeys());
       setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
+      setIfNew(state.getAlignmc(), ((ExportQuery) q).getAlignmc());
     }
   }
   
@@ -371,6 +372,7 @@ public class QueryController implements Serializable
       .exporter(state.getExporter().getValue())
       .annotations(state.getExportAnnotationKeys().getValue())
       .param(state.getExportParameters().getValue())
+      .alignmc(state.getAlignmc().getValue())
       .build();
   }
 

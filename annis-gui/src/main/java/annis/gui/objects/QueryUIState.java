@@ -70,6 +70,8 @@ public class QueryUIState implements Serializable
   private final ObjectProperty<String> exportParameters = 
     new ObjectProperty<>("");
   
+  private final ObjectProperty<Boolean> alignmc = new ObjectProperty<Boolean>(false);
+  
   private transient Map<QueryType, Future<?>> executedTasks;
   
   private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition
@@ -168,6 +170,11 @@ public class QueryUIState implements Serializable
   public ObjectProperty<String> getExportParameters()
   {
     return exportParameters;
+  }
+  
+  public ObjectProperty<Boolean> getAlignmc()
+  {
+    return alignmc;
   }
 
   public BeanContainer<Integer, UserGeneratedFrequencyEntry> getFrequencyTableDefinition()
