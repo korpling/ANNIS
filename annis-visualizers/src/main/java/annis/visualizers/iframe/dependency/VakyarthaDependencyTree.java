@@ -48,6 +48,8 @@ import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.RelannisNodeFeature;
 import annis.visualizers.iframe.WriterVisualizer;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -96,80 +98,27 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   {
     this.mappings = input.getMappings();
 
-    /**
-     * Try to create a sorted map of nodes. The left annis feature token index
-     * is used for sorting the nodes. It is possible the different nodes has the
-     * same left token index, but the probability of this is small and it seem's
-     * not to make much sense to visualize this. Mabye we should use the node
-     * id.
-     *
-     * Contains only token, if mappings does not contain "node_key".
-     */
-    Map<SNode, Integer> selectedNodes = new TreeMap<SNode, Integer>(
-      new Comparator<SNode>()
-      {
-        private int getIdx(SNode snode)
-        {
-          
-          RelannisNodeFeature feat = 
-            (RelannisNodeFeature) snode.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-          
-          if (snode instanceof SToken)
-          {
-            return feat != null ? (int) feat.getTokenIndex(): -1;
-          }
-          else
-          {
-            return feat != null ? (int) feat.getLeftToken() : -1;
-          }
-        }
-
-        @Override
-        public int compare(SNode o1, SNode o2)
-        {
-          int tok1 = getIdx(o1);
-          int tok2 = getIdx(o2);
-
-          if (tok1 < tok2)
-          {
-            return -1;
-          }
-
-          if (tok1 == tok2)
-          {
-            return 0;
-          }
-          else
-          {
-            return 1;
-          }
-
-        }
-      });
-
-    printHTMLOutput(input, writer, selectedNodes);
+    printHTMLOutput(input, writer);
   }
 
-  public void printHTMLOutput(VisualizerInput input, Writer writer,
-    Map<SNode, Integer> selectedNodes)
+  public void printHTMLOutput(VisualizerInput input, Writer writer)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getDocumentGraph();
+    
+    List<SToken> selectedNodes = new LinkedList<>();
 
-    for (SNode n : sDocumentGraph.getNodes())
+    for (SToken n : sDocumentGraph.getSortedTokenByText())
     {
       if (selectNode(n))
       {
-        RelannisNodeFeature feat = 
-          (RelannisNodeFeature) n.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-        
-        int tokenIdx = feat != null ? (int) feat.getTokenIndex() : -1;
-        selectedNodes.put(n, tokenIdx);
+        selectedNodes.add(n);
       }
     }
 
+
     Map<SNode, Integer> node2Int = new HashMap<SNode, Integer>();
     int count = 0;
-    for (SNode tok : selectedNodes.keySet())
+    for (SNode tok : selectedNodes)
     {
       node2Int.put(tok, count++);
     }
@@ -212,7 +161,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       println("tokens=new Object();", writer);
 
       count = 0;
-      for (SNode node : selectedNodes.keySet())
+      for (SNode node : selectedNodes)
       {
         JSONObject vakyarthaObject = new JSONObject();
 
