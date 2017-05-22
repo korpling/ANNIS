@@ -28,7 +28,10 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import annis.model.RelannisNodeFeature;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -152,24 +155,18 @@ public class GridComponent extends Panel
     
     
     
-    List<SNode> tokens = CommonHelper.getSortedSegmentationNodes(segmentationName,
-      graph);
-    Preconditions.checkArgument(!tokens.isEmpty(), "Token list must be non-empty");
-    RelannisNodeFeature featTokStart
-      = (RelannisNodeFeature) tokens.get(0).
-      getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).
-      getValue();
-    long startIndex = featTokStart.getTokenIndex();
-    RelannisNodeFeature featTokEnd
-      = (RelannisNodeFeature) tokens.get(tokens.size() - 1).
-      getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).
-      getValue();
-    long endIndex = featTokEnd.getTokenIndex();
+    List<SToken> sortedTokens = graph.getSortedTokenByText();
+    
+    BiMap<SToken, Integer> token2index = HashBiMap.create();
+    int i=0; 
+    for(SToken t : sortedTokens)
+    {
+      token2index.put(t, i++);
+    }
+    Preconditions.checkArgument(!sortedTokens.isEmpty(), "Token list must be non-empty");
     
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
-      computeAnnotationRows(startIndex, endIndex);
-    
-    
+      computeAnnotationRows(token2index);
     
     
     //Get Mappings
@@ -239,9 +236,8 @@ public class GridComponent extends Panel
     }
     
     // add tokens as row
-    AtomicInteger tokenOffsetForText = new AtomicInteger(-1);
-    Row tokenRow = computeTokenRow(tokens, graph,
-      rowsByAnnotation, startIndex, tokenOffsetForText);
+    Row tokenRow = computeTokenRow(sortedTokens, graph,
+      rowsByAnnotation, token2index);
     
     if(isHidingToken())
     {
@@ -281,12 +277,11 @@ public class GridComponent extends Panel
       lblEmptyToken.setVisible(tokenRowIsEmpty);
     }
     grid.setRowsByAnnotation(rowsByAnnotation);
-    grid.setTokenIndexOffset(tokenOffsetForText.get());
   }
   
-  private Row computeTokenRow(List<SNode> tokens, 
+  private Row computeTokenRow(List<SToken> tokens, 
     SDocumentGraph graph, LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
-    long startIndex, AtomicInteger tokenOffsetForText)
+    BiMap<SToken, Integer> token2index)
   {
     /* we will only add tokens of one texts which is mentioned by any
       included annotation. */
@@ -320,7 +315,7 @@ public class GridComponent extends Panel
     }
     
     Row tokenRow = new Row();
-    for (SNode t : tokens)
+    for (SToken t : tokens)
     {
       // get the Salt ID of the STextualDS of this token
       STextualDS tokenText = CommonHelper.getTextualDSForNode(t, graph);
@@ -328,19 +323,11 @@ public class GridComponent extends Panel
       // only add token if text ID matches the valid one
       if (tokenText != null && validTextIDs.contains(tokenText.getId()))
       {
-        RelannisNodeFeature feat
-          = (RelannisNodeFeature) t.getFeature(AnnisConstants.ANNIS_NS,
-            AnnisConstants.FEAT_RELANNIS_NODE).getValue();
-        long idxLeft = feat.getLeftToken() - startIndex;
-        long idxRight = feat.getRightToken() - startIndex;
-        if (tokenOffsetForText.get() < 0)
-        {
-          // set the token offset by assuming the first idx must be zero
-          tokenOffsetForText.set(Math.abs((int) idxLeft));
-        }
-        String text = extractTextForToken(t, segmentationName);
+        int idx = token2index.get(t);
+        
+        String text = graph.getText(t);
         GridEvent event
-          = new GridEvent(t.getId(), (int) idxLeft, (int) idxRight, text);
+          = new GridEvent(t.getId(), idx, idx, text);
         event.setTextID(tokenText.getId());
         // check if the token is a matched node
         Long match = isCoveredTokenMarked() ? 
@@ -373,7 +360,7 @@ public class GridComponent extends Panel
   }
   
   private LinkedHashMap<String, ArrayList<Row>> computeAnnotationRows(
-    long startIndex, long endIndex)
+    BiMap<SToken, Integer> token2index)
   {
     List<String> annos = new LinkedList<>();
     
@@ -415,7 +402,7 @@ public class GridComponent extends Panel
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation
       = EventExtractor.parseSalt(input, showSpanAnnotations, 
         showTokenAnnotations, annos, mediaAnnotations, isAddingPlaybackRow(),
-        (int) startIndex, (int) endIndex, pdfController, enforcedText);
+        token2index, pdfController, enforcedText);
     
     return rowsByAnnotation;
   }

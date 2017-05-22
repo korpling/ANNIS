@@ -166,8 +166,6 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             // finally put the table into the rendering class
             grid.setRowsByAnnotation(table);
 
-            grid.setTokenIndexOffset(startIdx);
-
             // add the annotation grid to the gui
             setContent(grid);
 

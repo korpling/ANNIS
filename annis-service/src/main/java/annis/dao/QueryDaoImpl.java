@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.StringBufferInputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -55,11 +54,7 @@ import java.util.concurrent.TimeoutException;
 
 import javax.cache.Cache;
 import javax.cache.Caching;
-import javax.cache.configuration.Configuration;
 import javax.cache.configuration.MutableConfiguration;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -73,7 +68,6 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.SaltUtil;
-import org.corpus_tools.salt.util.internal.persistence.SaltXML10Handler;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.eclipse.emf.common.util.URI;
 import org.corpus_tools.graphannis.API;
@@ -88,9 +82,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -142,8 +133,6 @@ import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -211,7 +200,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
       for (Match m : mg.getMatches()) {
         SDocumentGraph docGraph = fetchDocumentWithContext(m, annoExt);
-        SDocument doc = corpusGraph.createDocument(null, "match" + i++);
+        SDocument doc = corpusGraph.createDocument(rootCorpus, "match" + i++);
         doc.setDocumentGraph(docGraph);
       }
     }
@@ -227,7 +216,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     for (java.net.URI id : m.getSaltIDs()) {
       if (corpusName == null) {
         // use first node as template for the corpus name
-        corpusName = id.getHost();
+        corpusName = CommonHelper.getCorpusPath(id).get(0);
       }
       matchedIDs.put(id.toASCIIString());
     }

@@ -31,6 +31,7 @@ import annis.model.RelannisNodeFeature;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
 import com.google.common.base.Splitter;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.Range;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -82,8 +83,7 @@ public class EventExtractor {
    * @param mediaLayer  A set of all annotation layers which should be treated as special media layer.
    * @param annotationNames
    * @param replaceValueWithMediaIcon If true the actual value is removed and an icon for playing the media file is shown instead.
-   * @param startTokenIndex token index of the first token in the match
-   * @param endTokenIndex token index of the last token in the match
+   * @param token2index
    * @param pdfController makes status of all pdfviewer available for the
    * events.
    * @param text If non-null only include annotations for nodes of the specified text.
@@ -93,7 +93,7 @@ public class EventExtractor {
           VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
           List<String> annotationNames, 
           Set<String> mediaLayer, boolean replaceValueWithMediaIcon,
-          long startTokenIndex, long endTokenIndex,
+          BiMap<SToken, Integer> token2index,
           PDFController pdfController, STextualDS text) 
   {
 
@@ -117,7 +117,7 @@ public class EventExtractor {
       {
         if(text == null || text == CommonHelper.getTextualDSForNode(span, graph))
         {
-          addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
+          addAnnotationsForNode(span, graph, token2index,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation,
             true, mediaLayer, replaceValueWithMediaIcon);
         }
@@ -130,7 +130,7 @@ public class EventExtractor {
       {
         if(text == null || text == CommonHelper.getTextualDSForNode(tok, graph))
         {
-          addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
+          addAnnotationsForNode(tok, graph, token2index,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false,
             mediaLayer, replaceValueWithMediaIcon);
         }
@@ -152,14 +152,14 @@ public class EventExtractor {
     // 4. split up events if they cover islands
     for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
       for (Row r : e.getValue()) {
-        splitRowsOnIslands(r, graph, text, startTokenIndex, endTokenIndex);
+        splitRowsOnIslands(r, graph, text, token2index);
       }
     }
 
     // 5. split up events if they have gaps
     for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
       for (Row r : e.getValue()) {
-        splitRowsOnGaps(r, graph, startTokenIndex, endTokenIndex);
+        splitRowsOnGaps(r, graph, token2index);
       }
     }
     
@@ -253,7 +253,7 @@ public class EventExtractor {
   }
   private static void addAnnotationsForNode(SNode node,
     SDocumentGraph graph,
-    long startTokenIndex, long endTokenIndex,
+    BiMap<SToken, Integer> token2index,
     PDFController pdfController, PDFPageHelper pageNumberHelper,
     AtomicInteger eventCounter,
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
@@ -281,18 +281,14 @@ public class EventExtractor {
     
 
     // calculate the left and right values of a span
-    // TODO: howto get these numbers with Salt?
-    RelannisNodeFeature feat = (RelannisNodeFeature) node.
-      getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-
-    long leftLong = feat.getLeftToken();
-    long rightLong = feat.getRightToken();
-
-    leftLong = clip(leftLong, startTokenIndex, endTokenIndex);
-    rightLong = clip(rightLong, startTokenIndex, endTokenIndex);
-
-    int left = (int) (leftLong - startTokenIndex);
-    int right = (int) (rightLong - startTokenIndex);
+    List<SToken> overlappedToken = graph.getOverlappedTokens(node);
+    int left = Integer.MAX_VALUE;
+    int right = Integer.MIN_VALUE;
+    for(SToken t : overlappedToken)
+    {
+      left = Math.min(left, token2index.get(t));
+      right = Math.max(right, token2index.get(t));
+    }
 
     for (SAnnotation anno : node.getAnnotations())
     {
@@ -713,13 +709,12 @@ public class EventExtractor {
    * @param row
    * @param graph
    * @param text
-   * @param startTokenIndex token index of the first token in the match
-   * @param endTokenIndex token index of the last token in the match
+   * @param token2index 
    */
   private static void splitRowsOnIslands(Row row, 
     final SDocumentGraph graph,
     STextualDS text,
-    long startTokenIndex, long endTokenIndex)
+    BiMap<SToken, Integer> token2index)
   {
     
     BitSet tokenCoverage = new BitSet();
@@ -732,13 +727,7 @@ public class EventExtractor {
       SToken t = itToken.next();
       if (text == null || text == CommonHelper.getTextualDSForNode(t, graph))
       {
-        RelannisNodeFeature feat = (RelannisNodeFeature) t.getFeature(
-          ANNIS_NS,
-          FEAT_RELANNIS_NODE).getValue();
-        long tokenIndexRaw = feat.getTokenIndex();
-
-        tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);
-        int tokenIndex = (int) (tokenIndexRaw - startTokenIndex);
+        int tokenIndex = token2index.get(t);
         tokenCoverage.set(tokenIndex);
       }
     }
@@ -790,11 +779,10 @@ public class EventExtractor {
    *
    * @param row
    * @param graph
-   * @param startTokenIndex token index of the first token in the match
-   * @param endTokenIndex token index of the last token in the match
+   * @param token2index 
    */
   private static void splitRowsOnGaps(Row row, final SDocumentGraph graph,
-    long startTokenIndex, long endTokenIndex)
+    BiMap<SToken, Integer> token2index)
   {
     ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
     while (itEvents.hasNext())
@@ -811,8 +799,8 @@ public class EventExtractor {
         @Override
         public int compare(String o1, String o2)
         {
-          SNode node1 = graph.getNode(o1);
-          SNode node2 = graph.getNode(o2);
+          SToken node1 = (SToken) graph.getNode(o1);
+          SToken node2 = (SToken) graph.getNode(o2);
 
           if (node1 == node2)
           {
@@ -827,15 +815,9 @@ public class EventExtractor {
             return +1;
           }
 
-          RelannisNodeFeature feat1 = (RelannisNodeFeature) node1.getFeature(
-            ANNIS_NS,
-            FEAT_RELANNIS_NODE).getValue();
-          RelannisNodeFeature feat2 = (RelannisNodeFeature) node2.getFeature(
-            ANNIS_NS,
-            FEAT_RELANNIS_NODE).getValue();
 
-          long tokenIndex1 = feat1.getTokenIndex();
-          long tokenIndex2 = feat2.getTokenIndex();
+          long tokenIndex1 = token2index.get(node1);
+          long tokenIndex2 = token2index.get(node2);
 
           return ((Long) (tokenIndex1)).compareTo(tokenIndex2);
         }
@@ -845,16 +827,8 @@ public class EventExtractor {
       List<GridEvent> gaps = new LinkedList<>();
       for (String id : sortedCoveredToken)
       {
-
-        SNode node = graph.getNode(id);
-        RelannisNodeFeature feat = (RelannisNodeFeature) node.getFeature(
-          ANNIS_NS,
-          FEAT_RELANNIS_NODE).getValue();
-        long tokenIndexRaw = feat.getTokenIndex();
-
-        tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);
-
-        int tokenIndex = (int) (tokenIndexRaw - startTokenIndex);
+        SToken node = (SToken) graph.getNode(id);
+        int tokenIndex = token2index.get(node);
         
         // sanity check
         if(tokenIndex >= event.getLeft() && tokenIndex <= event.getRight())
