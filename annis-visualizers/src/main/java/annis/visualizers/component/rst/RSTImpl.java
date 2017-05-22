@@ -59,6 +59,7 @@ import annis.gui.widgets.gwt.client.ui.VJITWrapper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.RelannisNodeFeature;
+import java.util.HashMap;
 
 /**
  * The Visualizer Plugin for RST-Visualization.
@@ -153,52 +154,15 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   private Properties mappings;
 
   private String namespace;
+  
+  private final Map<SToken, Integer> token2index = new HashMap<>();
 
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
    * mapping the sentence to a number by the order of the SStructures in the
    * list.
    */
-  private TreeSet<SStructure> sentences = new TreeSet<SStructure>(
-          new Comparator<SStructure>() {
-    private int getStartPosition(SStructure s) {
-      List<SRelation<SNode,SNode>> out = s.getGraph().getOutRelations(s.getId());
-
-      for (SRelation e : out) {
-        if (e instanceof SRelation
-                && ((SRelation) e).getTarget() instanceof SToken) {
-          SToken tok = ((SToken) ((SRelation) e).getTarget());
-          
-          RelannisNodeFeature feat = 
-            (RelannisNodeFeature) tok.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-          
-          return (int) feat.getLeftToken();
-        }
-      }
-      
-      RelannisNodeFeature feat = 
-        (RelannisNodeFeature) s.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-     
-      return (int) feat.getLeftToken();
-    }
-
-    @Override
-    public int compare(SStructure t1, SStructure t2) {
-      int t1Idx = getStartPosition(t1);
-      int t2Idx = getStartPosition(t2);
-
-      if (t1Idx < t2Idx) {
-        return -1;
-      }
-
-      if (t1Idx == t2Idx) {
-        return 0;
-      } else {
-        return 1;
-      }
-    }
-  });
-
+  private final TreeSet<SStructure> sentences;
   private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
   public RSTImpl(VisualizerInput visInput) {
@@ -210,7 +174,64 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     namespace = visInput.getNamespace();
 
     visId = "rst_" + uniqueID.toString();
+    
+    int tokIdx = 0;
+    for(SToken tok : visInput.getDocument().getDocumentGraph().getSortedTokenByText())
+    {
+      token2index.put(tok, tokIdx++);
+    }
+   
+    this.sentences = new TreeSet<SStructure>(
+      new Comparator<SStructure>()
+    {
+      private int getStartPosition(SStructure s)
+      {
+        List<SRelation<SNode, SNode>> out = s.getGraph().getOutRelations(s.
+          getId());
 
+        for (SRelation e : out)
+        {
+          if (e instanceof SRelation
+            && ((SRelation) e).getTarget() instanceof SToken)
+          {
+            SToken tok = ((SToken) ((SRelation) e).getTarget());
+
+            return token2index.get(tok);
+          }
+        }
+        
+        int pos = Integer.MAX_VALUE;
+        for(SToken tok : s.getGraph().getOverlappedTokens(s))
+        {
+          pos = Math.min(pos, token2index.get(tok));
+        }
+
+        return pos;
+      }
+
+      @Override
+      public int compare(SStructure t1, SStructure t2)
+      {
+        int t1Idx = getStartPosition(t1);
+        int t2Idx = getStartPosition(t2);
+
+        if (t1Idx < t2Idx)
+        {
+          return -1;
+        }
+
+        if (t1Idx == t2Idx)
+        {
+          return 0;
+        }
+        else
+        {
+          return 1;
+        }
+      }
+    });
+
+    
     jit = new JITWrapper();
     jit.setWidth("100%");
     jit.setHeight("-1px");
@@ -222,7 +243,8 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     jit.requestRepaint();
 
     addScrollbar();
-
+    
+    
   }
 
   public void addExtension(CssRenderInfo renderInfo) {
