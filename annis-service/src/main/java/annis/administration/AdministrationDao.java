@@ -712,7 +712,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       conn.setAutoCommit(false);
       
-      stmt.execute("CREATE TABLE IF NOT EXISTS documents (salt_id UNIQUE, salt_xml)");
+      // TODO
       
       conn.commit();
     }
@@ -748,79 +748,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
           new File(importDir, "rank" + version.getFileSuffix()));
       importSQLiteTable(version.getEdgeAnnotationTable(),
           new File(importDir, "edge_annotation" + version.getFileSuffix()));
-
-      final String factsSQL = version.getFactsSQL();
-      final String insertDocSQL = "INSERT INTO documents(salt_id, salt_xml) VALUES(?,?)";
-      if(factsSQL == null)
-      {
-        log.warn("Can't import documents because this version of the ANNIS format is incompletly defined.");
-      }
-      else
-      {
-        final XMLOutputFactory xmlFactory = new WstxOutputFactory();
-        
-        org.eclipse.emf.common.util.URI corpusURI = org.eclipse.emf.common.util.URI.createURI("salt:/").appendSegment(corpusName);
-        // find all documents, map them to Salt and add the serialized Salt to a special table
-        try (Connection conn = createSQLiteConnection();
-            Statement stmt = conn.createStatement();
-            PreparedStatement psFacts = conn.prepareStatement(factsSQL);
-            PreparedStatement psInsertDoc = conn.prepareStatement(insertDocSQL))
-        {
-          conn.setAutoCommit(false);
-          try (ResultSet rsDocs = 
-              stmt.executeQuery("SELECT DISTINCT id, name FROM corpus WHERE type='DOCUMENT'"))
-          {
-            while(rsDocs.next())
-            {
-              
-              psFacts.setLong(1, rsDocs.getLong(1));
-              String docName = rsDocs.getString(2);
-              org.eclipse.emf.common.util.URI docURI = corpusURI.appendSegment(docName);
-              
-              try(ResultSet rsSingleDoc = psFacts.executeQuery())
-              {
-                SDocumentGraphMapper mapper = new SDocumentGraphMapper(docURI);
-                SDocumentGraph graph = mapper.extractData(rsSingleDoc);
-                
-                // TODO: serialization fails with nullpointer exception if there is no label
-                graph.createAnnotation("test", "test", "");
-                
-                psInsertDoc.setString(1, docURI.toString());
-                
-                
-                try(ByteArrayOutputStream outStream = new ByteArrayOutputStream(32*1024))
-                {
-                  XMLStreamWriter xml = xmlFactory.createXMLStreamWriter(outStream, 
-                      "UTF-8");
-                  
-                  xml.writeStartDocument("1.0");
-                  xml.writeCharacters("\n");
-                  SaltXML10Writer writer = new SaltXML10Writer();
-                  writer.setPrettyPrint(false);
-                  writer.writeDocumentGraph(xml, graph);
-                  xml.writeEndDocument();
-                  
-                  outStream.flush();
-                  outStream.close();
-                  
-                  psInsertDoc.setString(2, new String(outStream.toByteArray(), StandardCharsets.UTF_8));
-                  
-                  psInsertDoc.execute();
-                  
-                  log.info("Successfully extracted " + graph.getNodes().size() + " nodes for document " + docName);
-                }
-                catch(XMLStreamException | IOException ex)
-                {
-                  log.error("Can't serialize the document XML", ex);
-                }
-                
-              }
-            }
-          }
-          conn.commit();
-        }
-      }
-
     }
     catch (SQLException ex)
     {

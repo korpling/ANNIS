@@ -228,35 +228,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     return SaltExport.map(coveredNodes);
   }
 
-  private SDocumentGraph getSaltDocumentFromDB(String docID) {
-    if (docID != null) {
-      try (Connection conn = createSQLiteConnection();
-              PreparedStatement stmt = conn.prepareStatement("SELECT salt_xml FROM documents WHERE salt_id=?")) {
-        conn.setReadOnly(true);
-
-        stmt.setString(1, docID);
-        try (ResultSet rs = stmt.executeQuery()) {
-          SaltXML10Handler saltXMLHandler = new SaltXML10Handler();
-
-          SAXParser parser = xmlParserFactory.newSAXParser();
-          XMLReader xmlReader = parser.getXMLReader();
-          xmlReader.setContentHandler(saltXMLHandler);
-          InputSource source = new InputSource(rs.getCharacterStream(1));
-          source.setEncoding("UTF-8");
-          xmlReader.parse(source);
-
-          Object loadedObj = saltXMLHandler.getSaltObject();
-
-          if (loadedObj instanceof SDocumentGraph) {
-            return (SDocumentGraph) loadedObj;
-          }
-        }
-      } catch (SQLException | IOException | SAXException | ParserConfigurationException ex) {
-        log.error(null, ex);
-      }
-    }
-    return null;
-  }
 
   /**
    * @return the graphSqlGenerator
@@ -898,44 +869,23 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     if (cached != null) {
       return cached;
     } else {
-      try (Connection conn = createSQLiteConnection();
-              PreparedStatement stmt = conn.prepareStatement("SELECT salt_xml FROM documents WHERE salt_id=?")) {
-        stmt.setString(1, docURI.toString());
-        try (ResultSet rs = stmt.executeQuery()) {
-          if (rs.next()) {
-            SaltXML10Handler handler = new SaltXML10Handler();
-            SAXParser parser = xmlParserFactory.newSAXParser();
-            XMLReader reader = parser.getXMLReader();
-            reader.setContentHandler(handler);
-            String xml = rs.getString(1);
-            InputSource is = new InputSource(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
-            reader.parse(is);
+      
+      API.NodeVector nodes = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, new StringVector(docURI.toString()));
+      SDocumentGraph graph = SaltExport.map(nodes);
 
-            if (handler.getSaltObject() instanceof SDocumentGraph) {
-              SDocumentGraph graph = (SDocumentGraph) handler.getSaltObject();
+      // wrap the single document into a SaltProject
+      SaltProject project = SaltFactory.createSaltProject();
+      SCorpusGraph corpusGraph = project.createCorpusGraph();
+      SCorpus rootCorpus = corpusGraph.createCorpus(null, toplevelCorpusName);
+      SDocument doc = corpusGraph.createDocument(rootCorpus, documentName);
 
-              // wrap the single document into a SaltProject
-              SaltProject project = SaltFactory.createSaltProject();
-              SCorpusGraph corpusGraph = project.createCorpusGraph();
-              SCorpus rootCorpus = corpusGraph.createCorpus(null, toplevelCorpusName);
-              SDocument doc = corpusGraph.createDocument(rootCorpus, documentName);
+      doc.setDocumentGraph(graph);
 
-              doc.setDocumentGraph(graph);
-
-              docCache.put(docURI.toString(), project);
-
-              return project;
-            }
-
-          }
-        }
-      } catch (SQLException | SAXException | ParserConfigurationException | IOException ex) {
-        log.error("Could not retrieve the annotation graph.");
-      }
+      docCache.put(docURI.toString(), project);
+      
+      
+      return project;
     }
-
-    return null;
-
   }
 
   @Override
