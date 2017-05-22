@@ -298,7 +298,7 @@ public class EmbeddedVisUI extends CommonUI
             {
               // enhance the graph with match information from the arguments
               Match match = Match.parseFromString(rawMatch[0]);
-              Helper.addMatchToDocumentGraph(match, doc);
+              CommonHelper.addMatchToDocumentGraph(match, doc);
             }
           }
 

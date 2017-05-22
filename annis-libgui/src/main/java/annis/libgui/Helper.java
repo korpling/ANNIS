@@ -93,6 +93,9 @@ import annis.service.objects.Match;
 import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
 import elemental.json.JsonValue;
+import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SDocumentGraphObject;
+import org.corpus_tools.salt.util.DataSourceSequence;
 
 /**
  *
@@ -1094,18 +1097,19 @@ public class Helper
       public int compare(SNode o1, SNode o2)
       {
         // generate several helper variables we want to compare
-        RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getFeature(
-            ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-        RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getFeature(
-          ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        SDocumentGraph g1 = (SDocumentGraph) o1.getGraph();
+        SDocumentGraph g2 = (SDocumentGraph) o2.getGraph();
+        
+        List<DataSourceSequence> seq1 = g1.getOverlappedDataSourceSequence(o1, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
+        List<DataSourceSequence> seq2 = g2.getOverlappedDataSourceSequence(o2, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
 
-        long leftTokIdxO1 = feat1.getLeftToken();
-        long rightTokIdxO1 = feat1.getRightToken();
-        long leftTokIdxO2 = feat2.getLeftToken();
-        long rightTokIdxO2 = feat2.getRightToken();
+        long leftCharIdxO1 = seq1.get(0).getStart().longValue();;
+        long rightCharIdxO1 = seq1.get(0).getEnd().longValue();;
+        long leftCharIdxO2 = seq2.get(0).getStart().longValue();;
+        long rightCharIdxO2 = seq2.get(0).getStart().longValue();;
 
-        int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
-        int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);
+        int intervallO1 = (int) Math.abs(leftCharIdxO1 - rightCharIdxO1);
+        int intervallO2 = (int) Math.abs(leftCharIdxO2 - rightCharIdxO2);
 
         SFeature featMatch1 = o1.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
         SFeature featMatch2 = o2.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
@@ -1115,10 +1119,10 @@ public class Helper
         // use a comparison chain which is much less verbose and better readable
         return ComparisonChain.start()
             .compare(intervallO1, intervallO2)
-            .compare(feat1.getLeftToken(),  feat2.getLeftToken())
-            .compare(feat1.getRightToken(), feat2.getRightToken())
+            .compare(leftCharIdxO1,  leftCharIdxO2)
+            .compare(rightCharIdxO1, rightCharIdxO2)
             .compare(matchNode1, matchNode2)
-            .compare(feat1.getInternalID(), feat2.getInternalID())
+            .compare(o1.getId(), o2.getId())
             .result();
 
       }
@@ -1139,7 +1143,7 @@ public class Helper
 
       if (initialMatches.size() > 0)
       {
-        graph.traverse(new BasicEList<>(sortedMatchedNodes.
+        graph.traverse(new ArrayList<>(sortedMatchedNodes.
           keySet()),
           GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
           (GraphTraverseHandler) this, true);
@@ -1239,42 +1243,5 @@ public class Helper
     }
   }
   
-  public static void addMatchToDocumentGraph(Match match, SDocument document)
-  {
-    List<String> allUrisAsString = new LinkedList<>();
-    long i = 1;
-    for (URI u : match.getSaltIDs())
-    {
-      allUrisAsString.add(u.toASCIIString());
-      SNode matchedNode = document.getDocumentGraph().getNode(u.toASCIIString());
-      // set the feature for this specific node
-      if (matchedNode != null)
-      {
-        SFeature existing = matchedNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        if (existing == null)
-        {
-          SFeature featMatchedNode = SaltFactory.createSFeature();
-          featMatchedNode.setNamespace(ANNIS_NS);
-          featMatchedNode.setName(FEAT_MATCHEDNODE);
-          featMatchedNode.setValue(i);
-          matchedNode.addFeature(featMatchedNode);
-        }
-      }
-      i++;
-    }
-
-    SFeature featIDs = SaltFactory.createSFeature();
-    featIDs.setNamespace(ANNIS_NS);
-    featIDs.setName(FEAT_MATCHEDIDS);
-    featIDs.setValue(Joiner.on(",").join(allUrisAsString));
-    document.addFeature(featIDs);
-
-    SFeature featAnnos = SaltFactory.createSFeature();
-    featAnnos.setNamespace(ANNIS_NS);
-    featAnnos.setName(FEAT_MATCHEDANNOS);
-    featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
-    document.addFeature(featAnnos);
-
-  }
   
 }

@@ -202,6 +202,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
         SDocumentGraph docGraph = fetchDocumentWithContext(m, annoExt);
         SDocument doc = corpusGraph.createDocument(rootCorpus, "match" + i++);
         doc.setDocumentGraph(docGraph);
+        
+        CommonHelper.addMatchToDocumentGraph(m, doc);
       }
     }
 

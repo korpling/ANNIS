@@ -152,9 +152,6 @@ public class GridComponent extends Panel
     layout.addComponent(grid);
     SDocumentGraph graph = input.getDocument().getDocumentGraph();
     
-    
-    
-    
     List<SToken> sortedTokens = graph.getSortedTokenByText();
     
     BiMap<SToken, Integer> token2index = HashBiMap.create();
@@ -224,12 +221,8 @@ public class GridComponent extends Panel
                
              }
         
-         }
-      
-         
-           
+         } 
         }
-      
        }
       }
      }
@@ -484,13 +477,12 @@ public class GridComponent extends Panel
    */
   private Long markCoveredTokens(Map<SNode, Long> markedAndCovered, SNode tok)
   {
-    RelannisNodeFeature f = RelannisNodeFeature.extract(tok);
-    if (markedAndCovered.containsKey(tok) && f != null && f.getMatchedNode()
-      == null)
+    SFeature featMatched = tok.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+    if (markedAndCovered.containsKey(tok) && featMatched == null )
     {
       return markedAndCovered.get(tok);
     }
-    return f != null ? f.getMatchedNode() : null;
+    return featMatched != null ? featMatched.getValue_SNUMERIC() : null;
   }
   
   /**

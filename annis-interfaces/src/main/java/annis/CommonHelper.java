@@ -16,6 +16,8 @@
 package annis;
 
 import annis.model.AnnisConstants;
+import annis.service.objects.Match;
+import com.google.common.base.Joiner;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -33,6 +35,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
@@ -451,6 +454,42 @@ public class CommonHelper
     }
 
     return result;
+  }
+
+  public static void addMatchToDocumentGraph(Match match, SDocument document)
+  {
+    List<String> allUrisAsString = new LinkedList<>();
+    long i = 1;
+    for (URI u : match.getSaltIDs())
+    {
+      allUrisAsString.add(u.toASCIIString());
+      SNode matchedNode = document.getDocumentGraph().getNode(u.toASCIIString());
+      // set the feature for this specific node
+      if (matchedNode != null)
+      {
+        SFeature existing = matchedNode.getFeature(AnnisConstants.ANNIS_NS,
+          AnnisConstants.FEAT_MATCHEDNODE);
+        if (existing == null)
+        {
+          SFeature featMatchedNode = SaltFactory.createSFeature();
+          featMatchedNode.setNamespace(AnnisConstants.ANNIS_NS);
+          featMatchedNode.setName(AnnisConstants.FEAT_MATCHEDNODE);
+          featMatchedNode.setValue(i);
+          matchedNode.addFeature(featMatchedNode);
+        }
+      }
+      i++;
+    }
+    SFeature featIDs = SaltFactory.createSFeature();
+    featIDs.setNamespace(AnnisConstants.ANNIS_NS);
+    featIDs.setName(AnnisConstants.FEAT_MATCHEDIDS);
+    featIDs.setValue(Joiner.on(",").join(allUrisAsString));
+    document.addFeature(featIDs);
+    SFeature featAnnos = SaltFactory.createSFeature();
+    featAnnos.setNamespace(AnnisConstants.ANNIS_NS);
+    featAnnos.setName(AnnisConstants.FEAT_MATCHEDANNOS);
+    featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
+    document.addFeature(featAnnos);
   }
   
 }
