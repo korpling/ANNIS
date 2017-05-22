@@ -17,6 +17,10 @@ package annis.visualizers.component.tree;
 
 import annis.model.AnnisNode;
 import java.util.Comparator;
+import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.util.DataSourceSequence;
 
 public enum HorizontalOrientation {
 	LEFT_TO_RIGHT(1),
@@ -28,11 +32,16 @@ public enum HorizontalOrientation {
 		directionModifier = directionModifier_;
 	}
 	
-	Comparator<AnnisNode> getComparator() {
-		return new Comparator<AnnisNode>() {
+	Comparator<SNode> getComparator() {
+		return new Comparator<SNode>() {
 			@Override
-			public int compare(AnnisNode o1, AnnisNode o2) {
-        return directionModifier * (int) (o1.getLeftToken() - o2.getLeftToken());
+			public int compare(SNode o1, SNode o2) {
+        SDocumentGraph docGraph = (SDocumentGraph) o1.getGraph();
+        
+        DataSourceSequence seq1 =  docGraph.getOverlappedDataSourceSequence(o1, SALT_TYPE.STEXT_OVERLAPPING_RELATION).get(0);
+        DataSourceSequence seq2 =  docGraph.getOverlappedDataSourceSequence(o2, SALT_TYPE.STEXT_OVERLAPPING_RELATION).get(0);
+          
+        return directionModifier * (int)(seq1.getStart().longValue()- seq2.getStart().longValue());
 			}
 		};	
 	}
