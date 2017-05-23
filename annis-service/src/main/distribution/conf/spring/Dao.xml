@@ -165,18 +165,13 @@
     <!-- configuration -->
     <property name="timeout" value="${annis.sql-timeout}"/>
 
-    <property name="countSqlGenerator" ref="countSqlGenerator"/>
-    <property name="countMatchesAndDocumentsSqlGenerator" ref="countMatchesAndDocumentsSqlGenerator"/>
-    <property name="saltAnnotateExtractor" ref="saltAnnotateExtractor"/>
     <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
-    <property name="graphSqlGenerator" ref="graphSqlGenerator" />
     <property name="frequencySqlGenerator" ref="frequencySqlGenerator" />
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
 
     <property name="rawTextHelper" ref="rawTextSqlHelper" />
 
     <property name="aqlParser" ref="annisParserAntlr"/>
-    <property name="sqlGenerator" ref="findSqlGenerator"/>
 
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
@@ -186,7 +181,6 @@
 
     <property name="listExampleQueriesHelper" ref="listExampleQueriesHelper" />
 
-    <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="sqlSessionModifiers">
       <util:list>
         <ref bean="queryDao"/>

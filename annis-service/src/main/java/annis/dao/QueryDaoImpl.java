@@ -115,9 +115,6 @@ import annis.service.objects.MatchGroup;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotatedMatchIterator;
 import annis.sqlgen.ByteHelper;
-import annis.sqlgen.CountMatchesAndDocumentsSqlGenerator;
-import annis.sqlgen.CountSqlGenerator;
-import annis.sqlgen.FindSqlGenerator;
 import annis.sqlgen.FrequencySqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
@@ -133,34 +130,18 @@ import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.corpus_tools.graphannis.SaltExport;
-import org.corpus_tools.salt.util.internal.persistence.SaltXML10Handler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 // FIXME: test and refactor timeout and transaction management
 public class QueryDaoImpl extends AbstractDao implements QueryDao,
         SqlSessionModifier {
 
   // SQL generators for the different query functions
-  private FindSqlGenerator findSqlGenerator;
-
-  private CountMatchesAndDocumentsSqlGenerator countMatchesAndDocumentsSqlGenerator;
-
-  private CountSqlGenerator countSqlGenerator;
-
-  private SaltAnnotateExtractor saltAnnotateExtractor;
-
   private MatrixSqlGenerator matrixSqlGenerator;
 
   // generated sql for example queries and fetches the result
   private ListExampleQueriesHelper listExampleQueriesHelper;
-
-  private AnnotateSqlGenerator<SaltProject> graphSqlGenerator;
 
   private FrequencySqlGenerator frequencySqlGenerator;
 
@@ -226,21 +207,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     API.NodeVector coveredNodes = corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight());
 
     return SaltExport.map(coveredNodes);
-  }
-
-
-  /**
-   * @return the graphSqlGenerator
-   */
-  public AnnotateSqlGenerator getGraphSqlGenerator() {
-    return graphSqlGenerator;
-  }
-
-  /**
-   * @param graphSqlGenerator the graphSqlGenerator to set
-   */
-  public void setGraphSqlGenerator(AnnotateSqlGenerator<SaltProject> graphSqlGenerator) {
-    this.graphSqlGenerator = graphSqlGenerator;
   }
 
   /**
@@ -1171,14 +1137,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     this.sqlSessionModifiers = sqlSessionModifiers;
   }
 
-  public FindSqlGenerator getFindSqlGenerator() {
-    return findSqlGenerator;
-  }
-
-  public void setFindSqlGenerator(FindSqlGenerator findSqlGenerator) {
-    this.findSqlGenerator = findSqlGenerator;
-  }
-
   public ListCorpusByNameDaoHelper getListCorpusByNameDaoHelper() {
     return listCorpusByNameDaoHelper;
   }
@@ -1194,23 +1152,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   public void setMetaDataFilter(MetaDataFilter metaDataFilter) {
     this.metaDataFilter = metaDataFilter;
-  }
-
-  public CountMatchesAndDocumentsSqlGenerator getCountMatchesAndDocumentsSqlGenerator() {
-    return countMatchesAndDocumentsSqlGenerator;
-  }
-
-  public void setCountMatchesAndDocumentsSqlGenerator(
-          CountMatchesAndDocumentsSqlGenerator countMatchesAndDocumentsSqlGenerator) {
-    this.countMatchesAndDocumentsSqlGenerator = countMatchesAndDocumentsSqlGenerator;
-  }
-
-  public CountSqlGenerator getCountSqlGenerator() {
-    return countSqlGenerator;
-  }
-
-  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator) {
-    this.countSqlGenerator = countSqlGenerator;
   }
 
   @Override
@@ -1258,15 +1199,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   public void setMatrixSqlGenerator(MatrixSqlGenerator matrixSqlGenerator) {
     this.matrixSqlGenerator = matrixSqlGenerator;
-  }
-
-  public SaltAnnotateExtractor getSaltAnnotateExtractor() {
-    return saltAnnotateExtractor;
-  }
-
-  public void setSaltAnnotateExtractor(
-          SaltAnnotateExtractor saltAnnotateExtractor) {
-    this.saltAnnotateExtractor = saltAnnotateExtractor;
   }
 
   public ByteHelper getByteHelper() {

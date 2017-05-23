@@ -113,7 +113,6 @@ public class TestQueryDaoImpl
     queryDao = new QueryDaoImpl();
     queryDao.setAqlParser(annisParser);
     queryDao.setSqlGenerator(sqlGenerator);
-    queryDao.setSaltAnnotateExtractor(saltAnnotateExtractor);
     queryDao.setPlanRowMapper(planRowMapper);
     queryDao.setListCorpusSqlHelper(listCorpusHelper);
     queryDao.setListAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
@@ -144,7 +143,6 @@ public class TestQueryDaoImpl
     assertThat(springManagedDao.getListAnnotationsSqlHelper(),
       is(not(nullValue())));
 
-    assertThat(springManagedDao.getFindSqlGenerator(), is(not(nullValue())));
     assertThat(springManagedDao.getSqlSessionModifiers(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusByNameDaoHelper(), is(
       not(nullValue())));
