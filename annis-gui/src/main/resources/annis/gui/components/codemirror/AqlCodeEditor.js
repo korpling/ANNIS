@@ -44,7 +44,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       gutters: ["CodeMirror-lint-markers"],
       lint: true,
       placeholder: "",
-      specialChars: /[\t\u0000-\u0019\u00ad\u200b\u200c\200d\u200f\u2028\u2029\ufeff]/g,
+      specialChars: /[\t\u0000-\u0019\u00ad\u200b\u200c\u200d\u200f\u2028\u2029\ufeff]/g,
       inputStyle: 'textarea',
       rtlMoveVisually : true
     });
@@ -130,22 +130,27 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       changeDelayTime = newDelayTime;
     };
     
+   
     //pass user interaction to the server-side
     cmTextArea.on("change", function(instance, changeObj)
     {  
+ 
     	
+     var LRM = '\u200e';
+	 var quotationMark = "\"";
+	 var regexMark = "/";
      // TODO test behavior, cursor position, display of token, especially with u0627 at the and
-  	  var lineCount = cmTextArea.lineCount();   	  
+  	 var lineCount = cmTextArea.lineCount();   	  
   	  for (var i = 0; i < lineCount; i++) 
   	  {
   		  var lineValue = cmTextArea.getLine(i);
   		  var j = 0;
   		  var pos = 0;
-  		  var textMarker;
-  		  var LRM = '\u200e';
+  		  var textMarker;	
+  		 
   		  
   		  //find all occurrences of \"
-  		  while ((pos = lineValue.indexOf("\"", j)) != -1)
+  		  while ((pos = lineValue.indexOf(quotationMark, j)) != -1)
   		  {
   			  j = pos + 1;
   			  // if LRM already inserted, bind LRM and \" together
@@ -154,33 +159,27 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
   			  
   				  if (textMarker.length == 0)
   				  {
-  					  //cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});  
+  					  cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});  
   				  }
   				 
   		    	 
   			 }
   			  //else insert LRM and bind together
   			  else if (lineValue.charAt(pos - 1) != LRM || lineValue.charAt(pos - 1) === undefined)
-  			  {				  
-  				    
-                          //TODO find out why the cursor stays before Alif
-  			               cmTextArea.replaceRange(LRM, {line: i, ch: pos}); 
-  			              //instance.execCommand("goCharRight");
-  			              
-                          //cmTextArea.markText({line: i, ch: pos}, {line: i, ch: (pos + 2)}, {atomic: true});
+  			  {				 
+  			              cmTextArea.replaceRange(LRM, {line: i, ch: pos}); 
+                          cmTextArea.markText({line: i, ch: pos}, {line: i, ch: (pos + 2)}, {atomic: true});
                       
   			         
   			         j += 1;
   			         
   			  }
-  			  
   			  lineValue = cmTextArea.getLine(i);
   			
   	      }
   		       
   		  
-  	  }
-  	  
+  	  } 	  
   	  	
     	if(changeDelayTimerID)
       {
