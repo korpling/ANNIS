@@ -125,11 +125,11 @@ public class AnnisRunner extends AnnisBaseRunner
   
   public enum BenchmarkMode 
   {
-    sequential_random,
-    warmup_random
+    warmup_random,
+    sequential_random
   }
   
-  private BenchmarkMode benchMode;
+  private BenchmarkMode benchMode = BenchmarkMode.warmup_random;
 
   private MetaDataFilter metaDataFilter;
 
