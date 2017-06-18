@@ -40,6 +40,7 @@ import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.io.Files;
 import java.io.BufferedReader;
@@ -121,6 +122,14 @@ public class AnnisRunner extends AnnisBaseRunner
   private List<Long> corpusList;
 
   private boolean clearCaches;
+  
+  public enum BenchmarkMode 
+  {
+    sequential_random,
+    warmup_random
+  }
+  
+  private BenchmarkMode benchMode;
 
   private MetaDataFilter metaDataFilter;
 
@@ -916,6 +925,24 @@ public class AnnisRunner extends AnnisBaseRunner
       else
       {
         clearCaches = Boolean.parseBoolean(value);
+      }
+    }
+    else if("bench-mode".equals(setting))
+    {
+      if(show)
+      {
+        value = benchMode.name();
+      }
+      else
+      {
+        try
+        {
+          benchMode = BenchmarkMode.valueOf(value);
+        }
+        catch(IllegalArgumentException ex)
+        {
+          out.println("Invalid value, allowed values are: " + Joiner.on(", ").join(BenchmarkMode.values()));
+        }
       }
     }
     else if ("corpus-list".equals(setting))
