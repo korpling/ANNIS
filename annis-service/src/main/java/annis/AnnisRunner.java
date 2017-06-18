@@ -183,7 +183,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     private QueryData queryData;
 
-    private long avgTimeInMilliseconds;
+    private long sumTimeInMilliseconds;
 
     private long bestTimeInMilliseconds;
 
@@ -537,6 +537,7 @@ public class AnnisRunner extends AnnisBaseRunner
       out.println("---> running query sequentially " + SEQUENTIAL_RUNS
         + " times");
       String options = benchmarkOptions(benchmark.queryData);
+        
       for (int i = 0; i < SEQUENTIAL_RUNS; ++i)
       {
         if (i > 0)
@@ -554,20 +555,26 @@ public class AnnisRunner extends AnnisBaseRunner
           error = true;
         }
         long end = new Date().getTime();
-        long runtime = end - start;
-        benchmark.values.add(runtime);
-        benchmark.bestTimeInMilliseconds =
-          Math.min(benchmark.bestTimeInMilliseconds, runtime);
-        benchmark.worstTimeInMilliseconds =
-          Math.max(benchmark.worstTimeInMilliseconds, runtime);
-        ++benchmark.runs;
-        if (error)
+         long runtime = end - start;
+         
+        if(benchMode == BenchmarkMode.sequential_random)
         {
-          ++benchmark.errors;
+          // record the runtime and other benchmark values when the sequental run is counted
+          benchmark.sumTimeInMilliseconds += runtime;
+          benchmark.values.add(runtime);
+          benchmark.bestTimeInMilliseconds =
+            Math.min(benchmark.bestTimeInMilliseconds, runtime);
+          benchmark.worstTimeInMilliseconds =
+            Math.max(benchmark.worstTimeInMilliseconds, runtime);
+
+          ++benchmark.runs;
+
+          if (error)
+          {
+            ++benchmark.errors;
+          }
         }
-
         out.print(runtime + " ms");
-
       }
       out.println();
       out.println(benchmark.bestTimeInMilliseconds + " ms best time for '"
@@ -588,7 +595,7 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println();
     out.println("---> running queries in random order");
 
-    // execute the queries, record test times
+    // execute the random query order, record test times
     for (AnnisRunner.Benchmark benchmark : session)
     {
       if (benchmark.errors >= 3)
@@ -609,7 +616,8 @@ public class AnnisRunner extends AnnisBaseRunner
       }
       long end = new Date().getTime();
       long runtime = end - start;
-      benchmark.avgTimeInMilliseconds += runtime;
+      
+      benchmark.sumTimeInMilliseconds += runtime;
       benchmark.values.add(runtime);
       benchmark.bestTimeInMilliseconds =
         Math.min(benchmark.bestTimeInMilliseconds, runtime);
@@ -631,9 +639,6 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println("---> benchmark complete");
     for (AnnisRunner.Benchmark benchmark : benchmarks)
     {
-      benchmark.avgTimeInMilliseconds = Math.round(
-        (double) benchmark.avgTimeInMilliseconds
-        / (double) benchmark.runs);
       String options = benchmarkOptions(benchmark.queryData);
       out.println(benchmark.getMedian() + " ms (median for "
         + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", "
@@ -677,19 +682,21 @@ public class AnnisRunner extends AnnisBaseRunner
 
       String[] header = new String[]
       {
-        "corpora", "query", "median", "diff-best", "diff-worst"
+        "corpora", "query", "median", "diff-best", "diff-worst", "mean"
       };
       csv.writeNext(header);
       for (AnnisRunner.Benchmark benchmark : benchmarks)
       {
+        double mean = (double) benchmark.sumTimeInMilliseconds / (double) benchmark.runs;
         long median = benchmark.getMedian();
 
-        String[] line = new String[5];
+        String[] line = new String[6];
         line[0] = StringUtils.join(benchmark.queryData.getCorpusList(), ",");
         line[1] = benchmark.functionCall;
         line[2] = "" + median;
         line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds - median);
         line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
+        line[5] = "" + mean;
         csv.writeNext(line);
       }
     }
@@ -721,7 +728,8 @@ public class AnnisRunner extends AnnisBaseRunner
           // also write out a "time" and "count" file which can be used by the ANNIS4 prototype
           if(b.name != null)
           {
-            Files.write("" + b.avgTimeInMilliseconds, new File(outputDir, b.name + ".time"), StandardCharsets.UTF_8);
+            double mean = (double) b.sumTimeInMilliseconds / (double) b.runs;
+            Files.write("" + mean, new File(outputDir, b.name + ".time"), StandardCharsets.UTF_8);
             if(b.count != null)
             {
               Files.write("" + b.count, new File(outputDir, b.name + ".count"), StandardCharsets.UTF_8);
