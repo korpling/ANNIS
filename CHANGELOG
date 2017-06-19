@@ -1,3 +1,16 @@
+Version 3.5.0-preview4
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/54?closed=1
+
+[Fixed Bugs]
+ #561 Fix initial corpus set selection when pre-selected corpus is not visible 
+ #555 Code mirror keybindings interfere with some keyboard layouts
+
+[Enhancements]
+ #562 Add benchmark modes to perform different kind of benchmarks
+
 Version 3.5.0-preview3
 ======================
 
