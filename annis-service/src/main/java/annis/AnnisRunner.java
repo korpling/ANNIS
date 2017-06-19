@@ -40,6 +40,7 @@ import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.io.Files;
 import java.io.BufferedReader;
@@ -72,7 +73,6 @@ import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
 {
@@ -96,7 +96,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private int context;
 
   private AnnisParserAntlr annisParser;
-  
+
   private int matchLimit;
 
   private QueriesGenerator queriesGenerator;
@@ -109,18 +109,26 @@ public class AnnisRunner extends AnnisBaseRunner
   private int left = 5;
 
   private int right = 5;
-  
+
   private OrderType order = OrderType.ascending;
 
   private String segmentationLayer = null;
-  
+
   private SubgraphFilter filter = SubgraphFilter.all;
-  
+
   private FrequencyTableQuery frequencyDef = null;
 
   private List<Long> corpusList;
 
   private boolean clearCaches;
+
+  public enum BenchmarkMode
+  {
+    warmup_random,
+    sequential_random
+  }
+
+  private BenchmarkMode benchMode = BenchmarkMode.warmup_random;
 
   private MetaDataFilter metaDataFilter;
 
@@ -174,7 +182,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     private QueryData queryData;
 
-    private long avgTimeInMilliseconds;
+    private long sumTimeInMilliseconds;
 
     private long bestTimeInMilliseconds;
 
@@ -187,7 +195,7 @@ public class AnnisRunner extends AnnisBaseRunner
     private int runs;
 
     private int errors;
-    
+
     private Integer count;
 
     private final List<Long> values = Collections.synchronizedList(
@@ -232,12 +240,12 @@ public class AnnisRunner extends AnnisBaseRunner
         "conf/spring/Shell.xml").getAbsolutePath();
       AnnisBaseRunner.getInstance("annisRunner", "file:" + path).run(args);
     }
-    catch(AnnisRunnerException ex)
+    catch (AnnisRunnerException ex)
     {
       log.error(ex.getMessage() + " (error code " + ex.getExitCode() + ")", ex);
       System.exit(ex.getExitCode());
     }
-    catch(Throwable ex)
+    catch (Throwable ex)
     {
       log.error(ex.getMessage(), ex);
       System.exit(1);
@@ -255,8 +263,8 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     try
     {
-      
-      try(BufferedReader reader = new BufferedReader(new InputStreamReader(
+
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(
         new FileInputStream(filename), "UTF-8"));)
       {
         Map<String, Integer> queryRun = new HashMap<>();
@@ -393,7 +401,6 @@ public class AnnisRunner extends AnnisBaseRunner
     String annisQuery = getAnnisQueryFromFunctionCall(funcCall);
     QueryData queryData = analyzeQuery(annisQuery, doSqlFunctionName);
 
-
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
       + limit + "; offset = " + offset);
 
@@ -448,16 +455,15 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       generator = getGraphSqlGenerator();
     }
-    else if("frequency".equals(function))
+    else if ("frequency".equals(function))
     {
       generator = frequencySqlGenerator;
     }
-    
+
     Validate.notNull(generator, "don't now query function: " + function);
 
     return generator;
   }
-  
 
   private String getAnnisQueryFromFunctionCall(String functionCall)
   {
@@ -473,7 +479,7 @@ public class AnnisRunner extends AnnisBaseRunner
     benchmarks.clear();
     benchmarkName = null;
   }
-  
+
   public void doBenchmarkName(String name)
   {
     this.benchmarkName = name;
@@ -506,11 +512,11 @@ public class AnnisRunner extends AnnisBaseRunner
         resetCaches(currentOS);
       }
 
-      SqlGeneratorAndExtractor<QueryData, ?> generator =
-        getGeneratorForQueryFunction(benchmark.functionCall);
+      SqlGeneratorAndExtractor<QueryData, ?> generator
+        = getGeneratorForQueryFunction(benchmark.functionCall);
       benchmark.sql = getGeneratorForQueryFunction(benchmark.functionCall).
         toSql(
-        benchmark.queryData);
+          benchmark.queryData);
       out.println("---> SQL query for: " + benchmark.functionCall);
       out.println(benchmark.sql);
       try
@@ -528,6 +534,7 @@ public class AnnisRunner extends AnnisBaseRunner
       out.println("---> running query sequentially " + SEQUENTIAL_RUNS
         + " times");
       String options = benchmarkOptions(benchmark.queryData);
+
       for (int i = 0; i < SEQUENTIAL_RUNS; ++i)
       {
         if (i > 0)
@@ -546,19 +553,25 @@ public class AnnisRunner extends AnnisBaseRunner
         }
         long end = new Date().getTime();
         long runtime = end - start;
-        benchmark.values.add(runtime);
-        benchmark.bestTimeInMilliseconds =
-          Math.min(benchmark.bestTimeInMilliseconds, runtime);
-        benchmark.worstTimeInMilliseconds =
-          Math.max(benchmark.worstTimeInMilliseconds, runtime);
-        ++benchmark.runs;
-        if (error)
+
+        if (benchMode == BenchmarkMode.sequential_random)
         {
-          ++benchmark.errors;
+          // record the runtime and other benchmark values when the sequental run is counted
+          benchmark.sumTimeInMilliseconds += runtime;
+          benchmark.values.add(runtime);
+          benchmark.bestTimeInMilliseconds
+            = Math.min(benchmark.bestTimeInMilliseconds, runtime);
+          benchmark.worstTimeInMilliseconds
+            = Math.max(benchmark.worstTimeInMilliseconds, runtime);
+
+          ++benchmark.runs;
+
+          if (error)
+          {
+            ++benchmark.errors;
+          }
         }
-
         out.print(runtime + " ms");
-
       }
       out.println();
       out.println(benchmark.bestTimeInMilliseconds + " ms best time for '"
@@ -579,7 +592,7 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println();
     out.println("---> running queries in random order");
 
-    // execute the queries, record test times
+    // execute the random query order, record test times
     for (AnnisRunner.Benchmark benchmark : session)
     {
       if (benchmark.errors >= 3)
@@ -587,8 +600,8 @@ public class AnnisRunner extends AnnisBaseRunner
         continue;
       }
       boolean error = false;
-      SqlGeneratorAndExtractor<QueryData, ?> generator =
-        getGeneratorForQueryFunction(benchmark.functionCall);
+      SqlGeneratorAndExtractor<QueryData, ?> generator
+        = getGeneratorForQueryFunction(benchmark.functionCall);
       long start = new Date().getTime();
       try
       {
@@ -600,12 +613,13 @@ public class AnnisRunner extends AnnisBaseRunner
       }
       long end = new Date().getTime();
       long runtime = end - start;
-      benchmark.avgTimeInMilliseconds += runtime;
+
+      benchmark.sumTimeInMilliseconds += runtime;
       benchmark.values.add(runtime);
-      benchmark.bestTimeInMilliseconds =
-        Math.min(benchmark.bestTimeInMilliseconds, runtime);
-      benchmark.worstTimeInMilliseconds =
-        Math.max(benchmark.worstTimeInMilliseconds, runtime);
+      benchmark.bestTimeInMilliseconds
+        = Math.min(benchmark.bestTimeInMilliseconds, runtime);
+      benchmark.worstTimeInMilliseconds
+        = Math.max(benchmark.worstTimeInMilliseconds, runtime);
 
       ++benchmark.runs;
       if (error)
@@ -622,17 +636,13 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println("---> benchmark complete");
     for (AnnisRunner.Benchmark benchmark : benchmarks)
     {
-      benchmark.avgTimeInMilliseconds = Math.round(
-        (double) benchmark.avgTimeInMilliseconds
-        / (double) benchmark.runs);
       String options = benchmarkOptions(benchmark.queryData);
       out.println(benchmark.getMedian() + " ms (median for "
         + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", "
-        + benchmark.errors + " errors)" : ")") + " for '"
+          + benchmark.errors + " errors)" : ")") + " for '"
         + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
         + options));
     }
-
 
     // show best runtime for each query
     out.println();
@@ -642,7 +652,7 @@ public class AnnisRunner extends AnnisBaseRunner
       String options = benchmarkOptions(benchmark.queryData);
       out.println(benchmark.worstTimeInMilliseconds + " ms "
         + (benchmark.errors > 0 ? "("
-        + benchmark.errors + " errors)" : "") + " for '"
+          + benchmark.errors + " errors)" : "") + " for '"
         + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
         + options));
     }
@@ -655,32 +665,34 @@ public class AnnisRunner extends AnnisBaseRunner
       String options = benchmarkOptions(benchmark.queryData);
       out.println(benchmark.bestTimeInMilliseconds + " ms "
         + (benchmark.errors > 0 ? "("
-        + benchmark.errors + " errors)" : "") + " for '"
+          + benchmark.errors + " errors)" : "") + " for '"
         + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
         + options));
     }
     out.println();
 
     // CSV output
-    try(CSVWriter csv = new CSVWriter(new FileWriterWithEncoding(new File(
-        "annis_benchmark_result.csv"), "UTF-8"));)
-    { 
+    try (CSVWriter csv = new CSVWriter(new FileWriterWithEncoding(new File(
+      "annis_benchmark_result.csv"), "UTF-8"));)
+    {
 
       String[] header = new String[]
       {
-        "corpora", "query", "median", "diff-best", "diff-worst"
+        "corpora", "query", "median", "diff-best", "diff-worst", "mean"
       };
       csv.writeNext(header);
       for (AnnisRunner.Benchmark benchmark : benchmarks)
       {
+        double mean = (double) benchmark.sumTimeInMilliseconds / (double) benchmark.runs;
         long median = benchmark.getMedian();
 
-        String[] line = new String[5];
+        String[] line = new String[6];
         line[0] = StringUtils.join(benchmark.queryData.getCorpusList(), ",");
         line[1] = benchmark.functionCall;
         line[2] = "" + median;
         line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds - median);
         line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
+        line[5] = "" + mean;
         csv.writeNext(line);
       }
     }
@@ -688,32 +700,32 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       log.error(null, ex);
     }
-    
-    
+
     // property output format for Jenkins Plot plugin
     try
     {
       File outputDir = new File("annis_benchmark_results");
-      if(outputDir.isDirectory() || outputDir.mkdirs())
+      if (outputDir.isDirectory() || outputDir.mkdirs())
       {
-        int i=1;
-        for(AnnisRunner.Benchmark b : benchmarks)
+        int i = 1;
+        for (AnnisRunner.Benchmark b : benchmarks)
         {
           Properties props = new Properties();
           props.put("YVALUE", "" + b.getMedian());
-          try (FileWriterWithEncoding writer = 
-            new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8"))
+          try (FileWriterWithEncoding writer
+            = new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8"))
           {
             props.store(writer, "");
           }
-          
+
           i++;
-          
+
           // also write out a "time" and "count" file which can be used by the ANNIS4 prototype
-          if(b.name != null)
+          if (b.name != null)
           {
-            Files.write("" + b.avgTimeInMilliseconds, new File(outputDir, b.name + ".time"), StandardCharsets.UTF_8);
-            if(b.count != null)
+            double mean = (double) b.sumTimeInMilliseconds / (double) b.runs;
+            Files.write("" + mean, new File(outputDir, b.name + ".time"), StandardCharsets.UTF_8);
+            if (b.count != null)
             {
               Files.write("" + b.count, new File(outputDir, b.name + ".count"), StandardCharsets.UTF_8);
             }
@@ -721,7 +733,7 @@ public class AnnisRunner extends AnnisBaseRunner
         }
       }
     }
-    catch(IOException ex)
+    catch (IOException ex)
     {
       log.error(null, ex);
     }
@@ -767,7 +779,7 @@ public class AnnisRunner extends AnnisBaseRunner
           if (dropCaches.canWrite())
           {
             log.debug("clearing file system cache");
-            try(Writer w = new FileWriterWithEncoding(dropCaches, "UTF-8");)
+            try (Writer w = new FileWriterWithEncoding(dropCaches, "UTF-8");)
             {
               w.write("3");
             }
@@ -844,9 +856,9 @@ public class AnnisRunner extends AnnisBaseRunner
         offset = Integer.parseInt(value);
       }
     }
-    else if("order".equals(setting))
+    else if ("order".equals(setting))
     {
-      if(show)
+      if (show)
       {
         value = order.toString();
       }
@@ -918,6 +930,24 @@ public class AnnisRunner extends AnnisBaseRunner
         clearCaches = Boolean.parseBoolean(value);
       }
     }
+    else if ("bench-mode".equals(setting))
+    {
+      if (show)
+      {
+        value = benchMode.name();
+      }
+      else
+      {
+        try
+        {
+          benchMode = BenchmarkMode.valueOf(value);
+        }
+        catch (IllegalArgumentException ex)
+        {
+          out.println("Invalid value, allowed values are: " + Joiner.on(", ").join(BenchmarkMode.values()));
+        }
+      }
+    }
     else if ("corpus-list".equals(setting))
     {
       corpusList.clear();
@@ -942,9 +972,9 @@ public class AnnisRunner extends AnnisBaseRunner
         segmentationLayer = value;
       }
     }
-    else if("filter".equals(setting))
+    else if ("filter".equals(setting))
     {
-      if(show)
+      if (show)
       {
         value = filter.name();
       }
@@ -953,15 +983,15 @@ public class AnnisRunner extends AnnisBaseRunner
         filter = SubgraphFilter.valueOf(value);
       }
     }
-    else if("freq-def".equals(setting))
+    else if ("freq-def".equals(setting))
     {
-      if(show)
+      if (show)
       {
         value = (frequencyDef == null ? "<not set>" : frequencyDef.toString());
       }
       else
       {
-          frequencyDef = FrequencyTableQuery.parse(value);
+        frequencyDef = FrequencyTableQuery.parse(value);
       }
     }
     else
@@ -976,7 +1006,7 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     doSet("?" + setting);
   }
-  
+
   public void doVersion(String ignore)
   {
     out.println(VersionInfo.getVersion());
@@ -1005,7 +1035,6 @@ public class AnnisRunner extends AnnisBaseRunner
     QueryData queryData;
     log.debug("analyze query for " + queryFunction + " function");
 
-
     if (queryFunction != null && !queryFunction.matches("(sql_)?subgraph"))
     {
       queryData = queryDao.parseAQL(annisQuery, corpusList);
@@ -1020,7 +1049,6 @@ public class AnnisRunner extends AnnisBaseRunner
     // filter by meta data
     queryData.setDocuments(metaDataFilter.getDocumentsForMetadata(queryData));
 
-
     if (queryFunction != null && queryFunction.matches("(sql_)?(annotate|find)"))
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
@@ -1032,9 +1060,9 @@ public class AnnisRunner extends AnnisBaseRunner
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer, filter));
     }
-    else if(queryFunction != null && queryFunction.matches("(sql_)?frequency"))
+    else if (queryFunction != null && queryFunction.matches("(sql_)?frequency"))
     {
-      if(frequencyDef == null)
+      if (frequencyDef == null)
       {
         out.println("You have to set the 'freq-def' property first");
       }
@@ -1044,10 +1072,9 @@ public class AnnisRunner extends AnnisBaseRunner
       }
     }
 
-
     if (annisQuery != null)
     {
-      if(benchmarkName == null)
+      if (benchmarkName == null)
       {
         benchmarkName = "auto_" + benchmarks.size();
       }
@@ -1066,9 +1093,9 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doCount(String annisQuery)
   {
     MatchAndDocumentCount count = queryDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count"));
-    if(!benchmarks.isEmpty())
+    if (!benchmarks.isEmpty())
     {
-      Benchmark lastBench = benchmarks.get(benchmarks.size()-1);
+      Benchmark lastBench = benchmarks.get(benchmarks.size() - 1);
       lastBench.count = count.getMatchCount();
     }
     out.println(count);
@@ -1096,11 +1123,11 @@ public class AnnisRunner extends AnnisBaseRunner
     MatchGroup group = new MatchGroup(matches);
     out.println(group.toString());
   }
-  
+
   public void doFrequency(String definitions)
-  {    
+  {
     FrequencyTable result = queryDao.frequency(analyzeQuery(definitions, "frequency"));
-    for(FrequencyTable.Entry e : result.getEntries())
+    for (FrequencyTable.Entry e : result.getEntries())
     {
       out.println(e.toString());
     }
@@ -1159,8 +1186,8 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doAnnotations(String doListValues)
   {
     boolean listValues = "values".equals(doListValues);
-    List<AnnisAttribute> annotations =
-      queryDao.listAnnotations(getCorpusList(), listValues, true);
+    List<AnnisAttribute> annotations
+      = queryDao.listAnnotations(getCorpusList(), listValues, true);
     try
     {
       ObjectMapper om = new ObjectMapper();
@@ -1187,8 +1214,8 @@ public class AnnisRunner extends AnnisBaseRunner
       corpusIdAsList.add(Long.parseLong(corpusId));
       List<String> toplevelNames = queryDao.mapCorpusIdsToNames(corpusIdAsList);
 
-      List<Annotation> corpusAnnotations =
-        queryDao.listCorpusAnnotations(toplevelNames.get(0));
+      List<Annotation> corpusAnnotations
+        = queryDao.listCorpusAnnotations(toplevelNames.get(0));
       printAsTable(corpusAnnotations, "namespace", "name", "value");
     }
     catch (NumberFormatException ex)
@@ -1204,16 +1231,15 @@ public class AnnisRunner extends AnnisBaseRunner
       .splitToList(docCall);
 
     List<String> annoFilter = null;
-    if(splitted.size() > 2)
+    if (splitted.size() > 2)
     {
       annoFilter = Splitter.on(',').trimResults().omitEmptyStrings().splitToList(
         splitted.get(2));
     }
-    
-    
+
     Validate.isTrue(splitted.size() > 1,
       "must have to arguments (toplevel corpus name and document name");
-    
+
     long corpusID = queryDao.mapCorpusNameToId(splitted.get(0));
     System.out.println(graphSqlGenerator.getDocumentQuery(
       corpusID,
@@ -1227,7 +1253,7 @@ public class AnnisRunner extends AnnisBaseRunner
       .splitToList(docCall);
 
     List<String> annoFilter = null;
-    if(splitted.size() > 2)
+    if (splitted.size() > 2)
     {
       annoFilter = Splitter.on(',').trimResults().omitEmptyStrings().splitToList(
         splitted.get(2));
@@ -1235,18 +1261,18 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Validate.isTrue(splitted.size() > 1,
       "must have two arguments (toplevel corpus name and document name");
-    SaltProject p = queryDao.retrieveAnnotationGraph(splitted.get(0), 
+    SaltProject p = queryDao.retrieveAnnotationGraph(splitted.get(0),
       splitted.get(1), annoFilter);
     System.out.println(printSaltAsXMI(p));
   }
-  
+
   public void doExport(String args)
   {
     List<String> splitted = Splitter.on(' ').trimResults().omitEmptyStrings()
       .limit(2)
       .splitToList(args);
     Validate.isTrue(splitted.size() == 2, "must have two arguments: toplevel corpus name and output directory");
-    
+
     queryDao.exportCorpus(splitted.get(0), new File(splitted.get(1)));
   }
 
@@ -1255,7 +1281,7 @@ public class AnnisRunner extends AnnisBaseRunner
     System.out.println("bye bye!");
     System.exit(0);
   }
-  
+
   public void doExit(String dummy)
   {
     System.out.println("bye bye!");
@@ -1335,7 +1361,6 @@ public class AnnisRunner extends AnnisBaseRunner
     this.countSqlGenerator = countSqlGenerator;
   }
 
-
   public SqlGeneratorAndExtractor<QueryData, List<Match>> getFindSqlGenerator()
   {
     return findSqlGenerator;
@@ -1377,5 +1402,5 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.frequencySqlGenerator = frequencySqlGenerator;
   }
-  
+
 }
