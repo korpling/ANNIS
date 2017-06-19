@@ -1,5 +1,8 @@
 var NAVTREEINDEX1 =
 {
+"classannis_1_1administration_1_1_administration_dao.html#a2118869a475f906034729c6cf68b8b8d":[4,0,0,1,1,56],
+"classannis_1_1administration_1_1_administration_dao.html#a23c2cc1983a6bea232d35ddfc0cc6747":[4,0,0,1,1,31],
+"classannis_1_1administration_1_1_administration_dao.html#a257178ab4cd4d3177ce8b076592250e1":[4,0,0,1,1,38],
 "classannis_1_1administration_1_1_administration_dao.html#a2afc147dd45050f3c67f40e85e60698c":[4,0,0,1,1,43],
 "classannis_1_1administration_1_1_administration_dao.html#a2f70710c86c0e1332cfc9b4003f8811b":[4,0,0,1,1,29],
 "classannis_1_1administration_1_1_administration_dao.html#a307dcb63d8b630b38a3b74e51b6ac754":[4,0,0,1,1,23],
@@ -246,8 +249,5 @@ var NAVTREEINDEX1 =
 "classannis_1_1dao_1_1_resolver_dao_helper.html#aa1a012947a0761cecb6b2089c79a56d9":[4,0,0,3,8,1],
 "classannis_1_1dao_1_1_resolver_dao_helper.html#ace683816d52d0a42f2c791228f62280f":[4,0,0,3,8,0],
 "classannis_1_1dao_1_1_script_file_sql_session_modifier.html":[4,0,0,3,10],
-"classannis_1_1dao_1_1_script_file_sql_session_modifier.html#a37e5674935088e803611a3cb547133e3":[4,0,0,3,10,3],
-"classannis_1_1dao_1_1_script_file_sql_session_modifier.html#a5007779dc788865d8b81d891af3c71ad":[4,0,0,3,10,0],
-"classannis_1_1dao_1_1_script_file_sql_session_modifier.html#a7cde1f8f69028738cbe6f9e48ab00ac2":[4,0,0,3,10,1],
-"classannis_1_1dao_1_1_script_file_sql_session_modifier.html#aa4e018fd81f3c186eabc7ed201a1d3fe":[4,0,0,3,10,4]
+"classannis_1_1dao_1_1_script_file_sql_session_modifier.html#a37e5674935088e803611a3cb547133e3":[4,0,0,3,10,3]
 };

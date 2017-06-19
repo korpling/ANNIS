@@ -1,5 +1,8 @@
 var NAVTREEINDEX8 =
 {
+"classannis_1_1model_1_1_query_node.html#adc6e0d8a8359af8bb52d6d11707a7cc5":[4,0,0,8,10,33],
+"classannis_1_1model_1_1_query_node.html#adceb184ae03aa82d268869e95fdadc2a":[4,0,0,8,10,12],
+"classannis_1_1model_1_1_query_node.html#ae9762ee7950c43631e7521ce5b8a0b2a":[4,0,0,8,10,5],
 "classannis_1_1model_1_1_query_node.html#aea512fa92d34c5b77f978286ab001b62":[4,0,0,8,10,14],
 "classannis_1_1model_1_1_query_node.html#aebed76fa75ca1a38bccf42a840a6273e":[4,0,0,8,10,4],
 "classannis_1_1model_1_1_query_node.html#aecba8c1198784a28f7f380e30c306032":[4,0,0,8,10,3],
@@ -246,8 +249,5 @@ var NAVTREEINDEX8 =
 "classannis_1_1rest_1_1provider_1_1_s_q_l_exception_mapper.html#abd53bb1831bad302c3094bac7bc0e448":[4,0,0,12,0,3,0],
 "classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html":[4,0,0,13,0],
 "classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#a19b1e95b2346ee9ddb03995d99e7ea14":[4,0,0,13,0,2],
-"classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#a97ceca6a3982984d82655be80be5c94c":[4,0,0,13,0,0],
-"classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#ab766cd581972184f7aad1821625f8579":[4,0,0,13,0,1],
-"classannis_1_1security_1_1_a_n_n_i_s_security_manager.html":[4,0,0,13,1],
-"classannis_1_1security_1_1_a_n_n_i_s_security_manager.html#a51857e49ea5c6519dd0e4f76fd56edb6":[4,0,0,13,1,1]
+"classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#a97ceca6a3982984d82655be80be5c94c":[4,0,0,13,0,0]
 };

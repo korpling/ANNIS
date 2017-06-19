@@ -49,6 +49,7 @@ var hierarchy =
     [ "annis.sqlgen.AnnotationConditionProvider", "classannis_1_1sqlgen_1_1_annotation_condition_provider.html", null ],
     [ "annis.gui.querybuilder.AQLOperator", "enumannis_1_1gui_1_1querybuilder_1_1_a_q_l_operator.html", null ],
     [ "annis.libgui.Background", "classannis_1_1libgui_1_1_background.html", null ],
+    [ "annis.AnnisRunner.BenchmarkMode", "classannis_1_1_annis_runner.html#enumannis_1_1_annis_runner_1_1_benchmark_mode", null ],
     [ "annis.gui.beans.CitationProvider", "interfaceannis_1_1gui_1_1beans_1_1_citation_provider.html", [
       [ "annis.gui.beans.CorpusBrowserEntry", "classannis_1_1gui_1_1beans_1_1_corpus_browser_entry.html", null ]
     ] ],

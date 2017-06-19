@@ -6,6 +6,6 @@ var searchData=
   ['jitvisualization',['JITVisualization',['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_j_i_t_visualization.html',1,'annis::gui::widgets::gwt::client::ui']]],
   ['jitwrapper',['JITWrapper',['../classannis_1_1gui_1_1widgets_1_1_j_i_t_wrapper.html',1,'annis::gui::widgets']]],
   ['jitwrapperconnector',['JITWrapperConnector',['../classannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1_j_i_t_wrapper_connector.html',1,'annis::gui::widgets::gwt::client::ui']]],
-  ['join',['Join',['../classannis_1_1sqlgen_1_1model_1_1_join.html',1,'annis.sqlgen.model.Join'],['../classannis_1_1model_1_1_join.html',1,'annis.model.Join']]],
+  ['join',['Join',['../classannis_1_1model_1_1_join.html',1,'annis.model.Join'],['../classannis_1_1sqlgen_1_1model_1_1_join.html',1,'annis.sqlgen.model.Join']]],
   ['joinlistener',['JoinListener',['../classannis_1_1ql_1_1parser_1_1_join_listener.html',1,'annis.ql.parser.JoinListener'],['../classannis_1_1ql_1_1parser_1_1_join_listener.html#a348891c83b51aae665cca2025a00cf8e',1,'annis.ql.parser.JoinListener.JoinListener()']]]
 ];
