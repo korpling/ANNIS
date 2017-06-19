@@ -126,15 +126,6 @@ public class QueryController implements Serializable
       }
     });
     
-    this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
-    {
-
-      @Override
-      public void valueChange(Property.ValueChangeEvent event)
-      {
-        // TODO: check if the corpus is actually available to the user
-      }
-    });
   }
 
   public void validateQuery()
