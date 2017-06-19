@@ -20,7 +20,7 @@ Lists of 80 third-party dependencies.
      (The Apache Software License, Version 2.0) Apache Commons Codec (commons-codec:commons-codec:1.9 - http://commons.apache.org/proper/commons-codec/)
      (Apache License, Version 2.0) Apache Commons Collections (commons-collections:commons-collections:3.2.2 - http://commons.apache.org/collections/)
      (The Apache Software License, Version 2.0) Commons IO (commons-io:commons-io:2.4 - http://commons.apache.org/io/)
-     (The Apache Software License, Version 2.0) annis-interfaces (de.hu-berlin.german.korpling.annis:annis-interfaces:3.5.0-preview3 - http://corpus-tools.org/annis/annis-interfaces/)
+     (The Apache Software License, Version 2.0) annis-interfaces (de.hu-berlin.german.korpling.annis:annis-interfaces:3.5.0-preview4 - http://corpus-tools.org/annis/annis-interfaces/)
      (COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0) JavaBeans(TM) Activation Framework (javax.activation:activation:1.1.1 - http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
      (CDDL) (GPLv2+CE) JavaMail API (compat) (javax.mail:mail:1.4.5 - http://kenai.com/projects/javamail/mail)
      (CDDL License) jsr311-api (javax.ws.rs:jsr311-api:1.1.1 - https://jsr311.dev.java.net)
