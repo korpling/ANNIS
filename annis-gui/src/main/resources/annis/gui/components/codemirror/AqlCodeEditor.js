@@ -137,8 +137,10 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
  
     	
      var LRM = '\u200e';
+     var regexMark = "/";
 	 var quotationMark = "\"";
-	 var regexMark = "/";
+	 var currentMarkIsQuotationMark = false;
+	 
      // TODO test behavior, cursor position, display of token, especially with u0627 at the and
   	 var lineCount = cmTextArea.lineCount();   	  
   	  for (var i = 0; i < lineCount; i++) 
@@ -147,33 +149,81 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
   		  var j = 0;
   		  var pos = 0;
   		  var textMarker;	
+  		  var lastPos = 0;
+  		 
   		 
   		  
   		  //find all occurrences of \"
-  		  while ((pos = lineValue.indexOf(quotationMark, j)) != -1)
-  		  {
+  		  while ((lineValue.indexOf(quotationMark, j) != -1) || (lineValue.indexOf(regexMark, j) != -1 ))
+  		  {  
+  			  //get position
+  			  if ((lineValue.indexOf(quotationMark, j) != -1) && (lineValue.indexOf(regexMark, j) != -1 ))
+  			  {
+  				 //pos = Math.min(lineValue.indexOf(quotationMark, j), lineValue.indexOf(regexMark, j));
+  				 if (lineValue.indexOf(quotationMark, j) < lineValue.indexOf(regexMark, j))
+  				 {
+  					pos = lineValue.indexOf(quotationMark, j);
+  	  				currentMarkIsQuotationMark = true;
+  					 
+  				 }
+  				 else 
+  				 {
+  					pos = lineValue.indexOf(regexMark, j);
+  				 }
+  			  }
+  			  else if (lineValue.indexOf(quotationMark, j) != -1)
+  			  {
+	  			 pos = lineValue.indexOf(quotationMark, j);
+	  			 currentMarkIsQuotationMark = true;
+  			  }
+  			  else 
+  			  {
+  				  pos = lineValue.indexOf(regexMark, j);
+  			  }
+  			  
+  		      
   			  j = pos + 1;
   			  // if LRM already inserted, bind LRM and \" together
   			  if (lineValue.charAt(pos - 1) == LRM)
   			  {	  textMarker = cmTextArea.findMarksAt({line: i, ch: pos -1});
+		  		  //var testtok =  instance.getTokenAt({line: i, ch: lastPos + 1}, true);
+			  	  //var testtok1 =  instance.getTokenAt({line: i, ch: pos + 1}, true);
+			  	  var isAtomic = false;
+			  	  
+			  	  //iterate over text markers and find out, whether there is an atomic one
+			  	  for (var k = 0; k < textMarker.length; k++)
+			  	  {
+			  		  if (textMarker[k].atomic === true)
+			  		  {
+			  			  isAtomic = true;
+			  			  break;
+			  		  }
+			  	  }
   			  
-  				  if (textMarker.length == 0)
-  				  {
-  					  cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});  
+  				  if (!isAtomic)
+  				  {	  				  		
+				  		cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});
+	  					lastPos = pos;
   				  }
   				 
   		    	 
   			 }
   			  //else insert LRM and bind together
   			  else if (lineValue.charAt(pos - 1) != LRM || lineValue.charAt(pos - 1) === undefined)
-  			  {				 
+  			  {			
+  			             
+  				  		  //var testtok =  instance.getTokenAt({line: i, ch: lastPos + 1}, true);
+  				  		  //var testtok1 =  instance.getTokenAt({line: i, ch: pos + 1}, true);
+  				  		  
   			              cmTextArea.replaceRange(LRM, {line: i, ch: pos}); 
                           cmTextArea.markText({line: i, ch: pos}, {line: i, ch: (pos + 2)}, {atomic: true});
                       
   			         
   			         j += 1;
+  			         lastPos = pos + 1;
   			         
   			  }
+  			  
   			  lineValue = cmTextArea.getLine(i);
   			
   	      }
