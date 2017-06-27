@@ -587,7 +587,12 @@ public class TextColumnExporter extends SaltBasedExporter
   @Override
   public String getFileEnding()
   {
-    return "csv";
+    /* 
+      On Windows and Excel "csv" won't trigger the configuration dialog and will
+      use different defaults for importing the data depending on the locale of Windows.
+      Thus use the more general "txt" ending which will trigger a configuration dialog.
+    */
+    return "txt";
   }
 
 /**
@@ -820,7 +825,8 @@ public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args
 /**
  * Invokes the private static method {@link #calculateOrderedMatchNumbersGlobally}.
  */
-public void getOrderedMatchNumbers (){	 
+   @Override	 
+   public void getOrderedMatchNumbers (){	 
 		  
 	 orderedMatchNumbersGlobal =  calculateOrderedMatchNumbersGlobally(adjacencyMatrix, matrixIsFilled, singleMatchesGlobal);
 	 	  	

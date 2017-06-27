@@ -1,3 +1,40 @@
+Version 3.5.0-preview4
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/54?closed=1
+
+[Fixed Bugs]
+ #561 Fix initial corpus set selection when pre-selected corpus is not visible 
+ #555 Code mirror keybindings interfere with some keyboard layouts
+
+[Enhancements]
+ #562 Add benchmark modes to perform different kind of benchmarks
+
+Version 3.5.0-preview3
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/53?closed=1
+
+[Fixed Bugs]
+ #558 Update Vaadin Version to avoid Denial of Service attack vector
+ #557 Inserting an unknown context leads to NullPointerException
+
+[Enhancements]
+ #523 Exporting spans from corpora with more than one primary text
+
+Version 3.5.0-preview2
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/52?closed=1
+
+[Enhancements]
+ #551 Feature/kidko exporter two pass
+ #541 Add virtual keyboards for Ethiopic
+ #538 arabic in raw_text
+
 Version 3.5.0-preview1
 ======================
 

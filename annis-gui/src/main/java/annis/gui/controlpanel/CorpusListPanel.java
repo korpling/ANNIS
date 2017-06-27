@@ -903,6 +903,15 @@ public class CorpusListPanel extends VerticalLayout implements
                   && instanceConfig.getDefaultCorpusSet().length() > 0)
                 {
                   cbSelection.select(instanceConfig.getDefaultCorpusSet());
+                  
+                  // make sure the selected corpus set does contain the corpus
+                  Set<String> corpora = ui.getQueryState().getSelectedCorpora().getValue();
+                  Set<String> visibleCorpora = new HashSet<>(ui.getQueryState().
+                    getAvailableCorpora().getItemIds());
+                  if (!visibleCorpora.containsAll(corpora))
+                  {
+                    cbSelection.select(ALL_CORPORA);
+                  }
                 }
                 else
                 {

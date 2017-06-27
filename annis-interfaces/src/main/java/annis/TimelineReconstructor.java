@@ -32,6 +32,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import annis.model.AnnisConstants;
+import com.google.common.base.Joiner;
+import java.util.Arrays;
 
 /**
  * Allows to reconstruct a proper {@link SDocumentGraph} with an {@link STimeline} and
@@ -53,17 +55,29 @@ public class TimelineReconstructor
   private final Set<SNode> nodesToDelete = new HashSet<>();
   
   private final Multimap<String, String> order2spanAnnos = HashMultimap.create();
+
+  private final Set<String> matchIDs;
+  private final Map<String, String> oldID2newID;
   
   private TimelineReconstructor(SDocumentGraph graph, boolean virtualTokenizationFromNamespace)
   {
     this.virtualTokenizationFromNamespace = virtualTokenizationFromNamespace;
     this.graph = graph;
+
+    this.oldID2newID = new HashMap<>();
+    this.matchIDs = new HashSet<>();
+    getMatchedNodes();
   }
   
   private TimelineReconstructor(SDocumentGraph graph, Map<String, String> spanAnno2order)
   {
     this.virtualTokenizationFromNamespace = false;
     this.graph = graph;
+
+    this.oldID2newID = new HashMap<>();
+    this.matchIDs = new HashSet<>();
+    getMatchedNodes();
+
     if(spanAnno2order != null)
     {
       for(Map.Entry<String, String> e : spanAnno2order.entrySet())
@@ -73,6 +87,16 @@ public class TimelineReconstructor
     }
   }
   
+  private void getMatchedNodes() {
+    SFeature matchids = graph
+      .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
+    if (matchids != null)
+    {
+      String[] ids = matchids.getValue_STEXT().split(",");
+      this.matchIDs.addAll(Arrays.asList(ids));
+    }
+  }
+
   private void addTimeline()
   {
     
@@ -234,6 +258,9 @@ public class TimelineReconstructor
           textData.append(textValue);
           int endTextIdx = textData.length();
           SToken newToken = graph.createToken(textDS, startTextIdx, endTextIdx);
+          // keep track of changed ids for matches
+          if (this.matchIDs.contains(span.getId()))
+            this.oldID2newID.put(span.getId(), newToken.getId());
           
           // move all features to the new token
           if(span.getFeatures() != null)
@@ -243,6 +270,17 @@ public class TimelineReconstructor
               if(!"salt".equals(feat.getNamespace()))
               {
                 newToken.addFeature(feat);
+              }
+            }
+          }
+          // move all annotations to the new token
+          if(span.getAnnotations() != null)
+          {
+            for(SAnnotation annot : span.getAnnotations())
+            {
+              if(!"salt".equals(annot.getNamespace()) && !orderName.equals(annot.getName()))
+              {
+                newToken.addAnnotation(annot);
               }
             }
           }
@@ -360,6 +398,17 @@ public class TimelineReconstructor
     for(SNode node : nodesToDelete)
     {
       graph.removeNode(node);
+    }
+    // update the feature matchedIDs
+    SFeature matchids = graph.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
+    if(matchids != null) {
+      String[] ids = matchids.getValue_STEXT().split(",");
+      for (int i=0; i < ids.length; i++)
+      {
+        if (this.oldID2newID.containsKey(ids[i]))
+          ids[i] = this.oldID2newID.get(ids[i]);
+      }
+      matchids.setValue(Joiner.on(',').join(ids));
     }
   }
   

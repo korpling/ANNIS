@@ -29,6 +29,9 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var errorList = [];
     
    
+    
+    delete CodeMirror.keyMap.emacsy["Alt-F"]; 
+    delete CodeMirror.keyMap.emacsy["Alt-D"];
 
     CodeMirror.registerHelper("lint", "aql", function(text) {
       return errorList;
