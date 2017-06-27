@@ -136,10 +136,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     //pass user interaction to the server-side
     cmTextArea.on("change", function(instance, changeObj)
     {
-    	if (changeObj.origin === "+input")
-    	{
-
-
+    	
 	    	var LRM = '\u200e';
 		    var regexMark = "/";
 			var quotationMark = "\"";
@@ -244,7 +241,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
 			}
 			
 		}
-}
+
   	  	
     	if(changeDelayTimerID)
       {
