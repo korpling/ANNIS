@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+//JavaScript-connector, communicates between server-side (AqlCodeEditor) and JavaScript-code (codemirror) 
 window.annis_gui_components_codemirror_AqlCodeEditor = function() {
   
     var connector = this;
@@ -25,6 +27,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var lastServerRequestCounter = 0;
     
     var errorList = [];
+    
+   
     
     delete CodeMirror.keyMap.emacsy["Alt-F"]; 
     delete CodeMirror.keyMap.emacsy["Alt-D"];
@@ -45,12 +49,15 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       gutters: ["CodeMirror-lint-markers"],
       lint: true,
       placeholder: "",
-      inputStyle: 'textarea'
+      specialChars: /[\t\u0000-\u0019\u00ad\u200b\u200c\u200d\u200f\u2028\u2029\ufeff]/g,
+      inputStyle: 'textarea',
+      rtlMoveVisually : true
     });
         
     this.sendTextIfNecessary = function() 
     {
-      var current = cmTextArea.getValue();
+      // var current = cmTextArea.getValue();
+      var current = cmTextArea.getValue().replace(/\u200e/g, "");
             
       if(changeDelayTimerID)
       {
@@ -73,9 +80,12 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       }
     };
     
+       
+    // handle changes from the server-side
     this.onStateChange = function() 
-    {
-      var cursor = cmTextArea.getCursor();
+    {    
+             
+     var cursor = cmTextArea.getCursor();
       
       var newMode = {
         name: 'aql',
@@ -95,7 +105,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         cmTextArea.setCursor(cursor);
       }
       
-      // apply parent code class
+      //  apply parent code class
       if(connector.getState().textareaClass && connector.getState().textareaClass !== "") {
         var c = connector.getState().textareaClass;
         if(!$(cmTextArea.getWrapperElement()).find("pre").hasClass(c)) {
@@ -125,9 +135,118 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       changeDelayTime = newDelayTime;
     };
     
+   
+    //pass user interaction to the server-side
     cmTextArea.on("change", function(instance, changeObj)
-    {       
-      if(changeDelayTimerID)
+    {
+    	
+	    	var LRM = '\u200e';
+		    var regexMark = "/";
+			var quotationMark = "\"";
+			
+			var lastStatePosition = "def";
+			var currentStatePosition = "def";
+			var token; 
+			
+			var lineCount = cmTextArea.lineCount();
+	  
+		  	  for (var i = 0; i < lineCount; i++) 
+		  	  {
+					var lineValue = cmTextArea.getLine(i);
+					var j = 0;
+					var pos = 0;
+					var textMarker;
+					var lastPos = 0;
+
+			// find all occurrences of \" and /
+			while ((lineValue.indexOf(quotationMark, j) != -1) || (lineValue.indexOf(regexMark, j) != -1 ))
+			{
+				var currentMarkIsQuotationMark = false;
+			
+				// get position
+				if ((lineValue.indexOf(quotationMark, j) != -1) && (lineValue.indexOf(regexMark, j) != -1 ))
+				{
+				
+					if (lineValue.indexOf(quotationMark, j) < lineValue.indexOf(regexMark, j))
+					{
+						pos = lineValue.indexOf(quotationMark, j);
+						currentMarkIsQuotationMark = true;
+					
+					}
+					else 
+					{
+						pos = lineValue.indexOf(regexMark, j);
+					}
+				}
+				else if (lineValue.indexOf(quotationMark, j) != -1)
+				{
+					pos = lineValue.indexOf(quotationMark, j);
+					currentMarkIsQuotationMark = true;
+				}
+				else 
+				{
+					pos = lineValue.indexOf(regexMark, j);
+				}
+			
+			
+				j = pos + 1;
+				//  if LRM already inserted, bind LRM and \" together
+				if (lineValue.charAt(pos - 1) == LRM)
+				{
+					textMarker = cmTextArea.findMarksAt({line: i, ch: pos -1});
+				
+					token =  instance.getTokenAt({line: i, ch: pos + 1}, true);
+					currentStatePosition = token.state.position;
+					var isAtomic = false;
+				
+					//iterate over text markers and find out, whether there is an atomic one
+					for (var k = 0; k < textMarker.length; k++)
+					{
+						if (textMarker[k].atomic === true)
+						{
+							isAtomic = true;
+							break;
+						}
+					}
+				
+					if (!isAtomic)
+					{
+						cmTextArea.markText({line: i, ch: (pos - 1)}, {line: i, ch: (pos + 1)}, {atomic: true});
+						lastPos = pos;
+					}
+					
+					lastStatePosition = currentStatePosition;
+				
+				
+				}
+				//else insert LRM and bind together
+				else if (lineValue.charAt(pos - 1) != LRM || lineValue.charAt(pos - 1) === undefined)
+				{
+				
+					token =  instance.getTokenAt({line: i, ch: pos + 1}, true);
+					currentStatePosition = token.state.position;
+					
+					if ((lastStatePosition !== "string" && currentStatePosition === "string" && currentMarkIsQuotationMark)
+							|| (lastStatePosition === "string" && currentStatePosition !== "string" && currentMarkIsQuotationMark)
+							|| (lastStatePosition !== "string-2" && currentStatePosition === "string-2" && !currentMarkIsQuotationMark)
+							|| (lastStatePosition === "string-2" && currentStatePosition !== "string-2" && !currentMarkIsQuotationMark))
+					{
+						cmTextArea.replaceRange(LRM, {line: i, ch: pos}); 
+						cmTextArea.markText({line: i, ch: pos}, {line: i, ch: (pos + 2)}, {atomic: true});
+						j += 1;
+					}
+					
+					lastStatePosition = currentStatePosition;
+				
+				}
+				
+				lineValue = cmTextArea.getLine(i);
+			}
+			
+		}
+
+  	  	
+    	if(changeDelayTimerID)
       {
         window.clearTimeout(changeDelayTimerID);
       }
@@ -141,6 +260,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     {
       connector.sendTextIfNecessary();
     });
+    
     
 };
 
