@@ -62,8 +62,6 @@ import org.apache.commons.lang3.Validate;
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 {
 
-  // optimize indirect precedence for index on (leftToken - 1)
-  private boolean optimizeIndirectPrecedence;
   // allow binding of same node to both operands of sibling
   private boolean allowIdenticalSibling;
   // generate two-sided boundaries for both left and right text borders
@@ -346,16 +344,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     // indirect
     if (min == 0 && max == 0)
     {
-      if (optimizeIndirectPrecedence)
-      {
-        numberJoinOnNode(conditions, node, target, "<=", right,
-          left, -1);
-      }
-      else
-      {
-        joinOnNode(conditions, node, target, "<", right, left);
-      }
-
+      joinOnNode(conditions, node, target, "<", right, left);
     }
     // exact distance
     else if (min == max)
@@ -400,16 +389,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     // indirect
     if (min == 0 && max == 0)
     {
-      if (optimizeIndirectPrecedence)
-      {
-        numberMirrorJoinOnNode(conditions, node, target, "<=", right,
-          left, -1);
-      }
-      else
-      {
-        mirrorJoinOnNode(conditions, node, target, "<", right, left);
-      }
-
+      mirrorJoinOnNode(conditions, node, target, "<", right, left);
     }
     // exact distance
     else if (min == max)
@@ -789,16 +769,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     conditions.add(join(textMatching.sqlOperator(),
       tables(node).aliasedColumn(NODE_TABLE, "span"),
       sqlString(node.getSpannedText(), textMatching)));
-  }
-
-  public boolean isOptimizeIndirectPrecedence()
-  {
-    return optimizeIndirectPrecedence;
-  }
-
-  public void setOptimizeIndirectPrecedence(boolean optimizeIndirectPrecedence)
-  {
-    this.optimizeIndirectPrecedence = optimizeIndirectPrecedence;
   }
 
   public boolean isAllowIdenticalSibling()

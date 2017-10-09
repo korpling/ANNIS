@@ -47,7 +47,7 @@ public class AnnisXmlContextLoader extends GenericXmlContextLoader
     try
     {
       sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
-        "conf/annis-service-developer.properties").getAbsolutePath()));
+        "conf/developer.properties").getAbsolutePath()));
       sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
         "conf/annis-service.properties").getAbsolutePath()));
     }
