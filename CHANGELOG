@@ -2,6 +2,19 @@ Version 3.5.0-preview4
 ======================
 
 Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/55?closed=1
+
+[Fixed Bugs]
+ #566 Wrong count for some queries using the near operator ^
+ #540 AQL-editor and bidirectional text
+
+[Enhancements]
+ #565 Support PostgreSQL 10
+
+Version 3.5.0-preview4
+======================
+
+Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/milestone/54?closed=1
 
 [Fixed Bugs]
