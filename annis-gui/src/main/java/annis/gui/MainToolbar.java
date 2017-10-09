@@ -234,7 +234,7 @@ public class MainToolbar extends HorizontalLayout
     btLogout.setStyleName(ValoTheme.BUTTON_SMALL);
     btLogout.setIcon(FontAwesome.USER);
 
-    btOpenSource = new Button("Help us to make ANNIS better!");
+    btOpenSource = new Button("Help us make ANNIS better!");
     btOpenSource.setStyleName(BaseTheme.BUTTON_LINK);
     btOpenSource.addClickListener(new Button.ClickListener()
     {
@@ -242,7 +242,7 @@ public class MainToolbar extends HorizontalLayout
       public void buttonClick(Button.ClickEvent event)
       {
         Window w = new HelpUsWindow();
-        w.setCaption("Help us to make ANNIS better!");
+        w.setCaption("Help us make ANNIS better!");
         w.setModal(true);
         w.setResizable(true);
         w.setWidth("600px");
