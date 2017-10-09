@@ -1,7 +1,5 @@
 var NAVTREEINDEX13 =
 {
-"classannis_1_1visualizers_1_1component_1_1tree_1_1_annis_graph_tools.html#a94f121152c6d6f0246a181541a3f3a78":[4,0,0,17,0,7,1,4],
-"classannis_1_1visualizers_1_1component_1_1tree_1_1_annis_graph_tools.html#aedbf1fca6e563c807b04261691c9f66f":[4,0,0,17,0,7,1,1],
 "classannis_1_1visualizers_1_1component_1_1tree_1_1_constituent_layouter.html":[4,0,0,17,0,7,2],
 "classannis_1_1visualizers_1_1component_1_1tree_1_1_constituent_layouter.html#a5c26386301b35bfda8cce558daa028e9":[4,0,0,17,0,7,2,1],
 "classannis_1_1visualizers_1_1component_1_1tree_1_1_constituent_layouter.html#ab54294a878f819f051f5091199543746":[4,0,0,17,0,7,2,2],
@@ -249,5 +247,7 @@ var NAVTREEINDEX13 =
 "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_partitur_visualizer.html":[4,0,0,17,2,1,2],
 "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_partitur_visualizer.html#aa677d26b0821a153fbe28b5e55ed5ae6":[4,0,0,17,2,1,2,0],
 "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_partitur_visualizer.html#adccaddd91c245d21dab68879ab533c06":[4,0,0,17,2,1,2,1],
-"classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html":[4,0,0,17,2,1,3]
+"classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html":[4,0,0,17,2,1,3],
+"classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html#a393958489595b3ad8c65223e1989543a":[4,0,0,17,2,1,3,4],
+"classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html#a76de9a667a80fd669b032567f92f8989":[4,0,0,17,2,1,3,2]
 };

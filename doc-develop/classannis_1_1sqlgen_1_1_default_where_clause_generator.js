@@ -31,7 +31,6 @@ var classannis_1_1sqlgen_1_1_default_where_clause_generator =
     [ "isAllowIdenticalSibling", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a70a406f5f42d230a70717ccf3a57422c", null ],
     [ "isHackOperatorSameSpan", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a693493338b4f80abf9aafca0d4593b5e", null ],
     [ "isOptimizeInclusion", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#af2a50a015963cd928097a433afbc5ab4", null ],
-    [ "isOptimizeIndirectPrecedence", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#af387a2a48b3326dd282b3f5de3c57cb0", null ],
     [ "isUseComponentRefPredicateInCommonAncestorSubquery", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#ae0b65afbaf42462e0c92bc51b623655c", null ],
     [ "isUseIsTokenColumn", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#aad88422cbfde9ab4474e5084b9e393ae", null ],
     [ "isUseToplevelCorpusPredicateInCommonAncestorSubquery", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a916dd5698d9389b23668b1b3b67051c9", null ],
@@ -40,7 +39,6 @@ var classannis_1_1sqlgen_1_1_default_where_clause_generator =
     [ "setComponentPredicates", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a381eb105101f03e7dc02e8f36d956d9c", null ],
     [ "setHackOperatorSameSpan", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#ac6a9fc00afb7e2852dfa46816a9d3995", null ],
     [ "setOptimizeInclusion", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a584c14877012862e8cfcf30d71f6b347", null ],
-    [ "setOptimizeIndirectPrecedence", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#abf053d1e0fa245e76ec60457c89dfb46", null ],
     [ "setUseComponentRefPredicateInCommonAncestorSubquery", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#aab6fe0829c3d709c1353f89a11269e6d", null ],
     [ "setUseIsTokenColumn", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#a450c5640f4cd85479cdc59d8b645cfb8", null ],
     [ "setUseToplevelCorpusPredicateInCommonAncestorSubquery", "classannis_1_1sqlgen_1_1_default_where_clause_generator.html#aced6cba10458ea8dba15b1c88c4d59d1", null ]
