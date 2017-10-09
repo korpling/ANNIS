@@ -21,7 +21,6 @@ import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import static annis.sqlgen.SqlConstraints.between;
-import static annis.sqlgen.SqlConstraints.betweenMirror;
 import static annis.sqlgen.SqlConstraints.in;
 import static annis.sqlgen.SqlConstraints.isNotNull;
 import static annis.sqlgen.SqlConstraints.isNull;
@@ -29,7 +28,7 @@ import static annis.sqlgen.SqlConstraints.isTrue;
 import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.mirrorJoin;
 import static annis.sqlgen.SqlConstraints.numberJoin;
-import static annis.sqlgen.SqlConstraints.numberMirrorJoin;
+import static annis.sqlgen.SqlConstraints.or;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -62,8 +61,6 @@ import org.apache.commons.lang3.Validate;
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 {
 
-  // optimize indirect precedence for index on (leftToken - 1)
-  private boolean optimizeIndirectPrecedence;
   // allow binding of same node to both operands of sibling
   private boolean allowIdenticalSibling;
   // generate two-sided boundaries for both left and right text borders
@@ -109,15 +106,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
   }
 
-    void betweenMirrorJoinOnNode(List<String> conditions, QueryNode node,
-    QueryNode target, String leftColumn, String rightColumn, int min, int max)
-  {
-    
-    conditions.add(betweenMirror(tables(node).aliasedColumn(NODE_TABLE, leftColumn),
-      tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
-
-  }
-
   void numberJoinOnNode(List<String> conditions, QueryNode node,
     QueryNode target, String operator, String leftColumn, String rightColumn,
     int offset)
@@ -126,16 +114,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
       aliasedColumn(NODE_TABLE, rightColumn), offset));
   }
-  
-  void numberMirrorJoinOnNode(List<String> conditions, QueryNode node,
-    QueryNode target, String operator, String leftColumn, String rightColumn,
-    int offset)
-  {
-    conditions.add(numberMirrorJoin(operator,
-      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
-      aliasedColumn(NODE_TABLE, rightColumn), offset));
-  }
-
   
   
   /**
@@ -346,16 +324,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     // indirect
     if (min == 0 && max == 0)
     {
-      if (optimizeIndirectPrecedence)
-      {
-        numberJoinOnNode(conditions, node, target, "<=", right,
-          left, -1);
-      }
-      else
-      {
-        joinOnNode(conditions, node, target, "<", right, left);
-      }
-
+      joinOnNode(conditions, node, target, "<", right, left);
     }
     // exact distance
     else if (min == max)
@@ -400,29 +369,34 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     // indirect
     if (min == 0 && max == 0)
     {
-      if (optimizeIndirectPrecedence)
-      {
-        numberMirrorJoinOnNode(conditions, node, target, "<=", right,
-          left, -1);
-      }
-      else
-      {
-        mirrorJoinOnNode(conditions, node, target, "<", right, left);
-      }
-
+      mirrorJoinOnNode(conditions, node, target, "<", right, left);
     }
     // exact distance
     else if (min == max)
     {
-      numberMirrorJoinOnNode(conditions, node, target, "=", right,
-        left, -min);
-
+      conditions.add(
+        or(
+          numberJoin("=",
+            tables(node).aliasedColumn(NODE_TABLE, right), 
+            tables(target).aliasedColumn(NODE_TABLE, left), -min),
+          numberJoin("=",
+            tables(target).aliasedColumn(NODE_TABLE, right), 
+            tables(node).aliasedColumn(NODE_TABLE, left), -min)
+        ));
     }
     // ranged distance
     else
     {
-      betweenMirrorJoinOnNode(conditions, node, target, right, left,
-        -min, -max);
+      
+      conditions.add(
+        or(
+          between(
+            tables(node).aliasedColumn(NODE_TABLE, right),
+            tables(target).aliasedColumn(NODE_TABLE, left), -min, -max),
+          between(
+            tables(target).aliasedColumn(NODE_TABLE, right),
+            tables(node).aliasedColumn(NODE_TABLE, left), -min, -max)
+        ));
     }
   }
   
@@ -789,16 +763,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     conditions.add(join(textMatching.sqlOperator(),
       tables(node).aliasedColumn(NODE_TABLE, "span"),
       sqlString(node.getSpannedText(), textMatching)));
-  }
-
-  public boolean isOptimizeIndirectPrecedence()
-  {
-    return optimizeIndirectPrecedence;
-  }
-
-  public void setOptimizeIndirectPrecedence(boolean optimizeIndirectPrecedence)
-  {
-    this.optimizeIndirectPrecedence = optimizeIndirectPrecedence;
   }
 
   public boolean isAllowIdenticalSibling()

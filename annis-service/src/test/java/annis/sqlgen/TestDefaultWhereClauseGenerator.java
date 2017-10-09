@@ -522,20 +522,6 @@ public class TestDefaultWhereClauseGenerator
             join("<>", "_node23.id", "_node42.id"));
   }  
 
-  /**
-   * Indirect precedence on PostgreSQL may be optimized by an index on
-   * (leftToken - 1).
-   */
-  @Test
-  public void shouldOptimizeIndirectPrecedenceForIndexOnLeftTokenMinus1()
-  {
-    // given
-    generator.setOptimizeIndirectPrecedence(true);
-    node23.addOutgoingJoin(new Precedence(node42));
-    // then
-    checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
-        numberJoin("<=", "_node23.right_token", "_node42.left_token", -1));
-  }
 
   /**
    * WHERE conditions for inclusion (_i_).
