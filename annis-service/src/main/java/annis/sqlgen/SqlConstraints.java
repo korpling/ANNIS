@@ -71,9 +71,9 @@ public class SqlConstraints
     return lhs + " " + op + " " + rhs;
   }
 
-   public static String mirrorJoin(String op, String lhs, String rhs)
+  public static String mirrorJoin(String op, String lhs, String rhs)
   {
-    return "(" + lhs + " " + op + " " + rhs + " OR " + rhs + " " + op + " " + lhs + ")";
+    return or(lhs + " " + op + " " + rhs, rhs + " " + op + " " + lhs);
   }
 
   public static String numberJoin(String op, String lhs, String rhs, int offset)
@@ -81,11 +81,10 @@ public class SqlConstraints
     String plus = offset >= 0 ? " + " : " - ";
     return join(op, lhs, rhs) + plus + String.valueOf(Math.abs(offset));
   }
-
-  public static String numberMirrorJoin(String op, String lhs, String rhs, int offset)
+  
+  public static String or(String lhs, String rhs)
   {
-    String plus = offset >= 0 ? " + " : " - ";
-    return "(" + join(op, lhs, rhs) + plus + String.valueOf(Math.abs(offset)) + " OR " + join(op, rhs, lhs) + plus + String.valueOf(Math.abs(offset)) + ")";
+    return "((" + lhs + ") OR (" + rhs + "))";
   }
 
   public static String bitSelect(String column, boolean[] bits)
@@ -108,20 +107,6 @@ public class SqlConstraints
       + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
       + String.valueOf(Math.abs(max));
     
-  }
-
-  public static String betweenMirror(String lhs, String rhs, int min, int max)
-  {
-    String minPlus = min >= 0 ? " + " : " - ";
-    String maxPlus = max >= 0 ? " + " : " - ";
-    
-    return "((" + lhs + " " + "BETWEEN SYMMETRIC" + " " + rhs + minPlus
-      + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
-      + String.valueOf(Math.abs(max)) + ") OR ("
-      + rhs + " " + "BETWEEN SYMMETRIC" + " " + lhs + minPlus
-      + String.valueOf(Math.abs(min)) + " AND " + lhs + maxPlus
-      + String.valueOf(Math.abs(max)) + "))";
-
   }
 
   public static String between(String lhs, int min, int max)
