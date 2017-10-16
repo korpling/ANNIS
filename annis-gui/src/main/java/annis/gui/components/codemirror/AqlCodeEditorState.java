@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
+//state of the AqlCodeEditor-component
 public class AqlCodeEditorState extends JavaScriptComponentState
 {
 

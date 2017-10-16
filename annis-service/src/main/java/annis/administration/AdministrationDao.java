@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.sql.Blob;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -315,10 +316,31 @@ public class AdministrationDao extends AbstractAdminstrationDao
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
 
-    log.info("creating immutable functions for extracting annotations");
-    executeSqlFromScript("functions_get.sql");
+    log.info(
+      "creating immutable functions for extracting annotations");
+    
+    try(Connection conn = getJdbcTemplate().getDataSource().getConnection();)
+    {
+      
+      DatabaseMetaData meta = conn.getMetaData();
+      if(meta.getDatabaseMajorVersion() >= 10)
+      {
+        // there are some new regex functions in PostgreSQL 10 that don't exist in earlier versions
+        executeSqlFromScript("functions_get_pg10.sql");
+      }
+      else
+      {
+        executeSqlFromScript("functions_get.sql");
+      }
+    }
+    catch (SQLException ex)
+    {
+      log.error("could not get database version", ex);
+    }
+    
+    
   }
-
+  
   /**
    * Get the real schema name and version as used by the database.
    *

@@ -37,8 +37,6 @@ public class TestSqlConstraints
   @Before
   public void setup()
   {
-    SqlConstraints.setDisableBetweenPredicate(false);
-    SqlConstraints.setDisableBetweenSymmetricPredicate(false);
   }
 
   /**
@@ -108,7 +106,6 @@ public class TestSqlConstraints
   public void shouldUseBetweenSymmetric()
   {
     // given
-    SqlConstraints.setDisableBetweenSymmetricPredicate(false);
     int min = uniqueInt();
     int max = uniqueInt();
     // when
@@ -118,74 +115,6 @@ public class TestSqlConstraints
     assertEquals(expected, actual);
   }
 
-  /**
-   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested.
-   */
-  @Test
-  public void shouldNotUseBetweenSymmetric()
-  {
-    // given
-    SqlConstraints.setDisableBetweenSymmetricPredicate(true);
-    int min = uniqueInt(10);
-    int max = min + uniqueInt(10);
-    // when
-    String actual = between("lhs", min, max);
-    // then
-    String expected = "lhs BETWEEN " + min + " AND " + max;
-    assertEquals(expected, actual);
-  }
-
-  /**
-   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested, make sure
-   * min < max.
-   */
-  @Test
-  public void shouldNotUseBetweenSymmetricMinMaxReversed()
-  {
-    // given
-    SqlConstraints.setDisableBetweenSymmetricPredicate(true);
-    int max = uniqueInt(10);
-    int min = max + uniqueInt(10);
-    // when
-    String actual = between("lhs", min, max);
-    // then
-    String expected = "lhs BETWEEN " + max + " AND " + min;
-    assertEquals(expected, actual);
-  }
-
-  /**
-   * Use >= and <= comparison as a workaround for BETWEEN.
-   */
-  @Test
-  public void shouldNotUseBetweenPredicate()
-  {
-    // given
-    SqlConstraints.setDisableBetweenPredicate(true);
-    int min = uniqueInt(10);
-    int max = min + uniqueInt(10);
-    // when
-    String actual = between("lhs", min, max);
-    // then
-    String expected = "lhs >= " + min + " AND lhs <= " + max;
-    assertEquals(expected, actual);
-  }
-
-  /**
-   * Use >= and <= comparison as a workaround for BETWEEN, make sure min < max.
-   */
-  @Test
-  public void shouldNotUseBetweenPredicateMinMaxReversed()
-  {
-    // given
-    SqlConstraints.setDisableBetweenPredicate(true);
-    int max = uniqueInt(10);
-    int min = max + uniqueInt(10);
-    // when
-    String actual = between("lhs", min, max);
-    // then
-    String expected = "lhs >= " + max + " AND lhs <= " + min;
-    assertEquals(expected, actual);
-  }
 
   /**
    * Use BETWEEN SYMMETRIC for between predicates (explicit RHS version)
@@ -194,7 +123,6 @@ public class TestSqlConstraints
   public void shouldUseBetweenSymmetricRhs()
   {
     // given
-    SqlConstraints.setDisableBetweenSymmetricPredicate(false);
     int min = uniqueInt();
     int max = uniqueInt();
     // when
@@ -205,77 +133,6 @@ public class TestSqlConstraints
     assertEquals(expected, actual);
   }
 
-  /**
-   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested (explicit RHS
-   * version).
-   */
-  @Test
-  public void shouldNotUseBetweenSymmetricRhs()
-  {
-    // given
-    SqlConstraints.setDisableBetweenSymmetricPredicate(true);
-    int min = uniqueInt(10);
-    int max = min + uniqueInt(10);
-    // when
-    String actual = between("lhs", "rhs", min, max);
-    // then
-    String expected = "lhs BETWEEN rhs + " + min + " AND rhs + " + max;
-    assertEquals(expected, actual);
-  }
-
-  /**
-   * Don't use BETWEEN SYMMETRIC (only use BETWEEN) when requested, make sure
-   * min < max (explicit RHS version).
-   */
-  @Test
-  public void shouldNotUseBetweenSymmetricRhsMinMaxReversed()
-  {
-    // given
-    SqlConstraints.setDisableBetweenSymmetricPredicate(true);
-    int max = uniqueInt(10);
-    int min = max + uniqueInt(10);
-    // when
-    String actual = between("lhs", "rhs", min, max);
-    // then
-    String expected = "lhs BETWEEN rhs + " + max + " AND rhs + " + min;
-    assertEquals(expected, actual);
-  }
-
-  /**
-   * Use >= and <= comparison as a workaround for BETWEEN (explicit RHS
-   * version).
-   */
-  @Test
-  public void shouldNotUseBetweenPredicateRhs()
-  {
-    // given
-    SqlConstraints.setDisableBetweenPredicate(true);
-    int min = uniqueInt(10);
-    int max = min + uniqueInt(10);
-    // when
-    String actual = between("lhs", "rhs", min, max);
-    // then
-    String expected = "lhs >= rhs + " + min + " AND lhs <= rhs + " + max;
-    assertEquals(expected, actual);
-  }
-
-  /**
-   * Use >= and <= comparison as a workaround for BETWEEN, make sure min < max
-   * (explicit RHS version).
-   */
-  @Test
-  public void shouldNotUseBetweenPredicateRhsMinMaxReversed()
-  {
-    // given
-    SqlConstraints.setDisableBetweenPredicate(true);
-    int max = uniqueInt(10);
-    int min = max + uniqueInt(10);
-    // when
-    String actual = between("lhs", "rhs", min, max);
-    // then
-    String expected = "lhs >= rhs + " + max + " AND lhs <= rhs + " + min;
-    assertEquals(expected, actual);
-  }
 
   /**
    * A positive offset is added to the right-hand side of a join.
