@@ -15,81 +15,6 @@
  */
 package annis.dao;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
-import javax.cache.Cache;
-import javax.cache.Caching;
-import javax.cache.configuration.MutableConfiguration;
-
-import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.corpus_tools.salt.SaltFactory;
-import org.corpus_tools.salt.common.SCorpus;
-import org.corpus_tools.salt.common.SCorpusGraph;
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SNode;
-import org.corpus_tools.salt.core.SRelation;
-import org.corpus_tools.salt.util.SaltUtil;
-import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
-import org.eclipse.emf.common.util.URI;
-import org.corpus_tools.graphannis.API;
-import org.corpus_tools.graphannis.API.StringVector;
-import org.corpus_tools.graphannis.QueryToJSON;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.escape.Escaper;
-import com.google.common.io.ByteStreams;
-import com.google.common.net.UrlEscapers;
-
 import annis.CSVHelper;
 import annis.CommonHelper;
 import annis.WekaHelper;
@@ -112,7 +37,6 @@ import annis.service.objects.FrequencyTable;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
-import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotatedMatchIterator;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.FrequencySqlGenerator;
@@ -125,13 +49,83 @@ import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.RawTextSqlHelper;
-import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.escape.Escaper;
+import com.google.common.io.ByteStreams;
+import com.google.common.net.UrlEscapers;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import javax.cache.Cache;
+import javax.cache.Caching;
+import javax.cache.configuration.MutableConfiguration;
 import javax.xml.parsers.SAXParserFactory;
-import org.corpus_tools.graphannis.SaltExport;
+import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.corpus_tools.graphannis.QueryToJSON;
+import org.corpus_tools.graphannis.api.CorpusStorageManager;
+import org.corpus_tools.graphannis.api.LogLevel;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpus;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.SaltUtil;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
+import org.eclipse.emf.common.util.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
 public class QueryDaoImpl extends AbstractDao implements QueryDao,
@@ -153,7 +147,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   // configuration
   private int timeout;
 
-  private final API.CorpusStorageManager corpusStorageMgr;
+  private final CorpusStorageManager corpusStorageMgr;
 
   private final ExecutorService exec = Executors.newCachedThreadPool();
 
@@ -195,18 +189,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
     String corpusName = null;
     // find all covered token
-    API.StringVector matchedIDs = new API.StringVector();
+    List<String> matchedIDs = new LinkedList<>();
     for (java.net.URI id : m.getSaltIDs()) {
       if (corpusName == null) {
         // use first node as template for the corpus name
         corpusName = CommonHelper.getCorpusPath(id).get(0);
       }
-      matchedIDs.put(id.toASCIIString());
+      matchedIDs.add(id.toASCIIString());
     }
 
-    API.NodeVector coveredNodes = corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight());
+    SDocumentGraph result = corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight());
 
-    return SaltExport.map(coveredNodes);
+    return result;
   }
 
   /**
@@ -510,11 +504,20 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     planRowMapper = new ParameterizedSingleColumnRowMapper<>();
     sqlSessionModifiers = new ArrayList<>();
 
-    this.corpusStorageMgr = new API.CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath());
+    File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
+    this.corpusStorageMgr = new CorpusStorageManager(
+      QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
+      logfile.getAbsolutePath(), LogLevel.Trace);
   }
 
   public void init() {
     parseCorpusConfiguration();
+  }
+
+  @Override
+  public CorpusStorageManager getCorpusStorageManager()
+  {
+    return this.corpusStorageMgr;
   }
 
   @Override
@@ -589,18 +592,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     }
   }
 
-  protected StringVector createCorpusVector(QueryData queryData) {
+  protected List<String> createCorpusList(QueryData queryData) {
     List<AnnisCorpus> namedCorpora = listCorpora(queryData.getCorpusList());
     List<String> corpusList = new LinkedList<>();
     for (AnnisCorpus c : namedCorpora) {
       corpusList.add(corpusNameEscaper.escape(c.getName()));
     }
-    return new StringVector(corpusList.toArray(new String[corpusList.size()]));
+    return corpusList;
   }
 
   @Override
   public List<Match> find(QueryData queryData) {
-    StringVector corpora = createCorpusVector(queryData);
+    List<String> corpora = createCorpusList(queryData);
     String query = QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData());
 
     List<LimitOffsetQueryData> ext = queryData.getExtensions(
@@ -611,11 +614,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
     Future<List<Match>> result = exec.submit(()
             -> {
-      StringVector matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
+      String[] matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
 
-      ArrayList<Match> data = new ArrayList<>((int) matchesRaw.size());
-      for (long i = 0; i < matchesRaw.size(); i++) {
-        data.add(Match.parseFromString(matchesRaw.get(i).getString()));
+      ArrayList<Match> data = new ArrayList<>((int) matchesRaw.length);
+      for (int i = 0; i < matchesRaw.length; i++) {
+        data.add(Match.parseFromString(matchesRaw[i]));
       }
       return data;
     });
@@ -632,7 +635,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   @Override
   public boolean find(final QueryData queryData, final OutputStream out) {
-    StringVector corpora = createCorpusVector(queryData);
+    List<String> corpora = createCorpusList(queryData);
     String query = QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData());
 
     List<LimitOffsetQueryData> ext = queryData.getExtensions(
@@ -643,13 +646,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
     Future<Boolean> result = exec.submit(()
             -> {
-      StringVector matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
+      String[] matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(), extQueryData.getLimit());
 
       try {
         PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
 
-        for (long i = 0; i < matchesRaw.size(); i++) {
-          w.print(matchesRaw.get(i).getString());
+        for (int i = 0; i < matchesRaw.length; i++) {
+          w.print(matchesRaw[i]);
           w.print("\n");
 
           // flush after every 10th item
@@ -680,7 +683,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   public int count(QueryData queryData) {
     Future<Integer> result = exec.submit(()
             -> {
-      return (int) corpusStorageMgr.count(createCorpusVector(queryData),
+      return (int) corpusStorageMgr.count(createCorpusList(queryData),
               QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
     });
 
@@ -698,11 +701,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
     Future<MatchAndDocumentCount> result = exec.submit(()
             -> {
-      API.CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(
-              createCorpusVector(queryData),
+      CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(
+              createCorpusList(queryData),
               QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
 
-      return new MatchAndDocumentCount((int) data.matchCount(), (int) data.documentCount());
+      return new MatchAndDocumentCount((int) data.matchCount, (int) data.documentCount);
     });
 
     try {
@@ -836,9 +839,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
       return cached;
     } else {
       
-      API.NodeVector nodes = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, new StringVector(docURI.toString()));
-      SDocumentGraph graph = SaltExport.map(nodes);
-
+      SDocumentGraph graph = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString()));
+      
       // wrap the single document into a SaltProject
       SaltProject project = SaltFactory.createSaltProject();
       SCorpusGraph corpusGraph = project.createCorpusGraph();

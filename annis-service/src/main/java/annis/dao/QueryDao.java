@@ -40,11 +40,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import org.corpus_tools.graphannis.api.CorpusStorageManager;
 import org.corpus_tools.salt.common.SaltProject;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 public interface QueryDao
 {
+  
+  
+  public CorpusStorageManager getCorpusStorageManager();
 
   public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,
     String documentName, List<String> nodeAnnotationFilter);

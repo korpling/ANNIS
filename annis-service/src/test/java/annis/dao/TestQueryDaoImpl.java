@@ -62,6 +62,7 @@ import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.test.TestHelper;
+import org.corpus_tools.graphannis.api.CorpusStorageManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations =
@@ -109,7 +110,7 @@ public class TestQueryDaoImpl
   public void setup()
   {
     initMocks(this);
-    
+       
     queryDao = new QueryDaoImpl();
     queryDao.setAqlParser(annisParser);
     queryDao.setSqlGenerator(sqlGenerator);
