@@ -80,6 +80,17 @@ public class Table implements Serializable
     return new ArrayList<>(columns);
   }
   
+  public ArrayList<Column> getNonKeyColumns()
+  {
+    ArrayList<Column> result = new ArrayList<>(columns.size());
+    for(Column c : columns) {
+      if(!c.isPrimaryKey()) {
+        result.add(c);
+      }
+    }
+    return result;
+  }
+  
   public String getName()
   {
     return name;

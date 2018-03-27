@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,15 +46,16 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
   @Override
   public PreparedStatement createPreparedStatement(Connection cnctn) throws SQLException
   {
-    String select = "SELECT resolver_vis_map.id, "
+    String select = "SELECT "
+      + "resolver_vis_map.id, "
       + "resolver_vis_map.corpus, "
       + "resolver_vis_map.version, "
       + "resolver_vis_map.namespace, "
       + "resolver_vis_map.element, "
       + "resolver_vis_map.vis_type, "
       + "resolver_vis_map.display_name, "
-      + "resolver_vis_map.order, "
       + "resolver_vis_map.visibility, "
+      + "resolver_vis_map.\"order\", "
       + "resolver_vis_map.mappings\n";
 
     String defaultFromWhere = 
@@ -140,9 +142,8 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
     while (rs.next())
     {
       Properties mappings = new Properties();
-
-      String mappingsAsString = rs.getString("mappings");
-      if(mappingsAsString != null)
+      String mappingsAsString = rs.getString(10);
+      if(!rs.wasNull())
       {
         // split the entrys
         String[] entries = mappingsAsString.split(";");
@@ -157,19 +158,19 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
         }
       }
 
-      String element = rs.getString("element");
+      String element = rs.getString(5);
 
       ResolverEntry e = new ResolverEntry(
-        rs.getLong("id"),
-        rs.getString("corpus"),
-        rs.getString("version"),
-        rs.getString("namespace"),
+        rs.getLong(1),
+        rs.getString(2),
+        rs.getString(3),
+        rs.getString(4),
         element == null ? null : ResolverEntry.ElementType.valueOf(element),
-        rs.getString("vis_type"),
-        rs.getString("display_name"),
-        rs.getString("visibility"),
+        rs.getString(6),
+        rs.getString(7),
+        rs.getString(8),
         mappings,
-        rs.getInt("order"));
+        rs.getInt(9));
       
       if("removed".equals(e.getVisibility()))
       {

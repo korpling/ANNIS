@@ -18,6 +18,7 @@ public class Column implements Serializable
   
   private final String name;
   private Type type = Type.TEXT;
+  private boolean primaryKey = false;
   private boolean unique = false;
   private boolean notNull = false;
   
@@ -59,6 +60,13 @@ public class Column implements Serializable
     return copy;
   }
   
+  public Column primaryKey()
+  {
+    Column copy = new Column(this);
+    copy.primaryKey = true;
+    return copy;
+  }
+  
   public String getName()
   {
     return name;
@@ -78,11 +86,15 @@ public class Column implements Serializable
   {
     return notNull;
   }
-  
+
+  public boolean isPrimaryKey()
+  {
+    return primaryKey;
+  }
   
   @Override
   public String toString()
   {
-    return "\"" + name + "\" " + type.name() + (unique ? " UNIQUE" : "") + (notNull ? " NOT NULL" : "");
+    return "\"" + name + "\" " + type.name() + (primaryKey ? " PRIMARY KEY" : "")  + (unique ? " UNIQUE" : "") + (notNull ? " NOT NULL" : "");
   }
 }

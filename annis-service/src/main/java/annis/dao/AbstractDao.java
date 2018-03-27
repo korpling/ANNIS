@@ -54,10 +54,13 @@ import annis.administration.StatementController;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
 import annis.utils.DynamicDataSource;
-import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 import java.sql.ResultSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
+import org.sqlite.SQLiteConfig;
+import org.sqlite.SQLiteDataSource;
 
 /**
  * Common functions used by all data access objects.
@@ -185,9 +188,17 @@ public abstract class AbstractDao
   
   public Connection createSQLiteConnection() throws SQLException
   {
+    return createSQLiteConnection(false);
+  }
+  
+  public Connection createSQLiteConnection(boolean readonly) throws SQLException
+  {
     // TODO: make the datanase location configurable and maybe use a connection pool.
     File dbFile = new File(getGraphANNISDir(), "annis.db");
-    return DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
+    SQLiteConfig conf = new SQLiteConfig();
+    SQLiteDataSource source = new SQLiteDataSource(conf);
+    source.setUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());
+    return source.getConnection();
   }
   
   public void importSQLiteTable(Table table, File csvFile) throws SQLException {
@@ -240,19 +251,32 @@ public abstract class AbstractDao
               +  " (" + Joiner.on(", ").join(columns) +  ")");
           }
           
-          Preconditions.checkArgument(table.getColumns().size() == firstLine.length, "Import of table %s failed. "
+          List<Column> nonKeyColumns = table.getNonKeyColumns();
+          
+          Preconditions.checkArgument(nonKeyColumns.size() == firstLine.length, "Import of table %s failed. "
               + "File '%s' should have %s columns but has %s.", table.getName(), csvFile.getAbsolutePath(),
-              columns.size(), firstLine.length);
+              nonKeyColumns.size(), firstLine.length);
+          
+          List<String> columnNames = new LinkedList<>();
+          for(Column c : nonKeyColumns) {
+            columnNames.add("\"" + c.getName() + "\"");
+          }
           
           String[] line = firstLine;
           try(PreparedStatement insertStmt = conn.prepareStatement(
-            "INSERT INTO " + table.getName() + " VALUES(" + Strings.repeat("?, ", firstLine.length-1)  + "?)"))
+            "INSERT INTO " 
+              + "\"" + table.getName() + "\"" 
+              + "(" + Joiner.on(", ").join(columnNames) + ") " + " VALUES(" + Strings.repeat("?, ", firstLine.length-1)  + "?)"))
           {
             while(line != null)
             {
               for(int i=0; i < line.length; i++)
               {
-                insertStmt.setString(i+1, line[i]);
+                if(line[i] == null || line[i].equals("NULL")) {
+                  insertStmt.setString(i+1, null);
+                } else {
+                  insertStmt.setString(i+1, line[i]);
+                }
               }
               insertStmt.execute();
               line = csvReader.readNext();

@@ -87,6 +87,7 @@ import annis.security.UserConfig;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
+import com.google.common.base.Joiner;
 import java.util.function.Function;
 
 /**
@@ -220,6 +221,18 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
   private QueriesGenerator queriesGenerator;
+  
+  private final Table resolverTable = new Table(FILE_RESOLVER_VIS_MAP)
+        .c(new Column("id").type(Column.Type.INTEGER).primaryKey())
+        .c("corpus")
+        .c("version")
+        .c("namespace")
+        .c("element")
+        .c(new Column("vis_type").notNull())
+        .c(new Column("display_name").notNull())
+        .c("visibility")
+        .c_int("order")
+        .c("mappings");
 
   /**
    * Called when Spring configuration finished
@@ -719,49 +732,44 @@ public class AdministrationDao extends AbstractAdminstrationDao
   
   /**
    * Makes sure all tables needed by SQLite are available.
+   * @throws java.sql.SQLException
    */
-  protected void initSQLiteSchema()
+  protected void initSQLiteSchema() throws SQLException
   {
-    try(Connection conn = createSQLiteConnection();
-        Statement stmt = conn.createStatement())
-    {
-      conn.setAutoCommit(false);
+    boolean createResolverTable = false;
       
-      // TODO
-      
-      conn.commit();
+    try(Connection conn = createSQLiteConnection(true)) {
+      try(PreparedStatement resolverTableExistsStmt = 
+              conn.prepareStatement("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?")) {
+        resolverTableExistsStmt.setString(1, resolverTable.getName());
+        try(ResultSet res = resolverTableExistsStmt.executeQuery()) {
+          if(!res.next() || res.getLong(1) == 0) {
+            createResolverTable = true;
+          }
+        }
+      }      
     }
-    catch(SQLException ex)
-    {
-      log.error("Can't create database connection", ex);
+    if(createResolverTable) {
+      // create table and load it with initial data
+      File fScript = new File(getScriptPath(), "resolver_vis_map.annis");
+      if (fScript.canRead() && fScript.isFile()) {
+        importSQLiteTable(resolverTable, fScript, false);
+      }
     }
   }
 
   protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version)
   {
     File importDir = new File(path);
+    try {
+      log.info("ensure SQLite database schema is initialized");
+      initSQLiteSchema();
 
-    log.info("ensure SQLite database schema is initialized");
-    initSQLiteSchema();
+      log.info("importing corpus into graphANNIS");
+      getQueryDao().getCorpusStorageManager().importRelANNIS(corpusName, path);
+
+      log.info("loading tables into SQLite");
     
-    log.info("importing corpus into graphANNIS");
-    getQueryDao().getCorpusStorageManager().importRelANNIS(corpusName, path);
-
-    log.info("loading tables into SQLite");
-
-    try
-    {
-      final Table resolverTable = new Table(FILE_RESOLVER_VIS_MAP)
-        .c("corpus")
-        .c("version")
-        .c("namespace")
-        .c("element")
-        .c(new Column("vis_type").notNull())
-        .c(new Column("display_name").notNull())
-        .c("visibility")
-        .c_int("order")
-        .c("mappings");
-      
       Function<String[],String[]> lineModifier = (line) -> {
         if(line != null && line.length == 8) {
           String[] updateLine = new String[9];
