@@ -30,7 +30,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -87,7 +86,6 @@ import annis.security.UserConfig;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
-import com.google.common.base.Joiner;
 import java.util.function.Function;
 
 /**
@@ -574,7 +572,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     applyConstraints();
     createStagingAreaIndexes(version);
 
-    fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(FILE_RESOLVER_VIS_MAP));
     analyzeStagingTables();
 
     addDocumentNameMetaData();
@@ -655,7 +652,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     createStagingAreaIndexes(version);
 
-    fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(FILE_RESOLVER_VIS_MAP));
     computeTopLevelCorpus();
     analyzeStagingTables();
 
@@ -771,7 +767,15 @@ public class AdministrationDao extends AbstractAdminstrationDao
       log.info("loading tables into SQLite");
     
       Function<String[],String[]> lineModifier = (line) -> {
-        if(line != null && line.length == 8) {
+        if(line == null) {
+          return line;
+        }
+        // check that the resolver entry is applied to correct corpus
+        if(line[0] == null || !line[0].equals(corpusName)) {
+          log.warn("resolver entry references wrong corpus \"" + line[0] + "\" and was rewritten");
+          line[0] = corpusName;
+        }
+        if(line.length == 8) {
           String[] updateLine = new String[9];
           updateLine[0] = line[0];
           updateLine[1] = line[1];
@@ -1928,28 +1932,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     this.tableInsertFrom = tableInsertFrom;
   }
 
-
-  /**
-   * Removes any unwanted entries from the resolver_vis_map table
-   *
-   * @param toplevelCorpus
-   * @param table
-   */
-  private void fixResolverVisMapTable(String toplevelCorpus, String table)
-  {
-    log.info("checking resolver_vis_map for errors");
-
-    // delete all entries that reference a different corpus than the imported
-    // one
-    int invalidRows = getJdbcTemplate().update("DELETE FROM " + table + " WHERE corpus <> ?",
-        toplevelCorpus);
-    if (invalidRows > 0)
-    {
-      log.warn("there were " + invalidRows
-          + " rows in the resolver_vis_map that referenced the wrong corpus");
-    }
-
-  }
 
   /**
    * Generates example queries if no example queries tab file is defined by the
