@@ -16,8 +16,13 @@
 package annis.administration;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +72,13 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
     {
       return;
     }
-
+    Map<Long, String> id2name = new HashMap<>();
+    for(long l : ids) {
+      String name = getQueryDao().mapCorpusIdToName(l);
+      if(name != null) {
+        id2name.put(l, name);
+      }
+    }
     File dataDir = getRealDataDir();
 
     for (long l : ids)
@@ -108,6 +119,22 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
 
     executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
       StringUtils.join(ids, ", ")));
+    
+    try(Connection conn = createSQLiteConnection()) {
+      conn.setAutoCommit(false);
+      
+      log.info("deleting resolver entries");
+      try(PreparedStatement delStmt = conn.prepareStatement("DELETE FROM resolver_vis_map WHERE corpus=?")) {
+        for(String n : id2name.values()) {
+          delStmt.setString(1, n);
+          delStmt.executeUpdate();
+        }
+      }
+      conn.commit();
+    } catch(SQLException ex) {
+      log.error("error when deleting corpus", ex);
+    }
+    
   }
 
 }
