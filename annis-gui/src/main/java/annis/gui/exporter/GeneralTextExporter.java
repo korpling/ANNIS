@@ -15,6 +15,7 @@
  */
 package annis.gui.exporter;
 
+import annis.CommonHelper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,17 +48,19 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
-import annis.model.AnnisNode;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import annis.model.Annotation;
-import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
-import annis.utils.LegacyGraphConverter;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SFeature;
 
 public abstract class GeneralTextExporter implements ExporterPlugin, Serializable
 {
@@ -176,7 +179,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
               stepSize += 10;
             }
 
-            convertText(LegacyGraphConverter.convertToResultSet(p), 
+            convertText(p, 
               keys, args, out, offset-currentMatches.getMatches().size());
 
             currentMatches.getMatches().clear();
@@ -212,7 +215,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
           }
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
-          convertText(LegacyGraphConverter.convertToResultSet(p),
+          convertText(p,
             keys, args, out, offset - currentMatches.getMatches().size() - 1);
         }
         offset = 0;
@@ -233,7 +236,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
     }
   }
 
-  public void convertText(AnnisResultSet queryResult, List<String> keys,
+  public void convertText(SaltProject queryResult, List<String> keys,
     Map<String, String> args, Writer out, int offset) throws IOException
   {
     Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
@@ -250,44 +253,47 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
     }
     
     int counter = 0;
-
-    for (AnnisResult annisResult : queryResult)
-    {
-      Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
-
-      counter++;
-      out.append((counter + offset) + ". ");
-      List<AnnisNode> tok = annisResult.getGraph().getTokens();
-
-      for (AnnisNode annisNode : tok)
-      {
-        Long tokID = annisNode.getId();
-        if (matchedNodeIds.contains(tokID))
-        {
-          out.append("[");
-          out.append(annisNode.getSpannedText());
-          out.append("]");
-        }
-        else
-        {
-          out.append(annisNode.getSpannedText());
-        }
-
-        //for (Annotation annotation : annisNode.getNodeAnnotations()){
-        //      out.append("/"+annotation.getValue());
-        //}
-
-        out.append(" ");
-
-      }
-      out.append("\n");
     
-      if(!metaKeys.isEmpty())
+    for (SCorpusGraph corpusGraph : queryResult.getCorpusGraphs())
+    {
+      for (SDocument doc : corpusGraph.getDocuments())
       {
-        String[] path = annisResult.getPath();
-        appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
+        SDocumentGraph graph = doc.getDocumentGraph();
+        
+        counter++;
+        out.append((counter + offset) + ". ");
+        List<SToken> tok = graph.getSortedTokenByText();
+
+        for (SToken annisNode : tok)
+        {
+           SFeature featMatched = annisNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+           Long match = featMatched == null ? null : featMatched.
+                    getValue_SNUMERIC();
+            
+          if (match != null)
+          {
+            out.append("[");
+            out.append(graph.getText(annisNode));
+            out.append("]");
+          }
+          else
+          {
+            out.append(graph.getText(annisNode));
+          }
+
+          out.append(" ");
+
+        }
+        out.append("\n");
+
+        if(!metaKeys.isEmpty())
+        {
+          String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
+          appendMetaData(out, metaKeys, path[path.length-1], path[0], metadataCache);
+        }
+        out.append("\n");
+
       }
-      out.append("\n");
     }
 
   }

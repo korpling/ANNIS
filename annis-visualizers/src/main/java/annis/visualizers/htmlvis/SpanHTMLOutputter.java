@@ -92,12 +92,7 @@ public class SpanHTMLOutputter
       SDocumentGraph graph = (SDocumentGraph) span.getGraph();
       
      
-      List<SToken> coveredTokens = new LinkedList<>();
-      for(SNode n : span.getGraph().getChildren(span, SALT_TYPE.SSPANNING_RELATION)) {
-        if(n instanceof SToken) {
-          coveredTokens.add((SToken) n);
-        }
-      }
+      List<SToken> coveredTokens = graph.getOverlappedTokens(span);
       if(coveredTokens.isEmpty()) {
         return;
       }
