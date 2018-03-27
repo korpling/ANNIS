@@ -28,6 +28,12 @@ public class Table implements Serializable
     this.columns = new ArrayList<>(orig.columns);
   }
   
+  public Table c(Column column) {
+    Table copy = new Table(this);
+    copy.columns.add(column);
+    return copy;
+  }
+  
   public Table c(String name)
   {
     Table copy = new Table(this);

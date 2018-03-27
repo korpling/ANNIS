@@ -56,6 +56,8 @@ import annis.tabledefs.Table;
 import annis.utils.DynamicDataSource;
 import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
+import java.sql.ResultSet;
+import java.util.function.Function;
 
 /**
  * Common functions used by all data access objects.
@@ -183,12 +185,20 @@ public abstract class AbstractDao
   
   public Connection createSQLiteConnection() throws SQLException
   {
-    // TODO: make the dataase location configurable and maybe use a connection pool.
-    return DriverManager.getConnection("jdbc:sqlite:annis.db");
+    // TODO: make the datanase location configurable and maybe use a connection pool.
+    File dbFile = new File(getGraphANNISDir(), "annis.db");
+    return DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
   }
   
+  public void importSQLiteTable(Table table, File csvFile) throws SQLException {
+    importSQLiteTable(table, csvFile, true);
+  }
   
-  public void importSQLiteTable(Table table, File csvFile) throws SQLException
+  public void importSQLiteTable(Table table, File csvFile, boolean append) throws SQLException {
+    importSQLiteTable(table, csvFile, append, null);
+  }
+  
+  public void importSQLiteTable(Table table, File csvFile, boolean append, Function<String[], String[]> lineModifier) throws SQLException
   {
    
     try(CSVReader csvReader = 
@@ -196,6 +206,9 @@ public abstract class AbstractDao
             '\t'))
     {
       String[] firstLine = csvReader.readNext();
+      if(lineModifier != null) {
+        firstLine = lineModifier.apply(firstLine);
+      }
       
       if(firstLine != null && firstLine.length >= 1)
       {
@@ -204,13 +217,28 @@ public abstract class AbstractDao
             Statement stmt = conn.createStatement())
         {
           conn.setAutoCommit(false);
+         
+          if(!append) {
+             // drop any old version of the table
+            stmt.execute("DROP TABLE IF EXISTS " + table.getName());
+          }
           
-          // drop any old version of the table
-          stmt.execute("DROP TABLE IF EXISTS " + table.getName());
-          
+          // check if table exists
+          boolean createTable = false;
+          try(PreparedStatement tableExistsStmt = 
+              conn.prepareStatement("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?")) {
+            tableExistsStmt.setString(1, table.getName());
+            try(ResultSet res = tableExistsStmt.executeQuery()) {
+              if(res.next()) {
+                createTable = res.getLong(1) == 0;
+              }
+            }
+          }
           ArrayList<Column> columns = table.getColumns();
-          stmt.execute("CREATE TABLE " + table.getName() 
-            +  " (" + Joiner.on(", ").join(columns) +  ")");
+          if(createTable) {
+            stmt.execute("CREATE TABLE " + table.getName() 
+              +  " (" + Joiner.on(", ").join(columns) +  ")");
+          }
           
           Preconditions.checkArgument(table.getColumns().size() == firstLine.length, "Import of table %s failed. "
               + "File '%s' should have %s columns but has %s.", table.getName(), csvFile.getAbsolutePath(),
@@ -228,6 +256,9 @@ public abstract class AbstractDao
               }
               insertStmt.execute();
               line = csvReader.readNext();
+              if(lineModifier != null) {
+                line = lineModifier.apply(line);
+              }
             }
           }
           

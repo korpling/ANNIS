@@ -85,7 +85,9 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.security.UserConfig;
 import annis.tabledefs.ANNISFormatVersion;
-import org.corpus_tools.graphannis.api.CorpusStorageManager;
+import annis.tabledefs.Column;
+import annis.tabledefs.Table;
+import java.util.function.Function;
 
 /**
  *
@@ -205,10 +207,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   private final String[] importedTables =
   { "corpus", "corpus_annotation", "text", "node", "node_annotation", "component", "rank",
-      "edge_annotation", FILE_RESOLVER_VIS_MAP, EXAMPLE_QUERIES_TAB };
+      "edge_annotation", EXAMPLE_QUERIES_TAB };
 
   private final String[] tablesToCopyManually =
-  { "corpus", "corpus_annotation", "text", FILE_RESOLVER_VIS_MAP, EXAMPLE_QUERIES_TAB,
+  { "corpus", "corpus_annotation", "text", EXAMPLE_QUERIES_TAB,
       "corpus_stats", "media_files" };
   // tables created during import
 
@@ -658,6 +660,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     createNodeIdMapping();
 
     importBinaryData(path, toplevelCorpusName);
+    
     convertToGraphANNIS(toplevelCorpusName, path, version);
 
     extendStagingText(corpusID);
@@ -748,18 +751,39 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     try
     {
-      importSQLiteTable(version.getCorpusTable(),
-          new File(importDir, "corpus" + version.getFileSuffix()));
-      importSQLiteTable(version.getNodeTable(),
-          new File(importDir, "node" + version.getFileSuffix()));
-      importSQLiteTable(version.getNodeAnnotationTable(),
-          new File(importDir, "node_annotation" + version.getFileSuffix()));
-      importSQLiteTable(version.getComponentTable(),
-          new File(importDir, "component" + version.getFileSuffix()));
-      importSQLiteTable(version.getRankTable(),
-          new File(importDir, "rank" + version.getFileSuffix()));
-      importSQLiteTable(version.getEdgeAnnotationTable(),
-          new File(importDir, "edge_annotation" + version.getFileSuffix()));
+      final Table resolverTable = new Table(FILE_RESOLVER_VIS_MAP)
+        .c("corpus")
+        .c("version")
+        .c("namespace")
+        .c("element")
+        .c(new Column("vis_type").notNull())
+        .c(new Column("display_name").notNull())
+        .c("visibility")
+        .c_int("order")
+        .c("mappings");
+      
+      Function<String[],String[]> lineModifier = (line) -> {
+        if(line != null && line.length == 8) {
+          String[] updateLine = new String[9];
+          updateLine[0] = line[0];
+          updateLine[1] = line[1];
+          updateLine[2] = line[2];
+          updateLine[3] = line[3];
+          updateLine[4] = line[4];
+          updateLine[5] = line[5];
+          // use default value
+          updateLine[6] = "hidden";
+          updateLine[7] = line[6];
+          updateLine[8] = line[7];
+          
+          return updateLine;
+        } else {
+          return line;
+        }
+      };
+      importSQLiteTable(resolverTable,
+          new File(importDir, FILE_RESOLVER_VIS_MAP + version.getFileSuffix()), 
+          true, lineModifier);
     }
     catch (SQLException ex)
     {
@@ -823,12 +847,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     for (String table : importedTables)
     {
-      if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
-      {
-        importResolverVisMapTable(path, table, version.getFileSuffix());
-      }
       // check if example query exists. If not copy it from the resource folder.
-      else if (table.equalsIgnoreCase(EXAMPLE_QUERIES_TAB))
+      if (table.equalsIgnoreCase(EXAMPLE_QUERIES_TAB))
       {
         File f = new File(path, table + version.getFileSuffix());
         if (f.exists())
@@ -1900,116 +1920,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     this.tableInsertFrom = tableInsertFrom;
   }
 
-  private void readOldResolverVisMapFormat(File resolver_vis_tab)
-  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("CREATE TABLE tmp_resolver_vis_map ");
-    sb.append("( ");
-    sb.append("\"corpus\"   varchar, ");
-    sb.append("\"version\" 	varchar, ");
-    sb.append("\"namespace\"	varchar, ");
-    sb.append("\"element\"    varchar, ");
-    sb.append("\"vis_type\"   varchar NOT NULL, ");
-    sb.append("\"display_name\"   varchar NOT NULL, ");
-    sb.append("\"order\" integer default '0', ");
-    sb.append("\"mappings\" varchar");
-    sb.append(");");
-
-    getJdbcTemplate().execute(sb.toString());
-
-    bulkloadTableFromResource("tmp_resolver_vis_map", new FileSystemResource(resolver_vis_tab));
-
-    sb = new StringBuilder();
-
-    sb.append("INSERT INTO ");
-    sb.append(tableInStagingArea(FILE_RESOLVER_VIS_MAP));
-    sb.append("\n\t");
-    sb.append(" (");
-    sb.append("corpus, ");
-    sb.append("version, ");
-    sb.append("namespace, ");
-    sb.append("element, ");
-    sb.append("vis_type, ");
-    sb.append("display_name, ");
-    sb.append("\"order\", ");
-    sb.append("mappings");
-    sb.append(")");
-    sb.append("\n");
-    sb.append("SELECT tmp.corpus, ");
-    sb.append("tmp.version, ");
-    sb.append("tmp.namespace, ");
-    sb.append("tmp.element, ");
-    sb.append("tmp.vis_type, ");
-    sb.append("tmp.display_name, ");
-    sb.append("tmp.\"order\", ");
-    sb.append("tmp.mappings");
-    sb.append("\n\t");
-    sb.append("FROM tmp_resolver_vis_map AS tmp; ");
-
-    getJdbcTemplate().execute(sb.toString());
-    getJdbcTemplate().execute("DROP TABLE tmp_resolver_vis_map;");
-  }
-
-  /**
-   * Imported the old and the new version of the resolver_vis_map.tab. The new
-   * version has an additional column for visibility status of the
-   * visualization.
-   *
-   * @param path
-   *          The path to the ANNIS file.
-   * @param table
-   *          The final table in the database of the resolver_vis_map table.
-   */
-  private void importResolverVisMapTable(String path, String table, String annisFileSuffix)
-  {
-    try
-    {
-
-      // count cols for detecting old resolver_vis_map table format
-      File resolver_vis_tab = new File(path, table + annisFileSuffix);
-
-      if (!resolver_vis_tab.isFile())
-      {
-        return;
-      }
-
-      String firstLine;
-      try (BufferedReader bReader = new BufferedReader(
-          new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8")))
-      {
-        firstLine = bReader.readLine();
-      }
-
-      int cols = 9; // default number
-      if (firstLine != null)
-      {
-        String[] entries = firstLine.split("\t");
-        cols = entries.length;
-        log.debug("the first row: {} amount of cols: {}", entries, cols);
-      }
-
-      switch (cols)
-      {
-      // old format
-      case 8:
-        readOldResolverVisMapFormat(resolver_vis_tab);
-        break;
-      // new format
-      case 9:
-        bulkloadTableFromResource(tableInStagingArea(table),
-            new FileSystemResource(new File(path, table + annisFileSuffix)));
-        break;
-      default:
-        log.error("invalid amount of cols");
-        throw new RuntimeException();
-      }
-
-    }
-    catch (IOException | FileAccessException e)
-    {
-      log.error("could not read {}", table, e);
-    }
-  }
 
   /**
    * Removes any unwanted entries from the resolver_vis_map table

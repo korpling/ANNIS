@@ -888,7 +888,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   @Override
   @Transactional(readOnly = true)
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request) {
-    try (Connection conn = getDataSource().getConnection()) {
+    try (Connection conn = createSQLiteConnection()) {
       ResolverDaoHelper helper = new ResolverDaoHelper();
       PreparedStatement stmt = helper.createPreparedStatement(conn);
       helper.fillPreparedStatement(request, stmt);

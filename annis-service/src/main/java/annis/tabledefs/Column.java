@@ -19,6 +19,7 @@ public class Column implements Serializable
   private final String name;
   private Type type = Type.TEXT;
   private boolean unique = false;
+  private boolean notNull = false;
   
   public Column(String name)
   {
@@ -51,6 +52,13 @@ public class Column implements Serializable
     return copy;
   }
   
+  public Column notNull()
+  {
+    Column copy = new Column(this);
+    copy.notNull = true;
+    return copy;
+  }
+  
   public String getName()
   {
     return name;
@@ -65,10 +73,16 @@ public class Column implements Serializable
   {
     return unique;
   }
+
+  public boolean isNotNull()
+  {
+    return notNull;
+  }
+  
   
   @Override
   public String toString()
   {
-    return name + " " + type.name() + (unique ? " UNIQUE" : "");
+    return "\"" + name + "\" " + type.name() + (unique ? " UNIQUE" : "") + (notNull ? " NOT NULL" : "");
   }
 }

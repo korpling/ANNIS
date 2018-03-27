@@ -35,67 +35,24 @@ public enum ANNISFormatVersion
 {
   
   V3_1(
-      ".tab",
-      new Table("node").c_int_uniq("id").c_int("text_ref").c_int("corpus_ref").c("layer").c("name")
-          .c_int("left").c_int("right").c_int("token_index").c("continuous").c("span"),
-      new Table("component").c_int_uniq("id").c("type").c("layer").c("name"),
-      new Table("rank").c_int("pre").c_int("post").c_int("node_ref").c_int("component_ref")
-          .c_int("parent"),
-      new Table("node_annotation").c_int("node_ref").c("namespace").c("name").c("value"),
-      new Table("edge_annotation").c_int("rank_ref").c("namespace").c("name").c("value"),
-      new Table("corpus").c_int_uniq("id").c("name").c("type").c("version").c_int("pre")
-          .c_int("post")
+      ".tab"
   ), V3_2(
-      ".tab",
-      new Table("node").c_int_uniq("id").c_int("text_ref").c_int("corpus_ref").c("layer").c("name")
-          .c_int("left").c_int("right").c_int("token_index").c("seg_name").c_int("seg_index")
-          .c_int("seg_right").c("continuous").c("span"),
-      new Table("component").c_int_uniq("id").c("type").c("layer").c("name"),
-      new Table("rank").c_int("pre").c_int("post").c_int("node_ref").c_int("component_ref")
-          .c_int("parent"),
-      new Table("node_annotation").c_int("node_ref").c("namespace").c("name").c("value"),
-      new Table("edge_annotation").c_int("rank_ref").c("namespace").c("name").c("value"),
-      new Table("corpus").c_int_uniq("id").c("name").c("type").c("version").c_int("pre")
-          .c_int("post")
+      ".tab"
   ), V3_3(
-      ".annis",
-      new Table("node").c_int_uniq("id").c_int("text_ref").c_int("corpus_ref").c("layer").c("name")
-          .c_int("left").c_int("right").c_int("token_index").c_int("left_token")
-          .c_int("right_token").c_int("seg_index").c("seg_name").c("span").c("root"),
-      new Table("component").c_int_uniq("id").c("type").c("layer").c("name"),
-      new Table("rank").c_int_uniq("id").c_int("pre").c_int("post").c_int("node_ref")
-          .c_int("component_ref").c_int("parent").c_int("level"),
-      new Table("node_annotation").c_int("node_ref").c("namespace").c("name").c("value"),
-      new Table("edge_annotation").c_int("rank_ref").c("namespace").c("name").c("value"),
-      new Table("corpus").c_int_uniq("id").c("name").c("type").c("version").c_int("pre")
-          .c_int("post").c_int("top_level")
+      ".annis"
   ), UNKNOWN(
-      ".x", new Table("node"), new Table("component"), new Table("rank"),
-      new Table("node_annotation"), new Table("edge_annotation"), new Table("corpus")
+      ".x"
   );
   
   private static final Logger log = LoggerFactory.getLogger(ANNISFormatVersion.class);
 
 
   private final String fileSuffix;
-  private final Table nodeTable;
-  private final Table componentTable;
-  private final Table rankTable;
-  private final Table nodeAnnotationTable;
-  private final Table edgeAnnotationTable;
-  private final Table corpusTable;
-  
 
-  private ANNISFormatVersion(String fileSuffix, Table nodeTable, Table componentTable,
-      Table rankTable, Table nodeAnnotationTable, Table edgeAnnotationTable, Table corpusTable)
+
+  private ANNISFormatVersion(String fileSuffix)
   {
     this.fileSuffix = fileSuffix;
-    this.nodeTable = nodeTable;
-    this.componentTable = componentTable;
-    this.rankTable = rankTable;
-    this.nodeAnnotationTable = nodeAnnotationTable;
-    this.edgeAnnotationTable = edgeAnnotationTable;
-    this.corpusTable = corpusTable;
   }
 
   /**
@@ -108,35 +65,6 @@ public enum ANNISFormatVersion
     return fileSuffix;
   }
 
-  public Table getNodeTable()
-  {
-    return nodeTable;
-  }
-
-  public Table getComponentTable()
-  {
-    return componentTable;
-  }
-
-  public Table getRankTable()
-  {
-    return rankTable;
-  }
-
-  public Table getNodeAnnotationTable()
-  {
-    return nodeAnnotationTable;
-  }
-
-  public Table getEdgeAnnotationTable()
-  {
-    return edgeAnnotationTable;
-  }
-
-  public Table getCorpusTable()
-  {
-    return corpusTable;
-  }
   
   public String getFactsSQL()
   {
