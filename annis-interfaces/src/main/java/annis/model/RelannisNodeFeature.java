@@ -24,6 +24,8 @@ import org.corpus_tools.salt.core.SNode;
 /**
  * Common Features included in the Salt graph that are available
  * @author Thomas Krause <krauseto@hu-berlin.de>
+ * 
+ * @deprecated 
  */
 public class RelannisNodeFeature implements Serializable
 {

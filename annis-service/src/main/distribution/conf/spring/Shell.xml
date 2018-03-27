@@ -33,7 +33,6 @@ limitations under the License.
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="countSqlGenerator" ref="countMatchesAndDocumentsSqlGenerator"/>
     <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
-    <property name="graphSqlGenerator" ref="graphSqlGenerator" />
     <property name="frequencySqlGenerator" ref="frequencySqlGenerator" />
 
     <property name="queryDao" ref="queryDao"/>

@@ -153,10 +153,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   private final Escaper corpusNameEscaper = UrlEscapers.urlPathSegmentEscaper();
 
-  private final Cache<String, SaltProject> docCache = Caching.getCachingProvider().getCacheManager()
-          .createCache("documents", new MutableConfiguration<>());
-
-  private final SAXParserFactory xmlParserFactory = SAXParserFactory.newInstance();
 
   @Override
   public SaltProject graph(QueryData data) {
@@ -470,8 +466,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
           getLogger(QueryDaoImpl.class);
   // / old
 
-  private SqlGenerator sqlGenerator;
-
   private ListCorpusSqlHelper listCorpusSqlHelper;
 
   private ListAnnotationsSqlHelper listAnnotationsSqlHelper;
@@ -486,8 +480,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   private List<SqlSessionModifier> sqlSessionModifiers;
 //  private SqlGenerator findSqlGenerator;
 
-  private ParameterizedSingleColumnRowMapper<String> planRowMapper;
-
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
 
   private MetaDataFilter metaDataFilter;
@@ -501,7 +493,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   private MetaByteHelper metaByteHelper;
 
   public QueryDaoImpl() {
-    planRowMapper = new ParameterizedSingleColumnRowMapper<>();
     sqlSessionModifiers = new ArrayList<>();
 
     File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
@@ -834,26 +825,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
           String documentName, List<String> nodeAnnotationFilter) {
     URI docURI = SaltUtil.createSaltURI(toplevelCorpusName).appendSegment(documentName);
 
-    SaltProject cached = docCache.get(docURI.toString());
-    if (cached != null) {
-      return cached;
-    } else {
-      
-      SDocumentGraph graph = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString()));
-      
-      // wrap the single document into a SaltProject
-      SaltProject project = SaltFactory.createSaltProject();
-      SCorpusGraph corpusGraph = project.createCorpusGraph();
-      SCorpus rootCorpus = corpusGraph.createCorpus(null, toplevelCorpusName);
-      SDocument doc = corpusGraph.createDocument(rootCorpus, documentName);
+    SDocumentGraph graph = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString()));
 
-      doc.setDocumentGraph(graph);
+    // wrap the single document into a SaltProject
+    SaltProject project = SaltFactory.createSaltProject();
+    SCorpusGraph corpusGraph = project.createCorpusGraph();
+    SCorpus rootCorpus = corpusGraph.createCorpus(null, toplevelCorpusName);
+    SDocument doc = corpusGraph.createDocument(rootCorpus, documentName);
 
-      docCache.put(docURI.toString(), project);
-      
-      
-      return project;
-    }
+    doc.setDocumentGraph(graph);
+
+    return project;
+
   }
 
   @Override
@@ -1087,23 +1070,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   }
 
   // /// Getter / Setter
-  public SqlGenerator getSqlGenerator() {
-    return sqlGenerator;
-  }
-
-  public void setSqlGenerator(SqlGenerator sqlGenerator) {
-    this.sqlGenerator = sqlGenerator;
-  }
-
-  public ParameterizedSingleColumnRowMapper<String> getPlanRowMapper() {
-    return planRowMapper;
-  }
-
-  public void setPlanRowMapper(
-          ParameterizedSingleColumnRowMapper<String> planRowMapper) {
-    this.planRowMapper = planRowMapper;
-  }
-
   public ListCorpusSqlHelper getListCorpusSqlHelper() {
     return listCorpusSqlHelper;
   }

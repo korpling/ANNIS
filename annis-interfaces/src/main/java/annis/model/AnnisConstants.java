@@ -46,12 +46,14 @@ public class AnnisConstants
   
 
   /**
-   * A number of relANNIS specific node values encoded as {@link RelannisNodeFeature}.   * 
+   * A number of relANNIS specific node values encoded as {@link RelannisNodeFeature}.
+   * @deprecated 
    */
   public static final String FEAT_RELANNIS_NODE = "relannis_node";
   
   /**
-   * A number of relANNIS specific edge values encoded as {@link RelannisEdgeFeature}.   * 
+   * A number of relANNIS specific edge values encoded as {@link RelannisEdgeFeature}.  
+   * @deprecated 
    */
   public static final String FEAT_RELANNIS_EDGE = "relannis_edge";
   

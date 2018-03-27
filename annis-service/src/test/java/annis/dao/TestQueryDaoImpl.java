@@ -55,14 +55,11 @@ import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.DocumentBrowserConfig;
-import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
-import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.test.TestHelper;
-import org.corpus_tools.graphannis.api.CorpusStorageManager;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations =
@@ -83,14 +80,6 @@ public class TestQueryDaoImpl
   private AnnisParserAntlr annisParser;
   @Mock
   private MetaDataFilter metaDataFilter;
-  @Mock
-  private SqlGenerator sqlGenerator;
-  @Mock
-  private AnnotateSqlGenerator annotateSqlGenerator;
-  @Mock
-  private SaltAnnotateExtractor saltAnnotateExtractor;
-  @Mock
-  private ParameterizedSingleColumnRowMapper<String> planRowMapper;
   @Mock
   private JdbcTemplate jdbcTemplate;
   @Mock
@@ -113,8 +102,6 @@ public class TestQueryDaoImpl
        
     queryDao = new QueryDaoImpl();
     queryDao.setAqlParser(annisParser);
-    queryDao.setSqlGenerator(sqlGenerator);
-    queryDao.setPlanRowMapper(planRowMapper);
     queryDao.setListCorpusSqlHelper(listCorpusHelper);
     queryDao.setListAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
     queryDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
@@ -124,7 +111,6 @@ public class TestQueryDaoImpl
     verify(jdbcTemplate).getDataSource();
     
     when(annisParser.parse(anyString(), anyList())).thenReturn(PARSE_RESULT);
-    when(sqlGenerator.toSql(any(QueryData.class))).thenReturn(SQL);
     
   }
 
@@ -136,8 +122,6 @@ public class TestQueryDaoImpl
     QueryDaoImpl springManagedDao = (QueryDaoImpl) TestHelper.proxyTarget(queryDaoBean);
     assertThat(springManagedDao.getJdbcTemplate(), is(not(nullValue())));
     assertThat(springManagedDao.getAqlParser(), is(not(nullValue())));
-    assertThat(springManagedDao.getSqlGenerator(), is(not(nullValue())));
-    assertThat(springManagedDao.getPlanRowMapper(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusSqlHelper(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusAnnotationsSqlHelper(),
       is(not(nullValue())));
@@ -167,44 +151,6 @@ public class TestQueryDaoImpl
     // call and test
     assertThat(queryDao.listCorpora(), is(CORPORA));
     verify(jdbcTemplate).query(SQL, listCorpusHelper);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void listCorpusAnnotations()
-  {
-    // stub JdbcTemplate to return a list of Annotation
-    final List<Annotation> ANNOTATIONS = mock(List.class);
-    when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(
-      ANNOTATIONS);
-
-    // stub SQL query
-    final String ID = "toplevelcorpus";
-    when(listCorpusAnnotationsHelper.createSqlQuery(anyString(), anyString(), anyBoolean())).thenReturn(SQL);
-
-    // call and test
-    assertThat(queryDao.listCorpusAnnotations(ID), is(ANNOTATIONS));
-    verify(listCorpusAnnotationsHelper).createSqlQuery(ID, ID, true);
-    verify(jdbcTemplate).query(SQL, listCorpusAnnotationsHelper);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void listNodeAnnotations()
-  {
-    // stub JdbcTemplate to return a list of AnnisAttribute
-    final List<AnnisAttribute> NODE_ANNOTATIONS = mock(List.class);
-    when(jdbcTemplate.query(anyString(), any(ResultSetExtractor.class))).
-      thenReturn(NODE_ANNOTATIONS);
-
-    // stub SQL query
-    when(listNodeAnnotationsSqlHelper.createSqlQuery(anyList(), anyBoolean(),
-      anyBoolean())).thenReturn(SQL);
-
-    // call and test
-    assertThat(queryDao.listAnnotations(CORPUS_LIST, false, false), is(
-      NODE_ANNOTATIONS));
-    verify(jdbcTemplate).query(SQL, listNodeAnnotationsSqlHelper);
   }
 
   @SuppressWarnings("unchecked")

@@ -34,22 +34,18 @@ import annis.service.objects.OrderType;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.FrequencySqlGenerator;
-import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.utils.Utils;
-import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.io.Files;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -57,7 +53,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
@@ -87,7 +82,6 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private SqlGeneratorAndExtractor<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
 
-  private AnnotateSqlGenerator<?> graphSqlGenerator;
   private FrequencySqlGenerator frequencySqlGenerator;
   // dependencies
 
@@ -131,22 +125,6 @@ public class AnnisRunner extends AnnisBaseRunner
   private BenchmarkMode benchMode = BenchmarkMode.warmup_random;
 
   private MetaDataFilter metaDataFilter;
-
-  /**
-   * @return the graphSqlGenerator
-   */
-  public AnnotateSqlGenerator<?> getGraphSqlGenerator()
-  {
-    return graphSqlGenerator;
-  }
-
-  /**
-   * @param graphSqlGenerator the graphSqlGenerator to set
-   */
-  public void setGraphSqlGenerator(AnnotateSqlGenerator<?> graphSqlGenerator)
-  {
-    this.graphSqlGenerator = graphSqlGenerator;
-  }
 
   /**
    * @return the queriesGenerator
@@ -391,87 +369,7 @@ public class AnnisRunner extends AnnisBaseRunner
       }
     }
   }
-
-  // FIXME: missing tests
-  public void doSql(String funcCall)
-  {
-
-    String doSqlFunctionName = "sql_" + funcCall.split("\\s", 2)[0];
-    SqlGenerator<QueryData> gen = getGeneratorForQueryFunction(funcCall);
-    String annisQuery = getAnnisQueryFromFunctionCall(funcCall);
-    QueryData queryData = analyzeQuery(annisQuery, doSqlFunctionName);
-
-    out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
-      + limit + "; offset = " + offset);
-
-    out.println(gen.toSql(queryData));
-  }
-
-  public void doExplain(String functionCall, boolean analyze)
-  {
-    SqlGenerator<QueryData> generator = getGeneratorForQueryFunction(
-      functionCall);
-    String function = getAnnisQueryFromFunctionCall(functionCall);
-    String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
-    QueryData queryData = analyzeQuery(annisQuery, function);
-    out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
-      + limit + "; offset = " + offset);
-
-    out.println(queryDao.explain(generator, queryData, analyze));
-  }
-
-  public void doPlan(String functionCall)
-  {
-    doExplain(functionCall, false);
-  }
-
-  public void doAnalyze(String functionCall)
-  {
-    doExplain(functionCall, true);
-  }
-
-  private SqlGeneratorAndExtractor<QueryData, ?> getGeneratorForQueryFunction(
-    String funcCall)
-  {
-    String[] split = funcCall.split(" ", 2);
-
-    Validate.isTrue(split.length == 2, "bad call to plan");
-    String function = split[0];
-
-    SqlGeneratorAndExtractor<QueryData, ?> generator = null;
-    if ("count".equals(function))
-    {
-      generator = countSqlGenerator;
-    }
-    else if ("find".equals(function))
-    {
-      generator = findSqlGenerator;
-    }
-    else if ("matrix".equals(function))
-    {
-      generator = matrixSqlGenerator;
-    }
-    else if ("subgraph".equals(function))
-    {
-      generator = getGraphSqlGenerator();
-    }
-    else if ("frequency".equals(function))
-    {
-      generator = frequencySqlGenerator;
-    }
-
-    Validate.notNull(generator, "don't now query function: " + function);
-
-    return generator;
-  }
-
-  private String getAnnisQueryFromFunctionCall(String functionCall)
-  {
-    String[] split = functionCall.split(" ", 2);
-
-    Validate.isTrue(split.length == 2, "bad call to plan");
-    return split[1];
-  }
+  
 
   public void doRecord(String dummy)
   {
@@ -483,261 +381,6 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doBenchmarkName(String name)
   {
     this.benchmarkName = name;
-  }
-
-  public void doBenchmark(String benchmarkCount)
-  {
-
-    int count = Integer.parseInt(benchmarkCount);
-    out.println("---> executing " + benchmarks.size() + " queries " + count
-      + " times");
-
-    AnnisRunner.OS currentOS = AnnisRunner.OS.other;
-    try
-    {
-      currentOS = AnnisRunner.OS.valueOf(System.getProperty("os.name").
-        toLowerCase());
-    }
-    catch (IllegalArgumentException ex)
-    {
-    }
-
-    List<AnnisRunner.Benchmark> session = new ArrayList<>();
-
-    // create sql + plan for each query and create count copies for each benchmark
-    for (Benchmark benchmark : benchmarks)
-    {
-      if (clearCaches)
-      {
-        resetCaches(currentOS);
-      }
-
-      SqlGeneratorAndExtractor<QueryData, ?> generator
-        = getGeneratorForQueryFunction(benchmark.functionCall);
-      benchmark.sql = getGeneratorForQueryFunction(benchmark.functionCall).
-        toSql(
-          benchmark.queryData);
-      out.println("---> SQL query for: " + benchmark.functionCall);
-      out.println(benchmark.sql);
-      try
-      {
-        benchmark.plan = queryDao.explain(generator, benchmark.queryData, false);
-        out.println("---> query plan for: " + benchmark.functionCall);
-        out.println(benchmark.plan);
-      }
-      catch (RuntimeException ex)
-      { // nested DataAccessException would be better
-        out.println("---> query plan failed for " + benchmark.functionCall);
-      }
-      benchmark.bestTimeInMilliseconds = Long.MAX_VALUE;
-      benchmark.worstTimeInMilliseconds = Long.MIN_VALUE;
-      out.println("---> running query sequentially " + SEQUENTIAL_RUNS
-        + " times");
-      String options = benchmarkOptions(benchmark.queryData);
-
-      for (int i = 0; i < SEQUENTIAL_RUNS; ++i)
-      {
-        if (i > 0)
-        {
-          out.print(", ");
-        }
-        boolean error = false;
-        long start = new Date().getTime();
-        try
-        {
-          queryDao.executeQueryFunction(benchmark.queryData, generator);
-        }
-        catch (RuntimeException ex)
-        {
-          error = true;
-        }
-        long end = new Date().getTime();
-        long runtime = end - start;
-
-        if (benchMode == BenchmarkMode.sequential_random)
-        {
-          // record the runtime and other benchmark values when the sequental run is counted
-          benchmark.sumTimeInMilliseconds += runtime;
-          benchmark.values.add(runtime);
-          benchmark.bestTimeInMilliseconds
-            = Math.min(benchmark.bestTimeInMilliseconds, runtime);
-          benchmark.worstTimeInMilliseconds
-            = Math.max(benchmark.worstTimeInMilliseconds, runtime);
-
-          ++benchmark.runs;
-
-          if (error)
-          {
-            ++benchmark.errors;
-          }
-        }
-        out.print(runtime + " ms");
-      }
-      out.println();
-      out.println(benchmark.bestTimeInMilliseconds + " ms best time for '"
-        + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
-        + options));
-      session.addAll(Collections.nCopies(count, benchmark));
-    }
-
-    // clear cache again in order to treat the last query in the list equal to
-    // the others
-    if (clearCaches)
-    {
-      resetCaches(currentOS);
-    }
-
-    // shuffle the benchmark queries
-    Collections.shuffle(session);
-    out.println();
-    out.println("---> running queries in random order");
-
-    // execute the random query order, record test times
-    for (AnnisRunner.Benchmark benchmark : session)
-    {
-      if (benchmark.errors >= 3)
-      {
-        continue;
-      }
-      boolean error = false;
-      SqlGeneratorAndExtractor<QueryData, ?> generator
-        = getGeneratorForQueryFunction(benchmark.functionCall);
-      long start = new Date().getTime();
-      try
-      {
-        queryDao.executeQueryFunction(benchmark.queryData, generator);
-      }
-      catch (RuntimeException e)
-      {
-        error = true;
-      }
-      long end = new Date().getTime();
-      long runtime = end - start;
-
-      benchmark.sumTimeInMilliseconds += runtime;
-      benchmark.values.add(runtime);
-      benchmark.bestTimeInMilliseconds
-        = Math.min(benchmark.bestTimeInMilliseconds, runtime);
-      benchmark.worstTimeInMilliseconds
-        = Math.max(benchmark.worstTimeInMilliseconds, runtime);
-
-      ++benchmark.runs;
-      if (error)
-      {
-        ++benchmark.errors;
-      }
-      String options = benchmarkOptions(benchmark.queryData);
-      out.println(runtime + " ms for '" + benchmark.functionCall + ("".equals(
-        options) ? "'" : "' with " + options) + (error ? " ERROR" : ""));
-    }
-
-    // compute average runtime for each query
-    out.println();
-    out.println("---> benchmark complete");
-    for (AnnisRunner.Benchmark benchmark : benchmarks)
-    {
-      String options = benchmarkOptions(benchmark.queryData);
-      out.println(benchmark.getMedian() + " ms (median for "
-        + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", "
-          + benchmark.errors + " errors)" : ")") + " for '"
-        + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
-        + options));
-    }
-
-    // show best runtime for each query
-    out.println();
-    out.println("---> worst times");
-    for (AnnisRunner.Benchmark benchmark : benchmarks)
-    {
-      String options = benchmarkOptions(benchmark.queryData);
-      out.println(benchmark.worstTimeInMilliseconds + " ms "
-        + (benchmark.errors > 0 ? "("
-          + benchmark.errors + " errors)" : "") + " for '"
-        + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
-        + options));
-    }
-
-    // show best runtime for each query
-    out.println();
-    out.println("---> best times");
-    for (AnnisRunner.Benchmark benchmark : benchmarks)
-    {
-      String options = benchmarkOptions(benchmark.queryData);
-      out.println(benchmark.bestTimeInMilliseconds + " ms "
-        + (benchmark.errors > 0 ? "("
-          + benchmark.errors + " errors)" : "") + " for '"
-        + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
-        + options));
-    }
-    out.println();
-
-    // CSV output
-    try (CSVWriter csv = new CSVWriter(new FileWriterWithEncoding(new File(
-      "annis_benchmark_result.csv"), "UTF-8"));)
-    {
-
-      String[] header = new String[]
-      {
-        "corpora", "query", "median", "diff-best", "diff-worst", "mean"
-      };
-      csv.writeNext(header);
-      for (AnnisRunner.Benchmark benchmark : benchmarks)
-      {
-        double mean = (double) benchmark.sumTimeInMilliseconds / (double) benchmark.runs;
-        long median = benchmark.getMedian();
-
-        String[] line = new String[6];
-        line[0] = StringUtils.join(benchmark.queryData.getCorpusList(), ",");
-        line[1] = benchmark.functionCall;
-        line[2] = "" + median;
-        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds - median);
-        line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
-        line[5] = "" + mean;
-        csv.writeNext(line);
-      }
-    }
-    catch (IOException ex)
-    {
-      log.error(null, ex);
-    }
-
-    // property output format for Jenkins Plot plugin
-    try
-    {
-      File outputDir = new File("annis_benchmark_results");
-      if (outputDir.isDirectory() || outputDir.mkdirs())
-      {
-        int i = 1;
-        for (AnnisRunner.Benchmark b : benchmarks)
-        {
-          Properties props = new Properties();
-          props.put("YVALUE", "" + b.getMedian());
-          try (FileWriterWithEncoding writer
-            = new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8"))
-          {
-            props.store(writer, "");
-          }
-
-          i++;
-
-          // also write out a "time" and "count" file which can be used by the ANNIS4 prototype
-          if (b.name != null)
-          {
-            double mean = (double) b.sumTimeInMilliseconds / (double) b.runs;
-            Files.write("" + mean, new File(outputDir, b.name + ".time"), StandardCharsets.UTF_8);
-            if (b.count != null)
-            {
-              Files.write("" + b.count, new File(outputDir, b.name + ".count"), StandardCharsets.UTF_8);
-            }
-          }
-        }
-      }
-    }
-    catch (IOException ex)
-    {
-      log.error(null, ex);
-    }
-
   }
 
   public String benchmarkOptions(QueryData queryData)
@@ -1225,27 +868,6 @@ public class AnnisRunner extends AnnisBaseRunner
 
   }
 
-  public void doSqlDoc(String docCall)
-  {
-    List<String> splitted = Splitter.on(' ').trimResults().omitEmptyStrings()
-      .splitToList(docCall);
-
-    List<String> annoFilter = null;
-    if (splitted.size() > 2)
-    {
-      annoFilter = Splitter.on(',').trimResults().omitEmptyStrings().splitToList(
-        splitted.get(2));
-    }
-
-    Validate.isTrue(splitted.size() > 1,
-      "must have to arguments (toplevel corpus name and document name");
-
-    long corpusID = queryDao.mapCorpusNameToId(splitted.get(0));
-    System.out.println(graphSqlGenerator.getDocumentQuery(
-      corpusID,
-      splitted.get(1),
-      annoFilter));
-  }
 
   public void doDoc(String docCall)
   {

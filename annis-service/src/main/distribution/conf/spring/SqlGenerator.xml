@@ -237,12 +237,6 @@ limitations under the License.
     <property name="columnAliases" ref="annotateOuterQueryColumnAliases"/>
   </bean>
 
-  <bean id="saltAnnotateExtractor" class="annis.sqlgen.SaltAnnotateExtractor" lazy-init="true">
-    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
-    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
-    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
-  </bean>
-
   <bean id="islandsPolicy" class="annis.sqlgen.IslandsPolicy" lazy-init="true" >
     <property name="defaultIslandsPolicy" value="${annis.default-islands-policy}" />
   </bean>
@@ -366,37 +360,7 @@ limitations under the License.
         parent="defaultWhereClauseGeneratorBase" lazy-init="true">
     <property name="annoCondition" ref="annotationConditionProvider" />
   </bean>
-  
-  
-  <bean id="graphSqlGenerator" class="annis.sqlgen.AnnotateSqlGenerator" parent="tableAccessStrategyFactory" 
-        lazy-init="true">
-    
-    
-    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
-
-    <property name="includeIsTokenColumn" value="$dev{annis.use-is-token-column}" />
-    <property name="includeDocumentNameInAnnotateQuery" value="$dev{annis.include-document-name-in-annotate-query}"/>
-
-    <property name="selectClauseSqlGenerator" ref="graphSqlGenerator" />
-    <property name="fromClauseSqlGenerators">
-      <util:list>
-        <ref bean="graphSqlGenerator" />
-      </util:list>
-    </property>
-    <property name="whereClauseSqlGenerators">
-      <util:list>
-        <ref bean="graphSqlGenerator" />
-      </util:list>
-    </property>
-    <property name="orderByClauseSqlGenerator" ref="graphSqlGenerator" />
-    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
-    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
-    <property name="resultExtractor" ref="saltAnnotateExtractor" />
-    
-    <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
-    
-  </bean>
-
+ 
   <bean id="frequencySqlGenerator" class="annis.sqlgen.FrequencySqlGenerator" 
         parent="tableAccessStrategyFactory"
         lazy-init="true">
