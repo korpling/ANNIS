@@ -16,8 +16,6 @@
 package annis.visualizers.component.tree;
 
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.AnnisNode;
-import annis.model.Edge;
 import annis.visualizers.component.tree.GraphicsBackend.Alignment;
 import com.google.common.base.Preconditions;
 import edu.uci.ics.jung.graph.DirectedGraph;

@@ -15,7 +15,7 @@
  */
 package annis.sqlgen;
 
-import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.service.objects.AnnisAttribute;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -93,11 +93,11 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor<ArrayList<An
 
       String namespace = resultSet.getString("namespace");
       String name = resultSet.getString("name");
-      String qName = AnnisNode.qName(namespace, name);
+      String qName = Annotation.qName(namespace, name);
 
       String edgeNamespace = resultSet.getString("edge_namespace");
       String edgeName = resultSet.getString("edge_name");
-      String qEdgeName = AnnisNode.qName(edgeNamespace, edgeName);
+      String qEdgeName = Annotation.qName(edgeNamespace, edgeName);
 
       String key = qName;
       if (qEdgeName != null)

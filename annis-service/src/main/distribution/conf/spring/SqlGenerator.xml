@@ -213,10 +213,6 @@ limitations under the License.
     <property name="keyColumnName" value="key"/>
   </bean>
 
-  <!-- autowired by LegacyGraphConverterTest -->
-  <bean id="aomAnnotateExtractor" class="annis.sqlgen.AomAnnotateExtractor" lazy-init="true">
-    <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
-  </bean>
   
   <bean id="commonLimitOffsetGenerator" class="annis.sqlgen.CommonLimitOffsetGenerator" lazy-init="true" />
 

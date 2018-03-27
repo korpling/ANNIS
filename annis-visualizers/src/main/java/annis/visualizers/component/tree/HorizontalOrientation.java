@@ -15,7 +15,6 @@
  */
 package annis.visualizers.component.tree;
 
-import annis.model.AnnisNode;
 import java.util.Comparator;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocumentGraph;

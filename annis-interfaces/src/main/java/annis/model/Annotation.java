@@ -89,13 +89,24 @@ public class Annotation implements Comparable<Annotation>, Serializable
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append(AnnisNode.qName(namespace, name));
+    sb.append(qName(namespace, name));
     if (value != null)
     {
       sb.append("=");
       sb.append(value);
     }
     return sb.toString();
+  }
+  
+  public static String qName(String namespace, String name)
+  {
+    return qName(namespace, name, ":");
+  }
+  
+  public static String qName(String namespace, String name, String seperator)
+  {
+    return name == null ? null : (namespace == null ? name : namespace
+      + seperator + name);
   }
 
   @Override
@@ -160,7 +171,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
 
   public String getQualifiedName()
   {
-    return AnnisNode.qName(namespace, name);
+    return qName(namespace, name);
   }
 
   public String getType()
