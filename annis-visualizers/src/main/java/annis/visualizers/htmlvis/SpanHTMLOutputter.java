@@ -15,8 +15,6 @@
  */
 package annis.visualizers.htmlvis;
 
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +30,11 @@ import com.google.common.escape.Escaper;
 import com.google.common.html.HtmlEscapers;
 
 import annis.CommonHelper;
-import annis.model.RelannisNodeFeature;
+import java.util.LinkedList;
+import java.util.Map;
+import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SStructuredNode;
 
 /**
  *
@@ -56,10 +58,10 @@ public class SpanHTMLOutputter
   private final static Escaper htmlEscaper = HtmlEscapers.htmlEscaper();
   
   
-  public void outputHTML(SNode node, String matchedQName,
+  public void outputHTML(SStructuredNode node, String matchedQName,
     SortedMap<Long, List<OutputItem>> outputStartTags, 
     SortedMap<Long, List<OutputItem>> outputEndTags, String tokenColor,
-    int priority)
+    int priority, Map<SToken, Long> token2index)
   {
       
     this.tokenColor = tokenColor;
@@ -67,11 +69,12 @@ public class SpanHTMLOutputter
     if(node instanceof SToken && "tok".equals(matchedQName))
     {
         SToken tok = (SToken) node;
-        outputToken(tok, outputStartTags, outputEndTags, priority);
+        outputToken(tok, outputStartTags, outputEndTags, priority, token2index);
     }
     else if(node instanceof SSpan || node instanceof SToken)
     {
-        outputAnnotation(node, matchedQName, outputStartTags, outputEndTags,priority);
+        outputAnnotation(node, matchedQName, outputStartTags, outputEndTags,
+          priority, token2index);
     }
     else
     {
@@ -79,73 +82,83 @@ public class SpanHTMLOutputter
     }
   }
   
-  private void outputAnnotation(SNode span, String matchedQName, 
+  private void outputAnnotation(SStructuredNode span, String matchedQName, 
     SortedMap<Long, List<OutputItem>> outputStartTags, 
     SortedMap<Long, List<OutputItem>> outputEndTags,
-    int priority)
+    int priority,
+    Map<SToken, Long> token2index)
   {
-    long left;
-    long right;
-    
-        RelannisNodeFeature feat = 
-        (RelannisNodeFeature) span.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+    if(span.getGraph() instanceof SDocumentGraph) {
+      SDocumentGraph graph = (SDocumentGraph) span.getGraph();
+      
+     
+      List<SToken> coveredTokens = new LinkedList<>();
+      for(SNode n : span.getGraph().getChildren(span, SALT_TYPE.SSPANNING_RELATION)) {
+        if(n instanceof SToken) {
+          coveredTokens.add((SToken) n);
+        }
+      }
+      if(coveredTokens.isEmpty()) {
+        return;
+      }
 
-        left = feat.getLeftToken();
-        right = feat.getRightToken();
-  
-    SAnnotation matchedAnnotation;
-    if (type == Type.META_NAME){
-        matchedAnnotation = span.getAnnotation("meta::" + constant); //constant property is used to store metadata names, see VisParser.java
+      coveredTokens = graph.getSortedTokenByText(coveredTokens);
+
+      // use the left-most and right-most token indexes      
+      long left = token2index.get(coveredTokens.get(0));
+      long right = token2index.get(coveredTokens.get(coveredTokens.size()-1));
+
+      SAnnotation matchedAnnotation;
+      if (type == Type.META_NAME){
+          matchedAnnotation = span.getAnnotation("meta::" + constant); //constant property is used to store metadata names, see VisParser.java
+      }
+      else
+      {
+          matchedAnnotation = span.getAnnotation(matchedQName);
+      }
+
+      String value;
+      // output to an inner text node
+      switch(type)
+      {
+        case CONSTANT:
+          value = constant;
+          break;
+        case HTML_TEMPLATE:
+          String original = constant;
+          String innerValue = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
+          String innerAnno = matchedAnnotation == null ? "NULL" : matchedAnnotation.getName();
+          value = original.replaceAll("%%value%%", innerValue); 
+          value = value.replaceAll("%%anno%%", innerAnno);
+          break;
+        case VALUE:
+          value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
+          break;
+        case ESCAPED_VALUE:
+          value = htmlEscaper.escape(matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT());
+          break;
+        case ANNO_NAME:
+          value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getName();
+          break;
+        case META_NAME:
+          value = matchedAnnotation.getValue() == null ? "NULL" : matchedAnnotation.getValue().toString();
+          matchedQName = "meta::" + metaname;
+          break;
+        default:
+          value = "";
+          break;
+      }
+      outputAny(left, right, matchedQName, value, outputStartTags, outputEndTags, priority);
     }
-    else
-    {
-        matchedAnnotation = span.getAnnotation(matchedQName);
-    }
-    
-    String value;
-    // output to an inner text node
-    switch(type)
-    {
-      case CONSTANT:
-        value = constant;
-        break;
-      case HTML_TEMPLATE:
-        String original = constant;
-        String innerValue = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
-        String innerAnno = matchedAnnotation == null ? "NULL" : matchedAnnotation.getName();
-        value = original.replaceAll("%%value%%", innerValue); 
-        value = value.replaceAll("%%anno%%", innerAnno);
-        break;
-      case VALUE:
-        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT();
-        break;
-      case ESCAPED_VALUE:
-        value = htmlEscaper.escape(matchedAnnotation == null ? "NULL" : matchedAnnotation.getValue_STEXT());
-        break;
-      case ANNO_NAME:
-        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getName();
-        break;
-      case META_NAME:
-        value = matchedAnnotation.getValue() == null ? "NULL" : matchedAnnotation.getValue().toString();
-        matchedQName = "meta::" + metaname;
-        break;
-      default:
-        value = "";
-        break;
-    }
-    outputAny(left, right, matchedQName, value, outputStartTags, outputEndTags, priority);
   }
   
   private void outputToken(SToken tok,
     SortedMap<Long, List<OutputItem>> outputStartTags, 
     SortedMap<Long, List<OutputItem>> outputEndTags,
-    int priority)
+    int priority,
+    Map<SToken, Long> token2index)
   {
-
-    RelannisNodeFeature feat = 
-      (RelannisNodeFeature) tok.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-    
-    long index = feat.getTokenIndex();
+    long index = token2index.get(tok);
     
     String value;
     

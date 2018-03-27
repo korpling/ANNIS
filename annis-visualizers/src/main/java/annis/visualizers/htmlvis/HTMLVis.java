@@ -399,7 +399,14 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     StringBuilder sb = new StringBuilder();
 
     List<SToken> token = graph.getSortedTokenByText();
-
+    Map<SToken, Long> token2index = new HashMap<>();
+    {
+      long i = 0;
+      for(SToken t : token) 
+      {
+        token2index.put(t, i++);
+      }
+    }
     //Get metadata for visualizer if stylesheet requires it
     //First check the stylesheet
     Boolean bolMetaTypeFound = false;
@@ -463,7 +470,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(t, matched, outputStartTags,
-            outputEndTags, tokenColor, Objects.firstNonNull(instruction_priorities.get(vis), 0));
+            outputEndTags, tokenColor, 
+            Objects.firstNonNull(instruction_priorities.get(vis), 0),
+            token2index);
         }
       }
     }
@@ -484,7 +493,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(span, matched, outputStartTags,
-            outputEndTags, tokenColor, Objects.firstNonNull(instruction_priorities.get(vis), 0));
+            outputEndTags, tokenColor, 
+            Objects.firstNonNull(instruction_priorities.get(vis), 0),
+            token2index);
         }
       }
     }
