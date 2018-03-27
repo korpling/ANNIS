@@ -310,8 +310,6 @@ public class EmbeddedVisUI extends CommonUI
           Helper.calulcateColorsForMarkedAndCovered(doc, markedAndCovered,
             markedColorMap);
           visInput.setMarkedAndCovered(markedAndCovered);
-          visInput.setMarkableMap(markedColorMap);
-          visInput.setMarkableExactMap(exactMarkedMap);
           visInput.setContextPath(Helper.getContext());
           String template = Helper.getContext()
             + "/Resource/" + visName + "/%s";

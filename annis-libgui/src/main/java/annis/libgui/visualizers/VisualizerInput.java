@@ -49,28 +49,18 @@ public class VisualizerInput implements Serializable
 
   private String namespace = "";
 
-  private Map<String, Long> markedAndCovered = new HashMap<String, Long>();
+  private Map<String, Long> markedAndCovered = new HashMap<>();
   private transient Map<SNode, Long> cachedMarkedAndCoveredNodes;
   
-  private Map<String, String> markableMap = new HashMap<String, String>();
-
-  private Map<String, String> markableExactMap = new HashMap<String, String>();
-
   private String id = "";
 
   private String contextPath;
 
   private String annisWebServiceURL;
 
-  private String dotPath;
-
-  private AnnisResult result;
-
   private Properties mappings;
 
   private String resourcePathTemplate = "%s";
-
-  private transient List<SToken> cachedToken;
 
   private Set<String> tokenAnnos;
 
@@ -115,32 +105,7 @@ public class VisualizerInput implements Serializable
   {
     this.contextPath = contextPath;
   }
-
-  /**
-   * Get the path to the dot graph layout generator program.
-   *
-   * @deprecated For configuration of visualizers please use the more general
-   * {@link #getMappings()} .
-   */
-  @Deprecated
-  public String getDotPath()
-  {
-    return dotPath;
-  }
-
-  /**
-   * Set the path to the dot graph layout generator program.
-   *
-   * @param dotPath
-   * @deprecated For configuration of visualizers please use the more general
-   * {@link #setMappings(Properties)} .
-   */
-  @Deprecated
-  public void setDotPath(String dotPath)
-  {
-    this.dotPath = dotPath;
-  }
-
+  
   /**
    * Gets an optional result id to be used by {@link #writeOutput(Writer)}
    *
@@ -181,54 +146,6 @@ public class VisualizerInput implements Serializable
   public void setMappings(Properties mappings)
   {
     this.mappings = mappings;
-  }
-
-  /**
-   * Same as {@link #getMarkableMap() } except that this only includes the
- really matched nodes and not covered cachedToken.
-   *
-   * @return
-   */
-  @Deprecated
-  public Map<String, String> getMarkableExactMap()
-  {
-    return markableExactMap;
-  }
-
-  @Deprecated
-  public void setMarkableExactMap(Map<String, String> markableExactMap)
-  {
-    this.markableExactMap = markableExactMap;
-  }
-
-  /**
-   * Gets the map of markables used by {@link #writeOutput(Writer)}. The key of
- this map must be the corresponding node id of annotations or cachedTokens. The
- values must be HTML compatible color definitions like #000000 or red. For
- detailed information on HTML color definition refer to
- {@link http://www.w3schools.com/HTML/html_colornames.asp}
-   *
-   * @return
-   */
-  @Deprecated
-  public Map<String, String> getMarkableMap()
-  {
-    return markableMap;
-  }
-
-  /**
-   * Sets the map of markables used by {@link #writeOutput(Writer)}. The key of
- this map must be the corresponding node id of annotations or cachedTokens. The
- values must be HTML compatible color definitions like #000000 or red. For
- detailed information on HTML color definition refer to
- {@link http://www.w3schools.com/HTML/html_colornames.asp}
-   *
-   * @param markableMap
-   */
-  @Deprecated
-  public void setMarkableMap(Map<String, String> markableMap)
-  {
-    this.markableMap = markableMap;
   }
 
   /**
@@ -287,19 +204,7 @@ public class VisualizerInput implements Serializable
   {
     this.namespace = namespace;
   }
-
-  @Deprecated
-  public AnnisResult getResult()
-  {
-    if (result == null)
-    {
-      result
-        = new AnnisResultImpl(LegacyGraphConverter.convertToAnnotationGraph(
-            document));
-    }
-    return result;
-  }
-
+  
   public SDocument getDocument()
   {
     return document;
@@ -346,24 +251,6 @@ public class VisualizerInput implements Serializable
   public String getResourcePath(String resource)
   {
     return String.format(resourcePathTemplate, resource);
-  }
-
-  /**
-   * should contains a list of all cachedToken of a the which is available with
- {@link VisualizerInput#getSResult()}.
-   *
-   * @return TODO at the moment it's not certain, that cachedToken are nodes of the
- {@link VisualizerInput#getSResult()}.
-   *
-   */
-  @Deprecated
-  public List<SToken> getToken()
-  {
-    if(this.cachedToken == null)
-    {
-      this.cachedToken = getSResult().getDocumentGraph().getSortedTokenByText();
-    }
-    return this.cachedToken;
   }
 
   /**

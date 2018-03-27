@@ -22,7 +22,6 @@ After you made the service available for other servers you have to configure the
 Change the file `WEB-INF/conf/annis-gui.properties` and set the `AnnisWebService.URL` to the right value:
 \verbatim
 AnnisWebService.URL=https://example.com/annis3-service/annis/
-DotPath=dot
 # set to an valid e-mail adress in order to enable the "Report a bug" button
 bug-e-mail=
 \endverbatim

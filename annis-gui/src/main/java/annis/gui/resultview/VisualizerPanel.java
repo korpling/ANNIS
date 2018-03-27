@@ -282,13 +282,8 @@ public class VisualizerPanel extends CssLayout
     input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().
       getAttribute("AnnisWebService.URL"));
     input.setContextPath(Helper.getContext());
-    input.
-      setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
-
     input.setId(resultID);
 
-    input.setMarkableExactMap(markersExact);
-    input.setMarkableMap(markersCovered);
     input.setMarkedAndCovered(markedAndCovered);
 
     input.setResult(result);
