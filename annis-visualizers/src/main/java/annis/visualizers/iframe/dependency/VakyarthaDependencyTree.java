@@ -15,19 +15,15 @@
  */
 package annis.visualizers.iframe.dependency;
 
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.SALT_TYPE;
@@ -46,10 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.RelannisNodeFeature;
 import annis.visualizers.iframe.WriterVisualizer;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**

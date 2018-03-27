@@ -15,8 +15,6 @@
  */
 package annis.visualizers.component.rst;
 
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -58,7 +56,6 @@ import annis.gui.widgets.JITWrapper;
 import annis.gui.widgets.gwt.client.ui.VJITWrapper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.RelannisNodeFeature;
 import java.util.HashMap;
 
 /**
