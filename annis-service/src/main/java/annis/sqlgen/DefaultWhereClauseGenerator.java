@@ -713,7 +713,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     
     StringBuffer sb = new StringBuffer();
     sb.append("(SELECT count(DISTINCT " + id + ")\n");
-    sb.append("\tFROM " + tas.tableName(RANK_TABLE) + " AS children\n");
+    sb.append("\tFROM " + tas.partitionTableName(RANK_TABLE, corpusList) + " AS children\n");
     sb.append("\tWHERE " + parent + " = " + id1 
       + " AND " + componentID1 + " = " + componentID
       + " AND " + corpusRef1 + " = " + corpusRef

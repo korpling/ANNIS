@@ -286,7 +286,7 @@ public class CommonAnnotateWithClauseGenerator
       .append(" + 1)) ASC) AS rank_right\n");
 
 
-    sb.append(indent2).append("FROM ").append(tas.tableName(NODE_TABLE)).append(
+    sb.append(indent2).append("FROM ").append(tas.partitionTableName(NODE_TABLE, queryData.getCorpusList())).append(
       ", matches\n");
     sb.append(indent2).append("WHERE\n");
 
@@ -355,7 +355,7 @@ public class CommonAnnotateWithClauseGenerator
 
     sb.append(indent2).append("FROM ")
       .append(coveredName).append(", ")
-      .append(tas.tableName(NODE_TABLE)).append(", ")
+      .append(tas.partitionTableName(NODE_TABLE, corpusList)).append(", ")
       .append("keys")
       .append("\n");
 
