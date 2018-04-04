@@ -103,7 +103,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     {
       XMLStreamWriter xml = outFactory.createXMLStreamWriter(entityStream, "UTF-8");
 
-      xml.writeStartDocument("1.0");
+      xml.writeStartDocument("1.1");
       xml.writeCharacters("\n");
       long startTime = System.currentTimeMillis();
       
