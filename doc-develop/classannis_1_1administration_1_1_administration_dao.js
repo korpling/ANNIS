@@ -10,7 +10,6 @@ var classannis_1_1administration_1_1_administration_dao =
     [ "addUniqueNodeNameAppendix", "classannis_1_1administration_1_1_administration_dao.html#acc845019e18c1c961edbc3adb4390a83", null ],
     [ "adjustRankPrePost", "classannis_1_1administration_1_1_administration_dao.html#abc40aed8d10112ebbeb8262746a77ff0", null ],
     [ "adjustTextId", "classannis_1_1administration_1_1_administration_dao.html#ad22fb8d359e69a2daf79cdda056ba60a", null ],
-    [ "analyzeParentFacts", "classannis_1_1administration_1_1_administration_dao.html#aa0a88fda270b8425fe124a3b5d9bce17", null ],
     [ "checkDatabaseSchemaVersion", "classannis_1_1administration_1_1_administration_dao.html#a1cb085242d26fc8aa50da6246334478d", null ],
     [ "cleanupData", "classannis_1_1administration_1_1_administration_dao.html#a0c53c9c78d0c1ad9d82733cd3752695d", null ],
     [ "createDatabase", "classannis_1_1administration_1_1_administration_dao.html#aa2849798bff7d61e150b4a86112c48b8", null ],

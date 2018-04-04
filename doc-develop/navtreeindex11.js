@@ -1,6 +1,5 @@
 var NAVTREEINDEX11 =
 {
-"classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a5895a7a2f66f8b90fb2328bd8f2da208":[4,0,0,15,8,2],
 "classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a6545130eec7c93f78c9931adeec67649":[4,0,0,15,8,4],
 "classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a93ed52e7fce8c7b7129a550a223e57eb":[4,0,0,15,8,3],
 "classannis_1_1sqlgen_1_1_annotated_span_extractor.html":[4,0,0,15,9],
@@ -249,5 +248,6 @@ var NAVTREEINDEX11 =
 "classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html":[4,0,0,15,0,0],
 "classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#a0d4ac9aa6826f4bb3ad36b9ae3b8011d":[4,0,0,15,0,0,2],
 "classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#a129e1b25d091981ebf454feffa35b3d7":[4,0,0,15,0,0,3],
-"classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#a2967fc667b93b7b95cd79c313c0e44c7":[4,0,0,15,0,0,6]
+"classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#a2967fc667b93b7b95cd79c313c0e44c7":[4,0,0,15,0,0,6],
+"classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#a57b7b92254063ff24a935ba7655271c9":[4,0,0,15,0,0,5]
 };

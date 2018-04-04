@@ -579,6 +579,9 @@ var hierarchy =
     [ "ConnectorBundleLoaderFactory", null, [
       [ "OptimizedConnectorBundleLoaderFactory", "class_optimized_connector_bundle_loader_factory.html", null ]
     ] ],
+    [ "ContextResolver", null, [
+      [ "annis.rest.provider.GuavaEscaperMarshallerProvider", "classannis_1_1rest_1_1provider_1_1_guava_escaper_marshaller_provider.html", null ]
+    ] ],
     [ "Converter", null, [
       [ "annis.gui.converter.CommaSeperatedStringConverterList", "classannis_1_1gui_1_1converter_1_1_comma_seperated_string_converter_list.html", null ],
       [ "annis.gui.converter.CommaSeperatedStringConverterSet", "classannis_1_1gui_1_1converter_1_1_comma_seperated_string_converter_set.html", null ],

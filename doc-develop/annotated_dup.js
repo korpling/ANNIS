@@ -371,6 +371,7 @@ var annotated_dup =
           [ "AuthorizationExceptionMapper", "classannis_1_1rest_1_1provider_1_1_authorization_exception_mapper.html", "classannis_1_1rest_1_1provider_1_1_authorization_exception_mapper" ],
           [ "CannotCreateTransactionMapper", "classannis_1_1rest_1_1provider_1_1_cannot_create_transaction_mapper.html", "classannis_1_1rest_1_1provider_1_1_cannot_create_transaction_mapper" ],
           [ "DataAccessExceptionMapper", "classannis_1_1rest_1_1provider_1_1_data_access_exception_mapper.html", "classannis_1_1rest_1_1provider_1_1_data_access_exception_mapper" ],
+          [ "GuavaEscaperMarshallerProvider", "classannis_1_1rest_1_1provider_1_1_guava_escaper_marshaller_provider.html", "classannis_1_1rest_1_1provider_1_1_guava_escaper_marshaller_provider" ],
           [ "SQLExceptionMapper", "classannis_1_1rest_1_1provider_1_1_s_q_l_exception_mapper.html", "classannis_1_1rest_1_1provider_1_1_s_q_l_exception_mapper" ]
         ] ]
       ] ],
@@ -461,7 +462,7 @@ var annotated_dup =
           [ "SameSpan", "classannis_1_1sqlgen_1_1model_1_1_same_span.html", "classannis_1_1sqlgen_1_1model_1_1_same_span" ],
           [ "Sibling", "classannis_1_1sqlgen_1_1model_1_1_sibling.html", "classannis_1_1sqlgen_1_1model_1_1_sibling" ]
         ] ],
-        [ "AbstractFromClauseGenerator", "classannis_1_1sqlgen_1_1_abstract_from_clause_generator.html", "classannis_1_1sqlgen_1_1_abstract_from_clause_generator" ],
+        [ "AbstractFromClauseGenerator", "classannis_1_1sqlgen_1_1_abstract_from_clause_generator.html", null ],
         [ "AbstractSolutionKey", "classannis_1_1sqlgen_1_1_abstract_solution_key.html", "classannis_1_1sqlgen_1_1_abstract_solution_key" ],
         [ "AbstractSolutionMatchInFromClauseSqlGenerator", "classannis_1_1sqlgen_1_1_abstract_solution_match_in_from_clause_sql_generator.html", "classannis_1_1sqlgen_1_1_abstract_solution_match_in_from_clause_sql_generator" ],
         [ "AbstractSqlGenerator", "classannis_1_1sqlgen_1_1_abstract_sql_generator.html", "classannis_1_1sqlgen_1_1_abstract_sql_generator" ],

@@ -44,7 +44,6 @@ var searchData=
   ['adminserviceimpl',['AdminServiceImpl',['../classannis_1_1service_1_1internal_1_1_admin_service_impl.html',1,'annis::service::internal']]],
   ['adminview',['AdminView',['../classannis_1_1gui_1_1_admin_view.html',1,'annis::gui']]],
   ['alignment',['Alignment',['../classannis_1_1visualizers_1_1component_1_1tree_1_1_graphics_backend_1_1_alignment.html',1,'annis::visualizers::component::tree::GraphicsBackend']]],
-  ['analyzeparentfacts',['analyzeParentFacts',['../classannis_1_1administration_1_1_administration_dao.html#aa0a88fda270b8425fe124a3b5d9bce17',1,'annis::administration::AdministrationDao']]],
   ['analyzingquery',['analyzingQuery',['../classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#a2b2761a39f3bad83eec4f9dca45a794d',1,'annis.dao.autogenqueries.AutoSimpleRegexQuery.analyzingQuery()'],['../classannis_1_1dao_1_1autogenqueries_1_1_auto_tok_query.html#a4a7c179f6208c28736a0e5c5a0f0010a',1,'annis.dao.autogenqueries.AutoTokQuery.analyzingQuery()'],['../interfaceannis_1_1dao_1_1autogenqueries_1_1_queries_generator_1_1_query_builder.html#ae4f6cd9281191212bcb0cc67d3f6b7eb',1,'annis.dao.autogenqueries.QueriesGenerator.QueryBuilder.analyzingQuery()']]],
   ['annisadminrunner',['AnnisAdminRunner',['../classannis_1_1administration_1_1_annis_admin_runner.html',1,'annis::administration']]],
   ['annisattribute',['AnnisAttribute',['../classannis_1_1service_1_1objects_1_1_annis_attribute.html',1,'annis::service::objects']]],
