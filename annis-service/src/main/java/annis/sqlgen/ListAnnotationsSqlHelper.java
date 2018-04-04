@@ -38,10 +38,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor<ArrayList<An
   public String createSqlQuery(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValue)
   {
-    String annotationsTable = "annotations";
-    if(corpusList != null && corpusList.size() == 1) {
-      annotationsTable = "annotations_" + corpusList.get(0);
-    }
+    String annotationsTable = SelectedFactsFromClauseGenerator.inheritedTables("annotations", corpusList, "");
     
     String sqlAnnos = "select namespace, name, value, \"type\", subtype, edge_namespace, edge_name from\n"
       + "(\n"
