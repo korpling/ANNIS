@@ -829,8 +829,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     String corpusListStr = corpusList == null || corpusList.isEmpty()
       ? "NULL" : Joiner.on(", ").join(corpusList);
 
+    String annotationsTable = "annotations";
+    if(corpusList != null && corpusList.size() == 1) {
+      annotationsTable = "annotations_" + corpusList.get(0);
+    }
+    
     String sql = "SELECT DISTINCT \"name\"\n"
-      + "FROM annotations\n"
+      + "FROM " + annotationsTable + " AS annotations \n"
       + "WHERE\n"
       + "  toplevel_corpus IN (" + corpusListStr + ")\n"
       + "  AND type='segmentation'";
