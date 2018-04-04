@@ -268,7 +268,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       + tokenBoarder
       + ") FROM ";
     
-    innerSelect += SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, "")
+    innerSelect += SelectedFactsFromClauseGenerator.inheritedFactTables(corpusList, "")
       + " AS lrsub ";
 
     
@@ -572,7 +572,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String componentTarget
       = tables(target).aliasedColumn(RANK_TABLE, "component_ref");
 
-    String factsTable = SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, "");
+    String factsTable = SelectedFactsFromClauseGenerator.inheritedFactTables(corpusList, "");
     
     StringBuffer sb = new StringBuffer();
     sb.append("EXISTS (SELECT 1 FROM " + factsTable
@@ -711,7 +711,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String corpusRef = TableAccessStrategy.column("children", tas.columnName(NODE_TABLE, "corpus_ref"));;
     
     
-    String factsTable = SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, "");
+    String factsTable = SelectedFactsFromClauseGenerator.inheritedFactTables(corpusList, "");
     
     StringBuffer sb = new StringBuffer();
     sb.append("(SELECT count(DISTINCT " + id + ")\n");

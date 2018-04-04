@@ -286,7 +286,7 @@ public class CommonAnnotateWithClauseGenerator
       .append(" + 1)) ASC) AS rank_right\n");
 
 
-    String factsTable = SelectedFactsFromClauseGenerator.selectedFactsSQL(queryData.getCorpusList(), indent2);
+    String factsTable = SelectedFactsFromClauseGenerator.inheritedFactTables(queryData.getCorpusList(), indent2);
     sb.append(indent2).append("FROM ").append(factsTable).append(
       " AS facts, matches\n");
     sb.append(indent2).append("WHERE\n");
@@ -353,7 +353,7 @@ public class CommonAnnotateWithClauseGenerator
       .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
       .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
 
-    String factsTable = SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, indent2);
+    String factsTable = SelectedFactsFromClauseGenerator.inheritedFactTables(corpusList, indent2);
     sb.append(indent2).append("FROM ")
       .append(coveredName).append(", ")
       .append(factsTable).append(" AS facts, ")

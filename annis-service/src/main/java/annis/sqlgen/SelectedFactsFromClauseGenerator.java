@@ -44,13 +44,18 @@ public class SelectedFactsFromClauseGenerator extends AbstractFromClauseGenerato
       String aliasName = TableAccessStrategy.aliasedTable(node, tas.getTableAliases(), 
       TableAccessStrategy.FACTS_TABLE, 1);
       
-      clauses.add(selectedFactsSQL(queryData.getCorpusList(), indent)  + " AS " + aliasName);
+      clauses.add(inheritedFactTables(queryData.getCorpusList(), indent)  + " AS " + aliasName);
     }
 
     return Joiner.on(",\n" + indent + AbstractSqlGenerator.TABSTOP).join(clauses);
   }
   
-  public static String selectedFactsSQL(List<Long> corpusList, String indent)
+  public static String inheritedFactTables(List<Long> corpusList, String indent) 
+  {
+    return inheritedTables("facts", corpusList, indent);
+  }
+  
+  public static String inheritedTables(String parentTable, List<Long> corpusList, String indent)
   {
     if(indent == null)
     {
@@ -59,27 +64,28 @@ public class SelectedFactsFromClauseGenerator extends AbstractFromClauseGenerato
     
     if (corpusList == null || corpusList.isEmpty())
     {
-      return "(SELECT * FROM facts LIMIT 0)";
+      return "(SELECT * FROM " + parentTable + " LIMIT 0)";
     }
     else if (corpusList.size() == 1)
     {
-      return "facts_" + corpusList.get(0);
+      return parentTable + "_" + corpusList.get(0);
     }
     else
     {
-      return unionAllSelectedFacts(corpusList, indent
+      return unionAllSelectedTables(corpusList, parentTable, indent
         + AbstractSqlGenerator.TABSTOP);
     }
   }
   
-  private static String unionAllSelectedFacts(List<Long> corpusList, 
+  private static String unionAllSelectedTables(List<Long> corpusList, 
+    String tableName,
     String indent)
   {
     List<String> tables = new LinkedList<>();
     int idx=0;
     for(Long corpusID : corpusList)
     {
-      tables.add("SELECT *, " + idx + "::int AS sourceIdx FROM facts_" + corpusID);
+      tables.add("SELECT *, " + idx + "::int AS sourceIdx FROM " + tableName + "_" + corpusID);
       idx++;
     }
     

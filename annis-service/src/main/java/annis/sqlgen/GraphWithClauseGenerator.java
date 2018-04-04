@@ -103,7 +103,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     TableAccessStrategy tas, String indent,
       int nodeNr, List<Long> corpusList)
   {
-    String factsSQL = SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, indent);
+    String factsSQL = SelectedFactsFromClauseGenerator.inheritedFactTables(corpusList, indent);
     StringBuilder sb = new StringBuilder();
     sb.append(indent)
         .append(factsSQL).append(" AS ")

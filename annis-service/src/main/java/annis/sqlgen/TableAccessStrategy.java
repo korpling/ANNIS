@@ -75,6 +75,7 @@ public class TableAccessStrategy {
     return tableName(tableAliases, table);
 	}
   
+  @Deprecated
   public String partitionTableName(String table, List<Long> corpusList) 
   {
     return partitionTableName(tableAliases, tablePartitioned, table, corpusList);
