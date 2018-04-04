@@ -194,17 +194,14 @@ public class AnnotateSqlGenerator<T>
   public String fromClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    TableAccessStrategy tas = tables(null);
     List<Long> corpusList = queryData.getCorpusList();
     StringBuilder sb = new StringBuilder();
     
     sb.append(indent).append("solutions,\n");
-
-    sb.append(indent).append(TABSTOP);
-    sb.append(
-      AbstractFromClauseGenerator.tableAliasDefinition(tas, 
-        null, NODE_TABLE, 1, corpusList));
-    sb.append(",\n");
+    
+    String factsTable = SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, indent + TABSTOP);
+    sb.append(factsTable);
+    sb.append(" AS facts,\n");
 
     sb.append(indent).append(TABSTOP);
     sb.append(TableAccessStrategy.CORPUS_TABLE);
