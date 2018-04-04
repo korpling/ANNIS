@@ -24,8 +24,7 @@ import java.util.List;
  * A simple {@link FromClauseSqlGenerator} that statically returns
  * the name of the view which contains the selected facts table.
  * 
- * In order to work this needs the {@link SelectedCorporaWithClauseGenerator} to
- * be enabled and we have to use the facts table. This implementation is not
+ * In order to work we have to use the facts table. This implementation is not
  * prepared for a dynamic scheme where node, rank etc. are seperate tables.
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
