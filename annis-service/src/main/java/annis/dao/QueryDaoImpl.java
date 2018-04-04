@@ -146,24 +146,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   // configuration
   private int timeout;
-  
-  /**
-   * If true, queries on multiple corpora are executed consecutivly on each 
-   * corpus with multiple SQL queries.
-   */
-  private boolean consecutiveCorpusQueryExecution;
-
-  public boolean isConsecutiveCorpusQueryExecution()
-  {
-    return consecutiveCorpusQueryExecution;
-  }
-
-  public void setConsecutiveCorpusQueryExecution(boolean consecutiveCorpusQueryExecution)
-  {
-    this.consecutiveCorpusQueryExecution = consecutiveCorpusQueryExecution;
-  }
-  
-  
 
   @Override
   @Transactional(readOnly = true)
@@ -718,46 +700,15 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   @Override
   public int count(QueryData queryData)
   {
-    if(isConsecutiveCorpusQueryExecution())
-    {
-      int result = 0;
-      for(QueryData qd : queryData.splitByCorpus()) {
-        result += executeQueryFunction(qd, countSqlGenerator, countSqlGenerator);
-      }
-      return result;
-    }
-    else
-    {
-      return executeQueryFunction(queryData, countSqlGenerator, countSqlGenerator);
-    }
+    return executeQueryFunction(queryData, countSqlGenerator, countSqlGenerator);
   }
 
   @Transactional(readOnly = true)
   @Override
   public MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData)
   {
-    if(isConsecutiveCorpusQueryExecution())
-    {
-      int matchCount = 0;
-      int documentCount = 0;
-      for(QueryData qd : queryData.splitByCorpus()) 
-      {
-        MatchAndDocumentCount corpusResult = 
-          executeQueryFunction(qd, countMatchesAndDocumentsSqlGenerator,
-            countMatchesAndDocumentsSqlGenerator);
-        matchCount += corpusResult.getMatchCount();
-        documentCount += corpusResult.getDocumentCount();
-      } 
-      MatchAndDocumentCount result = new MatchAndDocumentCount();
-      result.setMatchCount(matchCount);
-      result.setDocumentCount(documentCount);
-      return result;
-    }
-    else
-    {
-      return executeQueryFunction(queryData, countMatchesAndDocumentsSqlGenerator,
-        countMatchesAndDocumentsSqlGenerator);
-    }
+    return executeQueryFunction(queryData, countMatchesAndDocumentsSqlGenerator,
+      countMatchesAndDocumentsSqlGenerator);
   }
 
   @Transactional(readOnly = true)

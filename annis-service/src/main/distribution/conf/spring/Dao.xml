@@ -199,8 +199,6 @@
     <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="byteHelper" ref="byteHelper" />
     <property name="metaByteHelper" ref="metaByteHelper" />
-    
-    <property name="consecutiveCorpusQueryExecution" value="${annis.consecutive-corpus-query-execution}" />
 
   </bean>
 

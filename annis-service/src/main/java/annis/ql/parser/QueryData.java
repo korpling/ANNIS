@@ -19,7 +19,6 @@ import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import com.google.common.base.Joiner;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -227,27 +226,6 @@ public class QueryData implements Cloneable
   public boolean addMetaAnnotations(List<QueryAnnotation> annotations)
   {
     return metaData.addAll(annotations);
-  }
-  
-  /**
-   * Returns a list of query data objects: one object for each corpus of this query data.
-   * The returned query data objects are the same as the original, but are 
-   * limited to one corpus. If the corpus list is not set or empty, a copy of
-   * this original object is returned.
-   * @return 
-   */
-  public List<QueryData> splitByCorpus() {
-    if(this.getCorpusList() == null || this.getCorpusList().isEmpty()) {
-      return Arrays.asList(this.clone());
-    } else {
-      List<QueryData> result = new LinkedList<>();
-      for(Long c : this.getCorpusList()) {
-        QueryData copy = this.clone();
-        copy.setCorpusList(Arrays.asList(c));
-        result.add(copy);
-      }
-      return result;
-    }
   }
 
   // FIXME: warum diese spezielle clone-Funktion?
