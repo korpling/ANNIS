@@ -408,7 +408,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
     checkEdgeConditions(componentPredicate, "d", null, true,
-        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+        "EXISTS (SELECT 1 FROM (SELECT * FROM facts LIMIT 0) AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" +
             "\n\tLIMIT 1)",
@@ -427,7 +427,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
     checkEdgeConditions(componentPredicate, "d", null, true,
-        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+        "EXISTS (SELECT 1 FROM (SELECT * FROM facts LIMIT 0) AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" +
             "\n\tLIMIT 1)");
@@ -448,7 +448,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
     checkEdgeConditions(componentPredicate, "d", null, true,
-        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+        "EXISTS (SELECT 1 FROM facts_" + corpusId + " AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post AND toplevel_corpus IN(" + corpusId + ")" + "\n\t" +
             "LIMIT 1)",
@@ -469,7 +469,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
     checkEdgeConditions(componentPredicate, "d", null, true,
-        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+        "EXISTS (SELECT 1 FROM (SELECT * FROM facts LIMIT 0) AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" +
             "\n\tLIMIT 1)",
