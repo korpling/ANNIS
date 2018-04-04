@@ -17,27 +17,12 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import java.util.LinkedList;
 import java.util.List;
 
 public abstract class AbstractFromClauseGenerator 
 	extends TableAccessStrategyFactory 
 	implements FromClauseSqlGenerator<QueryData>
 {
-  
-    protected String tableAliasDefinition(QueryNode node, String table,
-      int count)
-    {
-      return tableAliasDefinition(node, table, count, new LinkedList<Long>());
-    }
-
-    protected String tableAliasDefinition(QueryNode node, String table, 
-      int count, List<Long> corpora)
-	  {
-      TableAccessStrategy tas = tables(node);
-      return tableAliasDefinition(tas, node, table, 
-        count, corpora);
-    }
   
 	  public static String tableAliasDefinition(TableAccessStrategy tas, 
       QueryNode node, String table, 
