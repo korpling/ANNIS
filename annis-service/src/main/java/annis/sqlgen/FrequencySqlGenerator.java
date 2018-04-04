@@ -172,7 +172,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
       }
       else
       {
-        tableSql = SelectedFactsFromClauseGenerator.selectedFactsSQL(
+        tableSql = SelectedFactsFromClauseGenerator.inheritedFactTables(
         queryData.getCorpusList(), indent);
       }
       

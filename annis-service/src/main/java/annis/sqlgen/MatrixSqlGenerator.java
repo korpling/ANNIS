@@ -216,7 +216,7 @@ public class MatrixSqlGenerator
     sb.append(solutionSqlGenerator.toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(") AS solutions,\n");
 
-    String factsSQL = SelectedFactsFromClauseGenerator.selectedFactsSQL(
+    String factsSQL = SelectedFactsFromClauseGenerator.inheritedFactTables(
       queryData.getCorpusList(), indent);
     
     sb.append(indent).append(TABSTOP);
@@ -269,7 +269,7 @@ public class MatrixSqlGenerator
     
     List<Long> corpusList = queryData.getCorpusList();
 
-    String factsSQL = SelectedFactsFromClauseGenerator.selectedFactsSQL(
+    String factsSQL = SelectedFactsFromClauseGenerator.inheritedFactTables(
       queryData.getCorpusList(), indent);
 
     String corpusListString = StringUtils.

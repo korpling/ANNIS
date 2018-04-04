@@ -113,6 +113,7 @@ import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
+import annis.sqlgen.SelectedFactsFromClauseGenerator;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
 
@@ -829,8 +830,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     String corpusListStr = corpusList == null || corpusList.isEmpty()
       ? "NULL" : Joiner.on(", ").join(corpusList);
 
+    String annotationsTable = SelectedFactsFromClauseGenerator.inheritedTables("annotations", corpusList, "");
+    
     String sql = "SELECT DISTINCT \"name\"\n"
-      + "FROM annotations\n"
+      + "FROM " + annotationsTable + " AS annotations \n"
       + "WHERE\n"
       + "  toplevel_corpus IN (" + corpusListStr + ")\n"
       + "  AND type='segmentation'";
