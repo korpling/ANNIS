@@ -52,6 +52,11 @@ public class SelectedFactsFromClauseGenerator extends AbstractFromClauseGenerato
   
   public static String selectedFactsSQL(List<Long> corpusList, String indent)
   {
+    if(indent == null)
+    {
+      indent = "";
+    }
+    
     if (corpusList == null || corpusList.isEmpty())
     {
       return "(SELECT * FROM facts LIMIT 0)";

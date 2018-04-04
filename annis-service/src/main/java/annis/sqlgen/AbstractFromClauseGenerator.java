@@ -24,6 +24,7 @@ public abstract class AbstractFromClauseGenerator
 	implements FromClauseSqlGenerator<QueryData>
 {
   
+    @Deprecated
 	  public static String tableAliasDefinition(TableAccessStrategy tas, 
       QueryNode node, String table, 
       int count, List<Long> corpora)

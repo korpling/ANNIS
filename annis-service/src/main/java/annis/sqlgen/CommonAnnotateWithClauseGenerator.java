@@ -286,8 +286,9 @@ public class CommonAnnotateWithClauseGenerator
       .append(" + 1)) ASC) AS rank_right\n");
 
 
-    sb.append(indent2).append("FROM ").append(tas.partitionTableName(NODE_TABLE, queryData.getCorpusList())).append(
-      ", matches\n");
+    String factsTable = SelectedFactsFromClauseGenerator.selectedFactsSQL(queryData.getCorpusList(), indent2);
+    sb.append(indent2).append("FROM ").append(factsTable).append(
+      " AS facts, matches\n");
     sb.append(indent2).append("WHERE\n");
 
     sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus")).
@@ -352,10 +353,10 @@ public class CommonAnnotateWithClauseGenerator
       .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
       .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
 
-
+    String factsTable = SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, indent2);
     sb.append(indent2).append("FROM ")
       .append(coveredName).append(", ")
-      .append(tas.partitionTableName(NODE_TABLE, corpusList)).append(", ")
+      .append(factsTable).append(" AS facts, ")
       .append("keys")
       .append("\n");
 

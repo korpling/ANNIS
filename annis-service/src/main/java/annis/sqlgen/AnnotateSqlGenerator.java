@@ -200,6 +200,7 @@ public class AnnotateSqlGenerator<T>
     sb.append(indent).append("solutions,\n");
     
     String factsTable = SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, indent + TABSTOP);
+    sb.append(indent).append(TABSTOP);
     sb.append(factsTable);
     sb.append(" AS facts,\n");
 
