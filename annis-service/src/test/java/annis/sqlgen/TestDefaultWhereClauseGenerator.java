@@ -490,7 +490,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new CommonAncestor(node42));
     // then
     checkEdgeConditions(componentPredicate, "d", null, true,
-        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+        "EXISTS (SELECT 1 FROM (SELECT * FROM facts LIMIT 0) AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
             "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" + "\n\t" + 
             "LIMIT 1)",
@@ -513,7 +513,7 @@ public class TestDefaultWhereClauseGenerator
     // then
     checkEdgeConditions(componentPredicate, "d", null, true,
         join("=", "_rank23.component_ref", "_rank42.component_ref"),
-        "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
+        "EXISTS (SELECT 1 FROM facts_" + corpusId + " AS ancestor WHERE" + "\n\t" +
             "ancestor.component_ref = _rank23.component_ref AND" + "\n\t" +
             "ancestor.component_ref = _rank42.component_ref AND" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +

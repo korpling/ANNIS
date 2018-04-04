@@ -52,12 +52,11 @@ public class SelectedFactsFromClauseGenerator extends AbstractFromClauseGenerato
   
   public static String selectedFactsSQL(List<Long> corpusList, String indent)
   {
-    int numOfCorpora = corpusList.size();
-    if (numOfCorpora == 0)
+    if (corpusList == null || corpusList.isEmpty())
     {
       return "(SELECT * FROM facts LIMIT 0)";
     }
-    else if (numOfCorpora == 1)
+    else if (corpusList.size() == 1)
     {
       return "facts_" + corpusList.get(0);
     }
