@@ -46,7 +46,7 @@ public class TestCorpusAdministration
     administration.setAdministrationDao(administrationDao);
     
     Mockito.when(administrationDao.importCorpus(Matchers.anyString(), Matchers.
-      anyString(), Matchers.anyBoolean(), Matchers.anyBoolean())).thenReturn(
+      anyString(), Matchers.anyBoolean())).thenReturn(
         Boolean.TRUE);
   }
 
@@ -127,7 +127,7 @@ public class TestCorpusAdministration
   // a correct import requires this order
   private void verifyImport(InOrder inOrder, String path)
   {
-    inOrder.verify(administrationDao).importCorpus(path, null, true, false);
+    inOrder.verify(administrationDao).importCorpus(path, null, true);
 //    // create the staging area
 //    inOrder.verify(administrationDao).createStagingArea(true);
 //

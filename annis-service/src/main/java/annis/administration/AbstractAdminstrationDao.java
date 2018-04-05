@@ -44,21 +44,6 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
   
   private QueryDao queryDao;
 
-  protected boolean lockRepositoryMetadataTable(boolean waitForOtherTasks)
-  {
-    try
-    {
-      log.info("Locking repository_metadata table to ensure no other import is running");
-      getJdbcTemplate().execute(
-        "LOCK TABLE repository_metadata IN EXCLUSIVE MODE" + (waitForOtherTasks ? ""
-          : " NOWAIT"));
-      return true;
-    }
-    catch (DataAccessException ex)
-    {
-      return false;
-    }
-  }
 
   protected File getRealDataDir()
   {

@@ -92,7 +92,7 @@ public class CorpusAdministration
       }
     }
     log.info("Deleting corpora: " + ids);
-    deleteCorpusDao.deleteCorpora(ids, true);
+    deleteCorpusDao.deleteCorpora(ids);
     log.info("Finished deleting corpora: " + ids);
   }
 
@@ -213,7 +213,7 @@ public class CorpusAdministration
       {
         log.info("Importing corpus from: " + r.getPath());
         if (administrationDao.importCorpus(r.getPath(), aliasName,
-          overwrite, waitForOtherTasks))
+          overwrite))
         {
           log.info("Finished import from: " + r.getPath());
           sendImportStatusMail(statusEmailAdress, r.getPath(),

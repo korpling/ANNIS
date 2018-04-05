@@ -238,6 +238,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
         .c(new Column("corpus_path").createIndex())
         .c(new Column("mime_type").createIndex())
         .c(new Column("title").createIndex());
+  
+  private final Table repositoryMetaDataTable = new Table("repository_metadata")
+    .c(new Column("name").primaryKey()).c("value");
 
   /**
    * Called when Spring configuration finished
@@ -305,11 +308,18 @@ public class AdministrationDao extends AbstractAdminstrationDao
     executeSqlFromScript("schema.sql");
 
     // update schema version
-    getJdbcTemplate().execute("DELETE FROM repository_metadata WHERE \"name\"='schema-version'");
-
-    getJdbcTemplate().execute("INSERT INTO repository_metadata " + "VALUES ('schema-version', '"
-        + StringUtils.replace(getSchemaVersion(), "'", "''") + "');");
-
+    try(Connection conn = createSQLiteConnection()) {
+      conn.setAutoCommit(false);
+      
+      getQueryRunner().update(conn,
+        "DELETE FROM repository_metadata WHERE \"name\"='schema-version'");
+      getQueryRunner().update(conn,
+        "INSERT INTO repository_metadata " + "VALUES ('schema-version', ?)", getSchemaVersion());
+      
+      conn.commit();
+    } catch(SQLException ex) {
+      log.error("Error when creating schema", ex);
+    }
   }
 
   protected void createSchemaIndexes()
@@ -359,16 +369,17 @@ public class AdministrationDao extends AbstractAdminstrationDao
   @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
   public String getDatabaseSchemaVersion()
   {
-    try
+    try(Connection conn = createSQLiteConnection(true))
     {
+      
+      List<String> result = getQueryRunner().query(conn, 
+        "SELECT \"value\" FROM repository_metadata WHERE \"name\"='schema-version'", 
+        new ColumnListHandler<>(1));
 
-      List<Map<String, Object>> result = getJdbcTemplate().queryForList(
-          "SELECT \"value\" FROM repository_metadata WHERE \"name\"='schema-version'");
-
-      String schema = result.size() > 0 ? (String) result.get(0).get("value") : "";
+      String schema = result.size() > 0 ? (String) result.get(0) : "";
       return schema;
     }
-    catch (DataAccessException ex)
+    catch (SQLException ex)
     {
       String error = "Wrong database schema (too old to get the exact number), "
           + "please initialize the database.";
@@ -526,18 +537,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
    * @return true if successful
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-  public boolean importCorpus(String path, String aliasName, boolean overwrite,
-      boolean waitForOtherTasks)
+  public boolean importCorpus(String path, String aliasName, boolean overwrite)
   {
 
     // check schema version first
     checkDatabaseSchemaVersion();
-
-    if (!lockRepositoryMetadataTable(waitForOtherTasks))
-    {
-      log.error("Another import is currently running");
-      return false;
-    }
 
     // explicitly unset any timeout
     getJdbcTemplate().update("SET statement_timeout TO 0");
@@ -741,6 +745,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    */
   protected void initSQLiteSchema() throws SQLException
   {
+    createTableIfNotExists(repositoryMetaDataTable, null, null);
     createTableIfNotExists(resolverTable, new File(getScriptPath(), "resolver_vis_map.annis"), null);
     createTableIfNotExists(mediaFilesTable, null, null);
   }

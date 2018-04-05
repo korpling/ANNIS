@@ -1,12 +1,5 @@
 -- (modified) source tables
 
-DROP TABLE IF EXISTS repository_metadata CASCADE;
-CREATE TABLE repository_metadata
-(
-  name varchar NOT NULL PRIMARY KEY,
-  "value" varchar NOT NULL
-);
-
 DROP TABLE IF EXISTS corpus CASCADE;
 CREATE TABLE corpus
 (

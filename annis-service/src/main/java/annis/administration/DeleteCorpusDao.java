@@ -55,19 +55,14 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
       log.info("delete conflicting corpus: {}", corpusName);
       List<String> corpusNames = new LinkedList<>();
       corpusNames.add(corpusName);
-      deleteCorpora(getQueryDao().mapCorpusNamesToIds(corpusNames), false);
+      deleteCorpora(getQueryDao().mapCorpusNamesToIds(corpusNames));
     }
   }
 
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW,
     isolation = Isolation.READ_COMMITTED)
-  public void deleteCorpora(List<Long> ids, boolean acquireLock)
+  public void deleteCorpora(List<Long> ids)
   {
-    if (acquireLock && !lockRepositoryMetadataTable(false))
-    {
-      log.error("Another import is currently running");
-      return;
-    }
 
     if (ids == null || ids.isEmpty())
     {

@@ -407,7 +407,7 @@ public class AdminServiceImpl implements AdminService
 
       // get ID of corpus
       long id = queryDao.mapCorpusNameToId(corpusName);
-      deleteCorpusDao.deleteCorpora(Arrays.asList(id), true);
+      deleteCorpusDao.deleteCorpora(Arrays.asList(id));
       return Response.status(Response.Status.OK).build();
     }
     catch (IllegalArgumentException ex)
