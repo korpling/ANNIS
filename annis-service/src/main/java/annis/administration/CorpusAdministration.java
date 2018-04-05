@@ -66,8 +66,6 @@ public class CorpusAdministration
   private AdministrationDao administrationDao;
   private DeleteCorpusDao deleteCorpusDao;
 
-  private SchemeFixer schemeFixer;
-
   private String statusMailSender;
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -113,13 +111,6 @@ public class CorpusAdministration
     // write database information to property file
     writeDatabasePropertiesFile(host, port, database, user, password, useSSL,
       pgSchema);
-
-    // create tables and other stuff that is handled by the scheme fixer
-    if (schemeFixer != null)
-    {
-      schemeFixer.setDatabaseSchema(pgSchema);
-      schemeFixer.checkAndFix();
-    }
   }
 
   /**
@@ -146,12 +137,6 @@ public class CorpusAdministration
     // init the import stats. From the beginning everything is ok
     ImportStatus importStats = new ImportStatsImpl();
     importStats.setStatus(true);
-
-    // check if database scheme is ok
-    if (schemeFixer != null)
-    {
-      schemeFixer.checkAndFix();
-    }
 
     List<File> roots = new LinkedList<>();
     for (String path : paths)
@@ -939,15 +924,6 @@ public class CorpusAdministration
     this.statusMailSender = statusMailSender;
   }
 
-  public SchemeFixer getSchemeFixer()
-  {
-    return schemeFixer;
-  }
-
-  public void setSchemeFixer(SchemeFixer schemeFixer)
-  {
-    this.schemeFixer = schemeFixer;
-  }
 
   public DeleteCorpusDao getDeleteCorpusDao()
   {

@@ -15,7 +15,6 @@
   <bean id="corpusAdministration" class="annis.administration.CorpusAdministration" lazy-init="true" >
     <property name="administrationDao" ref="administrationDao"/>
     <property name="statusMailSender" value="${annis.mail-sender}"/>
-    <property name="schemeFixer" ref="schemeFixer" />
     <property name="deleteCorpusDao" ref="deleteCorpusDao" />
   </bean>
 

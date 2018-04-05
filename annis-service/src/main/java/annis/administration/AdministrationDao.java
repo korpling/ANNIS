@@ -83,6 +83,7 @@ import annis.security.UserConfig;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
+import org.apache.commons.dbutils.ResultSetHandler;
 
 /**
  *
@@ -220,6 +221,14 @@ public class AdministrationDao extends AbstractAdminstrationDao {
       .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c(new Column("example_query").notNull())
       .c(new Column("description").notNull())
       .c(new Column("corpus").notNull());
+  
+  private final Table userConfigTable = new Table("user_config")
+    .c(new Column("id").primaryKey())
+    .c("config");
+  
+  private final Table corpusAliasTable = new Table("corpus_alias")
+    .c(new Column("alias").primaryKey())
+    .c(new Column("corpus").createIndex());
 
   /**
    * Called when Spring configuration finished
@@ -559,7 +568,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     generateExampleQueries(toplevelCorpusName);
 
     if (aliasName != null && !aliasName.isEmpty()) {
-      addCorpusAlias(corpusID, aliasName);
+      addCorpusAlias(toplevelCorpusName, aliasName);
     }
     return true;
   }
@@ -641,7 +650,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     generateExampleQueries(toplevelCorpusName);
 
     if (aliasName != null && !aliasName.isEmpty()) {
-      addCorpusAlias(corpusID, aliasName);
+      addCorpusAlias(toplevelCorpusName, aliasName);
     }
     return true;
   }
@@ -659,6 +668,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
       createTableIfNotExists(mediaFilesTable, null, null);
       createTableIfNotExists(urlShortenerTable, null, null);
       createTableIfNotExists(exampleQueriesTable, null, null);
+      createTableIfNotExists(userConfigTable, null, null);
+      createTableIfNotExists(corpusAliasTable, null, null);
     } catch (SQLException ex) {
       log.error("Can not create SQL schema", ex);
     }
@@ -1312,98 +1323,120 @@ public class AdministrationDao extends AbstractAdminstrationDao {
    * Provides a list where the keys are the aliases and the values are the
    * corpus names.
    *
-   * @param databaseProperties
+   * @param dbFile
    * @return
    */
-  public Multimap<String, String> listCorpusAlias(File databaseProperties) {
+  public Multimap<String, String> listCorpusAlias(File dbFile) {
     Multimap<String, String> result = TreeMultimap.create();
 
-    DataSource origDataSource = getDataSource().getInnerDataSource();
-    try {
-      if (databaseProperties != null) {
-        getDataSource().setInnerDataSource(createDataSource(databaseProperties));
-      }
-      result = getJdbcTemplate().query("SELECT a.alias AS alias, c.name AS corpus\n"
-          + "FROM corpus_alias AS a, corpus AS c\n" + "WHERE\n" + " a.corpus_ref = c.id",
-          new ResultSetExtractor<Multimap<String, String>>() {
+    try(Connection conn = dbFile == null ? createSQLiteConnection(true) : createSQLiteConnection(dbFile, true) ) {
+      
+      ResultSetHandler<Multimap<String, String>> rsh = new ResultSetHandler<Multimap<String, String>>() {
+        @Override
+        public Multimap<String, String> handle(ResultSet rs) throws SQLException
+        {
+          Multimap<String, String> data = TreeMultimap.create();
+          while (rs.next()) {
+            // alias -> corpus name
+            data.put(rs.getString(1), rs.getString(2));
+          }
+          return data;
+        }        
+      };
+      result = getQueryRunner().query(conn, "SELECT alias, corpus FROM corpus_alias",rsh);
 
-            @Override
-            public Multimap<String, String> extractData(ResultSet rs) throws SQLException, DataAccessException {
-              Multimap<String, String> data = TreeMultimap.create();
-              while (rs.next()) {
-                // alias -> corpus name
-                data.put(rs.getString(1), rs.getString(2));
-              }
-              return data;
-            }
-          });
-
-    } catch (IOException | URISyntaxException | DataAccessException ex) {
-      if (databaseProperties == null) {
+    } catch (SQLException ex) {
+      if (dbFile == null) {
         log.error("Could not query corpus list", ex);
       } else {
-        log.error("Could not query corpus list for the file " + databaseProperties.getAbsolutePath(), ex);
+        log.error("Could not query corpus list for the file " + dbFile.getAbsolutePath(), ex);
       }
-    } finally {
-      getDataSource().setInnerDataSource(origDataSource);
     }
 
     return result;
   }
 
-  @Transactional(readOnly = true)
   public UserConfig retrieveUserConfig(final String userName) {
     String sql = "SELECT * FROM user_config WHERE id=?";
-    UserConfig config = getJdbcTemplate().query(sql, new Object[] { userName }, new ResultSetExtractor<UserConfig>() {
-      @Override
-      public UserConfig extractData(ResultSet rs) throws SQLException, DataAccessException {
+    UserConfig config = new UserConfig();
+    
+    try(Connection conn = createSQLiteConnection(true)) {
+      ResultSetHandler<UserConfig> rsh = new ResultSetHandler<UserConfig>() {
+        @Override
+        public UserConfig handle(ResultSet rs) throws SQLException
+        {
+          // default to empty config
+          UserConfig c = new UserConfig();
 
-        // default to empty config
-        UserConfig c = new UserConfig();
-
-        if (rs.next()) {
-          try {
-            c = jsonMapper.readValue(rs.getString("config"), UserConfig.class);
-          } catch (IOException ex) {
-            log.error("Could not parse JSON that is stored in database (user configuration)", ex);
+          if (rs.next()) {
+            try {
+              c = jsonMapper.readValue(rs.getString("config"), UserConfig.class);
+            } catch (IOException ex) {
+              log.error("Could not parse JSON that is stored in database (user configuration)", ex);
+            }
           }
+          return c;
         }
-        return c;
-      }
-    });
+        
+      };
+      config = getQueryRunner().query(conn, sql, rsh, userName);
+      
+    } catch(SQLException ex) {
+      log.error("Could not query user configuration for {}", userName, ex);
+    }
 
     return config;
   }
 
   @Transactional(readOnly = false)
   public void storeUserConfig(String userName, UserConfig config) {
-    String sqlUpdate = "UPDATE user_config SET config=?::json WHERE id=?";
+    String sqlUpdate = "UPDATE user_config SET config=? WHERE id=?";
     String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?)";
     try {
       String jsonVal = jsonMapper.writeValueAsString(config);
-
-      // if no row was affected there is no entry yet and we should create one
-      if (getJdbcTemplate().update(sqlUpdate, jsonVal, userName) == 0) {
-        getJdbcTemplate().update(sqlInsert, userName, jsonVal);
+      
+      try(Connection conn = createSQLiteConnection()) {
+        conn.setAutoCommit(false);
+        
+        if(getQueryRunner().update(conn, sqlUpdate, jsonVal, userName) == 0) {
+          // if no row was affected there is no entry yet and we should create one
+          getQueryRunner().update(conn, sqlInsert, userName, jsonVal);
+        }
+        
+        conn.commit();
+      } catch(SQLException ex) {
+        log.error("Could not store user configuration for {}", userName, ex);
       }
     } catch (IOException ex) {
       log.error("Cannot serialize user config JSON for database.", ex);
     }
   }
 
-  @Transactional(readOnly = false)
   public void deleteUserConfig(String userName) {
-    getJdbcTemplate().update("DELETE FROM user_config WHERE id=?", userName);
-  }
+    try(Connection conn = createSQLiteConnection()) {
+      conn.setAutoCommit(false);
 
-  public void addCorpusAlias(long corpusID, String alias) {
-    getJdbcTemplate().update(
-        "INSERT INTO corpus_alias (alias, corpus_ref)\n" + "VALUES(\n" + "  ?, \n" + "  ?\n" + ");", alias, corpusID);
+      getQueryRunner().update(conn, "DELETE FROM user_config WHERE id=?", userName);
+
+      conn.commit();
+    } catch(SQLException ex) {
+      log.error("Could not delete user configuration for {}", userName, ex);
+    }
   }
 
   public void addCorpusAlias(String corpusName, String alias) {
-    getJdbcTemplate().update("INSERT INTO corpus_alias (alias, corpus_ref)\n" + "SELECT ? AS alias, c.id\n"
-        + "FROM corpus AS c WHERE c.top_level AND c.name=? LIMIT 1;", alias, corpusName);
+    try(Connection conn = createSQLiteConnection()) {
+      conn.setAutoCommit(false);
+
+      getQueryRunner().update(conn, 
+        "INSERT INTO corpus_alias (alias, corpus) VALUES(?,?)", alias, corpusName);
+
+      conn.commit();
+      
+      log.info("adding alias {} for corpus {}", alias, corpusName);
+    } catch(SQLException ex) {
+      log.error("Could add alias {} for corpus", alias, corpusName, ex);
+    }
   }
 
   ///// Helpers

@@ -37,10 +37,14 @@ public class DBProvider {
     public File getDBFile() {
         return new File(getGraphANNISDir(), "annis.db");
     }
-
+    
     public Connection createSQLiteConnection(boolean readonly) throws SQLException {
-        // TODO: make the database location configurable and maybe use a connection pool.
+      // TODO: make the database location configurable and maybe use a connection pool.
         File dbFile = getDBFile();
+        return createSQLiteConnection(dbFile, readonly);
+    }
+
+    public Connection createSQLiteConnection(File dbFile, boolean readonly) throws SQLException {
         SQLiteConfig conf = new SQLiteConfig();
         SQLiteDataSource source = new SQLiteDataSource(conf);
         source.setUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());

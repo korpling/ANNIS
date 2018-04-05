@@ -122,14 +122,6 @@ COMMENT ON COLUMN facts.edge_type IS 'edge type of this component';
 COMMENT ON COLUMN facts.edge_namespace IS 'optional namespace of the edges’ names';
 COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
 
-DROP TABLE IF EXISTS corpus_alias CASCADE;
-CREATE TABLE corpus_alias
-(
-  alias text COLLATE "C",
-  corpus_ref bigint references corpus(id) ON DELETE CASCADE,
-   PRIMARY KEY (alias, corpus_ref)
-);
-
 -- stats
 DROP TABLE IF EXISTS corpus_stats CASCADE;
 CREATE TABLE corpus_stats
@@ -152,9 +144,8 @@ SELECT min(corpus_stats.name::text) AS name,
     corpus_stats.id,
     min(corpus_stats.text) AS text,
     min(corpus_stats.tokens) AS tokens,
-    min(corpus_stats.source_path::text) AS source_path,
-    array_remove(array_agg(a.alias), NULL) AS alias
-FROM corpus_stats LEFT JOIN corpus_alias AS a ON (corpus_stats.id = a.corpus_ref)
+    min(corpus_stats.source_path::text) AS source_path
+FROM corpus_stats
 GROUP BY corpus_stats.id;
 
 
@@ -174,13 +165,6 @@ CREATE TABLE annotations
   PRIMARY KEY (id)
 );
 
-DROP TABLE IF EXISTS user_config CASCADE;
-CREATE TABLE user_config
-(
-  id varchar NOT NULL,
-  config varchar, -- (should be json)
-  PRIMARY KEY(id)
-);
 
 -- HACK: add a custom operator which is the same as "=" for integers but always
 -- returns 0.995 as join selectivity. See the description
