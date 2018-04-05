@@ -87,6 +87,7 @@ import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
 import java.util.function.Function;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
 
 /**
  *
@@ -210,11 +211,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   private final String[] tablesToCopyManually =
   { "corpus", "corpus_annotation", "text", EXAMPLE_QUERIES_TAB,
-      "corpus_stats", "media_files" };
+      "corpus_stats" };
   // tables created during import
 
   private final String[] createdTables =
-  { "corpus_stats", "media_files", "nodeidmapping" };
+  { "corpus_stats", "nodeidmapping" };
 
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -231,6 +232,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
         .c("visibility")
         .c_int("order")
         .c("mappings");
+  
+  private final Table mediaFilesTable = new Table("media_files")
+        .c("filename")
+        .c("corpus_path")
+        .c("mime_type")
+        .c("title");
 
   /**
    * Called when Spring configuration finished
@@ -583,6 +590,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     importBinaryData(path, toplevelCorpusName);
 
     convertToGraphANNIS(toplevelCorpusName, path, version);
+    importResolverTable(toplevelCorpusName, path, version);
 
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
@@ -671,6 +679,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     importBinaryData(path, toplevelCorpusName);
     
     convertToGraphANNIS(toplevelCorpusName, path, version);
+    importResolverTable(toplevelCorpusName, path, version);
 
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
@@ -732,74 +741,72 @@ public class AdministrationDao extends AbstractAdminstrationDao
    */
   protected void initSQLiteSchema() throws SQLException
   {
-    boolean createResolverTable = false;
-      
-    try(Connection conn = createSQLiteConnection(true)) {
-      try(PreparedStatement resolverTableExistsStmt = 
-              conn.prepareStatement("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?")) {
-        resolverTableExistsStmt.setString(1, resolverTable.getName());
-        try(ResultSet res = resolverTableExistsStmt.executeQuery()) {
-          if(!res.next() || res.getLong(1) == 0) {
-            createResolverTable = true;
-          }
-        }
-      }      
-    }
-    if(createResolverTable) {
-      // create table and load it with initial data
-      File fScript = new File(getScriptPath(), "resolver_vis_map.annis");
-      if (fScript.canRead() && fScript.isFile()) {
-        importSQLiteTable(resolverTable, fScript, false);
-      }
-    }
+    createTableIfNotExists(resolverTable, new File(getScriptPath(), "resolver_vis_map.annis"), null);
+    createTableIfNotExists(mediaFilesTable, null, null);
   }
 
   protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version)
   {
-    File importDir = new File(path);
     try {
       log.info("ensure SQLite database schema is initialized");
       initSQLiteSchema();
 
       log.info("importing corpus into graphANNIS");
       getQueryDao().getCorpusStorageManager().importRelANNIS(corpusName, path);
-
-      log.info("loading tables into SQLite");
-    
-      Function<String[],String[]> lineModifier = (line) -> {
-        if(line == null) {
-          return line;
-        }
-        // check that the resolver entry is applied to correct corpus
-        if(line[0] == null || !line[0].equals(corpusName)) {
-          log.warn("resolver entry references wrong corpus \"" + line[0] + "\" and was rewritten");
-          line[0] = corpusName;
-        }
-        if(line.length == 8) {
-          String[] updateLine = new String[9];
-          updateLine[0] = line[0];
-          updateLine[1] = line[1];
-          updateLine[2] = line[2];
-          updateLine[3] = line[3];
-          updateLine[4] = line[4];
-          updateLine[5] = line[5];
-          // use default value
-          updateLine[6] = "hidden";
-          updateLine[7] = line[6];
-          updateLine[8] = line[7];
-          
-          return updateLine;
-        } else {
-          return line;
-        }
-      };
-      importSQLiteTable(resolverTable,
-          new File(importDir, FILE_RESOLVER_VIS_MAP + version.getFileSuffix()), 
-          true, lineModifier);
+  
     }
     catch (SQLException ex)
     {
       log.error(null, ex);
+    }
+  }
+  
+  private void importResolverTable(String corpusName, String path, ANNISFormatVersion version)
+  {
+
+    log.info("importing resolver entries");
+    File importDir = new File(path);
+
+    Function<String[], String[]> lineModifier = (line) ->
+    {
+      if (line == null)
+      {
+        return line;
+      }
+      // check that the resolver entry is applied to correct corpus
+      if (line[0] == null || !line[0].equals(corpusName))
+      {
+        log.warn("resolver entry references wrong corpus \"" + line[0] + "\" and was rewritten");
+        line[0] = corpusName;
+      }
+      if (line.length == 8)
+      {
+        String[] updateLine = new String[9];
+        updateLine[0] = line[0];
+        updateLine[1] = line[1];
+        updateLine[2] = line[2];
+        updateLine[3] = line[3];
+        updateLine[4] = line[4];
+        updateLine[5] = line[5];
+        // use default value
+        updateLine[6] = "hidden";
+        updateLine[7] = line[6];
+        updateLine[8] = line[7];
+
+        return updateLine;
+      }
+      else
+      {
+        return line;
+      }
+    };
+    
+    try {
+      importSQLiteTable(resolverTable,
+        new File(importDir, FILE_RESOLVER_VIS_MAP + version.getFileSuffix()),
+        lineModifier);
+    } catch(SQLException ex) {
+      log.error("Could not import resolver file {}", path, ex);
     }
   }
 
@@ -980,11 +987,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
           {
             log.info("import " + data.getCanonicalPath() + " to staging area");
 
-            // search for corpus_ref
-            String sqlScript = "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
-            long corpusID = getJdbcTemplate().queryForLong(sqlScript);
 
-            importSingleFile(data.getCanonicalPath(), toplevelCorpusName, corpusID);
+            importSingleFile(data.getCanonicalPath(), toplevelCorpusName);
           }
           else
           {
@@ -1012,12 +1016,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
               if (mimeTypeMapping.containsKey(extension))
               {
                 log.info("import " + data.getCanonicalPath() + " to staging area");
-
-                // search for corpus_ref
-                String sqlScript = "SELECT id FROM _corpus WHERE \"name\" = ? LIMIT 1";
-                long corpusID = getJdbcTemplate().queryForLong(sqlScript, doc.getName());
-
-                importSingleFile(data.getCanonicalPath(), toplevelCorpusName, corpusID);
+                
+                importSingleFile(data.getCanonicalPath(), toplevelCorpusName + "/" + doc.getName());
               }
               else
               {
@@ -1040,18 +1040,21 @@ public class AdministrationDao extends AbstractAdminstrationDao
    *
    * @param file
    *          Specifies the file to be imported.
-   * @param corpusRef
-   *          Assigns the file this corpus.
    * @param toplevelCorpusName
    *          The toplevel corpus name
    */
-  private void importSingleFile(String file, String toplevelCorpusName, long corpusRef)
+  private void importSingleFile(String file, String toplevelCorpusName)
   {
 
     BinaryImportHelper preStat = new BinaryImportHelper(file, getRealDataDir(), toplevelCorpusName,
-        corpusRef, mimeTypeMapping);
-    getJdbcTemplate().execute(BinaryImportHelper.SQL, preStat);
-
+        mimeTypeMapping);
+    try(Connection conn = createSQLiteConnection(); 
+      PreparedStatement stmt = conn.prepareStatement(BinaryImportHelper.SQL)) {
+      preStat.doInPreparedStatement(stmt);
+    }
+    catch(SQLException ex) {
+      log.error("Cannot import binary file {}", file, ex);
+    }
   }
 
   /**
@@ -1432,34 +1435,41 @@ public class AdministrationDao extends AbstractAdminstrationDao
   @Transactional(readOnly = true)
   public void cleanupData()
   {
+    
 
-    List<String> allFilesInDatabaseList = getJdbcTemplate()
-        .queryForList("SELECT filename FROM media_files AS m", String.class);
+    try(Connection conn = createSQLiteConnection(true)) {
+      
+      
+      List<String> allFilesInDatabaseList = getQueryRunner().query(conn, "SELECT filename FROM media_files AS m", new ColumnListHandler<>(1));
+      
+      File dataDir = getRealDataDir();
 
-    File dataDir = getRealDataDir();
-
-    Set<File> allFilesInDatabase = new HashSet<>();
-    for (String singleFileName : allFilesInDatabaseList)
-    {
-      allFilesInDatabase.add(new File(dataDir, singleFileName));
-    }
-
-    log.info("Cleaning up the data directory");
-    // go through each file of the folder and check if it is not included
-    File[] childFiles = dataDir.listFiles();
-    if (childFiles != null)
-    {
-      for (File f : childFiles)
+      Set<File> allFilesInDatabase = new HashSet<>();
+      for (String singleFileName : allFilesInDatabaseList)
       {
-        if (f.isFile() && !allFilesInDatabase.contains(f))
+        allFilesInDatabase.add(new File(dataDir, singleFileName));
+      }
+
+      log.info("Cleaning up the data directory");
+      // go through each file of the folder and check if it is not included
+      File[] childFiles = dataDir.listFiles();
+      if (childFiles != null)
+      {
+        for (File f : childFiles)
         {
-          if (!f.delete())
+          if (f.isFile() && !allFilesInDatabase.contains(f))
           {
-            log.warn("Could not delete {}", f.getAbsolutePath());
+            if (!f.delete())
+            {
+              log.warn("Could not delete {}", f.getAbsolutePath());
+            }
           }
         }
       }
+    } catch (SQLException ex) {
+      log.error("Error when cleaning up data", ex);
     }
+    
   }
 
   public List<Map<String, Object>> listCorpusStats()

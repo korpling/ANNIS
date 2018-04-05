@@ -46,18 +46,17 @@ public class BinaryImportHelper implements
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     BinaryImportHelper.class);
 
-  public static final String SQL = "INSERT INTO _media_files VALUES (?, ?, ?, ?)";
+  public static final String SQL = "INSERT INTO media_files VALUES (?, ?, ?, ?)";
 
   private File fileSource;
 
   private File fileDestination;
 
   private String mimeType;
-
-  private long corpusRef;
-
-  public BinaryImportHelper(File f, File dataDir, String toplevelCorpusName, 
-    long corpusRef,
+  
+  private String corpusPath;
+  
+  public BinaryImportHelper(File f, File dataDir, String corpusPath,
     Map<String, String> mimeTypeMapping)
   {
     this.fileSource = f;
@@ -69,7 +68,7 @@ public class BinaryImportHelper implements
     UUID uuid = UUID.randomUUID();
     
     String outputName = "";
-    if(toplevelCorpusName == null)
+    if(corpusPath == null)
     {
       outputName = baseName 
         + "_" + uuid.toString()
@@ -78,7 +77,7 @@ public class BinaryImportHelper implements
     else
     {
       outputName = baseName 
-        + "_" + CommonHelper.getSafeFileName(toplevelCorpusName)
+        + "_" + CommonHelper.getSafeFileName(corpusPath)
         + "_" + uuid.toString()
         + (extension.isEmpty() ? "" : "." + extension);
     }
@@ -95,7 +94,8 @@ public class BinaryImportHelper implements
     {
       this.mimeType = new MimetypesFileTypeMap().getContentType(fileSource);
     }
-    this.corpusRef = corpusRef;
+    
+    this.corpusPath = corpusPath;
   }
 
   /**
@@ -103,15 +103,14 @@ public class BinaryImportHelper implements
    *
    * @param file Specifies path to the file, including the filename.
    * @param dataDir Specifies the directory, where the file is copied to.
-   * @param toplevelCorpusName Name of the toplevel corpus..
-   * @param corpusRef Assigns the file to a specific corpus in the database.
+   * @param corpusPath path of the corpus to import, e.g. "toplevel/document"
    * @param mimeTypeMapping A map of default mime types.
    */
   public BinaryImportHelper(String file, File dataDir,
-    String toplevelCorpusName,
-    long corpusRef, Map<String, String> mimeTypeMapping)
+    String corpusPath,
+    Map<String, String> mimeTypeMapping)
   {
-    this(new File(file), dataDir, toplevelCorpusName, corpusRef, mimeTypeMapping);
+    this(new File(file), dataDir, corpusPath, mimeTypeMapping);
   }
 
   @Override
@@ -119,7 +118,7 @@ public class BinaryImportHelper implements
     DataAccessException
   {
     ps.setString(1, fileDestination.getName());
-    ps.setLong(2, this.corpusRef);
+    ps.setString(2, this.corpusPath);
     ps.setString(3, this.mimeType);
     ps.setString(4, fileSource.getName());
     ps.executeUpdate();

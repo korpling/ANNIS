@@ -16,20 +16,16 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinaryMetaData>
   
   private static final int[] ARG_TYPES = new int [] {
     Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, 
-    Types.VARCHAR, Types.VARCHAR, Types.VARCHAR
+    Types.VARCHAR, Types.VARCHAR
   };
   
 
   public static final String SQL =
       "SELECT\n"
-    + "filename, title, mime_type, sub.name as corpus_name\n"
-    + "FROM media_files, corpus AS sub, corpus AS top \n"
+    + "filename, title, mime_type\n"
+    + "FROM media_files\n"
     + "WHERE\n"
-    + "  top.top_level = true AND\n"
-    + "  top.name = ? AND\n"
-    + "  sub.name = ? AND\n"
-    + "  sub.pre >= top.pre AND sub.post <= top.post AND\n"
-    + "  sub.id = corpus_ref AND\n"
+    + "  corpus_path = ? AND\n"
     + "  (? IS NULL OR mime_type = ?) AND \n"
     + "  (? IS NULL OR title = ?)";
   ;
@@ -39,12 +35,12 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinaryMetaData>
     return Arrays.copyOf(ARG_TYPES, ARG_TYPES.length);
   }
   
-  public Object[] getArgs(String toplevelCorpusName, String corpusName, 
+  public Object[] getArgs(String corpusPath, 
     String mimeType, String title, int offset, int length)
   {
     return new Object[] 
     {
-      toplevelCorpusName, corpusName, mimeType, mimeType, title, title
+      corpusPath, mimeType, mimeType, title, title
     }; 
 
   }
@@ -60,7 +56,6 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinaryMetaData>
       {
         ab.setLocalFileName(rs.getString("filename"));
         ab.setFileName(rs.getString("title"));
-        ab.setCorpusName(rs.getString("corpus_name"));
         ab.setMimeType(rs.getString("mime_type"));
         // we only give one matching result back
         break;

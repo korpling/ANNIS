@@ -97,6 +97,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -324,46 +327,53 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   @Override
   public void setCorpusConfiguration(String toplevelCorpusName, Properties props) {
-    long corpusID = mapCorpusNameToId(toplevelCorpusName);
+    
+    try (Connection conn = createSQLiteConnection())
+    {
+      conn.setAutoCommit(false);
 
-    String sql = "SELECT filename FROM media_files "
-            + "WHERE corpus_ref=" + corpusID + " AND title = " + "'corpus.properties'";
-    String fileName = getJdbcTemplate().query(sql, (ResultSet rs)
-            -> {
-      while (rs.next()) {
-        return rs.getString("filename");
+      String sql = "SELECT filename FROM media_files "
+        + "WHERE corpus_path=? AND title = " + "'corpus.properties'";
+      
+      String fileName = getQueryRunner().query(conn, sql, new ScalarHandler<String>(1), toplevelCorpusName);
+      
+      File dir = getRealDataDir();
+      if (!dir.exists()) {
+        if (dir.mkdirs()) {
+          log.info("Created directory " + dir);
+        } else {
+          log.error("Directory " + dir + " doesn't exist and cannot be created");
+        }
       }
 
-      return null;
-    });
-
-    File dir = getRealDataDir();
-    if (!dir.exists()) {
-      if (dir.mkdirs()) {
-        log.info("Created directory " + dir);
-      } else {
-        log.error("Directory " + dir + " doesn't exist and cannot be created");
+      if (fileName == null) {
+        fileName = "corpus_"
+                + CommonHelper.getSafeFileName(toplevelCorpusName)
+                + "_" + UUID.randomUUID() + ".properties";
+        getQueryRunner().update(conn, "INSERT INTO media_files VALUES (?,?,'application/text+plain', 'corpus.properties')", fileName, toplevelCorpusName);
       }
+      log.info("write config file: " + dir + "/" + fileName);
+      try (FileOutputStream fStream = new FileOutputStream(new File(
+              dir.getCanonicalPath() + "/" + fileName));
+              OutputStreamWriter writer = new OutputStreamWriter(fStream,
+                      Charsets.UTF_8)) {
+        props.store(writer, "");
+
+      } catch (IOException ex) {
+        log.error("error: write back the corpus.properties configuration", ex);
+      }
+      
+      conn.commit();
+
+    }
+    catch (SQLException ex)
+    {
+      log.error("Error occured when setting the corpus configuration for corpus {}", toplevelCorpusName, ex);
     }
 
-    if (fileName == null) {
-      fileName = "corpus_"
-              + CommonHelper.getSafeFileName(toplevelCorpusName)
-              + "_" + UUID.randomUUID() + ".properties";
-      getJdbcTemplate().update(
-              "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
-              + "', 'application/text+plain', 'corpus.properties')");
-    }
-    log.info("write config file: " + dir + "/" + fileName);
-    try (FileOutputStream fStream = new FileOutputStream(new File(
-            dir.getCanonicalPath() + "/" + fileName));
-            OutputStreamWriter writer = new OutputStreamWriter(fStream,
-                    Charsets.UTF_8)) {
-      props.store(writer, "");
 
-    } catch (IOException ex) {
-      log.error("error: write back the corpus.properties configuration", ex);
-    }
+
+   
   }
 
   @Override
@@ -1177,10 +1187,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   @Override
   public InputStream getBinary(String toplevelCorpusName, String corpusName,
           String mimeType, String title, int offset, int length) {
+    String corpusPath = toplevelCorpusName + "/" + corpusName;
     AnnisBinaryMetaData binary
             = (AnnisBinaryMetaData) getJdbcTemplate().query(ByteHelper.SQL,
                     byteHelper.
-                            getArgs(toplevelCorpusName, corpusName, mimeType, title, offset,
+                            getArgs(corpusPath, mimeType, title, offset,
                                     length),
                     ByteHelper.getArgTypes(), byteHelper);
 
@@ -1208,21 +1219,36 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   @Override
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
-          String corpusName) {
-    List<AnnisBinaryMetaData> metaData = getJdbcTemplate().query(
-            MetaByteHelper.SQL,
-            metaByteHelper.getArgs(toplevelCorpusName, corpusName),
-            MetaByteHelper.getArgTypes(), metaByteHelper);
+    String corpusName)
+  {
 
-    // get the file size from the real file
-    ListIterator<AnnisBinaryMetaData> it = metaData.listIterator();
-    while (it.hasNext()) {
-      AnnisBinaryMetaData singleEntry = it.next();
-      File f = new File(getRealDataDir(), singleEntry.getLocalFileName());
-      singleEntry.setLength((int) f.length());
+    try (Connection conn = createSQLiteConnection(true))
+    { 
+      List<AnnisBinaryMetaData> metaData = getQueryRunner().query(
+        conn,
+        MetaByteHelper.SQL,
+        metaByteHelper, 
+        metaByteHelper.getArgs(toplevelCorpusName + "/" + corpusName)
+      );
+
+      // get the file size from the real file
+      ListIterator<AnnisBinaryMetaData> it = metaData.listIterator();
+      while (it.hasNext())
+      {
+        AnnisBinaryMetaData singleEntry = it.next();
+        File f = new File(getRealDataDir(), singleEntry.getLocalFileName());
+        singleEntry.setLength((int) f.length());
+      }
+      return metaData;
     }
-    return metaData;
+    catch (SQLException ex)
+    {
+      log.error("Could not query binary meta data for document {}/{}", toplevelCorpusName, corpusName);
+    }
+
+    return new LinkedList<>();
   }
+
 
   @Override
   public List<Long> mapCorpusAliasToIds(String alias) {

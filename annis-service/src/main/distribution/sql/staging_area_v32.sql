@@ -1,6 +1,4 @@
 -- cleanup in the proper order
-DROP TABLE IF EXISTS _media_files;
-DROP TABLE IF EXISTS _resolver_vis_map;
 DROP TABLE IF EXISTS _corpus_stats;
 DROP TABLE IF EXISTS _corpus_annotation;
 DROP TABLE IF EXISTS _edge_annotation;
@@ -126,14 +124,6 @@ CREATE :tmp TABLE _resolver_vis_map
   "visibility"  varchar default 'hidden' NOT NULL,
   "order" integer default '0', -- the order of the layers, in which they shall be shown
   "mappings" varchar
-);
-
-CREATE :tmp TABLE _media_files
-(
-  filename  text NOT NULL,
-  corpus_ref  bigint NOT NULL,
-  mime_type varchar NOT NULL,
-  title varchar NOT NULL
 );
 
 CREATE :tmp TABLE _example_queries

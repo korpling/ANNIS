@@ -15,6 +15,7 @@
  */
 package annis.administration;
 
+import com.google.common.base.Joiner;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +38,12 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class DeleteCorpusDao extends AbstractAdminstrationDao
 {
-  
+
   private final static Logger log = LoggerFactory.getLogger(AdministrationDao.class);
 
-  
-  
   /**
    * Deletes a top level corpus, when it is already exists.
+   *
    * @param corpusName
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW,
@@ -57,7 +58,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
       deleteCorpora(getQueryDao().mapCorpusNamesToIds(corpusNames), false);
     }
   }
-  
+
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW,
     isolation = Isolation.READ_COMMITTED)
   public void deleteCorpora(List<Long> ids, boolean acquireLock)
@@ -67,41 +68,71 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
       log.error("Another import is currently running");
       return;
     }
-    
-    if(ids == null || ids.isEmpty())
+
+    if (ids == null || ids.isEmpty())
     {
       return;
     }
     Map<Long, String> id2name = new HashMap<>();
-    for(long l : ids) {
+    for (long l : ids)
+    {
       String name = getQueryDao().mapCorpusIdToName(l);
-      if(name != null) {
+      if (name != null)
+      {
         id2name.put(l, name);
       }
     }
     File dataDir = getRealDataDir();
 
-    for (long l : ids)
+    try (Connection conn = createSQLiteConnection())
     {
-      log.info("deleting external data files");
+      conn.setAutoCommit(false);
 
-      List<String> filesToDelete = getJdbcTemplate().queryForList(
-        "SELECT filename FROM media_files AS m, corpus AS top, corpus AS child\n"
-        + "WHERE\n"
-        + "  m.corpus_ref = child.id AND\n"
-        + "  top.id = ? AND\n"
-        + "  child.pre >= top.pre AND child.post <= top.post", String.class, l);
-      for (String fileName : filesToDelete)
-      {
-        File f = new File(dataDir, fileName);
-        if (f.exists())
+      log.info("deleting external data files");
+      for(String corpusName : id2name.values()) {
+        List<String> filesToDelete = getQueryRunner().query(conn,
+          "SELECT filename FROM media_files\n"
+          + "WHERE\n"
+          + "  corpus_path = ? OR corpus_path like ?", new ColumnListHandler<>(1),
+          corpusName, corpusName + "/%");
+        for (String fileName : filesToDelete)
         {
-          if (!f.delete())
+          File f = new File(dataDir, fileName);
+          if (f.exists())
           {
-            log.warn("Could not delete {}", f.getAbsolutePath());
+            if (!f.delete())
+            {
+              log.warn("Could not delete {}", f.getAbsolutePath());
+            }
           }
         }
+        
+        getQueryRunner().update(conn,
+          "DELETE FROM media_files\n"
+          + "WHERE\n"
+          + "  corpus_path = ? OR corpus_path like ?",
+          corpusName, corpusName + "/%");
       }
+
+      log.info("deleting resolver entries");
+      try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM resolver_vis_map WHERE corpus=?"))
+      {
+        for (String n : id2name.values())
+        {
+          delStmt.setString(1, n);
+          delStmt.executeUpdate();
+        }
+      }
+      conn.commit();
+
+    }
+    catch (SQLException ex)
+    {
+      log.error("Error when deleting corpus {}", Joiner.on(",").join(id2name.values()), ex);
+    }
+
+    for (long l : ids)
+    {
 
       log.info("dropping tables");
 
@@ -119,22 +150,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
 
     executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
       StringUtils.join(ids, ", ")));
-    
-    try(Connection conn = createSQLiteConnection()) {
-      conn.setAutoCommit(false);
-      
-      log.info("deleting resolver entries");
-      try(PreparedStatement delStmt = conn.prepareStatement("DELETE FROM resolver_vis_map WHERE corpus=?")) {
-        for(String n : id2name.values()) {
-          delStmt.setString(1, n);
-          delStmt.executeUpdate();
-        }
-      }
-      conn.commit();
-    } catch(SQLException ex) {
-      log.error("error when deleting corpus", ex);
-    }
-    
+
   }
 
 }

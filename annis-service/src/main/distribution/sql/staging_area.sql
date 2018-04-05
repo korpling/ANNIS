@@ -1,6 +1,4 @@
 -- cleanup in the proper order
-DROP TABLE IF EXISTS _media_files;
-DROP TABLE IF EXISTS _resolver_vis_map;
 DROP TABLE IF EXISTS _corpus_stats;
 DROP TABLE IF EXISTS _corpus_annotation;
 DROP TABLE IF EXISTS _edge_annotation;
@@ -119,28 +117,6 @@ CREATE :tmp TABLE _edge_annotation
 	value			varchar
 );
 
--- resolver visualization mappings
--- this table is just a subset of resolver_vis_map. It contains all columns needed for copying data from ANNIS format
-CREATE :tmp TABLE _resolver_vis_map
-(
-  "corpus"   varchar, -- the name of the supercorpus
-  "version" 	varchar, -- the version of the corpus
-  "namespace"	varchar, -- the several layers of the corpus
-  "element"    varchar, -- the type of the entry: node | edge
-  "vis_type"   varchar NOT NULL, -- the abstract type of visualization: tree, discourse, grid, ...
-  "display_name"   varchar NOT NULL, -- the name of the layer which shall be shown for display
-  "visibility"  varchar default 'hidden' NOT NULL,
-  "order" integer default '0', -- the order of the layers, in which they shall be shown
-  "mappings" varchar
-);
-
-CREATE :tmp TABLE _media_files
-(
-  filename  text NOT NULL,
-  corpus_ref  bigint NOT NULL,
-  mime_type varchar NOT NULL,
-  title varchar NOT NULL
-);
 
 CREATE :tmp TABLE _example_queries
 (

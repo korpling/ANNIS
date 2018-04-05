@@ -59,6 +59,7 @@ import java.sql.ResultSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
+import org.apache.commons.dbutils.QueryRunner;
 import org.sqlite.SQLiteConfig;
 import org.sqlite.SQLiteDataSource;
 
@@ -75,6 +76,8 @@ public abstract class AbstractDao
   private DynamicDataSource dataSource;
   private StatementController statementController;
   private String scriptPath;
+  
+  private final QueryRunner queryRunner = new QueryRunner();
 
   /**
    * executes an SQL string, substituting the
@@ -201,59 +204,61 @@ public abstract class AbstractDao
     return source.getConnection();
   }
   
-  public void importSQLiteTable(Table table, File csvFile) throws SQLException {
-    importSQLiteTable(table, csvFile, true);
+  public void createTableIfNotExists(Table table, File initialValuesCSV, 
+    Function<String[],String[]> lineModifier) throws SQLException {
+    if(table == null) {
+      return;
+    }
+    
+    try(Connection conn = createSQLiteConnection();  
+            Statement stmt = conn.createStatement())
+    {
+      conn.setAutoCommit(false);
+      
+      // check if table exists
+      boolean createTable = false;
+      try(PreparedStatement tableExistsStmt = 
+          conn.prepareStatement("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?")) {
+        tableExistsStmt.setString(1, table.getName());
+        try(ResultSet res = tableExistsStmt.executeQuery()) {
+          if(res.next()) {
+            createTable = res.getLong(1) == 0;
+          }
+        }
+      }
+      
+      
+      if(createTable) {
+
+        ArrayList<Column> columns = table.getColumns();
+
+        stmt.execute("CREATE TABLE " + table.getName() 
+          +  " (" + Joiner.on(", ").join(columns) +  ")");
+
+        if(initialValuesCSV != null) {
+          importCSVIntoTable(conn, table, initialValuesCSV, lineModifier);
+        }
+        conn.commit();
+      }
+    }
   }
   
-  public void importSQLiteTable(Table table, File csvFile, boolean append) throws SQLException {
-    importSQLiteTable(table, csvFile, append, null);
-  }
-  
-  public void importSQLiteTable(Table table, File csvFile, boolean append, Function<String[], String[]> lineModifier) throws SQLException
-  {
-   
+  private void importCSVIntoTable(Connection conn, Table table, 
+     File csvFile, 
+     Function<String[], String[]> lineModifier) throws SQLException {
+    
     try(CSVReader csvReader = 
         new CSVReader(new InputStreamReader(new FileInputStream(csvFile), StandardCharsets.UTF_8),
-            '\t'))
-    {
+            '\t')) {
+      
       String[] firstLine = csvReader.readNext();
       if(lineModifier != null) {
         firstLine = lineModifier.apply(firstLine);
       }
       
-      if(firstLine != null && firstLine.length >= 1)
-      {
-        // TODO: use an enum for the table names to avoid any user supplied strings.
-        try(Connection conn = createSQLiteConnection();  
-            Statement stmt = conn.createStatement())
-        {
-          conn.setAutoCommit(false);
-         
-          if(!append) {
-             // drop any old version of the table
-            stmt.execute("DROP TABLE IF EXISTS " + table.getName());
-          }
-          
-          // check if table exists
-          boolean createTable = false;
-          try(PreparedStatement tableExistsStmt = 
-              conn.prepareStatement("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?")) {
-            tableExistsStmt.setString(1, table.getName());
-            try(ResultSet res = tableExistsStmt.executeQuery()) {
-              if(res.next()) {
-                createTable = res.getLong(1) == 0;
-              }
-            }
-          }
-          ArrayList<Column> columns = table.getColumns();
-          if(createTable) {
-            stmt.execute("CREATE TABLE " + table.getName() 
-              +  " (" + Joiner.on(", ").join(columns) +  ")");
-          }
-          
-          List<Column> nonKeyColumns = table.getNonKeyColumns();
-          
-          Preconditions.checkArgument(nonKeyColumns.size() == firstLine.length, "Import of table %s failed. "
+      if(firstLine != null && firstLine.length >= 1) {
+        List<Column> nonKeyColumns = table.getNonKeyColumns();
+        Preconditions.checkArgument(nonKeyColumns.size() == firstLine.length, "Import of table %s failed. "
               + "File '%s' should have %s columns but has %s.", table.getName(), csvFile.getAbsolutePath(),
               nonKeyColumns.size(), firstLine.length);
           
@@ -285,23 +290,27 @@ public abstract class AbstractDao
               }
             }
           }
-          
-          conn.commit();
-        }
       }
       
-    }
-    catch(FileNotFoundException ex)
-    {
+      
+    } catch(FileNotFoundException ex) {
       log.error("Could not find file", ex);
-    }
-    catch(IOException ex)
-    {
+    } catch(IOException ex){
       log.error("Could not read SQLite table", ex);
     }
   }
   
+  public void importSQLiteTable(Table table, File csvFile, Function<String[], String[]> lineModifier) throws SQLException {
+    
+    try(Connection conn = createSQLiteConnection()) {
+      conn.setAutoCommit(false);
+      importCSVIntoTable(conn, table, csvFile, lineModifier);
+      conn.commit();
+    }
+  }
   
+  
+  @Deprecated
   public JdbcTemplate getJdbcTemplate()
   {
     return jdbcTemplate;
@@ -399,5 +408,12 @@ public abstract class AbstractDao
       return null;
     }
   }
+
+  public QueryRunner getQueryRunner()
+  {
+    return queryRunner;
+  }
+  
+  
   
 }
