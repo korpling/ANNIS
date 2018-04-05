@@ -241,6 +241,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
   
   private final Table repositoryMetaDataTable = new Table("repository_metadata")
     .c(new Column("name").primaryKey()).c("value");
+  
+  private final Table urlShortenerTable = new Table("url_shortener")
+    .c(new Column("id").primaryKey())
+    .c("owner")
+    .c("created")
+    .c(new Column("url").createIndex());
 
   /**
    * Called when Spring configuration finished
@@ -330,12 +336,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   protected void populateSchema()
   {
-    log.info("populating the schemas with default values");
-    bulkloadTableFromResource("resolver_vis_map",
-        new FileSystemResource(new File(getScriptPath(), FILE_RESOLVER_VIS_MAP + ".annis")));
-    // update the sequence
-    executeSqlFromScript("update_resolver_sequence.sql");
-
     log.info(
       "creating immutable functions for extracting annotations");
     
@@ -437,6 +437,14 @@ public class AdministrationDao extends AbstractAdminstrationDao
       }
     }
 
+    log.info("deleting old SQLite database");
+    File dbFile = getDBFile();
+    if(dbFile.exists() && dbFile.isFile()) {
+      if(dbFile.delete() == false) {
+        log.warn("Could not delete SQLite database {}", dbFile.getAbsolutePath());
+      }
+    }
+
     setupDatabase();
 
   }
@@ -453,6 +461,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   private void setupDatabase()
   {
+    initSQLiteSchema();
+
     createFunctionUniqueToplevelCorpusName();
     createSchema();
     createSchemaIndexes();
@@ -545,6 +555,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     // explicitly unset any timeout
     getJdbcTemplate().update("SET statement_timeout TO 0");
+
+    initSQLiteSchema();
 
     ANNISFormatVersion annisFormatVersion = getANNISFormatVersion(path);
 
@@ -743,27 +755,25 @@ public class AdministrationDao extends AbstractAdminstrationDao
    * Makes sure all tables needed by SQLite are available.
    * @throws java.sql.SQLException
    */
-  protected void initSQLiteSchema() throws SQLException
+  protected void initSQLiteSchema()
   {
-    createTableIfNotExists(repositoryMetaDataTable, null, null);
-    createTableIfNotExists(resolverTable, new File(getScriptPath(), "resolver_vis_map.annis"), null);
-    createTableIfNotExists(mediaFilesTable, null, null);
+    try {
+      createTableIfNotExists(repositoryMetaDataTable, null, null);
+      createTableIfNotExists(resolverTable, new File(getScriptPath(), "resolver_vis_map.annis"), null);
+      createTableIfNotExists(mediaFilesTable, null, null);
+      createTableIfNotExists(urlShortenerTable, null, null);  
+    } catch(SQLException ex) {
+      log.error("Can not create SQL schema", ex);
+    }
   }
 
   protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version)
   {
-    try {
-      log.info("ensure SQLite database schema is initialized");
-      initSQLiteSchema();
+      
+    log.info("importing corpus into graphANNIS");
+    getQueryDao().getCorpusStorageManager().importRelANNIS(corpusName, path);
 
-      log.info("importing corpus into graphANNIS");
-      getQueryDao().getCorpusStorageManager().importRelANNIS(corpusName, path);
   
-    }
-    catch (SQLException ex)
-    {
-      log.error(null, ex);
-    }
   }
   
   private void importResolverTable(String corpusName, String path, ANNISFormatVersion version)

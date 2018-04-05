@@ -194,11 +194,15 @@ public abstract class AbstractDao
   {
     return createSQLiteConnection(false);
   }
+
+  public File getDBFile() {
+    return new File(getGraphANNISDir(), "annis.db");
+  }
   
   public Connection createSQLiteConnection(boolean readonly) throws SQLException
   {
     // TODO: make the datanase location configurable and maybe use a connection pool.
-    File dbFile = new File(getGraphANNISDir(), "annis.db");
+    File dbFile = getDBFile();
     SQLiteConfig conf = new SQLiteConfig();
     SQLiteDataSource source = new SQLiteDataSource(conf);
     source.setUrl("jdbc:sqlite:" + dbFile.getAbsolutePath());

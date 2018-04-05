@@ -140,15 +140,6 @@ CREATE TABLE corpus_alias
    PRIMARY KEY (alias, corpus_ref)
 );
 
-DROP TABLE IF EXISTS url_shortener CASCADE;
-CREATE  TABLE url_shortener 
-(
-  id UUID PRIMARY KEY,
-	"owner" varchar,
-  created timestamp with time zone,
-  url varchar
-);
-
 -- stats
 DROP TABLE IF EXISTS corpus_stats CASCADE;
 CREATE TABLE corpus_stats
