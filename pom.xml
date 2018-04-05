@@ -1,29 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project 
+  xmlns="http://maven.apache.org/POM/4.0.0" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-all</artifactId>
   <packaging>pom</packaging>
   <name>ANNIS corpus search</name>
   <version>3.5.0-SNAPSHOT</version>
-  <description>
-    ANNIS is an open source, versatile web browser-based search and
-    visualization architecture for complex multilevel linguistic corpora with
-    diverse types of annotation. ANNIS, which stands for ANNotation of Information
-    Structure, has been designed to provide access to the data of the
-    SFB 632 - "Information Structure: The Linguistic Means for Structuring
-    Utterances, Sentences and Texts". Since information structure interacts with
-    linguistic phenomena on many levels, ANNIS addresses the SFB's need to
-    concurrently annotate, query and visualize data from such varied areas as
-    syntax, semantics, morphology, prosody, referentiality, lexis and more.
-    For projects working with spoken language, support for audio / video
-    annotations is also required.
-  </description>
-
+  <description>ANNIS is an open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with    diverse types of annotation. ANNIS, which stands for ANNotation of Information Structure, has been designed to provide access to the data of the SFB 632 - "Information Structure: The Linguistic Means for Structuring Utterances, Sentences and Texts". Since information structure interacts with    linguistic phenomena on many levels, ANNIS addresses the SFB's need to concurrently annotate, query and visualize data from such varied areas as    syntax, semantics, morphology, prosody, referentiality, lexis and more. For projects working with spoken language, support for audio / video    annotations is also required.</description>
   <url>http://corpus-tools.org/annis/</url>
-  
-   <developers>
+  <developers>
     <developer>
       <name>Thomas Krause</name>
       <email>krauseto@hu-berlin.de</email>
@@ -31,13 +18,11 @@
       <organizationUrl>https://www.hu-berlin.de</organizationUrl>
     </developer>
   </developers>
-
   <scm>
     <connection>scm:git:https://github.com/korpling/ANNIS.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/korpling/ANNIS.git</developerConnection>
     <url>https://github.com/korpling/ANNIS</url>
   </scm>
-
   <organization>
     <name>SFB 632</name>
     <url>http://www.sfb632.uni-potsdam.de/</url>
@@ -48,8 +33,7 @@
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
-
-  <distributionManagement>    
+  <distributionManagement>
     <snapshotRepository>
       <id>ossrh</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -59,7 +43,6 @@
       <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
-
   <repositories>
     <repository>
       <id>korpling</id>
@@ -82,16 +65,12 @@
       </releases>
     </repository>
   </repositories>
-  
   <properties>
     <servlet.version>3.0.1</servlet.version>
     <vaadin.version>7.7.10</vaadin.version>
   </properties>
-
   <build>
-
     <plugins>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -101,48 +80,12 @@
           <target>1.8</target>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <version>2.3.7</version>
         <extensions>true</extensions>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <reportPlugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-project-info-reports-plugin</artifactId>
-              <version>2.4</version>
-              <configuration>
-                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-              </configuration>
-              <reports>
-                <report>index</report>
-                <report>summary</report>
-                <report>license</report>
-              </reports>
-            </plugin>
-
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>findbugs-maven-plugin</artifactId>
-              <version>2.5.3</version>
-              <configuration>
-                <excludeFilterFile>${basedir}/src/findbugs/excludeFilter.xml</excludeFilterFile>
-              </configuration>
-            </plugin>
-
-
-          </reportPlugins>
-        </configuration>
-      </plugin>
-
       <!-- update this with
       mvn license:add-third-party license:download-licenses
       -->
@@ -159,7 +102,6 @@
           <licensesOutputDirectory>${basedir}/THIRD-PARTY/licenses</licensesOutputDirectory>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
@@ -179,7 +121,6 @@
           <shortRevisionLength>10</shortRevisionLength>
         </configuration>
       </plugin>
-      
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -191,24 +132,6 @@
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.7</version>
-        <configuration>
-          <reportPlugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <configuration>
-                <additionalparam>${javadoc.opts}</additionalparam>
-              </configuration>
-            </plugin>
-          </reportPlugins>
-        </configuration>
-      </plugin>
-      
     </plugins>
     <extensions>
       <extension>
@@ -218,7 +141,42 @@
       </extension>
     </extensions>
   </build>
-
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalparam>${javadoc.opts}</additionalparam>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>index</report>
+              <report>summary</report>
+              <report>license</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>findbugs-maven-plugin</artifactId>
+        <version>2.5.3</version>
+        <configuration>
+          <excludeFilterFile>${basedir}/src/findbugs/excludeFilter.xml</excludeFilterFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
   <profiles>
     <profile>
       <id>java8-doclint-disabled</id>
@@ -246,7 +204,6 @@
               </execution>
             </executions>
           </plugin>
-      
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
@@ -258,12 +215,11 @@
                   <goal>jar</goal>
                 </goals>
                 <configuration>
-                    <additionalparam>${javadoc.opts}</additionalparam>
+                  <additionalparam>${javadoc.opts}</additionalparam>
                 </configuration>
               </execution>
             </executions>
           </plugin>
-      
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
@@ -282,7 +238,6 @@
       </build>
     </profile>
   </profiles>
-
   <modules>
     <module>annis-interfaces</module>
     <module>annis-service</module>
@@ -293,5 +248,4 @@
     <module>annis-libgui</module>
     <module>doc</module>
   </modules>
-
 </project>
