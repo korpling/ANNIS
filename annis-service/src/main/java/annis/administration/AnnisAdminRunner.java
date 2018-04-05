@@ -381,9 +381,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
     try
     {
-
-
-
       CommandLineParser parser = new PosixParser();
       CommandLine cmdLine = parser.parse(options, commandArgs.toArray(
         new String[commandArgs.size()]));
@@ -393,11 +390,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         throw new ParseException(
           "Where can I find the corpus you want to import?");
       }
-
+      
       boolean overwrite = cmdLine.hasOption('o');
       corpusAdministration.importCorporaSave(overwrite, 
-          options.getOption("alias").getValue(),
-          options.getOption("mail").getValue(), 
+          cmdLine.getOptionValue("alias"),
+          cmdLine.getOptionValue("mail"), 
           false,
           cmdLine.getArgList());
       
