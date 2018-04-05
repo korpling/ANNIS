@@ -262,7 +262,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   @Override
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName) {
-    return getBinaryMeta(toplevelCorpusName, toplevelCorpusName);
+    return getBinaryMeta(toplevelCorpusName, null);
   }
 
   @Override
@@ -335,7 +335,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
       String sql = "SELECT filename FROM media_files "
         + "WHERE corpus_path=? AND title = " + "'corpus.properties'";
       
-      String fileName = getQueryRunner().query(conn, sql, new ScalarHandler<String>(1), toplevelCorpusName);
+      String fileName = getQueryRunner().query(conn, sql, new ScalarHandler<>(1), toplevelCorpusName);
       
       File dir = getRealDataDir();
       if (!dir.exists()) {
@@ -1228,7 +1228,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
         conn,
         MetaByteHelper.SQL,
         metaByteHelper, 
-        metaByteHelper.getArgs(toplevelCorpusName + "/" + corpusName)
+        corpusName == null ? toplevelCorpusName : toplevelCorpusName + "/" + corpusName
       );
 
       // get the file size from the real file
