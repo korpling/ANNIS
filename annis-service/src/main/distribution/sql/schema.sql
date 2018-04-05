@@ -183,40 +183,6 @@ SELECT min(corpus_stats.name::text) AS name,
 FROM corpus_stats LEFT JOIN corpus_alias AS a ON (corpus_stats.id = a.corpus_ref)
 GROUP BY corpus_stats.id;
 
-DROP TYPE IF EXISTS resolver_visibility CASCADE;
-CREATE TYPE resolver_visibility AS ENUM (
-  'permanent',
-  'visible',
-  'hidden',
-  'removed',
-  'preloaded'
-);
-
-DROP TABLE IF EXISTS resolver_vis_map CASCADE;
-CREATE TABLE resolver_vis_map
-(
-  "id"   serial PRIMARY KEY,
-  "corpus"   varchar COLLATE "C",
-  "version"   varchar COLLATE "C",
-  "namespace"  varchar COLLATE "C",
-  "element"    varchar COLLATE "C" CHECK (element = 'node' OR element = 'edge'),
-  "vis_type"   varchar COLLATE "C" NOT NULL,
-  "display_name"   varchar COLLATE "C" NOT NULL,
-  "visibility"     resolver_visibility NOT NULL DEFAULT 'hidden',
-  "order" integer default '0',
-  "mappings" varchar,
-   UNIQUE (corpus,version,namespace,element,vis_type)
-);
-COMMENT ON COLUMN resolver_vis_map.id IS 'primary key';
-COMMENT ON COLUMN resolver_vis_map.corpus IS 'the name of the supercorpus, part of foreign key to corpus.name,corpus.version';
-COMMENT ON COLUMN resolver_vis_map.version IS 'the version of the corpus, part of foreign key to corpus.name,corpus.version';
-COMMENT ON COLUMN resolver_vis_map.namespace IS 'the several layers of the corpus';
-COMMENT ON COLUMN resolver_vis_map.element IS 'the type of the entry: node | edge';
-COMMENT ON COLUMN resolver_vis_map.vis_type IS 'the abstract type of visualization: tree, discourse, grid, ...';
-COMMENT ON COLUMN resolver_vis_map.display_name IS 'the name of the layer which shall be shown for display';
-COMMENT ON COLUMN resolver_vis_map.visibility IS 'defines the visibility state of a corpus: permanent: is always shown and can not be toggled, visible: is shown and can be toggled, hidden: is not shown can be toggled';
-COMMENT ON COLUMN resolver_vis_map.order IS 'the order of the layers, in which they shall be shown';
-COMMENT ON COLUMN resolver_vis_map.mappings IS 'which annotations in this corpus correspond to fields expected by the visualization, e.g. the tree visualizer expects a node label, which is called "cat" by default but may be changed using this field';
 
 DROP TABLE IF EXISTS annotations CASCADE;
 CREATE TABLE annotations
