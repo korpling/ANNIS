@@ -4,12 +4,11 @@ import annis.service.objects.AnnisBinaryMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Arrays;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
 
-public class ByteHelper implements ResultSetExtractor<AnnisBinaryMetaData>
+public class ByteHelper implements ResultSetHandler<AnnisBinaryMetaData>
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ByteHelper.class);
@@ -30,42 +29,18 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinaryMetaData>
     + "  (? IS NULL OR title = ?)";
   ;
   
-  public static int[] getArgTypes()
-  {
-    return Arrays.copyOf(ARG_TYPES, ARG_TYPES.length);
-  }
-  
-  public Object[] getArgs(String corpusPath, 
-    String mimeType, String title, int offset, int length)
-  {
-    return new Object[] 
-    {
-      corpusPath, mimeType, mimeType, title, title
-    }; 
-
-  }
-
   @Override
-  public AnnisBinaryMetaData extractData(ResultSet rs) throws
-    DataAccessException
+  public AnnisBinaryMetaData handle(ResultSet rs) throws SQLException
   {
     AnnisBinaryMetaData ab = new AnnisBinaryMetaData();
-    try
+    while (rs.next())
     {
-      while (rs.next())
-      {
-        ab.setLocalFileName(rs.getString("filename"));
-        ab.setFileName(rs.getString("title"));
-        ab.setMimeType(rs.getString("mime_type"));
-        // we only give one matching result back
-        break;
-      }
+      ab.setLocalFileName(rs.getString("filename"));
+      ab.setFileName(rs.getString("title"));
+      ab.setMimeType(rs.getString("mime_type"));
+      // we only give one matching result back
+      break;
     }
-    catch (SQLException ex)
-    {
-      log.error(null, ex);
-    }
-
     return ab;
   }
 

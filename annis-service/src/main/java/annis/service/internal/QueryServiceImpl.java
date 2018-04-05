@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -801,6 +802,12 @@ public class QueryServiceImpl implements QueryService
     if (acceptHeader == null || acceptHeader.trim().isEmpty())
     {
       acceptHeader = "*/*";
+    }
+    
+    if(Objects.equals(toplevelCorpusName, corpusName)) {
+      // the toplevel corpus was queried, not a document or sub-corpus
+      // TODO: improve the URL patterns
+      corpusName = null;
     }
 
     List<AnnisBinaryMetaData> meta = queryDao.getBinaryMeta(toplevelCorpusName,

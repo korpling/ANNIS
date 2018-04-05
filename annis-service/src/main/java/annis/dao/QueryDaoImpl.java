@@ -1193,31 +1193,43 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   @Override
   public InputStream getBinary(String toplevelCorpusName, String corpusName,
           String mimeType, String title, int offset, int length) {
-    String corpusPath = toplevelCorpusName + "/" + corpusName;
-    AnnisBinaryMetaData binary
-            = (AnnisBinaryMetaData) getJdbcTemplate().query(ByteHelper.SQL,
-                    byteHelper.
-                            getArgs(corpusPath, mimeType, title, offset,
-                                    length),
-                    ByteHelper.getArgTypes(), byteHelper);
+    
+    AnnisBinaryMetaData binary = null;
+    try (Connection conn = createSQLiteConnection(true))
+    { 
+      binary = getQueryRunner().query(
+        conn,
+        ByteHelper.SQL,
+        byteHelper, 
+        corpusName == null ? toplevelCorpusName : toplevelCorpusName + "/" + corpusName,
+        mimeType, mimeType, title, title
+      );
+    }
+    catch (SQLException ex)
+    {
+      log.error("Could not query binary meta data for {}/{}", toplevelCorpusName, corpusName, ex);
+    }
+    
+    if(binary != null) {
 
-    try {
-      // retrieve the requested part of the file from the data directory
-      File dataFile = new File(getRealDataDir(), binary.getLocalFileName());
+      try {
+        // retrieve the requested part of the file from the data directory
+        File dataFile = new File(getRealDataDir(), binary.getLocalFileName());
 
-      long fileSize = dataFile.length();
+        long fileSize = dataFile.length();
 
-      Preconditions.checkArgument(offset + length <= fileSize,
-              "Range larger than the actual file size requested. Actual file size is %d bytes, %d bytes were requested.",
-              fileSize, offset + length);
+        Preconditions.checkArgument(offset + length <= fileSize,
+                "Range larger than the actual file size requested. Actual file size is %d bytes, %d bytes were requested.",
+                fileSize, offset + length);
 
-      FileInputStream fInput = new FileInputStream(dataFile);
-      ByteStreams.skipFully(fInput, offset);
-      return ByteStreams.limit(fInput, length);
-    } catch (FileNotFoundException ex) {
-      log.warn("Media file from database not found in data directory", ex);
-    } catch (IOException ex) {
-      log.warn("Error when reading media file from the data directory", ex);
+        FileInputStream fInput = new FileInputStream(dataFile);
+        ByteStreams.skipFully(fInput, offset);
+        return ByteStreams.limit(fInput, length);
+      } catch (FileNotFoundException ex) {
+        log.warn("Media file from database not found in data directory", ex);
+      } catch (IOException ex) {
+        log.warn("Error when reading media file from the data directory", ex);
+      }
     }
 
     return new ByteArrayInputStream(new byte[0]);
