@@ -37,9 +37,7 @@ import javax.sql.DataSource;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import com.google.common.net.UrlEscapers;
 
-import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,8 +48,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.sqlite.SQLiteConfig;
-import org.sqlite.SQLiteDataSource;
 
 import annis.administration.FileAccessException;
 import annis.administration.StatementController;
@@ -196,7 +192,7 @@ public abstract class AbstractDao extends DBProvider {
 
     try (
         CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(csvFile), StandardCharsets.UTF_8),
-            '\t')) {
+            '\t', (char) 0)) {
 
       String[] firstLine = csvReader.readNext();
       if (lineModifier != null) {

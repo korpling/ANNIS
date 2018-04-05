@@ -118,6 +118,16 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
           delStmt.executeUpdate();
         }
       }
+
+      log.info("deleting example query entries");
+      try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM example_queries WHERE corpus=?"))
+      {
+        for (String n : id2name.values())
+        {
+          delStmt.setString(1, n);
+          delStmt.executeUpdate();
+        }
+      }
       conn.commit();
 
     }
