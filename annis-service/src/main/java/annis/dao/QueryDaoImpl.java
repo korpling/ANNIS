@@ -49,6 +49,7 @@ import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.RawTextSqlHelper;
+import annis.sqlgen.SelectedFactsFromClauseGenerator;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
 import annis.sqlgen.extensions.AnnotateQueryData;
@@ -96,10 +97,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.cache.Cache;
-import javax.cache.Caching;
-import javax.cache.configuration.MutableConfiguration;
-import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -123,7 +120,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -811,11 +807,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     String corpusListStr = corpusList == null || corpusList.isEmpty()
             ? "NULL" : Joiner.on(", ").join(corpusList);
 
+    String annotationsTable = SelectedFactsFromClauseGenerator.inheritedTables("annotations", corpusList, "");
+    
     String sql = "SELECT DISTINCT \"name\"\n"
-            + "FROM annotations\n"
-            + "WHERE\n"
-            + "  toplevel_corpus IN (" + corpusListStr + ")\n"
-            + "  AND type='segmentation'";
+      + "FROM " + annotationsTable + " AS annotations \n"
+      + "WHERE\n"
+      + "  toplevel_corpus IN (" + corpusListStr + ")\n"
+      + "  AND type='segmentation'";
     return getJdbcTemplate().queryForList(sql, String.class);
   }
 

@@ -268,7 +268,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       + tokenBoarder
       + ") FROM ";
     
-    innerSelect += SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, "")
+    innerSelect += SelectedFactsFromClauseGenerator.inheritedFactTables(corpusList, "")
       + " AS lrsub ";
 
     
@@ -572,10 +572,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String componentTarget
       = tables(target).aliasedColumn(RANK_TABLE, "component_ref");
 
-    String rankTableName = tas.partitionTableName(RANK_TABLE, corpusList);
+    String factsTable = SelectedFactsFromClauseGenerator.inheritedFactTables(corpusList, "");
     
     StringBuffer sb = new StringBuffer();
-    sb.append("EXISTS (SELECT 1 FROM " + rankTableName
+    sb.append("EXISTS (SELECT 1 FROM " + factsTable
       + " AS ancestor WHERE\n");
     if (useComponentRefPredicateInCommonAncestorSubquery)
     {
@@ -711,9 +711,11 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String corpusRef = TableAccessStrategy.column("children", tas.columnName(NODE_TABLE, "corpus_ref"));;
     
     
+    String factsTable = SelectedFactsFromClauseGenerator.inheritedFactTables(corpusList, "");
+    
     StringBuffer sb = new StringBuffer();
     sb.append("(SELECT count(DISTINCT " + id + ")\n");
-    sb.append("\tFROM " + tas.tableName(RANK_TABLE) + " AS children\n");
+    sb.append("\tFROM " + factsTable + " AS children\n");
     sb.append("\tWHERE " + parent + " = " + id1 
       + " AND " + componentID1 + " = " + componentID
       + " AND " + corpusRef1 + " = " + corpusRef

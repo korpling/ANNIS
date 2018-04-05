@@ -255,10 +255,7 @@ public class CorpusAdministration
           ex.getMessage());
       }
     } // end for each corpus
-    if(anyCorpusImported)
-    {
-      administrationDao.analyzeParentFacts();
-    }
+    
     return importStats;
   }
 

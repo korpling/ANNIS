@@ -44,4 +44,16 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>
         <org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
     </properties>
+    <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
+        <config-files>
+            <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Dao.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/SqlGenerator.xml</config-file>
+        </config-files>
+        <config-file-groups/>
+    </spring-data>
 </project-shared-configuration>

@@ -69,8 +69,6 @@ public class TestCorpusAdministration
 
     verifyPostImport(inOrder);
 
-    inOrder.verify(administrationDao).analyzeParentFacts();
-    
     // that should be it
     verifyNoMoreInteractions(administrationDao);
   }
@@ -98,8 +96,6 @@ public class TestCorpusAdministration
     verifyImport(inOrder, path1);
     verifyImport(inOrder, path2);
     verifyImport(inOrder, path3);
-
-    inOrder.verify(administrationDao).analyzeParentFacts();
     
     // that should be it
     verifyNoMoreInteractions(administrationDao);

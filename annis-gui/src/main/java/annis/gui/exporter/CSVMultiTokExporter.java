@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 
 import annis.service.objects.SubgraphFilter;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -81,6 +80,26 @@ public class CSVMultiTokExporter extends SaltBasedExporter
   private Set<String> metakeys;
   private SortedMap<Integer,TreeSet<String>> annotationsForMatchedNodes;
 
+    /**
+   * Takes a match and returns the matched nodes.
+   *
+   * @param graph
+   *
+   * @throws java.io.IOException
+   *
+   */
+  private Set<SNode> getMatchedNodes(SDocumentGraph graph) {
+
+    Set<SNode> matchedNodes = new HashSet<>();
+
+    for (SNode node: graph.getNodes()) {
+       if (node.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE) != null)
+         matchedNodes.add(node);
+    }
+
+    return matchedNodes;
+  }
+
   /**
    * Takes a match and stores annotation names to construct the header in
    * {@link #outputText(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph, boolean, int, java.io.Writer) }
@@ -109,15 +128,7 @@ public class CSVMultiTokExporter extends SaltBasedExporter
       // initialize list of annotations for the matched nodes
       annotationsForMatchedNodes = new TreeMap<>();
     }
-    // get list of annotations for the nodes in the current match
-    Set<String> matchIDs = new HashSet<>(Arrays.asList(
-      graph
-      .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
-      .getValue_STEXT().split(",")));
-    for (String matchID: matchIDs)
-    {
-      matchID = URLDecoder.decode(matchID, "UTF-8");
-      SNode node = graph.getNode(matchID);
+    for (SNode node: this.getMatchedNodes(graph)) {
       int node_id = node
           .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE)
           .getValue_SNUMERIC().intValue();
@@ -171,15 +182,8 @@ public class CSVMultiTokExporter extends SaltBasedExporter
 
     // output nodes in the order of the matches
     SortedMap<Integer, String> contentLine = new TreeMap<>();
-    Set<String> matchIDs = new HashSet<>(Arrays.asList(
-      graph
-      .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS)
-      .getValue_STEXT().split(",")));
-    for (String matchID: matchIDs)
-    {
-      matchID = URLDecoder.decode(matchID, "UTF-8");
+    for (SNode node: this.getMatchedNodes(graph)) {
       List<String> nodeLine = new ArrayList<>();
-      SNode node = graph.getNode(matchID);
       // export id
       RelannisNodeFeature feats = RelannisNodeFeature.extract(node);
       nodeLine.add(String.valueOf(feats.getInternalID()));

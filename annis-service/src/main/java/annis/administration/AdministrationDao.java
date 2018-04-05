@@ -1334,20 +1334,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     getJdbcTemplate().execute("ANALYZE facts_" + corpusID);
   }
 
-  /**
-   * Update the statistics for the "facts" table as a whole.
-   */
-  @Transactional(propagation = Propagation.REQUIRED)
-  public void analyzeParentFacts()
-  {
-    log.info("analyzing parent facts table");
-    // explicitly unset any timeout. Since this function might be called
-    // independent
-    // from the import process we have to set it manually.
-    getJdbcTemplate().update("SET statement_timeout TO 0");
-    getJdbcTemplate().execute("ANALYZE facts");
-  }
-
+  
   void adjustDistinctLeftRightToken(long corpusID)
   {
     /*
