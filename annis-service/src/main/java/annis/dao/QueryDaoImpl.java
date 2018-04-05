@@ -579,13 +579,19 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   }
 
   @Override
-  public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs) {
-    if (corpusIDs == null || corpusIDs.isEmpty()) {
+  public List<ExampleQuery> getExampleQueries(List<String> corpora){
+    if (corpora == null || corpora.isEmpty()) {
       return null;
     } else {
-      return (List<ExampleQuery>) getJdbcTemplate().query(
-              listExampleQueriesHelper.createSQLQuery(corpusIDs),
-              listExampleQueriesHelper);
+      List<ExampleQuery> result = new LinkedList<>();
+      try(Connection conn = createSQLiteConnection(true)) {
+        for(String c : corpora) {
+          result.addAll(getQueryRunner().query(conn, ListExampleQueriesHelper.SQL, listExampleQueriesHelper, c));
+        }
+      } catch(SQLException ex) {
+        log.error("Could not get example queries for corpora {}", Joiner.on(',').join(corpora), ex);
+      }
+      return result;
     }
   }
 

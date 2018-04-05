@@ -73,10 +73,7 @@ abstract public class AbstractAutoQuery implements QueriesGenerator.QueryBuilder
   public ExampleQuery getExampleQuery()
   {
     ExampleQuery exampleQuery = new ExampleQuery();
-    exampleQuery.setNodes(getNodes());
-    exampleQuery.setType(getType());
     exampleQuery.setDescription(getDescription());
-    exampleQuery.setUsedOperators(getOperators());
     exampleQuery.setExampleQuery(getFinalAQLQuery());
 
     return exampleQuery;

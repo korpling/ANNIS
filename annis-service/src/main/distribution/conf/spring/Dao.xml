@@ -92,9 +92,7 @@
   </bean>
 
   <bean id="queriesGenerator" class="annis.dao.autogenqueries.QueriesGenerator" lazy-init="true">
-    <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
     <property name="queryDao" ref="queryDao" />
-    <property name="tableInsertSelect" ref="tableInsertSelect" />
     <property name="queryBuilder">
       <util:set>
         <bean class="annis.dao.autogenqueries.AutoTokQuery"/>
@@ -104,8 +102,6 @@
   </bean>
   
   <util:map id="tableInsertFrom">
-    <entry key="resolver_vis_map" value="corpus, version, namespace, element, vis_type, display_name, visibility::resolver_visibility, &quot;order&quot;, mappings" />
-    <entry key="example_queries" value="example_query, description, &quot;type&quot;, nodes, used_ops, corpus_ref" />
     <entry key="text" value="(corpus_ref + :offset_corpus_id), id, name, text, toplevel_corpus" />
     <entry key="corpus" value="(id + :offset_corpus_id ), name, type, version, (pre + :offset_corpus_post), (post + :offset_corpus_post), top_level" />
     <entry key="corpus_annotation" value="(corpus_ref + :offset_corpus_id), namespace, name, value"/>
@@ -113,17 +109,13 @@
 (max_corpus_id + :offset_corpus_id), (max_corpus_pre + :offset_corpus_post), 
 (max_corpus_post + :offset_corpus_post), 
 (max_node_id + :offset_node_id), source_path" />
-    <entry key="media_files" value="filename, (corpus_ref + :offset_corpus_id), mime_type, title" />
   </util:map>
 
   <util:map id="tableInsertSelect">
-    <entry key="resolver_vis_map" value="corpus, version, namespace, element, vis_type, display_name, visibility, &quot;order&quot;, mappings" />
     <entry key="text" value="corpus_ref, id, name, text, toplevel_corpus" />
-    <entry key="example_queries" value="example_query, description, &quot;type&quot;, nodes, used_ops, corpus_ref" />
     <entry key="corpus" value="id, name, type, version, pre, post, top_level" />
     <entry key="corpus_annotation" value="corpus_ref, namespace, name, value"/>
     <entry key="corpus_stats" value="name, id, text, tokens, max_corpus_id, max_corpus_pre, max_corpus_post, max_node_id, source_path" />
-    <entry key="media_files" value="filename, corpus_ref, mime_type, title" />
   </util:map>
 
   <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" lazy-init="true">

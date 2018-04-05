@@ -283,12 +283,12 @@ public interface QueryDao
   /**
    * Fetches a list with auto generated queries.
    *
-   * @param corpusIDs determines the corpora, for which the example queries are
+   * @param corpora determines the corpora, for which the example queries are
    * defined. If null then all auto generated queries are fetched.
    * @return Is null, if no example queries exists in the database or no corpus
    * ids are specified.
    */
-  public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs);
+  public List<ExampleQuery> getExampleQueries(List<String> corpora);
 
   /**
    * Returns the raw text from the text.tab file of the ANNIS format.

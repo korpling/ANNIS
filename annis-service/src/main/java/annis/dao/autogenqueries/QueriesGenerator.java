@@ -15,7 +15,20 @@
  */
 package annis.dao.autogenqueries;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.corpus_tools.salt.common.SaltProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import annis.GraphHelper;
+import annis.dao.DBProvider;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.ql.parser.QueryData;
@@ -24,15 +37,6 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.corpus_tools.salt.common.SaltProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Controlls the generating of automatic generated queries.
@@ -43,35 +47,24 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class QueriesGenerator
-{
+public class QueriesGenerator extends DBProvider {
 
   private final Logger log = LoggerFactory.getLogger(QueriesGenerator.class);
 
   // for executing AQL queries
   private QueryDao queryDao;
 
-  // only contains one element: the top level corpus id of the imported corpus
-  private List<Long> corpusIds;
-
   // the name of the imported top level corpus
   private String corpusName;
 
-  // defines which cols of the tmp table are selected
-  private Map<String, String> tableInsertSelect;
-
   // a set of query builder, which generate the example queries.
   private Set<QueryBuilder> queryBuilder;
-
-  // to execute some sql commands directly
-  private JdbcTemplate jdbcTemplate;
 
   /**
    * All automatic generated queries must implement this interface.
    *
    */
-  public interface QueryBuilder
-  {
+  public interface QueryBuilder {
 
     /**
      * Getter for a trial query, which is not put into the database. This is
@@ -119,13 +112,16 @@ public class QueriesGenerator
   /**
    * Deletes all example queries for a specific corpus.
    *
-   * @param corpusId References the corpus of the example queries.
+   * @param corpus The corpus name of the example queries.
    */
-  public void delExampleQueries(long corpusId)
+  public void delExampleQueriesForCorpus(String corpus)
   {
-    log.info("delete example queries of {}", corpusId);
-    jdbcTemplate.execute(
-      "DELETE FROM example_queries WHERE corpus_ref = " + corpusId);
+    log.info("delete example queries of {}", corpus);
+    try(Connection conn = createSQLiteConnection()) {
+      getQueryRunner().update(conn, "DELETE FROM example_queries WHERE corpus=?", corpus);
+    } catch(SQLException ex) {
+      log.error("Could not delete example queries for corpus {}", corpus, ex);
+    }
   }
 
   /**
@@ -140,14 +136,17 @@ public class QueriesGenerator
     if (corpusNames == null || corpusNames.isEmpty())
     {
       log.info("delete all example queries");
-      jdbcTemplate.execute("TRUNCATE example_queries");
+      try(Connection conn = createSQLiteConnection()) {
+        getQueryRunner().update(conn, "DELETE FROM example_queries");
+      } catch(SQLException ex) {
+        log.error("Could not delete example queries", ex);
+      }
     }
     else
     {
-      List<Long> ids = queryDao.mapCorpusNamesToIds(corpusNames);
-      for (Long id : ids)
+      for (String name : corpusNames)
       {
-        delExampleQueries(id);
+        delExampleQueriesForCorpus(name);
       }
     }
   }
@@ -156,66 +155,34 @@ public class QueriesGenerator
    * Iterates over all registered {@link QueryBuilder} and generate example
    * queries.
    *
-   * @param corpusId Determines the corpus, for which the example queries are
-   * generated for. It must be the final ANNIS id of the corpus.
+   * @param corpus Determines the corpus, for which the example queries are
+   * generated for.
    *
    * @param delete Deletes the already existing example queries in the database.
    */
-  public void generateQueries(long corpusId, boolean delete)
-  {
-    if (delete)
-    {
-      delExampleQueries(corpusId);
+  public void generateQueries(String corpus, boolean delete) {
+    if (delete) {
+      delExampleQueriesForCorpus(corpus);
     }
 
-    generateQueries(corpusId);
+    generateQueries(corpus);
   }
 
   /**
    * Iterates over all registered {@link QueryBuilder} and generate example
    * queries.
    *
-   * @param corpusId Determines the corpus, for which the example queries are
-   * generated for. It must be the final ANNIS id of the corpus.
+   * @param corpus Determines the corpus, for which the example queries are
+   * generated for.
    */
-  public void generateQueries(long corpusId)
-  {
-    corpusIds = new ArrayList<>();
-    corpusIds.add(corpusId);
-    List<String> corpusNames = getQueryDao().mapCorpusIdsToNames(corpusIds);
-    if(!corpusNames.isEmpty())
-    {
-      corpusName = corpusNames.get(0);
-
-      if (queryBuilder != null)
-      {
-        for (QueryBuilder qB : queryBuilder)
-        {
+  public void generateQueries(String corpus) {
+    this.corpusName = corpus;
+    if (this.corpusName != null && !this.corpusName.isEmpty()) {
+      if (queryBuilder != null) {
+        for (QueryBuilder qB : queryBuilder) {
           generateQuery(qB);
         }
       }
-    }
-  }
-
-  /**
-   * Iterates over all registered {@link QueryBuilder} and generate example
-   * queries.
-   *
-   * @param name Determines the corpus, for which the example queries are
-   * generated for. It must be the final ANNIS id of the corpus.
-   */
-  public void generateQueries(String name, boolean delete)
-  {
-    List<String> names = new ArrayList<>();
-    names.add(name);
-    List<Long> ids = queryDao.mapCorpusNamesToIds(names);
-    if (!ids.isEmpty())
-    {
-      generateQueries(ids.get(0), delete);
-    }
-    else
-    {
-      log.error("{} is unknown to the system", name);
     }
   }
 
@@ -224,38 +191,34 @@ public class QueriesGenerator
    *
    * @param overwrite Deletes already exisiting example queries.
    */
-  public void generateQueries(Boolean overwrite)
-  {
+  public void generateQueries(Boolean overwrite) {
     List<AnnisCorpus> corpora = queryDao.listCorpora();
-    for (AnnisCorpus annisCorpus : corpora)
-    {
-      generateQueries(annisCorpus.getId(), overwrite);
+    for (AnnisCorpus annisCorpus : corpora) {
+      generateQueries(annisCorpus.getName(), overwrite);
     }
   }
 
-  private void generateQuery(QueryBuilder queryBuilder)
-  {
-    try
-    {
+  private void generateQuery(QueryBuilder queryBuilder) {
+    try {
 
       // retrieve the aql query for analyzing purposes
       String aql = queryBuilder.getAQL();
 
       // set some necessary extensions for generating complete sql
-      QueryData queryData = getQueryDao().parseAQL(aql, this.corpusIds);
+      long corpusIDs = getQueryDao().mapCorpusNameToId(this.corpusName);
+      QueryData queryData = getQueryDao().parseAQL(aql, Arrays.asList(corpusIDs));
       queryData.addExtension(queryBuilder.getLimitOffsetQueryData());
-      
+
       // retrieve the salt project to analyze
       List<Match> matches = getQueryDao().find(queryData);
-      
-      if(matches.isEmpty())
-      {
+
+      if (matches.isEmpty()) {
         return;
       }
-      
+
       QueryData matchQueryData = GraphHelper.createQueryData(new MatchGroup(matches), queryDao);
       matchQueryData.addExtension(queryBuilder.getAnnotateQueryData());
-      
+
       SaltProject saltProject = getQueryDao().graph(matchQueryData);
       queryBuilder.analyzingQuery(saltProject);
 
@@ -264,115 +227,49 @@ public class QueriesGenerator
       exampleQuery.setCorpusName(corpusName);
 
       // copy the example query to the database
-      if (exampleQuery.getExampleQuery() != null
-        && !"".equals(exampleQuery.getExampleQuery()))
-      {
-        if (getTableInsertSelect().containsKey("example_queries"))
-        {
-          
-          Object[] values = new Object[]
-          { 
-            exampleQuery.getExampleQuery(),
-            exampleQuery.getDescription(),
-            exampleQuery.getType() == null ? "" : exampleQuery.getType(),
-            exampleQuery.getNodes(),
-            "{}",
-            corpusIds.get(0)
-          };
-          int[] argTypes = new int[]
-          {
-            Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
-            Types.VARCHAR, Types.INTEGER
-          };
+      if (exampleQuery.getExampleQuery() != null && !"".equals(exampleQuery.getExampleQuery())) {
+        try(Connection conn = createSQLiteConnection()) {
+          getQueryRunner().update(conn, "INSERT INTO example_queries (example_query, description, corpus) VALUES(?,?,?)",
+            exampleQuery.getExampleQuery(), exampleQuery.getDescription(), this.corpusName);
 
-          getJdbcTemplate().update("INSERT INTO example_queries(" 
-            + getTableInsertSelect().get("example_queries") 
-            + ") VALUES(?, ?, ?, ?, ?::text[], ?)", values, argTypes);
-          log.info("generated example query: {}", exampleQuery.getExampleQuery());
+            log.info("generated example query: {}", exampleQuery.getExampleQuery());
+
+        } catch(SQLException ex) {
+          log.error("Could not add generated example query", ex);
         }
+      
+      } else {
+        log.warn("could not generating auto query with {}", queryBuilder.getClass().getName());
       }
-      else
-      {
-        log.warn("could not generating auto query with {}", queryBuilder.
-          getClass().getName());
-      }
-    }
-    catch(Exception ex)
-    {
+    } catch (Exception ex) {
       log.warn("Cannot generate example query", ex);
     }
   }
-
-  /**
-   * Defines the table columns of the temporary example query table are copied
-   * to the final table. The important table name for example queries is
-   * "example_queries".
-   *
-   * @return Returns a map of table names to column names.
-   */
-  public Map<String, String> getTableInsertSelect()
-  {
-    return tableInsertSelect;
-  }
-
-  /**
-   * Defines the table columns of the temporary example query table are copied
-   * to the final table. This field is set by using spring beans.
-   *
-   * @param tableInsertSelect the tableInsertSelect to set
-   */
-  public void setTableInsertSelect(Map<String, String> tableInsertSelect)
-  {
-    this.tableInsertSelect = tableInsertSelect;
-  }
-
-  /**
-   *
-   * @return the jdbcTemplate
-   */
-  public JdbcTemplate getJdbcTemplate()
-  {
-    return jdbcTemplate;
-  }
-
-  /**
-   * @param jdbcTemplate the jdbcTemplate to set
-   */
-  public void setJdbcTemplate(
-    JdbcTemplate jdbcTemplate)
-  {
-    this.jdbcTemplate = jdbcTemplate;
-  }
-
   /**
    * @return the queryDao
    */
-  public QueryDao getQueryDao()
-  {
+  public QueryDao getQueryDao() {
     return queryDao;
   }
 
   /**
    * @param queryDao the queryDao to set
    */
-  public void setQueryDao(QueryDao queryDao)
-  {
+  public void setQueryDao(QueryDao queryDao) {
     this.queryDao = queryDao;
   }
 
   /**
    * @return the queryBuilder
    */
-  public Set<QueryBuilder> getQueryBuilder()
-  {
+  public Set<QueryBuilder> getQueryBuilder() {
     return queryBuilder;
   }
 
   /**
    * @param queryBuilder the queryBuilder to set
    */
-  public void setQueryBuilder(Set<QueryBuilder> queryBuilder)
-  {
+  public void setQueryBuilder(Set<QueryBuilder> queryBuilder) {
     this.queryBuilder = queryBuilder;
   }
 }

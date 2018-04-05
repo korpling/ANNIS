@@ -336,10 +336,11 @@ public class AnnisRunner extends AnnisBaseRunner
    */
   public void doClearExampleQueries(String unused)
   {
-    for (Long corpusId : corpusList)
+    List<String> corpusNames = getQueryDao().mapCorpusIdsToNames(this.corpusList);
+    for (String corpus : corpusNames)
     {
-      System.out.println("delete example queries for " + corpusId);
-      queriesGenerator.delExampleQueries(corpusId);
+      System.out.println("delete example queries for " + corpus);
+      queriesGenerator.delExampleQueriesForCorpus(corpus);
     }
   }
 
@@ -362,10 +363,11 @@ public class AnnisRunner extends AnnisBaseRunner
 
     if (corpusList != null)
     {
-      for (Long corpusId : corpusList)
+      List<String> corpusNames = getQueryDao().mapCorpusIdsToNames(this.corpusList);
+      for (String corpus : corpusNames)
       {
-        System.out.println("generate example queries " + corpusId);
-        queriesGenerator.generateQueries(corpusId, del);
+        System.out.println("generate example queries " + corpus);
+        queriesGenerator.generateQueries(corpus, del);
       }
     }
   }

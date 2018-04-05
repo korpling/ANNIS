@@ -29,5 +29,3 @@ ALTER TABLE _node_annotation ADD CONSTRAINT "__FK_node_annotation__node" FOREIGN
 
 ALTER TABLE _edge_annotation ADD CONSTRAINT "__UNIQ_edge_annotation" UNIQUE (rank_ref, namespace, name);
 ALTER TABLE _edge_annotation ADD CONSTRAINT "__FK_edge_annotation__rank" FOREIGN KEY (rank_ref) REFERENCES _rank (id);
-
-ALTER TABLE _example_queries ADD CONSTRAINT "__UNIQUE_corpusname" UNIQUE (example_query);

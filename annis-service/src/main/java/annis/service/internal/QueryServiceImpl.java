@@ -939,8 +939,7 @@ public class QueryServiceImpl implements QueryService
         }
       }
 
-      List<Long> corpusIDs = queryDao.mapCorpusNamesToIds(allowedCorpora);
-      return queryDao.getExampleQueries(corpusIDs);
+      return queryDao.getExampleQueries(allowedCorpora);
     }
     catch (Exception ex)
     {

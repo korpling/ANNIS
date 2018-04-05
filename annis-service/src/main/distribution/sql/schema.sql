@@ -122,16 +122,6 @@ COMMENT ON COLUMN facts.edge_type IS 'edge type of this component';
 COMMENT ON COLUMN facts.edge_namespace IS 'optional namespace of the edges’ names';
 COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
 
-DROP TABLE IF EXISTS media_files CASCADE;
-CREATE TABLE media_files
-(
-  filename  text COLLATE "C" NOT NULL,
-  corpus_ref  integer NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
-  mime_type varchar COLLATE "C" NOT NULL,
-  title varchar COLLATE "C" NOT NULL,
-  UNIQUE (corpus_ref, title)
-);
-
 DROP TABLE IF EXISTS corpus_alias CASCADE;
 CREATE TABLE corpus_alias
 (
@@ -191,20 +181,6 @@ CREATE TABLE user_config
   config varchar, -- (should be json)
   PRIMARY KEY(id)
 );
-
---CREATE TYPE ops AS ENUM ('.','.*','>','->','_i_');
-DROP TABLE IF EXISTS example_queries;
-CREATE TABLE example_queries
-(
-  "id" serial PRIMARY KEY,
-  "example_query" TEXT COLLATE "C" NOT NULL,
-  "description" TEXT COLLATE "C" NOT NULL,
-  "type" TEXT COLLATE "C" NOT NULL,
-  "nodes" INTEGER NOT NULL,
-  "used_ops" TEXT[] COLLATE "C" NOT NULL,
-  "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
-);
-
 
 -- HACK: add a custom operator which is the same as "=" for integers but always
 -- returns 0.995 as join selectivity. See the description

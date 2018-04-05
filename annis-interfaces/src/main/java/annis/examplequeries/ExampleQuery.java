@@ -26,30 +26,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class ExampleQuery implements Serializable
 {
-
-  private String type;
-
   private String description;
 
   private String exampleQuery;
 
-  private String used_operators;
-
   private String corpusName;
 
-  // the amount of nodes of the example query
-  private int nodes;
+  
 
-  public String getType()
-  {
-    return type;
-  }
-
-  public void setType(String type)
-  {
-    this.type = type;
-  }
-
+  
   public String getDescription()
   {
     return description;
@@ -70,15 +55,6 @@ public class ExampleQuery implements Serializable
     this.exampleQuery = exampleQuery;
   }
 
-  public String getUsedOperators()
-  {
-    return used_operators;
-  }
-
-  public void setUsedOperators(String used_operators)
-  {
-    this.used_operators = used_operators;
-  }
 
   /**
    * @return the corpusName
@@ -103,24 +79,7 @@ public class ExampleQuery implements Serializable
     sb.append("example query: ").append(exampleQuery).append("\n");
     sb.append("example corpusName: ").append(corpusName).append("\n");
     sb.append("description: ").append(description).append("\n");
-    sb.append("used operators: ").append(used_operators).append("\n");
-    sb.append("nodes: ").append(nodes).append("\n");
     return sb.toString();
   }
 
-  /**
-   * @return the nodes
-   */
-  public int getNodes()
-  {
-    return nodes;
-  }
-
-  /**
-   * @param nodes the nodes to set
-   */
-  public void setNodes(int nodes)
-  {
-    this.nodes = nodes;
-  }
 }

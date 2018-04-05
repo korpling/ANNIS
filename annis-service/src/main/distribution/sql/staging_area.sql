@@ -8,7 +8,6 @@ DROP TABLE IF EXISTS _node_annotation;
 DROP TABLE IF EXISTS _node;
 DROP TABLE IF EXISTS _corpus;
 DROP TABLE IF EXISTS _text;
-DROP TABLE IF EXISTS _example_queries;
 
 
 -- corpora
@@ -115,11 +114,4 @@ CREATE :tmp TABLE _edge_annotation
 	namespace		varchar,
 	name			varchar NOT NULL,
 	value			varchar
-);
-
-
-CREATE :tmp TABLE _example_queries
-(
-  "example_query" TEXT NOT NULL,
-  "description" TEXT NOT NULL
 );
