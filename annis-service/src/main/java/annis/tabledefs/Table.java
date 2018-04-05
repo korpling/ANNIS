@@ -91,6 +91,17 @@ public class Table implements Serializable
     return result;
   }
   
+  public ArrayList<Column> getIndexedColumns()
+  {
+    ArrayList<Column> result = new ArrayList<>(columns.size());
+    for(Column c : columns) {
+      if(c.isCreateIndex()) {
+        result.add(c);
+      }
+    }
+    return result;
+  }
+  
   public String getName()
   {
     return name;

@@ -223,7 +223,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   
   private final Table resolverTable = new Table(FILE_RESOLVER_VIS_MAP)
         .c(new Column("id").type(Column.Type.INTEGER).primaryKey())
-        .c("corpus")
+        .c(new Column("corpus").createIndex())
         .c("version")
         .c("namespace")
         .c("element")
@@ -234,10 +234,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
         .c("mappings");
   
   private final Table mediaFilesTable = new Table("media_files")
-        .c("filename")
-        .c("corpus_path")
-        .c("mime_type")
-        .c("title");
+        .c(new Column("filename").unique())
+        .c(new Column("corpus_path").createIndex())
+        .c(new Column("mime_type").createIndex())
+        .c(new Column("title").createIndex());
 
   /**
    * Called when Spring configuration finished

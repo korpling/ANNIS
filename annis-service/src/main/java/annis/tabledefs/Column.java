@@ -22,6 +22,8 @@ public class Column implements Serializable
   private boolean unique = false;
   private boolean notNull = false;
   
+  private boolean createIndex = false;
+  
   public Column(String name)
   {
     this.name = name;
@@ -67,6 +69,13 @@ public class Column implements Serializable
     return copy;
   }
   
+  public Column createIndex()
+  {
+    Column copy = new Column(this);
+    copy.createIndex = true;
+    return copy;
+  }
+  
   public String getName()
   {
     return name;
@@ -90,6 +99,11 @@ public class Column implements Serializable
   public boolean isPrimaryKey()
   {
     return primaryKey;
+  }
+
+  public boolean isCreateIndex()
+  {
+    return createIndex;
   }
   
   @Override

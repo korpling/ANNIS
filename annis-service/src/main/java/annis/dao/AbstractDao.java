@@ -60,6 +60,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.sqlite.SQLiteConfig;
 import org.sqlite.SQLiteDataSource;
 
@@ -206,38 +207,37 @@ public abstract class AbstractDao
   
   public void createTableIfNotExists(Table table, File initialValuesCSV, 
     Function<String[],String[]> lineModifier) throws SQLException {
+    
     if(table == null) {
       return;
     }
     
-    try(Connection conn = createSQLiteConnection();  
-            Statement stmt = conn.createStatement())
+    try(Connection conn = createSQLiteConnection())
     {
       conn.setAutoCommit(false);
       
       // check if table exists
-      boolean createTable = false;
-      try(PreparedStatement tableExistsStmt = 
-          conn.prepareStatement("SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?")) {
-        tableExistsStmt.setString(1, table.getName());
-        try(ResultSet res = tableExistsStmt.executeQuery()) {
-          if(res.next()) {
-            createTable = res.getLong(1) == 0;
-          }
-        }
-      }
+      int num_existing = getQueryRunner().query(conn, 
+        "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?", 
+        new ScalarHandler<>(1),
+        table.getName());
       
-      
-      if(createTable) {
+      if(num_existing == 0) {
 
-        ArrayList<Column> columns = table.getColumns();
-
-        stmt.execute("CREATE TABLE " + table.getName() 
-          +  " (" + Joiner.on(", ").join(columns) +  ")");
+        getQueryRunner().update(conn, "CREATE TABLE " + table.getName() 
+          +  " (" + Joiner.on(", ").join(table.getColumns()) +  ")");
 
         if(initialValuesCSV != null) {
           importCSVIntoTable(conn, table, initialValuesCSV, lineModifier);
         }
+        
+        // create index for the columns
+        for(Column c : table.getIndexedColumns()) {
+          getQueryRunner().update(conn, "CREATE INDEX "
+            + "idx_" + table.getName() + "_" + c.getName() + " ON "
+            + table.getName() + " (" + c.getName() + ")");
+        }
+        
         conn.commit();
       }
     }
