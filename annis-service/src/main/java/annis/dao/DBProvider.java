@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package annis.dao;
 
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import com.google.common.net.UrlEscapers;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.sqlite.SQLiteConfig;
@@ -35,11 +32,13 @@ public class DBProvider {
     }
 
     public File getDBFile() {
-        return new File(getGraphANNISDir(), "annis.db");
+        return new File(getGraphANNISDir(), "annis.sqlite3");
     }
-    
+
     public Connection createSQLiteConnection(boolean readonly) throws SQLException {
-      // TODO: make the database location configurable and maybe use a connection pool.
+        // TODO: use a connection pool
+        // TODO: split into two databases, one "corpus_registry" and a
+        // "service_data" file
         File dbFile = getDBFile();
         return createSQLiteConnection(dbFile, readonly);
     }
@@ -51,13 +50,16 @@ public class DBProvider {
         return source.getConnection();
     }
 
-    public File getGraphANNISDir() {
-        return new File(System.getProperty("user.home"), ".annis/graphannis");
+    public final File getANNISDir() {
+        // TODO: make the annis folder location configurable
+        // (like the external data dir)
+        return new File(System.getProperty("user.home"), ".annis");
     }
 
-    public File getGraphANNISDir(String corpusName) {
-        String escapedCorpusName = UrlEscapers.urlPathSegmentEscaper().escape(corpusName);
-        return new File(getGraphANNISDir(), escapedCorpusName);
+    public final File getGraphANNISDir() {
+        if (false) {
+        }
+        return new File(getANNISDir(), "graphannis");
     }
 
     public QueryRunner getQueryRunner() {

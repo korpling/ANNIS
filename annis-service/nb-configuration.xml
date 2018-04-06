@@ -14,6 +14,18 @@ Without this configuration present, some functionality in the IDE may be limited
             <configuration id="ServiceRunNoSecurity" profiles=""/>
         </configurations>
     </config-data>
+    <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
+        <config-files>
+            <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Dao.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/SqlGenerator.xml</config-file>
+        </config-files>
+        <config-file-groups/>
+    </spring-data>
     <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
         <!--
 Properties that influence various parts of the IDE, especially code formatting and the like. 
@@ -43,17 +55,16 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>80</org-netbeans-modules-editor-indent.CodeStyle.project.text-limit-width>
         <org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>true</org-netbeans-modules-editor-indent.CodeStyle.project.expand-tabs>
         <org-netbeans-modules-editor-indent.CodeStyle.usedProfile>project</org-netbeans-modules-editor-indent.CodeStyle.usedProfile>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.SaveActionModifiedLinesOnly>false</de-markiewb-netbeans-plugins-eclipse-formatter46.SaveActionModifiedLinesOnly>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.preserveBreakPoints>true</de-markiewb-netbeans-plugins-eclipse-formatter46.preserveBreakPoints>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.linefeed/>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.eclipseFormatterActiveProfile/>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.useProjectPref>true</de-markiewb-netbeans-plugins-eclipse-formatter46.useProjectPref>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.eclipseFormatterLocation/>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.showNotifications>true</de-markiewb-netbeans-plugins-eclipse-formatter46.showNotifications>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.eclipseFormatterEnabled>true</de-markiewb-netbeans-plugins-eclipse-formatter46.eclipseFormatterEnabled>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.enableFormatAsSaveAction>false</de-markiewb-netbeans-plugins-eclipse-formatter46.enableFormatAsSaveAction>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.sourcelevel/>
+        <de-markiewb-netbeans-plugins-eclipse-formatter46.useProjectSettings>false</de-markiewb-netbeans-plugins-eclipse-formatter46.useProjectSettings>
     </properties>
-    <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
-        <config-files>
-            <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Dao.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/SqlGenerator.xml</config-file>
-        </config-files>
-        <config-file-groups/>
-    </spring-data>
 </project-shared-configuration>
