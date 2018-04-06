@@ -5,5 +5,5 @@
 -- corpus
 DELETE FROM corpus child 
 USING corpus toplevel 
-WHERE toplevel.id IN ( :ids ) 
+WHERE toplevel."name" IN ( :names ) AND toplevel.top_level IS TRUE 
 AND toplevel.pre <= child.pre AND toplevel.post >= child.pre;

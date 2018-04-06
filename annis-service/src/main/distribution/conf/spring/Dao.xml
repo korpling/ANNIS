@@ -190,7 +190,6 @@
     <property name="temporaryStagingArea" value="$dev{annis.import.temporary-staging-area}" />
     <property name="generateExampleQueries" value="${annis.import.example-queries}" />
     <property name="deleteCorpusDao" ref="deleteCorpusDao" />
-    <property name="hackDistinctLeftRightToken" value="$dev{annis.hack_distinct_left_right_token}" />
     
     <property name="mimeTypeMapping">
       <util:map>

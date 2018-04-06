@@ -196,7 +196,6 @@ public class CorpusAdministration
     } // end for each given path
 
     // import each corpus separately
-    boolean anyCorpusImported = false;
     for (File r : roots)
     {
       try
@@ -208,7 +207,6 @@ public class CorpusAdministration
           log.info("Finished import from: " + r.getPath());
           sendImportStatusMail(statusEmailAdress, r.getPath(),
             ImportJob.Status.SUCCESS, null);
-          anyCorpusImported = true;
         }
         else
         {
@@ -505,7 +503,7 @@ public class CorpusAdministration
   public void sendImportStatusMail(String adress, String corpusPath,
     ImportJob.Status status, String additionalInfo)
   {
-    if (adress == null || corpusPath == null)
+    if (adress == null || adress.isEmpty() || corpusPath == null)
     {
       return;
     }

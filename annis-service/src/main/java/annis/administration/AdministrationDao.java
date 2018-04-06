@@ -81,6 +81,7 @@ import annis.security.UserConfig;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
+import java.util.LinkedList;
 
 import org.corpus_tools.annis.ql.parser.QueryData;
   
@@ -98,8 +99,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     private DeleteCorpusDao deleteCorpusDao;
 
-    private boolean hackDistinctLeftRightToken;
-
     /**
      * Searches for textes which are empty or only contains whitespaces. If that
      * is the case the visualizer and no document visualizer are defined in the
@@ -111,7 +110,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      *            The id of the corpus which texts are analyzed.
      */
     private void analyzeTextTable(String toplevelCorpusName) {
-        List<String> rawTexts = getQueryDao().getRawText(toplevelCorpusName);
+        // TODO: enable again
+        List<String> rawTexts = new LinkedList<>();//getQueryDao().getRawText(toplevelCorpusName);
 
         // pattern for checking the token layer
         final Pattern WHITESPACE_MATCHER = Pattern.compile("^\\s+$");
@@ -556,13 +556,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         createAnnoCategory(corpusID);
 
-        // create the new facts table partition
-        createFacts(corpusID, version, offsets);
-
-        if (hackDistinctLeftRightToken) {
-            adjustDistinctLeftRightToken(corpusID);
-        }
-
         if (temporaryStagingArea) {
             dropStagingArea();
         }
@@ -573,7 +566,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             getQueryDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
         }
 
-        analyzeFacts(corpusID);
         analyzeTextTable(toplevelCorpusName);
         generateExampleQueries(toplevelCorpusName);
 
@@ -638,12 +630,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         createAnnoCategory(corpusID);
 
-        // create the new facts table partition
-        createFacts(corpusID, version, offsets);
-
-        if (hackDistinctLeftRightToken) {
-            adjustDistinctLeftRightToken(corpusID);
-        }
 
         if (temporaryStagingArea) {
             dropStagingArea();
@@ -655,7 +641,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             getQueryDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
         }
 
-        analyzeFacts(corpusID);
         analyzeTextTable(toplevelCorpusName);
         generateExampleQueries(toplevelCorpusName);
 
@@ -1181,70 +1166,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         executeSqlFromScript("annotation_category.sql", args);
     }
 
-    void analyzeFacts(long corpusID) {
-        log.info("analyzing facts table for corpus with ID " + corpusID);
-        getJdbcTemplate().execute("ANALYZE facts_" + corpusID);
-    }
-
-    void adjustDistinctLeftRightToken(long corpusID) {
-        /*
-         * HACK: adjust the left/right_token value to the average maximal
-         * left/right_token value per corpus/text on import to enhance the
-         * planner selectivity estimations.
-         */
-
-        log.info("adjusting statistical information for left_token and right_token columns");
-
-        int adjustedLeft = getJdbcTemplate().queryForObject(
-                "SELECT avg(maxleft)::integer\n" + "FROM\n"
-                        + "( SELECT max(left_token) maxleft FROM _node GROUP BY corpus_ref, text_ref ) AS m",
-                Integer.class);
-        int adjustedRight = getJdbcTemplate().queryForObject(
-                "SELECT avg(maxright)::integer\n" + "FROM\n"
-                        + "( SELECT max(right_token) maxright FROM _node GROUP BY corpus_ref, text_ref ) AS m",
-                Integer.class);
-
-        getJdbcTemplate().execute(
-                "ALTER TABLE facts_" + corpusID + " ALTER COLUMN left_token SET (n_distinct=" + adjustedLeft + ")");
-        getJdbcTemplate().execute(
-                "ALTER TABLE facts_" + corpusID + " ALTER COLUMN right_token SET (n_distinct=" + adjustedRight + ")");
-    }
-
-    void createFacts(long corpusID, ANNISFormatVersion version, Offsets offsets) {
-        MapSqlParameterSource args = offsets.makeArgs().addValue(":id", corpusID);
-
-        log.info("creating materialized facts table for corpus with ID " + corpusID);
-
-        String defaultStatTargetRaw = getJdbcTemplate().queryForObject("SHOW default_statistics_target", String.class);
-
-        // this is the minimal value
-        int selectedStatTarget = 250;
-
-        if (defaultStatTargetRaw != null) {
-            try {
-                int defaultStatTargetConfig = Integer.parseInt(defaultStatTargetRaw);
-                // make sure the sample size is not less than the default one
-                selectedStatTarget = Math.max(selectedStatTarget, defaultStatTargetConfig);
-            } catch (NumberFormatException ex) {
-                log.warn("Could not parse the \"default_statistics_target\" PostgreSQL parameter.");
-            }
-        }
-        args.addValue(":stat_target", selectedStatTarget);
-
-        if (version == ANNISFormatVersion.V3_3) {
-            executeSqlFromScript("facts.sql", args);
-        } else {
-            executeSqlFromScript("facts_v32.sql", args);
-        }
-
-        log.info("indexing the new facts table (general indexes)");
-        executeSqlFromScript("indexes.sql", args);
-
-        log.info("indexing the new facts table (edge related indexes)");
-        executeSqlFromScript("indexes_edge.sql", args);
-
-    }
-
+    
     void removeUnecessarySpanningRelations() {
         log.info("setting \"continuous\" to a correct value");
         executeSqlFromScript("set_continuous.sql");
@@ -1700,13 +1622,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         this.deleteCorpusDao = deleteCorpusDao;
     }
 
-    public boolean isHackDistinctLeftRightToken() {
-        return hackDistinctLeftRightToken;
-    }
-
-    public void setHackDistinctLeftRightToken(boolean hackDistinctLeftRightToken) {
-        this.hackDistinctLeftRightToken = hackDistinctLeftRightToken;
-    }
 
     /**
      * Checks, if a already exists a corpus with the same name of the top level

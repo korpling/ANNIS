@@ -21,10 +21,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,11 +96,26 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
                     delStmt.executeUpdate();
                 }
             }
+            
+            log.info("deleting from corpus info");
+            try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM corpus_info WHERE name=?")) {
+                for (String n : names) {
+                    delStmt.setString(1, n);
+                    delStmt.executeUpdate();
+                }
+            }
             conn.commit();
 
         } catch (SQLException ex) {
             log.error("Error when deleting corpus {}", Joiner.on(",").join(names), ex);
         }
+        
+        List<String> quotedNames = new LinkedList<>();
+        for(String n : names) {
+            quotedNames.add("'" + n + "'");
+        }
+        
+        executeSqlFromScript("delete_corpus.sql", new MapSqlParameterSource(":names", Joiner.on(",").join(quotedNames)));
 
     }
 
