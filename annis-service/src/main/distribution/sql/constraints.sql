@@ -7,9 +7,6 @@ ALTER TABLE _corpus ADD CONSTRAINT "_UNIQ__corpus_post" UNIQUE (post);
 ALTER TABLE _corpus_annotation ADD CONSTRAINT "_UNIQ__corpus_annotation" UNIQUE (corpus_ref, namespace, name);
 ALTER TABLE _corpus_annotation ADD CONSTRAINT "_FK__corpus_annotation__corpus" FOREIGN KEY (corpus_ref) REFERENCES _corpus (id);
 
--- _text
-ALTER TABLE _text ADD CONSTRAINT "_PK__text" PRIMARY KEY (corpus_ref, id);
-
 -- _node
 ALTER TABLE _node ADD CONSTRAINT "_PK__node" PRIMARY KEY (id);
 ALTER TABLE _node ADD CONSTRAINT "_FK__node__corpus" FOREIGN KEY (corpus_ref) REFERENCES _corpus (id);

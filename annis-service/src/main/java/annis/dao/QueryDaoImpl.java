@@ -41,7 +41,6 @@ import annis.sqlgen.ListDocumentsAnnotationsSqlHelper;
 import annis.sqlgen.ListDocumentsSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MetaByteHelper;
-import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
@@ -82,6 +81,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -113,9 +113,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
 
     // generated sql for example queries and fetches the result
     private ListExampleQueriesHelper listExampleQueriesHelper;
-
-    // reads the raw text entries of ANNIS format, originally placed in text.tab
-    private RawTextSqlHelper rawTextHelper;
 
     private String externalFilesPath;
 
@@ -248,11 +245,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         if (topLevelCorpus == null || documentName == null) {
             throw new IllegalArgumentException("top level corpus and document name may not be null");
         }
-        
-        // TODO: implement getting the raw text
-        
-        throw new UnsupportedOperationException();
 
+        try (Connection conn = createSQLiteConnection(true)) {
+
+            List<String> texts = getQueryRunner().query(conn, "SELECT \"text\" FROM text WHERE corpus_path=?",
+                    new ColumnListHandler<>(1), topLevelCorpus + "/" + documentName);
+
+            return texts;
+        } catch (SQLException ex) {
+            log.error("Failed to get raw text for document {}/{}", topLevelCorpus, documentName, ex);
+        }
+
+        return new LinkedList<>();
     }
 
     @Override
@@ -261,26 +265,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
             throw new IllegalArgumentException("corpus name may not be null");
         }
 
-        // TODO: implement getting the raw text
-        
-        throw new UnsupportedOperationException();
+        try (Connection conn = createSQLiteConnection(true)) {
+
+            List<String> texts = getQueryRunner().query(conn, "SELECT \"text\" FROM text WHERE corpus_path like ?",
+                    new ColumnListHandler<>(1), topLevelCorpus + "/%");
+
+            return texts;
+        } catch (SQLException ex) {
+            log.error("Failed to get raw text for corpus {}", topLevelCorpus, ex);
+        }
+        return new LinkedList<>();
     }
 
-    /**
-     * @return the rawTextHelper
-     */
-    public RawTextSqlHelper getRawTextHelper() {
-        return rawTextHelper;
-    }
-
-    /**
-     * @param rawTextHelper
-     *            the rawTextHelper to set
-     */
-    public void setRawTextHelper(RawTextSqlHelper rawTextHelper) {
-        this.rawTextHelper = rawTextHelper;
-    }
-    
     @Override
     public void setCorpusConfiguration(String toplevelCorpusName, Properties props) {
 
@@ -604,7 +600,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         throw new UnsupportedOperationException();
     }
 
-
     @Override
     public QueryData parseAQL(String aql, List<String> corpusList) {
         // parse the query
@@ -872,6 +867,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         SaltXML10Writer writer = new SaltXML10Writer(projectFile);
         writer.writeSaltProject(corpusProject);
     }
+
     // /// Getter / Setter
     public ListCorpusSqlHelper getListCorpusSqlHelper() {
         return listCorpusSqlHelper;

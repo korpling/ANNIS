@@ -75,9 +75,6 @@
   <!-- Helper for listDocuments command -->
   <bean id="listDocumentsSqlHelper" class="annis.sqlgen.ListDocumentsSqlHelper" lazy-init="true"/>
 
-  <!-- Helper for raw text extraction -->
-  <bean id="rawTextSqlHelper" class="annis.sqlgen.RawTextSqlHelper" lazy-init="true" />
-
   <!-- Helper for list example queries -->
   <bean id="listExampleQueriesHelper" class="annis.sqlgen.ListExampleQueriesHelper" lazy-init="true"/>
 
@@ -148,9 +145,7 @@
     <property name="timeout" value="${annis.sql-timeout}"/>
 
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
-
-    <property name="rawTextHelper" ref="rawTextSqlHelper" />
-
+s
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
     <property name="listDocumentsAnnotationsSqlHelper" ref="listDocumentsAnnotationsSqlHelper"/>

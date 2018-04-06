@@ -32,19 +32,6 @@ COMMENT ON COLUMN corpus_annotation.namespace IS 'optional namespace of annotati
 COMMENT ON COLUMN corpus_annotation.name IS 'annotation key';
 COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
-DROP TABLE IF EXISTS text CASCADE;
-CREATE TABLE text
-(
-  corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
-  id    integer,
-  name  varchar COLLATE "C",
-  text  text COLLATE "C",
-  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
-  PRIMARY KEY(corpus_ref, id)
-);
-COMMENT ON COLUMN text.id IS 'primary key';
-COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
-COMMENT ON COLUMN text.text IS 'raw text data';
 
 DROP TABLE IF EXISTS annotation_category CASCADE;
 CREATE TABLE annotation_category

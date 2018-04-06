@@ -21,10 +21,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -40,7 +37,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -81,10 +77,14 @@ import annis.security.UserConfig;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
-import java.util.LinkedList;
+import au.com.bytecode.opencsv.CSVReader;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 import org.corpus_tools.annis.ql.parser.QueryData;
-  
+
 import org.apache.commons.dbutils.ResultSetHandler;
 
 /**
@@ -110,8 +110,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      *            The id of the corpus which texts are analyzed.
      */
     private void analyzeTextTable(String toplevelCorpusName) {
-        // TODO: enable again
-        List<String> rawTexts = new LinkedList<>();//getQueryDao().getRawText(toplevelCorpusName);
+        List<String> rawTexts = getQueryDao().getRawText(toplevelCorpusName);
 
         // pattern for checking the token layer
         final Pattern WHITESPACE_MATCHER = Pattern.compile("^\\s+$");
@@ -191,13 +190,11 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     // DO NOT CHANGE THE ORDER OF THIS LIST! Doing so may cause foreign key
     // failures during import.
 
-    private final String[] importedTables = { "corpus", "corpus_annotation", "text", "node", "node_annotation",
-            "component", "rank", "edge_annotation" };
+    private final String[] importedTables = { "corpus", "corpus_annotation", "node", "node_annotation", "component",
+            "rank", "edge_annotation" };
 
-    private final String[] tablesToCopyManually = { "corpus", "corpus_annotation", "text" };
-    // tables created during import
+    private final String[] tablesToCopyManually = { "corpus", "corpus_annotation" };
 
-    private final String[] createdTables = { "nodeidmapping" };
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -207,6 +204,9 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c(new Column("corpus").createIndex())
             .c("version").c("namespace").c("element").c(new Column("vis_type").notNull())
             .c(new Column("display_name").notNull()).c("visibility").c_int("order").c("mappings");
+
+    private final Table textTable = new Table("text").c(new Column("corpus_path").createIndex()).c_int("id").c("name")
+            .c("text");
 
     private final Table mediaFilesTable = new Table("media_files").c(new Column("filename").unique())
             .c(new Column("corpus_path").createIndex()).c(new Column("mime_type").createIndex())
@@ -412,32 +412,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         populateSchema();
     }
 
-    private BasicDataSource createDataSource(File dbProperties) throws IOException, URISyntaxException {
-        BasicDataSource result;
-
-        Properties props = new Properties();
-        try (InputStream is = new FileInputStream(dbProperties)) {
-            props.load(is);
-
-            String rawJdbcURL = props.getProperty("datasource.url").trim();
-
-            rawJdbcURL = StringUtils.removeStart(rawJdbcURL, "jdbc:");
-            URI jdbcURL = new URI(rawJdbcURL);
-
-            result = createDataSource(jdbcURL.getHost(), "" + jdbcURL.getPort(), jdbcURL.getPath().substring(1), // remove
-                    // the
-                    // "/"
-                    // at
-                    // the
-                    // beginning
-                    props.getProperty("datasource.username"), props.getProperty("datasource.password"),
-                    "true".equalsIgnoreCase(props.getProperty("datasource.ssl")),
-                    props.getProperty("datasource.schema"));
-        }
-
-        return result;
-    }
-
     private BasicDataSource createDataSource(String host, String port, String database, String user, String password,
             boolean useSSL, String schema) {
 
@@ -534,15 +508,13 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         Offsets offsets = calculateOffsets();
         long corpusID = getNewToplevelCorpusID(offsets);
-        createNodeIdMapping();
 
         importBinaryData(path, toplevelCorpusName);
 
         convertToGraphANNIS(toplevelCorpusName, path, version);
+        importTexts(toplevelCorpusName, path, version);
         importResolverTable(toplevelCorpusName, path, version);
         importExampleQueries(toplevelCorpusName, path, version);
-
-        extendStagingText(corpusID);
 
         computeCorpusStatistics(toplevelCorpusName, path);
 
@@ -599,20 +571,17 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         addUniqueNodeNameAppendix();
         adjustRankPrePost();
-        adjustTextId();
         addDocumentNameMetaData();
 
         Offsets offsets = calculateOffsets();
         long corpusID = getNewToplevelCorpusID(offsets);
-        createNodeIdMapping();
 
         importBinaryData(path, toplevelCorpusName);
 
         convertToGraphANNIS(toplevelCorpusName, path, version);
+        importTexts(toplevelCorpusName, path, version);
         importResolverTable(toplevelCorpusName, path, version);
         importExampleQueries(toplevelCorpusName, path, version);
-
-        extendStagingText(corpusID);
 
         computeRealRoot();
         computeLevel();
@@ -629,7 +598,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         createAnnotations(corpusID);
 
         createAnnoCategory(corpusID);
-
 
         if (temporaryStagingArea) {
             dropStagingArea();
@@ -666,6 +634,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             createTableIfNotExists(exampleQueriesTable, null, null);
             createTableIfNotExists(userConfigTable, null, null);
             createTableIfNotExists(corpusAliasTable, null, null);
+            createTableIfNotExists(textTable, null, null);
         } catch (SQLException ex) {
             log.error("Can not create SQL schema", ex);
         }
@@ -760,6 +729,109 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             log.info(EXAMPLE_QUERIES_TAB + version.getFileSuffix() + " file not found");
         }
 
+    }
+
+    private void importTexts(String corpusName, String path, ANNISFormatVersion version) {
+
+        log.info("importing text table");
+        File importDir = new File(path);
+        
+        // get the ID of all documents that are referenced in the text table
+        final Map<Long, String> docID2Name = new HashMap<>();
+        File corpusFile = new File(importDir, "corpus" + version.getFileSuffix());
+        try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(corpusFile), StandardCharsets.UTF_8),
+            '\t', (char) 0)) {
+            
+            for(String[] line = csvReader.readNext(); line != null; line=csvReader.readNext()) {
+                long id = Long.parseLong(line[0]);
+                String name = line[1];
+                String type = line[2];
+                if("DOCUMENT".equals(type)) {
+                    docID2Name.put(id, name);
+                }
+            }
+            
+        } catch(IOException | ArrayIndexOutOfBoundsException | NumberFormatException | NullPointerException ex) {
+            log.error("Failed to read file {}", corpusFile, ex);
+        }
+        
+        // get the document ID for all texts by iterating over the node tabel, where these are connected
+        final Map<Long, Long> text2doc = new HashMap<>();
+        if(version == ANNISFormatVersion.V3_1 || version == ANNISFormatVersion.V3_2) {
+            File nodeFile = new File(importDir, "node" + version.getFileSuffix());
+            try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(nodeFile), StandardCharsets.UTF_8),
+                '\t', (char) 0)) {
+
+                for(String[] line = csvReader.readNext(); line != null; line=csvReader.readNext()) {
+                    long textRef = Long.parseLong(line[1]);
+                    long docRef = Long.parseLong(line[2]);
+                    text2doc.put(textRef, docRef);
+                }
+
+            } catch(IOException | ArrayIndexOutOfBoundsException | NumberFormatException | NullPointerException ex) {
+                log.error("Failed to read file {}", corpusFile, ex);
+            }
+        }
+        
+        final Multiset<String> textsPerDoc = HashMultiset.create();
+
+        Function<String[], String[]> lineModifier = (line) -> {
+            if (line == null) {
+                return line;
+            }
+            if (line.length == 4) {
+                long docID = Long.parseLong(line[0]);
+                String docName = docID2Name.get(docID);
+                if(docName == null) {
+                    log.warn("Could not import text with ID {} because document with ID {} was not "
+                      + "found in corpus table", line[1], docID);
+                    return null;
+                }
+                
+                String[] updateLine = new String[4];
+                updateLine[0] = corpusName + "/" + docName;
+                updateLine[1] = line[1];
+                updateLine[2] = line[2];
+                updateLine[3] = line[3];
+                return updateLine;
+            } else if (line.length == 3) {
+                long textID = Long.parseLong(line[0]);
+                // text ID is globally unique, get the actual doc ID from the map
+                Long docID = text2doc.get(textID);
+                if(docID == null) {
+                    log.warn("Could not import text with ID {} because no matching document was found"
+                      + " in node table", line[1], textID);
+                    return null;
+                }
+                String docName = docID2Name.get(docID);
+                if(docName == null) {
+                    log.warn("Could not import text with ID {} because document with ID {} was not "
+                      + "found in corpus table", textID, docID);
+                    return null;
+                }
+                
+                String[] updateLine = new String[4];
+                updateLine[0] = corpusName + "/" + docName;
+                // give an relative ID to the text
+                updateLine[1] = "" + textsPerDoc.count(docName);
+                updateLine[2] = line[1];
+                updateLine[3] = line[2];
+                
+                textsPerDoc.add(docName);
+                
+                return updateLine;
+            } else {
+                log.warn("Invalid text table entry detected and ignored: {}", (Object) line);
+                return null;
+            }
+        };
+
+        try {
+            importSQLiteTable(textTable, new File(importDir, "text" + version.getFileSuffix()),
+                    lineModifier);
+        } catch (SQLException ex) {
+            log.error("Could not import text table {}", path, ex);
+        }
     }
 
     protected void dropIndexes() {
@@ -938,10 +1010,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
     }
 
-    void extendStagingText(long toplevelID) {
-        log.info("extending _text");
-        executeSqlFromScript("extend_staging_text.sql", makeArgs().addValue(":id", toplevelID));
-    }
 
     void computeLeftTokenRightToken() {
         log.info("computing values for struct.left_token and struct.right_token");
@@ -977,19 +1045,19 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
 
         log.info("computing statistics for top-level corpus");
-        
+
         // get number of tokens
         QueryData tokQuery = getQueryDao().parseAQL("tok", null);
         tokQuery.setCorpusList(Arrays.asList(toplevelCorpusName));
         int tokCount = getQueryDao().count(tokQuery);
-        
+
         // TODO: get number of documents
-        
+
         try (Connection conn = createSQLiteConnection()) {
 
             getQueryRunner().update(conn,
-                    "INSERT INTO corpus_info(\"name\", docs, tokens, source_path) VALUES(?,?,?,?)",
-                    toplevelCorpusName, -1, tokCount, absolutePath);
+                    "INSERT INTO corpus_info(\"name\", docs, tokens, source_path) VALUES(?,?,?,?)", toplevelCorpusName,
+                    -1, tokCount, absolutePath);
 
         } catch (SQLException ex) {
             log.error("Could not insert corpus information into database", ex);
@@ -1014,14 +1082,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         getJdbcTemplate().execute("ANALYZE " + tableInStagingArea("rank"));
     }
 
-    protected void adjustTextId() {
-        log.info("updating id in _text and text_ref in _node");
-        executeSqlFromScript("adjusttextid.sql");
-        log.info("analyzing _node and _text");
-        getJdbcTemplate().execute("ANALYZE " + tableInStagingArea("text"));
-        getJdbcTemplate().execute("ANALYZE " + tableInStagingArea("node"));
-    }
-
     protected void addUniqueNodeNameAppendix() {
         // first check if this is actually necessary
         log.info("check if node names are unique");
@@ -1036,17 +1096,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             log.info("add an unique node name appendix");
             executeSqlFromScript("unique_node_name_appendix.sql");
         }
-    }
-
-    /**
-     *
-     * @return the new corpus ID
-     */
-    void createNodeIdMapping() {
-
-        log.info("creating node ID mapping (for properly sorted IDs)");
-        executeSqlFromScript("node_id_mapping.sql");
-
     }
 
 
@@ -1075,13 +1124,13 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private Offsets calculateOffsets() {
         log.info("querying ID offsets");
 
-        long offsetCorpusID = getJdbcTemplate()
-                .queryForObject("SELECT COALESCE((SELECT max(id)+1 FROM corpus),0)", Long.class);
-        long offsetCorpusPost = getJdbcTemplate()
-                .queryForObject("SELECT COALESCE((SELECT max(post)+1 FROM corpus),0)", Long.class);
+        long offsetCorpusID = getJdbcTemplate().queryForObject("SELECT COALESCE((SELECT max(id)+1 FROM corpus),0)",
+                Long.class);
+        long offsetCorpusPost = getJdbcTemplate().queryForObject("SELECT COALESCE((SELECT max(post)+1 FROM corpus),0)",
+                Long.class);
 
-        long offsetNodeID = getJdbcTemplate()
-                .queryForObject("SELECT COALESCE((SELECT max(id)+1 FROM facts),0)", Long.class);
+        long offsetNodeID = getJdbcTemplate().queryForObject("SELECT COALESCE((SELECT max(id)+1 FROM facts),0)",
+                Long.class);
 
         return new Offsets(offsetCorpusID, offsetCorpusPost, offsetNodeID);
     }
@@ -1166,7 +1215,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         executeSqlFromScript("annotation_category.sql", args);
     }
 
-    
     void removeUnecessarySpanningRelations() {
         log.info("setting \"continuous\" to a correct value");
         executeSqlFromScript("set_continuous.sql");
@@ -1181,7 +1229,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     ///// Other sub tasks
-    
 
     /**
      * Delete files not used by this instance in the data directory.
@@ -1352,14 +1399,12 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private List<String> importedAndCreatedTables() {
         List<String> tables = new ArrayList<>();
         tables.addAll(Arrays.asList(importedTables));
-        tables.addAll(Arrays.asList(createdTables));
         return tables;
     }
 
     private List<String> allTables() {
         List<String> tables = new ArrayList<>();
         tables.addAll(Arrays.asList(importedTables));
-        tables.addAll(Arrays.asList(createdTables));
         // tables.addAll(Arrays.asList(materializedTables));
         return tables;
     }
@@ -1621,7 +1666,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     public void setDeleteCorpusDao(DeleteCorpusDao deleteCorpusDao) {
         this.deleteCorpusDao = deleteCorpusDao;
     }
-
 
     /**
      * Checks, if a already exists a corpus with the same name of the top level

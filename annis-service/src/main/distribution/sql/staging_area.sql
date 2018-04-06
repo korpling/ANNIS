@@ -6,7 +6,6 @@ DROP TABLE IF EXISTS _component;
 DROP TABLE IF EXISTS _node_annotation;
 DROP TABLE IF EXISTS _node;
 DROP TABLE IF EXISTS _corpus;
-DROP TABLE IF EXISTS _text;
 
 
 -- corpora
@@ -33,16 +32,6 @@ CREATE :tmp TABLE _corpus_annotation
 	namespace	varchar,
 	name		varchar NOT NULL,
 	value		varchar
-);
-
--- source texts
--- stores each source text in its entirety
-CREATE :tmp TABLE _text
-(
-  corpus_ref	integer NOT NULL,		-- foreign key to _corpus.id
-	id 		integer NOT NULL,			-- primary key
-	name	varchar COLLATE "C",					-- name (not used)
-	text 	text							-- text contents (not used)
 );
 
 -- nodes in the annotation graph

@@ -96,7 +96,14 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
                     delStmt.executeUpdate();
                 }
             }
-            
+
+            log.info("deleting texts");
+            for (String corpusName : names) {
+                getQueryRunner().update(conn,
+                        "DELETE FROM text\n" + "WHERE\n" + "  corpus_path = ? OR corpus_path like ?", corpusName,
+                        corpusName + "/%");
+            }
+
             log.info("deleting from corpus info");
             try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM corpus_info WHERE name=?")) {
                 for (String n : names) {
@@ -109,13 +116,14 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
         } catch (SQLException ex) {
             log.error("Error when deleting corpus {}", Joiner.on(",").join(names), ex);
         }
-        
+
         List<String> quotedNames = new LinkedList<>();
-        for(String n : names) {
+        for (String n : names) {
             quotedNames.add("'" + n + "'");
         }
-        
-        executeSqlFromScript("delete_corpus.sql", new MapSqlParameterSource(":names", Joiner.on(",").join(quotedNames)));
+
+        executeSqlFromScript("delete_corpus.sql",
+                new MapSqlParameterSource(":names", Joiner.on(",").join(quotedNames)));
 
     }
 
