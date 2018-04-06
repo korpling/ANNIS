@@ -55,7 +55,7 @@ public interface QueryDao
 
   public List<AnnisCorpus> listCorpora();
 
-  public List<AnnisCorpus> listCorpora(List<Long> ids);
+  public List<AnnisCorpus> listCorpora(List<String> corpusNames);
 
   public List<AnnisAttribute> listAnnotations(List<String> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);

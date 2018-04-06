@@ -17,6 +17,7 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
+import annis.service.objects.AnnisCorpus;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -182,14 +183,15 @@ public class ListDialog extends javax.swing.JDialog
         }, 0);
       tableList.setModel(tableModel);
 
-      List<Map<String, Object>> stats = corpusAdmin.listCorpusStats();
+      List<AnnisCorpus> corpora = corpusAdmin.getAdministrationDao().getQueryDao().listCorpora();
 
-      for(Map<String, Object> map : stats)
+      for(AnnisCorpus c : corpora)
       {
         String[] rowData = new String[tableModel.getColumnCount()];
         for(int j = 0; j < rowData.length; j++)
         {
           String cName = tableList.getColumnName(j);
+          Map<String, Object> map = c.asTableRow();
           if(map.containsKey(cName))
           {
             rowData[j] = map.get(cName).toString();

@@ -79,7 +79,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.exceptions.AnnisException;
-import annis.ql.parser.AnnisParserAntlr;
 import annis.ql.parser.QueryData;
 import annis.security.UserConfig;
 import annis.tabledefs.ANNISFormatVersion;
@@ -997,12 +996,15 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         // get number of tokens
         QueryData tokQuery = getQueryDao().parseAQL("tok", null);
         tokQuery.setCorpusList(Arrays.asList(toplevelCorpusName));
+        int tokCount = getQueryDao().count(tokQuery);
+        
+        // TODO: get number of documents
         
         try (Connection conn = createSQLiteConnection()) {
 
             getQueryRunner().update(conn,
                     "INSERT INTO corpus_info(\"name\", docs, tokens, source_path) VALUES(?,?,?,?)",
-                    toplevelCorpusName, 0, 0, absolutePath);
+                    toplevelCorpusName, -1, tokCount, absolutePath);
 
         } catch (SQLException ex) {
             log.error("Could not insert corpus information into database", ex);
@@ -1062,18 +1064,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     }
 
-    /*
-     * private long getRecentCorpusID() { int numOfEntries =
-     * getJdbcTemplate().queryForObject( "SELECT COUNT(*) from corpus_stats",
-     * Integer.class);
-     * 
-     * long recentCorpusId = 0;
-     * 
-     * if (numOfEntries > 0) { recentCorpusId =
-     * getJdbcTemplate().queryForObject( "SELECT max(id) FROM corpus_stats",
-     * Long.class); log.debug("the id from recently imported corpus: {}",
-     * recentCorpusId); } return recentCorpusId; }
-     */
 
     long getNewToplevelCorpusID(Offsets offsets) {
         log.info("query for the new corpus ID");
@@ -1101,12 +1091,12 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         log.info("querying ID offsets");
 
         long offsetCorpusID = getJdbcTemplate()
-                .queryForObject("SELECT COALESCE((SELECT max(max_corpus_id)+1 FROM corpus_stats),0)", Long.class);
+                .queryForObject("SELECT COALESCE((SELECT max(id)+1 FROM corpus),0)", Long.class);
         long offsetCorpusPost = getJdbcTemplate()
-                .queryForObject("SELECT COALESCE((SELECT max(max_corpus_post)+1 FROM corpus_stats),0)", Long.class);
+                .queryForObject("SELECT COALESCE((SELECT max(post)+1 FROM corpus),0)", Long.class);
 
         long offsetNodeID = getJdbcTemplate()
-                .queryForObject("SELECT COALESCE((SELECT max(max_node_id)+1 FROM corpus_stats),0)", Long.class);
+                .queryForObject("SELECT COALESCE((SELECT max(id)+1 FROM facts),0)", Long.class);
 
         return new Offsets(offsetCorpusID, offsetCorpusPost, offsetNodeID);
     }
@@ -1310,38 +1300,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             log.error("Error when cleaning up data", ex);
         }
 
-    }
-
-    public List<Map<String, Object>> listCorpusStats() {
-        return getJdbcTemplate().queryForList("SELECT * FROM corpus_info ORDER BY name");
-    }
-
-    /**
-     * Lists the corpora using the connection information of a given
-     * "database.properties". file
-     *
-     * @param databaseProperties
-     * @return
-     */
-    public List<Map<String, Object>> listCorpusStats(File databaseProperties) {
-        List<Map<String, Object>> result = new LinkedList<>();
-
-        DataSource origDataSource = getDataSource().getInnerDataSource();
-        try {
-            if (databaseProperties != null) {
-                getDataSource().setInnerDataSource(createDataSource(databaseProperties));
-            }
-            result = getJdbcTemplate().queryForList("SELECT * FROM corpus_info ORDER BY name");
-        } catch (IOException | URISyntaxException | DataAccessException ex) {
-            if (databaseProperties == null) {
-                log.error("Could not query corpus list", ex);
-            } else {
-                log.error("Could not query corpus list for the file " + databaseProperties.getAbsolutePath(), ex);
-            }
-        } finally {
-            getDataSource().setInnerDataSource(origDataSource);
-        }
-        return result;
     }
 
     public List<String> listUsedIndexes() {

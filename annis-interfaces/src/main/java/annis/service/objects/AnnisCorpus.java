@@ -16,125 +16,111 @@
 package annis.service.objects;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class AnnisCorpus implements Serializable, Comparable<AnnisCorpus>
-{
+public class AnnisCorpus implements Serializable, Comparable<AnnisCorpus> {
 
-  private long id;
-  private String name;
-  private int textCount, tokenCount;
-  private String sourcePath;
+    private long id;
+    private String name;
+    private int documentCount, tokenCount;
+    private String sourcePath;
 
-  public AnnisCorpus(long id, String name, int textCount, int tokenCount)
-  {
-    this.id = id;
-    this.textCount = textCount;
-    this.tokenCount = tokenCount;
-    this.name = name;
-  }
-
-  public AnnisCorpus()
-  {
-    this(0, null, 0, 0);
-  }
-
-
-  public long getId()
-  {
-    return id;
-  }
-
-  public void setId(long id)
-  {
-    this.id = id;
-  }
-
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-
-  public int getTextCount()
-  {
-    return textCount;
-  }
-
-  public void setTextCount(int textCount)
-  {
-    this.textCount = textCount;
-  }
-
-  public int getTokenCount()
-  {
-    return tokenCount;
-  }
-  
-  public void setTokenCount(int tokenCount)
-  {
-    this.tokenCount = tokenCount;
-  }
-
-  public String getSourcePath()
-  {
-    return sourcePath;
-  }
-
-  public void setSourcePath(String sourcePath)
-  {
-    this.sourcePath = sourcePath;
-  }
-  
-
-  @Override
-  public String toString()
-  {
-    return String.valueOf("corpus #" + id + ": " + name);
-  }
-
-  @Override
-  public boolean equals(Object obj)
-  {
-    if(obj == null)
-    {
-      return false;
+    public AnnisCorpus(long id, String name, int documentCount, int tokenCount) {
+        this.id = id;
+        this.documentCount = documentCount;
+        this.tokenCount = tokenCount;
+        this.name = name;
     }
-    if(getClass() != obj.getClass())
-    {
-      return false;
-    }
-    final AnnisCorpus other = (AnnisCorpus) obj;
-    if(this.id != other.id)
-    {
-      return false;
-    }
-    return true;
-  }
 
-  @Override
-  public int hashCode()
-  {
-    int hash = 5;
-    hash = 53 * hash + (int) (this.id ^ (this.id >>> 32));
-    return hash;
-  }
+    public AnnisCorpus() {
+        this(0, null, 0, 0);
+    }
 
-  @Override
-  public int compareTo(AnnisCorpus o)
-  {
-    if(o == null)
-    {
-      return -1;
+    public long getId() {
+        return id;
     }
-    else
-    {
-      return id < o.getId() ? -1 : (id > o.getId() ? +1 : 0);
+
+    public void setId(long id) {
+        this.id = id;
     }
-  }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getDocumentCount() {
+        return documentCount;
+    }
+
+    public void setDocumentCount(int documentCount) {
+        this.documentCount = documentCount;
+    }
+
+    public int getTokenCount() {
+        return tokenCount;
+    }
+
+    public void setTokenCount(int tokenCount) {
+        this.tokenCount = tokenCount;
+    }
+
+    public String getSourcePath() {
+        return sourcePath;
+    }
+
+    public void setSourcePath(String sourcePath) {
+        this.sourcePath = sourcePath;
+    }
+
+    public Map<String, Object> asTableRow() {
+        Map<String, Object> row = new LinkedHashMap<>();
+        row.put("name", getName());
+        row.put("tokens", getTokenCount());
+        row.put("documents", getDocumentCount());
+        row.put("source path", getSourcePath());
+        return row;
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf("corpus #" + id + ": " + name);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final AnnisCorpus other = (AnnisCorpus) obj;
+        if (this.id != other.id) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 53 * hash + (int) (this.id ^ (this.id >>> 32));
+        return hash;
+    }
+
+    @Override
+    public int compareTo(AnnisCorpus o) {
+        if (o == null) {
+            return -1;
+        } else {
+            return id < o.getId() ? -1 : (id > o.getId() ? +1 : 0);
+        }
+    }
 }

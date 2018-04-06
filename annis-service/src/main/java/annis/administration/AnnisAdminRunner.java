@@ -18,9 +18,9 @@ package annis.administration;
 import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
 import annis.UsageException;
-import annis.corpuspathsearch.Search;
 import annis.dao.QueryDao;
 import annis.dao.autogenqueries.QueriesGenerator;
+import annis.service.objects.AnnisCorpus;
 import annis.utils.Utils;
 import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -113,10 +114,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     else if ("delete".equals(command))
     {
       doDelete(commandArgs);
-    }
-    else if ("copy".equals(command))
-    {
-      doCopy(commandArgs);
     }
     else if ("list".equals(command))
     {
@@ -236,9 +233,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         "name of a PostgreSQL super user (defaults to \"postgres\")")
       .addParameter("P", "superpassword",
         "password of a PostgreSQL super user")
-      .addParameter("m", "migratecorpora",
-        "Try to import the already existing corpora into the database. "
-        + "You can set the root directory for corpus sources as an argument.")
       .addToggle("s", "ssl", false,
         "if given use SSL for connecting to the database")
       .addLongParameter("schema", "The PostgreSQL schema to use (defaults to \"public\"). "
@@ -271,34 +265,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       String pgSchema = cmdLine.getOptionValue("schema", "public")
         .toLowerCase().replaceAll("[^a-z0-9]", "_");;
 
-      boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
-      
       List<Map<String, Object>> existingCorpora = new LinkedList<>();
-
-      if (migrateCorpora)
-      {
-        // get corpus list
-        try
-        {
-          existingCorpora = corpusAdministration.listCorpusStats();
-        }
-        catch (Exception ex)
-        {
-          log.warn(
-            "Could not get existing corpus list for migration, migrating "
-            + "the corpora will be disabled.", ex);
-          migrateCorpora = false;
-        }
-      }
 
       corpusAdministration.
         initializeDatabase(host, port, database, user, password,
         defaultDatabase, superUser, superPassword, useSSL, pgSchema);
-
-      if (migrateCorpora && existingCorpora.size() > 0)
-      {
-        doMigration(cmdLine.getOptionValue("migratecorpora"), existingCorpora);
-      }
 
     }
     catch (ParseException e)
@@ -308,67 +279,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
   }
   
-  private void doMigration(String corpusRoot, List<Map<String, Object>> existingCorpora)
-  {
-
-    Search search = null;
-    if (corpusRoot != null && !"".equals(corpusRoot))
-    {
-      File rootCorpusPath = new File(corpusRoot);
-      if (rootCorpusPath.isDirectory())
-      {
-        LinkedList<File> l = new LinkedList<>();
-        l.add(rootCorpusPath);
-
-        search = new Search(l);
-      }
-    }
-
-    for (Map<String, Object> corpusStat : existingCorpora)
-    {
-      String corpusName = (String) corpusStat.get("name");
-      String migratePath = (String) corpusStat.get("source_path");
-
-      if (migratePath == null)
-      {
-
-        if (search == null)
-        {
-          log.error(
-            "You have to give a valid corpus root directory as argument to migratecorpora");
-          search = new Search(new LinkedList<File>());
-        }
-        else if (!search.isWasSearched())
-        {
-          log.info("Searching for corpora at given directory, "
-            + "this can take some minutes");
-          search.startSearch();
-        }
-
-        // used the searched corpus path of corpus path was not part of the
-        // corpus description in the database
-        if (search.getCorpusPaths().containsKey(corpusName))
-        {
-          migratePath = search.getCorpusPaths().get(corpusName).
-            getParentFile().getAbsolutePath();
-        }
-
-      } // end if migratePath == null
-
-
-      if (migratePath == null || !(new File(migratePath).isDirectory()))
-      {
-        log.warn(
-          "Unable to migrate \"" + corpusName + "\" because the system "
-          + "can not find a valid source directory where it is located.");
-      }
-      else
-      {
-        log.info("migrating corpus " + corpusName);
-        corpusAdministration.importCorporaSave(true, null, null, false, migratePath);
-      }
-    }
-  }
 
   private void doImport(List<String> commandArgs)
   {
@@ -467,59 +377,24 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     corpusAdministration.deleteCorpora(ids);
   }
   
-  private void doCopy(List<String> commandArgs)
-  {
-    Options options = new OptionBuilder()
-      .addToggle("o", "overwrite", false,
-        "Overwrites a corpus, when it is already stored in the database.")
-      .addParameter("m", "mail",
-        "e-mail adress to where status updates should be send")
-      .createOptions();
-
-    CommandLineParser parser = new PosixParser();
-    try
-    {
-      CommandLine cmdLine = parser.parse(options, commandArgs.toArray(
-        new String[commandArgs.size()]));
-
-      if (cmdLine.getArgList().isEmpty())
-      {
-        throw new ParseException(
-          "You need to specifiy where to find the database.properties file.");
-      }
-      
-      File dbProperties = new File(cmdLine.getArgs()[0]);
-      boolean success = corpusAdministration.copyFromOtherInstance(dbProperties, 
-        cmdLine.hasOption("overwrite"),
-        cmdLine.getOptionValue("mail"));
-      
-      if(!success)
-      {
-        throw new AnnisRunnerException(50);
-      }
-      
-      
-    }
-    catch (ParseException ex)
-    {
-      HelpFormatter helpFormatter = new HelpFormatter();
-      helpFormatter.printHelp("annis-admin.sh copy [OPTION] CONFIGFILE",
-        options);
-    }
-
-  }
 
   private void doList()
   {
-    List<Map<String, Object>> stats = corpusAdministration.listCorpusStats();
+    List<AnnisCorpus> corpora = queryDao.listCorpora();
 
-    if (stats.isEmpty())
+    if (corpora.isEmpty())
     {
-      System.out.println("Annis database is empty.");
+      System.out.println("ANNIS database is empty.");
       return;
     }
-
-    printTable(stats);
+    
+    List<Map<String,Object>> asTable = new LinkedList<>();
+    
+    for(AnnisCorpus c : corpora) {
+        asTable.add(c.asTableRow());
+    }
+    
+    printTable(asTable);
   }
 
   private void doIndexes()

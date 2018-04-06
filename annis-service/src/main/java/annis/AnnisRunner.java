@@ -592,7 +592,7 @@ public class AnnisRunner extends AnnisBaseRunner {
 
     public void doList(String unused) {
         List<AnnisCorpus> corpora = queryDao.listCorpora();
-        printAsTable(corpora, "id", "name", "textCount", "tokenCount");
+        printAsTable(corpora, "name", "documentCount", "tokenCount");
     }
 
 

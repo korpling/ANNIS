@@ -688,16 +688,26 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<AnnisCorpus> listCorpora() {
-        return (List<AnnisCorpus>) getJdbcTemplate().query(listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
+        try (Connection conn = createSQLiteConnection(true)) {
+            return getQueryRunner().query(conn, listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
+        } catch (SQLException ex) {
+            log.error("Listing corpora failed", ex);
+        }
+        ;
+        return new LinkedList<>();
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<AnnisCorpus> listCorpora(List<Long> ids) {
-        return (List<AnnisCorpus>) getJdbcTemplate().query(listCorpusSqlHelper.createSqlQueryWithList(ids.size()),
-                listCorpusSqlHelper, ids.toArray());
+    public List<AnnisCorpus> listCorpora(List<String> corpusNames) {
+        try (Connection conn = createSQLiteConnection(true)) {
+            return getQueryRunner().query(conn, listCorpusSqlHelper.createSqlQueryWithList(corpusNames.size()),
+                    listCorpusSqlHelper, corpusNames.toArray());
+        } catch (SQLException ex) {
+            log.error("Listing corpora failed", ex);
+        }
+
+        return new LinkedList<>();
     }
 
     @Override

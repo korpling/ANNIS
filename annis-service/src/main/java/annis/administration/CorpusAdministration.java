@@ -53,6 +53,7 @@ import com.google.common.io.ByteStreams;
 import annis.AnnisRunnerException;
 import annis.CommonHelper;
 import annis.exceptions.AnnisException;
+import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
 import annis.utils.ANNISFormatHelper;
 
@@ -716,16 +717,6 @@ public class CorpusAdministration
       Arrays.asList(paths));
   }
 
-  public List<Map<String, Object>> listCorpusStats()
-  {
-    return administrationDao.listCorpusStats();
-  }
-
-  public List<Map<String, Object>> listCorpusStats(File databaseProperties)
-  {
-    return administrationDao.listCorpusStats(databaseProperties);
-  }
-
   public List<String> listUsedIndexes()
   {
     return administrationDao.listUsedIndexes();
@@ -736,117 +727,6 @@ public class CorpusAdministration
     return administrationDao.listUnusedIndexes();
   }
 
-  public boolean copyFromOtherInstance(File dbProperties,
-    boolean overwrite, String mail)
-  {
-    if (dbProperties.isFile() && dbProperties.canRead())
-    {
-      // find the corpus paths
-      List<Map<String, Object>> corpora = listCorpusStats(
-        dbProperties);
-      List<String> corpusPaths = new LinkedList<>();
-      for (Map<String, Object> c : corpora)
-      {
-        String sourcePath = (String) c.get("source_path");
-        if (sourcePath != null)
-        {
-          corpusPaths.add(sourcePath);
-        }
-      }
-
-      if (corpusPaths.isEmpty())
-      {
-        log.warn("No corpora found");
-        return true;
-      }
-      else
-      {
-        
-        log.info("The following corpora will be imported:\n"
-          + "---------------\n"
-          + "{}\n"
-          + "---------------\n",
-          Joiner.on("\n").join(corpusPaths));
-        sendCopyStatusMail(mail, dbProperties.getAbsolutePath(), ImportJob.Status.RUNNING,
-          "The following corpora will be imported:\n"
-          + "---------------\n"
-          + Joiner.on("\n").join(corpusPaths) + "\n"
-          + "---------------\n");
-
-
-        // remember the corpus alias table
-        Multimap<String, String> corpusAlias = administrationDao.listCorpusAlias(
-          dbProperties);
-
-        //import each corpus
-        ImportStatus status = importCorporaSave(
-          overwrite, null,
-          null,
-          false,
-          corpusPaths);
-
-
-        // report the successful or failure failed
-        Set<String> successfullCorpora = new LinkedHashSet<>(corpusPaths);
-        Set<String> failedCorpora = new LinkedHashSet<>(
-          status.getAllThrowable().keySet());
-        successfullCorpora.removeAll(failedCorpora);
-
-        log.info("copying corpus aliases");
-        for(Map.Entry<String, String> e : corpusAlias.entries())
-        {
-          administrationDao.addCorpusAlias(e.getValue(), e.getKey());
-        }
-
-        if (failedCorpora.isEmpty())
-        {
-          log.info("All corpora imported without errors:\n"
-            + "---------------\n"
-            + "{}\n"
-            + "---------------\n",
-            Joiner.on("\n").join(successfullCorpora));
-          sendCopyStatusMail(mail, dbProperties.getAbsolutePath(),
-            ImportJob.Status.SUCCESS,
-            "All corpora imported without errors:\n"
-            + "---------------\n"
-            + Joiner.on("\n").join(corpusPaths) + "\n"
-            + "---------------\n");
-          return true;
-        }
-        else
-        {
-
-          log.error(
-            "Errors occured during import, not all corpora have been imported.\n"
-              + "---------------\n"
-              + "Success:\n"
-              + "{}\n"
-              + "---------------\n"
-              + "Failed:\n"
-              + "{}\n"
-              + "---------------\n",
-            Joiner.on("\n").join(successfullCorpora),
-            Joiner.on("\n").join(failedCorpora));
-          sendCopyStatusMail(mail, dbProperties.getAbsolutePath(), ImportJob.Status.ERROR,
-            
-            "Errors occured during import, not all corpora have been imported.\n"
-              + "---------------\n"
-              + "Success:\n"
-              +  Joiner.on("\n").join(successfullCorpora) + "\n"
-              + "---------------\n"
-              + "Failed:\n"
-              + Joiner.on("\n").join(failedCorpora) + "\n"
-              + "---------------\n");
-        }
-      }
-    }
-    else
-    {
-      log.error("Can not read the database configuration file {}", dbProperties.
-        getAbsolutePath());
-    }
-    return false;
-  }
   
   public void dumpTable(String tableName, File outputFile)
   {

@@ -527,7 +527,7 @@ public class MainFrame extends javax.swing.JFrame
     // hack, just try to list corpora
     try
     {
-      corpusAdministration.listCorpusStats();
+      corpusAdministration.getAdministrationDao().getQueryDao().listCorpora();
     }
     catch (Exception ex)
     {

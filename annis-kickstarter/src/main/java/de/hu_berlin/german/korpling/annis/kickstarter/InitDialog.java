@@ -17,6 +17,7 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
+import annis.service.objects.AnnisCorpus;
 import com.google.common.base.Charsets;
 import java.awt.Frame;
 import java.io.File;
@@ -47,7 +48,7 @@ public class InitDialog extends javax.swing.JDialog
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     InitDialog.class);
-  private CorpusAdministration corpusAdministration;
+  private final CorpusAdministration corpusAdministration;
   private SwingWorker<String, Void> initWorker;
   private Frame parentFrame;
 
@@ -171,7 +172,6 @@ public class InitDialog extends javax.swing.JDialog
 
     getRootPane().setDefaultButton(btOk);
     this.corpusAdministration = corpusAdministration;
-
   }
 
   /**
@@ -329,7 +329,10 @@ public class InitDialog extends javax.swing.JDialog
         // catch all existing corpora
         try
         {
-          existingCorpora = corpusAdministration.listCorpusStats();
+          List<AnnisCorpus> result = corpusAdministration.getAdministrationDao().getQueryDao().listCorpora();
+          for(AnnisCorpus c : result) {
+            existingCorpora.add(c.asTableRow());
+          }
         }
         catch(Exception ex)
         {

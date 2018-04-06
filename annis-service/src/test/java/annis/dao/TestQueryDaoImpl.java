@@ -119,22 +119,6 @@ public class TestQueryDaoImpl
   }
 
 
-  @SuppressWarnings("unchecked")
-  @Test
-  public void listCorpora()
-  {
-    // stub JdbcTemplate to return a list of AnnisCorpus
-    final List<AnnisCorpus> CORPORA = mock(List.class);
-    when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(
-      CORPORA);
-
-    // stub SQL query
-    when(listCorpusHelper.createSqlQuery()).thenReturn(SQL);
-
-    // call and test
-    assertThat(queryDao.listCorpora(), is(CORPORA));
-    verify(jdbcTemplate).query(SQL, listCorpusHelper);
-  }
 
   @SuppressWarnings("unchecked")
   @Ignore

@@ -50,13 +50,13 @@ public class DBProvider {
         return source.getConnection();
     }
 
-    public final File getANNISDir() {
+    public File getANNISDir() {
         // TODO: make the annis folder location configurable
         // (like the external data dir)
         return new File(System.getProperty("user.home"), ".annis");
     }
 
-    public final File getGraphANNISDir() {
+    public File getGraphANNISDir() {
         return new File(getANNISDir(), "graphannis");
     }
 

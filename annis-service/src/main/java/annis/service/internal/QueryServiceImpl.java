@@ -530,13 +530,11 @@ public class QueryServiceImpl implements QueryService
     
     LinkedList<String> originalCorpusNames = new LinkedList<>();
     originalCorpusNames.add(toplevelName);
-    List<Long> ids = queryDao.mapCorpusNamesToIds(originalCorpusNames);
     
-    // also add all corpora that match the alias name
-    ids.addAll(queryDao.mapCorpusAliasToIds(toplevelName));
-    if(!ids.isEmpty())
+    // TODO: also add all corpora that match the alias name
+    if(!originalCorpusNames.isEmpty())
     {
-      List<AnnisCorpus> allCorpora = queryDao.listCorpora(ids);
+      List<AnnisCorpus> allCorpora = queryDao.listCorpora(originalCorpusNames);
       for(AnnisCorpus c : allCorpora)
       {
         if(user.isPermitted("query:show:" + c.getName()))
