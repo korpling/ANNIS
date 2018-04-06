@@ -57,8 +57,6 @@ public class DBProvider {
     }
 
     public final File getGraphANNISDir() {
-        if (false) {
-        }
         return new File(getANNISDir(), "graphannis");
     }
 
