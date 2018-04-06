@@ -32,7 +32,7 @@ public class DBProvider {
     }
 
     public File getDBFile() {
-        return new File(getGraphANNISDir(), "annis.sqlite3");
+        return new File(getANNISDir(), "annis.sqlite3");
     }
 
     public Connection createSQLiteConnection(boolean readonly) throws SQLException {
