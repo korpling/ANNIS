@@ -26,21 +26,15 @@ limitations under the License.
        default-lazy-init="true">
 
   <import resource="file:${annis.home}/conf/spring/Common.xml" />
-  <import resource="file:${annis.home}/conf/spring/SqlGenerator.xml" />
   <import resource="file:${annis.home}/conf/spring/Dao.xml"/>
 
   <bean id="annisRunner" class="annis.AnnisRunner" lazy-init="true">
-    <property name="findSqlGenerator" ref="findSqlGenerator"/>
-    <property name="countSqlGenerator" ref="countMatchesAndDocumentsSqlGenerator"/>
-    <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
-    <property name="frequencySqlGenerator" ref="frequencySqlGenerator" />
 
     <property name="queryDao" ref="queryDao"/>
     <property name="annisParser" ref="annisParserAntlr"/>
     <property name="helloMessage" value="ANNIS Interactive Shell"/>
     <property name="prompt" value="ANNIS"/>
     <property name="matchLimit" value="10"/>
-    <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="queriesGenerator" ref="queriesGenerator" />
   </bean>
 

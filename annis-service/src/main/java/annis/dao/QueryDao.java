@@ -57,12 +57,12 @@ public interface QueryDao
 
   public List<AnnisCorpus> listCorpora(List<Long> ids);
 
-  public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
+  public List<AnnisAttribute> listAnnotations(List<String> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);
 
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName);
 
-  public List<String> listSegmentationNames(List<Long> corpusList);
+  public List<String> listSegmentationNames(List<String> corpusList);
 
   /**
    * Creates sql for getting annotations of corpora.
@@ -139,7 +139,7 @@ public interface QueryDao
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
-  public QueryData parseAQL(String aql, List<Long> corpusList);
+  public QueryData parseAQL(String aql, List<String> corpusList);
 
   int count(QueryData queryData);
 
@@ -163,9 +163,6 @@ public interface QueryDao
     final boolean analyze);
 
   FrequencyTable frequency(QueryData queryData);
-
-  public void matrix(final QueryData queryData, boolean outputCSV,
-    final OutputStream out);
 
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGeneratorAndExtractor<QueryData, T> generator);

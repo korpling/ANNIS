@@ -14,7 +14,6 @@
   default-lazy-init="true">
   
   <import resource="Common.xml" />
-  <import resource="file:${annis.home}/conf/spring/SqlGenerator.xml" />
 
   <!-- Transaction management -->
   <tx:annotation-driven transaction-manager="transactionManager"/>
@@ -66,8 +65,6 @@
   <!-- Helper for list command -->
   <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper" lazy-init="true"/>
 
-  <!-- Helper for nodeAnnotations command -->
-  <bean id="listAnnotationsSqlHelper" class="annis.sqlgen.ListAnnotationsSqlHelper" lazy-init="true"/>
 
   <!-- Helper for listCorpusAnnotations command -->
   <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper" lazy-init="true"/>
@@ -147,18 +144,12 @@
   <bean id="shortenerDao" class="annis.dao.ShortenerDao" lazy-init="true" parent="daoBase">
   </bean>
   
-  <bean id="metaDataFilter" class="annis.dao.MetaDataFilter" lazy-init="true" parent="daoBase">
-    <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
-  </bean>
-
   <!-- exported bean: QueryDao -->
   <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true" parent="daoBase">
 
     <!-- configuration -->
     <property name="timeout" value="${annis.sql-timeout}"/>
 
-    <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
-    <property name="frequencySqlGenerator" ref="frequencySqlGenerator" />
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
 
     <property name="rawTextHelper" ref="rawTextSqlHelper" />
@@ -166,7 +157,6 @@
     <property name="aqlParser" ref="annisParserAntlr"/>
 
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
-    <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
     <property name="listDocumentsAnnotationsSqlHelper" ref="listDocumentsAnnotationsSqlHelper"/>
     <property name="listDocumentsSqlHelper" ref="listDocumentsSqlHelper" />
@@ -182,7 +172,6 @@
 
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
 
-    <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="byteHelper" ref="byteHelper" />
     <property name="metaByteHelper" ref="metaByteHelper" />
 

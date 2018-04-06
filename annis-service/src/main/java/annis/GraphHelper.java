@@ -53,10 +53,7 @@ public class GraphHelper  {
       }
       queryData.addAlternative(pseudoNodes);
     }
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<>(
-      corpusNames));
-
-    queryData.setCorpusList(corpusIDs);
+    queryData.setCorpusList(new LinkedList<>(corpusNames));
 
     queryData.addExtension(matchGroup);
     return queryData;

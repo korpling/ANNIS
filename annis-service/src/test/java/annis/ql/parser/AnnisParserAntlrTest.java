@@ -99,8 +99,8 @@ public class AnnisParserAntlrTest
   public void testParse()
   {
     System.out.println("parse " + aql);
-    List<Long> corpusList = new LinkedList<>();
-    corpusList.add(1234l);
+    List<String> corpusList = new LinkedList<>();
+    corpusList.add("corpus");
     
     AnnisParserAntlr instance = new AnnisParserAntlr();
     

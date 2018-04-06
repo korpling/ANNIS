@@ -18,6 +18,7 @@ package annis;
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
 import annis.ql.parser.QueryData;
+import annis.service.objects.AnnisCorpus;
 import annis.test.TestHelper;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,7 +50,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations =
 {
   "file:src/main/distribution/conf/spring/Common.xml",
-  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
   "file:src/main/distribution/conf/spring/Dao.xml"
 }, loader = AnnisXmlContextLoader.class)
 public class CountTest
@@ -60,9 +60,9 @@ public class CountTest
   @Resource(name = "queryDao")
   QueryDao annisDao;
 
-  private List<Long> pcc2CorpusID;
+  private List<String> pcc2CorpusID;
 
-  private List<Long> tiger2CorpusID;
+  private List<String> tiger2CorpusID;
 
   @Before
   public void setup()
@@ -89,13 +89,17 @@ public class CountTest
     tiger2CorpusID = getCorpusIDs("tiger2");
   }
 
-  private List<Long> getCorpusIDs(String corpus)
+  private List<String> getCorpusIDs(String corpus)
   {
+    LinkedList<String> result = new LinkedList<>();
     // (and check if it's there, otherwise ignore these tests)
-    List<String> corpusNames = new LinkedList<>();
-    corpusNames.add(corpus);
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
-    return corpusIDs;
+    for(AnnisCorpus c : annisDao.listCorpora()) {
+        if(corpus.equals(c.getName())) {
+            result.add(corpus);
+            break;
+        }
+    }
+    return result;
   }
 
   @Test
@@ -274,7 +278,7 @@ public class CountTest
     return count(aql, tiger2CorpusID);
   }
 
-  private int count(String aql, List<Long> corpora)
+  private int count(String aql, List<String> corpora)
   {
     QueryData qd = annisDao.parseAQL(aql, corpora);
     return annisDao.count(qd);

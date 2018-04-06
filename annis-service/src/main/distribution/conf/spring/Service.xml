@@ -7,7 +7,6 @@
        default-lazy-init="true">
 
   <import resource="Common.xml" />
-  <import resource="file:${annis.home}/conf/spring/SqlGenerator.xml" />
   <import resource="file:${annis.home}/conf/spring/Dao.xml"/>
   <import resource="Admin.xml" />
   

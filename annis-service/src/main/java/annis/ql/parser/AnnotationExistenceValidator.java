@@ -48,7 +48,7 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
   @Override
   public QueryData transform(QueryData data)
   {
-    List<Long> corpusList = data.getCorpusList();
+    List<String> corpusList = data.getCorpusList();
 
     if (queryDao != null && (corpusList != null) && !corpusList.isEmpty())
     {

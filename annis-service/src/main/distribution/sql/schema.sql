@@ -122,32 +122,6 @@ COMMENT ON COLUMN facts.edge_type IS 'edge type of this component';
 COMMENT ON COLUMN facts.edge_namespace IS 'optional namespace of the edges’ names';
 COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
 
--- stats
-DROP TABLE IF EXISTS corpus_stats CASCADE;
-CREATE TABLE corpus_stats
-(
-  name        varchar,
-  id          integer NOT NULL REFERENCES corpus ON DELETE CASCADE,
-  text        integer,
-  tokens        bigint,
-  max_corpus_id integer  NULL,
-  max_corpus_pre integer NULL,
-  max_corpus_post integer NULL,
-  max_node_id bigint NULL,
-  source_path varchar COLLATE "C" -- original path to the folder containing the ANNIS format sources
-);
-
-
-DROP VIEW IF EXISTS corpus_info CASCADE;
-CREATE VIEW corpus_info AS 
-SELECT min(corpus_stats.name::text) AS name,
-    corpus_stats.id,
-    min(corpus_stats.text) AS text,
-    min(corpus_stats.tokens) AS tokens,
-    min(corpus_stats.source_path::text) AS source_path
-FROM corpus_stats
-GROUP BY corpus_stats.id;
-
 
 DROP TABLE IF EXISTS annotations CASCADE;
 CREATE TABLE annotations

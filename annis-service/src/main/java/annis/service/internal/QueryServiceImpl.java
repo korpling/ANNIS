@@ -53,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.Date;
@@ -266,65 +267,6 @@ public class QueryServiceImpl implements QueryService
   }
 
 
-  /**
-   * Get result as matrix in WEKA (ARFF) format.
-   * @param query
-   * @param rawCorpusNames
-   * @param rawMetaKeys
-   * @param rawCsv
-   * @return 
-   */
-  @GET
-  @Path("search/matrix")
-  @Produces("text/plain")
-  public StreamingOutput matrix(
-    final @QueryParam("q") String query,
-    final @QueryParam("corpora") String rawCorpusNames,
-    @QueryParam("metakeys") String rawMetaKeys,
-    @DefaultValue("false") @QueryParam("csv") String rawCsv)
-  {
-    requiredParameter(query, "q", "AnnisQL query");
-    requiredParameter(rawCorpusNames, "corpora",
-      "comma separated list of corpus names");
-
-    final boolean outputCsv = Boolean.parseBoolean(rawCsv);
-    
-    Subject user = SecurityUtils.getSubject();
-    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
-    for (String c : corpusNames)
-    {
-      user.checkPermission("query:matrix:" + c);
-    }
-
-    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
-
-    MatrixQueryData ext = new MatrixQueryData();
-    if(rawMetaKeys != null)
-    {
-      ext.setMetaKeys(splitMatrixKeysFromRaw(rawMetaKeys));
-    }
-    if(ext.getMetaKeys() != null && ext.getMetaKeys().isEmpty())
-    {
-      ext.setMetaKeys(null);
-    }
-
-    data.addExtension(ext);
-
-    StreamingOutput result = new StreamingOutput()
-    {
-      @Override
-      public void write(OutputStream output) throws IOException, WebApplicationException
-      {
-        long start = new Date().getTime();
-        queryDao.matrix(data, outputCsv, output);
-        long end = new Date().getTime();
-        logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames),
-          end - start);
-      }
-    };
-
-    return result;
-  }
   
   /**
    * Frequency analysis.
@@ -643,10 +585,7 @@ public class QueryServiceImpl implements QueryService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:annotations:" + toplevelCorpus);
 
-    List<Long> corpusList = new ArrayList<>();
-    corpusList.add(queryDao.mapCorpusNameToId(toplevelCorpus));
-
-    return queryDao.listAnnotations(corpusList,
+    return queryDao.listAnnotations(Arrays.asList(toplevelCorpus),
       Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
       onlyMostFrequentValues));
 
@@ -662,10 +601,7 @@ public class QueryServiceImpl implements QueryService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:annotations:" + toplevelCorpus);
 
-    List<Long> corpusList = new ArrayList<>();
-    corpusList.add(queryDao.mapCorpusNameToId(toplevelCorpus));
-
-    return new SegmentationList(queryDao.listSegmentationNames(corpusList));
+    return new SegmentationList(queryDao.listSegmentationNames(Arrays.asList(toplevelCorpus)));
 
   }
 
@@ -690,10 +626,7 @@ public class QueryServiceImpl implements QueryService
     }
     Collections.sort(corpusNames);
     
-    List<Long> corpusIDs = queryDao.mapCorpusNamesToIds(
-      corpusNames);
-    
-    queryDao.parseAQL(query, corpusIDs);
+    queryDao.parseAQL(query, corpusNames);
     return "ok";
   }
   
@@ -719,10 +652,8 @@ public class QueryServiceImpl implements QueryService
     }
     Collections.sort(corpusNames);
     
-    List<Long> corpusIDs = queryDao.mapCorpusNamesToIds(
-      corpusNames);
     
-    QueryData data = queryDao.parseAQL(query, corpusIDs);
+    QueryData data = queryDao.parseAQL(query, corpusNames);
     List<QueryNode> nodes = new LinkedList<>();
     int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
@@ -1045,7 +976,7 @@ public class QueryServiceImpl implements QueryService
         "text/plain").entity("one ore more corpora are unknown to the system").
         build());
     }
-    return queryDao.parseAQL(query, corpusIDs);
+    return queryDao.parseAQL(query, corpusNames);
   }
 
   /**

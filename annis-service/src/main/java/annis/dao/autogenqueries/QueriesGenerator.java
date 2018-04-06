@@ -17,10 +17,8 @@ package annis.dao.autogenqueries;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.corpus_tools.salt.common.SaltProject;
@@ -205,8 +203,7 @@ public class QueriesGenerator extends DBProvider {
       String aql = queryBuilder.getAQL();
 
       // set some necessary extensions for generating complete sql
-      long corpusIDs = getQueryDao().mapCorpusNameToId(this.corpusName);
-      QueryData queryData = getQueryDao().parseAQL(aql, Arrays.asList(corpusIDs));
+      QueryData queryData = getQueryDao().parseAQL(aql, Arrays.asList(this.corpusName));
       queryData.addExtension(queryBuilder.getLimitOffsetQueryData());
 
       // retrieve the salt project to analyze

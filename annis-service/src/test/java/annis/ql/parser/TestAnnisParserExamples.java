@@ -70,7 +70,7 @@ public class TestAnnisParserExamples
     @SpringSyntaxTreeExamples(exampleMap = "exampleSyntaxTrees", contextLocation = EXAMPLES) SyntaxTreeExample example)
   {
 
-    QueryData data = parserAntlr.parse(example.getQuery(), new LinkedList<Long>());
+    QueryData data = parserAntlr.parse(example.getQuery(), new LinkedList<>());
     assertThat(data, is(not(nullValue())));
 
     String actual = data.toAQL().trim();
@@ -89,7 +89,7 @@ public class TestAnnisParserExamples
     try
     {
       QueryData result = parserAntlr.parse(annisQuery,
-        new LinkedList<Long>());
+        new LinkedList<>());
       assertThat(result, is(not(nullValue())));
     } catch (Exception ex)
     {
@@ -106,7 +106,7 @@ public class TestAnnisParserExamples
 
     try
     {
-      parserAntlr.parse(annisQuery, new LinkedList<Long>());
+      parserAntlr.parse(annisQuery, new LinkedList<>());
 
       fail("bad query passed as good: " + annisQuery);
     } catch (AnnisQLSyntaxException | AnnisQLSemanticsException ex)

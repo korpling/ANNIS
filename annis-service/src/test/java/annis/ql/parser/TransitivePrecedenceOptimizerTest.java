@@ -101,7 +101,7 @@ public class TransitivePrecedenceOptimizerTest
     parser.setPrecedenceBound(50);
     
     // perform the initial parsing
-    QueryData data = parser.parse(aql, new LinkedList<Long>());
+    QueryData data = parser.parse(aql, new LinkedList<>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
     
     
@@ -206,7 +206,7 @@ public class TransitivePrecedenceOptimizerTest
       + "& #4 .* #2";
     
     // perform the initial parsing
-    QueryData data = parser.parse(aql, new LinkedList<Long>());
+    QueryData data = parser.parse(aql, new LinkedList<>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
     
     assertEquals("alternative added", 1, data.getAlternatives().size());
@@ -301,7 +301,7 @@ public class TransitivePrecedenceOptimizerTest
     String aql = "node & node & node & #1 .abc #2 & #2 .abc #3";
     
     // perform the initial parsing
-    QueryData data = parser.parse(aql, new LinkedList<Long>());
+    QueryData data = parser.parse(aql, new LinkedList<>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
     
     assertEquals(1, data.getAlternatives().size());
@@ -320,7 +320,7 @@ public class TransitivePrecedenceOptimizerTest
     String aql = "node & node & node & #1 .def #2 & #2 .abc #3";
     
     // perform the initial parsing
-    QueryData data = parser.parse(aql, new LinkedList<Long>());
+    QueryData data = parser.parse(aql, new LinkedList<>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
     
     assertEquals(1, data.getAlternatives().size());
@@ -339,7 +339,7 @@ public class TransitivePrecedenceOptimizerTest
     String aql = "tok & tok & tok & #1 . #2 & #2 .abc #3";
     
     // perform the initial parsing
-    QueryData data = parser.parse(aql, new LinkedList<Long>());
+    QueryData data = parser.parse(aql, new LinkedList<>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
     
     assertEquals(1, data.getAlternatives().size());
@@ -358,7 +358,7 @@ public class TransitivePrecedenceOptimizerTest
     String aql = "node & node & node & #1 . #2 & #2 . #3";
     
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
-    QueryData data = parser.parse(aql, new LinkedList<Long>());
+    QueryData data = parser.parse(aql, new LinkedList<>());
     
     assertEquals(1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);

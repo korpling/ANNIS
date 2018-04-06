@@ -51,7 +51,7 @@ public class AnnisParserAntlr
   private int precedenceBound;
   private List<QueryDataTransformer> postProcessors;
   
-  public QueryData parse(String aql, List<Long> corpusList)
+  public QueryData parse(String aql, List<String> corpusList)
   {
     final List<AqlParseError> errors = new LinkedList<>();
     

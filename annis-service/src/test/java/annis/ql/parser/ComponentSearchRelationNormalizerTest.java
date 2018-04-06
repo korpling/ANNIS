@@ -80,7 +80,7 @@ public class ComponentSearchRelationNormalizerTest
     
     
     // perform the initial parsing
-    QueryData data = parser.parse(aql, new LinkedList<Long>());
+    QueryData data = parser.parse(aql, new LinkedList<>());
     Assert.assertEquals(1, data.getAlternatives().size());
     List<QueryNode> alt = data.getAlternatives().get(0);
     Assert.assertEquals(7, alt.size());

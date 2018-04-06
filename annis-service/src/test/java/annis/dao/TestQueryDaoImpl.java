@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -42,30 +41,23 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import annis.AnnisXmlContextLoader;
-import annis.model.Annotation;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.ql.parser.QueryData;
-import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.DocumentBrowserConfig;
-import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
-import annis.sqlgen.SqlGenerator;
 import annis.test.TestHelper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations =
 {
   "file:src/main/distribution/conf/spring/Common.xml",
-  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
   "file:src/main/distribution/conf/spring/Dao.xml"
 }, loader=AnnisXmlContextLoader.class)
 public class TestQueryDaoImpl
@@ -79,13 +71,9 @@ public class TestQueryDaoImpl
   @Mock
   private AnnisParserAntlr annisParser;
   @Mock
-  private MetaDataFilter metaDataFilter;
-  @Mock
   private JdbcTemplate jdbcTemplate;
   @Mock
   private ListCorpusSqlHelper listCorpusHelper;
-  @Mock
-  private ListAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
   @Mock
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper;
   
@@ -103,9 +91,7 @@ public class TestQueryDaoImpl
     queryDao = new QueryDaoImpl();
     queryDao.setAqlParser(annisParser);
     queryDao.setListCorpusSqlHelper(listCorpusHelper);
-    queryDao.setListAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
     queryDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
-    queryDao.setMetaDataFilter(metaDataFilter);
     
     queryDao.setJdbcTemplate(jdbcTemplate);
     verify(jdbcTemplate).getDataSource();
@@ -125,14 +111,11 @@ public class TestQueryDaoImpl
     assertThat(springManagedDao.getListCorpusSqlHelper(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusAnnotationsSqlHelper(),
       is(not(nullValue())));
-    assertThat(springManagedDao.getListAnnotationsSqlHelper(),
-      is(not(nullValue())));
 
     assertThat(springManagedDao.getSqlSessionModifiers(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusByNameDaoHelper(), is(
       not(nullValue())));
-    assertThat(springManagedDao.getMetaDataFilter(), is(not(nullValue())));
-    assertThat(springManagedDao.getFrequencySqlGenerator(), is(not(nullValue())));
+
   }
 
 

@@ -60,7 +60,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations =
 {
   "file:src/main/distribution/conf/spring/Common.xml",
-  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
   "file:src/main/distribution/conf/spring/Dao.xml"
   
 }, loader = AnnisXmlContextLoader.class)

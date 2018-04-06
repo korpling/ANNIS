@@ -1,5 +1,4 @@
 -- cleanup in the proper order
-DROP TABLE IF EXISTS _corpus_stats;
 DROP TABLE IF EXISTS _corpus_annotation;
 DROP TABLE IF EXISTS _edge_annotation;
 DROP TABLE IF EXISTS _rank;

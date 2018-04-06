@@ -50,7 +50,7 @@ limitations under the License.
 	</util:list>
   
   <bean id="annisParserAntlr" class="annis.ql.parser.AnnisParserAntlr">
-    <property name="precedenceBound" value="$dev{annis.precedence-restriction}"/>
+    <property name="precedenceBound" value="50"/>
     <property name="postProcessors" ref="queryAnalysisPostProcessors" />    
   </bean>
 
