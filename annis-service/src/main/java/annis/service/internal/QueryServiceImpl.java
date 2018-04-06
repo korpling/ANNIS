@@ -41,7 +41,6 @@ import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
 import annis.service.objects.SegmentationList;
 import annis.service.objects.SubgraphFilter;
-import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.common.base.Splitter;
@@ -988,37 +987,6 @@ public class QueryServiceImpl implements QueryService
   private List<String> splitCorpusNamesFromRaw(String rawCorpusNames)
   {
     return new ArrayList<>(Splitter.on(",").omitEmptyStrings().trimResults().splitToList(rawCorpusNames));
-  }
-
-  /**
-   * Splits a list of qualified (meta-) annotation names into a proper java
-   * list.
-   *
-   * @param rawCorpusNames The qualified names separated by ",".
-   * @return
-   */
-  private List<MatrixQueryData.QName> splitMatrixKeysFromRaw(String raw)
-  {
-    LinkedList<MatrixQueryData.QName> result = new LinkedList<>();
-
-    String[] split = raw.split(",");
-    for (String s : split)
-    {
-      String[] nameSplit = s.trim().split(":", 2);
-      MatrixQueryData.QName qname = new MatrixQueryData.QName();
-      if (nameSplit.length == 2)
-      {
-        qname.namespace = nameSplit[0].trim();
-        qname.name = nameSplit[1].trim();
-      }
-      else
-      {
-        qname.name = nameSplit[0].trim();
-      }
-      result.add(qname);
-    }
-
-    return result;
   }
 
   public QueryDao getQueryDao()
