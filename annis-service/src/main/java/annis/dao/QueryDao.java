@@ -19,7 +19,6 @@ import annis.administration.BinaryImportHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
-import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
@@ -30,8 +29,6 @@ import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
-import annis.sqlgen.SqlGenerator;
-import annis.sqlgen.SqlGeneratorAndExtractor;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -40,9 +37,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import org.corpus_tools.annis.ql.parser.QueryData;
 import org.corpus_tools.graphannis.api.CorpusStorageManager;
 import org.corpus_tools.salt.common.SaltProject;
-import org.springframework.jdbc.core.ResultSetExtractor;
 
 public interface QueryDao
 {

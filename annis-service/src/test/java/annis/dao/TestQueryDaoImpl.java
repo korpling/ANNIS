@@ -19,10 +19,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -35,24 +33,20 @@ import javax.annotation.Resource;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import annis.AnnisXmlContextLoader;
-import annis.ql.parser.AnnisParserAntlr;
-import annis.ql.parser.QueryData;
-import annis.service.objects.AnnisCorpus;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.test.TestHelper;
+import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
+import org.corpus_tools.annis.ql.parser.QueryData;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations =
@@ -89,7 +83,6 @@ public class TestQueryDaoImpl
     initMocks(this);
        
     queryDao = new QueryDaoImpl();
-    queryDao.setAqlParser(annisParser);
     queryDao.setListCorpusSqlHelper(listCorpusHelper);
     queryDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
     
@@ -107,7 +100,6 @@ public class TestQueryDaoImpl
 
     QueryDaoImpl springManagedDao = (QueryDaoImpl) TestHelper.proxyTarget(queryDaoBean);
     assertThat(springManagedDao.getJdbcTemplate(), is(not(nullValue())));
-    assertThat(springManagedDao.getAqlParser(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusSqlHelper(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusAnnotationsSqlHelper(),
       is(not(nullValue())));

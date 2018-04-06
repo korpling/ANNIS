@@ -17,10 +17,7 @@ package annis;
 
 import annis.dao.QueryDao;
 import annis.dao.autogenqueries.QueriesGenerator;
-import annis.model.Annotation;
 import annis.model.QueryAnnotation;
-import annis.ql.parser.AnnisParserAntlr;
-import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableQuery;
@@ -51,6 +48,8 @@ import java.util.Set;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
+import org.corpus_tools.annis.ql.parser.QueryData;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.eclipse.emf.common.util.URI;
@@ -71,7 +70,7 @@ public class AnnisRunner extends AnnisBaseRunner {
 
     private int context;
 
-    private AnnisParserAntlr annisParser;
+    private final AnnisParserAntlr annisParser = new AnnisParserAntlr();
 
     private int matchLimit;
 
@@ -634,14 +633,6 @@ public class AnnisRunner extends AnnisBaseRunner {
         // TODO: actuall transform it
         throw new UnsupportedOperationException("Not implemented yet");
 
-    }
-
-    public AnnisParserAntlr getAnnisParser() {
-        return annisParser;
-    }
-
-    public void setAnnisParser(AnnisParserAntlr annisParser) {
-        this.annisParser = annisParser;
     }
 
     public QueryDao getQueryDao() {

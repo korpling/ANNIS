@@ -16,7 +16,6 @@ Without this configuration present, some functionality in the IDE may be limited
     </config-data>
     <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
         <config-files>
-            <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
             <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
             <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
             <config-file>src/main/distribution/conf/spring/Dao.xml</config-file>

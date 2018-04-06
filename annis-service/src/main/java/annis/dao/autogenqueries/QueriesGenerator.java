@@ -29,12 +29,12 @@ import annis.GraphHelper;
 import annis.dao.DBProvider;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
-import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import org.corpus_tools.annis.ql.parser.QueryData;
 
 /**
  * Controlls the generating of automatic generated queries.

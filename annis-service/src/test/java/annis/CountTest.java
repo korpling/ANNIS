@@ -17,7 +17,7 @@ package annis;
 
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
-import annis.ql.parser.QueryData;
+import org.corpus_tools.annis.ql.parser.QueryData;
 import annis.service.objects.AnnisCorpus;
 import annis.test.TestHelper;
 import java.util.LinkedList;

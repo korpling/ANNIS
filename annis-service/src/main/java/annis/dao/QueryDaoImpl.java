@@ -21,8 +21,7 @@ import annis.exceptions.AnnisException;
 import annis.exceptions.AnnisTimeoutException;
 import annis.model.AnnisConstants;
 import annis.model.Annotation;
-import annis.ql.parser.AnnisParserAntlr;
-import annis.ql.parser.QueryData;
+import org.corpus_tools.annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
@@ -87,6 +86,7 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
 import org.corpus_tools.graphannis.QueryToJSON;
 import org.corpus_tools.graphannis.api.CorpusStorageManager;
 import org.corpus_tools.graphannis.api.LogLevel;
@@ -428,7 +428,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
 
     private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
 
-    private AnnisParserAntlr aqlParser;
+    private final AnnisParserAntlr aqlParser = new AnnisParserAntlr();
 
     private HashMap<String, Properties> corpusConfiguration;
 
@@ -872,15 +872,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         SaltXML10Writer writer = new SaltXML10Writer(projectFile);
         writer.writeSaltProject(corpusProject);
     }
-
-    public AnnisParserAntlr getAqlParser() {
-        return aqlParser;
-    }
-
-    public void setAqlParser(AnnisParserAntlr aqlParser) {
-        this.aqlParser = aqlParser;
-    }
-
     // /// Getter / Setter
     public ListCorpusSqlHelper getListCorpusSqlHelper() {
         return listCorpusSqlHelper;

@@ -17,7 +17,6 @@ package annis;
 
 import annis.dao.QueryDao;
 import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import org.corpus_tools.annis.ql.parser.QueryData;
 
 public class GraphHelper  {
 

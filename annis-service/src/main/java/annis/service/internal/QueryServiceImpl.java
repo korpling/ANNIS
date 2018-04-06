@@ -22,7 +22,7 @@ import annis.WekaHelper;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
+import org.corpus_tools.annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.QueryService;

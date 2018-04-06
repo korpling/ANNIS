@@ -16,7 +16,7 @@
 package annis.dao;
 
 import annis.administration.AdministrationDao;
-import annis.ql.parser.QueryData;
+import org.corpus_tools.annis.ql.parser.QueryData;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 public class ScriptFileSqlSessionModifier implements SqlSessionModifier {

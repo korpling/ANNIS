@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -42,7 +41,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import javax.sql.DataSource;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -79,11 +77,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.exceptions.AnnisException;
-import annis.ql.parser.QueryData;
 import annis.security.UserConfig;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
+
+import org.corpus_tools.annis.ql.parser.QueryData;
+  
 import org.apache.commons.dbutils.ResultSetHandler;
 
 /**

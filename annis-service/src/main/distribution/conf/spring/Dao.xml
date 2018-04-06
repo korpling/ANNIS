@@ -81,9 +81,6 @@
   <!-- Helper for list example queries -->
   <bean id="listExampleQueriesHelper" class="annis.sqlgen.ListExampleQueriesHelper" lazy-init="true"/>
 
-  <!-- Annis parser -->
-  <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
-
   <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper" lazy-init="true">
     <property name="requiredType" value="java.lang.Long"/>
   </bean>
@@ -153,8 +150,6 @@
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
 
     <property name="rawTextHelper" ref="rawTextSqlHelper" />
-
-    <property name="aqlParser" ref="annisParserAntlr"/>
 
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
