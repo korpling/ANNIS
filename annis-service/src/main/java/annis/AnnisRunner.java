@@ -596,20 +596,6 @@ public class AnnisRunner extends AnnisBaseRunner {
     }
 
 
-    public void doMeta(String corpusId) {
-        LinkedList<Long> corpusIdAsList = new LinkedList<>();
-        try {
-            corpusIdAsList.add(Long.parseLong(corpusId));
-            List<String> toplevelNames = queryDao.mapCorpusIdsToNames(corpusIdAsList);
-
-            List<Annotation> corpusAnnotations = queryDao.listCorpusAnnotations(toplevelNames.get(0));
-            printAsTable(corpusAnnotations, "namespace", "name", "value");
-        } catch (NumberFormatException ex) {
-            System.out.print("not a number: " + corpusId);
-        }
-
-    }
-
     public void doDoc(String docCall) {
         List<String> splitted = Splitter.on(' ').trimResults().omitEmptyStrings().splitToList(docCall);
 

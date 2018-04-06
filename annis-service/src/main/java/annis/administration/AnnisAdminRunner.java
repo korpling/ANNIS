@@ -353,28 +353,12 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
 
     // convert ids from string to int
-    List<Long> ids = new ArrayList<>();
-    for (String id : commandArgs)
+    List<String> names = new ArrayList<>();
+    for (String n : commandArgs)
     {
-      try
-      {
-        ids.add(Long.parseLong(id));
-      }
-      catch (NumberFormatException e)
-      {
-        // interpret this as name
-        try
-        {
-          long numericID = queryDao.mapCorpusNameToId(id.trim());
-          ids.add(numericID);
-        }
-        catch(IllegalArgumentException ex)
-        {
-          throw new UsageException("\"" + id + "\" is neither a number nor a known corpus");
-        }
-      }
+      names.add(n);
     }
-    corpusAdministration.deleteCorpora(ids);
+    corpusAdministration.deleteCorpora(names);
   }
   
 

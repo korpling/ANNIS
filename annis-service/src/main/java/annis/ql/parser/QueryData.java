@@ -44,7 +44,7 @@ public class QueryData implements Cloneable {
 
     private Set<Object> extensions;
 
-    private HashMap<Long, Properties> corpusConfiguration;
+    private HashMap<String, Properties> corpusConfiguration;
 
     public QueryData() {
         alternatives = new ArrayList<>();
@@ -233,11 +233,11 @@ public class QueryData implements Cloneable {
         return extensions.add(extension);
     }
 
-    public HashMap<Long, Properties> getCorpusConfiguration() {
+    public HashMap<String, Properties> getCorpusConfiguration() {
         return corpusConfiguration;
     }
 
-    public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration) {
+    public void setCorpusConfiguration(HashMap<String, Properties> corpusConfiguration) {
         this.corpusConfiguration = corpusConfiguration;
     }
 }

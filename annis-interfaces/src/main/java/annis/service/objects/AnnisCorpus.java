@@ -15,36 +15,28 @@
  */
 package annis.service.objects;
 
+import com.google.common.collect.ComparisonChain;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class AnnisCorpus implements Serializable, Comparable<AnnisCorpus> {
 
-    private long id;
     private String name;
     private int documentCount, tokenCount;
     private String sourcePath;
 
-    public AnnisCorpus(long id, String name, int documentCount, int tokenCount) {
-        this.id = id;
+    public AnnisCorpus(String name, int documentCount, int tokenCount) {
         this.documentCount = documentCount;
         this.tokenCount = tokenCount;
         this.name = name;
     }
 
     public AnnisCorpus() {
-        this(0, null, 0, 0);
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+        this(null, 0, 0);
     }
 
     public String getName() {
@@ -90,11 +82,21 @@ public class AnnisCorpus implements Serializable, Comparable<AnnisCorpus> {
 
     @Override
     public String toString() {
-        return String.valueOf("corpus #" + id + ": " + name);
+        return String.valueOf("corpus " + name);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.name);
+        return hash;
     }
 
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (obj == null) {
             return false;
         }
@@ -102,17 +104,10 @@ public class AnnisCorpus implements Serializable, Comparable<AnnisCorpus> {
             return false;
         }
         final AnnisCorpus other = (AnnisCorpus) obj;
-        if (this.id != other.id) {
+        if (!Objects.equals(this.name, other.name)) {
             return false;
         }
         return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 53 * hash + (int) (this.id ^ (this.id >>> 32));
-        return hash;
     }
 
     @Override
@@ -120,7 +115,7 @@ public class AnnisCorpus implements Serializable, Comparable<AnnisCorpus> {
         if (o == null) {
             return -1;
         } else {
-            return id < o.getId() ? -1 : (id > o.getId() ? +1 : 0);
+            return ComparisonChain.start().compare(this.name, o.name).result();
         }
     }
 }

@@ -118,32 +118,6 @@ public class TestQueryDaoImpl
 
   }
 
-
-
-  @SuppressWarnings("unchecked")
-  @Ignore
-  public void listCorpusByName()
-  {
-    final List<String> CORPUS_NAMES = mock(List.class);
-
-    ListCorpusByNameDaoHelper listCorpusByNameDaoHelper =
-      mock(ListCorpusByNameDaoHelper.class);
-    queryDao.setListCorpusByNameDaoHelper(listCorpusByNameDaoHelper);
-    when(listCorpusByNameDaoHelper.createSql(anyList())).thenReturn(SQL);
-
-//		String sql = "SELECT id FROM corpus WHERE name IN (?) AND top_level = 't'";
-
-    // must use expected values here, otherwise the verify below breaks because it is operating on a spy
-    List<Long> wtf = jdbcTemplate.query(anyString(),
-      any(ListCorpusByNameDaoHelper.class));
-    when(wtf).thenReturn(CORPUS_LIST);
-
-    assertThat(queryDao.mapCorpusNamesToIds(CORPUS_NAMES), is(CORPUS_LIST));
-
-    verify(listCorpusByNameDaoHelper).createSql(CORPUS_NAMES);
-    verify(jdbcTemplate).query(SQL, listCorpusByNameDaoHelper);
-  }
-
   @Test
   public void sessionTimeout()
   {
@@ -169,33 +143,6 @@ public class TestQueryDaoImpl
 
     // verify that nothing has happened
     verifyNoMoreInteractions(jdbcTemplate);
-  }
-
-  /**
-   * Tests only an invalid corpus id.
-   */
-  @Test
-  public void mapCorpusIdsToNames()
-  {
-    long invalidCorpusId = -1;
-    List<Long> ids = new ArrayList<>();
-    ids.add(invalidCorpusId);
-    List<String> names = queryDao.mapCorpusIdsToNames(ids);
-
-    Assert.assertTrue("list of names must be empty: ", names.isEmpty());
-  }
-
-  /**
-   * Tests only an invalid corpus id.
-   */
-  @Test(expected = DataAccessException.class)
-  public void mapCorpusIdToName()
-  {
-    long invalidCorpusId = -1;
-    List<Long> ids = new ArrayList<>();
-    ids.add(invalidCorpusId);
-    when(queryDao.mapCorpusIdsToNames(ids)).thenReturn(new ArrayList<String>());
-    queryDao.mapCorpusIdToName(invalidCorpusId);
   }
 
   @Test

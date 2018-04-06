@@ -26,6 +26,7 @@ import annis.security.Group;
 import annis.security.User;
 import annis.security.UserConfig;
 import annis.service.AdminService;
+import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
 import annis.utils.ANNISFormatHelper;
 import com.google.common.base.Joiner;
@@ -400,9 +401,7 @@ public class AdminServiceImpl implements AdminService
     try
     {
 
-      // get ID of corpus
-      long id = queryDao.mapCorpusNameToId(corpusName);
-      deleteCorpusDao.deleteCorpora(Arrays.asList(id));
+      deleteCorpusDao.deleteCorpora(Arrays.asList(corpusName));
       return Response.status(Response.Status.OK).build();
     }
     catch (IllegalArgumentException ex)
@@ -482,9 +481,9 @@ public class AdminServiceImpl implements AdminService
         }
         String caption = Joiner.on(", ").join(allNames);
 
-        List<Long> corpusIDs = queryDao.mapCorpusNamesToIds(new LinkedList<>(
-          allNames));
-        if (overwrite || corpusIDs == null || corpusIDs.isEmpty())
+        List<AnnisCorpus> existingCorpora = queryDao.listCorpora(new LinkedList<>(allNames));
+     
+        if (overwrite || existingCorpora == null || existingCorpora.isEmpty())
         {
           ImportJob job = new ImportJob();
           UUID uuid = UUID.randomUUID();

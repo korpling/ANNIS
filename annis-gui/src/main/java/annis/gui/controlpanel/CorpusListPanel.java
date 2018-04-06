@@ -776,8 +776,7 @@ public class CorpusListPanel extends VerticalLayout implements
     infoLayout.setColumnExpandRatio(1, 0.5f);
     infoLayout.setComponentAlignment(lblLink, Alignment.MIDDLE_CENTER);
 
-    Window window = new Window("Corpus information for " + c.getName()
-      + " (ID: " + c.getId() + ")", infoLayout);
+    Window window = new Window("Corpus information for " + c.getName(), infoLayout);
     window.setWidth(70, Unit.EM);
     window.setHeight(45, Unit.EM);
     window.setResizable(true);

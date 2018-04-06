@@ -44,7 +44,6 @@ import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.SqlGenerator;
-import annis.sqlgen.SqlGeneratorAndExtractor;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.common.base.Charsets;
@@ -76,9 +75,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Properties;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -109,7 +106,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
@@ -243,7 +239,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     }
 
     @Override
-    public HashMap<Long, Properties> getCorpusConfiguration() {
+    public HashMap<String, Properties> getCorpusConfiguration() {
         return corpusConfiguration;
     }
 
@@ -252,10 +248,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         if (topLevelCorpus == null || documentName == null) {
             throw new IllegalArgumentException("top level corpus and document name may not be null");
         }
-
-        long topLevelCorpusId = mapCorpusNameToId(topLevelCorpus);
-        return (List<String>) getJdbcTemplate().query(rawTextHelper.createSQL(topLevelCorpusId, documentName),
-                rawTextHelper);
+        
+        // TODO: implement getting the raw text
+        
+        throw new UnsupportedOperationException();
 
     }
 
@@ -265,9 +261,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
             throw new IllegalArgumentException("corpus name may not be null");
         }
 
-        long id = mapCorpusNameToId(topLevelCorpus);
-        String sql = rawTextHelper.createSQL(id);
-        return (List<String>) getJdbcTemplate().query(sql, rawTextHelper);
+        // TODO: implement getting the raw text
+        
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -284,24 +280,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     public void setRawTextHelper(RawTextSqlHelper rawTextHelper) {
         this.rawTextHelper = rawTextHelper;
     }
-
-    @Override
-    public String mapCorpusIdToName(long corpusId) {
-
-        List<Long> ids = new ArrayList<>();
-        ids.add(corpusId);
-        List<String> names = mapCorpusIdsToNames(ids);
-
-        if (names == null || names.isEmpty()) {
-            String msg = "corpus is not known to the system";
-            throw new DataAccessException(msg) {
-            };
-        }
-
-        return names.get(0);
-
-    }
-
+    
     @Override
     public void setCorpusConfiguration(String toplevelCorpusName, Properties props) {
 
@@ -451,7 +430,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
 
     private AnnisParserAntlr aqlParser;
 
-    private HashMap<Long, Properties> corpusConfiguration;
+    private HashMap<String, Properties> corpusConfiguration;
 
     private ByteHelper byteHelper;
 
@@ -472,55 +451,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     @Override
     public CorpusStorageManager getCorpusStorageManager() {
         return this.corpusStorageMgr;
-    }
-
-    @Override
-    public List<String> mapCorpusIdsToNames(List<Long> ids) {
-        List<String> names = new ArrayList<>();
-
-        Map<Long, String> corpusNamesById = new TreeMap<>();
-        List<AnnisCorpus> corpora = listCorpora();
-        for (AnnisCorpus corpus : corpora) {
-            corpusNamesById.put(corpus.getId(), corpus.getName());
-        }
-
-        for (Long id : ids) {
-            if (corpusNamesById.containsKey(id)) {
-                names.add(corpusNamesById.get(id));
-            }
-        }
-        return names;
-    }
-
-    private void prepareTransaction(QueryData queryData) {
-        JdbcTemplate jdbcTemplate = getJdbcTemplate();
-
-        // FIXME: muss corpusConfiguration an jeden Query angehangen werden?
-        // oder nur an annotate-Queries?
-        queryData.setCorpusConfiguration(corpusConfiguration);
-
-        // execute session modifiers if any
-        for (SqlSessionModifier sqlSessionModifier : sqlSessionModifiers) {
-            sqlSessionModifier.modifySqlSession(jdbcTemplate, queryData);
-        }
-    }
-
-    // query functions
-    @Override
-    @Transactional(readOnly = true)
-    public <T> T executeQueryFunction(QueryData queryData, final SqlGeneratorAndExtractor<QueryData, T> generator) {
-        return executeQueryFunction(queryData, generator, generator);
-    }
-
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
-    @Override
-    public <T> T executeQueryFunction(QueryData queryData, final SqlGenerator<QueryData> generator,
-            final ResultSetExtractor<T> extractor) {
-
-        prepareTransaction(queryData);
-
-        // execute query and return result
-        return getJdbcTemplate().query(generator.toSql(queryData), extractor);
     }
 
     @Override
@@ -674,12 +604,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public String explain(SqlGenerator<QueryData> generator, QueryData queryData, final boolean analyze) {
-        ExplainSqlGenerator gen = new ExplainSqlGenerator(generator, analyze);
-        return executeQueryFunction(queryData, gen, gen);
-    }
 
     @Override
     public QueryData parseAQL(String aql, List<String> corpusList) {
@@ -772,17 +696,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Long> mapCorpusNamesToIds(List<String> corpusNames) {
-        if (corpusNames == null || corpusNames.isEmpty()) {
-            return new LinkedList<>();
-        }
-        final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
-        final List<Long> result = getJdbcTemplate().query(sql, listCorpusByNameDaoHelper);
-        return result;
-    }
-
-    @Override
     public List<ResolverEntry> getResolverEntries(SingleResolverRequest request) {
         try (Connection conn = createSQLiteConnection(true)) {
             ResolverDaoHelper helper = new ResolverDaoHelper();
@@ -830,7 +743,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
                     continue;
                 }
 
-                corpusConfiguration.put(c.getId(), p);
+                corpusConfiguration.put(c.getName(), p);
             }
         } catch (org.springframework.jdbc.CannotGetJdbcConnectionException ex) {
             log.warn("No corpus configuration loaded due to missing database connection.");
@@ -882,9 +795,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     @Override
     @Transactional(readOnly = true)
     public void exportCorpus(String toplevelCorpus, File outputDirectory) {
-
-        // check if the corpus really exists
-        mapCorpusNameToId(toplevelCorpus);
 
         SaltProject corpusProject = SaltFactory.createSaltProject();
         SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
@@ -1028,7 +938,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     }
 
     @Override
-    public void setCorpusConfiguration(HashMap<Long, Properties> corpusConfiguration) {
+    public void setCorpusConfiguration(HashMap<String, Properties> corpusConfiguration) {
         this.corpusConfiguration = corpusConfiguration;
     }
 
@@ -1154,24 +1064,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
 
     public void setListExampleQueriesHelper(ListExampleQueriesHelper listExampleQueriesHelper) {
         this.listExampleQueriesHelper = listExampleQueriesHelper;
-    }
-
-    @Override
-    public long mapCorpusNameToId(String topLevelCorpus) {
-        if (topLevelCorpus == null) {
-            throw new IllegalArgumentException("corpus name may not be null");
-        }
-
-        List<String> corpusNames = new ArrayList<>();
-        corpusNames.add(topLevelCorpus);
-        List<Long> corpusIds = mapCorpusNamesToIds(corpusNames);
-
-        if (corpusIds == null || corpusIds.isEmpty()) {
-            throw new IllegalArgumentException("corpus name \"" + topLevelCorpus + "\" is not known to the system");
-        }
-
-        // corpus names of top level corpora are unique.
-        return corpusIds.get(0);
     }
 
     @Override

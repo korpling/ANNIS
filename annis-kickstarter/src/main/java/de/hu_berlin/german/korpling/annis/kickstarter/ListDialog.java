@@ -18,6 +18,7 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
 import annis.service.objects.AnnisCorpus;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -133,15 +134,13 @@ public class ListDialog extends javax.swing.JDialog
     {//GEN-HEADEREND:event_btDeleteActionPerformed
 
       int row = tableList.getSelectedRow();
-      int col = tableModel.findColumn("id");
+      int col = tableModel.findColumn("name");
 
       if(row > -1 && col > -1)
       {
         Object value = tableModel.getValueAt(row, col);
-        final LinkedList<Long> corpusListToDelete = new LinkedList<Long>();
-        long l = Long.parseLong(value.toString());
-        corpusListToDelete.add(l);
-
+        String corpusToDelete = value.toString();
+        
         pbDelete.setIndeterminate(true);
         btClose.setEnabled(false);
         btDelete.setEnabled(false);
@@ -152,7 +151,7 @@ public class ListDialog extends javax.swing.JDialog
           @Override
           protected String doInBackground() throws Exception
           {
-            corpusAdmin.deleteCorpora(corpusListToDelete);
+            corpusAdmin.deleteCorpora(Arrays.asList(corpusToDelete));
             updateTable();
             return "";
           }

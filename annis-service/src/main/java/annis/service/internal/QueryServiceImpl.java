@@ -964,9 +964,9 @@ public class QueryServiceImpl implements QueryService
     // this ensures a stable ordering and less surprises when the UI changes it's behavior
     Collections.sort(corpusNames);
     
-    List<Long> corpusIDs = queryDao.mapCorpusNamesToIds(
-      corpusNames);
-    if (corpusIDs.size() != corpusNames.size())
+    List<AnnisCorpus> existingCorpora = queryDao.listCorpora(corpusNames);
+   
+    if (existingCorpora.size() != corpusNames.size())
     {
       throw new WebApplicationException(
         Response.status(Response.Status.NOT_FOUND).type(

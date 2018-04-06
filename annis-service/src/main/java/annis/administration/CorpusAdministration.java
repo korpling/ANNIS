@@ -56,6 +56,7 @@ import annis.exceptions.AnnisException;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
 import annis.utils.ANNISFormatHelper;
+import java.util.HashSet;
 
 /**
  *
@@ -76,23 +77,26 @@ public class CorpusAdministration
   {
   }
 
-  @Transactional(readOnly = false)
-  public void deleteCorpora(List<Long> ids)
+  public void deleteCorpora(List<String> corpora)
   {
     // check if corpus exists
-    List<Long> corpora = administrationDao.listToplevelCorpora();
-    for (long id : ids)
+    List<AnnisCorpus> existingCorpora = administrationDao.getQueryDao().listCorpora(corpora);
+    Set<String> existingCorpusNames = new HashSet<>();
+    for(AnnisCorpus c : existingCorpora) {
+        existingCorpusNames.add(c.getName());
+    }
+    for (String toDelete : corpora)
     {
-      if (!corpora.contains(id))
+      if (!existingCorpusNames.contains(toDelete))
       {
         throw new AnnisRunnerException(
           "Corpus does not exist (or is not a top-level corpus): "
-          + id, 51);
+          + toDelete, 51);
       }
     }
-    log.info("Deleting corpora: " + ids);
-    deleteCorpusDao.deleteCorpora(ids);
-    log.info("Finished deleting corpora: " + ids);
+    log.info("Deleting corpora: " + corpora);
+    deleteCorpusDao.deleteCorpora(corpora);
+    log.info("Finished deleting corpora: " + corpora);
   }
 
   public void cleanupData()

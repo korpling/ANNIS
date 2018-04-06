@@ -1259,11 +1259,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     ///// Other sub tasks
-    public List<Long> listToplevelCorpora() {
-        String sql = "SELECT id FROM corpus WHERE top_level = 'y'";
-
-        return getJdbcTemplate().query(sql, ParameterizedSingleColumnRowMapper.newInstance(Long.class));
-    }
+    
 
     /**
      * Delete files not used by this instance in the data directory.

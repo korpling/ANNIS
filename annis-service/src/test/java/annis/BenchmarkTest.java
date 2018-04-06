@@ -18,6 +18,7 @@ package annis;
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
 import annis.provider.SaltProjectProvider;
+import annis.service.objects.AnnisCorpus;
 import annis.test.TestHelper;
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
@@ -29,6 +30,7 @@ import com.google.common.io.ByteStreams;
 import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import javax.annotation.Resource;
@@ -77,9 +79,9 @@ public class BenchmarkTest
   @Resource(name = "queryDao")
   QueryDao annisDao;
 
-  private List<Long> pcc2CorpusID;
+  private List<AnnisCorpus> pcc2Corpus;
 
-  private List<Long> ridgesCorpusID;
+  private List<AnnisCorpus> ridgesCorpus;
 
   private final SaltProjectProvider provider = new SaltProjectProvider();
 
@@ -105,27 +107,25 @@ public class BenchmarkTest
     }
 
     // get the id of the "pcc2" corpus
-    pcc2CorpusID = getCorpusIDs("pcc2");
+    pcc2Corpus = getExistingCorpora("pcc2");
 
     // get the id of the "Ridges_Herbology_Version_2.0" corpus
-    ridgesCorpusID = getCorpusIDs("Ridges_Herbology_Version_2.0");
+    ridgesCorpus = getExistingCorpora("Ridges_Herbology_Version_2.0");
 
 
   }
 
-  private List<Long> getCorpusIDs(String corpus)
+  private List<AnnisCorpus> getExistingCorpora(String corpus)
   {
     // (and check if it's there, otherwise ignore these tests)
-    List<String> corpusNames = new LinkedList<>();
-    corpusNames.add(corpus);
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
+    List<AnnisCorpus> corpusIDs = annisDao.listCorpora(Arrays.asList(corpus));
     return corpusIDs;
   }
 
   @Test
   public void mapSalt_Pcc4282()
   {
-    assumeTrue(pcc2CorpusID.size() > 0);
+    assumeTrue(pcc2Corpus.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282", null);
@@ -136,7 +136,7 @@ public class BenchmarkTest
   @Test
   public void mapSaltAndSaveXMI_Pcc4282() throws IOException
   {
-    assumeTrue(ridgesCorpusID.size() > 0);
+    assumeTrue(ridgesCorpus.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282", null);
@@ -149,7 +149,7 @@ public class BenchmarkTest
   @Test
   public void mapSalt_SonderbaresKraeuterBuch()
   {
-    assumeTrue(ridgesCorpusID.size() > 0);
+    assumeTrue(ridgesCorpus.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21", null);
@@ -160,7 +160,7 @@ public class BenchmarkTest
   @Test
   public void mapSaltAndSaveXMI_SonderbaresKraeuterBuch() throws IOException
   {
-    assumeTrue(ridgesCorpusID.size() > 0);
+    assumeTrue(ridgesCorpus.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21", null);

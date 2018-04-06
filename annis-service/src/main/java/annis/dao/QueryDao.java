@@ -159,17 +159,8 @@ public interface QueryDao
    */
   SaltProject graph(QueryData queryData);
 
-  String explain(SqlGenerator<QueryData> generator, QueryData queryData,
-    final boolean analyze);
-
   FrequencyTable frequency(QueryData queryData);
 
-  public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGeneratorAndExtractor<QueryData, T> generator);
-
-  public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData> generator,
-    final ResultSetExtractor<T> extractor);
 
   /**
    * Gets the corpus configuration from all imported corpora.
@@ -177,7 +168,7 @@ public interface QueryDao
    * @return The return value is the Key of corpus table entry.
    * @deprecated Use {@link #getCorpusConfigurations()} instead.
    */
-  public HashMap<Long, Properties> getCorpusConfiguration();
+  public HashMap<String, Properties> getCorpusConfiguration();
 
   /**
    * Gets the corpus configuration from all imported corpora.
@@ -206,22 +197,12 @@ public interface QueryDao
   public DocumentBrowserConfig getDefaultDocBrowserConfiguration();
 
   public void setCorpusConfiguration(
-    HashMap<Long, Properties> corpusConfiguration);
+    HashMap<String, Properties> corpusConfiguration);
 
   ///// configuration
   void setTimeout(int milliseconds);
 
   int getTimeout();
-
-  public List<String> mapCorpusIdsToNames(List<Long> ids);
-
-  /**
-   * Return a list of internal IDs for a list of top-level corpus names.
-   *
-   * @param corpusNames
-   * @return
-   */
-  public List<Long> mapCorpusNamesToIds(List<String> corpusNames);
 
   /**
    * Get a specific configuration of a corpus from directory.
@@ -304,22 +285,6 @@ public interface QueryDao
    */
   public List<String> getRawText(String topLevelCorpus);
 
-  /**
-   * Returns the corpus internal corpus id of a top level corpus.
-   *
-   * @param topLevelCorpus the name of the corpus
-   * @return the corpus id
-   */
-  public long mapCorpusNameToId(String topLevelCorpus);
-
-  /**
-   * Returns the corpus name for a given corpus id.
-   *
-   * @param corpusId the id of the corpus
-   * @return the name of the corpus. The name of each top level corpus is
-   * unique.
-   */
-  public String mapCorpusIdToName(long corpusId);
 
   /**
    * Stores a corpus configuration. If the properties object is empty, an empty
