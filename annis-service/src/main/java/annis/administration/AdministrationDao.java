@@ -524,8 +524,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         computeCorpusPath(corpusID);
 
-        createAnnotations(corpusID);
-
         if (temporaryStagingArea) {
             dropStagingArea();
         }
@@ -592,8 +590,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         insertCorpus(corpusID, offsets);
 
         computeCorpusPath(corpusID);
-
-        createAnnotations(corpusID);
 
         if (temporaryStagingArea) {
             dropStagingArea();
@@ -1193,14 +1189,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
     }
 
-    void createAnnotations(long corpusID) {
-        MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
-        log.info("creating annotations table for corpus with ID " + corpusID);
-        executeSqlFromScript("annotations.sql", args);
-
-        log.info("indexing annotations table for corpus with ID " + corpusID);
-        executeSqlFromScript("indexes_annotations.sql", args);
-    }
 
     void removeUnecessarySpanningRelations() {
         log.info("setting \"continuous\" to a correct value");

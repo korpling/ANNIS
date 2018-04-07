@@ -33,23 +33,6 @@ COMMENT ON COLUMN corpus_annotation.name IS 'annotation key';
 COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 
-DROP TABLE IF EXISTS annotations CASCADE;
-CREATE TABLE annotations
-(
-  id bigserial NOT NULL,
-  namespace varchar COLLATE "C",
-  "name" varchar COLLATE "C",
-  "value" varchar COLLATE "C",
-  occurences bigint,
-  "type" varchar COLLATE "C",
-  "subtype" char(1),
-  edge_namespace varchar COLLATE "C",
-  edge_name varchar COLLATE "C",
-  toplevel_corpus integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
-  PRIMARY KEY (id)
-);
-
-
 -- HACK: add a custom operator which is the same as "=" for integers but always
 -- returns 0.995 as join selectivity. See the description
 -- of "annis.hack_operator_same_span" in conf/develop.properties or the
