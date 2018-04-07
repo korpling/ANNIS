@@ -50,9 +50,9 @@ public class CorpusAdminPanel extends Panel
     final Grid corporaGrid = new Grid(corpusContainer);
     corporaGrid.setSizeFull();
     corporaGrid.setSelectionMode(Grid.SelectionMode.MULTI);
-    corporaGrid.setColumns("name", "textCount", "tokenCount", "sourcePath");
+    corporaGrid.setColumns("name", "documentCount", "tokenCount", "sourcePath");
 
-    corporaGrid.getColumn("textCount").setHeaderCaption("Texts");
+    corporaGrid.getColumn("documentCount").setHeaderCaption("Documents");
     corporaGrid.getColumn("tokenCount").setHeaderCaption("Tokens");
     corporaGrid.getColumn("sourcePath").setHeaderCaption("Source Path");
 

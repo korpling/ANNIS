@@ -246,15 +246,15 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
     tblCorpora.addGeneratedColumn("docs", new DocLinkGenerator());
 
-    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info",
+    tblCorpora.setVisibleColumns("name", "documentCount", "tokenCount", "info",
       "docs");
-    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "", "");
+    tblCorpora.setColumnHeaders("Name", "Docs", "Tokens", "", "");
     tblCorpora.setHeight("100%");
     tblCorpora.setWidth("100%");
     tblCorpora.setSelectable(true);
     tblCorpora.setNullSelectionAllowed(false);
     tblCorpora.setColumnExpandRatio("name", 0.6f);
-    tblCorpora.setColumnExpandRatio("textCount", 0.15f);
+    tblCorpora.setColumnExpandRatio("documentCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.addStyleName(ValoTheme.TABLE_SMALL);
 
