@@ -33,19 +33,6 @@ COMMENT ON COLUMN corpus_annotation.name IS 'annotation key';
 COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 
-DROP TABLE IF EXISTS annotation_category CASCADE;
-CREATE TABLE annotation_category
-(
-  id SERIAL,
-  namespace character varying COLLATE "C",
-  name character varying COLLATE "C" NOT NULL,
-  toplevel_corpus integer NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (toplevel_corpus) REFERENCES corpus (id) ON DELETE CASCADE,
-  UNIQUE (namespace, name, toplevel_corpus)
-);
-
-
 DROP TABLE IF EXISTS annotations CASCADE;
 CREATE TABLE annotations
 (
