@@ -72,9 +72,6 @@
   <!-- Helper for listDocumentsAnnotations command -->
   <bean id="listDocumentsAnnotationsSqlHelper" class="annis.sqlgen.ListDocumentsAnnotationsSqlHelper" lazy-init="true"/>
 
-  <!-- Helper for listDocuments command -->
-  <bean id="listDocumentsSqlHelper" class="annis.sqlgen.ListDocumentsSqlHelper" lazy-init="true"/>
-
   <!-- Helper for list example queries -->
   <bean id="listExampleQueriesHelper" class="annis.sqlgen.ListExampleQueriesHelper" lazy-init="true"/>
 
@@ -145,11 +142,10 @@
     <property name="timeout" value="${annis.sql-timeout}"/>
 
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
-s
+
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
     <property name="listDocumentsAnnotationsSqlHelper" ref="listDocumentsAnnotationsSqlHelper"/>
-    <property name="listDocumentsSqlHelper" ref="listDocumentsSqlHelper" />
 
     <property name="listExampleQueriesHelper" ref="listExampleQueriesHelper" />
 

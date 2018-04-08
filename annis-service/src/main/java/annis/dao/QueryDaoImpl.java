@@ -38,7 +38,6 @@ import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListDocumentsAnnotationsSqlHelper;
-import annis.sqlgen.ListDocumentsSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.SqlGenerator;
@@ -202,20 +201,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         return result;
     }
 
-    /**
-     * @return the listDocumentsSqlHelper
-     */
-    public ListDocumentsSqlHelper getListDocumentsSqlHelper() {
-        return listDocumentsSqlHelper;
-    }
-
-    /**
-     * @param listDocumentsSqlHelper
-     *            the listDocumentsSqlHelper to set
-     */
-    public void setListDocumentsSqlHelper(ListDocumentsSqlHelper listDocumentsSqlHelper) {
-        this.listDocumentsSqlHelper = listDocumentsSqlHelper;
-    }
 
     @Override
     public InputStream getBinaryComplete(String toplevelCorpusName, String mimeType, String title) {
@@ -425,8 +410,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
 
     private ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper;
 
-    private ListDocumentsSqlHelper listDocumentsSqlHelper;
-    // / new
 
     private List<SqlSessionModifier> sqlSessionModifiers;
     // private SqlGenerator findSqlGenerator;
