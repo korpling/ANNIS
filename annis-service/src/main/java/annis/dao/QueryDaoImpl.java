@@ -108,7 +108,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.transaction.annotation.Transactional;
 
-// FIXME: test and refactor timeout and transaction management
 public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionModifier {
 
     // generated sql for example queries and fetches the result
@@ -189,8 +188,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
 
     @Override
     public List<Annotation> listDocuments(String toplevelCorpusName) {
-        return (List<Annotation>) getJdbcTemplate().query(getListDocumentsSqlHelper().createSql(toplevelCorpusName),
-                getListDocumentsSqlHelper());
+        
+        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
+        
+        List<Annotation> result = new LinkedList<>();
+        for(SDocument doc : corpusGraph.getDocuments()) {
+            Annotation anno = new Annotation();
+            anno.setName(doc.getName());
+            anno.setAnnotationPath(doc.getPath().segmentsList());
+            result.add(anno);
+        }
+        
+        return result;
     }
 
     /**
