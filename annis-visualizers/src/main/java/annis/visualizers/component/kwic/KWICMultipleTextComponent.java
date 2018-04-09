@@ -16,59 +16,52 @@
 
 package annis.visualizers.component.kwic;
 
-import annis.libgui.media.MediaController;
-import annis.libgui.media.PDFController;
-import annis.libgui.visualizers.VisualizerInput;
-import com.vaadin.ui.CssLayout;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.core.SNode;
+
+import com.vaadin.ui.CssLayout;
+
+import annis.libgui.media.MediaController;
+import annis.libgui.media.PDFController;
+import annis.libgui.visualizers.VisualizerInput;
 
 /**
- * Implementation that can display several texts but has slower rendering due
- * to an extra div.
+ * Implementation that can display several texts but has slower rendering due to
+ * an extra div.
  */
-public class KWICMultipleTextComponent extends CssLayout implements KWICInterface
-{
-  List<KWICInterface> kwicPanels;
+public class KWICMultipleTextComponent extends CssLayout implements KWICInterface {
+    List<KWICInterface> kwicPanels;
 
-  public KWICMultipleTextComponent(VisualizerInput visInput,
-    MediaController mediaController, PDFController pdfController)
-  {
-    this.kwicPanels = new LinkedList<KWICInterface>();
-    if (visInput != null)
-    {
-      List<STextualDS> texts
-        = visInput.getDocument().getDocumentGraph().getTextualDSs();
-      for (STextualDS t : texts)
-      {
-        KWICComponent kwic
-          = new KWICComponent(visInput, mediaController, pdfController, t);
-        kwicPanels.add(kwic);
-        addComponent(kwic);
-      }
+    public KWICMultipleTextComponent(VisualizerInput visInput, MediaController mediaController,
+            PDFController pdfController) {
+        this.kwicPanels = new LinkedList<KWICInterface>();
+        if (visInput != null) {
+            List<STextualDS> texts = visInput.getDocument().getDocumentGraph().getTextualDSs();
+            for (STextualDS t : texts) {
+                KWICComponent kwic = new KWICComponent(visInput, mediaController, pdfController, t);
+                kwicPanels.add(kwic);
+                addComponent(kwic);
+            }
+        }
     }
-  }
 
-  @Override
-  public void setVisibleTokenAnnos(Set<String> annos)
-  {
-    for (KWICInterface kwic : kwicPanels)
-    {
-      kwic.setVisibleTokenAnnos(annos);
+    @Override
+    public void setVisibleTokenAnnos(Set<String> annos) {
+        for (KWICInterface kwic : kwicPanels) {
+            kwic.setVisibleTokenAnnos(annos);
+        }
     }
-  }
 
-  @Override
-  public void setSegmentationLayer(String segmentationName,
-    Map<String, Long> markedAndCovered)
-  {
-    for (KWICInterface kwic : kwicPanels)
-    {
-      kwic.setSegmentationLayer(segmentationName, markedAndCovered);
+    @Override
+    public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered) {
+        for (KWICInterface kwic : kwicPanels) {
+            kwic.setSegmentationLayer(segmentationName, markedAndCovered);
+        }
     }
-  }
-  
+
 } // end class KWICMultipleTextImpl

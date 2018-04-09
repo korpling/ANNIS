@@ -302,7 +302,7 @@ public class EmbeddedVisUI extends CommonUI
             }
           }
 
-          Map<String, Long> markedAndCovered = new HashMap<>();
+          Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(doc, segNodes, baseText);
           visInput.setMarkedAndCovered(markedAndCovered);
           visInput.setContextPath(Helper.getContext());
           String template = Helper.getContext()

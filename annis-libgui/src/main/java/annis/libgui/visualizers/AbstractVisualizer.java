@@ -15,11 +15,14 @@
  */
 package annis.libgui.visualizers;
 
-import com.vaadin.ui.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import org.corpus_tools.salt.core.SNode;
+
+import com.vaadin.ui.Component;
 
 /**
  * Base class for all Visualizer. This class sets some defaults, so you may
@@ -44,7 +47,7 @@ public abstract class AbstractVisualizer<I extends Component> implements Visuali
 
   @Override
   public void setSegmentationLayer(I visualizerImplementation, 
-    String segmentationName, Map<String, Long> markedAndCovered)
+    String segmentationName, Map<SNode, Long> markedAndCovered)
   {
   }
 

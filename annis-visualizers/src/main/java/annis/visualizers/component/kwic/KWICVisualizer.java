@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.core.SNode;
 
 import com.vaadin.server.VaadinSession;
 
@@ -33,63 +34,45 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 /**
  * Key words in context visualizer (KWIC).
  * 
- * This visualizer has the same mappings as the {@link annis.visualizers.component.grid.GridVisualizer}.
+ * This visualizer has the same mappings as the
+ * {@link annis.visualizers.component.grid.GridVisualizer}.
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class KWICVisualizer extends AbstractVisualizer<KWICInterface>
-{
-  @Override
-  public String getShortName()
-  {
-    return "kwic";
-  }
-
-  @Override
-  public KWICInterface createComponent(
-    VisualizerInput visInput, VisualizationToggle visToggle)
-  {
-    MediaController mediaController = VaadinSession.getCurrent().getAttribute(
-      MediaController.class);
-    PDFController pdfController = VaadinSession.getCurrent().getAttribute(
-      PDFController.class);
-    
-    List<STextualDS> texts = visInput.getDocument().getDocumentGraph().
-      getTextualDSs();
-
-    // having the KWIC nested in a panel can slow down rendering
-    if (texts.size() == 1)
-    {
-      // directly return the single non-nested KWIC panel
-      return new KWICComponent(visInput,
-        mediaController, pdfController, texts.get(0));
+public class KWICVisualizer extends AbstractVisualizer<KWICInterface> {
+    @Override
+    public String getShortName() {
+        return "kwic";
     }
-    else
-    {
-      // return a more complicated implementation which can handle several texts
-      return new KWICMultipleTextComponent(visInput, mediaController,
-        pdfController);
+
+    @Override
+    public KWICInterface createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
+        MediaController mediaController = VaadinSession.getCurrent().getAttribute(MediaController.class);
+        PDFController pdfController = VaadinSession.getCurrent().getAttribute(PDFController.class);
+
+        List<STextualDS> texts = visInput.getDocument().getDocumentGraph().getTextualDSs();
+
+        // having the KWIC nested in a panel can slow down rendering
+        if (texts.size() == 1) {
+            // directly return the single non-nested KWIC panel
+            return new KWICComponent(visInput, mediaController, pdfController, texts.get(0));
+        } else {
+            // return a more complicated implementation which can handle several texts
+            return new KWICMultipleTextComponent(visInput, mediaController, pdfController);
+        }
     }
-  }
 
-  @Override
-  public void setVisibleTokenAnnosVisible(KWICInterface component,
-    Set<String> annos)
-  {
-    component.setVisibleTokenAnnos(annos);
-  }
+    @Override
+    public void setVisibleTokenAnnosVisible(KWICInterface component, Set<String> annos) {
+        component.setVisibleTokenAnnos(annos);
+    }
 
-  
-  @Override
-  public void setSegmentationLayer(KWICInterface visualizerImplementation,
-    String segmentationName, Map<String, Long> markedAndCovered)
-  {
-    visualizerImplementation.setSegmentationLayer(segmentationName,
-      markedAndCovered);
-  }
-  
-  
-  
+    @Override
+    public void setSegmentationLayer(KWICInterface visualizerImplementation, String segmentationName,
+            Map<SNode, Long> markedAndCovered) {
+        visualizerImplementation.setSegmentationLayer(segmentationName, markedAndCovered);
+    }
+
 }

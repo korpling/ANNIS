@@ -939,10 +939,10 @@ public class Helper
       getEncodedValue();
   }
 
-  public static Map<String, Long> calculateMarkedAndCoveredIDs(
+  public static Map<SNode, Long> calculateMarkedAndCovered(
     SDocument doc, List<SNode> segNodes, String segmentationName)
   {
-    Map<String, Long> initialCovered = new HashMap<>();
+    Map<SNode, Long> initialCovered = new HashMap<>();
 
     // add all covered nodes
     for (SNode n : doc.getDocumentGraph().getNodes())
@@ -953,23 +953,22 @@ public class Helper
 
       if (match != null)
       {
-        initialCovered.put(n.getId(), match);
+        initialCovered.put(n, match);
       }
     }
 
     // calculate covered nodes
     CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(
-      doc.
-      getDocumentGraph(), initialCovered);
-    Map<String, Long> covered = cmc.getMatchedAndCovered();
+      doc.getDocumentGraph(), initialCovered);
+    Map<SNode, Long> covered = cmc.getMatchedAndCovered();
 
     if (segmentationName != null)
     {
       // filter token
       Map<SToken, Long> coveredToken = new HashMap<>();
-      for (Map.Entry<String, Long> e : covered.entrySet())
+      for (Map.Entry<SNode, Long> e : covered.entrySet())
       {
-        SNode n = doc.getDocumentGraph().getNode(e.getKey());
+        SNode n = e.getKey();
         if (n instanceof SToken)
         {
           coveredToken.put((SToken) n, e.getValue());
@@ -981,7 +980,7 @@ public class Helper
         RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.
           getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-        if (!covered.containsKey(segNode.getId()))
+        if (!covered.containsKey(segNode))
         {
           long leftTok = featSegNode.getLeftToken();
           long rightTok = featSegNode.getRightToken();
@@ -995,7 +994,7 @@ public class Helper
             if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
             {
               // add this segmentation node to the covered set
-              covered.put(segNode.getId(), e.getValue());
+              covered.put(segNode, e.getValue());
               break;
             }
           } // end for each covered token
@@ -1024,7 +1023,7 @@ public class Helper
   public static class CoveredMatchesCalculator implements GraphTraverseHandler
   {
 
-    private Map<String, Long> matchedAndCovered;
+    private Map<SNode, Long> matchedAndCovered;
 
     private final static Comparator<SNode> comp = new Comparator<SNode>()
     {
@@ -1065,16 +1064,15 @@ public class Helper
     };
 
     public CoveredMatchesCalculator(SDocumentGraph graph,
-      Map<String, Long> initialMatches)
+      Map<SNode, Long> initialMatches)
     {
       this.matchedAndCovered = initialMatches;
 
       Map<SNode, Long> sortedMatchedNodes = new TreeMap<>(comp);
 
-      for (Map.Entry<String, Long> entry : initialMatches.entrySet())
+      for (Map.Entry<SNode, Long> entry : initialMatches.entrySet())
       {
-        SNode n = graph.getNode(entry.getKey());
-        sortedMatchedNodes.put(n, entry.getValue());
+        sortedMatchedNodes.put(entry.getKey(), entry.getValue());
       }
 
       if (initialMatches.size() > 0)
@@ -1092,16 +1090,16 @@ public class Helper
       long order)
     {
       if (fromNode != null
-        && matchedAndCovered.containsKey(fromNode.getId())
+        && matchedAndCovered.containsKey(fromNode)
         && currNode != null)
       {
-        long currentMatchPos = matchedAndCovered.get(fromNode.getId());
+        long currentMatchPos = matchedAndCovered.get(fromNode);
         
         // only update the map when there is no entry yet or if the new index/position is smaller
-        Long oldMatchPos = matchedAndCovered.get(currNode.getId());
+        Long oldMatchPos = matchedAndCovered.get(currNode);
         if(oldMatchPos == null)
         {          
-          matchedAndCovered.put(currNode.getId(), currentMatchPos);
+          matchedAndCovered.put(currNode, currentMatchPos);
         }
       }
 
@@ -1128,7 +1126,7 @@ public class Helper
       }
     }
 
-    public Map<String, Long> getMatchedAndCovered()
+    public Map<SNode, Long> getMatchedAndCovered()
     {
       return matchedAndCovered;
     }

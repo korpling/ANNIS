@@ -410,7 +410,7 @@ public class GridComponent extends Panel
   }
   
   public void setSegmentationLayer(String segmentationName, 
-    Map<String, Long> markedAndCovered)
+    Map<SNode, Long> markedAndCovered)
   {
     this.segmentationName = segmentationName;
     this.input.setMarkedAndCovered(markedAndCovered);

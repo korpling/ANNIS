@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +33,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,11 +103,8 @@ public class VisualizerPanel extends CssLayout
 
   private ResolverEntry entry;
 
-  private Map<String, Long> markedAndCovered;
+  private Map<SNode, Long> markedAndCovered;
 
-  private Map<String, String> markersExact;
-
-  private Map<String, String> markersCovered;
 
   private Button btEntry;
 
@@ -145,9 +142,7 @@ public class VisualizerPanel extends CssLayout
     SDocument result,
     Match match,
     Set<String> visibleTokenAnnos,
-    Map<String, Long> markedAndCovered,
-    @Deprecated Map<String, String> markedAndCoveredMap,
-    @Deprecated Map<String, String> markedExactMap,
+    Map<SNode, Long> markedAndCovered,
     String htmlID,
     String resultID,
     SingleResultPanel parent,
@@ -157,8 +152,6 @@ public class VisualizerPanel extends CssLayout
   {
     this.instanceConfig = instanceConfig;
     this.entry = entry;
-    this.markersExact = markedExactMap;
-    this.markersCovered = markedAndCoveredMap;
 
     this.visCtxChanger = parent;
 
@@ -352,7 +345,7 @@ public class VisualizerPanel extends CssLayout
   }
 
   public void setSegmentationLayer(String segmentationName,
-    Map<String, Long> markedAndCovered)
+    Map<SNode, Long> markedAndCovered)
   {
     this.segmentationName = segmentationName;
     this.markedAndCovered = markedAndCovered;

@@ -15,24 +15,22 @@
  */
 package annis.gui.resultview;
 
-import annis.CommonHelper;
-import annis.gui.AnnisUI;
-import annis.gui.ShareSingleMatchGenerator;
-import annis.gui.MetaDataPanel;
-import annis.gui.QueryController;
-import annis.gui.objects.DisplayedResultQuery;
-import annis.gui.objects.PagedResultQuery;
-import annis.libgui.Helper;
-import static annis.libgui.Helper.calculateMarkedAndCoveredIDs;
-import annis.libgui.IDGenerator;
-import annis.libgui.InstanceConfig;
-import annis.libgui.PluginSystem;
-import annis.libgui.ResolverProvider;
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-import annis.model.RelannisNodeFeature;
-import annis.resolver.ResolverEntry;
-import annis.service.objects.Match;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+import java.util.Set;
+import java.util.SortedSet;
+
+import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
@@ -51,23 +49,21 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedSet;
-import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SToken;
-import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SFeature;
-import org.corpus_tools.salt.core.SNode;
-import org.slf4j.LoggerFactory;
+
+import annis.CommonHelper;
+import annis.gui.AnnisUI;
+import annis.gui.MetaDataPanel;
+import annis.gui.QueryController;
+import annis.gui.ShareSingleMatchGenerator;
+import annis.gui.objects.DisplayedResultQuery;
+import annis.gui.objects.PagedResultQuery;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.libgui.InstanceConfig;
+import annis.libgui.PluginSystem;
+import annis.libgui.ResolverProvider;
+import annis.resolver.ResolverEntry;
+import annis.service.objects.Match;
 
 /**
  *
@@ -83,8 +79,6 @@ public class SingleResultPanel extends CssLayout implements
   private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
   private SDocument result;
-
-  private Map<String, String> markedCoveredMap;
 
   private Map<String, String> markedExactMap;
 
@@ -338,7 +332,7 @@ public class SingleResultPanel extends CssLayout implements
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
         result.getDocumentGraph());
-      Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes, segmentationName);
+      Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(result, segNodes, segmentationName);
       for (VisualizerPanel p : visualizers)
       {
         p.setSegmentationLayer(segmentationName, markedAndCovered);
@@ -356,8 +350,6 @@ public class SingleResultPanel extends CssLayout implements
 
   private void calculateHelperVariables()
   {
-    markedCoveredMap = new HashMap<>();
-    
     markedExactMap = new HashMap<>();
   }
 
@@ -411,7 +403,7 @@ public class SingleResultPanel extends CssLayout implements
         segmentationName,
         result.getDocumentGraph());
 
-      Map<String, Long> markedAndCovered = new HashMap<>();
+      Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(result, segNodes, segmentationName);
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
 
@@ -422,7 +414,6 @@ public class SingleResultPanel extends CssLayout implements
         VisualizerPanel p = new VisualizerPanel(
           entries[i], result, match,
           visibleTokenAnnos, markedAndCovered,
-          markedCoveredMap, markedExactMap,
           htmlID, resultID, this, segmentationName, ps, instanceConfig);
 
         visualizers.add(p);

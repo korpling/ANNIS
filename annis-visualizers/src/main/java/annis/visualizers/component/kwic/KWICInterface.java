@@ -16,21 +16,22 @@
 
 package annis.visualizers.component.kwic;
 
-import com.vaadin.ui.Component;
 import java.util.Map;
 import java.util.Set;
 
+import org.corpus_tools.salt.core.SNode;
+
+import com.vaadin.ui.Component;
+
 /**
  * A KWIC (Keyword in context) visualization shows the token of the match and
- * their context in a table like view. This is the basic interface for
- * different variants of the KWIC panel implementation.
+ * their context in a table like view. This is the basic interface for different
+ * variants of the KWIC panel implementation.
  */
-public interface KWICInterface extends Component
-{
+public interface KWICInterface extends Component {
 
-  public void setVisibleTokenAnnos(Set<String> annos);
+    public void setVisibleTokenAnnos(Set<String> annos);
 
-  public void setSegmentationLayer(String segmentationName,
-    Map<String, Long> markedAndCovered);
-  
+    public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered);
+
 }

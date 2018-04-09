@@ -44,8 +44,7 @@ public class VisualizerInput implements Serializable
 
   private String namespace = "";
 
-  private Map<String, Long> markedAndCovered = new HashMap<>();
-  private transient Map<SNode, Long> cachedMarkedAndCoveredNodes;
+  private Map<SNode, Long> markedAndCovered = new HashMap<>();
   
   private String id = "";
 
@@ -151,9 +150,8 @@ public class VisualizerInput implements Serializable
    * {@link MatchedNodeColors}.
    *
    */
-  public void setMarkedAndCovered(Map<String, Long> markedAndCovered)
+  public void setMarkedAndCovered(Map<SNode, Long> markedAndCovered)
   {
-    this.cachedMarkedAndCoveredNodes = null;
     this.markedAndCovered = markedAndCovered;
   }
 
@@ -168,16 +166,7 @@ public class VisualizerInput implements Serializable
    */
   public Map<SNode, Long> getMarkedAndCovered()
   {
-    if(cachedMarkedAndCoveredNodes == null)
-    {      
-      if (document != null)
-      {
-        cachedMarkedAndCoveredNodes = CommonHelper.createSNodeMapFromIDs(
-          markedAndCovered, document.getDocumentGraph());
-      }
-    }
-    
-    return cachedMarkedAndCoveredNodes;
+    return this.markedAndCovered;
   }
 
   /**
