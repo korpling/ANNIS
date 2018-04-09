@@ -68,8 +68,6 @@ public class TestQueryDaoImpl
   private JdbcTemplate jdbcTemplate;
   @Mock
   private ListCorpusSqlHelper listCorpusHelper;
-  @Mock
-  private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper;
   
   // constants for flow control verification
   private static final QueryData PARSE_RESULT = new QueryData();
@@ -84,7 +82,6 @@ public class TestQueryDaoImpl
        
     queryDao = new QueryDaoImpl();
     queryDao.setListCorpusSqlHelper(listCorpusHelper);
-    queryDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
     
     queryDao.setJdbcTemplate(jdbcTemplate);
     verify(jdbcTemplate).getDataSource();
@@ -101,9 +98,7 @@ public class TestQueryDaoImpl
     QueryDaoImpl springManagedDao = (QueryDaoImpl) TestHelper.proxyTarget(queryDaoBean);
     assertThat(springManagedDao.getJdbcTemplate(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusSqlHelper(), is(not(nullValue())));
-    assertThat(springManagedDao.getListCorpusAnnotationsSqlHelper(),
-      is(not(nullValue())));
-
+    
     assertThat(springManagedDao.getSqlSessionModifiers(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusByNameDaoHelper(), is(
       not(nullValue())));

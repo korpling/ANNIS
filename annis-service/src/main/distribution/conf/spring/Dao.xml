@@ -66,9 +66,6 @@
   <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper" lazy-init="true"/>
 
 
-  <!-- Helper for listCorpusAnnotations command -->
-  <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper" lazy-init="true"/>
-
   <!-- Helper for list example queries -->
   <bean id="listExampleQueriesHelper" class="annis.sqlgen.ListExampleQueriesHelper" lazy-init="true"/>
 
@@ -141,8 +138,7 @@
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
 
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
-    <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
-
+    
     <property name="listExampleQueriesHelper" ref="listExampleQueriesHelper" />
 
     <property name="sqlSessionModifiers">

@@ -390,11 +390,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     }
 
     private static final Logger log = LoggerFactory.getLogger(QueryDaoImpl.class);
-    // / old
-
+   
     private ListCorpusSqlHelper listCorpusSqlHelper;
-
-    private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
 
 
 
@@ -624,7 +621,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     }
 
     @Override
-    @Transactional(readOnly = true)
     public SaltProject retrieveAnnotationGraph(String toplevelCorpusName, String documentName,
             List<String> nodeAnnotationFilter) {
         URI docURI = SaltUtil.createSaltURI(toplevelCorpusName).appendSegment(documentName);
@@ -641,14 +637,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
 
         return project;
 
-    }
-
-    @Override
-    public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) {
-        final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName, toplevelCorpusName, true);
-        final List<Annotation> corpusAnnotations = (List<Annotation>) getJdbcTemplate().query(sql,
-                listCorpusAnnotationsSqlHelper);
-        return corpusAnnotations;
     }
     
     private List<Annotation> allAnnotationForCorpus(SNode corpus) {
@@ -700,6 +688,33 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
                 if(n instanceof SCorpus) {
                     result.addAll(allAnnotationForCorpus(n));
                     break;
+                }
+            }
+        }
+        
+        return result;
+    }
+
+    @Override
+    public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) {
+        List<Annotation> result = new LinkedList<>();
+
+        // select the document and all its parent corpora
+        String aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=\"" + toplevelCorpusName + "\"";
+        
+        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraphForQuery(toplevelCorpusName, aql);
+        if(corpusGraph != null) {
+            List<SNode> roots = corpusGraph.getRoots();
+            if(roots == null) {
+                for(SCorpus c : corpusGraph.getCorpora()) {
+                    result.addAll(allAnnotationForCorpus(c));
+                }
+            } else {
+                for(SNode n : roots) {
+                    if(n instanceof SCorpus) {
+                        result.addAll(allAnnotationForCorpus(n));
+                        break;
+                    }
                 }
             }
         }
@@ -917,14 +932,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
 
     public void setListCorpusSqlHelper(ListCorpusSqlHelper listCorpusHelper) {
         this.listCorpusSqlHelper = listCorpusHelper;
-    }
-
-    public ListCorpusAnnotationsSqlHelper getListCorpusAnnotationsSqlHelper() {
-        return listCorpusAnnotationsSqlHelper;
-    }
-
-    public void setListCorpusAnnotationsSqlHelper(ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper) {
-        this.listCorpusAnnotationsSqlHelper = listCorpusAnnotationsHelper;
     }
 
     public List<SqlSessionModifier> getSqlSessionModifiers() {
