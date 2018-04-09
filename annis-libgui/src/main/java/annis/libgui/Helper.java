@@ -940,7 +940,7 @@ public class Helper
   }
 
   public static Map<SNode, Long> calculateMarkedAndCovered(
-    SDocument doc, List<SNode> segNodes, String segmentationName)
+    SDocument doc)
   {
     Map<SNode, Long> initialCovered = new HashMap<>();
 
@@ -962,46 +962,7 @@ public class Helper
       doc.getDocumentGraph(), initialCovered);
     Map<SNode, Long> covered = cmc.getMatchedAndCovered();
 
-    if (segmentationName != null)
-    {
-      // filter token
-      Map<SToken, Long> coveredToken = new HashMap<>();
-      for (Map.Entry<SNode, Long> e : covered.entrySet())
-      {
-        SNode n = e.getKey();
-        if (n instanceof SToken)
-        {
-          coveredToken.put((SToken) n, e.getValue());
-        }
-      }
-
-      for (SNode segNode : segNodes)
-      {
-        RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.
-          getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-
-        if (!covered.containsKey(segNode))
-        {
-          long leftTok = featSegNode.getLeftToken();
-          long rightTok = featSegNode.getRightToken();
-
-          // check for each covered token if this segment is covering it
-          for (Map.Entry<SToken, Long> e : coveredToken.entrySet())
-          {
-            RelannisNodeFeature featTok = (RelannisNodeFeature) e.getKey().
-              getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-            long entryTokenIndex = featTok.getTokenIndex();
-            if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
-            {
-              // add this segmentation node to the covered set
-              covered.put(segNode, e.getValue());
-              break;
-            }
-          } // end for each covered token
-        } // end if not already contained
-      } // end for each segmentation node
-    }
-
+   
     return covered;
   }
 

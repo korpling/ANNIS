@@ -287,10 +287,6 @@ public class EmbeddedVisUI extends CommonUI
             }
           }
 
-          List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
-            baseText,
-            doc.getDocumentGraph());
-
           if (argsCopy.containsKey(KEY_MATCH))
           {
             String[] rawMatch = argsCopy.get(KEY_MATCH);
@@ -302,7 +298,7 @@ public class EmbeddedVisUI extends CommonUI
             }
           }
 
-          Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(doc, segNodes, baseText);
+          Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(doc);
           visInput.setMarkedAndCovered(markedAndCovered);
           visInput.setContextPath(Helper.getContext());
           String template = Helper.getContext()

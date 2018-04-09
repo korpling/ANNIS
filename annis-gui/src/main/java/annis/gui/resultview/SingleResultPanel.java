@@ -329,10 +329,7 @@ public class SingleResultPanel extends CssLayout implements
 
     if (result != null)
     {
-      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
-        segmentationName,
-        result.getDocumentGraph());
-      Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(result, segNodes, segmentationName);
+      Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(result);
       for (VisualizerPanel p : visualizers)
       {
         p.setSegmentationLayer(segmentationName, markedAndCovered);
@@ -403,7 +400,7 @@ public class SingleResultPanel extends CssLayout implements
         segmentationName,
         result.getDocumentGraph());
 
-      Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(result, segNodes, segmentationName);
+      Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(result);
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
 
