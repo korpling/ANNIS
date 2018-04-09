@@ -17,11 +17,8 @@ package annis.sqlgen;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 import org.apache.commons.dbutils.handlers.AbstractListHandler;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import annis.examplequeries.ExampleQuery;
 
@@ -32,18 +29,17 @@ import annis.examplequeries.ExampleQuery;
  */
 public class ListExampleQueriesHelper extends AbstractListHandler<ExampleQuery> {
 
-  public final static String SQL = 
-  "SELECT example_query, description, corpus\n"
-  + "FROM example_queries WHERE corpus=?";
+    public final static String SQL = "SELECT example_query, description, corpus\n"
+            + "FROM example_queries WHERE corpus=?";
 
-  @Override
-  protected ExampleQuery handleRow(ResultSet rs) throws SQLException {
-    ExampleQuery exampleQuery = new ExampleQuery();
+    @Override
+    protected ExampleQuery handleRow(ResultSet rs) throws SQLException {
+        ExampleQuery exampleQuery = new ExampleQuery();
 
-    exampleQuery.setExampleQuery(rs.getString("example_query"));
-    exampleQuery.setDescription(rs.getString("description"));
-    exampleQuery.setCorpusName(rs.getString("corpus"));
+        exampleQuery.setExampleQuery(rs.getString("example_query"));
+        exampleQuery.setDescription(rs.getString("description"));
+        exampleQuery.setCorpusName(rs.getString("corpus"));
 
-    return exampleQuery;
-  }
+        return exampleQuery;
+    }
 }

@@ -21,8 +21,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -31,84 +29,70 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
+import org.corpus_tools.annis.ql.parser.QueryData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import annis.AnnisXmlContextLoader;
 import annis.service.objects.DocumentBrowserConfig;
-import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.test.TestHelper;
-import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
-import org.corpus_tools.annis.ql.parser.QueryData;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations =
-{
-  "file:src/main/distribution/conf/spring/Common.xml",
-  "file:src/main/distribution/conf/spring/Dao.xml"
-}, loader=AnnisXmlContextLoader.class)
-public class TestQueryDaoImpl
-{
+@ContextConfiguration(locations = { "file:src/main/distribution/conf/spring/Common.xml",
+        "file:src/main/distribution/conf/spring/Dao.xml" }, loader = AnnisXmlContextLoader.class)
+public class TestQueryDaoImpl {
 
-  @Resource(name="queryDao")
-  private QueryDao queryDaoBean;
+    @Resource(name = "queryDao")
+    private QueryDao queryDaoBean;
 
-  // simple SpringDao instance with mocked dependencies
-  private QueryDaoImpl queryDao;
-  @Mock
-  private AnnisParserAntlr annisParser;
-  @Mock
-  private ListCorpusSqlHelper listCorpusHelper;
-  
-  // constants for flow control verification
-  private static final QueryData PARSE_RESULT = new QueryData();
-  private static final String SQL = "SQL";
-  private static final List<Long> CORPUS_LIST = new ArrayList<>();
+    // simple SpringDao instance with mocked dependencies
+    private QueryDaoImpl queryDao;
+    @Mock
+    private AnnisParserAntlr annisParser;
+    @Mock
+    private ListCorpusSqlHelper listCorpusHelper;
 
-  @SuppressWarnings("unchecked")
-  @Before
-  public void setup()
-  {
-    initMocks(this);
-       
-    queryDao = new QueryDaoImpl();
-    queryDao.setListCorpusSqlHelper(listCorpusHelper);
-    
-    when(annisParser.parse(anyString(), anyList())).thenReturn(PARSE_RESULT);
-    
-  }
+    // constants for flow control verification
+    private static final QueryData PARSE_RESULT = new QueryData();
+    private static final String SQL = "SQL";
+    private static final List<Long> CORPUS_LIST = new ArrayList<>();
 
-  // check dependencies
-  @Test
-  public void springManagedInstanceHasAllDependencies()
-  {
+    @SuppressWarnings("unchecked")
+    @Before
+    public void setup() {
+        initMocks(this);
 
-    QueryDaoImpl springManagedDao = (QueryDaoImpl) TestHelper.proxyTarget(queryDaoBean);
-    assertThat(springManagedDao.getListCorpusSqlHelper(), is(not(nullValue())));
-    
-    assertThat(springManagedDao.getSqlSessionModifiers(), is(not(nullValue())));
-    assertThat(springManagedDao.getListCorpusByNameDaoHelper(), is(
-      not(nullValue())));
+        queryDao = new QueryDaoImpl();
+        queryDao.setListCorpusSqlHelper(listCorpusHelper);
 
-  }
+        when(annisParser.parse(anyString(), anyList())).thenReturn(PARSE_RESULT);
 
-  @Test
-  public void getDefaultDocBrowserConfiguration()
-  {
-    DocumentBrowserConfig docBrowseConfig =
-      queryDao.getDefaultDocBrowserConfiguration();
+    }
 
-    Assert.assertNotNull("default document browser config may not be null", docBrowseConfig);
-    Assert.assertNotNull(docBrowseConfig.getVisualizers());
-    Assert.assertTrue(docBrowseConfig.getVisualizers().length > 0);
-    Assert.assertTrue(docBrowseConfig.getVisualizers()[0].getType() != null);
-    Assert.assertTrue(docBrowseConfig.getVisualizers()[0].getDisplayName() != null);
-  }
+    // check dependencies
+    @Test
+    public void springManagedInstanceHasAllDependencies() {
+
+        QueryDaoImpl springManagedDao = (QueryDaoImpl) TestHelper.proxyTarget(queryDaoBean);
+        assertThat(springManagedDao.getListCorpusSqlHelper(), is(not(nullValue())));
+
+    }
+
+    @Test
+    public void getDefaultDocBrowserConfiguration() {
+        DocumentBrowserConfig docBrowseConfig = queryDao.getDefaultDocBrowserConfiguration();
+
+        Assert.assertNotNull("default document browser config may not be null", docBrowseConfig);
+        Assert.assertNotNull(docBrowseConfig.getVisualizers());
+        Assert.assertTrue(docBrowseConfig.getVisualizers().length > 0);
+        Assert.assertTrue(docBrowseConfig.getVisualizers()[0].getType() != null);
+        Assert.assertTrue(docBrowseConfig.getVisualizers()[0].getDisplayName() != null);
+    }
 }

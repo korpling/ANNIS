@@ -15,21 +15,19 @@
  */
 package annis.administration;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,38 +36,26 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
-import com.google.common.io.Files;
-
-import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.dbcp2.DelegatingConnection;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
-import org.postgresql.PGConnection;
+import org.corpus_tools.annis.ql.parser.QueryData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.WritableResource;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.TreeMultimap;
+import com.google.common.io.Files;
 
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.exceptions.AnnisException;
@@ -79,14 +65,6 @@ import annis.tabledefs.Column;
 import annis.tabledefs.Table;
 import annis.utils.ANNISFormatHelper;
 import au.com.bytecode.opencsv.CSVReader;
-import com.google.common.collect.HashMultiset;
-import com.google.common.collect.Multiset;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-
-import org.corpus_tools.annis.ql.parser.QueryData;
-
-import org.apache.commons.dbutils.ResultSetHandler;
 
 /**
  *
@@ -190,7 +168,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     // DO NOT CHANGE THE ORDER OF THIS LIST! Doing so may cause foreign key
     // failures during import.
 
-
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
     private QueriesGenerator queriesGenerator;
@@ -261,7 +238,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         // create all tables that do not exist yet
         initSQLiteSchema();
-        
+
         String dbSchemaVersion = getDatabaseSchemaVersion();
         if (getSchemaVersion() != null && !getSchemaVersion().equalsIgnoreCase(dbSchemaVersion)) {
             String error = "Wrong database schema \"" + dbSchemaVersion + "\", please initialize the database.";
@@ -270,8 +247,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
         return true;
     }
-
-
 
     /**
      * Reads ANNIS files from several directories.
@@ -288,24 +263,24 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * @return true if successful
      */
     public boolean importCorpus(String path, String aliasName, boolean overwrite) {
-        
+
         // this will throw an exception if the database has the wrong schema version
         checkDatabaseSchemaVersion();
 
         ANNISFormatVersion version = getANNISFormatVersion(path);
-        
-        if(version == ANNISFormatVersion.UNKNOWN) {
+
+        if (version == ANNISFormatVersion.UNKNOWN) {
             log.error("Unknown ANNIS import format version");
             return false;
         }
-        
+
         String toplevelCorpusName = ANNISFormatHelper
                 .extractToplevelCorpusNames(new File(path, "corpus" + version.getFileSuffix()));
-        
-        if(toplevelCorpusName == null) {
+
+        if (toplevelCorpusName == null) {
             return false;
         }
-        
+
         // remove conflicting top level corpora, when override is set to true.
         if (overwrite) {
             deleteCorpusDao.checkAndRemoveTopLevelCorpus(toplevelCorpusName);
@@ -320,7 +295,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         importTexts(toplevelCorpusName, path, version);
         importResolverTable(toplevelCorpusName, path, version);
         importExampleQueries(toplevelCorpusName, path, version);
-
 
         // create empty corpus properties file
         if (getQueryDao().getCorpusConfigurationSave(toplevelCorpusName) == null) {
@@ -345,7 +319,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      */
     protected void initSQLiteSchema() {
         try {
-            createTableIfNotExists(repositoryMetaDataTable, new File(getScriptPath(), "repository_metadata.annis"), null);
+            createTableIfNotExists(repositoryMetaDataTable, new File(getScriptPath(), "repository_metadata.annis"),
+                    null);
             createTableIfNotExists(corpusInfoTable, null, null);
             createTableIfNotExists(resolverTable, new File(getScriptPath(), "resolver_vis_map.annis"), null);
             createTableIfNotExists(mediaFilesTable, null, null);
@@ -553,8 +528,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
     }
 
-    
-
     void importBinaryData(String path, String toplevelCorpusName) {
         log.info("importing all binary data from ExtData");
         File extData = new File(path + "/ExtData");
@@ -620,7 +593,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
     }
 
-   
     void computeCorpusStatistics(String toplevelCorpusName, String path) {
 
         File f = new File(path);
@@ -650,7 +622,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             log.error("Could not insert corpus information into database", ex);
         }
     }
-
 
     ///// Other sub tasks
 
@@ -757,7 +728,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         return config;
     }
 
-    @Transactional(readOnly = false)
     public void storeUserConfig(String userName, UserConfig config) {
         String sqlUpdate = "UPDATE user_config SET config=? WHERE id=?";
         String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?)";
@@ -960,30 +930,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         public ConflictingCorpusException(String msg) {
             super(msg);
-        }
-    }
-
-    public static class Offsets {
-
-        private final long corpusID;
-        private final long corpusPost;
-
-        public Offsets(long corpusID, long corpusPost) {
-            this.corpusID = corpusID;
-            this.corpusPost = corpusPost;
-        }
-
-        public long getCorpusID() {
-            return corpusID;
-        }
-
-        public long getCorpusPost() {
-            return corpusPost;
-        }
-
-        public MapSqlParameterSource makeArgs() {
-            return new MapSqlParameterSource().addValue(":offset_corpus_id", corpusID).addValue(":offset_corpus_post",
-                    corpusPost);
         }
     }
 

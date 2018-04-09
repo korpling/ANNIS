@@ -26,10 +26,6 @@ import java.util.List;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -44,7 +40,6 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
      *
      * @param corpusName
      */
-    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public void checkAndRemoveTopLevelCorpus(String corpusName) {
         if (existConflictingTopLevelCorpus(corpusName)) {
             log.info("delete conflicting corpus: {}", corpusName);

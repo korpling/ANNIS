@@ -15,7 +15,6 @@
  */
 package annis.dao;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,35 +24,21 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 
-import javax.sql.DataSource;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-
-import annis.administration.FileAccessException;
 import annis.administration.StatementController;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
-import annis.utils.DynamicDataSource;
 import au.com.bytecode.opencsv.CSVReader;
 
 /**
@@ -63,13 +48,8 @@ import au.com.bytecode.opencsv.CSVReader;
 public abstract class AbstractDao extends DBProvider {
   private final static Logger log = LoggerFactory.getLogger(AbstractDao.class);
 
-  private DynamicDataSource dataSource;
   private StatementController statementController;
   private String scriptPath;
-
-  protected MapSqlParameterSource makeArgs() {
-    return new MapSqlParameterSource();
-  }
 
   public void registerGUICancelThread(StatementController statementCon) {
     this.statementController = statementCon;
@@ -172,10 +152,6 @@ public abstract class AbstractDao extends DBProvider {
   }
 
 
-  public DynamicDataSource getDataSource() {
-    return dataSource;
-  }
-
   public String getScriptPath() {
     return scriptPath;
   }
@@ -184,39 +160,5 @@ public abstract class AbstractDao extends DBProvider {
     this.scriptPath = scriptPath;
   }
 
-  /**
-   * Registers a {@link PreparedStatement} to the {@link StatementController}.
-   */
-  private static class CancelableStatements implements PreparedStatementCreator, PreparedStatementCallback<Void> {
-
-    private final String sqlQuery;
-
-    private PreparedStatement statement;
-    private final StatementController statementController;
-
-    public CancelableStatements(String sql, StatementController statementController) {
-      this.sqlQuery = sql;
-      this.statementController = statementController;
-    }
-
-    @Override
-    public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-      if (statementController != null && statementController.isCancelled()) {
-        throw new SQLException("process was cancelled");
-      }
-
-      statement = con.prepareCall(sqlQuery);
-      if (statementController != null) {
-        statementController.registerStatement(statement);
-      }
-      return statement;
-    }
-
-    @Override
-    public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException {
-      ps.execute();
-      return null;
-    }
-  }
 
 }

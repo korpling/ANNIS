@@ -29,7 +29,6 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,9 +70,6 @@ import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -103,11 +99,10 @@ import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MetaByteHelper;
-import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 
-public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionModifier {
+public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     // generated sql for example queries and fetches the result
     private ListExampleQueriesHelper listExampleQueriesHelper;
@@ -344,57 +339,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         return null;
     }
 
-    // private MatrixSqlGenerator matrixSqlGenerator;
-    // SqlGenerator that prepends EXPLAIN to a query
-    private static final class ExplainSqlGenerator implements SqlGenerator<QueryData>, ResultSetExtractor<String> {
-
-        private final boolean analyze;
-
-        private final SqlGenerator<QueryData> generator;
-
-        private ExplainSqlGenerator(SqlGenerator<QueryData> generator, boolean analyze) {
-            this.generator = generator;
-            this.analyze = analyze;
-        }
-
-        @Override
-        public String toSql(QueryData queryData) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("EXPLAIN ");
-            if (analyze) {
-                sb.append("ANALYZE ");
-            }
-            sb.append(generator.toSql(queryData));
-            return sb.toString();
-        }
-
-        @Override
-        public String extractData(ResultSet rs) throws SQLException, DataAccessException {
-            StringBuilder sb = new StringBuilder();
-            while (rs.next()) {
-                sb.append(rs.getString(1));
-                sb.append("\n");
-            }
-            return sb.toString();
-        }
-
-        @Override
-        public String toSql(QueryData queryData, String indent) {
-            // dont indent
-            return toSql(queryData);
-        }
-    }
 
     private static final Logger log = LoggerFactory.getLogger(QueryDaoImpl.class);
    
     private ListCorpusSqlHelper listCorpusSqlHelper;
 
-
-
-    private List<SqlSessionModifier> sqlSessionModifiers;
-    // private SqlGenerator findSqlGenerator;
-
-    private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
 
     private final AnnisParserAntlr aqlParser = new AnnisParserAntlr();
 
@@ -405,8 +354,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     private MetaByteHelper metaByteHelper;
 
     public QueryDaoImpl() {
-        sqlSessionModifiers = new ArrayList<>();
-
         File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
         this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
                 logfile.getAbsolutePath(), LogLevel.Warn);
@@ -421,12 +368,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         return this.corpusStorageMgr;
     }
 
-    @Override
-    public void modifySqlSession(JdbcTemplate jdbcTemplate, QueryData queryData) {
-        if (timeout > 0) {
-            jdbcTemplate.update("SET statement_timeout TO " + timeout);
-        }
-    }
 
     @Override
     public List<ExampleQuery> getExampleQueries(List<String> corpora) {
@@ -749,7 +690,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
             ResolverDaoHelper helper = new ResolverDaoHelper();
             PreparedStatement stmt = helper.createPreparedStatement(conn);
             helper.fillPreparedStatement(request, stmt);
-            List<ResolverEntry> result = helper.extractData(stmt.executeQuery());
+            List<ResolverEntry> result = helper.handle(stmt.executeQuery());
             return result;
         } catch (SQLException ex) {
             log.error("Could not get resolver entries from database", ex);
@@ -779,25 +720,20 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     private void parseCorpusConfiguration() {
         corpusConfiguration = new HashMap<>();
 
-        try {
-            List<AnnisCorpus> corpora = listCorpora();
-            for (AnnisCorpus c : corpora) {
-                // copy properties from map
-                Properties p;
-                try {
-                    p = getCorpusConfiguration(c.getName());
-                } catch (FileNotFoundException ex) {
-                    log.warn("no config found for {}", c.getName());
-                    continue;
-                }
-
-                corpusConfiguration.put(c.getName(), p);
+        List<AnnisCorpus> corpora = listCorpora();
+        for (AnnisCorpus c : corpora) {
+            // copy properties from map
+            Properties p;
+            try {
+                p = getCorpusConfiguration(c.getName());
+            } catch (FileNotFoundException ex) {
+                log.warn("no config found for {}", c.getName());
+                continue;
             }
-        } catch (org.springframework.jdbc.CannotGetJdbcConnectionException ex) {
-            log.warn("No corpus configuration loaded due to missing database connection.");
-        } catch (org.springframework.jdbc.BadSqlGrammarException ex) {
-            log.warn("Your database schema seems to be old. Probably you need to reinit it");
+
+            corpusConfiguration.put(c.getName(), p);
         }
+        
     }
 
 
@@ -891,21 +827,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         this.listCorpusSqlHelper = listCorpusHelper;
     }
 
-    public List<SqlSessionModifier> getSqlSessionModifiers() {
-        return sqlSessionModifiers;
-    }
-
-    public void setSqlSessionModifiers(List<SqlSessionModifier> sqlSessionModifiers) {
-        this.sqlSessionModifiers = sqlSessionModifiers;
-    }
-
-    public ListCorpusByNameDaoHelper getListCorpusByNameDaoHelper() {
-        return listCorpusByNameDaoHelper;
-    }
-
-    public void setListCorpusByNameDaoHelper(ListCorpusByNameDaoHelper listCorpusByNameDaoHelper) {
-        this.listCorpusByNameDaoHelper = listCorpusByNameDaoHelper;
-    }
 
     @Override
     public CorpusConfigMap getCorpusConfigurations() {

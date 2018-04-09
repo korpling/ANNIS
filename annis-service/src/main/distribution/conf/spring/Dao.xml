@@ -65,10 +65,6 @@
   <!-- Helper for list example queries -->
   <bean id="listExampleQueriesHelper" class="annis.sqlgen.ListExampleQueriesHelper" lazy-init="true"/>
 
-  <bean id="listCorpusByNameDaoHelper" class="annis.dao.ListCorpusByNameDaoHelper" lazy-init="true">
-    <property name="requiredType" value="java.lang.Long"/>
-  </bean>
-
   <bean id="queriesGenerator" class="annis.dao.autogenqueries.QueriesGenerator" lazy-init="true">
     <property name="queryDao" ref="queryDao" />
     <property name="queryBuilder">
@@ -126,8 +122,6 @@
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     
     <property name="listExampleQueriesHelper" ref="listExampleQueriesHelper" />
-
-    <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
 
     <property name="byteHelper" ref="byteHelper" />
     <property name="metaByteHelper" ref="metaByteHelper" />

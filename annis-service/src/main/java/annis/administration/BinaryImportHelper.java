@@ -15,123 +15,106 @@
  */
 package annis.administration;
 
-import annis.CommonHelper;
 import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
+
 import javax.activation.MimetypesFileTypeMap;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.PreparedStatementCallback;
+
+import annis.CommonHelper;
 
 /**
  * Imports binary files.
  *
- * <p>Therefore the meta data of the files are stored in the database, while the
- * real data are store in a simple file directory.</p>
+ * <p>
+ * Therefore the meta data of the files are stored in the database, while the
+ * real data are store in a simple file directory.
+ * </p>
  *
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <p.pixeldrama@gmail.com>
  */
-public class BinaryImportHelper implements
-  PreparedStatementCallback<Boolean>
-{
+public class BinaryImportHelper {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    BinaryImportHelper.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(BinaryImportHelper.class);
 
-  public static final String SQL = "INSERT INTO media_files VALUES (?, ?, ?, ?)";
+    public static final String SQL = "INSERT INTO media_files VALUES (?, ?, ?, ?)";
 
-  private File fileSource;
+    private File fileSource;
 
-  private File fileDestination;
+    private File fileDestination;
 
-  private String mimeType;
-  
-  private String corpusPath;
-  
-  public BinaryImportHelper(File f, File dataDir, String corpusPath,
-    Map<String, String> mimeTypeMapping)
-  {
-    this.fileSource = f;
+    private String mimeType;
 
-    // create a file-name in the form of "filename_toplevelcorpus_UUID.ending", thus we
-    // need to split the file name into its components
-    String baseName = FilenameUtils.getBaseName(fileSource.getName());
-    String extension = FilenameUtils.getExtension(fileSource.getName());
-    UUID uuid = UUID.randomUUID();
-    
-    String outputName = "";
-    if(corpusPath == null)
-    {
-      outputName = baseName 
-        + "_" + uuid.toString()
-        + (extension.isEmpty() ? "" : "." + extension);
-    }
-    else
-    {
-      outputName = baseName 
-        + "_" + CommonHelper.getSafeFileName(corpusPath)
-        + "_" + uuid.toString()
-        + (extension.isEmpty() ? "" : "." + extension);
-    }
-    
-    fileDestination = new File(dataDir, outputName);
+    private String corpusPath;
 
+    public BinaryImportHelper(File f, File dataDir, String corpusPath, Map<String, String> mimeTypeMapping) {
+        this.fileSource = f;
 
-    String fileEnding = FilenameUtils.getExtension(f.getName());
-    if (mimeTypeMapping.containsKey(fileEnding))
-    {
-      this.mimeType = mimeTypeMapping.get(fileEnding);
-    }
-    else
-    {
-      this.mimeType = new MimetypesFileTypeMap().getContentType(fileSource);
-    }
-    
-    this.corpusPath = corpusPath;
-  }
+        // create a file-name in the form of "filename_toplevelcorpus_UUID.ending", thus
+        // we
+        // need to split the file name into its components
+        String baseName = FilenameUtils.getBaseName(fileSource.getName());
+        String extension = FilenameUtils.getExtension(fileSource.getName());
+        UUID uuid = UUID.randomUUID();
 
-  /**
-   * Imports binary files.
-   *
-   * @param file Specifies path to the file, including the filename.
-   * @param dataDir Specifies the directory, where the file is copied to.
-   * @param corpusPath path of the corpus to import, e.g. "toplevel/document"
-   * @param mimeTypeMapping A map of default mime types.
-   */
-  public BinaryImportHelper(String file, File dataDir,
-    String corpusPath,
-    Map<String, String> mimeTypeMapping)
-  {
-    this(new File(file), dataDir, corpusPath, mimeTypeMapping);
-  }
+        String outputName = "";
+        if (corpusPath == null) {
+            outputName = baseName + "_" + uuid.toString() + (extension.isEmpty() ? "" : "." + extension);
+        } else {
+            outputName = baseName + "_" + CommonHelper.getSafeFileName(corpusPath) + "_" + uuid.toString()
+                    + (extension.isEmpty() ? "" : "." + extension);
+        }
 
-  @Override
-  public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException,
-    DataAccessException
-  {
-    ps.setString(1, fileDestination.getName());
-    ps.setString(2, this.corpusPath);
-    ps.setString(3, this.mimeType);
-    ps.setString(4, fileSource.getName());
-    ps.executeUpdate();
-    try
-    {
-      FileUtils.copyFile(fileSource, fileDestination);
-    }
-    catch (IOException ex)
-    {
-      log.error("Could not copy file " + fileSource.getPath(), ex);
-      return false;
+        fileDestination = new File(dataDir, outputName);
+
+        String fileEnding = FilenameUtils.getExtension(f.getName());
+        if (mimeTypeMapping.containsKey(fileEnding)) {
+            this.mimeType = mimeTypeMapping.get(fileEnding);
+        } else {
+            this.mimeType = new MimetypesFileTypeMap().getContentType(fileSource);
+        }
+
+        this.corpusPath = corpusPath;
     }
 
-    return true;
-  }
+    /**
+     * Imports binary files.
+     *
+     * @param file
+     *            Specifies path to the file, including the filename.
+     * @param dataDir
+     *            Specifies the directory, where the file is copied to.
+     * @param corpusPath
+     *            path of the corpus to import, e.g. "toplevel/document"
+     * @param mimeTypeMapping
+     *            A map of default mime types.
+     */
+    public BinaryImportHelper(String file, File dataDir, String corpusPath, Map<String, String> mimeTypeMapping) {
+        this(new File(file), dataDir, corpusPath, mimeTypeMapping);
+    }
+
+    public Boolean doInPreparedStatement(PreparedStatement ps) throws SQLException {
+        ps.setString(1, fileDestination.getName());
+        ps.setString(2, this.corpusPath);
+        ps.setString(3, this.mimeType);
+        ps.setString(4, fileSource.getName());
+        ps.executeUpdate();
+        try {
+            FileUtils.copyFile(fileSource, fileDestination);
+        } catch (IOException ex) {
+            log.error("Could not copy file " + fileSource.getPath(), ex);
+            return false;
+        }
+
+        return true;
+    }
 }
