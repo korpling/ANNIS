@@ -644,7 +644,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) {
         final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName, toplevelCorpusName, true);
         final List<Annotation> corpusAnnotations = (List<Annotation>) getJdbcTemplate().query(sql,
@@ -687,7 +686,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName, boolean listRootCorpus) {
         
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
@@ -710,11 +708,28 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Annotation> listCorpusAnnotations(String toplevelCorpusName, String documentName, boolean exclude) {
-        String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName, documentName, exclude);
-        final List<Annotation> cA = (List<Annotation>) getJdbcTemplate().query(sql, listCorpusAnnotationsSqlHelper);
-        return cA;
+        
+        // select the document and all its parent corpora
+        String aql = "annis:doc=\"" + documentName + "\" @* annis:node_type=\"corpus\"";
+        
+        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraphForQuery(toplevelCorpusName, aql);
+        
+        List<Annotation> result = new LinkedList<>();
+        for(SDocument doc : corpusGraph.getDocuments()) {
+            result.addAll(allAnnotationForCorpus(doc));
+        }
+
+        if(!exclude) {
+            for(SNode n : corpusGraph.getRoots()) {
+                if(n instanceof SCorpus) {
+                    result.addAll(allAnnotationForCorpus(n));
+                    break;
+                }
+            }
+        }
+        
+        return result;
     }
 
     @Override

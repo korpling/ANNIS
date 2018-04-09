@@ -15,8 +15,6 @@
  */
 package annis.model;
 
-import annis.sqlgen.model.RankTableJoin;
-import com.google.common.base.Joiner;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,11 +22,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
+import com.google.common.base.Joiner;
 
 @XmlRootElement
 public class QueryNode implements Serializable
@@ -39,7 +41,6 @@ public class QueryNode implements Serializable
   private String spannedText;
   private Set<QueryAnnotation> nodeAnnotations;
   // node constraints
-  private boolean partOfEdge;
   private boolean root;
   private boolean token;
   private TextMatching spanTextMatching;
@@ -201,7 +202,6 @@ public class QueryNode implements Serializable
     // the ingoing joins of the query node
     this.ingoingJoins = new ArrayList<>();
     this.nodeAnnotations = new TreeSet<>(other.nodeAnnotations);
-    this.partOfEdge = other.partOfEdge;
     this.root = other.root;
     this.spanTextMatching = other.spanTextMatching;
     this.spannedText = other.spannedText;
@@ -412,17 +412,6 @@ public class QueryNode implements Serializable
     {
       join.getTarget().ingoingJoins.add(join);
     }
-    
-    if (join instanceof RankTableJoin)
-    {
-      this.setPartOfEdge(true);
-
-      QueryNode target = join.getTarget();
-      if(target != null)
-      {
-        target.setPartOfEdge(true);
-      }
-    }
 
     return result;
   }
@@ -465,11 +454,7 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-
-    if (this.partOfEdge != other.partOfEdge)
-    {
-      return false;
-    }
+    
     if (this.root != other.root)
     {
       return false;
@@ -642,16 +627,6 @@ public class QueryNode implements Serializable
   public void setToken(boolean token)
   {
     this.token = token;
-  }
-
-  public boolean isPartOfEdge()
-  {
-    return partOfEdge;
-  }
-
-  public void setPartOfEdge(boolean partOfEdge)
-  {
-    this.partOfEdge = partOfEdge;
   }
 
   public Range getArity()

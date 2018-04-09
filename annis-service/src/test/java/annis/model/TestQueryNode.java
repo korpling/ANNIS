@@ -15,11 +15,12 @@
  */
 package annis.model;
 
-import annis.sqlgen.model.RankTableJoin;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+
+import org.corpus_tools.annis.ql.model.RankTableJoin;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -70,21 +71,6 @@ public class TestQueryNode {
 		
 		// test for null values
 		assertThat(node.getSpannedText(), is(nullValue()));
-	}
-	
-	@Test
-	public void addRelationRankTable() {
-		// sanity check
-		assertThat(node.isPartOfEdge(), is(false));
-		
-		// add a join that uses the rank table
-		QueryNode target = new QueryNode(1);
-		RankTableJoin rankTableJoin = new RankTableJoin(target, "foo", 0, 0) { };
-		node.addOutgoingJoin(rankTableJoin);
-		
-		// assert both node and target know about the edge
-		assertThat(node.isPartOfEdge(), is(true));
-    assertThat(target.isPartOfEdge(), is(true));
 	}
 
 }

@@ -62,7 +62,7 @@ public interface QueryDao
   public List<String> listSegmentationNames(List<String> corpusList);
 
   /**
-   * Creates sql for getting annotations of corpora.
+   * Gets annotations of corpora.
    *
    * @param toplevelCorpusName The toplevel corpus defines the root.
    * @param corpusName Specifies the document, for which the annotations are
@@ -70,7 +70,7 @@ public interface QueryDao
    * @param exclude If set to true, the top level corpus annotations are
    * excluded. Only has an effect, if corpus name is different from top level
    * corpus name.
-   * @return Valid sql as string.
+   * @return The annotations
    */
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
     String documentName, boolean exclude);
