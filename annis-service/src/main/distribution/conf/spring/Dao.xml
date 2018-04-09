@@ -69,9 +69,6 @@
   <!-- Helper for listCorpusAnnotations command -->
   <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper" lazy-init="true"/>
 
-  <!-- Helper for listDocumentsAnnotations command -->
-  <bean id="listDocumentsAnnotationsSqlHelper" class="annis.sqlgen.ListDocumentsAnnotationsSqlHelper" lazy-init="true"/>
-
   <!-- Helper for list example queries -->
   <bean id="listExampleQueriesHelper" class="annis.sqlgen.ListExampleQueriesHelper" lazy-init="true"/>
 
@@ -145,7 +142,6 @@
 
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
-    <property name="listDocumentsAnnotationsSqlHelper" ref="listDocumentsAnnotationsSqlHelper"/>
 
     <property name="listExampleQueriesHelper" ref="listExampleQueriesHelper" />
 

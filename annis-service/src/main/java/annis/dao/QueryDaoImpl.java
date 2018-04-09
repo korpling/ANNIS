@@ -15,40 +15,6 @@
  */
 package annis.dao;
 
-import annis.CommonHelper;
-import annis.examplequeries.ExampleQuery;
-import annis.exceptions.AnnisException;
-import annis.exceptions.AnnisTimeoutException;
-import annis.model.AnnisConstants;
-import annis.model.Annotation;
-import org.corpus_tools.annis.ql.parser.QueryData;
-import annis.resolver.ResolverEntry;
-import annis.resolver.SingleResolverRequest;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisBinaryMetaData;
-import annis.service.objects.AnnisCorpus;
-import annis.service.objects.CorpusConfig;
-import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.DocumentBrowserConfig;
-import annis.service.objects.FrequencyTable;
-import annis.service.objects.Match;
-import annis.service.objects.MatchAndDocumentCount;
-import annis.service.objects.MatchGroup;
-import annis.sqlgen.ByteHelper;
-import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
-import annis.sqlgen.ListCorpusSqlHelper;
-import annis.sqlgen.ListDocumentsAnnotationsSqlHelper;
-import annis.sqlgen.ListExampleQueriesHelper;
-import annis.sqlgen.MetaByteHelper;
-import annis.sqlgen.SqlGenerator;
-import annis.sqlgen.extensions.AnnotateQueryData;
-import annis.sqlgen.extensions.LimitOffsetQueryData;
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.escape.Escaper;
-import com.google.common.io.ByteStreams;
-import com.google.common.net.UrlEscapers;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -73,6 +39,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -80,12 +47,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
+import org.corpus_tools.annis.ql.parser.QueryData;
 import org.corpus_tools.graphannis.QueryToJSON;
 import org.corpus_tools.graphannis.api.CorpusStorageManager;
 import org.corpus_tools.graphannis.api.LogLevel;
@@ -95,6 +64,7 @@ import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.SaltUtil;
@@ -106,6 +76,40 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.escape.Escaper;
+import com.google.common.io.ByteStreams;
+import com.google.common.net.UrlEscapers;
+
+import annis.CommonHelper;
+import annis.examplequeries.ExampleQuery;
+import annis.exceptions.AnnisException;
+import annis.exceptions.AnnisTimeoutException;
+import annis.model.AnnisConstants;
+import annis.model.Annotation;
+import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisBinaryMetaData;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfig;
+import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.FrequencyTable;
+import annis.service.objects.Match;
+import annis.service.objects.MatchAndDocumentCount;
+import annis.service.objects.MatchGroup;
+import annis.sqlgen.ByteHelper;
+import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
+import annis.sqlgen.ListCorpusSqlHelper;
+import annis.sqlgen.ListExampleQueriesHelper;
+import annis.sqlgen.MetaByteHelper;
+import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 
 public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionModifier {
 
@@ -167,22 +171,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
                 annoExt.getRight());
 
         return result;
-    }
-
-    /**
-     * @return the listDocumentsAnnotationsSqlHelper
-     */
-    public ListDocumentsAnnotationsSqlHelper getListDocumentsAnnotationsSqlHelper() {
-        return listDocumentsAnnotationsSqlHelper;
-    }
-
-    /**
-     * @param listDocumentsAnnotationsSqlHelper
-     *            the listDocumentsAnnotationsSqlHelper to set
-     */
-    public void setListDocumentsAnnotationsSqlHelper(
-            ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper) {
-        this.listDocumentsAnnotationsSqlHelper = listDocumentsAnnotationsSqlHelper;
     }
 
     @Override
@@ -408,7 +396,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
 
     private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
 
-    private ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper;
 
 
     private List<SqlSessionModifier> sqlSessionModifiers;
@@ -664,14 +651,62 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
                 listCorpusAnnotationsSqlHelper);
         return corpusAnnotations;
     }
+    
+    private List<Annotation> allAnnotationForCorpus(SNode corpus) {
+        
+        String type = corpus instanceof SDocument ? "DOCUMENT" : "CORPUS";
+        
+        List<Annotation> result = new LinkedList<>();
+        
+        Set<SMetaAnnotation> metaAnnos = corpus.getMetaAnnotations();
+        if(metaAnnos.isEmpty()) {
+            // add single entry for the document without annotation value
+            Annotation anno = new Annotation();
+            anno.setName(corpus.getName());
+            anno.setAnnotationPath(corpus.getPath().segmentsList());
+            anno.setType(type);
+            
+            result.add(anno);
+        } else {
+            // add all annotations of this document as value
+            for(SMetaAnnotation meta : metaAnnos) {
+                Annotation anno = new Annotation();
+                anno.setName(corpus.getName());
+                anno.setAnnotationPath(corpus.getPath().segmentsList());
+                anno.setType(type);
+               
+                anno.setNamespace(meta.getNamespace());
+                anno.setName(meta.getName());
+                anno.setValue(meta.getValue().toString());
+                
+                result.add(anno);
+            }
+        }
+        
+        return result;
+    }
 
     @Override
     @Transactional(readOnly = true)
     public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName, boolean listRootCorpus) {
-        final String sql = listDocumentsAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName, listRootCorpus);
-        final List<Annotation> docAnnotations = (List<Annotation>) getJdbcTemplate().query(sql,
-                listDocumentsAnnotationsSqlHelper);
-        return docAnnotations;
+        
+        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
+        
+        List<Annotation> result = new LinkedList<>();
+        for(SDocument doc : corpusGraph.getDocuments()) {
+            result.addAll(allAnnotationForCorpus(doc));
+        }
+        
+        if(listRootCorpus) {
+            for(SNode n : corpusGraph.getRoots()) {
+                if(n instanceof SCorpus) {
+                    result.addAll(allAnnotationForCorpus(n));
+                    break;
+                }
+            }
+        }
+        
+        return result;
     }
 
     @Override
