@@ -194,17 +194,5 @@ public class RelannisNodeFeature implements Serializable
     
   }
   
-  public static RelannisNodeFeature extract(SNode node)
-  {
-    RelannisNodeFeature featNode = null;
-    SFeature sfeatNode = node.getFeature(ANNIS_NS +"::"+ FEAT_RELANNIS_NODE);
-    if(sfeatNode != null)
-    {
-      featNode = (RelannisNodeFeature) sfeatNode.getValue();
-    }
-    return featNode;
-  }
-  
-  
   
 }

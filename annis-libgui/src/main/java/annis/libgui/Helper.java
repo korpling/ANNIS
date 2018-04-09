@@ -939,63 +939,6 @@ public class Helper
       getEncodedValue();
   }
 
-  public static Map<String, String> calculateColorsForMarkedExact(
-    SDocument result)
-  {
-    Map<String, String> markedExactMap = new HashMap<>();
-    if (result != null)
-    {
-      SDocumentGraph g = result.getDocumentGraph();
-      if (g != null)
-      {
-        for (SNode n : result.getDocumentGraph().getNodes())
-        {
-
-          SFeature featMatched = n.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-          Long matchNum = featMatched == null ? null : featMatched.
-            getValue_SNUMERIC();
-
-          if (matchNum != null)
-          {
-            int color = Math.max(0, Math.min((int) matchNum.longValue() - 1,
-              MatchedNodeColors.values().length - 1));
-            RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
-            if (feat != null)
-            {
-              markedExactMap.put("" + feat.getInternalID(),
-                MatchedNodeColors.values()[color].name());
-            }
-          }
-
-        }
-      } // end if g not null
-    } // end if result not null
-    return markedExactMap;
-  }
-
-  public static void calulcateColorsForMarkedAndCovered(SDocument result,
-    Map<String, Long> markedAndCovered, Map<String, String> markedCoveredMap)
-  {
-    if (markedAndCovered != null)
-    {
-      for (Map.Entry<String, Long> markedEntry : markedAndCovered.entrySet())
-      {
-        int color = Math.max(0, Math.min((int) markedEntry.getValue().
-          longValue()
-          - 1,
-          MatchedNodeColors.values().length - 1));
-        SNode n = result.getDocumentGraph().getNode(markedEntry.getKey());
-        RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
-
-        if (feat != null)
-        {
-          markedCoveredMap.put("" + feat.getInternalID(),
-            MatchedNodeColors.values()[color].name());
-        }
-      } // end for each entry in markedAndCoverd
-    } // end if markedAndCovered not null
-  }
-
   public static Map<String, Long> calculateMarkedAndCoveredIDs(
     SDocument doc, List<SNode> segNodes, String segmentationName)
   {

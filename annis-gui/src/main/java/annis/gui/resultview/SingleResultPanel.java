@@ -358,7 +358,7 @@ public class SingleResultPanel extends CssLayout implements
   {
     markedCoveredMap = new HashMap<>();
     
-    markedExactMap = Helper.calculateColorsForMarkedExact(result);
+    markedExactMap = new HashMap<>();
   }
 
   @Override
@@ -411,9 +411,7 @@ public class SingleResultPanel extends CssLayout implements
         segmentationName,
         result.getDocumentGraph());
 
-      Map<String, Long> markedAndCovered = 
-        Helper.calculateMarkedAndCoveredIDs(result, segNodes, segmentationName);
-      Helper.calulcateColorsForMarkedAndCovered(result, markedAndCovered, markedCoveredMap);
+      Map<String, Long> markedAndCovered = new HashMap<>();
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
 

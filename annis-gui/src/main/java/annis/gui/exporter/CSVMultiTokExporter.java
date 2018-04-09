@@ -184,9 +184,7 @@ public class CSVMultiTokExporter extends SaltBasedExporter
     SortedMap<Integer, String> contentLine = new TreeMap<>();
     for (SNode node: this.getMatchedNodes(graph)) {
       List<String> nodeLine = new ArrayList<>();
-      // export id
-      RelannisNodeFeature feats = RelannisNodeFeature.extract(node);
-      nodeLine.add(String.valueOf(feats.getInternalID()));
+      nodeLine.add(node.getId());
       // export spanned text
       String span = graph.getText(node);
       if (span != null)
