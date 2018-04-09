@@ -207,7 +207,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             .c(new Column("corpus_path").createIndex()).c(new Column("mime_type").createIndex())
             .c(new Column("title").createIndex());
 
-    private final Table repositoryMetaDataTable = new Table("repository_metadata").c(new Column("name").primaryKey())
+    private final Table repositoryMetaDataTable = new Table("repository_metadata").c(new Column("name").unique())
             .c("value");
 
     private final Table urlShortenerTable = new Table("url_shortener").c(new Column("id").primaryKey()).c("owner")
@@ -240,7 +240,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      *
      * @return
      */
-    @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
     public String getDatabaseSchemaVersion() {
         try (Connection conn = createSQLiteConnection(true)) {
 
@@ -259,6 +258,10 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     public boolean checkDatabaseSchemaVersion() throws AnnisException {
+
+        // create all tables that do not exist yet
+        initSQLiteSchema();
+        
         String dbSchemaVersion = getDatabaseSchemaVersion();
         if (getSchemaVersion() != null && !getSchemaVersion().equalsIgnoreCase(dbSchemaVersion)) {
             String error = "Wrong database schema \"" + dbSchemaVersion + "\", please initialize the database.";
@@ -285,8 +288,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * @return true if successful
      */
     public boolean importCorpus(String path, String aliasName, boolean overwrite) {
-
-        initSQLiteSchema();
         
         // this will throw an exception if the database has the wrong schema version
         checkDatabaseSchemaVersion();
@@ -344,7 +345,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      */
     protected void initSQLiteSchema() {
         try {
-            createTableIfNotExists(repositoryMetaDataTable, null, null);
+            createTableIfNotExists(repositoryMetaDataTable, new File(getScriptPath(), "repository_metadata.annis"), null);
             createTableIfNotExists(corpusInfoTable, null, null);
             createTableIfNotExists(resolverTable, new File(getScriptPath(), "resolver_vis_map.annis"), null);
             createTableIfNotExists(mediaFilesTable, null, null);

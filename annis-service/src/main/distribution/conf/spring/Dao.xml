@@ -108,7 +108,7 @@
   <!-- BEGIN EXPORTS -->
 
   <bean id="daoBase" class="annis.dao.AbstractDao" abstract="true" lazy-init="true">
- 
+ 	 <property name="scriptPath" value="$dev{annis.script-path}"/>
   </bean>
   
   
