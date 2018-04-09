@@ -132,8 +132,6 @@ public interface QueryDao
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
     String subCorpusName);
 
-  public List<Long> mapCorpusAliasToIds(String alias);
-
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
   public QueryData parseAQL(String aql, List<String> corpusList);

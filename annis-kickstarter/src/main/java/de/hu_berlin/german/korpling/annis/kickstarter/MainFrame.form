@@ -28,7 +28,6 @@
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="btInit" alignment="1" pref="376" max="32767" attributes="0"/>
                   <Component id="btImport" alignment="1" pref="376" max="32767" attributes="0"/>
                   <Component id="btList" alignment="0" pref="376" max="32767" attributes="0"/>
                   <Component id="lblStatusService" alignment="1" pref="376" max="32767" attributes="0"/>
@@ -48,17 +47,15 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="btInit" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
               <Component id="btImport" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="btList" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="lblStatusService" pref="102" max="32767" attributes="0"/>
+              <Component id="lblStatusService" pref="93" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="pbStart" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="btLaunch" min="-2" max="-2" attributes="0"/>
+              <Component id="btLaunch" min="-2" pref="78" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btExit" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -70,20 +67,6 @@
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JButton" name="btInit">
-      <Properties>
-        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/db_comit.png"/>
-        </Property>
-        <Property name="mnemonic" type="int" value="100"/>
-        <Property name="text" type="java.lang.String" value="Init database"/>
-        <Property name="toolTipText" type="java.lang.String" value="&lt;html&gt;&#xa;Before you can use ANNIS the very first time&lt;br&gt;&#xa;you have to initialize the database. &lt;br&gt;&lt;br&gt;&#xa;&#xa;Please note that if you initialize a database that was&lt;br&gt;&#xa;already in use you will delete all imported corpora&lt;br&gt;&#xa;of this database.&#xa;&lt;/html&gt;"/>
-        <Property name="name" type="java.lang.String" value="btInit" noResource="true"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btInitActionPerformed"/>
-      </Events>
-    </Component>
     <Component class="javax.swing.JButton" name="btImport">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
@@ -139,8 +122,8 @@
         <Property name="name" type="java.lang.String" value="btLaunch" noResource="true"/>
       </Properties>
       <Events>
-        <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btLaunchMouseEntered"/>
         <EventHandler event="mouseExited" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btLaunchMouseExited"/>
+        <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="btLaunchMouseEntered"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btLaunchActionPerformed"/>
       </Events>
     </Component>

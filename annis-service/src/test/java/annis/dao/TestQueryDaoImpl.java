@@ -65,8 +65,6 @@ public class TestQueryDaoImpl
   @Mock
   private AnnisParserAntlr annisParser;
   @Mock
-  private JdbcTemplate jdbcTemplate;
-  @Mock
   private ListCorpusSqlHelper listCorpusHelper;
   
   // constants for flow control verification
@@ -83,9 +81,6 @@ public class TestQueryDaoImpl
     queryDao = new QueryDaoImpl();
     queryDao.setListCorpusSqlHelper(listCorpusHelper);
     
-    queryDao.setJdbcTemplate(jdbcTemplate);
-    verify(jdbcTemplate).getDataSource();
-    
     when(annisParser.parse(anyString(), anyList())).thenReturn(PARSE_RESULT);
     
   }
@@ -96,40 +91,12 @@ public class TestQueryDaoImpl
   {
 
     QueryDaoImpl springManagedDao = (QueryDaoImpl) TestHelper.proxyTarget(queryDaoBean);
-    assertThat(springManagedDao.getJdbcTemplate(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusSqlHelper(), is(not(nullValue())));
     
     assertThat(springManagedDao.getSqlSessionModifiers(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusByNameDaoHelper(), is(
       not(nullValue())));
 
-  }
-
-  @Test
-  public void sessionTimeout()
-  {
-    // time out after 100 seconds
-    int timeout = 100;
-    queryDao.setTimeout(timeout);
-
-    // call (query data not needed)
-    queryDao.modifySqlSession(jdbcTemplate, null);
-
-    // verify correct session timeout
-    verify(jdbcTemplate).update("SET statement_timeout TO " + timeout);
-  }
-
-  @Test
-  public void noTimeout()
-  {
-    // 0 indicates no timeout
-    queryDao.setTimeout(0);
-    
-    // call
-    queryDao.modifySqlSession(jdbcTemplate, null);
-
-    // verify that nothing has happened
-    verifyNoMoreInteractions(jdbcTemplate);
   }
 
   @Test

@@ -98,10 +98,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       usage(null);
     }
-    else if ("init".equals(command))
-    {
-      doInit(commandArgs);
-    }
     else if ("import".equals(command))
     {
       doImport(commandArgs);
@@ -119,10 +115,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       doList();
     }
-    else if ("indexes".equals(command))
-    {
-      doIndexes();
-    }
     else if ("genexamples".equals(command))
     {
       doGenerateExampleQueries(commandArgs);
@@ -138,14 +130,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     else if("check-db-schema-version".equals(command))
     {
       doCheckDBSchemaVersion();
-    }
-    else if("dump".equals(command))
-    {
-      doDumpTable(commandArgs);
-    }
-    else if("restore".equals(command))
-    {
-      doRestoreTable(commandArgs);
     }
     else
     {
@@ -215,71 +199,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
   }
 
-  private void doInit(List<String> commandArgs)
-  {
-
-    Options options = new OptionBuilder()
-      .addParameter("h", "host",
-        "database server host (defaults to localhost)")
-      .addLongParameter("port", "database server port")
-      .addRequiredParameter("d", "database",
-        "name of the ANNIS database (REQUIRED)")
-      .addRequiredParameter("u", "user", "name of the ANNIS user (REQUIRED)")
-      .addRequiredParameter("p", "password",
-        "password of the ANNIS suer (REQUIRED)")
-      .addParameter("D", "defaultdb",
-        "name of the PostgreSQL default database (defaults to \"postgres\")")
-      .addParameter("U", "superuser",
-        "name of a PostgreSQL super user (defaults to \"postgres\")")
-      .addParameter("P", "superpassword",
-        "password of a PostgreSQL super user")
-      .addToggle("s", "ssl", false,
-        "if given use SSL for connecting to the database")
-      .addLongParameter("schema", "The PostgreSQL schema to use (defaults to \"public\"). "
-        + "Only lowercase characters and digits are allowed in the schema name.")
-      .createOptions();
-    CommandLineParser parser = new PosixParser();
-    CommandLine cmdLine = null;
-
-    try
-    {
-      cmdLine = parser.parse(options, commandArgs.toArray(
-        new String[commandArgs.size()]));
-
-      // check for required flags
-      if (!cmdLine.hasOption("user") || !cmdLine.hasOption("database") || !cmdLine.
-        hasOption("password"))
-      {
-        throw new ParseException("required option is missing");
-      }
-
-      String host = cmdLine.getOptionValue("host", "localhost");
-      String port = cmdLine.getOptionValue("port", "5432");
-      String database = cmdLine.getOptionValue("database");
-      String user = cmdLine.getOptionValue("user");
-      String password = cmdLine.getOptionValue("password");
-      String defaultDatabase = cmdLine.getOptionValue("defaultdb", "postgres");
-      String superUser = cmdLine.getOptionValue("superuser", "postgres");
-      String superPassword = cmdLine.getOptionValue("superpassword");
-      boolean useSSL = cmdLine.hasOption("ssl");
-      String pgSchema = cmdLine.getOptionValue("schema", "public")
-        .toLowerCase().replaceAll("[^a-z0-9]", "_");;
-
-      List<Map<String, Object>> existingCorpora = new LinkedList<>();
-
-      corpusAdministration.
-        initializeDatabase(host, port, database, user, password,
-        defaultDatabase, superUser, superPassword, useSSL, pgSchema);
-
-    }
-    catch (ParseException e)
-    {
-      HelpFormatter helpFormatter = new HelpFormatter();
-      helpFormatter.printHelp("annis-admin.sh init", options);
-    }
-  }
   
-
   private void doImport(List<String> commandArgs)
   {
     Options options = new OptionBuilder()
@@ -381,18 +301,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     printTable(asTable);
   }
 
-  private void doIndexes()
-  {
-    for (String indexDefinition : corpusAdministration.listUsedIndexes())
-    {
-      System.out.println(indexDefinition + ";");
-    }
-    for (String indexDefinition : corpusAdministration.listUnusedIndexes())
-    {
-      System.out.println("-- " + indexDefinition + ";");
-    }
-  }
-
   private void doDeleteExampleQueries(List<String> commandArgs)
   {
     if (commandArgs == null || commandArgs.isEmpty())
@@ -454,18 +362,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       System.exit(1);
     }
     
-  }
-  
-  public void doDumpTable(List<String> commandArgs)
-  {
-    Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the output file as argument");
-    corpusAdministration.dumpTable(commandArgs.get(0), new File(commandArgs.get(1)));
-  }
-  
-  public void doRestoreTable(List<String> commandArgs)
-  {
-    Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the input file as argument");
-    corpusAdministration.restoreTable(commandArgs.get(0), new File(commandArgs.get(1)));
   }
 
   private void usage(String error)

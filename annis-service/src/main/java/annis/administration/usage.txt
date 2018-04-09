@@ -2,38 +2,12 @@ ANNIS Administration Utility
 ----------------------------
 
 usage:
-  annis-admin.sh init DATABASE OPTIONS
   annis-admin.sh import OPTIONS PATH [PATH ...]
   annis-admin.sh delete CORPUS_ID [CORPUS_ID ...]
   annis-admin.sh list
-  annis-admin.sh copy [OPTION] CONFIGFILE
   annis-admin.sh delexamples [CORPUS_NAME ...]
   annis-admin.sh genexamples [CORPUS_NAME ...]
 
-* init:    Initialize a PostgreSQL database for Annis and
-    update conf/database.properties
-
-  Options:
-
-  -d, --database    name of the Annis database (REQUIRED)
-  -u, --user    name of the Annis user (REQUIRED)
-  -p, --password    password of the Annis user (REQUIRED)
-  -s, --ssl     if given use SSL for connecting to the database
-
-  NOTE: The database and the user will be dropped if they exist.
-
-  -h, --host    database server host
-        (defaults to localhost)
-  --port      database server port
-
-  -D, --defaultdb    name of the PostgreSQL default database
-        (defaults to "postgres")
-  -U, --superuser    name of a PostgreSQL super user
-        (defaults to "postgres")
-  -P, --superpassword  password of the PostgreSQL super user
-  -m, --migratecorpora  Try to import the already existing corpora
-                        into the database. You can set the root
-                        directory for corpus sources as an argument.
 
 * import:  Import a list of corpora.
     Specify the path to one or more corpora as arguments.
@@ -52,12 +26,6 @@ usage:
 
 * list:    List all top-level corpora.
 
-* copy: Import all the corpora from another ANNIS installation
-  Options:
-    -m,--mail <arg>   e-mail adress to where status updates should be send
-    -o,--overwrite    Overwrites a corpus, when it is already stored in the
-                      database.
-
 * genexamples:  Generate example queries for corpora.
     Specify to one or more corpus names as arguments.
 
@@ -73,10 +41,3 @@ usage:
 
 * cleanup-data: Delete files not used by this instance in the data directory.
 
-* check-db-schema-version: Check if the schema used for the databases tables is the correct one. If not re-initialization is necessary.
-
-* dump: Dump a single table to a file.
-  Specificy the table name and the output file as arguments.
-
-* restore: Restore a single table from a file. 
-  Specificy the table name and the input file as arguments.

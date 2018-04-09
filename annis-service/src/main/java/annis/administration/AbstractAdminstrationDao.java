@@ -20,6 +20,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 
 import annis.dao.AbstractDao;
 import annis.dao.QueryDao;
+import annis.service.objects.AnnisCorpus;
 
 /**
  * Contains common functions used in the different adminstration DAOs
@@ -68,27 +71,8 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
    */
   protected boolean existConflictingTopLevelCorpus(String topLevelCorpusName)
   {
-    String sql = "SELECT count(name) as amount FROM corpus WHERE top_level=true AND name='"
-      + topLevelCorpusName + "'";
-    Integer numberOfCorpora = getJdbcTemplate().query(sql,
-      new ResultSetExtractor<Integer>()
-      {
-        @Override
-        public Integer extractData(ResultSet rs) throws SQLException,
-        DataAccessException
-        {
-          if (rs.next())
-          {
-            return rs.getInt("amount");
-          }
-          else
-          {
-            return 0;
-          }
-        }
-      });
-
-    return numberOfCorpora > 0;
+    List<AnnisCorpus> existing = queryDao.listCorpora(Arrays.asList(topLevelCorpusName));
+    return !existing.isEmpty();
   }
   
   // tables in the staging area have their names prefixed with "_"
@@ -108,44 +92,6 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
   }
 
   
-  /**
-   * Closes all open idle connections. The current data source
-   * must have superuser rights.
-   * 
-   * This can be used if a another database action needs full access to a database,
-   * e.g. when deleting and then creating it
-   * @param databasename
-   */
-  protected void closeAllConnections(String databasename)
-  {
-    String sql
-      = "SELECT pg_terminate_backend(pg_stat_activity.pid)\n"
-      + "FROM pg_stat_activity\n"
-      + "WHERE pg_stat_activity.datname = ?\n"
-      + "  AND pid <> pg_backend_pid();";
-    try(Connection conn = getDataSource().getConnection())
-    {
-      DatabaseMetaData meta = conn.getMetaData();
-      
-      if(meta.getDatabaseMajorVersion() == 9 
-        && meta.getDatabaseMinorVersion() <= 1)
-      {
-        sql
-          = "SELECT pg_terminate_backend(pg_stat_activity.procpid)\n"
-          + "FROM pg_stat_activity\n"
-          + "WHERE pg_stat_activity.datname = ?\n"
-          + "  AND procpid <> pg_backend_pid();";
-      }
-    }
-    catch(SQLException ex)
-    {
-      log.warn("Could not get the PostgreSQL version", ex);
-    }
-    
-    getJdbcTemplate().queryForRowSet(sql, databasename);
-
-  }
-
   public QueryDao getQueryDao()
   {
     return queryDao;

@@ -16,11 +16,7 @@
   <import resource="Common.xml" />
 
   <!-- Transaction management -->
-  <tx:annotation-driven transaction-manager="transactionManager"/>
-  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    <property name="dataSource" ref="dataSource"/>
-  </bean>
-  
+
   <util:list id="schemaInitSQL">
     <value>SET search_path TO "$user",$dao{datasource.schema:#{'public'}}</value>
   </util:list>
@@ -109,20 +105,10 @@
   <bean id="byteHelper" class="annis.sqlgen.ByteHelper" lazy-init="true" />
   <bean id="metaByteHelper" class="annis.sqlgen.MetaByteHelper" lazy-init="true" />
 
-  
-  <bean id="sqlScriptSessionModifier" class="annis.dao.ScriptFileSqlSessionModifier" parent="sqlScriptSessionModifierBase" lazy-init="true">
-    <property name="administrationDao" ref="administrationDao"/>
-  </bean>
-  
-  <bean id="sqlScriptSessionModifierBase" class="annis.dao.ScriptFileSqlSessionModifier" lazy-init="true">
-    <property name="scriptFile" value="modify_session.sql"/>
-  </bean>
-    
   <!-- BEGIN EXPORTS -->
 
   <bean id="daoBase" class="annis.dao.AbstractDao" abstract="true" lazy-init="true">
-    <property name="scriptPath" value="$dev{annis.script-path}"/>
-    <property name="dataSource" ref="dataSource" />
+    
   </bean>
   
   
@@ -133,20 +119,11 @@
   <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true" parent="daoBase">
 
     <!-- configuration -->
-    <property name="timeout" value="${annis.sql-timeout}"/>
-
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
 
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     
     <property name="listExampleQueriesHelper" ref="listExampleQueriesHelper" />
-
-    <property name="sqlSessionModifiers">
-      <util:list>
-        <ref bean="queryDao"/>
-        <ref bean="sqlScriptSessionModifier"/>
-      </util:list>
-    </property>
 
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
 

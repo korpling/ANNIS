@@ -70,18 +70,6 @@ public class CountTest
     QueryDaoImpl springAnnisDao = (QueryDaoImpl) TestHelper.proxyTarget(
       annisDao);
 
-    try
-    {
-      assumeNotNull(springAnnisDao.getJdbcTemplate());
-
-      springAnnisDao.getJdbcTemplate().queryForInt("SELECT 1");
-
-    }
-    catch (DataAccessException ex)
-    {
-      assumeNoException(ex);
-    }
-
     // get the id of the "pcc2" corpus 
     pcc2CorpusID = getCorpusIDs("pcc2");
 

@@ -45,21 +45,7 @@ public class TestAnnisAdminRunner {
 		List<String> expected = Arrays.asList("data/corpus1 data/corpus2 data/corpus3".split(" "));
 		verify(administration).importCorporaSave(false, null, null, false, expected);
 	}
-
-	@Test
-	public void initializeDatabase() {
-		run("init -h host --port 5432 -d database -u user -p password");
-		verify(administration).initializeDatabase("host", "5432", "database", "user", 
-      "password", "postgres", "postgres", null, false, "public");
-	}
-
-	@Test
-	public void indexes() {
-		run("indexes");
-		verify(administration).listUsedIndexes();
-		verify(administration).listUnusedIndexes();
-	}
-
+	
 	private void run(String cmdline) {
 		main.run(cmdline.split(" "));
 	}

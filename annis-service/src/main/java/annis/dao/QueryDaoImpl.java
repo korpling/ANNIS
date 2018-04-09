@@ -1014,15 +1014,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         return new LinkedList<>();
     }
 
-    @Override
-    public List<Long> mapCorpusAliasToIds(String alias) {
-        try {
-            return getJdbcTemplate().queryForList("SELECT corpus_ref FROM corpus_alias WHERE alias=?", Long.class,
-                    alias);
-        } catch (DataAccessException ex) {
-            return new LinkedList<>();
-        }
-    }
 
     public MetaByteHelper getMetaByteHelper() {
         return metaByteHelper;

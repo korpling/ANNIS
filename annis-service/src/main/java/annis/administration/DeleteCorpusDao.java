@@ -57,6 +57,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
         if (names == null || names.isEmpty()) {
             return;
         }
+        
         File dataDir = getRealDataDir();
 
         try (Connection conn = createSQLiteConnection()) {
@@ -111,6 +112,15 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
                     delStmt.executeUpdate();
                 }
             }
+            
+            log.info("deleting from graphANNIS");
+            for (String corpusName : names) {
+                getQueryDao().getCorpusStorageManager().deleteCorpus(corpusName);
+                getQueryRunner().update(conn,
+                        "DELETE FROM text\n" + "WHERE\n" + "  corpus_path = ? OR corpus_path like ?", corpusName,
+                        corpusName + "/%");
+            }
+            
             conn.commit();
 
         } catch (SQLException ex) {
@@ -122,8 +132,6 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
             quotedNames.add("'" + n + "'");
         }
 
-        executeSqlFromScript("delete_corpus.sql",
-                new MapSqlParameterSource(":names", Joiner.on(",").join(quotedNames)));
 
     }
 

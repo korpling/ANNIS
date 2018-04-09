@@ -104,20 +104,6 @@ public class CorpusAdministration
     administrationDao.cleanupData();
   }
 
-  public void initializeDatabase(String host, String port, String database,
-    String user, String password, String defaultDatabase, String superUser,
-    String superPassword, boolean useSSL, String pgSchema)
-  {
-
-    log.info("initializing database");
-    administrationDao.initializeDatabase(host, port, database, user, password,
-      defaultDatabase, superUser, superPassword, useSSL, pgSchema);
-
-    // write database information to property file
-    writeDatabasePropertiesFile(host, port, database, user, password, useSSL,
-      pgSchema);
-  }
-
   /**
    * Imports several corpora and catches a possible thrown
    * {@link DefaultAdministrationDao.ConflictingCorpusException} when the
@@ -719,41 +705,6 @@ public class CorpusAdministration
       Arrays.asList(paths));
   }
 
-  public List<String> listUsedIndexes()
-  {
-    return administrationDao.listUsedIndexes();
-  }
-
-  public List<String> listUnusedIndexes()
-  {
-    return administrationDao.listUnusedIndexes();
-  }
-
-  
-  public void dumpTable(String tableName, File outputFile)
-  {
-    log.info("Dumping table {} to file {}", tableName, outputFile);
-    administrationDao.dumpTableToResource(tableName, new FileSystemResource(outputFile));
-    if(!outputFile.exists())
-    {
-      try
-      {
-        // when a table is empty to output file is generated, still create an empty
-        // file so the user knows something happend
-        outputFile.createNewFile();
-      }
-      catch (IOException ex)
-      {
-        log.error("Could not create (empty) output file", ex);
-      }
-    }
-  }
-  
-  public void restoreTable(String tableName, File inputFile)
-  {
-    log.info("Restoring table {} from file {}", tableName, inputFile);
-    administrationDao.restoreTableFromResource(tableName, new FileSystemResource(inputFile));
-  }
 
   ///// Helper
   protected void writeDatabasePropertiesFile(String host, String port,
