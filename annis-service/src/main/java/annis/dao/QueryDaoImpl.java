@@ -778,18 +778,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                         // remove all ANNIS specific features that require a
                         // special Java class
                         SDocumentGraph graph = doc.getDocumentGraph();
-                        if (graph != null) {
-                            if (graph.getNodes() != null) {
-                                for (SNode n : graph.getNodes()) {
-                                    n.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE);
-                                }
-                            }
-                            if (graph.getRelations() != null) {
-                                for (SRelation e : graph.getRelations()) {
-                                    e.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_EDGE);
-                                }
-                            }
-                        }
                         SDocument docCopy = corpusGraph.createDocument(rootCorpus, doc.getName());
                         doc.setDocumentGraph(graph);
 
