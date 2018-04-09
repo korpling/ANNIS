@@ -77,6 +77,7 @@ import annis.security.UserConfig;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
+import annis.utils.ANNISFormatHelper;
 import au.com.bytecode.opencsv.CSVReader;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
@@ -100,10 +101,10 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private DeleteCorpusDao deleteCorpusDao;
 
     /**
-     * Searches for textes which are empty or only contains whitespaces. If that
-     * is the case the visualizer and no document visualizer are defined in the
-     * corpus properties file a new file is created and stores a new config
-     * which disables document browsing.
+     * Searches for textes which are empty or only contains whitespaces. If that is
+     * the case the visualizer and no document visualizer are defined in the corpus
+     * properties file a new file is created and stores a new config which disables
+     * document browsing.
      *
      *
      * @param corpusID
@@ -159,8 +160,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     /**
-     * If this is true and no example_queries.tab is found, automatic queries
-     * are generated.
+     * If this is true and no example_queries.tab is found, automatic queries are
+     * generated.
      */
     private EXAMPLE_QUERIES_CONFIG generateExampleQueries;
 
@@ -176,14 +177,13 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private Map<String, String> tableInsertFrom;
 
     /**
-     * Optional tab for example queries. If this tab not exist, a dummy file
-     * from the resource folder is used.
+     * Optional tab for example queries. If this tab not exist, a dummy file from
+     * the resource folder is used.
      */
     private static final String EXAMPLE_QUERIES_TAB = "example_queries";
 
     /**
-     * The name of the file and the relation containing the resolver
-     * information.
+     * The name of the file and the relation containing the resolver information.
      */
     private static final String FILE_RESOLVER_VIS_MAP = "resolver_vis_map";
     // tables imported from bulk files
@@ -194,7 +194,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             "rank", "edge_annotation" };
 
     private final String[] tablesToCopyManually = { "corpus", "corpus_annotation" };
-
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -463,137 +462,42 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      *
      * @return true if successful
      */
-    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public boolean importCorpus(String path, String aliasName, boolean overwrite) {
 
-        // check schema version first
+        initSQLiteSchema();
+        
+        // this will throw an exception if the database has the wrong schema version
         checkDatabaseSchemaVersion();
 
-        // explicitly unset any timeout
-        getJdbcTemplate().update("SET statement_timeout TO 0");
-
-        initSQLiteSchema();
-
-        ANNISFormatVersion annisFormatVersion = getANNISFormatVersion(path);
-
-        if (annisFormatVersion == ANNISFormatVersion.V3_3) {
-            return importVersion4(path, aliasName, overwrite, annisFormatVersion);
-        } else if (annisFormatVersion == ANNISFormatVersion.V3_1 || annisFormatVersion == ANNISFormatVersion.V3_2) {
-            return importVersion3(path, aliasName, overwrite, annisFormatVersion);
+        ANNISFormatVersion version = getANNISFormatVersion(path);
+        
+        if(version == ANNISFormatVersion.UNKNOWN) {
+            log.error("Unknown ANNIS import format version");
+            return false;
         }
-
-        log.error("Unknown ANNIS import format version");
-        return false;
-    }
-
-    private boolean importVersion4(String path, String aliasName, boolean overwrite, ANNISFormatVersion version) {
-        createStagingAreaV33(temporaryStagingArea);
-        bulkImport(path, version);
-
-        String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
-
+        
+        String toplevelCorpusName = ANNISFormatHelper
+                .extractToplevelCorpusNames(new File(path, "corpus" + version.getFileSuffix()));
+        
+        if(toplevelCorpusName == null) {
+            return false;
+        }
+        
         // remove conflicting top level corpora, when override is set to true.
         if (overwrite) {
             deleteCorpusDao.checkAndRemoveTopLevelCorpus(toplevelCorpusName);
         } else {
-            checkTopLevelCorpus();
+            checkTopLevelCorpus(toplevelCorpusName);
         }
-
-        applyConstraints();
-        createStagingAreaIndexes(version);
-
-        analyzeStagingTables();
-
-        addDocumentNameMetaData();
-
-        Offsets offsets = calculateOffsets();
-        long corpusID = getNewToplevelCorpusID(offsets);
 
         importBinaryData(path, toplevelCorpusName);
 
         convertToGraphANNIS(toplevelCorpusName, path, version);
+        computeCorpusStatistics(toplevelCorpusName, path);
         importTexts(toplevelCorpusName, path, version);
         importResolverTable(toplevelCorpusName, path, version);
         importExampleQueries(toplevelCorpusName, path, version);
 
-        computeCorpusStatistics(toplevelCorpusName, path);
-
-        analyzeStagingTables();
-
-        insertCorpus(corpusID, offsets);
-
-        computeCorpusPath(corpusID);
-
-        if (temporaryStagingArea) {
-            dropStagingArea();
-        }
-
-        // create empty corpus properties file
-        if (getQueryDao().getCorpusConfigurationSave(toplevelCorpusName) == null) {
-            log.info("creating new corpus.properties file");
-            getQueryDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
-        }
-
-        analyzeTextTable(toplevelCorpusName);
-        generateExampleQueries(toplevelCorpusName);
-
-        if (aliasName != null && !aliasName.isEmpty()) {
-            addCorpusAlias(toplevelCorpusName, aliasName);
-        }
-        return true;
-    }
-
-    private boolean importVersion3(String path, String aliasName, boolean overwrite, ANNISFormatVersion version) {
-        createStagingAreaV32(temporaryStagingArea);
-        bulkImport(path, version);
-
-        String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
-
-        // remove conflicting top level corpora, when override is set to true.
-        if (overwrite) {
-            deleteCorpusDao.checkAndRemoveTopLevelCorpus(toplevelCorpusName);
-        } else {
-            checkTopLevelCorpus();
-        }
-
-        createStagingAreaIndexes(version);
-
-        computeTopLevelCorpus();
-        analyzeStagingTables();
-
-        computeLeftTokenRightToken();
-
-        removeUnecessarySpanningRelations();
-
-        addUniqueNodeNameAppendix();
-        adjustRankPrePost();
-        addDocumentNameMetaData();
-
-        Offsets offsets = calculateOffsets();
-        long corpusID = getNewToplevelCorpusID(offsets);
-
-        importBinaryData(path, toplevelCorpusName);
-
-        convertToGraphANNIS(toplevelCorpusName, path, version);
-        importTexts(toplevelCorpusName, path, version);
-        importResolverTable(toplevelCorpusName, path, version);
-        importExampleQueries(toplevelCorpusName, path, version);
-
-        computeRealRoot();
-        computeLevel();
-        computeCorpusStatistics(toplevelCorpusName, path);
-        computeSpanFromSegmentation();
-
-        applyConstraints();
-        analyzeStagingTables();
-
-        insertCorpus(corpusID, offsets);
-
-        computeCorpusPath(corpusID);
-
-        if (temporaryStagingArea) {
-            dropStagingArea();
-        }
 
         // create empty corpus properties file
         if (getQueryDao().getCorpusConfigurationSave(toplevelCorpusName) == null) {
@@ -727,44 +631,45 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         log.info("importing text table");
         File importDir = new File(path);
-        
+
         // get the ID of all documents that are referenced in the text table
         final Map<Long, String> docID2Name = new HashMap<>();
         File corpusFile = new File(importDir, "corpus" + version.getFileSuffix());
-        try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(corpusFile), StandardCharsets.UTF_8),
-            '\t', (char) 0)) {
-            
-            for(String[] line = csvReader.readNext(); line != null; line=csvReader.readNext()) {
+        try (CSVReader csvReader = new CSVReader(
+                new InputStreamReader(new FileInputStream(corpusFile), StandardCharsets.UTF_8), '\t', (char) 0)) {
+
+            for (String[] line = csvReader.readNext(); line != null; line = csvReader.readNext()) {
                 long id = Long.parseLong(line[0]);
                 String name = line[1];
                 String type = line[2];
-                if("DOCUMENT".equals(type)) {
+                if ("DOCUMENT".equals(type)) {
                     docID2Name.put(id, name);
                 }
             }
-            
-        } catch(IOException | ArrayIndexOutOfBoundsException | NumberFormatException | NullPointerException ex) {
+
+        } catch (IOException | ArrayIndexOutOfBoundsException | NumberFormatException | NullPointerException ex) {
             log.error("Failed to read file {}", corpusFile, ex);
         }
-        
-        // get the document ID for all texts by iterating over the node tabel, where these are connected
-        final Map<Long, Long> text2doc = new HashMap<>();
-        if(version == ANNISFormatVersion.V3_1 || version == ANNISFormatVersion.V3_2) {
-            File nodeFile = new File(importDir, "node" + version.getFileSuffix());
-            try (CSVReader csvReader = new CSVReader(new InputStreamReader(new FileInputStream(nodeFile), StandardCharsets.UTF_8),
-                '\t', (char) 0)) {
 
-                for(String[] line = csvReader.readNext(); line != null; line=csvReader.readNext()) {
+        // get the document ID for all texts by iterating over the node tabel, where
+        // these are connected
+        final Map<Long, Long> text2doc = new HashMap<>();
+        if (version == ANNISFormatVersion.V3_1 || version == ANNISFormatVersion.V3_2) {
+            File nodeFile = new File(importDir, "node" + version.getFileSuffix());
+            try (CSVReader csvReader = new CSVReader(
+                    new InputStreamReader(new FileInputStream(nodeFile), StandardCharsets.UTF_8), '\t', (char) 0)) {
+
+                for (String[] line = csvReader.readNext(); line != null; line = csvReader.readNext()) {
                     long textRef = Long.parseLong(line[1]);
                     long docRef = Long.parseLong(line[2]);
                     text2doc.put(textRef, docRef);
                 }
 
-            } catch(IOException | ArrayIndexOutOfBoundsException | NumberFormatException | NullPointerException ex) {
+            } catch (IOException | ArrayIndexOutOfBoundsException | NumberFormatException | NullPointerException ex) {
                 log.error("Failed to read file {}", corpusFile, ex);
             }
         }
-        
+
         final Multiset<String> textsPerDoc = HashMultiset.create();
 
         Function<String[], String[]> lineModifier = (line) -> {
@@ -774,12 +679,12 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             if (line.length == 4) {
                 long docID = Long.parseLong(line[0]);
                 String docName = docID2Name.get(docID);
-                if(docName == null) {
+                if (docName == null) {
                     log.warn("Could not import text with ID {} because document with ID {} was not "
-                      + "found in corpus table", line[1], docID);
+                            + "found in corpus table", line[1], docID);
                     return null;
                 }
-                
+
                 String[] updateLine = new String[4];
                 updateLine[0] = corpusName + "/" + docName;
                 updateLine[1] = line[1];
@@ -790,27 +695,27 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                 long textID = Long.parseLong(line[0]);
                 // text ID is globally unique, get the actual doc ID from the map
                 Long docID = text2doc.get(textID);
-                if(docID == null) {
+                if (docID == null) {
                     log.warn("Could not import text with ID {} because no matching document was found"
-                      + " in node table", line[1], textID);
+                            + " in node table", line[1], textID);
                     return null;
                 }
                 String docName = docID2Name.get(docID);
-                if(docName == null) {
+                if (docName == null) {
                     log.warn("Could not import text with ID {} because document with ID {} was not "
-                      + "found in corpus table", textID, docID);
+                            + "found in corpus table", textID, docID);
                     return null;
                 }
-                
+
                 String[] updateLine = new String[4];
                 updateLine[0] = corpusName + "/" + docName;
                 // give an relative ID to the text
                 updateLine[1] = "" + textsPerDoc.count(docName);
                 updateLine[2] = line[1];
                 updateLine[3] = line[2];
-                
+
                 textsPerDoc.add(docName);
-                
+
                 return updateLine;
             } else {
                 log.warn("Invalid text table entry detected and ignored: {}", (Object) line);
@@ -819,8 +724,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         };
 
         try {
-            importSQLiteTable(textTable, new File(importDir, "text" + version.getFileSuffix()),
-                    lineModifier);
+            importSQLiteTable(textTable, new File(importDir, "text" + version.getFileSuffix()), lineModifier);
         } catch (SQLException ex) {
             log.error("Could not import text table {}", path, ex);
         }
@@ -847,25 +751,23 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     /**
-     * Reads tab seperated files from the filesystem, but it takes only files
-     * into account with the
-     * {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX} suffix. Further it
-     * is straight forward except for the
+     * Reads tab seperated files from the filesystem, but it takes only files into
+     * account with the {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
+     * suffix. Further it is straight forward except for the
      * {@link DefaultAdministrationDao#FILE_RESOLVER_VIS_MAP} and the
-     * {@link DefaultAdministrationDao#EXAMPLE_QUERIES_TAB}. This is done by
-     * this method automatically.
+     * {@link DefaultAdministrationDao#EXAMPLE_QUERIES_TAB}. This is done by this
+     * method automatically.
      *
      * <ul>
      *
      * <li>{@link DefaultAdministrationDao#FILE_RESOLVER_VIS_MAP}: For backwards
-     * compatibility, the columns must be counted, since there exists one
-     * additional column for visibility behaviour of visualizers.</li>
+     * compatibility, the columns must be counted, since there exists one additional
+     * column for visibility behaviour of visualizers.</li>
      *
      * </ul>
      *
      * @param path
-     *            The path to the ANNIS files. The files have to have this
-     *            suffix
+     *            The path to the ANNIS files. The files have to have this suffix
      * @param version
      *            {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
      */
@@ -1002,7 +904,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
     }
 
-
     void computeLeftTokenRightToken() {
         log.info("computing values for struct.left_token and struct.right_token");
         executeSqlFromScript("left_token_right_token.sql");
@@ -1089,7 +990,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             executeSqlFromScript("unique_node_name_appendix.sql");
         }
     }
-
 
     long getNewToplevelCorpusID(Offsets offsets) {
         log.info("query for the new corpus ID");
@@ -1189,7 +1089,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
     }
 
-
     void removeUnecessarySpanningRelations() {
         log.info("setting \"continuous\" to a correct value");
         executeSqlFromScript("set_continuous.sql");
@@ -1253,8 +1152,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     /**
-     * Provides a list where the keys are the aliases and the values are the
-     * corpus names.
+     * Provides a list where the keys are the aliases and the values are the corpus
+     * names.
      *
      * @param dbFile
      * @return
@@ -1479,9 +1378,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     /*
-     * Returns the CREATE INDEX statement for all indexes on the Annis tables,
-     * that are not auto-created by PostgreSQL (primary keys and unique
-     * constraints).
+     * Returns the CREATE INDEX statement for all indexes on the Annis tables, that
+     * are not auto-created by PostgreSQL (primary keys and unique constraints).
      *
      * @param used If True, return used indexes. If False, return unused indexes
      * (scan count is 0).
@@ -1526,8 +1424,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * At this point, the tab files must be in the staging area.
      * </p>
      *
-     * @return The name of the toplevel corpus or an empty String if no top
-     *         level corpus is found.
+     * @return The name of the toplevel corpus or an empty String if no top level
+     *         corpus is found.
      */
     private String getTopLevelCorpusFromTmpArea() {
         String sql = "SELECT name FROM " + tableInStagingArea("corpus") + " WHERE type='CORPUS'\n"
@@ -1594,8 +1492,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     /**
-     * Generates example queries if no example queries tab file is defined by
-     * the user.
+     * Generates example queries if no example queries tab file is defined by the
+     * user.
      */
     private void generateExampleQueries(String toplevelCorpusName) {
         // set in the annis.properties file.
@@ -1644,13 +1542,14 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     /**
      * Checks, if a already exists a corpus with the same name of the top level
-     * corpus in the corpus.tab file. If this is the case an Exception is thrown
-     * and the import is aborted.
+     * corpus in the corpus.tab file. If this is the case an Exception is thrown and
+     * the import is aborted.
+     *
+     * @param corpusName
      *
      * @throws annis.administration.DefaultAdministrationDao.ConflictingCorpusException
      */
-    private void checkTopLevelCorpus() throws ConflictingCorpusException {
-        String corpusName = getTopLevelCorpusFromTmpArea();
+    private void checkTopLevelCorpus(String corpusName) throws ConflictingCorpusException {
         if (existConflictingTopLevelCorpus(corpusName)) {
             String msg = "There already exists a top level corpus with the name: " + corpusName;
             throw new ConflictingCorpusException(msg);
@@ -1719,8 +1618,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
 
         public MapSqlParameterSource makeArgs() {
-            return new MapSqlParameterSource().addValue(":offset_corpus_id", corpusID)
-                    .addValue(":offset_corpus_post", corpusPost);
+            return new MapSqlParameterSource().addValue(":offset_corpus_id", corpusID).addValue(":offset_corpus_post",
+                    corpusPost);
         }
     }
 

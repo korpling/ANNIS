@@ -232,11 +232,6 @@ public interface QueryDao
   public Properties getCorpusConfigurationSave(String topLevelCorpus);
 
   /**
-   * Called to check if the database management program has the right version
-   */
-  public boolean checkDatabaseVersion() throws AnnisException;
-
-  /**
    * Retrieves all metadata of a corpus including all subcorpora and documents.
    *
    * @param toplevelCorpusName Determines the root corpus.

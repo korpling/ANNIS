@@ -176,11 +176,7 @@ public class MetadataServiceImpl implements MetadataService
    * the method is called by Spring as an init-method.
    */
   public void init()
-  {
-    // check version of PostgreSQL
-    queryDao.checkDatabaseVersion();
-
-    // log a message after successful startup
+  {    // log a message after successful startup
     log.info("ANNIS MetadataService loaded.");
   }
 

@@ -131,9 +131,6 @@ public class QueryServiceImpl implements QueryService
    */
   public void init()
   {
-    // check version of PostgreSQL
-    queryDao.checkDatabaseVersion();
-
     // log a message after successful startup
     log.info("ANNIS QueryService loaded.");
   }

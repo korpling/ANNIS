@@ -28,7 +28,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -75,7 +74,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -86,7 +84,6 @@ import com.google.common.net.UrlEscapers;
 
 import annis.CommonHelper;
 import annis.examplequeries.ExampleQuery;
-import annis.exceptions.AnnisException;
 import annis.exceptions.AnnisTimeoutException;
 import annis.model.AnnisConstants;
 import annis.model.Annotation;
@@ -103,7 +100,6 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.sqlgen.ByteHelper;
-import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MetaByteHelper;
@@ -804,48 +800,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao, SqlSessionMod
         }
     }
 
-    @Override
-    public boolean checkDatabaseVersion() throws AnnisException {
-        try (Connection conn = getJdbcTemplate().getDataSource().getConnection();) {
 
-            DatabaseMetaData meta = conn.getMetaData();
-
-            log.debug("database info [major: " + meta.getDatabaseMajorVersion() + " minor: "
-                    + meta.getDatabaseMinorVersion() + " complete: " + meta.getDatabaseProductVersion() + " name: "
-                    + meta.getDatabaseProductName() + "]");
-
-            if (!"PostgreSQL".equalsIgnoreCase(meta.getDatabaseProductName())) {
-                throw new AnnisException("You did provide a database connection to a "
-                        + "database that is not PostgreSQL. Please note that this will " + "not work.");
-            }
-            if (meta.getDatabaseMajorVersion() < 9
-                    || (meta.getDatabaseMajorVersion() == 9 && meta.getDatabaseMinorVersion() < 1)) // we
-                                                                                                    // urge
-                                                                                                    // people
-                                                                                                    // to
-                                                                                                    // use
-                                                                                                    // 9.2,
-                                                                                                    // but
-                                                                                                    // 9.1
-                                                                                                    // should
-                                                                                                    // be
-                                                                                                    // valid
-                                                                                                    // as
-                                                                                                    // well
-            {
-                throw new AnnisException("Wrong PostgreSQL version installed. Please "
-                        + "install at least PostgreSQL 9.2 (current installed version is "
-                        + meta.getDatabaseProductVersion() + ")");
-            }
-        } catch (SQLException ex) {
-            log.error("could not get database version", ex);
-        }
-
-        return false;
-    }
 
     @Override
-    @Transactional(readOnly = true)
     public void exportCorpus(String toplevelCorpus, File outputDirectory) {
 
         SaltProject corpusProject = SaltFactory.createSaltProject();
