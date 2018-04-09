@@ -51,9 +51,6 @@
     
     <property name="connectionInitSqls" ref="schemaInitSQL"/>
   </bean>
-  <bean id="dataSource" class="annis.utils.DynamicDataSource" lazy-init="true">
-    <property name="innerDataSource" ref="startupDataSource" />
-  </bean>
 
   <!-- Helper for weka command -->
   <bean id="wekaHelper" class="annis.WekaHelper" lazy-init="true"/>
@@ -91,12 +88,6 @@
     <entry key="corpus_annotation" value="corpus_ref, namespace, name, value"/>
     <entry key="corpus_stats" value="name, id, text, tokens, max_corpus_id, max_corpus_pre, max_corpus_post, max_node_id, source_path" />
   </util:map>
-
-  <bean id="defaultJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" lazy-init="true">
-    <property name="dataSource" ref="dataSource"/>
-    <property name="fetchSize" value="0"/>
-  </bean>
-
 
   <bean id="byteHelper" class="annis.sqlgen.ByteHelper" lazy-init="true" />
   <bean id="metaByteHelper" class="annis.sqlgen.MetaByteHelper" lazy-init="true" />
