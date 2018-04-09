@@ -269,6 +269,9 @@ public class VisualizerPanel extends CssLayout
     final VisualizerInput input = createInput();
 
     Component c = visPlugin.createComponent(input, this);
+    if (c == null) {
+        return c;
+    }
     c.setVisible(false);
     c.addStyleName(Helper.CORPUS_FONT);
     c.addStyleName("vis-content");

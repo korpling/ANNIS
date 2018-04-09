@@ -199,13 +199,10 @@ public class SingleResultPanel extends CssLayout implements
     path = CommonHelper.getCorpusPath(result.getGraph(), result);
     Collections.reverse(path);
 
-    MinMax minMax = getIds(result.getDocumentGraph());
 
     // build label
     StringBuilder sb = new StringBuilder("Path: ");
     sb.append(StringUtils.join(path, " > "));
-    sb.append(" (" + minMax.segName + " ").append(minMax.min);
-    sb.append(" - ").append(minMax.max).append(")");
 
     Label lblPath = new Label(sb.toString());
     lblPath.addStyleName("path-label");
@@ -590,80 +587,6 @@ public class SingleResultPanel extends CssLayout implements
   }
 
 
-  private static class MinMax
-  {
-
-    String segName = "tokens";
-
-    long min;
-
-    long max;
-
-  }
-
-  private MinMax getIds(SDocumentGraph graph)
-  {
-    List<SToken> sTokens = graph.getTokens();
-
-    MinMax minMax = new MinMax();
-    minMax.min = Long.MAX_VALUE;
-    minMax.max = Long.MIN_VALUE;
-
-    if (segmentationName == null)
-    {
-      minMax.segName = "tokens";
-
-      if (sTokens != null)
-      {
-        for (SToken t : sTokens)
-        {
-          SFeature feature = t.getFeature(ANNIS_NS,
-            FEAT_RELANNIS_NODE);
-          if(feature != null && feature.getValue() instanceof RelannisNodeFeature)
-          {
-            RelannisNodeFeature f = (RelannisNodeFeature) feature.getValue();
-
-            if (minMax.min > f.getTokenIndex())
-            {
-              minMax.min = f.getTokenIndex();
-            }
-
-            if (minMax.max < f.getTokenIndex())
-            {
-              minMax.max = f.getTokenIndex();
-            }
-          }
-        }
-      }
-    }
-    else
-    {
-      minMax.segName = segmentationName;
-
-      List<SNode> nodes = CommonHelper.getSortedSegmentationNodes(
-        segmentationName, graph);
-
-      for (SNode n : nodes)
-      {
-        RelannisNodeFeature f = RelannisNodeFeature.extract(n);
-
-        if (minMax.min > f.getSegIndex())
-        {
-          minMax.min = f.getSegIndex();
-        }
-
-        if (minMax.max < f.getSegIndex())
-        {
-          minMax.max = f.getSegIndex();
-        }
-      }
-    }
-
-    minMax.min++;
-    minMax.max++;
-    
-    return minMax;
-  }
 
   @Override
   public void updateResult(SaltProject p, PagedResultQuery query)
