@@ -552,9 +552,15 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     @Override
     public List<String> listSegmentationNames(List<String> corpusList) {
-
-        // TODO: list segmentations with graphANNIS
-        return new LinkedList<>();
+        LinkedList<String> result = new LinkedList<>();
+        for(String corpus : corpusList) {
+            for(String orderRelName : corpusStorageMgr.getAllOrderRelationNames(corpus)) {
+                if(!orderRelName.isEmpty()) {
+                    result.add(orderRelName);
+                }
+            }
+        }
+        return result;
     }
 
     @Override
