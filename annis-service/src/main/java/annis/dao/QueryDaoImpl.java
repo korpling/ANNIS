@@ -32,12 +32,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -64,7 +69,6 @@ import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
-import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.eclipse.emf.common.util.URI;
@@ -81,11 +85,12 @@ import com.google.common.net.UrlEscapers;
 import annis.CommonHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisTimeoutException;
-import annis.model.AnnisConstants;
 import annis.model.Annotation;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisAttribute.SubType;
+import annis.service.objects.AnnisAttribute.Type;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
@@ -166,20 +171,19 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     @Override
     public List<Annotation> listDocuments(String toplevelCorpusName) {
-        
+
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
-        
+
         List<Annotation> result = new LinkedList<>();
-        for(SDocument doc : corpusGraph.getDocuments()) {
+        for (SDocument doc : corpusGraph.getDocuments()) {
             Annotation anno = new Annotation();
             anno.setName(doc.getName());
             anno.setAnnotationPath(doc.getPath().segmentsList());
             result.add(anno);
         }
-        
+
         return result;
     }
-
 
     @Override
     public InputStream getBinaryComplete(String toplevelCorpusName, String mimeType, String title) {
@@ -339,11 +343,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         return null;
     }
 
-
     private static final Logger log = LoggerFactory.getLogger(QueryDaoImpl.class);
-   
-    private ListCorpusSqlHelper listCorpusSqlHelper;
 
+    private ListCorpusSqlHelper listCorpusSqlHelper;
 
     private final AnnisParserAntlr aqlParser = new AnnisParserAntlr();
 
@@ -367,7 +369,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public CorpusStorageManager getCorpusStorageManager() {
         return this.corpusStorageMgr;
     }
-
 
     @Override
     public List<ExampleQuery> getExampleQueries(List<String> corpora) {
@@ -546,16 +547,52 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public List<AnnisAttribute> listAnnotations(List<String> corpusList, boolean listValues,
             boolean onlyMostFrequentValues) {
 
-        // TODO: list annotations with graphANNIS
-        return new LinkedList<>();
+        List<AnnisAttribute> result = new LinkedList<>();
+
+        Map<String, Set<String>> nodeAnnos = new TreeMap<>();
+        for (String corpusName : corpusList) {
+
+            List<Annotation> annoList = corpusStorageMgr.listNodeAnnotations(corpusName, listValues,
+                    onlyMostFrequentValues);
+            for (Annotation anno : annoList) {
+                String qname = anno.getQualifiedName();
+                if (qname == null) {
+                    qname = anno.getName();
+                }
+                if (qname != null) {
+                    Set<String> values = nodeAnnos.get(qname);
+                    if (values == null) {
+                        values = new LinkedHashSet<>();
+                        nodeAnnos.put(qname, values);
+                    }
+                    String val = anno.getValue();
+                    if (val != null) {
+                        values.add(val);
+                    }
+                }
+            }
+        }
+
+        for (Entry<String, Set<String>> e : nodeAnnos.entrySet()) {
+            AnnisAttribute att = new AnnisAttribute();
+            att.setType(Type.node);
+            att.setName(e.getKey());
+            att.setValueSet(e.getValue());
+            att.setSubtype(SubType.n);
+
+            result.add(att);
+        }
+
+        // TODO: list non-node annotations (edge, edge types, meta)
+        return result;
     }
 
     @Override
     public List<String> listSegmentationNames(List<String> corpusList) {
         LinkedList<String> result = new LinkedList<>();
-        for(String corpus : corpusList) {
-            for(String orderRelName : corpusStorageMgr.getAllOrderRelationNames(corpus)) {
-                if(!orderRelName.isEmpty()) {
+        for (String corpus : corpusList) {
+            for (String orderRelName : corpusStorageMgr.getAllOrderRelationNames(corpus)) {
+                if (!orderRelName.isEmpty()) {
                     result.add(orderRelName);
                 }
             }
@@ -581,60 +618,60 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         return project;
 
     }
-    
+
     private List<Annotation> allAnnotationForCorpus(SNode corpus) {
-        
+
         String type = corpus instanceof SDocument ? "DOCUMENT" : "CORPUS";
-        
+
         List<Annotation> result = new LinkedList<>();
-        
+
         Set<SMetaAnnotation> metaAnnos = corpus.getMetaAnnotations();
-        if(metaAnnos.isEmpty()) {
+        if (metaAnnos.isEmpty()) {
             // add single entry for the document without annotation value
             Annotation anno = new Annotation();
             anno.setName(corpus.getName());
             anno.setAnnotationPath(corpus.getPath().segmentsList());
             anno.setType(type);
-            
+
             result.add(anno);
         } else {
             // add all annotations of this document as value
-            for(SMetaAnnotation meta : metaAnnos) {
+            for (SMetaAnnotation meta : metaAnnos) {
                 Annotation anno = new Annotation();
                 anno.setName(corpus.getName());
                 anno.setAnnotationPath(corpus.getPath().segmentsList());
                 anno.setType(type);
-               
+
                 anno.setNamespace(meta.getNamespace());
                 anno.setName(meta.getName());
                 anno.setValue(meta.getValue().toString());
-                
+
                 result.add(anno);
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName, boolean listRootCorpus) {
-        
+
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
-        
+
         List<Annotation> result = new LinkedList<>();
-        for(SDocument doc : corpusGraph.getDocuments()) {
+        for (SDocument doc : corpusGraph.getDocuments()) {
             result.addAll(allAnnotationForCorpus(doc));
         }
-        
-        if(listRootCorpus) {
-            for(SNode n : corpusGraph.getRoots()) {
-                if(n instanceof SCorpus) {
+
+        if (listRootCorpus) {
+            for (SNode n : corpusGraph.getRoots()) {
+                if (n instanceof SCorpus) {
                     result.addAll(allAnnotationForCorpus(n));
                     break;
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -644,49 +681,49 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         // select the document and all its parent corpora
         String aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=\"" + toplevelCorpusName + "\"";
-        
+
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraphForQuery(toplevelCorpusName, aql);
-        if(corpusGraph != null) {
+        if (corpusGraph != null) {
             List<SNode> roots = corpusGraph.getRoots();
-            if(roots == null) {
-                for(SCorpus c : corpusGraph.getCorpora()) {
+            if (roots == null) {
+                for (SCorpus c : corpusGraph.getCorpora()) {
                     result.addAll(allAnnotationForCorpus(c));
                 }
             } else {
-                for(SNode n : roots) {
-                    if(n instanceof SCorpus) {
+                for (SNode n : roots) {
+                    if (n instanceof SCorpus) {
                         result.addAll(allAnnotationForCorpus(n));
                         break;
                     }
                 }
             }
         }
-        
+
         return result;
     }
 
     @Override
     public List<Annotation> listCorpusAnnotations(String toplevelCorpusName, String documentName, boolean exclude) {
-        
+
         // select the document and all its parent corpora
         String aql = "annis:doc=\"" + documentName + "\" @* annis:node_type=\"corpus\"";
-        
+
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraphForQuery(toplevelCorpusName, aql);
-        
+
         List<Annotation> result = new LinkedList<>();
-        for(SDocument doc : corpusGraph.getDocuments()) {
+        for (SDocument doc : corpusGraph.getDocuments()) {
             result.addAll(allAnnotationForCorpus(doc));
         }
 
-        if(!exclude) {
-            for(SNode n : corpusGraph.getRoots()) {
-                if(n instanceof SCorpus) {
+        if (!exclude) {
+            for (SNode n : corpusGraph.getRoots()) {
+                if (n instanceof SCorpus) {
                     result.addAll(allAnnotationForCorpus(n));
                     break;
                 }
             }
         }
-        
+
         return result;
     }
 
@@ -739,10 +776,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
             corpusConfiguration.put(c.getName(), p);
         }
-        
+
     }
-
-
 
     @Override
     public void exportCorpus(String toplevelCorpus, File outputDirectory) {
@@ -820,7 +855,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public void setListCorpusSqlHelper(ListCorpusSqlHelper listCorpusHelper) {
         this.listCorpusSqlHelper = listCorpusHelper;
     }
-
 
     @Override
     public CorpusConfigMap getCorpusConfigurations() {
@@ -928,7 +962,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         return new LinkedList<>();
     }
-
 
     public MetaByteHelper getMetaByteHelper() {
         return metaByteHelper;
