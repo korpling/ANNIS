@@ -62,8 +62,7 @@ public class CountTest {
 
     @Before
     public void setup() {
-        QueryDaoImpl springAnnisDao = (QueryDaoImpl) TestHelper.proxyTarget(annisDao);
-
+        
         // get the id of the "pcc2" corpus
         pcc2CorpusID = getCorpusIDs("pcc2");
 

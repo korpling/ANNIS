@@ -75,16 +75,6 @@ public class TestQueryDaoImpl {
         when(annisParser.parse(anyString(), anyList())).thenReturn(PARSE_RESULT);
 
     }
-
-    // check dependencies
-    @Test
-    public void springManagedInstanceHasAllDependencies() {
-
-        QueryDaoImpl springManagedDao = (QueryDaoImpl) TestHelper.proxyTarget(queryDaoBean);
-        assertThat(springManagedDao.getListCorpusSqlHelper(), is(not(nullValue())));
-
-    }
-
     @Test
     public void getDefaultDocBrowserConfiguration() {
         DocumentBrowserConfig docBrowseConfig = queryDao.getDefaultDocBrowserConfiguration();
