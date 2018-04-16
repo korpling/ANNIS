@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import annis.GraphHelper;
 import annis.dao.DBProvider;
 import annis.dao.QueryDao;
+import annis.dao.DBProvider.DB;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
@@ -115,7 +116,7 @@ public class QueriesGenerator extends DBProvider {
   public void delExampleQueriesForCorpus(String corpus)
   {
     log.info("delete example queries of {}", corpus);
-    try(Connection conn = createSQLiteConnection()) {
+    try(Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
       getQueryRunner().update(conn, "DELETE FROM example_queries WHERE corpus=?", corpus);
     } catch(SQLException ex) {
       log.error("Could not delete example queries for corpus {}", corpus, ex);
@@ -134,7 +135,7 @@ public class QueriesGenerator extends DBProvider {
     if (corpusNames == null || corpusNames.isEmpty())
     {
       log.info("delete all example queries");
-      try(Connection conn = createSQLiteConnection()) {
+      try(Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
         getQueryRunner().update(conn, "DELETE FROM example_queries");
       } catch(SQLException ex) {
         log.error("Could not delete example queries", ex);
@@ -225,7 +226,7 @@ public class QueriesGenerator extends DBProvider {
 
       // copy the example query to the database
       if (exampleQuery.getExampleQuery() != null && !"".equals(exampleQuery.getExampleQuery())) {
-        try(Connection conn = createSQLiteConnection()) {
+        try(Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
           getQueryRunner().update(conn, "INSERT INTO example_queries (example_query, description, corpus) VALUES(?,?,?)",
             exampleQuery.getExampleQuery(), exampleQuery.getDescription(), this.corpusName);
 

@@ -56,14 +56,14 @@ public abstract class AbstractDao extends DBProvider {
   }
 
 
-  public void createTableIfNotExists(Table table, File initialValuesCSV, Function<String[], String[]> lineModifier)
+  public void createTableIfNotExists(DB db, Table table, File initialValuesCSV, Function<String[], String[]> lineModifier)
       throws SQLException {
 
     if (table == null) {
       return;
     }
 
-    try (Connection conn = createSQLiteConnection()) {
+    try (Connection conn = createConnection(db)) {
       conn.setAutoCommit(false);
 
       // check if table exists
@@ -141,10 +141,10 @@ public abstract class AbstractDao extends DBProvider {
     }
   }
 
-  public void importSQLiteTable(Table table, File csvFile, Function<String[], String[]> lineModifier)
+  public void importSQLiteTable(DB db, Table table, File csvFile, Function<String[], String[]> lineModifier)
       throws SQLException {
 
-    try (Connection conn = createSQLiteConnection()) {
+    try (Connection conn = createConnection(db)) {
       conn.setAutoCommit(false);
       importCSVIntoTable(conn, table, csvFile, lineModifier);
       conn.commit();

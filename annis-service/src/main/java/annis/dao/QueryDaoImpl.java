@@ -223,7 +223,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             throw new IllegalArgumentException("top level corpus and document name may not be null");
         }
 
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
 
             List<String> texts = getQueryRunner().query(conn, "SELECT \"text\" FROM text WHERE corpus_path=?",
                     new ColumnListHandler<>(1), topLevelCorpus + "/" + documentName);
@@ -242,7 +242,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             throw new IllegalArgumentException("corpus name may not be null");
         }
 
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
 
             List<String> texts = getQueryRunner().query(conn, "SELECT \"text\" FROM text WHERE corpus_path like ?",
                     new ColumnListHandler<>(1), topLevelCorpus + "/%");
@@ -257,7 +257,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public void setCorpusConfiguration(String toplevelCorpusName, Properties props) {
 
-        try (Connection conn = createSQLiteConnection()) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
             conn.setAutoCommit(false);
 
             String sql = "SELECT filename FROM media_files " + "WHERE corpus_path=? AND title = "
@@ -376,7 +376,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             return null;
         } else {
             List<ExampleQuery> result = new LinkedList<>();
-            try (Connection conn = createSQLiteConnection(true)) {
+            try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
                 for (String c : corpora) {
                     result.addAll(
                             getQueryRunner().query(conn, ListExampleQueriesHelper.SQL, listExampleQueriesHelper, c));
@@ -522,7 +522,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     @Override
     public List<AnnisCorpus> listCorpora() {
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             return getQueryRunner().query(conn, listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
         } catch (SQLException ex) {
             log.error("Listing corpora failed", ex);
@@ -533,7 +533,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     @Override
     public List<AnnisCorpus> listCorpora(List<String> corpusNames) {
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             return getQueryRunner().query(conn, listCorpusSqlHelper.createSqlQueryWithList(corpusNames.size()),
                     listCorpusSqlHelper, corpusNames.toArray());
         } catch (SQLException ex) {
@@ -729,7 +729,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     @Override
     public List<ResolverEntry> getResolverEntries(SingleResolverRequest request) {
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             ResolverDaoHelper helper = new ResolverDaoHelper();
             PreparedStatement stmt = helper.createPreparedStatement(conn);
             helper.fillPreparedStatement(request, stmt);
@@ -907,7 +907,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             int offset, int length) {
 
         AnnisBinaryMetaData binary = null;
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             binary = getQueryRunner().query(conn, ByteHelper.SQL, byteHelper,
                     corpusName == null ? toplevelCorpusName : toplevelCorpusName + "/" + corpusName, mimeType, mimeType,
                     title, title);
@@ -944,7 +944,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName, String corpusName) {
 
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             List<AnnisBinaryMetaData> metaData = getQueryRunner().query(conn, MetaByteHelper.SQL, metaByteHelper,
                     corpusName == null ? toplevelCorpusName : toplevelCorpusName + "/" + corpusName);
 

@@ -24,26 +24,37 @@ import org.sqlite.SQLiteConfig;
 import org.sqlite.SQLiteDataSource;
 
 public class DBProvider {
+    
+    public enum DB {
+        CORPUS_REGISTRY("corpus_registry.sqlite3"),
+        SERVICE_DATA("service_data.sqlite3");
+        
+        final String filename;
+        
+        DB(String filename) {
+            this.filename = filename;
+        }
+    }
 
     private final QueryRunner queryRunner = new QueryRunner();
 
-    public Connection createSQLiteConnection() throws SQLException {
-        return createSQLiteConnection(false);
+    public Connection createConnection(DB db) throws SQLException {
+        return createConnection(db, false);
     }
 
-    public File getDBFile() {
-        return new File(getANNISDir(), "annis.sqlite3");
+    public File getDBFile(DB db) {
+        return new File(getANNISDir(), db.filename);
     }
 
-    public Connection createSQLiteConnection(boolean readonly) throws SQLException {
+    public Connection createConnection(DB db, boolean readonly) throws SQLException {
         // TODO: use a connection pool
         // TODO: split into two databases, one "corpus_registry" and a
         // "service_data" file
-        File dbFile = getDBFile();
-        return createSQLiteConnection(dbFile, readonly);
+        File dbFile = getDBFile(db);
+        return createConnection(dbFile, readonly);
     }
 
-    public Connection createSQLiteConnection(File dbFile, boolean readonly) throws SQLException {
+    public Connection createConnection(File dbFile, boolean readonly) throws SQLException {
         SQLiteConfig conf = new SQLiteConfig();
         SQLiteDataSource source = new SQLiteDataSource(conf);
         source.setUrl("jdbc:sqlite:" + dbFile.getAbsolutePath() + "?journal_mode=wal");

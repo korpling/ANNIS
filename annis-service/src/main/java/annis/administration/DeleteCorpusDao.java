@@ -55,7 +55,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
         
         File dataDir = getRealDataDir();
 
-        try (Connection conn = createSQLiteConnection()) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
             conn.setAutoCommit(false);
 
             log.info("deleting external data files");

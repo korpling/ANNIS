@@ -46,7 +46,7 @@ public class ShortenerDao extends AbstractDao {
   public UUID shorten(String str, String userName) {
     UUID result = null;
 
-    try (Connection conn = createSQLiteConnection()) {
+    try (Connection conn = createConnection(DB.SERVICE_DATA)) {
       conn.setAutoCommit(false);
 
       // check if the string to shorten was already shortened before
@@ -82,7 +82,7 @@ public class ShortenerDao extends AbstractDao {
   }
 
   public String unshorten(UUID id) {
-    try (Connection conn = createSQLiteConnection(true)) {
+    try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
       
       List<String> result = getQueryRunner().query("SELECT url FROM url_shortener WHERE id=? LIMIT 1",
           new ColumnListHandler<>(1), id);

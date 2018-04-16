@@ -57,6 +57,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Files;
 
+import annis.dao.DBProvider.DB;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.exceptions.AnnisException;
 import annis.security.UserConfig;
@@ -218,7 +219,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * @return
      */
     public String getDatabaseSchemaVersion() {
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
 
             List<String> result = getQueryRunner().query(conn,
                     "SELECT \"value\" FROM repository_metadata WHERE \"name\"='schema-version'",
@@ -319,16 +320,20 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      */
     protected void initSQLiteSchema() {
         try {
-            createTableIfNotExists(repositoryMetaDataTable, new File(getScriptPath(), "repository_metadata.annis"),
+            createTableIfNotExists(DB.SERVICE_DATA, repositoryMetaDataTable, new File(getScriptPath(), "repository_metadata.annis"),
                     null);
-            createTableIfNotExists(corpusInfoTable, null, null);
-            createTableIfNotExists(resolverTable, new File(getScriptPath(), "resolver_vis_map.annis"), null);
-            createTableIfNotExists(mediaFilesTable, null, null);
-            createTableIfNotExists(urlShortenerTable, null, null);
-            createTableIfNotExists(exampleQueriesTable, null, null);
-            createTableIfNotExists(userConfigTable, null, null);
-            createTableIfNotExists(corpusAliasTable, null, null);
-            createTableIfNotExists(textTable, null, null);
+            createTableIfNotExists(DB.SERVICE_DATA, userConfigTable, null, null);
+            createTableIfNotExists(DB.SERVICE_DATA, urlShortenerTable, null, null);
+            
+            createTableIfNotExists(DB.CORPUS_REGISTRY, corpusInfoTable, null, null);
+            createTableIfNotExists(DB.CORPUS_REGISTRY, resolverTable, new File(getScriptPath(), "resolver_vis_map.annis"), null);
+            createTableIfNotExists(DB.CORPUS_REGISTRY,mediaFilesTable, null, null);
+            createTableIfNotExists(DB.CORPUS_REGISTRY, exampleQueriesTable, null, null);
+            createTableIfNotExists(DB.CORPUS_REGISTRY, corpusAliasTable, null, null);
+            createTableIfNotExists(DB.CORPUS_REGISTRY, textTable, null, null);
+            
+            
+            
         } catch (SQLException ex) {
             log.error("Can not create SQL schema", ex);
         }
@@ -375,7 +380,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         };
 
         try {
-            importSQLiteTable(resolverTable, new File(importDir, FILE_RESOLVER_VIS_MAP + version.getFileSuffix()),
+            importSQLiteTable(DB.CORPUS_REGISTRY, resolverTable, new File(importDir, FILE_RESOLVER_VIS_MAP + version.getFileSuffix()),
                     lineModifier);
         } catch (SQLException ex) {
             log.error("Could not import resolver file {}", path, ex);
@@ -411,7 +416,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             };
 
             try {
-                importSQLiteTable(exampleQueriesTable, exampleFile, lineModifier);
+                importSQLiteTable(DB.CORPUS_REGISTRY, exampleQueriesTable, exampleFile, lineModifier);
             } catch (SQLException ex) {
                 log.error("Could not import example queries file {}", path, ex);
             }
@@ -522,7 +527,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         };
 
         try {
-            importSQLiteTable(textTable, new File(importDir, "text" + version.getFileSuffix()), lineModifier);
+            importSQLiteTable(DB.CORPUS_REGISTRY, textTable, new File(importDir, "text" + version.getFileSuffix()), lineModifier);
         } catch (SQLException ex) {
             log.error("Could not import text table {}", path, ex);
         }
@@ -585,7 +590,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         BinaryImportHelper preStat = new BinaryImportHelper(file, getRealDataDir(), toplevelCorpusName,
                 mimeTypeMapping);
-        try (Connection conn = createSQLiteConnection();
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY);
                 PreparedStatement stmt = conn.prepareStatement(BinaryImportHelper.SQL)) {
             preStat.doInPreparedStatement(stmt);
         } catch (SQLException ex) {
@@ -612,7 +617,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         // TODO: get number of documents
 
-        try (Connection conn = createSQLiteConnection()) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
 
             getQueryRunner().update(conn,
                     "INSERT INTO corpus_info(\"name\", docs, tokens, source_path) VALUES(?,?,?,?)", toplevelCorpusName,
@@ -630,7 +635,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      */
     public void cleanupData() {
 
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
 
             List<String> allFilesInDatabaseList = getQueryRunner().query(conn, "SELECT filename FROM media_files AS m",
                     new ColumnListHandler<>(1));
@@ -671,7 +676,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     public Multimap<String, String> listCorpusAlias(File dbFile) {
         Multimap<String, String> result = TreeMultimap.create();
 
-        try (Connection conn = dbFile == null ? createSQLiteConnection(true) : createSQLiteConnection(dbFile, true)) {
+        try (Connection conn = dbFile == null ? createConnection(DB.CORPUS_REGISTRY, true) : 
+                createConnection(dbFile, true)) {
 
             ResultSetHandler<Multimap<String, String>> rsh = new ResultSetHandler<Multimap<String, String>>() {
                 @Override
@@ -701,7 +707,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         String sql = "SELECT * FROM user_config WHERE id=?";
         UserConfig config = new UserConfig();
 
-        try (Connection conn = createSQLiteConnection(true)) {
+        try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
             ResultSetHandler<UserConfig> rsh = new ResultSetHandler<UserConfig>() {
                 @Override
                 public UserConfig handle(ResultSet rs) throws SQLException {
@@ -734,7 +740,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         try {
             String jsonVal = jsonMapper.writeValueAsString(config);
 
-            try (Connection conn = createSQLiteConnection()) {
+            try (Connection conn = createConnection(DB.SERVICE_DATA)) {
                 conn.setAutoCommit(false);
 
                 if (getQueryRunner().update(conn, sqlUpdate, jsonVal, userName) == 0) {
@@ -753,7 +759,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     public void deleteUserConfig(String userName) {
-        try (Connection conn = createSQLiteConnection()) {
+        try (Connection conn = createConnection(DB.SERVICE_DATA)) {
             conn.setAutoCommit(false);
 
             getQueryRunner().update(conn, "DELETE FROM user_config WHERE id=?", userName);
@@ -765,7 +771,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     public void addCorpusAlias(String corpusName, String alias) {
-        try (Connection conn = createSQLiteConnection()) {
+        try (Connection conn = createConnection(DB.SERVICE_DATA)) {
             conn.setAutoCommit(false);
 
             getQueryRunner().update(conn, "INSERT INTO corpus_alias (alias, corpus) VALUES(?,?)", alias, corpusName);
