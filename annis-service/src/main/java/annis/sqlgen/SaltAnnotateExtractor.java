@@ -350,7 +350,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     List<String> allUrisAsString = new LinkedList<>();
     for (URI u : match.getSaltIDs())
     {
-      allUrisAsString.add(u.toASCIIString());
+      allUrisAsString.add(u.toASCIIString().replace(",", "%2C"));
     }
     // set the matched keys
     SFeature featIDs = SaltFactory.createSFeature();
