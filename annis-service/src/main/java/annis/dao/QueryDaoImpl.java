@@ -629,7 +629,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         if (metaAnnos.isEmpty()) {
             // add single entry for the document without annotation value
             Annotation anno = new Annotation();
-            anno.setName(corpus.getName());
+            anno.setCorpusName(corpus.getName());
             anno.setAnnotationPath(corpus.getPath().segmentsList());
             anno.setType(type);
 
@@ -638,11 +638,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             // add all annotations of this document as value
             for (SMetaAnnotation meta : metaAnnos) {
                 Annotation anno = new Annotation();
-                anno.setName(corpus.getName());
+                anno.setCorpusName(corpus.getName());
                 anno.setAnnotationPath(corpus.getPath().segmentsList());
                 anno.setType(type);
-
-                anno.setNamespace(meta.getNamespace());
+                
+                if(!"".equals(meta.getNamespace())) {
+                    anno.setNamespace(meta.getNamespace());
+                }
                 anno.setName(meta.getName());
                 anno.setValue(meta.getValue().toString());
 
