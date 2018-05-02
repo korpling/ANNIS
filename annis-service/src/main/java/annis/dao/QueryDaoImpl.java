@@ -644,8 +644,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 
                 if(!"".equals(meta.getNamespace())) {
                     anno.setNamespace(meta.getNamespace());
-                }
                 anno.setName(meta.getName());
+                }
                 anno.setValue(meta.getValue().toString());
 
                 result.add(anno);
