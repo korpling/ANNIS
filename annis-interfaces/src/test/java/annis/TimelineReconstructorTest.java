@@ -70,7 +70,7 @@ public class TimelineReconstructorTest
     seq.setDataSource(instructorDipl);
     seq.setStart(instructorDipl.getStart());
     seq.setEnd(instructorDipl.getEnd());
-    List<SToken> instructorDiplToken = docGraph.getTokensBySequence(seq);
+    List<SToken> instructorDiplToken = docGraph.getSortedTokenByText(docGraph.getTokensBySequence(seq));
     assertEquals(7, instructorDiplToken.size());
     assertEquals("in", docGraph.getText(instructorDiplToken.get(0)));
     assertEquals("Richtung", docGraph.getText(instructorDiplToken.get(1)));
