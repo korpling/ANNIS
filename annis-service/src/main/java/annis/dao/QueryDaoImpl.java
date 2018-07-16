@@ -358,7 +358,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public QueryDaoImpl() {
         File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
         this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
-                logfile.getAbsolutePath(), LogLevel.Warn);
+                logfile.getAbsolutePath(), true, LogLevel.Warn);
     }
 
     public void init() {
