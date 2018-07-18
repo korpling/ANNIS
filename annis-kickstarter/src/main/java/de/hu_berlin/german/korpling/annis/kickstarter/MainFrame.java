@@ -121,7 +121,7 @@ public class MainFrame extends javax.swing.JFrame
   private CorpusAdministration corpusAdministration;
   private MainFrameWorker serviceWorker;
   private boolean wasStarted = false;
-  private final int webServerPort = 5712;
+  private final int webServerPort;
   
   
   /**
@@ -151,6 +151,13 @@ public class MainFrame extends javax.swing.JFrame
     this.setIconImages(allImages);
     
     // TODO: read webserver port from config
+    String webPortRaw = System.getProperty("annis.web-port");
+    if(webPortRaw == null || webPortRaw.isEmpty()) {
+    	// use default
+    	this.webServerPort = 5712;
+    } else {
+    	this.webServerPort = Integer.parseInt(webPortRaw);
+    }
 
     // find the location of the kickstarter
     if(System.getProperty("annis.home") == null)
