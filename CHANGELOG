@@ -1,3 +1,15 @@
+Version 3.5.0-preview7
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/57?closed=1
+
+[Fixed Bugs]
+ #576 GridExporter fails for texts with "," in name
+
+[Enhancements]
+ #583 Allow to configure the web server port on the command line for the Kickstarter
+
 Version 3.5.0-preview6
 ======================
 
