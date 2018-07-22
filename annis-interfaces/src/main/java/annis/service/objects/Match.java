@@ -176,7 +176,7 @@ public class Match implements Serializable
       URI uri;
       
       // undo any escaping
-      singleMatch = singleMatch.replace("%20", " ").replace("%25", "%");
+      singleMatch = singleMatch.replace("%20", " ").replace("%25", "%").replace("%2C", ",");
       
       String id = "";
       String anno = null;
