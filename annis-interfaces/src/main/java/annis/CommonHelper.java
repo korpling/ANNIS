@@ -462,7 +462,7 @@ public class CommonHelper
     long i = 1;
     for (URI u : match.getSaltIDs())
     {
-      allUrisAsString.add(u.toASCIIString());
+      allUrisAsString.add(u.toASCIIString().replace(",", "%2C"));
       SNode matchedNode = document.getDocumentGraph().getNode(u.toASCIIString());
       // set the feature for this specific node
       if (matchedNode != null)
