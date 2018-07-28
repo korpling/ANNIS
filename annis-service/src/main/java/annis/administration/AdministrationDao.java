@@ -60,6 +60,7 @@ import com.google.common.io.Files;
 import annis.dao.DBProvider.DB;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.exceptions.AnnisException;
+import annis.model.Annotation;
 import annis.security.UserConfig;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableQuery;
@@ -618,11 +619,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         int tokCount = getQueryDao().count(tokQuery);
         
         // get number of documents
-        QueryData docQuery = getQueryDao().parseAQL("node @ annis:node_type=\"corpus\"", null);
-        docQuery.setCorpusList(Arrays.asList(toplevelCorpusName));
-        docQuery.addExtension(FrequencyTableQuery.parse("2:node_name"));
-        FrequencyTable documents = getQueryDao().frequency(docQuery);
-        int documentCount = documents.getEntries().size();
+        List<Annotation> documents = getQueryDao().listDocuments(toplevelCorpusName);
+        int documentCount = documents.size();
 
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
 
