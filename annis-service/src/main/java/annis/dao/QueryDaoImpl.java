@@ -730,7 +730,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraphForQuery(toplevelCorpusName, aql);
 
         List<Annotation> result = new LinkedList<>();
-        for (SDocument doc : corpusGraph.getDocuments()) {
+        List<SDocument> documents = corpusGraph == null ? new LinkedList<>() : corpusGraph.getDocuments();
+        for (SDocument doc : documents) {
             result.addAll(allAnnotationForCorpus(doc));
         }
 
