@@ -526,7 +526,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 for(FrequencyTable.Entry e : freqTableForCorpus.getEntries()) {
                     result.addEntry(e);
                 }
-                result.setSum(result.getSum() + freqTableForCorpus.getSum());
             }
         }
         return result;
