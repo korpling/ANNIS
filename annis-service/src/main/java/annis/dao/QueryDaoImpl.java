@@ -97,6 +97,7 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.FrequencyTable;
+import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
@@ -510,8 +511,25 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     @Override
     public FrequencyTable frequency(QueryData queryData) {
-        // TODO: implement frequency query with graphANNIS
-        throw new UnsupportedOperationException();
+        
+        List<FrequencyTableQuery> freqQuery = queryData.getExtensions(FrequencyTableQuery.class);
+        FrequencyTable result = new FrequencyTable();
+        if(freqQuery.isEmpty()) {
+            return result;
+        }
+        
+        for(String corpus : escapedCorpusNames(queryData)) {
+            FrequencyTable freqTableForCorpus = corpusStorageMgr.frequency(corpus, 
+                    QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()), 
+                    freqQuery.get(0));
+            if(freqTableForCorpus != null) {
+                for(FrequencyTable.Entry e : freqTableForCorpus.getEntries()) {
+                    result.addEntry(e);
+                }
+                result.setSum(result.getSum() + freqTableForCorpus.getSum());
+            }
+        }
+        return result;
     }
 
     @Override
@@ -641,8 +659,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 anno.setCorpusName(corpus.getName());
                 anno.setAnnotationPath(corpus.getPath().segmentsList());
                 anno.setType(type);
-                
-                if(!"".equals(meta.getNamespace())) {
+
+                if (!"".equals(meta.getNamespace())) {
                     anno.setNamespace(meta.getNamespace());
                 }
                 anno.setName(meta.getName());

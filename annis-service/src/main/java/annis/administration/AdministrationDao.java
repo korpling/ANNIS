@@ -61,6 +61,8 @@ import annis.dao.DBProvider.DB;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.exceptions.AnnisException;
 import annis.security.UserConfig;
+import annis.service.objects.FrequencyTable;
+import annis.service.objects.FrequencyTableQuery;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
@@ -614,14 +616,19 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         QueryData tokQuery = getQueryDao().parseAQL("tok", null);
         tokQuery.setCorpusList(Arrays.asList(toplevelCorpusName));
         int tokCount = getQueryDao().count(tokQuery);
-
-        // TODO: get number of documents
+        
+        // get number of documents
+        QueryData docQuery = getQueryDao().parseAQL("node @ annis:node_type=\"corpus\"", null);
+        docQuery.setCorpusList(Arrays.asList(toplevelCorpusName));
+        docQuery.addExtension(FrequencyTableQuery.parse("2:node_name"));
+        FrequencyTable documents = getQueryDao().frequency(docQuery);
+        int documentCount = documents.getEntries().size();
 
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
 
             getQueryRunner().update(conn,
                     "INSERT INTO corpus_info(\"name\", docs, tokens, source_path) VALUES(?,?,?,?)", toplevelCorpusName,
-                    -1, tokCount, absolutePath);
+                    documentCount, tokCount, absolutePath);
 
         } catch (SQLException ex) {
             log.error("Could not insert corpus information into database", ex);
