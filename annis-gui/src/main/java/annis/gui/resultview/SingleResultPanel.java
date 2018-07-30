@@ -396,10 +396,6 @@ public class SingleResultPanel extends CssLayout implements
       
       List<VisualizerPanel> openVisualizers = new LinkedList<>();
 
-      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
-        segmentationName,
-        result.getDocumentGraph());
-
       Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(result);
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);

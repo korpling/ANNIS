@@ -15,6 +15,46 @@
  */
 package annis.gui.resultview;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.BlockingQueue;
+
+import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SOrderRelation;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
+import com.vaadin.server.AbstractClientConnector;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.JavaScript;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
+
 import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.QueryController;
@@ -33,40 +73,6 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
-import com.google.common.base.Preconditions;
-import com.vaadin.server.AbstractClientConnector;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.JavaScript;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.MenuBar.MenuItem;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ValoTheme;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.concurrent.BlockingQueue;
-import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.salt.common.SCorpusGraph;
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SFeature;
-import org.corpus_tools.salt.core.SNode;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -368,12 +374,14 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
             for (SDocument doc : corpusGraphs.getDocuments()) {
                 SDocumentGraph g = doc.getDocumentGraph();
                 if (g != null) {
+                    List<SNode> orderRoots = g.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
                     // collect the start nodes of a segmentation chain of length 1
-                    for (SNode n : g.getNodes()) {
-                        SFeature feat = n.getFeature(AnnisConstants.ANNIS_NS,
-                                AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
-                        if (feat != null && feat.getValue_STEXT() != null) {
-                            result.add(feat.getValue_STEXT());
+                    for (SNode n : orderRoots) {
+                        for (SRelation<?, ?> rel : n.getOutRelations()) {
+                            if (rel instanceof SOrderRelation) {
+                                // the type is the name of the relation
+                                result.add(rel.getType());
+                            }
                         }
                     }
                 } // end if graph not null
