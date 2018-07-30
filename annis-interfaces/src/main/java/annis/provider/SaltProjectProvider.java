@@ -42,6 +42,9 @@ import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SStructure;
+import org.corpus_tools.salt.common.SStructuredNode;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
@@ -155,11 +158,18 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>, Mess
                 SDocument doc = null;
 
                 List<SNode> nodes = g.getNodes();
-                Iterator<String> it;
+                Iterator<String> it = null;
                 if (nodes != null && !nodes.isEmpty()) {
-                    // the path of each node ID is always the document/corpus path
-                    it = nodes.get(0).getPath().segmentsList().iterator();
-                } else {
+                    for(SNode n : nodes) {
+                        if(n instanceof SStructuredNode) {
+                            // the path of each node ID is always the document/corpus path
+                            it = n.getPath().segmentsList().iterator();
+                            break;
+                        }
+                    }
+                   
+                }
+                if(it == null) {
                     // Old salt versions had a separate ID for the document graph
                     // which was the document name with the suffix "_graph".
                     // Thus this method of getting the corpus path is only the fallback.
