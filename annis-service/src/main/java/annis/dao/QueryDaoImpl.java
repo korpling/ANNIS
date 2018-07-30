@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -359,7 +360,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public QueryDaoImpl() {
         File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
         this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
-                logfile.getAbsolutePath(), true, LogLevel.Warn);
+                logfile.getAbsolutePath(), true, LogLevel.Debug);
     }
 
     public void init() {
@@ -723,19 +724,28 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     @Override
     public List<Annotation> listCorpusAnnotations(String toplevelCorpusName, String documentName, boolean exclude) {
-
+        
+        boolean isToplevel = Objects.equals(toplevelCorpusName, documentName);
         // select the document and all its parent corpora
-        String aql = "annis:doc=\"" + documentName + "\" @* annis:node_type=\"corpus\"";
-
-        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraphForQuery(toplevelCorpusName, aql);
-
+        String aql =  isToplevel ? 
+                "annis:node_type=\"corpus\" @* annis:node_name=\"" + toplevelCorpusName + "\""
+                : "annis:doc=\"" + documentName + "\" @* annis:node_type=\"corpus\"";
+        
         List<Annotation> result = new LinkedList<>();
-        List<SDocument> documents = corpusGraph == null ? new LinkedList<>() : corpusGraph.getDocuments();
-        for (SDocument doc : documents) {
-            result.addAll(allAnnotationForCorpus(doc));
+        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraphForQuery(toplevelCorpusName, aql);
+        
+        if(corpusGraph == null) {
+            return result;
+        }
+        
+        if(!isToplevel ) {
+            List<SDocument> documents = corpusGraph.getDocuments();
+            for (SDocument doc : documents) {
+                result.addAll(allAnnotationForCorpus(doc));
+            }
         }
 
-        if (!exclude) {
+        if (!exclude || isToplevel) {
             for (SNode n : corpusGraph.getRoots()) {
                 if (n instanceof SCorpus) {
                     result.addAll(allAnnotationForCorpus(n));
