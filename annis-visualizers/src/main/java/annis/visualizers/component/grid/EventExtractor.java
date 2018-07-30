@@ -70,839 +70,735 @@ import org.slf4j.LoggerFactory;
  */
 public class EventExtractor {
 
-  private static final Logger log = LoggerFactory.getLogger(EventExtractor.class);
+    private static final Logger log = LoggerFactory.getLogger(EventExtractor.class);
 
-  /**
-   * Converts Salt document graph to rows.
-   *
-   * @param input
-   * @param showSpanAnnos
-   * @param showTokenAnnos
-   * @param mediaLayer  A set of all annotation layers which should be treated as special media layer.
-   * @param annotationNames
-   * @param replaceValueWithMediaIcon If true the actual value is removed and an icon for playing the media file is shown instead.
-   * @param token2index
-   * @param pdfController makes status of all pdfviewer available for the
-   * events.
-   * @param text If non-null only include annotations for nodes of the specified text.
-   * @return
-   */
-  public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
-          VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
-          List<String> annotationNames, 
-          Set<String> mediaLayer, boolean replaceValueWithMediaIcon,
-          BiMap<SToken, Integer> token2index,
-          PDFController pdfController, STextualDS text) 
-  {
+    /**
+     * Converts Salt document graph to rows.
+     *
+     * @param input
+     * @param showSpanAnnos
+     * @param showTokenAnnos
+     * @param mediaLayer
+     *                                      A set of all annotation layers which
+     *                                      should be treated as special media
+     *                                      layer.
+     * @param annotationNames
+     * @param replaceValueWithMediaIcon
+     *                                      If true the actual value is removed and
+     *                                      an icon for playing the media file is
+     *                                      shown instead.
+     * @param token2index
+     * @param pdfController
+     *                                      makes status of all pdfviewer available
+     *                                      for the events.
+     * @param text
+     *                                      If non-null only include annotations for
+     *                                      nodes of the specified text.
+     * @return
+     */
+    public static LinkedHashMap<String, ArrayList<Row>> parseSalt(VisualizerInput input, boolean showSpanAnnos,
+            boolean showTokenAnnos, List<String> annotationNames, Set<String> mediaLayer,
+            boolean replaceValueWithMediaIcon, BiMap<SToken, Integer> token2index, PDFController pdfController,
+            STextualDS text) {
 
-    SDocumentGraph graph = input.getDocument().getDocumentGraph();
+        SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
-    // only look at annotations which were defined by the user
-    LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
-            new LinkedHashMap<>();
+        // only look at annotations which were defined by the user
+        LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = new LinkedHashMap<>();
 
-    for (String anno : annotationNames) {
-      rowsByAnnotation.put(anno, new ArrayList<Row>());
-    }
-
-    AtomicInteger eventCounter = new AtomicInteger();
-
-    PDFPageHelper pageNumberHelper = new PDFPageHelper(input);
-
-    if(showSpanAnnos)
-    {
-      for (SSpan span : graph.getSpans())
-      {
-        if(text == null || text == CommonHelper.getTextualDSForNode(span, graph))
-        {
-          addAnnotationsForNode(span, graph, token2index,
-            pdfController, pageNumberHelper, eventCounter, rowsByAnnotation,
-            true, mediaLayer, replaceValueWithMediaIcon);
+        for (String anno : annotationNames) {
+            rowsByAnnotation.put(anno, new ArrayList<Row>());
         }
-      } // end for each span
-    }
-    
-    if(showTokenAnnos)
-    {
-      for(SToken tok : graph.getTokens())
-      {
-        if(text == null || text == CommonHelper.getTextualDSForNode(tok, graph))
-        {
-          addAnnotationsForNode(tok, graph, token2index,
-            pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false,
-            mediaLayer, replaceValueWithMediaIcon);
-        }
-      }
-    }
 
-    // 2. merge rows when possible
-    for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
-      mergeAllRowsIfPossible(e.getValue());
-    }
+        AtomicInteger eventCounter = new AtomicInteger();
 
-    // 3. sort events on one row by left token index
-    for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
-      for (Row r : e.getValue()) {
-        sortEventsByTokenIndex(r);
-      }
-    }
-    
-    // 4. split up events if they cover islands
-    for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
-      for (Row r : e.getValue()) {
-        splitRowsOnIslands(r, graph, text, token2index);
-      }
-    }
+        PDFPageHelper pageNumberHelper = new PDFPageHelper(input);
 
-    // 5. split up events if they have gaps
-    for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
-      for (Row r : e.getValue()) {
-        splitRowsOnGaps(r, graph, token2index);
-      }
-    }
-    
-    return rowsByAnnotation;
-  }
-  
-  public static void removeEmptySpace(LinkedHashMap<String, 
-    ArrayList<Row>> rowsByAnnotation, Row tokenRow)
-  {
-    List<Range<Integer>> gaps = new LinkedList<>();
-
-    BitSet totalOccupancyGrid = new BitSet();
-    for(Map.Entry<String, ArrayList<Row>> layer : rowsByAnnotation.entrySet())
-    {
-      for(Row r : layer.getValue())
-      {
-        totalOccupancyGrid.or(r.getOccupancyGridCopy());
-      }
-    }
-    // We always include the token row in the occupancy grid since it is not
-    // a gap. Otherwise empty token would trigger gaps if the token list
-    // is included in the visualizer output.
-    // See https://github.com/korpling/ANNIS/issues/281 for the corresponding
-    // bug report.
-    if(tokenRow != null)
-    {
-      totalOccupancyGrid.or(tokenRow.getOccupancyGridCopy());
-    }
-    
-    
-    // The Range class can give us the next bit that is not set. Use this
-    // to detect gaps. A gap starts from the next non-set bit and goes to
-    // the next set bit.
-    Range<Integer> gap = Range.closed(-1, totalOccupancyGrid.nextSetBit(0));
-    while(true)
-    {
-      int gapStart = totalOccupancyGrid.nextClearBit(gap.upperEndpoint()+1);
-      int gapEnd = totalOccupancyGrid.nextSetBit(gapStart);
-      if(gapEnd <= 0)
-      {
-        break;
-      }
-      gap = Range.closed(gapStart, gapEnd-1);
-      gaps.add(gap);
-      
-      
-    }
-    
-    int gapID =0;
-    int totalOffset = 0;
-    for(Range<Integer> gRaw : gaps)
-    {
-      // adjust the space range itself
-      Range<Integer> g = 
-        Range.closed(gRaw.lowerEndpoint() - totalOffset, gRaw.upperEndpoint() - totalOffset);
-      int offset = g.upperEndpoint() - g.lowerEndpoint();
-      totalOffset += offset;
-      
-      for(Entry<String, ArrayList<Row>> rowEntry : rowsByAnnotation.entrySet())
-      {
-        ArrayList<Row> rows = rowEntry.getValue();
-        for(Row r : rows)
-        {
-          List<GridEvent> eventsCopy = new LinkedList<>(r.getEvents());
-          for(GridEvent e : eventsCopy)
-          {
-            if(e.getLeft() >= g.upperEndpoint())
-            {
-              
-              
-              r.removeEvent(e);
-              e.setLeft(e.getLeft() - offset);
-              e.setRight(e.getRight() - offset);
-              r.addEvent(e);
-            }
-          }
-          
-          // add a special space event
-          String spaceCaption ="";
-          if("tok".equalsIgnoreCase(rowEntry.getKey()))
-          {
-            spaceCaption = "(...)";
-          }
-          GridEvent spaceEvent = new GridEvent("gap-" + gapID, g.lowerEndpoint(), g.lowerEndpoint(), spaceCaption);
-          spaceEvent.setSpace(true);
-          r.addEvent(spaceEvent);
-          gapID++; 
-       }
-      }
-    }
-  }
-  private static void addAnnotationsForNode(SNode node,
-    SDocumentGraph graph,
-    BiMap<SToken, Integer> token2index,
-    PDFController pdfController, PDFPageHelper pageNumberHelper,
-    AtomicInteger eventCounter,
-    LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
-    boolean addMatch,
-    Set<String> mediaLayer, boolean replaceValueWithMediaIcon)
-  {
-
-    List<String> matchedAnnos = new ArrayList<>();
-    SFeature featMatchedAnnos = graph.getFeature(ANNIS_NS, FEAT_MATCHEDANNOS);
-    if(featMatchedAnnos != null)
-    {
-      matchedAnnos = Splitter.on(',').trimResults()
-        .splitToList(featMatchedAnnos.getValue_STEXT());
-    }
-    // check if the span is a matched node
-    SFeature featMatched = node.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-    Long matchRaw = featMatched == null ? null : featMatched.
-      getValue_SNUMERIC();
-    
-    String matchedQualifiedAnnoName = "";
-    if(matchRaw != null && matchRaw <= matchedAnnos.size())
-    {
-      matchedQualifiedAnnoName = matchedAnnos.get((int) ((long) matchRaw)-1);
-    }
-    
-
-    // calculate the left and right values of a span
-    List<SToken> overlappedToken = graph.getOverlappedTokens(node);
-    int left = Integer.MAX_VALUE;
-    int right = Integer.MIN_VALUE;
-    for(SToken t : overlappedToken)
-    {
-      left = Math.min(left, token2index.get(t));
-      right = Math.max(right, token2index.get(t));
-    }
-
-    for (SAnnotation anno : node.getAnnotations())
-    {
-      ArrayList<Row> rows = rowsByAnnotation.get(anno.getQName());
-      if (rows == null)
-      {
-        // try again with only the name
-        rows = rowsByAnnotation.get(anno.getName());
-      }
-      if (rows != null)
-      {
-        // only do something if the annotation was defined before
-
-        // 1. give each annotation of each span an own row
-        Row r = new Row();
-
-        String id = "event_" + eventCounter.incrementAndGet();
-        GridEvent event = new GridEvent(id, left, right,
-          anno.getValue_STEXT());
-        event.setTooltip(Helper.getQualifiedName(anno));
-
-        if(addMatch && matchRaw != null)
-        {
-          long match = matchRaw;
-          
-          if(matchedQualifiedAnnoName.isEmpty())
-          {
-            // always set the match when there is no matched annotation at all
-            event.setMatch(match);
-          }
-          // check if the annotation also matches
-          else if(matchedQualifiedAnnoName.equals(anno.getQName()))
-          {
-            event.setMatch(match);
-          }
-
-        }
-        if(node instanceof SSpan)
-        {
-          // calculate overlapped SToken
-          
-          List<? extends SRelation<? extends SNode, ? extends SNode>> outEdges = graph.getOutRelations(node.getId());
-          if (outEdges != null)
-          {
-            for (SRelation<? extends SNode, ? extends SNode> e : outEdges)
-            {
-              if (e instanceof SSpanningRelation)
-              {
-                SSpanningRelation spanRel = (SSpanningRelation) e;
-
-                SToken tok = spanRel.getTarget();
-                event.getCoveredIDs().add(tok.getId());
-
-                // get the STextualDS of this token and add it to the event
-                String textID = getTextID(tok, graph);
-                if(textID != null)
-                {
-                  event.setTextID(textID);
+        if (showSpanAnnos) {
+            for (SSpan span : graph.getSpans()) {
+                if (text == null || text == CommonHelper.getTextualDSForNode(span, graph)) {
+                    addAnnotationsForNode(span, graph, token2index, pdfController, pageNumberHelper, eventCounter,
+                            rowsByAnnotation, true, mediaLayer, replaceValueWithMediaIcon);
                 }
-              }
-            }
-          } // end if span has out edges
-        }
-        else if(node instanceof SToken)
-        {
-          event.getCoveredIDs().add(node.getId());
-          // get the STextualDS of this token and add it to the event
-          String textID = getTextID((SToken) node, graph);
-          if(textID != null)
-          {
-            event.setTextID(textID);
-          }
+            } // end for each span
         }
 
-
-        // try to get time annotations
-        if(mediaLayer == null || mediaLayer.contains(anno.getQName()))
-        {
-          
-          double[] startEndTime = TimeHelper.getOverlappedTime(node);
-          if (startEndTime.length == 1)
-          {
-            if (replaceValueWithMediaIcon)
-            {
-              event.setValue(" ");
-              event.setTooltip("play excerpt " + event.getStartTime());
-            }
-            event.setStartTime(startEndTime[0]);
-          }
-          else if (startEndTime.length == 2)
-          {
-            event.setStartTime(startEndTime[0]);
-            event.setEndTime(startEndTime[1]);
-            if (replaceValueWithMediaIcon)
-            {
-              event.setValue(" ");
-              event.setTooltip("play excerpt " + event.getStartTime() + "-"
-                + event.getEndTime());
-            }
-          }
-          
-        }
-
-        r.addEvent(event);
-        rows.add(r);
-
-        if (pdfController != null &&
-          pdfController.sizeOfRegisterdPDFViewer() > 0)
-        {
-          String page = pageNumberHelper.getPageFromAnnotation(node);
-          if (page != null)
-          {
-            event.setPage(page);
-          }
-        }
-      }
-    } // end for each annotation of span
-  }
-
-  private static String getTextID(SToken tok, SDocumentGraph graph)
-  {
-    List<? extends SRelation<? extends SNode, ? extends SNode>> tokenOutEdges = graph.getOutRelations(tok.getId());
-    if (tokenOutEdges != null)
-    {
-      for (SRelation<? extends SNode, ? extends SNode> tokEdge : tokenOutEdges)
-      {
-        if (tokEdge instanceof STextualRelation)
-        {
-          return ((STextualRelation) tokEdge).
-            getTarget().getId();
-        }
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Returns the annotations to display according to the mappings configuration.
-   *
-   * This will check the "annos" and "annos_regex" paramters for determining.
-   * the annotations to display. It also iterates over all nodes of the graph
-   * matching the type.
-   *
-   * @param input The input for the visualizer.
-   * @param type Which type of nodes to include
-   * @return
-   */
-  public static List<String> computeDisplayAnnotations(VisualizerInput input,
-          Class<? extends SNode> type) {
-    if (input == null) {
-      return new LinkedList<>();
-    }
-
-    SDocumentGraph graph = input.getDocument().getDocumentGraph();
-
-    Set<String> annoPool = SToken.class.isAssignableFrom(type) ?
-      getAnnotationLevelSet(graph, null, type)
-      : getAnnotationLevelSet(graph, input.getNamespace(), type);
-    List<String> annos = new LinkedList<>(annoPool);
-
-    String annosConfiguration = input.getMappings().getProperty(
-            MAPPING_ANNOS_KEY);
-    if (annosConfiguration != null && annosConfiguration.trim().length() > 0) {
-      String[] split = annosConfiguration.split(",");
-      annos.clear();
-      for (String s : split) {
-        s = s.trim();
-        // is regular expression?
-        if (s.startsWith("/") && s.endsWith("/")) {
-          // go over all remaining items in our pool of all annotations and
-          // check if they match
-          Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
-
-          LinkedList<String> matchingAnnos = new LinkedList<>();
-          for (String a : annoPool) {
-            if (regex.matcher(a).matches()) {
-              matchingAnnos.add(a);
-            }
-          }
-
-          annos.addAll(matchingAnnos);
-          annoPool.removeAll(matchingAnnos);
-
-        } else {
-          annos.add(s);
-          annoPool.remove(s);
-        }
-      }
-    }
-
-    // filter already found annotation names by regular expression
-    // if this was given as mapping
-    String regexFilterRaw = input.getMappings().getProperty(
-            MAPPING_ANNO_REGEX_KEY);
-    if (regexFilterRaw != null) {
-      try {
-        Pattern regexFilter = Pattern.compile(regexFilterRaw);
-        ListIterator<String> itAnnos = annos.listIterator();
-        while (itAnnos.hasNext()) {
-          String a = itAnnos.next();
-          // remove entry if not matching
-          if (!regexFilter.matcher(a).matches()) {
-            itAnnos.remove();
-          }
-        }
-      } catch (PatternSyntaxException ex) {
-        log.
-                warn("invalid regular expression in mapping for grid visualizer",
-                ex);
-      }
-    }
-    return annos;
-  }
-  
-  /**
-   * Returns the annotations to which should be displayed together with their namespace.
-   *
-   * This will check the "show_ns" paramter for determining.
-   * the annotations to display. It also iterates over all nodes of the graph
-   * matching the type.
-   *
-   * @param input The input for the visualizer.
-   * @param types Which types of nodes to include
-   * @return
-   */
-  public static Set<String> computeDisplayedNamespace(VisualizerInput input,
-          List<Class<? extends SNode>> types) {
-    if (input == null) {
-      return new HashSet<>();
-    }    
-
-    String showNamespaceConfig = input.getMappings().getProperty(
-            GridComponent.MAPPING_SHOW_NAMESPACE);
-    
-    if (showNamespaceConfig != null)
-    {
-      
-      SDocumentGraph graph = input.getDocument().getDocumentGraph();
-
-      Set<String> annoPool = new LinkedHashSet<>();
-      for(Class<? extends SNode> t : types)
-      {
-        annoPool.addAll(SToken.class.isAssignableFrom(t)
-        ? getAnnotationLevelSet(graph, null, t)
-        : getAnnotationLevelSet(graph, input.getNamespace(), t));
-      }
-      
-      
-      if ("true".equalsIgnoreCase(showNamespaceConfig))
-      {
-        // all annotations should be displayed with a namespace
-        return annoPool;
-      }
-      else if("false".equalsIgnoreCase(showNamespaceConfig))
-      {
-        return new LinkedHashSet<>();
-      }
-      else
-      {
-        Set<String> annos = new LinkedHashSet<>();
-        
-        List<String> defs = Splitter.on(',').omitEmptyStrings()
-          .trimResults().splitToList(showNamespaceConfig);
-        for (String s : defs)
-        {
-          // is regular expression?
-          if (s.startsWith("/") && s.endsWith("/"))
-          {
-            // go over all remaining items in our pool of all annotations and
-            // check if they match
-            Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
-
-            LinkedList<String> matchingAnnos = new LinkedList<>();
-            for (String a : annoPool)
-            {
-              if (regex.matcher(a).matches())
-              {
-                matchingAnnos.add(a);
-              }
-            }
-
-            annos.addAll(matchingAnnos);
-            annoPool.removeAll(matchingAnnos);
-
-          }
-          else
-          {
-            annos.add(s);
-            annoPool.remove(s);
-          }
-        }
-        
-        return annos;
-      }
-    }
-    
-    return new LinkedHashSet<>();
-  }
-
-  /**
-   * Get the qualified name of all annotations belonging to spans having a
-   * specific namespace.
-   *
-   * @param graph The graph.
-   * @param namespace The namespace of the node (not the annotation) to search
-   * for.
-   * @param type Which type of nodes to include
-   * @return
-   *
-   */
-  private static Set<String> getAnnotationLevelSet(SDocumentGraph graph,
-          String namespace, Class<? extends SNode> type) {
-    Set<String> result = new TreeSet<>();
-
-    if (graph != null) {
-      List<? extends SNode> nodes;
-      // catch most common cases directly
-      if (SSpan.class == type) {
-        nodes = graph.getSpans();
-      } else if (SToken.class == type) {
-        nodes = graph.getTokens();
-      } else {
-        nodes = graph.getNodes();
-      }
-      if (nodes != null) {
-        for (SNode n : nodes) {
-          if (type.isAssignableFrom(n.getClass())) {
-            for (SLayer layer : n.getLayers()) {
-              if (namespace == null || namespace.equals(layer.getName())) {
-                for (SAnnotation anno : n.getAnnotations()) {
-                  result.add(anno.getQName());
+        if (showTokenAnnos) {
+            for (SToken tok : graph.getTokens()) {
+                if (text == null || text == CommonHelper.getTextualDSForNode(tok, graph)) {
+                    addAnnotationsForNode(tok, graph, token2index, pdfController, pageNumberHelper, eventCounter,
+                            rowsByAnnotation, false, mediaLayer, replaceValueWithMediaIcon);
                 }
-                // we got all annotations of this node, jump to next node
+            }
+        }
+
+        // 2. merge rows when possible
+        for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
+            mergeAllRowsIfPossible(e.getValue());
+        }
+
+        // 3. sort events on one row by left token index
+        for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
+            for (Row r : e.getValue()) {
+                sortEventsByTokenIndex(r);
+            }
+        }
+
+        // 4. split up events if they cover islands
+        for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
+            for (Row r : e.getValue()) {
+                splitRowsOnIslands(r, graph, text, token2index);
+            }
+        }
+
+        // 5. split up events if they have gaps
+        for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
+            for (Row r : e.getValue()) {
+                splitRowsOnGaps(r, graph, token2index);
+            }
+        }
+
+        return rowsByAnnotation;
+    }
+
+    public static void removeEmptySpace(LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation, Row tokenRow) {
+        List<Range<Integer>> gaps = new LinkedList<>();
+
+        BitSet totalOccupancyGrid = new BitSet();
+        for (Map.Entry<String, ArrayList<Row>> layer : rowsByAnnotation.entrySet()) {
+            for (Row r : layer.getValue()) {
+                totalOccupancyGrid.or(r.getOccupancyGridCopy());
+            }
+        }
+        // We always include the token row in the occupancy grid since it is not
+        // a gap. Otherwise empty token would trigger gaps if the token list
+        // is included in the visualizer output.
+        // See https://github.com/korpling/ANNIS/issues/281 for the corresponding
+        // bug report.
+        if (tokenRow != null) {
+            totalOccupancyGrid.or(tokenRow.getOccupancyGridCopy());
+        }
+
+        // The Range class can give us the next bit that is not set. Use this
+        // to detect gaps. A gap starts from the next non-set bit and goes to
+        // the next set bit.
+        Range<Integer> gap = Range.closed(-1, totalOccupancyGrid.nextSetBit(0));
+        while (true) {
+            int gapStart = totalOccupancyGrid.nextClearBit(gap.upperEndpoint() + 1);
+            int gapEnd = totalOccupancyGrid.nextSetBit(gapStart);
+            if (gapEnd <= 0) {
                 break;
-              } // end if namespace equals layer name
-            } // end for each layer
-          }
-        } // end for each node
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Merges the rows. This function uses a heuristical approach that guarantiess
-   * to merge all rows into one if there is no conflict at all. If there are
-   * conflicts the heuristic will be best-efford but with linear runtime (given
-   * a a number of rows).
-   *
-   * @param rows Will be altered, if no conflicts occcured this wil have only
-   * one element.
-   */
-  private static void mergeAllRowsIfPossible(ArrayList<Row> rows) {
-    // use fixed seed in order to get consistent results (with random properties)
-    Random rand = new Random(5711l);
-    int tries = 0;
-    // this should be enough to be quite sure we don't miss any optimalization
-    // possibility
-    final int maxTries = rows.size() * 2;
-
-    // do this loop until we successfully merged everything into one row
-    // or we give up until too much tries
-    while (rows.size() > 1 && tries < maxTries) {
-      // choose two random entries
-      int oneIdx = rand.nextInt(rows.size());
-      int secondIdx = rand.nextInt(rows.size());
-      if (oneIdx == secondIdx) {
-        // try again if we choose the same rows by accident
-        continue;
-      }
-
-      Row one = rows.get(oneIdx);
-      Row second = rows.get(secondIdx);
-
-      if (one.merge(second)) {
-        // remove the second one since it is merged into the first
-        rows.remove(secondIdx);
-
-        // success: reset counter
-        tries = 0;
-      } else {
-        // increase counter to avoid endless loops if no improvement is possible
-        tries++;
-      }
-    }
-  }
-
-  /**
-   * Sort events of a row. The sorting is depending on the left value of the
-   * event
-   *
-   * @param row
-   */
-  private static void sortEventsByTokenIndex(Row row) {
-    Collections.sort(row.getEvents(), new Comparator<GridEvent>() {
-      @Override
-      public int compare(GridEvent o1, GridEvent o2) {
-        if (o1 == o2) {
-          return 0;
-        }
-        if (o1 == null) {
-          return -1;
-        }
-        if (o2 == null) {
-          return +1;
-        }
-
-        return ((Integer) o1.getLeft()).compareTo(o2.getLeft());
-      }
-    });
-  }
-  
-  /**
-   * Splits events of a row if they overlap an island.  Islands are areas between
-   * the token which are included in the result.
-   *
-   * @param row
-   * @param graph
-   * @param text
-   * @param token2index 
-   */
-  private static void splitRowsOnIslands(Row row, 
-    final SDocumentGraph graph,
-    STextualDS text,
-    BiMap<SToken, Integer> token2index)
-  {
-    
-    BitSet tokenCoverage = new BitSet();
-    // get the sorted token
-    List<SToken> sortedTokenList = graph.getSortedTokenByText();
-    // add all token belonging to the right text to the bit set
-    ListIterator<SToken> itToken = sortedTokenList.listIterator();
-    while (itToken.hasNext())
-    {
-      SToken t = itToken.next();
-      if (text == null || text == CommonHelper.getTextualDSForNode(t, graph))
-      {
-        int tokenIndex = token2index.get(t);
-        tokenCoverage.set(tokenIndex);
-      }
-    }
-
-    ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
-    while (itEvents.hasNext())
-    {
-      GridEvent event = itEvents.next();
-      BitSet eventBitSet = new BitSet();
-      eventBitSet.set(event.getLeft(), event.getRight()+1);
-      
-      // restrict event bitset on the locations where token are present
-      eventBitSet.and(tokenCoverage);
-      
-      // if there is is any 0 bit before the right border there is a break in the event
-      // and we need to split it
-      if(eventBitSet.nextClearBit(event.getLeft()) <= event.getRight())
-      {
-        // remove the original event
-        row.removeEvent(itEvents);
-        
-        // The event bitset now marks all the locations which the event should
-        // cover.
-        // Make a list of new events for each connected range in the bitset
-        int subElement = 0;
-        int offset = eventBitSet.nextSetBit(0);
-        while(offset >= 0)
-        {
-          int end = eventBitSet.nextClearBit(offset)-1;
-          if(offset < end)
-          {
-            GridEvent newEvent = new GridEvent(event);
-            newEvent.setId(event.getId() + "_islandsplit_" +  subElement++);
-            newEvent.setLeft(offset);
-            newEvent.setRight(end);
-            row.addEvent(itEvents, newEvent);
-          }
-          offset = eventBitSet.nextSetBit(end+1);
-        }
-      } // end if we need to split
-
-    }
-  }
-
-  /**
-   * Splits events of a row if they contain a gap. Gaps are found using the
-   * token index (provided as ANNIS specific {@link SFeature}. Inserted events
-   * have a special style to mark them as gaps.
-   *
-   * @param row
-   * @param graph
-   * @param token2index 
-   */
-  private static void splitRowsOnGaps(Row row, final SDocumentGraph graph,
-    BiMap<SToken, Integer> token2index)
-  {
-    ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
-    while (itEvents.hasNext())
-    {
-      GridEvent event = itEvents.next();
-
-      int lastTokenIndex = -1;
-
-      // sort the coveredIDs
-      LinkedList<String> sortedCoveredToken = new LinkedList<>(event.
-        getCoveredIDs());
-      Collections.sort(sortedCoveredToken, new Comparator<String>()
-      {
-        @Override
-        public int compare(String o1, String o2)
-        {
-          SToken node1 = (SToken) graph.getNode(o1);
-          SToken node2 = (SToken) graph.getNode(o2);
-
-          if (node1 == node2)
-          {
-            return 0;
-          }
-          if (node1 == null)
-          {
-            return -1;
-          }
-          if (node2 == null)
-          {
-            return +1;
-          }
-
-
-          long tokenIndex1 = token2index.get(node1);
-          long tokenIndex2 = token2index.get(node2);
-
-          return ((Long) (tokenIndex1)).compareTo(tokenIndex2);
-        }
-      });
-
-      // first calculate all gaps
-      List<GridEvent> gaps = new LinkedList<>();
-      for (String id : sortedCoveredToken)
-      {
-        SToken node = (SToken) graph.getNode(id);
-        int tokenIndex = token2index.get(node);
-        
-        // sanity check
-        if(tokenIndex >= event.getLeft() && tokenIndex <= event.getRight())
-        {
-          int diff = tokenIndex - lastTokenIndex;
-
-          if (lastTokenIndex >= 0 && diff > 1)
-          {
-            // we detected a gap
-            GridEvent gap = new GridEvent(event.getId() + "_gap_" + gaps.size(),
-              lastTokenIndex + 1, tokenIndex - 1, "");
-            gap.setGap(true);
+            }
+            gap = Range.closed(gapStart, gapEnd - 1);
             gaps.add(gap);
-          }
-
-          lastTokenIndex = tokenIndex;
-        }
-        else
-        {
-          // reset gap search when discovered there were token we use for 
-          // hightlighting but do not actually cover
-          lastTokenIndex = -1;
-        }
-      } // end for each covered token id
-
-      ListIterator<GridEvent> itGaps = gaps.listIterator();
-      // remember the old right value
-      int oldRight = event.getRight();
-      
-      int gapNr = 0;
-      while(itGaps.hasNext())
-      {
-        GridEvent gap = itGaps.next();
-      
-        if(gapNr == 0)
-        {
-          // shorten original event
-          event.setRight(gap.getLeft() - 1);
-        }
-        
-        // insert the real gap
-        itEvents.add(gap);
-
-        int rightBorder = oldRight;
-        if(itGaps.hasNext())
-        {
-          // don't use the old event right border since the gap should only go until
-          // the next event
-          GridEvent nextGap = itGaps.next();
-          itGaps.previous();
-
-          rightBorder = nextGap.getLeft()-1;
 
         }
-        // insert a new event node that covers the rest of the event
-        GridEvent after = new GridEvent(event);
-          
-        after.setId(event.getId() + "_after_" + gapNr);
-        after.setLeft(gap.getRight() + 1);
-        after.setRight(rightBorder);
-        
-        itEvents.add(after);
-        gapNr++;
-      }
 
-    }
-  }
+        int gapID = 0;
+        int totalOffset = 0;
+        for (Range<Integer> gRaw : gaps) {
+            // adjust the space range itself
+            Range<Integer> g = Range.closed(gRaw.lowerEndpoint() - totalOffset, gRaw.upperEndpoint() - totalOffset);
+            int offset = g.upperEndpoint() - g.lowerEndpoint();
+            totalOffset += offset;
 
-  private static long clip(long value, long min, long max) {
-    if (value > max) {
-      return max;
-    } else if (value < min) {
-      return min;
-    } else {
-      return value;
+            for (Entry<String, ArrayList<Row>> rowEntry : rowsByAnnotation.entrySet()) {
+                ArrayList<Row> rows = rowEntry.getValue();
+                for (Row r : rows) {
+                    List<GridEvent> eventsCopy = new LinkedList<>(r.getEvents());
+                    for (GridEvent e : eventsCopy) {
+                        if (e.getLeft() >= g.upperEndpoint()) {
+
+                            r.removeEvent(e);
+                            e.setLeft(e.getLeft() - offset);
+                            e.setRight(e.getRight() - offset);
+                            r.addEvent(e);
+                        }
+                    }
+
+                    // add a special space event
+                    String spaceCaption = "";
+                    if ("tok".equalsIgnoreCase(rowEntry.getKey())) {
+                        spaceCaption = "(...)";
+                    }
+                    GridEvent spaceEvent = new GridEvent("gap-" + gapID, g.lowerEndpoint(), g.lowerEndpoint(),
+                            spaceCaption);
+                    spaceEvent.setSpace(true);
+                    r.addEvent(spaceEvent);
+                    gapID++;
+                }
+            }
+        }
     }
 
-  }
+    private static Range<Integer> getLeftRightSpan(SNode node, SDocumentGraph graph,
+            BiMap<SToken, Integer> token2index) {
+        int left = Integer.MAX_VALUE;
+        int right = Integer.MIN_VALUE;
+
+        List<SToken> overlappedToken = graph.getOverlappedTokens(node);
+        for (SToken t : overlappedToken) {
+            left = Math.min(left, token2index.get(t));
+            right = Math.max(right, token2index.get(t));
+        }
+
+        return Range.closed(left, right);
+    }
+
+    private static void addAnnotationsForNode(SNode node, SDocumentGraph graph, BiMap<SToken, Integer> token2index,
+            PDFController pdfController, PDFPageHelper pageNumberHelper, AtomicInteger eventCounter,
+            LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation, boolean addMatch, Set<String> mediaLayer,
+            boolean replaceValueWithMediaIcon) {
+
+        List<String> matchedAnnos = new ArrayList<>();
+        SFeature featMatchedAnnos = graph.getFeature(ANNIS_NS, FEAT_MATCHEDANNOS);
+        if (featMatchedAnnos != null) {
+            matchedAnnos = Splitter.on(',').trimResults().splitToList(featMatchedAnnos.getValue_STEXT());
+        }
+        // check if the span is a matched node
+        SFeature featMatched = node.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        Long matchRaw = featMatched == null ? null : featMatched.getValue_SNUMERIC();
+
+        String matchedQualifiedAnnoName = "";
+        if (matchRaw != null && matchRaw <= matchedAnnos.size()) {
+            matchedQualifiedAnnoName = matchedAnnos.get((int) ((long) matchRaw) - 1);
+        }
+
+        // calculate the left and right values of a span
+        Range<Integer> overlappedSpan = getLeftRightSpan(node, graph, token2index);
+        int left = overlappedSpan.lowerEndpoint();
+        int right = overlappedSpan.upperEndpoint();
+
+        for (SAnnotation anno : node.getAnnotations()) {
+            ArrayList<Row> rows = rowsByAnnotation.get(anno.getQName());
+            if (rows == null) {
+                // try again with only the name
+                rows = rowsByAnnotation.get(anno.getName());
+            }
+            if (rows != null) {
+                // only do something if the annotation was defined before
+
+                // 1. give each annotation of each span an own row
+                Row r = new Row();
+
+                String id = "event_" + eventCounter.incrementAndGet();
+                GridEvent event = new GridEvent(id, left, right, anno.getValue_STEXT());
+                event.setTooltip(Helper.getQualifiedName(anno));
+
+                if (addMatch && matchRaw != null) {
+                    long match = matchRaw;
+
+                    if (matchedQualifiedAnnoName.isEmpty()) {
+                        // always set the match when there is no matched annotation at all
+                        event.setMatch(match);
+                    }
+                    // check if the annotation also matches
+                    else if (matchedQualifiedAnnoName.equals(anno.getQName())) {
+                        event.setMatch(match);
+                    }
+
+                }
+                if (node instanceof SSpan) {
+                    // calculate overlapped SToken
+
+                    List<? extends SRelation<? extends SNode, ? extends SNode>> outEdges = graph
+                            .getOutRelations(node.getId());
+                    if (outEdges != null) {
+                        for (SRelation<? extends SNode, ? extends SNode> e : outEdges) {
+                            if (e instanceof SSpanningRelation) {
+                                SSpanningRelation spanRel = (SSpanningRelation) e;
+
+                                SToken tok = spanRel.getTarget();
+                                event.getCoveredIDs().add(tok.getId());
+
+                                // get the STextualDS of this token and add it to the event
+                                String textID = CommonHelper.getTextualDSForNode(tok, graph).getId();
+                                if (textID != null) {
+                                    event.setTextID(textID);
+                                }
+                            }
+                        }
+                    } // end if span has out edges
+                } else if (node instanceof SToken) {
+                    event.getCoveredIDs().add(node.getId());
+                    // get the STextualDS of this token and add it to the event
+                    String textID = CommonHelper.getTextualDSForNode(node, graph).getId();
+                    if (textID != null) {
+                        event.setTextID(textID);
+                    }
+                }
+
+                // try to get time annotations
+                if (mediaLayer == null || mediaLayer.contains(anno.getQName())) {
+
+                    double[] startEndTime = TimeHelper.getOverlappedTime(node);
+                    if (startEndTime.length == 1) {
+                        if (replaceValueWithMediaIcon) {
+                            event.setValue(" ");
+                            event.setTooltip("play excerpt " + event.getStartTime());
+                        }
+                        event.setStartTime(startEndTime[0]);
+                    } else if (startEndTime.length == 2) {
+                        event.setStartTime(startEndTime[0]);
+                        event.setEndTime(startEndTime[1]);
+                        if (replaceValueWithMediaIcon) {
+                            event.setValue(" ");
+                            event.setTooltip("play excerpt " + event.getStartTime() + "-" + event.getEndTime());
+                        }
+                    }
+
+                }
+
+                r.addEvent(event);
+                rows.add(r);
+
+                if (pdfController != null && pdfController.sizeOfRegisterdPDFViewer() > 0) {
+                    String page = pageNumberHelper.getPageFromAnnotation(node);
+                    if (page != null) {
+                        event.setPage(page);
+                    }
+                }
+            }
+        } // end for each annotation of span
+    }
+
+    /**
+     * Returns the annotations to display according to the mappings configuration.
+     *
+     * This will check the "annos" and "annos_regex" paramters for determining. the
+     * annotations to display. It also iterates over all nodes of the graph matching
+     * the type.
+     *
+     * @param input
+     *                  The input for the visualizer.
+     * @param type
+     *                  Which type of nodes to include
+     * @return
+     */
+    public static List<String> computeDisplayAnnotations(VisualizerInput input, Class<? extends SNode> type) {
+        if (input == null) {
+            return new LinkedList<>();
+        }
+
+        SDocumentGraph graph = input.getDocument().getDocumentGraph();
+
+        Set<String> annoPool = SToken.class.isAssignableFrom(type) ? getAnnotationLevelSet(graph, null, type)
+                : getAnnotationLevelSet(graph, input.getNamespace(), type);
+        List<String> annos = new LinkedList<>(annoPool);
+
+        String annosConfiguration = input.getMappings().getProperty(MAPPING_ANNOS_KEY);
+        if (annosConfiguration != null && annosConfiguration.trim().length() > 0) {
+            String[] split = annosConfiguration.split(",");
+            annos.clear();
+            for (String s : split) {
+                s = s.trim();
+                // is regular expression?
+                if (s.startsWith("/") && s.endsWith("/")) {
+                    // go over all remaining items in our pool of all annotations and
+                    // check if they match
+                    Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
+
+                    LinkedList<String> matchingAnnos = new LinkedList<>();
+                    for (String a : annoPool) {
+                        if (regex.matcher(a).matches()) {
+                            matchingAnnos.add(a);
+                        }
+                    }
+
+                    annos.addAll(matchingAnnos);
+                    annoPool.removeAll(matchingAnnos);
+
+                } else {
+                    annos.add(s);
+                    annoPool.remove(s);
+                }
+            }
+        }
+
+        // filter already found annotation names by regular expression
+        // if this was given as mapping
+        String regexFilterRaw = input.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
+        if (regexFilterRaw != null) {
+            try {
+                Pattern regexFilter = Pattern.compile(regexFilterRaw);
+                ListIterator<String> itAnnos = annos.listIterator();
+                while (itAnnos.hasNext()) {
+                    String a = itAnnos.next();
+                    // remove entry if not matching
+                    if (!regexFilter.matcher(a).matches()) {
+                        itAnnos.remove();
+                    }
+                }
+            } catch (PatternSyntaxException ex) {
+                log.warn("invalid regular expression in mapping for grid visualizer", ex);
+            }
+        }
+        return annos;
+    }
+
+    /**
+     * Returns the annotations to which should be displayed together with their
+     * namespace.
+     *
+     * This will check the "show_ns" paramter for determining. the annotations to
+     * display. It also iterates over all nodes of the graph matching the type.
+     *
+     * @param input
+     *                  The input for the visualizer.
+     * @param types
+     *                  Which types of nodes to include
+     * @return
+     */
+    public static Set<String> computeDisplayedNamespace(VisualizerInput input, List<Class<? extends SNode>> types) {
+        if (input == null) {
+            return new HashSet<>();
+        }
+
+        String showNamespaceConfig = input.getMappings().getProperty(GridComponent.MAPPING_SHOW_NAMESPACE);
+
+        if (showNamespaceConfig != null) {
+
+            SDocumentGraph graph = input.getDocument().getDocumentGraph();
+
+            Set<String> annoPool = new LinkedHashSet<>();
+            for (Class<? extends SNode> t : types) {
+                annoPool.addAll(SToken.class.isAssignableFrom(t) ? getAnnotationLevelSet(graph, null, t)
+                        : getAnnotationLevelSet(graph, input.getNamespace(), t));
+            }
+
+            if ("true".equalsIgnoreCase(showNamespaceConfig)) {
+                // all annotations should be displayed with a namespace
+                return annoPool;
+            } else if ("false".equalsIgnoreCase(showNamespaceConfig)) {
+                return new LinkedHashSet<>();
+            } else {
+                Set<String> annos = new LinkedHashSet<>();
+
+                List<String> defs = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(showNamespaceConfig);
+                for (String s : defs) {
+                    // is regular expression?
+                    if (s.startsWith("/") && s.endsWith("/")) {
+                        // go over all remaining items in our pool of all annotations and
+                        // check if they match
+                        Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
+
+                        LinkedList<String> matchingAnnos = new LinkedList<>();
+                        for (String a : annoPool) {
+                            if (regex.matcher(a).matches()) {
+                                matchingAnnos.add(a);
+                            }
+                        }
+
+                        annos.addAll(matchingAnnos);
+                        annoPool.removeAll(matchingAnnos);
+
+                    } else {
+                        annos.add(s);
+                        annoPool.remove(s);
+                    }
+                }
+
+                return annos;
+            }
+        }
+
+        return new LinkedHashSet<>();
+    }
+
+    /**
+     * Get the qualified name of all annotations belonging to spans having a
+     * specific namespace.
+     *
+     * @param graph
+     *                      The graph.
+     * @param namespace
+     *                      The namespace of the node (not the annotation) to search
+     *                      for.
+     * @param type
+     *                      Which type of nodes to include
+     * @return
+     *
+     */
+    private static Set<String> getAnnotationLevelSet(SDocumentGraph graph, String namespace,
+            Class<? extends SNode> type) {
+        Set<String> result = new TreeSet<>();
+
+        if (graph != null) {
+            List<? extends SNode> nodes;
+            // catch most common cases directly
+            if (SSpan.class == type) {
+                nodes = graph.getSpans();
+            } else if (SToken.class == type) {
+                nodes = graph.getTokens();
+            } else {
+                nodes = graph.getNodes();
+            }
+            if (nodes != null) {
+                for (SNode n : nodes) {
+                    if (type.isAssignableFrom(n.getClass())) {
+                        for (SLayer layer : n.getLayers()) {
+                            if (namespace == null || namespace.equals(layer.getName())) {
+                                for (SAnnotation anno : n.getAnnotations()) {
+                                    result.add(anno.getQName());
+                                }
+                                // we got all annotations of this node, jump to next node
+                                break;
+                            } // end if namespace equals layer name
+                        } // end for each layer
+                    }
+                } // end for each node
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Merges the rows. This function uses a heuristical approach that guarantiess
+     * to merge all rows into one if there is no conflict at all. If there are
+     * conflicts the heuristic will be best-efford but with linear runtime (given a
+     * a number of rows).
+     *
+     * @param rows
+     *                 Will be altered, if no conflicts occcured this wil have only
+     *                 one element.
+     */
+    private static void mergeAllRowsIfPossible(ArrayList<Row> rows) {
+        // use fixed seed in order to get consistent results (with random properties)
+        Random rand = new Random(5711l);
+        int tries = 0;
+        // this should be enough to be quite sure we don't miss any optimalization
+        // possibility
+        final int maxTries = rows.size() * 2;
+
+        // do this loop until we successfully merged everything into one row
+        // or we give up until too much tries
+        while (rows.size() > 1 && tries < maxTries) {
+            // choose two random entries
+            int oneIdx = rand.nextInt(rows.size());
+            int secondIdx = rand.nextInt(rows.size());
+            if (oneIdx == secondIdx) {
+                // try again if we choose the same rows by accident
+                continue;
+            }
+
+            Row one = rows.get(oneIdx);
+            Row second = rows.get(secondIdx);
+
+            if (one.merge(second)) {
+                // remove the second one since it is merged into the first
+                rows.remove(secondIdx);
+
+                // success: reset counter
+                tries = 0;
+            } else {
+                // increase counter to avoid endless loops if no improvement is possible
+                tries++;
+            }
+        }
+    }
+
+    /**
+     * Sort events of a row. The sorting is depending on the left value of the event
+     *
+     * @param row
+     */
+    private static void sortEventsByTokenIndex(Row row) {
+        Collections.sort(row.getEvents(), new Comparator<GridEvent>() {
+            @Override
+            public int compare(GridEvent o1, GridEvent o2) {
+                if (o1 == o2) {
+                    return 0;
+                }
+                if (o1 == null) {
+                    return -1;
+                }
+                if (o2 == null) {
+                    return +1;
+                }
+
+                return ((Integer) o1.getLeft()).compareTo(o2.getLeft());
+            }
+        });
+    }
+
+    /**
+     * Splits events of a row if they overlap an island. Islands are areas between
+     * the token which are included in the result.
+     *
+     * @param row
+     * @param graph
+     * @param text
+     * @param token2index
+     */
+    private static void splitRowsOnIslands(Row row, final SDocumentGraph graph, STextualDS text,
+            BiMap<SToken, Integer> token2index) {
+
+        BitSet tokenCoverage = new BitSet();
+        // get the sorted token
+        List<SToken> sortedTokenList = graph.getSortedTokenByText();
+        // add all token belonging to the right text to the bit set
+        ListIterator<SToken> itToken = sortedTokenList.listIterator();
+        while (itToken.hasNext()) {
+            SToken t = itToken.next();
+            if (text == null || text == CommonHelper.getTextualDSForNode(t, graph)) {
+                int tokenIndex = token2index.get(t);
+                tokenCoverage.set(tokenIndex);
+            }
+        }
+
+        ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
+        while (itEvents.hasNext()) {
+            GridEvent event = itEvents.next();
+            BitSet eventBitSet = new BitSet();
+            eventBitSet.set(event.getLeft(), event.getRight() + 1);
+
+            // restrict event bitset on the locations where token are present
+            eventBitSet.and(tokenCoverage);
+
+            // if there is is any 0 bit before the right border there is a break in the
+            // event
+            // and we need to split it
+            if (eventBitSet.nextClearBit(event.getLeft()) <= event.getRight()) {
+                // remove the original event
+                row.removeEvent(itEvents);
+
+                // The event bitset now marks all the locations which the event should
+                // cover.
+                // Make a list of new events for each connected range in the bitset
+                int subElement = 0;
+                int offset = eventBitSet.nextSetBit(0);
+                while (offset >= 0) {
+                    int end = eventBitSet.nextClearBit(offset) - 1;
+                    if (offset < end) {
+                        GridEvent newEvent = new GridEvent(event);
+                        newEvent.setId(event.getId() + "_islandsplit_" + subElement++);
+                        newEvent.setLeft(offset);
+                        newEvent.setRight(end);
+                        row.addEvent(itEvents, newEvent);
+                    }
+                    offset = eventBitSet.nextSetBit(end + 1);
+                }
+            } // end if we need to split
+
+        }
+    }
+
+    /**
+     * Splits events of a row if they contain a gap. Gaps are found using the token
+     * index (provided as ANNIS specific {@link SFeature}. Inserted events have a
+     * special style to mark them as gaps.
+     *
+     * @param row
+     * @param graph
+     * @param token2index
+     */
+    private static void splitRowsOnGaps(Row row, final SDocumentGraph graph, BiMap<SToken, Integer> token2index) {
+        ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
+        while (itEvents.hasNext()) {
+            GridEvent event = itEvents.next();
+
+            int lastTokenIndex = -1;
+
+            // sort the coveredIDs
+            LinkedList<String> sortedCoveredToken = new LinkedList<>(event.getCoveredIDs());
+            Collections.sort(sortedCoveredToken, new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    SToken node1 = (SToken) graph.getNode(o1);
+                    SToken node2 = (SToken) graph.getNode(o2);
+
+                    if (node1 == node2) {
+                        return 0;
+                    }
+                    if (node1 == null) {
+                        return -1;
+                    }
+                    if (node2 == null) {
+                        return +1;
+                    }
+
+                    long tokenIndex1 = token2index.get(node1);
+                    long tokenIndex2 = token2index.get(node2);
+
+                    return ((Long) (tokenIndex1)).compareTo(tokenIndex2);
+                }
+            });
+
+            // first calculate all gaps
+            List<GridEvent> gaps = new LinkedList<>();
+            for (String id : sortedCoveredToken) {
+                SToken node = (SToken) graph.getNode(id);
+                int tokenIndex = token2index.get(node);
+
+                // sanity check
+                if (tokenIndex >= event.getLeft() && tokenIndex <= event.getRight()) {
+                    int diff = tokenIndex - lastTokenIndex;
+
+                    if (lastTokenIndex >= 0 && diff > 1) {
+                        // we detected a gap
+                        GridEvent gap = new GridEvent(event.getId() + "_gap_" + gaps.size(), lastTokenIndex + 1,
+                                tokenIndex - 1, "");
+                        gap.setGap(true);
+                        gaps.add(gap);
+                    }
+
+                    lastTokenIndex = tokenIndex;
+                } else {
+                    // reset gap search when discovered there were token we use for
+                    // hightlighting but do not actually cover
+                    lastTokenIndex = -1;
+                }
+            } // end for each covered token id
+
+            ListIterator<GridEvent> itGaps = gaps.listIterator();
+            // remember the old right value
+            int oldRight = event.getRight();
+
+            int gapNr = 0;
+            while (itGaps.hasNext()) {
+                GridEvent gap = itGaps.next();
+
+                if (gapNr == 0) {
+                    // shorten original event
+                    event.setRight(gap.getLeft() - 1);
+                }
+
+                // insert the real gap
+                itEvents.add(gap);
+
+                int rightBorder = oldRight;
+                if (itGaps.hasNext()) {
+                    // don't use the old event right border since the gap should only go until
+                    // the next event
+                    GridEvent nextGap = itGaps.next();
+                    itGaps.previous();
+
+                    rightBorder = nextGap.getLeft() - 1;
+
+                }
+                // insert a new event node that covers the rest of the event
+                GridEvent after = new GridEvent(event);
+
+                after.setId(event.getId() + "_after_" + gapNr);
+                after.setLeft(gap.getRight() + 1);
+                after.setRight(rightBorder);
+
+                itEvents.add(after);
+                gapNr++;
+            }
+
+        }
+    }
+
+    private static long clip(long value, long min, long max) {
+        if (value > max) {
+            return max;
+        } else if (value < min) {
+            return min;
+        } else {
+            return value;
+        }
+
+    }
 }
