@@ -68,6 +68,7 @@
   <properties>
     <servlet.version>3.0.1</servlet.version>
     <vaadin.version>7.7.13</vaadin.version>
+    <main.basedir>${project.basedir}</main.basedir>
   </properties>
   <build>
     <plugins>
