@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Range;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
@@ -964,6 +965,25 @@ public class Helper
 
    
     return covered;
+  }
+  
+
+  public static Range<Integer> getLeftRightSpan(SNode node, SDocumentGraph graph,
+          Map<SToken, Integer> token2index) {
+      int left = Integer.MAX_VALUE;
+      int right = Integer.MIN_VALUE;
+      if(node instanceof SToken) {
+          left = Math.min(left, token2index.get((SToken) node));
+          right = Math.max(right, token2index.get((SToken) node));
+      } else {
+          List<SToken> overlappedToken = graph.getOverlappedTokens(node);
+          for (SToken t : overlappedToken) {
+              left = Math.min(left, token2index.get(t));
+              right = Math.max(right, token2index.get(t));
+          }
+      }
+  
+      return Range.closed(left, right);
   }
 
   /**

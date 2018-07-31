@@ -253,7 +253,7 @@ public class EventExtractor {
         }
 
         // calculate the left and right values of a span
-        Range<Integer> overlappedSpan = CommonHelper.getLeftRightSpan(node, graph, token2index);
+        Range<Integer> overlappedSpan = Helper.getLeftRightSpan(node, graph, token2index);
         int left = overlappedSpan.lowerEndpoint();
         int right = overlappedSpan.upperEndpoint();
 

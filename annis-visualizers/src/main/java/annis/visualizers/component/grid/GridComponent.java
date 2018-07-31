@@ -305,7 +305,7 @@ public class GridComponent extends Panel {
             if (tokenText != null && validTextIDs.contains(tokenText.getId())
                     && hasSegmentation(t, this.segmentationName)) {
                 
-                Range<Integer> coveredRange = CommonHelper.getLeftRightSpan(t, graph, token2index);
+                Range<Integer> coveredRange = Helper.getLeftRightSpan(t, graph, token2index);
 
                 String text;
                 if(this.segmentationName == null) {
