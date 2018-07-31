@@ -29,6 +29,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -48,6 +49,7 @@ import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SStructuredNode;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
@@ -135,6 +137,7 @@ public class GridComponent extends Panel {
         layout.addComponent(grid);
         SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
+        List<SNode> sortedSegmentationNodes = CommonHelper.getSortedSegmentationNodes(this.segmentationName, graph);
         List<SToken> sortedTokens = graph.getSortedTokenByText();
 
         BiMap<SToken, Integer> token2index = HashBiMap.create();
@@ -206,7 +209,7 @@ public class GridComponent extends Panel {
         }
 
         // add tokens as row
-        Row tokenRow = computeTokenRow(sortedTokens, graph, rowsByAnnotation, token2index);
+        Row tokenRow = computeTokenRow(sortedSegmentationNodes, graph, rowsByAnnotation, token2index);
 
         if (isHidingToken()) {
             tokenRow.setStyle("invisible_token");
@@ -243,7 +246,7 @@ public class GridComponent extends Panel {
         return !tokenRowIsEmpty;
     }
     
-    private boolean hasSegmentation(SStructuredNode node, String segmentation) {
+    private boolean hasSegmentation(SNode node, String segmentation) {
         if(segmentation == null) {
             return node instanceof SToken;
         }
@@ -265,7 +268,7 @@ public class GridComponent extends Panel {
         return false;
     }
 
-    private Row computeTokenRow(List<SToken> tokens, SDocumentGraph graph,
+    private Row computeTokenRow(List<SNode> tokens, SDocumentGraph graph,
             LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation, BiMap<SToken, Integer> token2index) {
         /*
          * we will only add tokens of one texts which is mentioned by any included
@@ -294,17 +297,29 @@ public class GridComponent extends Panel {
         }
 
         Row tokenRow = new Row();
-        for (SToken t : tokens) {
+        for (SNode t : tokens) {
             // get the Salt ID of the STextualDS of this token
             STextualDS tokenText = CommonHelper.getTextualDSForNode(t, graph);
 
             // only add token if text ID matches the valid one
             if (tokenText != null && validTextIDs.contains(tokenText.getId())
                     && hasSegmentation(t, this.segmentationName)) {
-                int idx = token2index.get(t);
+                
+                Range<Integer> coveredRange = EventExtractor.getLeftRightSpan(t, graph, token2index);
 
-                String text = graph.getText(t);
-                GridEvent event = new GridEvent(t.getId(), idx, idx, text);
+                String text;
+                if(this.segmentationName == null) {
+                    text = graph.getText(t);
+                } else {
+                    SAnnotation anno = t.getAnnotation(this.segmentationName);
+                    if(anno == null) {
+                        text = "";
+                    } else {
+                        text = anno.getValue_STEXT();
+                    }
+                }
+                GridEvent event = new GridEvent(t.getId(), coveredRange.lowerEndpoint(), coveredRange.upperEndpoint(), 
+                        text);
                 event.setTextID(tokenText.getId());
                 // check if the token is a matched node
                 Long match = isCoveredTokenMarked() ? markCoveredTokens(input.getMarkedAndCovered(), t) : tokenMatch(t);

@@ -233,23 +233,18 @@ public class EventExtractor {
         }
     }
 
-    private static Range<Integer> getLeftRightSpan(SNode node, SDocumentGraph graph,
+    public static Range<Integer> getLeftRightSpan(SNode node, SDocumentGraph graph,
             BiMap<SToken, Integer> token2index) {
         int left = Integer.MAX_VALUE;
         int right = Integer.MIN_VALUE;
-
-        if (graph.getTimeline() == null) {
+        if(node instanceof SToken) {
+            left = Math.min(left, token2index.get((SToken) node));
+            right = Math.max(right, token2index.get((SToken) node));
+        } else {
             List<SToken> overlappedToken = graph.getOverlappedTokens(node);
             for (SToken t : overlappedToken) {
                 left = Math.min(left, token2index.get(t));
                 right = Math.max(right, token2index.get(t));
-            }
-        } else {
-            List<DataSourceSequence> sequences = graph.getOverlappedDataSourceSequence(node,
-                    SALT_TYPE.STIME_OVERLAPPING_RELATION);
-            if(sequences != null && !sequences.isEmpty()) {
-                left = sequences.get(0).getStart().intValue();
-                right = sequences.get(0).getEnd().intValue();
             }
         }
 

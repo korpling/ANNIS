@@ -131,12 +131,19 @@ public class CommonHelper {
         } else {
             // get the very first node of the order relation chain
             Set<SNode> startNodes = new LinkedHashSet<SNode>();
-
-            for (SNode n : graph.getNodes()) {
-                SFeature feat = n.getFeature(AnnisConstants.ANNIS_NS,
-                        AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
-                if (feat != null && segName.equalsIgnoreCase(feat.getValue_STEXT())) {
-                    startNodes.add(n);
+            if(graph != null) {
+                List<SNode> orderRoots = graph.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
+                // collect the start nodes of a segmentation chain of length 1
+                for (SNode n : orderRoots) {
+                    for (SRelation<?, ?> rel : n.getOutRelations()) {
+                        if (rel instanceof SOrderRelation) {
+                            // the type is the name of the relation
+                            if(segName.equals(rel.getType())) {
+                                startNodes.add(n);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
 
