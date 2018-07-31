@@ -412,7 +412,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         Future<List<Match>> result = exec.submit(() -> {
             String[] matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(),
-                    extQueryData.getLimit());
+                    extQueryData.getLimit(), extQueryData.getOrder());
 
             ArrayList<Match> data = new ArrayList<>((int) matchesRaw.length);
             for (int i = 0; i < matchesRaw.length; i++) {
@@ -445,7 +445,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         Future<Boolean> result = exec.submit(() -> {
             String[] matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(),
-                    extQueryData.getLimit());
+                    extQueryData.getLimit(), extQueryData.getOrder());
 
             try {
                 PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
