@@ -85,6 +85,8 @@ import com.google.common.net.UrlEscapers;
 
 import annis.CommonHelper;
 import annis.examplequeries.ExampleQuery;
+import annis.exceptions.AnnisException;
+import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisTimeoutException;
 import annis.model.Annotation;
 import annis.resolver.ResolverEntry;
@@ -422,11 +424,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         try {
             return result.get(getTimeout(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-            result.cancel(true);
+            if(ex.getCause() instanceof AnnisException) {
+                throw((AnnisException) ex.getCause());
+            } else {
+                result.cancel(true);
+                throw (new AnnisTimeoutException());
+            }
         }
-
-        throw (new AnnisTimeoutException());
-
     }
 
     @Override
@@ -467,11 +471,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         try {
             return result.get(getTimeout(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-            result.cancel(true);
+            if(ex.getCause() instanceof AnnisException) {
+                throw((AnnisException) ex.getCause());
+            } else {
+                result.cancel(true);
+                throw (new AnnisTimeoutException());
+            }
         }
-
-        throw (new AnnisTimeoutException());
-
     }
 
     @Override
@@ -484,10 +490,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         try {
             return result.get(getTimeout(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-            result.cancel(true);
+            if(ex.getCause() instanceof AnnisException) {
+                throw((AnnisException) ex.getCause());
+            } else {
+                result.cancel(true);
+                throw (new AnnisTimeoutException());
+            }
         }
-
-        throw (new AnnisTimeoutException());
     }
 
     @Override
@@ -502,12 +511,14 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         try {
             return result.get(getTimeout(), TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-            result.cancel(true);
+        } catch (InterruptedException | ExecutionException | TimeoutException ex) { 
+            if(ex.getCause() instanceof AnnisException) {
+                throw((AnnisException) ex.getCause());
+            } else {
+                result.cancel(true);
+                throw (new AnnisTimeoutException());
+            }
         }
-
-        throw (new AnnisTimeoutException());
-
     }
 
     @Override
