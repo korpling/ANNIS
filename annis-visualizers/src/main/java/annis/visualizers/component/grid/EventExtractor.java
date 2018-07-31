@@ -50,6 +50,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SSpanningRelation;
@@ -61,6 +62,7 @@ import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,10 +238,19 @@ public class EventExtractor {
         int left = Integer.MAX_VALUE;
         int right = Integer.MIN_VALUE;
 
-        List<SToken> overlappedToken = graph.getOverlappedTokens(node);
-        for (SToken t : overlappedToken) {
-            left = Math.min(left, token2index.get(t));
-            right = Math.max(right, token2index.get(t));
+        if (graph.getTimeline() == null) {
+            List<SToken> overlappedToken = graph.getOverlappedTokens(node);
+            for (SToken t : overlappedToken) {
+                left = Math.min(left, token2index.get(t));
+                right = Math.max(right, token2index.get(t));
+            }
+        } else {
+            List<DataSourceSequence> sequences = graph.getOverlappedDataSourceSequence(node,
+                    SALT_TYPE.STIME_OVERLAPPING_RELATION);
+            if(!sequences.isEmpty()) {
+                left = sequences.get(0).getStart().intValue();
+                right = sequences.get(1).getEnd().intValue();
+            }
         }
 
         return Range.closed(left, right);

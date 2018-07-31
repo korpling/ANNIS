@@ -43,11 +43,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.SStructuredNode;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -237,6 +240,28 @@ public class GridComponent extends Panel {
         }
         grid.setRowsByAnnotation(rowsByAnnotation);
     }
+    
+    private boolean hasSegmentation(SStructuredNode node, String segmentation) {
+        if(segmentation == null) {
+            return node instanceof SToken;
+        }
+        
+        for(SRelation<?, ?> outRel : node.getOutRelations()) {
+            if(outRel instanceof SOrderRelation) {
+                if(segmentation.equals(outRel.getType())) {
+                    return true;
+                }
+            }
+        }
+        for(SRelation<?, ?> inRel : node.getInRelations()) {
+            if(inRel instanceof SOrderRelation) {
+                if(segmentation.equals(inRel.getType())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     private Row computeTokenRow(List<SToken> tokens, SDocumentGraph graph,
             LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation, BiMap<SToken, Integer> token2index) {
@@ -272,7 +297,8 @@ public class GridComponent extends Panel {
             STextualDS tokenText = CommonHelper.getTextualDSForNode(t, graph);
 
             // only add token if text ID matches the valid one
-            if (tokenText != null && validTextIDs.contains(tokenText.getId())) {
+            if (tokenText != null && validTextIDs.contains(tokenText.getId())
+                    && hasSegmentation(t, this.segmentationName)) {
                 int idx = token2index.get(t);
 
                 String text = graph.getText(t);
