@@ -970,9 +970,14 @@ public class Helper
   }
   
   public static Map<SToken, Integer> createToken2IndexMap(SDocumentGraph graph) {
+      Map<SToken, Integer> token2index = new LinkedHashMap<>();
+
+      if(graph == null) {
+          return token2index;
+      }
+      
       List<SToken> sortedTokens = graph.getSortedTokenByText();
       
-      Map<SToken, Integer> token2index = new LinkedHashMap();
       int i = 0;
       for (SToken t : sortedTokens) {
           token2index.put(t, i++);
