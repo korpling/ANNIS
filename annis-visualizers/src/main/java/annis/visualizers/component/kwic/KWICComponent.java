@@ -47,9 +47,6 @@ public class KWICComponent extends GridComponent implements KWICInterface {
         boolean result = super.setSegmentationLayer(segmentationName, markedAndCovered);
         getGrid().setShowCaption(false);
         
-        // hide or show this component depending on whether it contains tokens of the requested segmentation
-        setVisible(result);
-        
         return result;
     }
 
