@@ -58,10 +58,14 @@ public class KWICMultipleTextComponent extends CssLayout implements KWICInterfac
     }
 
     @Override
-    public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered) {
+    public boolean setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered) {
+        boolean result = false;
         for (KWICInterface kwic : kwicPanels) {
-            kwic.setSegmentationLayer(segmentationName, markedAndCovered);
+            if(kwic.setSegmentationLayer(segmentationName, markedAndCovered)) {
+                result = true;
+            }
         }
+        return result;
     }
 
 } // end class KWICMultipleTextImpl

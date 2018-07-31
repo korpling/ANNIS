@@ -32,6 +32,6 @@ public interface KWICInterface extends Component {
 
     public void setVisibleTokenAnnos(Set<String> annos);
 
-    public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered);
+    public boolean setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered);
 
 }

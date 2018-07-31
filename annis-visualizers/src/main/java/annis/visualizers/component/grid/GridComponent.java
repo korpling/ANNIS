@@ -117,7 +117,7 @@ public class GridComponent extends Panel {
 
     }
 
-    private void createAnnotationGrid() {
+    private boolean createAnnotationGrid() {
         String resultID = input.getId();
         grid = new AnnotationGrid(mediaController, pdfController, resultID);
         grid.addStyleName(getMainStyle());
@@ -239,6 +239,8 @@ public class GridComponent extends Panel {
             lblEmptyToken.setVisible(tokenRowIsEmpty);
         }
         grid.setRowsByAnnotation(rowsByAnnotation);
+        
+        return !tokenRowIsEmpty;
     }
     
     private boolean hasSegmentation(SStructuredNode node, String segmentation) {
@@ -360,12 +362,12 @@ public class GridComponent extends Panel {
 
     }
 
-    public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered) {
+    public boolean setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered) {
         this.segmentationName = segmentationName;
         this.input.setMarkedAndCovered(markedAndCovered);
         // complete recreation of the grid
         layout.removeComponent(grid);
-        createAnnotationGrid();
+        return createAnnotationGrid();
     }
 
     protected boolean isShowingTokenAnnotations() {

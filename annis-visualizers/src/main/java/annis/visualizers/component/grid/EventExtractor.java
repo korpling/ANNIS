@@ -247,9 +247,9 @@ public class EventExtractor {
         } else {
             List<DataSourceSequence> sequences = graph.getOverlappedDataSourceSequence(node,
                     SALT_TYPE.STIME_OVERLAPPING_RELATION);
-            if(!sequences.isEmpty()) {
+            if(sequences != null && !sequences.isEmpty()) {
                 left = sequences.get(0).getStart().intValue();
-                right = sequences.get(1).getEnd().intValue();
+                right = sequences.get(0).getEnd().intValue();
             }
         }
 
