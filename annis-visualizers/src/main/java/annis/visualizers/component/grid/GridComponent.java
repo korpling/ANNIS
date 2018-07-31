@@ -140,7 +140,7 @@ public class GridComponent extends Panel {
         List<SNode> sortedSegmentationNodes = CommonHelper.getSortedSegmentationNodes(this.segmentationName, graph);
         List<SToken> sortedTokens = graph.getSortedTokenByText();
 
-        BiMap<SToken, Integer> token2index = HashBiMap.create();
+        Map<SToken, Integer> token2index = new LinkedHashMap();
         int i = 0;
         for (SToken t : sortedTokens) {
             token2index.put(t, i++);
@@ -269,7 +269,7 @@ public class GridComponent extends Panel {
     }
 
     private Row computeTokenRow(List<SNode> tokens, SDocumentGraph graph,
-            LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation, BiMap<SToken, Integer> token2index) {
+            LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation, Map<SToken, Integer> token2index) {
         /*
          * we will only add tokens of one texts which is mentioned by any included
          * annotation.
@@ -305,7 +305,7 @@ public class GridComponent extends Panel {
             if (tokenText != null && validTextIDs.contains(tokenText.getId())
                     && hasSegmentation(t, this.segmentationName)) {
                 
-                Range<Integer> coveredRange = EventExtractor.getLeftRightSpan(t, graph, token2index);
+                Range<Integer> coveredRange = CommonHelper.getLeftRightSpan(t, graph, token2index);
 
                 String text;
                 if(this.segmentationName == null) {
@@ -331,7 +331,7 @@ public class GridComponent extends Panel {
         return tokenRow;
     }
 
-    private LinkedHashMap<String, ArrayList<Row>> computeAnnotationRows(BiMap<SToken, Integer> token2index) {
+    private LinkedHashMap<String, ArrayList<Row>> computeAnnotationRows(Map<SToken, Integer> token2index) {
         List<String> annos = new LinkedList<>();
 
         boolean showSpanAnnotations = isShowingSpanAnnotations();

@@ -100,7 +100,7 @@ public class EventExtractor {
      */
     public static LinkedHashMap<String, ArrayList<Row>> parseSalt(VisualizerInput input, boolean showSpanAnnos,
             boolean showTokenAnnos, List<String> annotationNames, Set<String> mediaLayer,
-            boolean replaceValueWithMediaIcon, BiMap<SToken, Integer> token2index, PDFController pdfController,
+            boolean replaceValueWithMediaIcon, Map<SToken, Integer> token2index, PDFController pdfController,
             STextualDS text) {
 
         SDocumentGraph graph = input.getDocument().getDocumentGraph();
@@ -233,25 +233,7 @@ public class EventExtractor {
         }
     }
 
-    public static Range<Integer> getLeftRightSpan(SNode node, SDocumentGraph graph,
-            BiMap<SToken, Integer> token2index) {
-        int left = Integer.MAX_VALUE;
-        int right = Integer.MIN_VALUE;
-        if(node instanceof SToken) {
-            left = Math.min(left, token2index.get((SToken) node));
-            right = Math.max(right, token2index.get((SToken) node));
-        } else {
-            List<SToken> overlappedToken = graph.getOverlappedTokens(node);
-            for (SToken t : overlappedToken) {
-                left = Math.min(left, token2index.get(t));
-                right = Math.max(right, token2index.get(t));
-            }
-        }
-
-        return Range.closed(left, right);
-    }
-
-    private static void addAnnotationsForNode(SNode node, SDocumentGraph graph, BiMap<SToken, Integer> token2index,
+    private static void addAnnotationsForNode(SNode node, SDocumentGraph graph, Map<SToken, Integer> token2index,
             PDFController pdfController, PDFPageHelper pageNumberHelper, AtomicInteger eventCounter,
             LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation, boolean addMatch, Set<String> mediaLayer,
             boolean replaceValueWithMediaIcon) {
@@ -271,7 +253,7 @@ public class EventExtractor {
         }
 
         // calculate the left and right values of a span
-        Range<Integer> overlappedSpan = getLeftRightSpan(node, graph, token2index);
+        Range<Integer> overlappedSpan = CommonHelper.getLeftRightSpan(node, graph, token2index);
         int left = overlappedSpan.lowerEndpoint();
         int right = overlappedSpan.upperEndpoint();
 
@@ -638,7 +620,7 @@ public class EventExtractor {
      * @param token2index
      */
     private static void splitRowsOnIslands(Row row, final SDocumentGraph graph, STextualDS text,
-            BiMap<SToken, Integer> token2index) {
+            Map<SToken, Integer> token2index) {
 
         BitSet tokenCoverage = new BitSet();
         // get the sorted token
@@ -699,7 +681,7 @@ public class EventExtractor {
      * @param graph
      * @param token2index
      */
-    private static void splitRowsOnGaps(Row row, final SDocumentGraph graph, BiMap<SToken, Integer> token2index) {
+    private static void splitRowsOnGaps(Row row, final SDocumentGraph graph, Map<SToken, Integer> token2index) {
         ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
         while (itEvents.hasNext()) {
             GridEvent event = itEvents.next();
