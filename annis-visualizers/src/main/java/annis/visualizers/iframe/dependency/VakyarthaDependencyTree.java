@@ -18,12 +18,15 @@ package annis.visualizers.iframe.dependency;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.SALT_TYPE;
@@ -40,6 +43,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Range;
+
+import annis.libgui.Helper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.iframe.WriterVisualizer;
@@ -90,17 +96,58 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   public void writeOutput(VisualizerInput input, Writer writer)
   {
     this.mappings = input.getMappings();
+    
+    /**
+     * Try to create a sorted map of nodes. The left annis feature token index
+     * is used for sorting the nodes. It is possible the different nodes has the
+     * same left token index, but the probability of this is small and it seem's
+     * not to make much sense to visualize this. Mabye we should use the node
+     * id.
+     *
+     * Contains only token, if mappings does not contain "node_key".
+     */
+    Map<SToken, Integer> token2index = Helper.createToken2IndexMap(input.getSResult().getDocumentGraph());
+    TreeSet<SNode> selectedNodes = new TreeSet<>(
+      new Comparator<SNode>()
+      {
+        private int getIdx(SNode snode)
+        {
+          Range<Integer> leftRight = Helper.getLeftRightSpan(snode, input.getSResult().getDocumentGraph(), token2index);
+          return leftRight.lowerEndpoint();
+        }
 
-    printHTMLOutput(input, writer);
+        @Override
+        public int compare(SNode o1, SNode o2)
+        {
+          int tok1 = getIdx(o1);
+          int tok2 = getIdx(o2);
+
+          if (tok1 < tok2)
+          {
+            return -1;
+          }
+
+          if (tok1 == tok2)
+          {
+            return 0;
+          }
+          else
+          {
+            return 1;
+          }
+
+        }
+      });
+
+    printHTMLOutput(input, writer, selectedNodes);
   }
 
-  public void printHTMLOutput(VisualizerInput input, Writer writer)
+  public void printHTMLOutput(VisualizerInput input, Writer writer, TreeSet<SNode> selectedNodes)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getDocumentGraph();
     
-    List<SToken> selectedNodes = new LinkedList<>();
 
-    for (SToken n : sDocumentGraph.getSortedTokenByText())
+    for (SNode n : sDocumentGraph.getNodes())
     {
       if (selectNode(n))
       {
