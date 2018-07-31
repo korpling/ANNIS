@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -57,6 +58,7 @@ import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Range;
 import com.google.common.escape.Escaper;
@@ -965,6 +967,17 @@ public class Helper
 
    
     return covered;
+  }
+  
+  public static Map<SToken, Integer> createToken2IndexMap(SDocumentGraph graph) {
+      List<SToken> sortedTokens = graph.getSortedTokenByText();
+      
+      Map<SToken, Integer> token2index = new LinkedHashMap();
+      int i = 0;
+      for (SToken t : sortedTokens) {
+          token2index.put(t, i++);
+      }
+      return token2index;
   }
   
 

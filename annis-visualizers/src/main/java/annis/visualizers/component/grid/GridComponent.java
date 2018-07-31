@@ -138,14 +138,10 @@ public class GridComponent extends Panel {
         SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
         List<SNode> sortedSegmentationNodes = CommonHelper.getSortedSegmentationNodes(this.segmentationName, graph);
-        List<SToken> sortedTokens = graph.getSortedTokenByText();
+        
 
-        Map<SToken, Integer> token2index = new LinkedHashMap();
-        int i = 0;
-        for (SToken t : sortedTokens) {
-            token2index.put(t, i++);
-        }
-        Preconditions.checkArgument(!sortedTokens.isEmpty(), "Token list must be non-empty");
+        Map<SToken, Integer> token2index = Helper.createToken2IndexMap(graph);
+        Preconditions.checkArgument(!token2index.isEmpty(), "Token list must be non-empty");
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = computeAnnotationRows(token2index);
 
