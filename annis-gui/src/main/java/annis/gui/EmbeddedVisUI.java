@@ -297,8 +297,12 @@ public class EmbeddedVisUI extends CommonUI
               CommonHelper.addMatchToDocumentGraph(match, doc);
             }
           }
+          
+          List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
+              baseText,
+              doc.getDocumentGraph());
 
-          Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(doc);
+          Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(doc, segNodes, baseText);
           visInput.setMarkedAndCovered(markedAndCovered);
           visInput.setContextPath(Helper.getContext());
           String template = Helper.getContext()
