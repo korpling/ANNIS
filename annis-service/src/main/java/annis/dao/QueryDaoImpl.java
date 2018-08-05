@@ -611,6 +611,28 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
             result.add(att);
         }
+        
+        for(String corpusName : corpusList) {
+            for(String name : corpusStorageMgr.getAllDominanceRelationNames(corpusName)) {
+                AnnisAttribute att = new AnnisAttribute();
+                att.setType(Type.edge);
+                att.setEdgeName(name);
+                att.setSubtype(SubType.d);
+               
+                result.add(att);
+            }
+        }
+        
+        for(String corpusName : corpusList) {
+            for(String name : corpusStorageMgr.getAllPointingRelationNames(corpusName)) {
+                AnnisAttribute att = new AnnisAttribute();
+                att.setType(Type.edge);
+                att.setEdgeName(name);
+                att.setSubtype(SubType.p);
+                
+                result.add(att);
+            }
+        }
 
         // TODO: list non-node annotations (edge, edge types, meta)
         return result;
