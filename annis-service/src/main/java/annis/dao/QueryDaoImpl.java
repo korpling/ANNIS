@@ -60,8 +60,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
 import org.corpus_tools.annis.ql.parser.QueryData;
 import org.corpus_tools.graphannis.QueryToJSON;
+import org.corpus_tools.graphannis.api.Component;
 import org.corpus_tools.graphannis.api.CorpusStorageManager;
 import org.corpus_tools.graphannis.api.LogLevel;
+import org.corpus_tools.graphannis.capi.AnnisComponentType;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -577,64 +579,91 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             boolean onlyMostFrequentValues) {
 
         List<AnnisAttribute> result = new LinkedList<>();
-
-        Map<String, Set<String>> nodeAnnos = new TreeMap<>();
-        for (String corpusName : corpusList) {
-
-            List<Annotation> annoList = corpusStorageMgr.listNodeAnnotations(corpusName, listValues,
-                    onlyMostFrequentValues);
-            for (Annotation anno : annoList) {
-                String qname = anno.getQualifiedName();
-                if (qname == null) {
-                    qname = anno.getName();
-                }
-                if (qname != null) {
-                    Set<String> values = nodeAnnos.get(qname);
-                    if (values == null) {
-                        values = new LinkedHashSet<>();
-                        nodeAnnos.put(qname, values);
+        
+        {
+            Map<String, Set<String>> nodeAnnos = new TreeMap<>();
+            for (String corpusName : corpusList) {
+    
+                List<Annotation> annoList = corpusStorageMgr.listNodeAnnotations(corpusName, listValues,
+                        onlyMostFrequentValues);
+                for (Annotation anno : annoList) {
+                    String qname = anno.getQualifiedName();
+                    if (qname == null) {
+                        qname = anno.getName();
                     }
-                    String val = anno.getValue();
-                    if (val != null) {
-                        values.add(val);
+                    if (qname != null) {
+                        Set<String> values = nodeAnnos.get(qname);
+                        if (values == null) {
+                            values = new LinkedHashSet<>();
+                            nodeAnnos.put(qname, values);
+                        }
+                        String val = anno.getValue();
+                        if (val != null) {
+                            values.add(val);
+                        }
                     }
                 }
             }
-        }
 
-        for (Entry<String, Set<String>> e : nodeAnnos.entrySet()) {
-            AnnisAttribute att = new AnnisAttribute();
-            att.setType(Type.node);
-            att.setName(e.getKey());
-            att.setValueSet(e.getValue());
-            att.setSubtype(SubType.n);
+            for (Entry<String, Set<String>> e : nodeAnnos.entrySet()) {
+                AnnisAttribute att = new AnnisAttribute();
+                att.setType(Type.node);
+                att.setName(e.getKey());
+                att.setValueSet(e.getValue());
+                att.setSubtype(SubType.n);
 
-            result.add(att);
-        }
-        
-        for(String corpusName : corpusList) {
-            for(String name : corpusStorageMgr.getAllDominanceRelationNames(corpusName)) {
-                AnnisAttribute att = new AnnisAttribute();
-                att.setType(Type.edge);
-                att.setEdgeName(name);
-                att.setSubtype(SubType.d);
-               
-                result.add(att);
-            }
-        }
-        
-        for(String corpusName : corpusList) {
-            for(String name : corpusStorageMgr.getAllPointingRelationNames(corpusName)) {
-                AnnisAttribute att = new AnnisAttribute();
-                att.setType(Type.edge);
-                att.setEdgeName(name);
-                att.setSubtype(SubType.p);
-                
                 result.add(att);
             }
         }
 
-        // TODO: list non-node annotations (edge, edge types, meta)
+        Integer[] allComponentTypes = new Integer[] {AnnisComponentType.Dominance, AnnisComponentType.Pointing};
+        for(String corpusName : corpusList) {
+            for(int ctype : allComponentTypes) {
+                for(Component c : corpusStorageMgr.getAllComponentsByType(corpusName, ctype)) {
+                    AnnisAttribute att = new AnnisAttribute();
+                    att.setType(Type.edge);
+                    att.setEdgeName(c.getName());
+                    att.setSubtype(SubType.d);
+                   
+                    result.add(att);
+                    
+                    // also find all edge annotations for this component
+                    Map<String, Set<String>> edgeAnnos = new TreeMap<>();
+                    List<Annotation> edgeAnnoList = corpusStorageMgr.listEdgeAnnotations(corpusName, 
+                            ctype, c.getName(), c.getLayer(), 
+                            listValues, onlyMostFrequentValues);
+                    for (Annotation anno : edgeAnnoList) {
+                        String qname = anno.getQualifiedName();
+                        if (qname == null) {
+                            qname = anno.getName();
+                        }
+                        if (qname != null) {
+                            Set<String> values = edgeAnnos.get(qname);
+                            if (values == null) {
+                                values = new LinkedHashSet<>();
+                                edgeAnnos.put(qname, values);
+                            }
+                            String val = anno.getValue();
+                            if (val != null) {
+                                values.add(val);
+                            }
+                            
+                        }
+                    }
+                    for (Entry<String, Set<String>> e : edgeAnnos.entrySet()) {
+                        AnnisAttribute attAnno = new AnnisAttribute();
+                        attAnno.setType(Type.edge);
+                        attAnno.setEdgeName(c.getName());
+                        attAnno.setName(e.getKey());
+                        attAnno.setValueSet(e.getValue());
+                        attAnno.setSubtype(ctype == AnnisComponentType.Dominance ? SubType.d : SubType.p);
+    
+                        result.add(attAnno);
+                    }
+                }
+            }
+        }
+
         return result;
     }
 
@@ -642,9 +671,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public List<String> listSegmentationNames(List<String> corpusList) {
         LinkedList<String> result = new LinkedList<>();
         for (String corpus : corpusList) {
-            for (String orderRelName : corpusStorageMgr.getAllOrderRelationNames(corpus)) {
-                if (!orderRelName.isEmpty()) {
-                    result.add(orderRelName);
+            for (Component orderRelComponent : corpusStorageMgr.getAllComponentsByType(corpus, AnnisComponentType.Ordering)) {
+                if (!orderRelComponent.getName().isEmpty()) {
+                    result.add(orderRelComponent.getName());
                 }
             }
         }
