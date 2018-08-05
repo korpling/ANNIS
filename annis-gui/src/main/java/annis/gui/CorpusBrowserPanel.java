@@ -37,12 +37,9 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.declarative.Design;
 
 import annis.gui.beans.CorpusBrowserEntry;
@@ -89,18 +86,16 @@ public class CorpusBrowserPanel extends Panel
   
   private Label lblNoEdgeAnno;
 
-  private ExampleTable tblMetaAnno;
+//  private ExampleTable tblMetaAnno;
 
   private BeanItemContainer<CorpusBrowserEntry> containerMetaAnno;
   
-  private Label lblNoMetaAnno;
+//  private Label lblNoMetaAnno;
 
   private CitationLinkGenerator citationGenerator;
 
   private QueryController controller;
   
-  private Accordion accordion;
-
   public CorpusBrowserPanel()
   {
     this(null, null);
@@ -137,17 +132,17 @@ public class CorpusBrowserPanel extends Panel
     tblNodeAnno.addValueChangeListener(new ExampleListener());
     tblEdgeTypes.addValueChangeListener(new ExampleListener());
     tblEdgeAnno.addValueChangeListener(new ExampleListener());
-    tblMetaAnno.addValueChangeListener(new ExampleListener());
+//    tblMetaAnno.addValueChangeListener(new ExampleListener());
     
     tblNodeAnno.setContainerDataSource(containerNodeAnno);
     tblEdgeAnno.setContainerDataSource(containerEdgeAnno);
     tblEdgeTypes.setContainerDataSource(containerEdgeType);
-    tblMetaAnno.setContainerDataSource(containerMetaAnno);
+//    tblMetaAnno.setContainerDataSource(containerMetaAnno);
     
     tblNodeAnno.setCitationLinkGenerator(citationGenerator);
     tblEdgeAnno.setCitationLinkGenerator(citationGenerator);
     tblEdgeTypes.setCitationLinkGenerator(citationGenerator);
-    tblMetaAnno.setCitationLinkGenerator(citationGenerator);
+//    tblMetaAnno.setCitationLinkGenerator(citationGenerator);
 
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
@@ -326,11 +321,11 @@ public class CorpusBrowserPanel extends Panel
     }
     
 
-    if (tblMetaAnno.getContainerDataSource().size() == 0)
+/*    if (tblMetaAnno.getContainerDataSource().size() == 0)
     {
       lblNoMetaAnno.setVisible(true);
       tblMetaAnno.setVisible(false);
-    }
+    }*/
     
   }
 
