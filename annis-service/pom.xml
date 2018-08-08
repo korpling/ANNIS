@@ -20,6 +20,12 @@
       <artifactId>graphannis-api</artifactId>
       <version>${graphannis.version}</version>
       <scope>compile</scope>
+      <exclusions>
+      	<exclusion>
+      		<groupId>org.corpus-tools</groupId>
+      		<artifactId>annis-interfaces</artifactId>
+      	</exclusion>
+      </exclusions>
     </dependency>
     
     <dependency>
@@ -442,6 +448,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <annis.userconfig>/etc/annis/user_config/</annis.userconfig>
-    <graphannis.version>0.7.1</graphannis.version>
+    <graphannis.version>0.8.0-SNAPSHOT</graphannis.version>
   </properties>
 </project>
