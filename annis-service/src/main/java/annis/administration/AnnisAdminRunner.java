@@ -135,6 +135,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       throw new UsageException("Unknown command: " + command);
     }
+    
+    getQueryDao().shutdown();
   }
 
   /**

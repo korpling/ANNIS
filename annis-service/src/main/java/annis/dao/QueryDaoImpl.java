@@ -370,6 +370,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public void init() {
         parseCorpusConfiguration();
     }
+    
+    @Override
+    public void shutdown() {
+        exec.shutdownNow();
+    }
 
     @Override
     public CorpusStorageManager getCorpusStorageManager() {

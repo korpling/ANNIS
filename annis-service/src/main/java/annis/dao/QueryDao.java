@@ -292,4 +292,6 @@ public interface QueryDao
   public void setCorpusConfiguration(String topLevelCorpus, Properties props);
   
   public void exportCorpus(String toplevelCorpus, File outputDirectory);
+  
+  public void shutdown();
 }
