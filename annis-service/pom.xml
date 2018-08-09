@@ -1,4 +1,3 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -16,6 +15,12 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>org.jhades</groupId>
+			<artifactId>jhades</artifactId>
+			<version>1.0.4</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.corpus-tools</groupId>
@@ -58,18 +63,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>3.2.17.RELEASE</version>
-			<!-- do not use commons logging -->
-			<exclusions>
-				<exclusion>
-					<groupId>commons-logging</groupId>
-					<artifactId>commons-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 
 		<!-- provide a binary replacement for commons-logging based on slf4j -->
 		<dependency>
@@ -83,8 +76,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jul-to-slf4j</artifactId>
-			<version>1.7.5</version>
-			<scope>compile</scope>
+			<version>1.7.25</version>
 		</dependency>
 
 		<dependency>
@@ -216,30 +208,20 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-server</artifactId>
-			<version>8.1.16.v20140903</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-servlet</artifactId>
-			<version>8.1.16.v20140903</version>
-		</dependency>
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-servlets</artifactId>
-			<version>8.1.16.v20140903</version>
-		</dependency>
-
-
-		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-grizzly2-http</artifactId>
+			<artifactId>jersey-container-jetty-http</artifactId>
 			<version>2.27</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.glassfish.jersey.inject</groupId>
 			<artifactId>jersey-hk2</artifactId>
+			<version>2.27</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
 			<version>2.27</version>
 		</dependency>
 
@@ -248,12 +230,12 @@
 			<artifactId>jersey-media-json-binding</artifactId>
 			<version>2.27</version>
 		</dependency>
-		
+
 		<dependency>
-		  <groupId>com.fasterxml.jackson.core</groupId>
-		  <artifactId>jackson-databind</artifactId>
-		  <version>2.9.6</version>
-		  <type>bundle</type>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.6</version>
+			<type>bundle</type>
 		</dependency>
 
 
@@ -278,13 +260,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
-		<dependency>
-			<groupId>org.apache.shiro</groupId>
-			<artifactId>shiro-jaxrs</artifactId>
-			<version>1.4.0</version>
-		</dependency>
-
 
 		<dependency>
 			<groupId>org.ehcache</groupId>

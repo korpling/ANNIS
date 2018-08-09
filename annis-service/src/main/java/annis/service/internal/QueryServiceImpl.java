@@ -44,6 +44,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
@@ -109,7 +110,9 @@ public class QueryServiceImpl implements QueryService
 
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
 
-  private QueryDao queryDao;
+  
+  @Context
+  Configuration config;
 
   private int port = 5711;
 
@@ -136,6 +139,15 @@ public class QueryServiceImpl implements QueryService
     // log a message after successful startup
     log.info("ANNIS QueryService loaded.");
   }
+  
+  private QueryDao getQueryDao() {
+      Object prop = config.getProperty("queryDao");
+      if(prop instanceof QueryDao) {
+          return (QueryDao) prop;
+      } else {
+          return null;
+      }
+  }
 
   @GET
   @Path("search/count")
@@ -158,7 +170,7 @@ public class QueryServiceImpl implements QueryService
 
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     long start = new Date().getTime();
-    MatchAndDocumentCount count = queryDao.countMatchesAndDocuments(data);
+    MatchAndDocumentCount count = getQueryDao().countMatchesAndDocuments(data);
     long end = new Date().getTime();
 
     logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames),
@@ -176,7 +188,7 @@ public class QueryServiceImpl implements QueryService
       public void write(OutputStream output) throws IOException, WebApplicationException
       {
         long start = new Date().getTime();
-        queryDao.find(data, output);
+        getQueryDao().find(data, output);
         long end = new Date().getTime();
         logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames),
           end - start);
@@ -189,7 +201,7 @@ public class QueryServiceImpl implements QueryService
     final String rawCorpusNames, final String query) throws IOException
   {
     long start = new Date().getTime();
-    List<Match> result = queryDao.find(data);
+    List<Match> result = getQueryDao().find(data);
     long end = new Date().getTime();
     logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
     return result;
@@ -237,7 +249,7 @@ public class QueryServiceImpl implements QueryService
     }
     
     final QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    data.setCorpusConfiguration(queryDao.getCorpusConfiguration());
+    data.setCorpusConfiguration(getQueryDao().getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit, order));
     
     String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
@@ -298,7 +310,7 @@ public class QueryServiceImpl implements QueryService
     data.addExtension(ext);
     
     long start = new Date().getTime();
-    FrequencyTable freqTable = queryDao.frequency(data);
+    FrequencyTable freqTable = getQueryDao().frequency(data);
     long end = new Date().getTime();
     logQuery("FREQUENCY", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
     
@@ -370,7 +382,7 @@ public class QueryServiceImpl implements QueryService
     int right = Integer.parseInt(rightRaw);
     SubgraphFilter filter = SubgraphFilter.valueOf(filterRaw);
 
-    QueryData data = GraphHelper.createQueryData(matches, queryDao);
+    QueryData data = GraphHelper.createQueryData(matches, getQueryDao());
 
     data.addExtension(new AnnotateQueryData(left, right,
       segmentation, filter));
@@ -399,7 +411,7 @@ public class QueryServiceImpl implements QueryService
     }
     
     long start = new Date().getTime();
-    SaltProject p = queryDao.graph(data);
+    SaltProject p = getQueryDao().graph(data);
     long end = new Date().getTime();
     String options =
       "matches: " + matches.toString()
@@ -436,7 +448,7 @@ public class QueryServiceImpl implements QueryService
     try
     {
       long start = new Date().getTime();
-      SaltProject p = queryDao.retrieveAnnotationGraph(toplevelCorpusName,
+      SaltProject p = getQueryDao().retrieveAnnotationGraph(toplevelCorpusName,
         documentName, nodeAnnotationFilter);
       long end = new Date().getTime();
       logQuery("GRAPH", toplevelCorpusName, documentName, end - start);
@@ -460,7 +472,7 @@ public class QueryServiceImpl implements QueryService
     ResolverEntry.ElementType enumType = ResolverEntry.ElementType.valueOf(type);
     SingleResolverRequest r = new SingleResolverRequest(corpusName, namespace,
       enumType);
-    return queryDao.getResolverEntries(r);
+    return getQueryDao().getResolverEntries(r);
   }
 
   @GET
@@ -468,7 +480,7 @@ public class QueryServiceImpl implements QueryService
   @Produces("application/xml")
   public List<AnnisCorpus> corpora()
   { 
-    List<AnnisCorpus> allCorpora = queryDao.listCorpora();
+    List<AnnisCorpus> allCorpora = getQueryDao().listCorpora();
     
     
     List<AnnisCorpus> allowedCorpora = new LinkedList<>();
@@ -491,7 +503,7 @@ public class QueryServiceImpl implements QueryService
   @Produces("application/xml")
   public CorpusConfigMap corpusConfigs()
   {
-    CorpusConfigMap corpusConfigs = queryDao.getCorpusConfigurations();
+    CorpusConfigMap corpusConfigs = getQueryDao().getCorpusConfigurations();
     CorpusConfigMap result = new CorpusConfigMap();
     Subject user = SecurityUtils.getSubject();
 
@@ -533,7 +545,7 @@ public class QueryServiceImpl implements QueryService
     // TODO: also add all corpora that match the alias name
     if(!originalCorpusNames.isEmpty())
     {
-      List<AnnisCorpus> allCorpora = queryDao.listCorpora(originalCorpusNames);
+      List<AnnisCorpus> allCorpora = getQueryDao().listCorpora(originalCorpusNames);
       for(AnnisCorpus c : allCorpora)
       {
         if(user.isPermitted("query:show:" + c.getName()))
@@ -556,7 +568,7 @@ public class QueryServiceImpl implements QueryService
 
     try
     {
-      Properties tmp = queryDao.getCorpusConfigurationSave(toplevelName);
+      Properties tmp = getQueryDao().getCorpusConfigurationSave(toplevelName);
 
       CorpusConfig corpusConfig = new CorpusConfig();
       corpusConfig.setConfig(tmp);
@@ -581,7 +593,7 @@ public class QueryServiceImpl implements QueryService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:annotations:" + toplevelCorpus);
 
-    return queryDao.listAnnotations(Arrays.asList(toplevelCorpus),
+    return getQueryDao().listAnnotations(Arrays.asList(toplevelCorpus),
       Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
       onlyMostFrequentValues));
 
@@ -597,7 +609,7 @@ public class QueryServiceImpl implements QueryService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:annotations:" + toplevelCorpus);
 
-    return new SegmentationList(queryDao.listSegmentationNames(Arrays.asList(toplevelCorpus)));
+    return new SegmentationList(getQueryDao().listSegmentationNames(Arrays.asList(toplevelCorpus)));
 
   }
 
@@ -622,7 +634,7 @@ public class QueryServiceImpl implements QueryService
     }
     Collections.sort(corpusNames);
     
-    queryDao.parseAQL(query, corpusNames);
+    getQueryDao().parseAQL(query, corpusNames);
     return "ok";
   }
   
@@ -649,7 +661,7 @@ public class QueryServiceImpl implements QueryService
     Collections.sort(corpusNames);
     
     
-    QueryData data = queryDao.parseAQL(query, corpusNames);
+    QueryData data = getQueryDao().parseAQL(query, corpusNames);
     List<QueryNode> nodes = new LinkedList<>();
     int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
@@ -737,7 +749,7 @@ public class QueryServiceImpl implements QueryService
       corpusName = null;
     }
 
-    List<AnnisBinaryMetaData> meta = queryDao.getBinaryMeta(toplevelCorpusName,
+    List<AnnisBinaryMetaData> meta = getQueryDao().getBinaryMeta(toplevelCorpusName,
       corpusName);
     HashMap<String, AnnisBinaryMetaData> matchedMetaByType = new LinkedHashMap<>();
 
@@ -805,7 +817,7 @@ public class QueryServiceImpl implements QueryService
       + toplevelCorpusName + "/" + corpusName + (fileName == null ? "" : fileName) + " "
       + mediaType.toString());
 
-    final InputStream stream = queryDao.
+    final InputStream stream = getQueryDao().
       getBinary(toplevelCorpusName, corpusName, mediaType.toString(), fileName,
       offset, length);
 
@@ -854,7 +866,7 @@ public class QueryServiceImpl implements QueryService
       }
       else
       {
-        List<AnnisCorpus> allCorpora = queryDao.listCorpora();
+        List<AnnisCorpus> allCorpora = getQueryDao().listCorpora();
         corpusNames = new String[allCorpora.size()];
         for (int i = 0; i < corpusNames.length; i++)
         {
@@ -873,7 +885,7 @@ public class QueryServiceImpl implements QueryService
         }
       }
 
-      return queryDao.getExampleQueries(allowedCorpora);
+      return getQueryDao().getExampleQueries(allowedCorpora);
     }
     catch (Exception ex)
     {
@@ -963,7 +975,7 @@ public class QueryServiceImpl implements QueryService
     // this ensures a stable ordering and less surprises when the UI changes it's behavior
     Collections.sort(corpusNames);
     
-    List<AnnisCorpus> existingCorpora = queryDao.listCorpora(corpusNames);
+    List<AnnisCorpus> existingCorpora = getQueryDao().listCorpora(corpusNames);
    
     if (existingCorpora.size() != corpusNames.size())
     {
@@ -972,7 +984,7 @@ public class QueryServiceImpl implements QueryService
         "text/plain").entity("one ore more corpora are unknown to the system").
         build());
     }
-    return queryDao.parseAQL(query, corpusNames);
+    return getQueryDao().parseAQL(query, corpusNames);
   }
 
   /**
@@ -984,16 +996,6 @@ public class QueryServiceImpl implements QueryService
   private List<String> splitCorpusNamesFromRaw(String rawCorpusNames)
   {
     return new ArrayList<>(Splitter.on(",").omitEmptyStrings().trimResults().splitToList(rawCorpusNames));
-  }
-
-  public QueryDao getQueryDao()
-  {
-    return queryDao;
-  }
-
-  public void setQueryDao(QueryDao queryDao)
-  {
-    this.queryDao = queryDao;
   }
 
   /**
@@ -1086,7 +1088,7 @@ public class QueryServiceImpl implements QueryService
     user.checkPermission("query:raw_text:" + top);
 
     RawTextWrapper result = new RawTextWrapper();
-    result.setTexts(queryDao.getRawText(top, docname));
+    result.setTexts(getQueryDao().getRawText(top, docname));
     return result;
   }
 
@@ -1096,10 +1098,10 @@ public class QueryServiceImpl implements QueryService
   public DocumentBrowserConfig getDocumentBrowserConfig(
     @PathParam("corpus") String corpus)
   {
-    DocumentBrowserConfig config = queryDao.getDocBrowserConfiguration(corpus);
+    DocumentBrowserConfig config = getQueryDao().getDocBrowserConfiguration(corpus);
     if(config == null)
     {
-      config = queryDao.getDefaultDocBrowserConfiguration();
+      config = getQueryDao().getDefaultDocBrowserConfiguration();
     }
 
     return (config != null) ? config : null;

@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.shiro.web.env.EnvironmentLoader;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.eclipse.jetty.server.Server;
+import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +32,12 @@ import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
 import annis.ServiceConfig;
 import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
 import annis.exceptions.AnnisException;
 import annis.security.MultipleIniWebEnvironment;
 import annis.service.objects.AnnisCorpus;
 
-public class AnnisServiceRunner extends AnnisBaseRunner {
+public class AnnisServiceRunner extends ResourceConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AnnisServiceRunner.class);
 
@@ -49,12 +50,12 @@ public class AnnisServiceRunner extends AnnisBaseRunner {
 
     private static Thread mainThread;
 
-    private HttpServer server;
+    private Server server;
 
     private boolean useAuthentification = true;
     private Integer overridePort = null;
 
-    private QueryDao queryDao;
+    private final QueryDao queryDao;
 
     public AnnisServiceRunner() {
         this(null);
@@ -64,6 +65,26 @@ public class AnnisServiceRunner extends AnnisBaseRunner {
         this.overridePort = port;
         boolean nosecurity = Boolean.parseBoolean(System.getProperty("annis.nosecurity", "false"));
         this.useAuthentification = !nosecurity;
+        
+        this.queryDao = new QueryDaoImpl();
+        
+        property("queryDao", this.queryDao);
+        
+        packages("annis.service.internal", "annis.provider",
+                "annis.rest.provider");
+        property(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM,
+                MultipleIniWebEnvironment.class.getName());
+        
+        if (useAuthentification) {
+            log.info("Using authentification");
+            property(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
+                    "file:" + System.getProperty("annis.home") + "/conf/shiro.ini," + "file:"
+                            + System.getProperty("annis.home") + "/conf/develop_shiro.ini");
+        } else {
+            log.warn("*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
+            property(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
+                    "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
+        }
     }
 
     public static void main(String[] args) throws Exception {
@@ -149,8 +170,6 @@ public class AnnisServiceRunner extends AnnisBaseRunner {
 
     private void createWebServer() {
 
-        ResourceConfig rc = new ResourceConfig().packages("annis.service.internal", "annis.provider",
-                "annis.rest.provider");
         
 
         int port = overridePort == null ? cfg.webservicePort() : overridePort;
@@ -159,25 +178,8 @@ public class AnnisServiceRunner extends AnnisBaseRunner {
             // if the administrator wants to allow external acccess he *has* to
             // use a HTTP proxy which also should use SSL encryption
             URI addr = URI.create("http://localhost:" + port);
-
-            // TODO: check useAuthentification flag
-
-            rc.property(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM,
-                    MultipleIniWebEnvironment.class.getName());
-
-            if (useAuthentification) {
-                log.info("Using authentification");
-                rc.property(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
-                        "file:" + System.getProperty("annis.home") + "/conf/shiro.ini," + "file:"
-                                + System.getProperty("annis.home") + "/conf/develop_shiro.ini");
-            } else {
-                log.warn("*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
-                rc.property(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
-                        "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
-            }
             
-            
-            server = GrizzlyHttpServerFactory.createHttpServer(addr, rc);
+            server = JettyHttpContainerFactory.createServer(addr, this);
 
         } catch (IllegalArgumentException ex) {
             log.error("IllegalArgumentException at ANNIS service startup", ex);
