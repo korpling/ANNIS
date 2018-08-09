@@ -18,7 +18,6 @@ package annis.service.internal;
 
 import annis.CommonHelper;
 import annis.GraphHelper;
-import annis.WekaHelper;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.model.QueryNode;
@@ -106,8 +105,6 @@ public class QueryServiceImpl implements QueryService
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
 
   private QueryDao queryDao;
-
-  private WekaHelper wekaHelper;
 
   private int port = 5711;
 
@@ -1036,16 +1033,6 @@ public class QueryServiceImpl implements QueryService
     }
 
     return value;
-  }
-
-  public WekaHelper getWekaHelper()
-  {
-    return wekaHelper;
-  }
-
-  public void setWekaHelper(WekaHelper wekaHelper)
-  {
-    this.wekaHelper = wekaHelper;
   }
 
   public int getPort()

@@ -16,44 +16,13 @@
   <import resource="Common.xml" />
 
   <!-- Transaction management -->
-
-  <util:list id="schemaInitSQL">
-    <value>SET search_path TO "$user",$dao{datasource.schema:#{'public'}}</value>
-  </util:list>
-
+  
   <!-- database connection configuration -->
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" lazy-init="true">
     <property name="location" value="file:${annis.home}/conf/database.properties"/>
     <property name="placeholderPrefix" value="$dao{"/>
   </bean>
   
-  <!-- DataSource -->
-  <bean id="startupDataSource" class="org.apache.commons.dbcp2.BasicDataSource" lazy-init="true">
-    <property name="driverClassName" value="$dao{datasource.driver}"/>
-    <property name="url" value="$dao{datasource.url}"/>
-
-    <property name="username" value="$dao{datasource.username}"/>
-    <property name="password" value="$dao{datasource.password}"/>
-    <property name="connectionProperties" value="#{ $dao{datasource.ssl} ? 'ssl=true' : ''}" />
-    
-    <property name="validationQuery" value="SELECT 1;" />
-    <property name="testOnCreate" value="true" />
-    <property name="testOnBorrow" value="true" />
-    <property name="testOnReturn" value="true" />
-    <property name="testWhileIdle" value="true" />
-    
-    <!-- resource and connection related exceptions will fail fast-->
-    <property name="fastFailValidation" value="true" />
-    <property name="disconnectionSqlCodes" value="53000,53300,53400,08000,08003,08006,08001,08004,08007,08P01" />
-    
-    <property name="accessToUnderlyingConnectionAllowed" value="true" />
-    
-    
-    <property name="connectionInitSqls" ref="schemaInitSQL"/>
-  </bean>
-
-  <!-- Helper for weka command -->
-  <bean id="wekaHelper" class="annis.WekaHelper" lazy-init="true"/>
 
   <!-- Helper for list command -->
   <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper" lazy-init="true"/>

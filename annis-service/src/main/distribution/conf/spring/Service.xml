@@ -47,7 +47,6 @@
   <!-- QueryService -->
   <bean id="queryService" class="annis.service.internal.QueryServiceImpl" init-method="init" lazy-init="true">
     <property name="queryDao" ref="queryDao"/>
-    <property name="wekaHelper" ref="wekaHelper"/>
     <property name="defaultCorpusConfig" ref="defaultCorpusConfig" />
     <property name="port" value="${annis.webservice-port}" />
   </bean>
