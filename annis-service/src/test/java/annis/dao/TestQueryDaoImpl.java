@@ -70,7 +70,6 @@ public class TestQueryDaoImpl {
         initMocks(this);
 
         queryDao = new QueryDaoImpl();
-        queryDao.setListCorpusSqlHelper(listCorpusHelper);
 
         when(annisParser.parse(anyString(), anyList())).thenReturn(PARSE_RESULT);
 

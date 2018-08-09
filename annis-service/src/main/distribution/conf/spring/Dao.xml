@@ -23,14 +23,6 @@
     <property name="placeholderPrefix" value="$dao{"/>
   </bean>
   
-
-  <!-- Helper for list command -->
-  <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper" lazy-init="true"/>
-
-
-  <!-- Helper for list example queries -->
-  <bean id="listExampleQueriesHelper" class="annis.sqlgen.ListExampleQueriesHelper" lazy-init="true"/>
-
   <bean id="queriesGenerator" class="annis.dao.autogenqueries.QueriesGenerator" lazy-init="true">
     <property name="queryDao" ref="queryDao" />
     <property name="queryBuilder">
@@ -58,9 +50,6 @@
     <entry key="corpus_stats" value="name, id, text, tokens, max_corpus_id, max_corpus_pre, max_corpus_post, max_node_id, source_path" />
   </util:map>
 
-  <bean id="byteHelper" class="annis.sqlgen.ByteHelper" lazy-init="true" />
-  <bean id="metaByteHelper" class="annis.sqlgen.MetaByteHelper" lazy-init="true" />
-
   <!-- BEGIN EXPORTS -->
 
   <bean id="daoBase" class="annis.dao.AbstractDao" abstract="true" lazy-init="true">
@@ -73,15 +62,6 @@
   
   <!-- exported bean: QueryDao -->
   <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true" parent="daoBase">
-
-
-    <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
-    
-    <property name="listExampleQueriesHelper" ref="listExampleQueriesHelper" />
-
-    <property name="byteHelper" ref="byteHelper" />
-    <property name="metaByteHelper" ref="metaByteHelper" />
-
   </bean>
 
   <!-- exported Database API for administration tasks -->

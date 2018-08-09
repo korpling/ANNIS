@@ -32,7 +32,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -90,7 +89,6 @@ import annis.CommonHelper;
 import annis.ServiceConfig;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
-import annis.exceptions.AnnisQLSyntaxException;
 import annis.exceptions.AnnisTimeoutException;
 import annis.model.Annotation;
 import annis.resolver.ResolverEntry;
@@ -121,7 +119,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
 
     // generated sql for example queries and fetches the result
-    private ListExampleQueriesHelper listExampleQueriesHelper;
+    private final ListExampleQueriesHelper listExampleQueriesHelper = new ListExampleQueriesHelper();
 
     private int timeout;
 
@@ -353,15 +351,15 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     private static final Logger log = LoggerFactory.getLogger(QueryDaoImpl.class);
 
-    private ListCorpusSqlHelper listCorpusSqlHelper;
+    private final ListCorpusSqlHelper listCorpusSqlHelper = new ListCorpusSqlHelper();
 
     private final AnnisParserAntlr aqlParser = new AnnisParserAntlr();
 
     private HashMap<String, Properties> corpusConfiguration;
 
-    private ByteHelper byteHelper;
+    private final ByteHelper byteHelper = new ByteHelper();
 
-    private MetaByteHelper metaByteHelper;
+    private final MetaByteHelper metaByteHelper = new MetaByteHelper();
 
     public QueryDaoImpl() {
         File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
@@ -950,13 +948,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     // /// Getter / Setter
-    public ListCorpusSqlHelper getListCorpusSqlHelper() {
-        return listCorpusSqlHelper;
-    }
-
-    public void setListCorpusSqlHelper(ListCorpusSqlHelper listCorpusHelper) {
-        this.listCorpusSqlHelper = listCorpusHelper;
-    }
 
     @Override
     public CorpusConfigMap getCorpusConfigurations() {
@@ -996,13 +987,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         this.timeout = timeout;
     }
 
-    public ByteHelper getByteHelper() {
-        return byteHelper;
-    }
-
-    public void setByteHelper(ByteHelper byteHelper) {
-        this.byteHelper = byteHelper;
-    }
 
     @Override
     public InputStream getBinary(String toplevelCorpusName, String corpusName, String mimeType, String title,
@@ -1065,13 +1049,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         return new LinkedList<>();
     }
 
-    public MetaByteHelper getMetaByteHelper() {
-        return metaByteHelper;
-    }
-
-    public void setMetaByteHelper(MetaByteHelper metaByteHelper) {
-        this.metaByteHelper = metaByteHelper;
-    }
 
     public File getRealDataDir() {
         File dataDir;
@@ -1084,14 +1061,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         return dataDir;
     }
 
-
-    public ListExampleQueriesHelper getListExampleQueriesHelper() {
-        return listExampleQueriesHelper;
-    }
-
-    public void setListExampleQueriesHelper(ListExampleQueriesHelper listExampleQueriesHelper) {
-        this.listExampleQueriesHelper = listExampleQueriesHelper;
-    }
 
     @Override
     public Properties getCorpusConfigurationSave(String corpus) {
