@@ -160,8 +160,6 @@ public class AnnisServiceRunner extends AnnisBaseRunner {
             // use a HTTP proxy which also should use SSL encryption
             URI addr = URI.create("http://localhost:" + port);
 
-            server = GrizzlyHttpServerFactory.createHttpServer(addr, rc);
-
             // TODO: check useAuthentification flag
 
             rc.property(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM,
