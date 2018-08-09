@@ -210,31 +210,31 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-jetty-http</artifactId>
-			<version>2.27</version>
+			<version>${jersey.version}</version>
 		</dependency>
 		
 		<dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.4.7.v20170914</version>
+            <version>${jetty.version}</version>
         </dependency>        
         
 		<dependency>
 			<groupId>org.glassfish.jersey.inject</groupId>
 			<artifactId>jersey-hk2</artifactId>
-			<version>2.27</version>
+			<version>${jersey.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
-			<version>2.27</version>
+			<version>${jersey.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-json-binding</artifactId>
-			<version>2.27</version>
+			<version>${jersey.version}</version>
 		</dependency>
 
 		<dependency>

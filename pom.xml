@@ -187,6 +187,8 @@
       </activation>
       <properties>
         <javadoc.opts>-Xdoclint:none</javadoc.opts>
+        <jetty.version>9.4.7.v20170914</jetty.version>
+        <jersey.version>2.27</jersey.version>
       </properties>
     </profile>
     <profile>

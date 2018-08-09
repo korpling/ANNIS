@@ -89,8 +89,8 @@ public class KickstartRunner
     // Whenever we add new dependencies on jersey classes for the service but
     // not for the GUI and "Missing dependency" errors occur, add the classes
     // to the server class list
-    context.addServerClass("com.sun.jersey.json.");
-    context.addServerClass("com.sun.jersey.server.");
+    context.addServerClass("org.glassfish.jersey.json.");
+    context.addServerClass("org.glassfish.jersey.server.");
     jetty.setHandler(context);
     
     // start
