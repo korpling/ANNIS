@@ -165,7 +165,7 @@ public class CorpusAdministration {
         for (File r : roots) {
             try {
                 log.info("Importing corpus from: " + r.getPath());
-                if (administrationDao.importCorpus(r.getPath(), aliasName, overwrite)) {
+                if (getAdministrationDao().importCorpus(r.getPath(), aliasName, overwrite)) {
                     log.info("Finished import from: " + r.getPath());
                     getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.SUCCESS, null);
                 } else {

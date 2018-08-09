@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,6 +94,21 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     
     public AdministrationDao() {
         this.queriesGenerator = QueriesGenerator.create(getQueryDao());
+        
+        this.mimeTypeMapping = new LinkedHashMap<>();
+        // TODO: make this configurable for the user
+        this.mimeTypeMapping.put("webm", "video/webm");
+        this.mimeTypeMapping.put("ogg", "audio/ogg");
+        this.mimeTypeMapping.put("wav", "audio/wav");
+        this.mimeTypeMapping.put("mp3", "audio/mpeg");
+        this.mimeTypeMapping.put("mp4", "video/mp4");
+        this.mimeTypeMapping.put("pdf", "application/pdf");
+        this.mimeTypeMapping.put("css", "text/css");
+        this.mimeTypeMapping.put("config", "application/x-config+text");
+        this.mimeTypeMapping.put("properties", "application/text+plain");
+        this.mimeTypeMapping.put("json", "application/json");
+        
+        this.generateExampleQueries = cfg.generateExampleQueries();
     }
     
     public static AdministrationDao create(QueryDao queryDao, DeleteCorpusDao deleteCorpusDao) {
@@ -168,16 +184,13 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      */
     private EXAMPLE_QUERIES_CONFIG generateExampleQueries;
 
-    private String schemaVersion;
+    private final String schemaVersion = "3.4.3";
 
     /**
      * A mapping for file-endings to mime types.
      */
-    private Map<String, String> mimeTypeMapping;
+    private final Map<String, String> mimeTypeMapping;
 
-    private Map<String, String> tableInsertSelect;
-
-    private Map<String, String> tableInsertFrom;
 
     /**
      * Optional tab for example queries. If this tab not exist, a dummy file from
@@ -886,33 +899,12 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         return schemaVersion;
     }
 
-    public void setSchemaVersion(String schemaVersion) {
-        this.schemaVersion = schemaVersion;
-    }
 
     public Map<String, String> getMimeTypeMapping() {
         return mimeTypeMapping;
     }
 
-    public void setMimeTypeMapping(Map<String, String> mimeTypeMapping) {
-        this.mimeTypeMapping = mimeTypeMapping;
-    }
 
-    public Map<String, String> getTableInsertSelect() {
-        return tableInsertSelect;
-    }
-
-    public void setTableInsertSelect(Map<String, String> tableInsertSelect) {
-        this.tableInsertSelect = tableInsertSelect;
-    }
-
-    public Map<String, String> getTableInsertFrom() {
-        return tableInsertFrom;
-    }
-
-    public void setTableInsertFrom(Map<String, String> tableInsertFrom) {
-        this.tableInsertFrom = tableInsertFrom;
-    }
 
     /**
      * Generates example queries if no example queries tab file is defined by the
