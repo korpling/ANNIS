@@ -61,7 +61,6 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -100,7 +99,6 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-@Component
 @Path("annis/query")
 public class QueryServiceImpl implements QueryService
 {

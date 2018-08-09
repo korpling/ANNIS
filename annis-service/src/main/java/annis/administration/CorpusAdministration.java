@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -44,10 +44,8 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Multimap;
 import com.google.common.io.ByteStreams;
 
 import annis.AnnisRunnerException;
@@ -57,7 +55,6 @@ import annis.exceptions.AnnisException;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
 import annis.utils.ANNISFormatHelper;
-import java.util.HashSet;
 
 /**
  *

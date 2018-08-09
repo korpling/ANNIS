@@ -18,6 +18,7 @@ package annis.administration;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +36,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
@@ -369,9 +368,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
   private void usage(String error)
   {
-    Resource resource = new ClassPathResource("annis/administration/usage.txt");
-    try(BufferedReader reader = new BufferedReader(new InputStreamReader(resource.
-        getInputStream(), "UTF-8"));)
+    InputStream resource = this.getClass().getResourceAsStream("/annis/administration/usage.txt");
+    try(BufferedReader reader = new BufferedReader(new InputStreamReader(resource, "UTF-8"));)
     {
       
       for (String line = reader.readLine(); line != null; line = reader.

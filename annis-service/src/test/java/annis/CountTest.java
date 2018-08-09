@@ -27,28 +27,19 @@ import javax.annotation.Resource;
 import org.corpus_tools.annis.ql.parser.QueryData;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import annis.dao.QueryDao;
-import annis.dao.QueryDaoImpl;
 import annis.service.objects.AnnisCorpus;
-import annis.test.TestHelper;
 
-;
 
 /**
  * This will execute tests on a real database and check if the counts are OK.
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
 // TODO: do not test context only for annopool
-@ContextConfiguration(locations = { "file:src/main/distribution/conf/spring/Common.xml",
-        "file:src/main/distribution/conf/spring/Dao.xml" }, loader = AnnisXmlContextLoader.class)
 public class CountTest {
 
     Logger log = LoggerFactory.getLogger(CountTest.class);

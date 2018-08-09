@@ -49,15 +49,11 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 
 import annis.administration.AdministrationDao;
-import annis.administration.CorpusAdministration;
-import annis.administration.DeleteCorpusDao;
-import annis.dao.QueryDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
 import annis.security.ANNISUserRealm;
@@ -74,7 +70,6 @@ import annis.utils.ANNISFormatHelper;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Component
 @Path("annis/admin")
 public class AdminServiceImpl implements AdminService
 {
