@@ -39,9 +39,9 @@ import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
 import annis.ServiceConfig;
 import annis.administration.AdministrationDao;
+import annis.administration.CorpusAdministration;
 import annis.administration.DeleteCorpusDao;
 import annis.dao.QueryDao;
-import annis.dao.QueryDaoImpl;
 import annis.dao.ShortenerDao;
 import annis.exceptions.AnnisException;
 import annis.security.MultipleIniWebEnvironment;
@@ -72,22 +72,25 @@ public class AnnisServiceRunner extends ResourceConfig {
     
 
     public AnnisServiceRunner() {
-        this(null);
+        this(null, null);
     }
 
-    public AnnisServiceRunner(Integer port) {
+    public AnnisServiceRunner(Integer port, CorpusAdministration corpusAdmin) {
         this.overridePort = port;
         boolean nosecurity = Boolean.parseBoolean(System.getProperty("annis.nosecurity", "false"));
         this.useAuthentification = !nosecurity;
 
-        this.queryDao = new QueryDaoImpl();
-        
-        this.deleteCorpusDao = new DeleteCorpusDao();
-        this.deleteCorpusDao.setQueryDao(this.queryDao);
-        
-        this.adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
-        
-        this.shortenerDao = new ShortenerDao();
+        if(corpusAdmin == null) {
+            this.queryDao = QueryDao.create();
+            this.deleteCorpusDao = DeleteCorpusDao.create(this.queryDao);
+            this.adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
+            this.shortenerDao = new ShortenerDao();
+        } else {
+            this.queryDao = corpusAdmin.getAdministrationDao().getQueryDao();
+            this.deleteCorpusDao = corpusAdmin.getAdministrationDao().getDeleteCorpusDao();
+            this.adminDao = corpusAdmin.getAdministrationDao();
+            this.shortenerDao = new ShortenerDao();
+        }
         
         property("queryDao", this.queryDao);
         property("adminDao", this.adminDao);
@@ -96,6 +99,11 @@ public class AnnisServiceRunner extends ResourceConfig {
         packages("annis.service.internal", "annis.provider", "annis.rest.provider");
 
     }
+    
+    public QueryDao getQueryDao() {
+        return queryDao;
+    }
+    
 
     public static void main(String[] args) throws Exception {
 

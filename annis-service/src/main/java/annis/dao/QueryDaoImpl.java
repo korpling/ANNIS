@@ -362,13 +362,19 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     private final MetaByteHelper metaByteHelper = new MetaByteHelper();
 
-    public QueryDaoImpl() {
+    protected QueryDaoImpl() {
         File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
         this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
                 logfile.getAbsolutePath(), true, LogLevel.Debug);
         
         // initialize timeout with value from config (can be overwritten by API)
         this.timeout = cfg.timeout();
+    }
+    
+    public static QueryDao create() {
+        QueryDaoImpl result = new QueryDaoImpl();
+        
+        return result;
     }
 
     public void init() {

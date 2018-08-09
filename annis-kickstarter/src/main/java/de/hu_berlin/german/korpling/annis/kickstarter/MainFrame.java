@@ -86,7 +86,7 @@ public class MainFrame extends javax.swing.JFrame {
         private final KickstartRunner delegate;
 
         public MainFrameWorker() {
-            this.delegate = new KickstartRunner(webServerPort, null);
+            this.delegate = new KickstartRunner(webServerPort, null, corpusAdministration);
         }
 
         @Override
@@ -180,8 +180,9 @@ public class MainFrame extends javax.swing.JFrame {
 
         // init corpusAdministration
 
+        QueryDao queryDao = QueryDao.create();
         this.corpusAdministration = CorpusAdministration
-                .create(AdministrationDao.create(new QueryDaoImpl(), new DeleteCorpusDao()));
+                .create(AdministrationDao.create(queryDao, DeleteCorpusDao.create(queryDao)));
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel() {
                 @Override

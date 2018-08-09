@@ -566,7 +566,7 @@ public class AdminServiceImpl implements AdminService
   public AdministrationDao getAdminDao()
   {
       Object prop = config.getProperty("adminDao");
-      if(prop instanceof QueryDao) {
+      if(prop instanceof AdministrationDao) {
           return (AdministrationDao) prop;
       } else {
           return null;

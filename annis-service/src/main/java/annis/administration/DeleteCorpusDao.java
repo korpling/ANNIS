@@ -16,6 +16,9 @@
 package annis.administration;
 
 import com.google.common.base.Joiner;
+
+import annis.dao.QueryDao;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,6 +37,16 @@ import org.slf4j.LoggerFactory;
 public class DeleteCorpusDao extends AbstractAdminstrationDao {
 
     private final static Logger log = LoggerFactory.getLogger(AdministrationDao.class);
+    
+    protected DeleteCorpusDao() {
+        
+    }
+    
+    public static DeleteCorpusDao create(QueryDao queryDao) {
+        DeleteCorpusDao result = new DeleteCorpusDao();
+        result.setQueryDao(queryDao);
+        return result;
+    }
 
     /**
      * Deletes a top level corpus, when it is already exists.

@@ -60,7 +60,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   private final QueriesGenerator queriesGenerator;
   
   public AnnisAdminRunner() {
-      this.queryDao = new QueryDaoImpl();
+      this.queryDao = QueryDaoImpl.create();
       this.queriesGenerator = QueriesGenerator.create(this.queryDao);
       
       DeleteCorpusDao deleteCorpusDao = new DeleteCorpusDao();

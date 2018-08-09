@@ -70,7 +70,7 @@ public class AcceptanceTest
   {
     try
     {
-      runner = new KickstartRunner(WEB_PORT, SERVICE_PORT);
+      runner = new KickstartRunner(WEB_PORT, SERVICE_PORT, null);
       
       runner.startService();
       runner.startJetty();

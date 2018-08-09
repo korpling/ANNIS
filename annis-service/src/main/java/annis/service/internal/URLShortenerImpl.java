@@ -118,7 +118,7 @@ public class URLShortenerImpl
   public ShortenerDao getShortenerDao()
   {
       Object prop = config.getProperty("shortenerDao");
-      if(prop instanceof QueryDao) {
+      if(prop instanceof ShortenerDao) {
           return (ShortenerDao) prop;
       } else {
           return null;

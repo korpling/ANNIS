@@ -189,7 +189,7 @@ public class AnnisRunner extends AnnisBaseRunner {
         corpusList = new LinkedList<>();
         benchmarks = new ArrayList<>();
         
-        this.queryDao = new QueryDaoImpl();
+        this.queryDao = QueryDao.create();
 
         this.queriesGenerator = QueriesGenerator.create(this.queryDao);
     }
