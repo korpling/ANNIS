@@ -52,6 +52,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
@@ -86,6 +87,7 @@ import com.google.common.io.ByteStreams;
 import com.google.common.net.UrlEscapers;
 
 import annis.CommonHelper;
+import annis.ServiceConfig;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.exceptions.AnnisQLSyntaxException;
@@ -114,13 +116,13 @@ import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 
 public class QueryDaoImpl extends AbstractDao implements QueryDao {
+    
+    private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
+
 
     // generated sql for example queries and fetches the result
     private ListExampleQueriesHelper listExampleQueriesHelper;
 
-    private String externalFilesPath;
-
-    // configuration
     private int timeout;
 
     private final CorpusStorageManager corpusStorageMgr;
@@ -365,6 +367,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
         this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
                 logfile.getAbsolutePath(), true, LogLevel.Debug);
+        
+        // initialize timeout with value from config (can be overwritten by API)
+        this.timeout = cfg.timeout();
     }
 
     public void init() {
@@ -1068,24 +1073,17 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         this.metaByteHelper = metaByteHelper;
     }
 
-    public String getExternalFilesPath() {
-        return externalFilesPath;
-    }
-
     public File getRealDataDir() {
         File dataDir;
-        if (getExternalFilesPath() == null || getExternalFilesPath().isEmpty()) {
+        if (cfg.externalDataPath() == null || cfg.externalDataPath().isEmpty()) {
             // use the default directory
             dataDir = new File(System.getProperty("user.home"), ".annis/data/");
         } else {
-            dataDir = new File(getExternalFilesPath());
+            dataDir = new File(cfg.externalDataPath());
         }
         return dataDir;
     }
 
-    public void setExternalFilesPath(String externalFilesPath) {
-        this.externalFilesPath = externalFilesPath;
-    }
 
     public ListExampleQueriesHelper getListExampleQueriesHelper() {
         return listExampleQueriesHelper;

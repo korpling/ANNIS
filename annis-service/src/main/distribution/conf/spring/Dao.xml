@@ -74,10 +74,6 @@
   <!-- exported bean: QueryDao -->
   <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true" parent="daoBase">
 
-    <!-- configuration -->
-    <property name="timeout" value="${annis.sql-timeout}"/>
-
-    <property name="externalFilesPath" value="${annis.external-data-path}"/>
 
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     
