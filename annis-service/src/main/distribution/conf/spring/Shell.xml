@@ -30,11 +30,9 @@ limitations under the License.
 
   <bean id="annisRunner" class="annis.AnnisRunner" lazy-init="true">
 
-    <property name="queryDao" ref="queryDao"/>
     <property name="helloMessage" value="ANNIS Interactive Shell"/>
     <property name="prompt" value="ANNIS"/>
     <property name="matchLimit" value="10"/>
-    <property name="queriesGenerator" ref="queriesGenerator" />
   </bean>
 
 </beans>

@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -41,14 +42,12 @@ import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
-import org.codehaus.jackson.map.AnnotationIntrospector;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.corpus_tools.annis.ql.parser.QueryData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultiset;
@@ -57,13 +56,13 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Files;
 
-import annis.dao.DBProvider.DB;
+import annis.dao.autogenqueries.AutoSimpleRegexQuery;
+import annis.dao.autogenqueries.AutoTokQuery;
 import annis.dao.autogenqueries.QueriesGenerator;
+import annis.dao.autogenqueries.QueriesGenerator.QueryBuilder;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
 import annis.security.UserConfig;
-import annis.service.objects.FrequencyTable;
-import annis.service.objects.FrequencyTableQuery;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
@@ -81,6 +80,14 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private boolean temporaryStagingArea;
 
     private DeleteCorpusDao deleteCorpusDao;
+    
+    public AdministrationDao() {
+        this.queriesGenerator = new QueriesGenerator(getQueryDao());
+        Set<QueryBuilder> queryBuilders = new LinkedHashSet<>();
+        queryBuilders.add(new AutoTokQuery());
+        queryBuilders.add(new AutoSimpleRegexQuery());
+        this.queriesGenerator.setQueryBuilder(queryBuilders);
+    }
 
     /**
      * Searches for textes which are empty or only contains whitespaces. If that is
@@ -174,7 +181,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
-    private QueriesGenerator queriesGenerator;
+    private final QueriesGenerator queriesGenerator;
 
     private final Table resolverTable = new Table(FILE_RESOLVER_VIS_MAP)
             .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c(new Column("corpus").createIndex())
@@ -210,10 +217,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * Called when Spring configuration finished
      */
     public void init() {
-        AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
-        jsonMapper.setAnnotationIntrospector(introspector);
-        // the json should be as compact as possible in the database
-        jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, false);
+        jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     /**
@@ -869,21 +873,10 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         return queriesGenerator;
     }
 
-    /**
-     * @param queriesGenerator
-     *            the queriesGenerator to set
-     */
-    public void setQueriesGenerator(QueriesGenerator queriesGenerator) {
-        this.queriesGenerator = queriesGenerator;
-    }
-
     public DeleteCorpusDao getDeleteCorpusDao() {
         return deleteCorpusDao;
     }
 
-    public void setDeleteCorpusDao(DeleteCorpusDao deleteCorpusDao) {
-        this.deleteCorpusDao = deleteCorpusDao;
-    }
 
     /**
      * Checks, if a already exists a corpus with the same name of the top level

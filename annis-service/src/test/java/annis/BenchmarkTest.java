@@ -27,6 +27,7 @@ import javax.annotation.Resource;
 import javax.ws.rs.core.MediaType;
 
 import org.corpus_tools.salt.common.SaltProject;
+import org.glassfish.jersey.internal.util.collection.StringKeyIgnoreCaseMultivaluedMap;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -43,7 +44,6 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 import com.google.common.io.ByteStreams;
-import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
 
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;

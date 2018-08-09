@@ -51,13 +51,15 @@ public class QueriesGenerator extends DBProvider {
   private final Logger log = LoggerFactory.getLogger(QueriesGenerator.class);
 
   // for executing AQL queries
-  private QueryDao queryDao;
+  private final QueryDao queryDao;
 
   // the name of the imported top level corpus
   private String corpusName;
 
   // a set of query builder, which generate the example queries.
   private Set<QueryBuilder> queryBuilder;
+  
+
 
   /**
    * All automatic generated queries must implement this interface.
@@ -106,6 +108,10 @@ public class QueriesGenerator extends DBProvider {
      * @return The final {@link ExampleQuery}, which is written to the database.
      */
     public ExampleQuery getExampleQuery();
+  }
+  
+  public QueriesGenerator(QueryDao queryDao) {
+      this.queryDao = queryDao;
   }
 
   /**
@@ -250,12 +256,6 @@ public class QueriesGenerator extends DBProvider {
     return queryDao;
   }
 
-  /**
-   * @param queryDao the queryDao to set
-   */
-  public void setQueryDao(QueryDao queryDao) {
-    this.queryDao = queryDao;
-  }
 
   /**
    * @return the queryBuilder

@@ -15,6 +15,5 @@ public interface ServiceConfig extends Config {
     int timeout();
     
     @Key("annis.external-data-path")
-    @DefaultValue("")
     String externalDataPath();
 }

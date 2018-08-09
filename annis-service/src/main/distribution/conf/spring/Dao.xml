@@ -23,16 +23,6 @@
     <property name="placeholderPrefix" value="$dao{"/>
   </bean>
   
-  <bean id="queriesGenerator" class="annis.dao.autogenqueries.QueriesGenerator" lazy-init="true">
-    <property name="queryDao" ref="queryDao" />
-    <property name="queryBuilder">
-      <util:set>
-        <bean class="annis.dao.autogenqueries.AutoTokQuery"/>
-        <bean class="annis.dao.autogenqueries.AutoSimpleRegexQuery"/>
-      </util:set>
-    </property>
-  </bean>
-  
   <util:map id="tableInsertFrom">
     <entry key="text" value="(corpus_ref + :offset_corpus_id), id, name, text, toplevel_corpus" />
     <entry key="corpus" value="(id + :offset_corpus_id ), name, type, version, (pre + :offset_corpus_post), (post + :offset_corpus_post), top_level" />
@@ -55,27 +45,12 @@
   <bean id="shortenerDao" class="annis.dao.ShortenerDao" lazy-init="true">
   </bean>
   
-  <!-- exported bean: QueryDao -->
-  <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true">
-  </bean>
-
   <!-- exported Database API for administration tasks -->
- <bean id="adminDaoBase" class="annis.administration.AbstractAdminstrationDao" abstract="true" lazy-init="true">
-  <property name="externalFilesPath" value="${annis.external-data-path}"/>
-  <property name="queryDao" ref="queryDao" />
- </bean>
-
- <bean id="deleteCorpusDao" class="annis.administration.DeleteCorpusDao" lazy-init="true"
-      parent="adminDaoBase">
-  
- </bean>
  
- <bean id="administrationDao" class="annis.administration.AdministrationDao" lazy-init="true"
-        parent="adminDaoBase">
+ <bean id="administrationDao" class="annis.administration.AdministrationDao" lazy-init="true" >
     
     <property name="temporaryStagingArea" value="$dev{annis.import.temporary-staging-area}" />
     <property name="generateExampleQueries" value="${annis.import.example-queries}" />
-    <property name="deleteCorpusDao" ref="deleteCorpusDao" />
     
     <property name="mimeTypeMapping">
       <util:map>
@@ -93,7 +68,6 @@
     </property>
     <property name="tableInsertFrom" ref="tableInsertFrom" />
     <property name="tableInsertSelect" ref="tableInsertSelect" />
-    <property name="queriesGenerator" ref="queriesGenerator" />
     <property name="schemaVersion" value="3.4.3"/>
   </bean>
   

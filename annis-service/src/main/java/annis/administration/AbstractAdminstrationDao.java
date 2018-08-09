@@ -19,9 +19,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import annis.ServiceConfig;
 import annis.dao.AbstractDao;
 import annis.dao.QueryDao;
 import annis.service.objects.AnnisCorpus;
@@ -37,6 +39,7 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
   private final static Logger log = LoggerFactory.getLogger(
     AbstractAdminstrationDao.class);
 
+  private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
   private String externalFilesPath;
   
   private QueryDao queryDao;
@@ -45,14 +48,14 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
   protected File getRealDataDir()
   {
     File dataDir;
-    if (getExternalFilesPath() == null || getExternalFilesPath().isEmpty())
+    if (cfg.externalDataPath() == null || cfg.externalDataPath().isEmpty())
     {
       // use the default directory
       dataDir = new File(System.getProperty("user.home"), ".annis/data/");
     }
     else
     {
-      dataDir = new File(getExternalFilesPath());
+      dataDir = new File(cfg.externalDataPath());
     }
     return dataDir;
   }
@@ -73,16 +76,6 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
   protected String tableInStagingArea(String table)
   {
     return "_" + table;
-  }
-
-  public String getExternalFilesPath()
-  {
-    return externalFilesPath;
-  }
-
-  public void setExternalFilesPath(String externalFilesPath)
-  {
-    this.externalFilesPath = externalFilesPath;
   }
 
   

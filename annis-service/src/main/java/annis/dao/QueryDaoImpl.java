@@ -55,8 +55,6 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
 import org.corpus_tools.annis.ql.parser.QueryData;
 import org.corpus_tools.graphannis.QueryToJSON;
@@ -78,6 +76,9 @@ import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.DeserializationConfig;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -338,7 +339,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
             // map json to pojo
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper.readValue(input, DocumentBrowserConfig.class);
         } catch (FileNotFoundException ex) {
             log.error("file \"${annis.home}/conf/document-browser.json\" does not exists", ex);
