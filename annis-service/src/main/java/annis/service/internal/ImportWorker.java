@@ -103,7 +103,7 @@ public class ImportWorker extends Thread
   private void importSingleCorpusFile(ImportJob job)
   {
     currentJob.setStatus(ImportJob.Status.RUNNING);
-    corpusAdmin.sendImportStatusMail(currentJob.getStatusEmail(), 
+    corpusAdmin.getAdministrationDao().sendImportStatusMail(currentJob.getStatusEmail(), 
           job.getCaption(), ImportJob.Status.RUNNING, null);
     
    

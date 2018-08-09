@@ -26,6 +26,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -33,6 +34,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.subject.Subject;
 
+import annis.administration.AdministrationDao;
+import annis.dao.QueryDao;
 import annis.dao.ShortenerDao;
 
 /**
@@ -46,10 +49,12 @@ import annis.dao.ShortenerDao;
 @Path("annis/shortener")
 public class URLShortenerImpl
 {
-  private ShortenerDao shortenerDao;
   
   @Context
   private HttpServletRequest request;
+  
+  @Context
+  Configuration config;
   
   public void init()
   {
@@ -80,7 +85,7 @@ public class URLShortenerImpl
     String remoteIP = request.getRemoteAddr().replaceAll("[.:]", "_");
     user.checkPermission("shortener:create:" + remoteIP);
     
-    return shortenerDao.shorten(str, "" + user.getPrincipal()).toString();
+    return getShortenerDao().shorten(str, "" + user.getPrincipal()).toString();
   }
   
   @GET
@@ -96,7 +101,7 @@ public class URLShortenerImpl
     try
     {
       UUID id = UUID.fromString(idRaw);
-      String result = shortenerDao.unshorten(id);
+      String result = getShortenerDao().unshorten(id);
       if(result == null)
       {
         throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -112,13 +117,12 @@ public class URLShortenerImpl
 
   public ShortenerDao getShortenerDao()
   {
-    return shortenerDao;
+      Object prop = config.getProperty("shortenerDao");
+      if(prop instanceof QueryDao) {
+          return (ShortenerDao) prop;
+      } else {
+          return null;
+      }
   }
-
-  public void setShortenerDao(ShortenerDao shortenerDao)
-  {
-    this.shortenerDao = shortenerDao;
-  }
-  
   
 }

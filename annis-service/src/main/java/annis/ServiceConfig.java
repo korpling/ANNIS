@@ -16,4 +16,7 @@ public interface ServiceConfig extends Config {
     
     @Key("annis.external-data-path")
     String externalDataPath();
+    
+    @Key("annis.mail-sender")
+    String mailSender();
 }

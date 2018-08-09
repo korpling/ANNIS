@@ -30,7 +30,6 @@ import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
@@ -39,8 +38,12 @@ import org.slf4j.LoggerFactory;
 import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
 import annis.ServiceConfig;
+import annis.administration.AdministrationDao;
+import annis.administration.CorpusAdministration;
+import annis.administration.DeleteCorpusDao;
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
+import annis.dao.ShortenerDao;
 import annis.exceptions.AnnisException;
 import annis.security.MultipleIniWebEnvironment;
 import annis.service.objects.AnnisCorpus;
@@ -64,6 +67,10 @@ public class AnnisServiceRunner extends ResourceConfig {
     private Integer overridePort = null;
 
     private final QueryDao queryDao;
+    private final AdministrationDao adminDao;
+    private final DeleteCorpusDao deleteCorpusDao;
+    private final ShortenerDao shortenerDao;
+    
 
     public AnnisServiceRunner() {
         this(null);
@@ -75,8 +82,19 @@ public class AnnisServiceRunner extends ResourceConfig {
         this.useAuthentification = !nosecurity;
 
         this.queryDao = new QueryDaoImpl();
-
+        
+        this.deleteCorpusDao = new DeleteCorpusDao();
+        this.deleteCorpusDao.setQueryDao(this.queryDao);
+        
+        this.adminDao = new AdministrationDao();
+        this.adminDao.setQueryDao(this.queryDao);
+        this.adminDao.setDeleteCorpusDao(deleteCorpusDao);
+        
+        this.shortenerDao = new ShortenerDao();
+        
         property("queryDao", this.queryDao);
+        property("adminDao", this.adminDao);
+        property("shortenerDao", this.shortenerDao);
 
         packages("annis.service.internal", "annis.provider", "annis.rest.provider");
 
