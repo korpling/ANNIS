@@ -16,15 +16,23 @@
 package annis.service.internal;
 
 import java.io.File;
-import java.net.URI;
+import java.net.InetSocketAddress;
+import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.DispatcherType;
+
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.shiro.web.env.EnvironmentLoader;
+import org.apache.shiro.web.env.EnvironmentLoaderListener;
+import org.apache.shiro.web.servlet.ShiroFilter;
 import org.eclipse.jetty.server.Server;
-import org.glassfish.jersey.jetty.JettyHttpContainerFactory;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,26 +73,13 @@ public class AnnisServiceRunner extends ResourceConfig {
         this.overridePort = port;
         boolean nosecurity = Boolean.parseBoolean(System.getProperty("annis.nosecurity", "false"));
         this.useAuthentification = !nosecurity;
-        
+
         this.queryDao = new QueryDaoImpl();
-        
+
         property("queryDao", this.queryDao);
-        
-        packages("annis.service.internal", "annis.provider",
-                "annis.rest.provider");
-        property(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM,
-                MultipleIniWebEnvironment.class.getName());
-        
-        if (useAuthentification) {
-            log.info("Using authentification");
-            property(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
-                    "file:" + System.getProperty("annis.home") + "/conf/shiro.ini," + "file:"
-                            + System.getProperty("annis.home") + "/conf/develop_shiro.ini");
-        } else {
-            log.warn("*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
-            property(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
-                    "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
-        }
+
+        packages("annis.service.internal", "annis.provider", "annis.rest.provider");
+
     }
 
     public static void main(String[] args) throws Exception {
@@ -170,16 +165,48 @@ public class AnnisServiceRunner extends ResourceConfig {
 
     private void createWebServer() {
 
-        
-
         int port = overridePort == null ? cfg.webservicePort() : overridePort;
         try {
             // only allow connections from localhost
             // if the administrator wants to allow external acccess he *has* to
             // use a HTTP proxy which also should use SSL encryption
-            URI addr = URI.create("http://localhost:" + port);
-            
-            server = JettyHttpContainerFactory.createServer(addr, this);
+            // URI addr = URI.create("http://localhost:" + port);
+            // server = JettyHttpContainerFactory.createServer(addr, this);
+
+            InetSocketAddress addr = new InetSocketAddress("localhost", port);
+            server = new Server(addr);
+
+            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+            context.setContextPath("/");
+
+            server.setHandler(context);
+
+            ServletContainer jerseyContainer = new ServletContainer(this);
+
+            ServletHolder holder = new ServletHolder(jerseyContainer);
+            context.addServlet(holder, "/*");
+            context.setInitParameter(EnvironmentLoader.ENVIRONMENT_CLASS_PARAM,
+                    MultipleIniWebEnvironment.class.getName());
+
+            if (useAuthentification) {
+                log.info("Using authentification");
+                context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
+                        "file:" + System.getProperty("annis.home") + "/conf/shiro.ini," + "file:"
+                                + System.getProperty("annis.home") + "/conf/develop_shiro.ini");
+            } else {
+                log.warn("*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
+                context.setInitParameter(EnvironmentLoader.CONFIG_LOCATIONS_PARAM,
+                        "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
+            }
+
+            //EnumSet<DispatcherType> gzipDispatcher = EnumSet.of(DispatcherType.REQUEST);
+            //context.addFilter(GzipFilter.class, "/*", gzipDispatcher);
+
+            // configure Apache Shiro with the web application
+            context.addEventListener(new EnvironmentLoaderListener());
+            EnumSet<DispatcherType> shiroDispatchers = EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD,
+                    DispatcherType.INCLUDE, DispatcherType.ERROR);
+            context.addFilter(ShiroFilter.class, "/*", shiroDispatchers);
 
         } catch (IllegalArgumentException ex) {
             log.error("IllegalArgumentException at ANNIS service startup", ex);
