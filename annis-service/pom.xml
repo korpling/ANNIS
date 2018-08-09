@@ -16,11 +16,6 @@
 
 	<dependencies>
 
-		<dependency>
-			<groupId>org.jhades</groupId>
-			<artifactId>jhades</artifactId>
-			<version>1.0.4</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.corpus-tools</groupId>
@@ -112,20 +107,8 @@
 			<version>1.0.10</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>1.7.4</version>
-			<scope>compile</scope>
-		</dependency>
 
 
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2.2</version>
-			<scope>compile</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>commons-cli</groupId>
@@ -233,19 +216,8 @@
 			<groupId>org.apache.shiro</groupId>
 			<artifactId>shiro-ehcache</artifactId>
 			<version>1.4.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>net.sf.ehcache</groupId>
-					<artifactId>ehcache-core</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
-		<dependency>
-			<groupId>org.ehcache</groupId>
-			<artifactId>jcache</artifactId>
-			<version>1.0.1</version>
-		</dependency>
 
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
