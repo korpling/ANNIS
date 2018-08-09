@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
+import annis.DevelopConfig;
+import annis.ServiceConfig;
 import annis.administration.StatementController;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
@@ -47,10 +50,11 @@ import au.com.bytecode.opencsv.CSVReader;
  */
 public abstract class AbstractDao extends DBProvider {
   private final static Logger log = LoggerFactory.getLogger(AbstractDao.class);
+  
+  private final DevelopConfig cfg = ConfigFactory.create(DevelopConfig.class);
 
   private StatementController statementController;
-  private String scriptPath;
-
+  
   public void registerGUICancelThread(StatementController statementCon) {
     this.statementController = statementCon;
   }
@@ -153,12 +157,9 @@ public abstract class AbstractDao extends DBProvider {
 
 
   public String getScriptPath() {
-    return scriptPath;
+    return cfg.scriptPath();
   }
 
-  public void setScriptPath(String scriptPath) {
-    this.scriptPath = scriptPath;
-  }
 
 
 }

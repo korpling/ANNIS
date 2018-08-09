@@ -51,22 +51,16 @@
   </util:map>
 
   <!-- BEGIN EXPORTS -->
-
-  <bean id="daoBase" class="annis.dao.AbstractDao" abstract="true" lazy-init="true">
- 	 <property name="scriptPath" value="$dev{annis.script-path}"/>
-  </bean>
   
-  
-  <bean id="shortenerDao" class="annis.dao.ShortenerDao" lazy-init="true" parent="daoBase">
+  <bean id="shortenerDao" class="annis.dao.ShortenerDao" lazy-init="true">
   </bean>
   
   <!-- exported bean: QueryDao -->
-  <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true" parent="daoBase">
+  <bean id="queryDao" class="annis.dao.QueryDaoImpl" init-method="init" lazy-init="true">
   </bean>
 
   <!-- exported Database API for administration tasks -->
- <bean id="adminDaoBase" class="annis.administration.AbstractAdminstrationDao" abstract="true" lazy-init="true"
-   parent="daoBase">
+ <bean id="adminDaoBase" class="annis.administration.AbstractAdminstrationDao" abstract="true" lazy-init="true">
   <property name="externalFilesPath" value="${annis.external-data-path}"/>
   <property name="queryDao" ref="queryDao" />
  </bean>
