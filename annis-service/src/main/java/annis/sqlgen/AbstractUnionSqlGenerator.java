@@ -50,15 +50,19 @@ public abstract class AbstractUnionSqlGenerator extends AbstractSqlGenerator
     StringBuffer sb = new StringBuffer();
 
     List<String> alternatives = new ArrayList<>();
+    List<QueryNode> alternatives_nodes = new ArrayList<>();
     for (List<QueryNode> alternative : queryData.getAlternatives())
     {
+      int i = 1;
+      // duplicates in alternatives_nodes do not matter
+      // as it is only used for ORDER BY and LIMIT/OFFSET clauses
+      alternatives_nodes.addAll(alternative);
       alternatives.add(createSqlForAlternative(queryData, alternative, indent));
     }
     sb.append(StringUtils.join(alternatives, "\n" + indent + "UNION "));
 
-    // ORDER BY and LIMIT/OFFSET clauses cannot depend on alternative?
-    appendOrderByClause(sb, queryData, null, indent);
-    appendLimitOffsetClause(sb, queryData, null, indent);
+    appendOrderByClause(sb, queryData, alternatives_nodes, indent);
+    appendLimitOffsetClause(sb, queryData, alternatives_nodes, indent);
 
     return sb.toString();
   }

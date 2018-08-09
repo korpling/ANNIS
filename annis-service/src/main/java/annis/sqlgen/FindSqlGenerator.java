@@ -70,10 +70,27 @@ public class FindSqlGenerator extends AbstractSqlGenerator
     
     String indent2 = indent + TABSTOP;
     
-    sb.append(indent2).append("solution.*,\n");
+    int i = 0;
+    int node_i = 0;
+    for (QueryNode n: alternative) {
+        i++;
+        String node_id;
+        if (n.hasCustomName()) {
+            node_id = n.getVariable();
+        }
+        else {
+            ++node_i;
+            node_id = "" + node_i;
+        }
+        sb.append(indent2).append("solution.id" + node_id + " AS id" + i +",\n");
+        sb.append(indent2).append("solution.cat" + node_id + " AS cat" + i +",\n");
+        if (solutionSqlGenerator.isOutputNodeName()) {
+            sb.append(indent2).append("solution.salt_id" + node_id + " AS salt_id" + i +",\n");
+        }
+    }
     
     // add node annotation namespace and name for each query node
-    int i=0;
+    i=0;
     Iterator<QueryNode> itNodes = alternative.iterator();
     while(itNodes.hasNext())
     {
@@ -115,9 +132,17 @@ public class FindSqlGenerator extends AbstractSqlGenerator
     Iterator<QueryNode> itNodes = alternative.iterator();
     while(itNodes.hasNext())
     {
-      i++;
-      
+
       QueryNode n = itNodes.next();
+      String node_id;
+      if (n.hasCustomName()) {
+          node_id = n.getVariable();
+      }
+      else {
+          ++i;
+          node_id = "" + i;
+      }
+
       sb.append(indent)
         .append("LEFT JOIN annotation_category AS annotation_category")
         .append(n.getId())
@@ -125,7 +150,7 @@ public class FindSqlGenerator extends AbstractSqlGenerator
         .append(n.getId())
         .append(".toplevel_corpus")
         .append(" AND solution.cat")
-        .append(i)
+        .append(node_id)
         .append(" = annotation_category")
         .append(n.getId())
         .append(".id")

@@ -193,6 +193,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
   {
     Multimap<FrequencyTableEntry, String> conditions = LinkedHashMultimap.create();
     int i = 1;
+    int node_i = 0;
 
     ImmutableMap<String, QueryNode> idxNodeVariables = Maps.uniqueIndex(
       alternative.iterator(), new Function<QueryNode, String>()
@@ -242,7 +243,16 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
             + "Your query contains " + alternative.size()
             + " node(s), make sure no node definition numbers are greater than this number");
         }
-        conditions.put(e, "v" + i + ".id = solutions.id" + referencedNode.getId());
+        String node_id;
+        if (referencedNode.hasCustomName()) {
+            node_id = referencedNode.getVariable();
+        }
+        else {
+            ++node_i;
+            node_id = "" + node_i;
+        }
+
+        conditions.put(e, "v" + i + ".id = solutions.id" + node_id);
 
         if (e.getType() == FrequencyTableEntryType.span)
         {
