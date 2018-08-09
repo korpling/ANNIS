@@ -39,7 +39,6 @@ import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
 import annis.ServiceConfig;
 import annis.administration.AdministrationDao;
-import annis.administration.CorpusAdministration;
 import annis.administration.DeleteCorpusDao;
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
@@ -86,9 +85,7 @@ public class AnnisServiceRunner extends ResourceConfig {
         this.deleteCorpusDao = new DeleteCorpusDao();
         this.deleteCorpusDao.setQueryDao(this.queryDao);
         
-        this.adminDao = new AdministrationDao();
-        this.adminDao.setQueryDao(this.queryDao);
-        this.adminDao.setDeleteCorpusDao(deleteCorpusDao);
+        this.adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
         
         this.shortenerDao = new ShortenerDao();
         

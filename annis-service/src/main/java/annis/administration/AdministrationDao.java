@@ -64,6 +64,7 @@ import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Files;
 
 import annis.ServiceConfig;
+import annis.dao.QueryDao;
 import annis.dao.autogenqueries.AutoSimpleRegexQuery;
 import annis.dao.autogenqueries.AutoTokQuery;
 import annis.dao.autogenqueries.QueriesGenerator;
@@ -91,11 +92,15 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private DeleteCorpusDao deleteCorpusDao;
     
     public AdministrationDao() {
-        this.queriesGenerator = new QueriesGenerator(getQueryDao());
-        Set<QueryBuilder> queryBuilders = new LinkedHashSet<>();
-        queryBuilders.add(new AutoTokQuery());
-        queryBuilders.add(new AutoSimpleRegexQuery());
-        this.queriesGenerator.setQueryBuilder(queryBuilders);
+        this.queriesGenerator = QueriesGenerator.create(getQueryDao());
+    }
+    
+    public static AdministrationDao create(QueryDao queryDao, DeleteCorpusDao deleteCorpusDao) {
+        AdministrationDao adminDao = new AdministrationDao();
+        adminDao.setQueryDao(queryDao);
+        adminDao.setDeleteCorpusDao(deleteCorpusDao);
+        
+        return adminDao;
     }
 
     /**

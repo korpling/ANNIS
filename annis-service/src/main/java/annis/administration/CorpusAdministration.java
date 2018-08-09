@@ -66,13 +66,19 @@ import java.util.HashSet;
 public class CorpusAdministration {
 
     private AdministrationDao administrationDao;
-    private DeleteCorpusDao deleteCorpusDao;
 
     private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
 
     private static final Logger log = LoggerFactory.getLogger(CorpusAdministration.class);
 
     public CorpusAdministration() {
+    }
+    
+    public static CorpusAdministration create(AdministrationDao administrationDao) {
+        CorpusAdministration corpusAdmin = new CorpusAdministration();
+        corpusAdmin.setAdministrationDao(administrationDao);
+        
+        return corpusAdmin;
     }
 
     public void deleteCorpora(List<String> corpora) {
@@ -88,7 +94,7 @@ public class CorpusAdministration {
             }
         }
         log.info("Deleting corpora: " + corpora);
-        deleteCorpusDao.deleteCorpora(corpora);
+        getDeleteCorpusDao().deleteCorpora(corpora);
         log.info("Finished deleting corpora: " + corpora);
     }
 
@@ -518,11 +524,8 @@ public class CorpusAdministration {
     }
 
     public DeleteCorpusDao getDeleteCorpusDao() {
-        return deleteCorpusDao;
+        return administrationDao.getDeleteCorpusDao();
     }
 
-    public void setDeleteCorpusDao(DeleteCorpusDao deleteCorpusDao) {
-        this.deleteCorpusDao = deleteCorpusDao;
-    }
 
 }

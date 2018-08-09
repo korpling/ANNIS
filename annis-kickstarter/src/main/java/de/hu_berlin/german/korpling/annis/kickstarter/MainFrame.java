@@ -23,12 +23,17 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
@@ -37,11 +42,30 @@ import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import org.corpus_tools.annis.ql.parser.QueryData;
+import org.corpus_tools.graphannis.api.CorpusStorageManager;
+import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.LoggerFactory;
 
 import annis.AnnisBaseRunner;
+import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
+import annis.administration.DeleteCorpusDao;
 import annis.administration.ImportStatus;
+import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
+import annis.examplequeries.ExampleQuery;
+import annis.model.Annotation;
+import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisBinaryMetaData;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.FrequencyTable;
+import annis.service.objects.Match;
+import annis.service.objects.MatchAndDocumentCount;
 import annis.utils.Utils;
 import java.awt.Font;
 import java.awt.GraphicsDevice;
@@ -54,242 +78,183 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
  *
  * @author thomas
  */
-public class MainFrame extends javax.swing.JFrame
-{
-  
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    MainFrame.class);
+public class MainFrame extends javax.swing.JFrame {
 
-  private class MainFrameWorker extends SwingWorker<String, String>
-  {
-    private final KickstartRunner delegate;
-    
-    public MainFrameWorker() {
-    	this.delegate = new KickstartRunner(webServerPort, null);
-    }
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainFrame.class);
 
-    @Override
-    protected String doInBackground() throws Exception
-    {
-      delegate.resetRunner();
-      setProgress(1);
-      try
-      {
-        delegate.startService();
-        setProgress(2);
-        delegate.startJetty();
-      }
-      catch (Exception ex)
-      {
-        return ex.getLocalizedMessage();
-      }
-      return "";
-    }
+    private class MainFrameWorker extends SwingWorker<String, String> {
+        private final KickstartRunner delegate;
 
+        public MainFrameWorker() {
+            this.delegate = new KickstartRunner(webServerPort, null);
+        }
 
-    @Override
-    protected void done()
-    {
-      try 
-      {
-        final String result = get();
-        SwingUtilities.invokeLater(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            handleServiceStartResult(result);
-          }
-        });
-      }
-      catch (InterruptedException ex)
-      {
-        log.error(null, ex);
-      }
-      catch (ExecutionException ex)
-      {
-        log.error(null, ex);
-      }
-    }
-    
-    public void setTimeoutDisabled(boolean disabled)
-    {
-      delegate.setTimeoutDisabled(disabled);
-    }
-    
-  } //end MainFrameWorker class
-  private CorpusAdministration corpusAdministration;
-  private MainFrameWorker serviceWorker;
-  private boolean wasStarted = false;
-  private final int webServerPort;
-  
-  
-  /**
-   * Creates new form MainFrame
-   */
-  public MainFrame()
-  {
-    Integer[] sizes = new Integer[]
-    {
-      192, 128, 64, 48, 32, 16, 14
-    };
-    List<Image> allImages = new LinkedList<Image>();
-
-    for (int s : sizes)
-    {
-      try
-      {
-        BufferedImage imgIcon = ImageIO.read(MainFrame.class.getResource(
-          "logo/annis_" + s + ".png"));
-        allImages.add(imgIcon);
-      }
-      catch (IOException ex)
-      {
-        log.error(null, ex);
-      }
-    }
-    this.setIconImages(allImages);
-    
-    // TODO: read webserver port from config
-    String webPortRaw = System.getProperty("annis.web-port");
-    if(webPortRaw == null || webPortRaw.isEmpty()) {
-    	// use default
-    	this.webServerPort = 5712;
-    } else {
-    	this.webServerPort = Integer.parseInt(webPortRaw);
-    }
-
-    // find the location of the kickstarter
-    if(System.getProperty("annis.home") == null)
-    {
-      try
-      {
-       URL classLocation = getClass().getProtectionDomain().getCodeSource().getLocation();
-       File jarFile = new File(classLocation.toURI());
-       // check if this is an actual jar file or only a folder
-       if(jarFile.isFile())
-       {
-         System.setProperty("annis.home", jarFile.getParent());
-       }
-       else
-       {
-         // fallback to current working directory
-         System.setProperty("annis.home", ".");
-       }
-      }
-      catch(SecurityException | URISyntaxException ex)
-      {
-        log.warn("Could not reliable get the location of ANNIS Kickstarter, fallback to working directory is used.", ex);
-        // fallback to current working directory
-        System.setProperty("annis.home", ".");
-      }
-    }
-    
-
-    // init corpusAdministration
-    this.corpusAdministration =
-      (CorpusAdministration) AnnisBaseRunner.getBean("corpusAdministration",
-      true, "file:"
-      + Utils.getAnnisFile("conf/spring/Admin.xml").getAbsolutePath());
-
-    try
-    {
-      UIManager.setLookAndFeel(new NimbusLookAndFeel()
-      {
         @Override
-        public UIDefaults getDefaults()
-        {
-          UIDefaults defaults = super.getDefaults();
-          GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-          if(gd.getDisplayMode().getWidth() > 2000)
-          {
-            defaults.put("defaultFont", new Font(Font.SANS_SERIF, Font.PLAIN, 18));
-          }
-          return defaults;
+        protected String doInBackground() throws Exception {
+            delegate.resetRunner();
+            setProgress(1);
+            try {
+                delegate.startService();
+                setProgress(2);
+                delegate.startJetty();
+            } catch (Exception ex) {
+                return ex.getLocalizedMessage();
+            }
+            return "";
         }
-        
-      });
+
+        @Override
+        protected void done() {
+            try {
+                final String result = get();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        handleServiceStartResult(result);
+                    }
+                });
+            } catch (InterruptedException ex) {
+                log.error(null, ex);
+            } catch (ExecutionException ex) {
+                log.error(null, ex);
+            }
+        }
+
+        public void setTimeoutDisabled(boolean disabled) {
+            delegate.setTimeoutDisabled(disabled);
+        }
+
+    } // end MainFrameWorker class
+
+    private CorpusAdministration corpusAdministration;
+    private MainFrameWorker serviceWorker;
+    private boolean wasStarted = false;
+    private final int webServerPort;
+
+    /**
+     * Creates new form MainFrame
+     */
+    public MainFrame() {
+        Integer[] sizes = new Integer[] { 192, 128, 64, 48, 32, 16, 14 };
+        List<Image> allImages = new LinkedList<Image>();
+
+        for (int s : sizes) {
+            try {
+                BufferedImage imgIcon = ImageIO.read(MainFrame.class.getResource("logo/annis_" + s + ".png"));
+                allImages.add(imgIcon);
+            } catch (IOException ex) {
+                log.error(null, ex);
+            }
+        }
+        this.setIconImages(allImages);
+
+        // TODO: read webserver port from config
+        String webPortRaw = System.getProperty("annis.web-port");
+        if (webPortRaw == null || webPortRaw.isEmpty()) {
+            // use default
+            this.webServerPort = 5712;
+        } else {
+            this.webServerPort = Integer.parseInt(webPortRaw);
+        }
+
+        // find the location of the kickstarter
+        if (System.getProperty("annis.home") == null) {
+            try {
+                URL classLocation = getClass().getProtectionDomain().getCodeSource().getLocation();
+                File jarFile = new File(classLocation.toURI());
+                // check if this is an actual jar file or only a folder
+                if (jarFile.isFile()) {
+                    System.setProperty("annis.home", jarFile.getParent());
+                } else {
+                    // fallback to current working directory
+                    System.setProperty("annis.home", ".");
+                }
+            } catch (SecurityException | URISyntaxException ex) {
+                log.warn(
+                        "Could not reliable get the location of ANNIS Kickstarter, fallback to working directory is used.",
+                        ex);
+                // fallback to current working directory
+                System.setProperty("annis.home", ".");
+            }
+        }
+
+        // init corpusAdministration
+
+        this.corpusAdministration = CorpusAdministration
+                .create(AdministrationDao.create(new QueryDaoImpl(), new DeleteCorpusDao()));
+        try {
+            UIManager.setLookAndFeel(new NimbusLookAndFeel() {
+                @Override
+                public UIDefaults getDefaults() {
+                    UIDefaults defaults = super.getDefaults();
+                    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                    if (gd.getDisplayMode().getWidth() > 2000) {
+                        defaults.put("defaultFont", new Font(Font.SANS_SERIF, Font.PLAIN, 18));
+                    }
+                    return defaults;
+                }
+
+            });
+        } catch (UnsupportedLookAndFeelException ex) {
+            log.error(null, ex);
+        }
+
+        initComponents();
+
+        serviceWorker = new MainFrameWorker();
+        serviceWorker.addPropertyChangeListener(new PropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (serviceWorker.getProgress() == 1) {
+                    pbStart.setIndeterminate(true);
+                    lblStatusService.setText("<html>Starting ANNIS...</html>");
+                    lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource(
+                            "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/quick_restart.png")));
+                }
+            }
+        });
+
+        if (!serviceWorker.isDone()) {
+
+            btImport.setEnabled(true);
+            btList.setEnabled(true);
+
+            serviceWorker.execute();
+
+        }
     }
-    catch (UnsupportedLookAndFeelException ex)
-    {
-      log.error(null, ex);
+
+    private void handleServiceStartResult(String result) {
+        try {
+            wasStarted = true;
+            pbStart.setIndeterminate(false);
+            pbStart.setValue(100);
+            if ("".equals(result)) {
+                lblStatusService.setText("<html>ANNIS started</html>");
+                lblStatusService.setIcon(new javax.swing.ImageIcon(MainFrame.class
+                        .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
+                btLaunch.setEnabled(true);
+                btLaunch.setForeground(Color.blue);
+                cbDisableTimeout.setEnabled(true);
+            } else {
+                lblStatusService.setText("<html>ANNIS start failed:<br>" + result + "</html>");
+                lblStatusService.setIcon(new javax.swing.ImageIcon(getClass()
+                        .getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png")));
+            }
+        } catch (Exception ex) {
+            ImportStatus importStatus = corpusAdministration.getAdministrationDao().initImportStatus();
+            importStatus.addException("unknown exception", ex);
+            new ExceptionDialog(importStatus).setVisible(true);
+        }
     }
 
-    initComponents();
-
-
-    serviceWorker = new MainFrameWorker();
-    serviceWorker.addPropertyChangeListener(new PropertyChangeListener()
-    {
-
-      public void propertyChange(PropertyChangeEvent evt)
-      {
-        if (serviceWorker.getProgress() == 1)
-        {
-          pbStart.setIndeterminate(true);
-          lblStatusService.setText("<html>Starting ANNIS...</html>");
-          lblStatusService.setIcon(
-            new javax.swing.ImageIcon(
-            getClass().getResource(
-            "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/quick_restart.png")));
-        }
-      }
-    });
-
-
-    if (!serviceWorker.isDone())
-    {
-
-      btImport.setEnabled(true);
-      btList.setEnabled(true);
-
-      serviceWorker.execute();
-
-    }
-  }
-  
-  private void handleServiceStartResult(String result)
-  {
-    try
-      {
-        wasStarted = true;
-        pbStart.setIndeterminate(false);
-        pbStart.setValue(100);
-        if ("".equals(result))
-        {
-          lblStatusService.setText("<html>ANNIS started</html>");
-          lblStatusService.setIcon(
-            new javax.swing.ImageIcon(
-            MainFrame.class.getResource(
-            "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
-          btLaunch.setEnabled(true);
-          btLaunch.setForeground(Color.blue);
-          cbDisableTimeout.setEnabled(true);
-        }
-        else
-        {
-          lblStatusService.setText("<html>ANNIS start failed:<br>" + result + "</html>");
-          lblStatusService.setIcon(
-            new javax.swing.ImageIcon(
-            getClass().getResource(
-            "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png")));
-        }
-      }
-      catch (Exception ex)
-      {
-        ImportStatus importStatus = corpusAdministration
-          .getAdministrationDao().initImportStatus();
-        importStatus.addException("unknown exception", ex);
-        new ExceptionDialog(importStatus).setVisible(true);
-      }
-  }
-
-  /**
-   * This method is called from within the constructor to initialize the form.
-   * WARNING: Do NOT modify this code. The content of this method is always
-   * regenerated by the Form Editor.
-   */
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    // <editor-fold defaultstate="collapsed" desc="Generated
+    // Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         btImport = new javax.swing.JButton();
@@ -304,7 +269,8 @@ public class MainFrame extends javax.swing.JFrame
         setTitle("ANNIS Kickstarter");
         setLocationByPlatform(true);
 
-        btImport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/db_add.png"))); // NOI18N
+        btImport.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/db_add.png"))); // NOI18N
         btImport.setMnemonic('i');
         btImport.setText("Import corpus");
         btImport.setToolTipText("<html>\nImport a new corpus to ANNIS.\n</html>");
@@ -316,10 +282,12 @@ public class MainFrame extends javax.swing.JFrame
             }
         });
 
-        btList.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/month.png"))); // NOI18N
+        btList.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/month.png"))); // NOI18N
         btList.setMnemonic('l');
         btList.setText("List imported corpora");
-        btList.setToolTipText("<html>\nList all existing corpora of the database.<br>\nYou can delete copora here as well.\n</html>");
+        btList.setToolTipText(
+                "<html>\nList all existing corpora of the database.<br>\nYou can delete copora here as well.\n</html>");
         btList.setEnabled(false);
         btList.setName("btList"); // NOI18N
         btList.addActionListener(new java.awt.event.ActionListener() {
@@ -330,7 +298,8 @@ public class MainFrame extends javax.swing.JFrame
 
         lblStatusService.setFont(new java.awt.Font("DejaVu Sans", 0, 18)); // NOI18N
         lblStatusService.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblStatusService.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png"))); // NOI18N
+        lblStatusService.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/no.png"))); // NOI18N
         lblStatusService.setText("<html>Annis stopped</html>");
         lblStatusService.setName("lblStatusService"); // NOI18N
 
@@ -344,6 +313,7 @@ public class MainFrame extends javax.swing.JFrame
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 btLaunchMouseExited(evt);
             }
+
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 btLaunchMouseEntered(evt);
             }
@@ -356,7 +326,8 @@ public class MainFrame extends javax.swing.JFrame
 
         pbStart.setName("pbStart"); // NOI18N
 
-        btExit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/exit.png"))); // NOI18N
+        btExit.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/exit.png"))); // NOI18N
         btExit.setMnemonic('e');
         btExit.setText("Exit");
         btExit.setToolTipText("<html>\nThis will terminate the application.\n</html>");
@@ -368,7 +339,8 @@ public class MainFrame extends javax.swing.JFrame
         });
 
         cbDisableTimeout.setText("disable query timeout");
-        cbDisableTimeout.setToolTipText("If this checkbox is active no query timeout will be applied. Please note the only way to abort the query is either the automatic timeout or by closing the ANNIS kickstarter.");
+        cbDisableTimeout.setToolTipText(
+                "If this checkbox is active no query timeout will be applied. Please note the only way to abort the query is either the automatic timeout or by closing the ANNIS kickstarter.");
         cbDisableTimeout.setEnabled(false);
         cbDisableTimeout.setName("cbDisableTimeout"); // NOI18N
         cbDisableTimeout.addActionListener(new java.awt.event.ActionListener() {
@@ -379,125 +351,114 @@ public class MainFrame extends javax.swing.JFrame
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btImport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addComponent(btList, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addComponent(lblStatusService, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addComponent(pbStart, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addComponent(btLaunch, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(cbDisableTimeout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup().addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(btImport, javax.swing.GroupLayout.Alignment.TRAILING,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                                .addComponent(btList, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                                .addComponent(lblStatusService, javax.swing.GroupLayout.Alignment.TRAILING,
+                                        javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                                .addComponent(pbStart, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                                .addComponent(btLaunch, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                        layout.createSequentialGroup()
+                                                .addComponent(cbDisableTimeout, javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btExit)))
+                        .addContainerGap()));
+        layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup().addContainerGap().addComponent(btImport)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(btList)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btExit)))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btImport)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btList)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblStatusService, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pbStart, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btLaunch, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btExit)
-                    .addComponent(cbDisableTimeout))
-                .addContainerGap())
-        );
+                        .addComponent(lblStatusService, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pbStart, javax.swing.GroupLayout.PREFERRED_SIZE,
+                                javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btLaunch, javax.swing.GroupLayout.PREFERRED_SIZE, 78,
+                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(btExit).addComponent(cbDisableTimeout))
+                        .addContainerGap()));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btImportActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btImportActionPerformed
-    {//GEN-HEADEREND:event_btImportActionPerformed
+    private void btImportActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_btImportActionPerformed
+    {// GEN-HEADEREND:event_btImportActionPerformed
 
-      ImportDialog dlg = new ImportDialog(this, true, corpusAdministration);
-      dlg.setVisible(true);
+        ImportDialog dlg = new ImportDialog(this, true, corpusAdministration);
+        dlg.setVisible(true);
 
-    }//GEN-LAST:event_btImportActionPerformed
+    }// GEN-LAST:event_btImportActionPerformed
 
-    private void btListActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btListActionPerformed
-    {//GEN-HEADEREND:event_btListActionPerformed
+    private void btListActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_btListActionPerformed
+    {// GEN-HEADEREND:event_btListActionPerformed
 
-      ListDialog dlg = new ListDialog(this, true, corpusAdministration);
-      dlg.setVisible(true);
+        ListDialog dlg = new ListDialog(this, true, corpusAdministration);
+        dlg.setVisible(true);
 
-    }//GEN-LAST:event_btListActionPerformed
+    }// GEN-LAST:event_btListActionPerformed
 
-    private void btLaunchActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btLaunchActionPerformed
-    {//GEN-HEADEREND:event_btLaunchActionPerformed
-      try
-      {
-        Desktop.getDesktop().browse(new URI(
-          "http://localhost:" + webServerPort + "/annis-gui/"));
-      }
-      catch (IOException | URISyntaxException ex)
-      {
-       ImportStatus importStatus = corpusAdministration
-          .getAdministrationDao().initImportStatus();
-        importStatus.addException("unknown exception", ex);
-        new ExceptionDialog(importStatus).setVisible(true);
-      }
+    private void btLaunchActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_btLaunchActionPerformed
+    {// GEN-HEADEREND:event_btLaunchActionPerformed
+        try {
+            Desktop.getDesktop().browse(new URI("http://localhost:" + webServerPort + "/annis-gui/"));
+        } catch (IOException | URISyntaxException ex) {
+            ImportStatus importStatus = corpusAdministration.getAdministrationDao().initImportStatus();
+            importStatus.addException("unknown exception", ex);
+            new ExceptionDialog(importStatus).setVisible(true);
+        }
 
-    }//GEN-LAST:event_btLaunchActionPerformed
+    }// GEN-LAST:event_btLaunchActionPerformed
 
-    private void btExitActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btExitActionPerformed
-    {//GEN-HEADEREND:event_btExitActionPerformed
+    private void btExitActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_btExitActionPerformed
+    {// GEN-HEADEREND:event_btExitActionPerformed
 
-      System.exit(0);
+        System.exit(0);
 
-    }//GEN-LAST:event_btExitActionPerformed
+    }// GEN-LAST:event_btExitActionPerformed
 
-    private void btLaunchMouseEntered(java.awt.event.MouseEvent evt)//GEN-FIRST:event_btLaunchMouseEntered
-    {//GEN-HEADEREND:event_btLaunchMouseEntered
+    private void btLaunchMouseEntered(java.awt.event.MouseEvent evt)// GEN-FIRST:event_btLaunchMouseEntered
+    {// GEN-HEADEREND:event_btLaunchMouseEntered
 
-      this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        this.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-    }//GEN-LAST:event_btLaunchMouseEntered
+    }// GEN-LAST:event_btLaunchMouseEntered
 
-    private void btLaunchMouseExited(java.awt.event.MouseEvent evt)//GEN-FIRST:event_btLaunchMouseExited
-    {//GEN-HEADEREND:event_btLaunchMouseExited
+    private void btLaunchMouseExited(java.awt.event.MouseEvent evt)// GEN-FIRST:event_btLaunchMouseExited
+    {// GEN-HEADEREND:event_btLaunchMouseExited
 
-      this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
-    }//GEN-LAST:event_btLaunchMouseExited
+    }// GEN-LAST:event_btLaunchMouseExited
 
-  private void cbDisableTimeoutActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_cbDisableTimeoutActionPerformed
-  {//GEN-HEADEREND:event_cbDisableTimeoutActionPerformed
-    
-    if(serviceWorker != null)
-    {
-      serviceWorker.setTimeoutDisabled(cbDisableTimeout.isSelected());
+    private void cbDisableTimeoutActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_cbDisableTimeoutActionPerformed
+    {// GEN-HEADEREND:event_cbDisableTimeoutActionPerformed
+
+        if (serviceWorker != null) {
+            serviceWorker.setTimeoutDisabled(cbDisableTimeout.isSelected());
+        }
+
+    }// GEN-LAST:event_cbDisableTimeoutActionPerformed
+
+    /**
+     * @param args
+     *                 the command line arguments
+     */
+    public static void main(String args[]) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+
+            public void run() {
+                MainFrame frame = new MainFrame();
+                frame.setVisible(true);
+            }
+        });
     }
-    
-  }//GEN-LAST:event_cbDisableTimeoutActionPerformed
 
-
-  /**
-   * @param args the command line arguments
-   */
-  public static void main(String args[])
-  {
-    java.awt.EventQueue.invokeLater(new Runnable()
-    {
-
-      public void run()
-      {
-        MainFrame frame = new MainFrame();
-        frame.setVisible(true);
-      }
-    });
-  }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btExit;
     private javax.swing.JButton btImport;

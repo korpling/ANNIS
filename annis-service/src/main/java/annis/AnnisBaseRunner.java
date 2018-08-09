@@ -66,33 +66,6 @@ public abstract class AnnisBaseRunner
 
   private String prompt;
 
-  public static AnnisBaseRunner getInstance(String beanName,
-    String... contextLocations)
-  {
-    return getInstance(beanName, true, contextLocations);
-  }
-
-  public static AnnisBaseRunner getInstance(String beanName,
-    boolean logToConsole, String... contextLocations)
-  {
-    return (AnnisBaseRunner) getBean(beanName, logToConsole, contextLocations);
-  }
-
-  public static Object getBean(String beanName,
-    boolean logToConsole, String... contextLocations)
-  {
-    checkForAnnisHome();
-    setupLogging(logToConsole);
-
-    GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
-    ctx.setValidating(false);
-   
-    AnnisXmlContextHelper.prepareContext(ctx);
-
-    ctx.load(contextLocations);
-    ctx.refresh();
-    return ctx.getBean(beanName);
-  }
 
   public void run(String[] args) throws IOException
   {

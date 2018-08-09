@@ -34,7 +34,7 @@ public class TestAnnisAdminRunner {
 		initMocks(this);
 
 		main = new AnnisAdminRunner();
-      main.setCorpusAdministration(null);
+		main.setCorpusAdministration(null);
 		main.setCorpusAdministration(administration);
 	}
 
