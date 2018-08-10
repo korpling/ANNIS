@@ -53,6 +53,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
@@ -69,6 +70,7 @@ import com.google.mimeparse.MIMEParse;
 
 import annis.CommonHelper;
 import annis.GraphHelper;
+import annis.ServiceConfig;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.model.QueryNode;
@@ -108,13 +110,13 @@ public class QueryServiceImpl implements QueryService
 
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
 
+  private final ServiceConfig serviceConfig = ConfigFactory.create(ServiceConfig.class);
   
   @Context
   Configuration config;
 
-  private int port = 5711;
 
-  private CorpusConfig defaultCorpusConfig;
+  private final CorpusConfig defaultCorpusConfig;
 
   @Context
   private UriInfo uriInfo;
@@ -136,6 +138,19 @@ public class QueryServiceImpl implements QueryService
   {
     // log a message after successful startup
     log.info("ANNIS QueryService loaded.");
+  }
+  
+  public QueryServiceImpl() {
+      defaultCorpusConfig = new CorpusConfig();
+      defaultCorpusConfig.setConfig("max-context-left", "" + serviceConfig.maxContextLeft());
+      defaultCorpusConfig.setConfig("max-context-right", "" + serviceConfig.maxContextLeft());
+      defaultCorpusConfig.setConfig("default-context", "" + serviceConfig.defaultContext());
+      defaultCorpusConfig.setConfig("context-steps", "" + serviceConfig.contextSteps());
+      defaultCorpusConfig.setConfig("results-per-page", "" + serviceConfig.resultsPerPage());
+      defaultCorpusConfig.setConfig("default-context-segmentation", serviceConfig.defaultContextSegmenation());
+      defaultCorpusConfig.setConfig("default-base-text-segmentation", serviceConfig.defaultBaseTextSegmentation());
+      defaultCorpusConfig.setConfig("browse-documents", Boolean.toString(serviceConfig.browseDocuments()));
+      
   }
   
   private QueryDao getQueryDao() {
@@ -1040,15 +1055,6 @@ public class QueryServiceImpl implements QueryService
     return value;
   }
 
-  public int getPort()
-  {
-    return port;
-  }
-
-  public void setPort(int port)
-  {
-    this.port = port;
-  }
 
   /**
    * @return the defaultCorpusConfig
@@ -1058,14 +1064,6 @@ public class QueryServiceImpl implements QueryService
     return defaultCorpusConfig;
   }
 
-  /**
-   * @param defaultCorpusConfig the defaultCorpusConfig to set
-   */
-  public void setDefaultCorpusConfig(
-    CorpusConfig defaultCorpusConfig)
-  {
-    this.defaultCorpusConfig = defaultCorpusConfig;
-  }
 
   /**
    * Fetches the raw text from the text.tab file.
