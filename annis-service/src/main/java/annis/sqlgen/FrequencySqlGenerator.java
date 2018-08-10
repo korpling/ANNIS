@@ -243,16 +243,13 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
             + "Your query contains " + alternative.size()
             + " node(s), make sure no node definition numbers are greater than this number");
         }
-        String node_id;
         if (referencedNode.hasCustomName()) {
-            node_id = referencedNode.getVariable();
+            conditions.put(e, "v" + i + ".id = solutions.id" + referencedNode.getVariable());
         }
         else {
-            ++node_i;
-            node_id = "" + node_i;
+            conditions.put(e, "v" + i + ".id = solutions.id" + e.getReferencedNode());
         }
 
-        conditions.put(e, "v" + i + ".id = solutions.id" + node_id);
 
         if (e.getType() == FrequencyTableEntryType.span)
         {
