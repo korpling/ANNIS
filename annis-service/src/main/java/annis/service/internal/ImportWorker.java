@@ -15,6 +15,15 @@
  */
 package annis.service.internal;
 
+import java.util.concurrent.BlockingQueue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Queues;
+
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
 import annis.service.objects.ImportJob;
@@ -24,19 +33,11 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Queues;
-import java.util.concurrent.BlockingQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Component
 public class ImportWorker extends Thread
 {
 
@@ -103,7 +104,7 @@ public class ImportWorker extends Thread
   private void importSingleCorpusFile(ImportJob job)
   {
     currentJob.setStatus(ImportJob.Status.RUNNING);
-    corpusAdmin.sendImportStatusMail(currentJob.getStatusEmail(), 
+    corpusAdmin.getAdministrationDao().sendImportStatusMail(currentJob.getStatusEmail(), 
           job.getCaption(), ImportJob.Status.RUNNING, null);
     
    

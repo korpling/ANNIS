@@ -19,8 +19,6 @@ package annis.service.internal;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-import org.springframework.stereotype.Component;
-
 import annis.VersionInfo;
 
 /**
@@ -28,7 +26,6 @@ import annis.VersionInfo;
  * ANNIS instance.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Component
 @Path("annis/version")
 public class VersionServiceImpl
 { 

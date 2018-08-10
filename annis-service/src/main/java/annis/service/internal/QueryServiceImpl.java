@@ -16,12 +16,64 @@
  */
 package annis.service.internal;
 
+import static java.util.Arrays.asList;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
+
+import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
+import org.corpus_tools.annis.ql.parser.QueryData;
+import org.corpus_tools.salt.common.SaltProject;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.io.ByteStreams;
+import com.google.mimeparse.MIMEParse;
+
 import annis.CommonHelper;
 import annis.GraphHelper;
+import annis.ServiceConfig;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.model.QueryNode;
-import org.corpus_tools.annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.QueryService;
@@ -42,51 +94,6 @@ import annis.service.objects.SegmentationList;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.io.ByteStreams;
-import com.google.mimeparse.MIMEParse;
-import com.sun.jersey.api.core.ResourceConfig;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import static java.util.Arrays.asList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.UriInfo;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.subject.Subject;
-import org.corpus_tools.salt.common.SaltProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * Methods for querying the database.
@@ -94,7 +101,6 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-@Component
 @Path("annis/query")
 public class QueryServiceImpl implements QueryService
 {
@@ -104,11 +110,13 @@ public class QueryServiceImpl implements QueryService
 
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
 
-  private QueryDao queryDao;
+  private final ServiceConfig serviceConfig = ConfigFactory.create(ServiceConfig.class);
+  
+  @Context
+  Configuration config;
 
-  private int port = 5711;
 
-  private CorpusConfig defaultCorpusConfig;
+  private final CorpusConfig defaultCorpusConfig;
 
   @Context
   private UriInfo uriInfo;
@@ -130,6 +138,28 @@ public class QueryServiceImpl implements QueryService
   {
     // log a message after successful startup
     log.info("ANNIS QueryService loaded.");
+  }
+  
+  public QueryServiceImpl() {
+      defaultCorpusConfig = new CorpusConfig();
+      defaultCorpusConfig.setConfig("max-context-left", "" + serviceConfig.maxContextLeft());
+      defaultCorpusConfig.setConfig("max-context-right", "" + serviceConfig.maxContextLeft());
+      defaultCorpusConfig.setConfig("default-context", "" + serviceConfig.defaultContext());
+      defaultCorpusConfig.setConfig("context-steps", "" + serviceConfig.contextSteps());
+      defaultCorpusConfig.setConfig("results-per-page", "" + serviceConfig.resultsPerPage());
+      defaultCorpusConfig.setConfig("default-context-segmentation", serviceConfig.defaultContextSegmenation());
+      defaultCorpusConfig.setConfig("default-base-text-segmentation", serviceConfig.defaultBaseTextSegmentation());
+      defaultCorpusConfig.setConfig("browse-documents", Boolean.toString(serviceConfig.browseDocuments()));
+      
+  }
+  
+  private QueryDao getQueryDao() {
+      Object prop = config.getProperty("queryDao");
+      if(prop instanceof QueryDao) {
+          return (QueryDao) prop;
+      } else {
+          return null;
+      }
   }
 
   @GET
@@ -153,7 +183,7 @@ public class QueryServiceImpl implements QueryService
 
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     long start = new Date().getTime();
-    MatchAndDocumentCount count = queryDao.countMatchesAndDocuments(data);
+    MatchAndDocumentCount count = getQueryDao().countMatchesAndDocuments(data);
     long end = new Date().getTime();
 
     logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames),
@@ -171,7 +201,7 @@ public class QueryServiceImpl implements QueryService
       public void write(OutputStream output) throws IOException, WebApplicationException
       {
         long start = new Date().getTime();
-        queryDao.find(data, output);
+        getQueryDao().find(data, output);
         long end = new Date().getTime();
         logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames),
           end - start);
@@ -184,7 +214,7 @@ public class QueryServiceImpl implements QueryService
     final String rawCorpusNames, final String query) throws IOException
   {
     long start = new Date().getTime();
-    List<Match> result = queryDao.find(data);
+    List<Match> result = getQueryDao().find(data);
     long end = new Date().getTime();
     logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
     return result;
@@ -232,7 +262,7 @@ public class QueryServiceImpl implements QueryService
     }
     
     final QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    data.setCorpusConfiguration(queryDao.getCorpusConfiguration());
+    data.setCorpusConfiguration(getQueryDao().getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit, order));
     
     String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
@@ -293,7 +323,7 @@ public class QueryServiceImpl implements QueryService
     data.addExtension(ext);
     
     long start = new Date().getTime();
-    FrequencyTable freqTable = queryDao.frequency(data);
+    FrequencyTable freqTable = getQueryDao().frequency(data);
     long end = new Date().getTime();
     logQuery("FREQUENCY", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
     
@@ -365,7 +395,7 @@ public class QueryServiceImpl implements QueryService
     int right = Integer.parseInt(rightRaw);
     SubgraphFilter filter = SubgraphFilter.valueOf(filterRaw);
 
-    QueryData data = GraphHelper.createQueryData(matches, queryDao);
+    QueryData data = GraphHelper.createQueryData(matches, getQueryDao());
 
     data.addExtension(new AnnotateQueryData(left, right,
       segmentation, filter));
@@ -394,7 +424,7 @@ public class QueryServiceImpl implements QueryService
     }
     
     long start = new Date().getTime();
-    SaltProject p = queryDao.graph(data);
+    SaltProject p = getQueryDao().graph(data);
     long end = new Date().getTime();
     String options =
       "matches: " + matches.toString()
@@ -431,7 +461,7 @@ public class QueryServiceImpl implements QueryService
     try
     {
       long start = new Date().getTime();
-      SaltProject p = queryDao.retrieveAnnotationGraph(toplevelCorpusName,
+      SaltProject p = getQueryDao().retrieveAnnotationGraph(toplevelCorpusName,
         documentName, nodeAnnotationFilter);
       long end = new Date().getTime();
       logQuery("GRAPH", toplevelCorpusName, documentName, end - start);
@@ -455,7 +485,7 @@ public class QueryServiceImpl implements QueryService
     ResolverEntry.ElementType enumType = ResolverEntry.ElementType.valueOf(type);
     SingleResolverRequest r = new SingleResolverRequest(corpusName, namespace,
       enumType);
-    return queryDao.getResolverEntries(r);
+    return getQueryDao().getResolverEntries(r);
   }
 
   @GET
@@ -463,7 +493,7 @@ public class QueryServiceImpl implements QueryService
   @Produces("application/xml")
   public List<AnnisCorpus> corpora()
   { 
-    List<AnnisCorpus> allCorpora = queryDao.listCorpora();
+    List<AnnisCorpus> allCorpora = getQueryDao().listCorpora();
     
     
     List<AnnisCorpus> allowedCorpora = new LinkedList<>();
@@ -486,7 +516,7 @@ public class QueryServiceImpl implements QueryService
   @Produces("application/xml")
   public CorpusConfigMap corpusConfigs()
   {
-    CorpusConfigMap corpusConfigs = queryDao.getCorpusConfigurations();
+    CorpusConfigMap corpusConfigs = getQueryDao().getCorpusConfigurations();
     CorpusConfigMap result = new CorpusConfigMap();
     Subject user = SecurityUtils.getSubject();
 
@@ -528,7 +558,7 @@ public class QueryServiceImpl implements QueryService
     // TODO: also add all corpora that match the alias name
     if(!originalCorpusNames.isEmpty())
     {
-      List<AnnisCorpus> allCorpora = queryDao.listCorpora(originalCorpusNames);
+      List<AnnisCorpus> allCorpora = getQueryDao().listCorpora(originalCorpusNames);
       for(AnnisCorpus c : allCorpora)
       {
         if(user.isPermitted("query:show:" + c.getName()))
@@ -551,7 +581,7 @@ public class QueryServiceImpl implements QueryService
 
     try
     {
-      Properties tmp = queryDao.getCorpusConfigurationSave(toplevelName);
+      Properties tmp = getQueryDao().getCorpusConfigurationSave(toplevelName);
 
       CorpusConfig corpusConfig = new CorpusConfig();
       corpusConfig.setConfig(tmp);
@@ -576,7 +606,7 @@ public class QueryServiceImpl implements QueryService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:annotations:" + toplevelCorpus);
 
-    return queryDao.listAnnotations(Arrays.asList(toplevelCorpus),
+    return getQueryDao().listAnnotations(Arrays.asList(toplevelCorpus),
       Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
       onlyMostFrequentValues));
 
@@ -592,7 +622,7 @@ public class QueryServiceImpl implements QueryService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:annotations:" + toplevelCorpus);
 
-    return new SegmentationList(queryDao.listSegmentationNames(Arrays.asList(toplevelCorpus)));
+    return new SegmentationList(getQueryDao().listSegmentationNames(Arrays.asList(toplevelCorpus)));
 
   }
 
@@ -617,7 +647,7 @@ public class QueryServiceImpl implements QueryService
     }
     Collections.sort(corpusNames);
     
-    queryDao.parseAQL(query, corpusNames);
+    getQueryDao().parseAQL(query, corpusNames);
     return "ok";
   }
   
@@ -644,7 +674,7 @@ public class QueryServiceImpl implements QueryService
     Collections.sort(corpusNames);
     
     
-    QueryData data = queryDao.parseAQL(query, corpusNames);
+    QueryData data = getQueryDao().parseAQL(query, corpusNames);
     List<QueryNode> nodes = new LinkedList<>();
     int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
@@ -732,7 +762,7 @@ public class QueryServiceImpl implements QueryService
       corpusName = null;
     }
 
-    List<AnnisBinaryMetaData> meta = queryDao.getBinaryMeta(toplevelCorpusName,
+    List<AnnisBinaryMetaData> meta = getQueryDao().getBinaryMeta(toplevelCorpusName,
       corpusName);
     HashMap<String, AnnisBinaryMetaData> matchedMetaByType = new LinkedHashMap<>();
 
@@ -800,7 +830,7 @@ public class QueryServiceImpl implements QueryService
       + toplevelCorpusName + "/" + corpusName + (fileName == null ? "" : fileName) + " "
       + mediaType.toString());
 
-    final InputStream stream = queryDao.
+    final InputStream stream = getQueryDao().
       getBinary(toplevelCorpusName, corpusName, mediaType.toString(), fileName,
       offset, length);
 
@@ -849,7 +879,7 @@ public class QueryServiceImpl implements QueryService
       }
       else
       {
-        List<AnnisCorpus> allCorpora = queryDao.listCorpora();
+        List<AnnisCorpus> allCorpora = getQueryDao().listCorpora();
         corpusNames = new String[allCorpora.size()];
         for (int i = 0; i < corpusNames.length; i++)
         {
@@ -868,7 +898,7 @@ public class QueryServiceImpl implements QueryService
         }
       }
 
-      return queryDao.getExampleQueries(allowedCorpora);
+      return getQueryDao().getExampleQueries(allowedCorpora);
     }
     catch (Exception ex)
     {
@@ -958,7 +988,7 @@ public class QueryServiceImpl implements QueryService
     // this ensures a stable ordering and less surprises when the UI changes it's behavior
     Collections.sort(corpusNames);
     
-    List<AnnisCorpus> existingCorpora = queryDao.listCorpora(corpusNames);
+    List<AnnisCorpus> existingCorpora = getQueryDao().listCorpora(corpusNames);
    
     if (existingCorpora.size() != corpusNames.size())
     {
@@ -967,7 +997,7 @@ public class QueryServiceImpl implements QueryService
         "text/plain").entity("one ore more corpora are unknown to the system").
         build());
     }
-    return queryDao.parseAQL(query, corpusNames);
+    return getQueryDao().parseAQL(query, corpusNames);
   }
 
   /**
@@ -979,16 +1009,6 @@ public class QueryServiceImpl implements QueryService
   private List<String> splitCorpusNamesFromRaw(String rawCorpusNames)
   {
     return new ArrayList<>(Splitter.on(",").omitEmptyStrings().trimResults().splitToList(rawCorpusNames));
-  }
-
-  public QueryDao getQueryDao()
-  {
-    return queryDao;
-  }
-
-  public void setQueryDao(QueryDao queryDao)
-  {
-    this.queryDao = queryDao;
   }
 
   /**
@@ -1035,15 +1055,6 @@ public class QueryServiceImpl implements QueryService
     return value;
   }
 
-  public int getPort()
-  {
-    return port;
-  }
-
-  public void setPort(int port)
-  {
-    this.port = port;
-  }
 
   /**
    * @return the defaultCorpusConfig
@@ -1053,14 +1064,6 @@ public class QueryServiceImpl implements QueryService
     return defaultCorpusConfig;
   }
 
-  /**
-   * @param defaultCorpusConfig the defaultCorpusConfig to set
-   */
-  public void setDefaultCorpusConfig(
-    CorpusConfig defaultCorpusConfig)
-  {
-    this.defaultCorpusConfig = defaultCorpusConfig;
-  }
 
   /**
    * Fetches the raw text from the text.tab file.
@@ -1081,7 +1084,7 @@ public class QueryServiceImpl implements QueryService
     user.checkPermission("query:raw_text:" + top);
 
     RawTextWrapper result = new RawTextWrapper();
-    result.setTexts(queryDao.getRawText(top, docname));
+    result.setTexts(getQueryDao().getRawText(top, docname));
     return result;
   }
 
@@ -1091,10 +1094,10 @@ public class QueryServiceImpl implements QueryService
   public DocumentBrowserConfig getDocumentBrowserConfig(
     @PathParam("corpus") String corpus)
   {
-    DocumentBrowserConfig config = queryDao.getDocBrowserConfiguration(corpus);
+    DocumentBrowserConfig config = getQueryDao().getDocBrowserConfiguration(corpus);
     if(config == null)
     {
-      config = queryDao.getDefaultDocBrowserConfiguration();
+      config = getQueryDao().getDefaultDocBrowserConfiguration();
     }
 
     return (config != null) ? config : null;

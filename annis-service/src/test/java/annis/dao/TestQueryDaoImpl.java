@@ -15,10 +15,6 @@
  */
 package annis.dao;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
@@ -34,19 +30,11 @@ import org.corpus_tools.annis.ql.parser.QueryData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import annis.AnnisXmlContextLoader;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.sqlgen.ListCorpusSqlHelper;
-import annis.test.TestHelper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "file:src/main/distribution/conf/spring/Common.xml",
-        "file:src/main/distribution/conf/spring/Dao.xml" }, loader = AnnisXmlContextLoader.class)
 public class TestQueryDaoImpl {
 
     @Resource(name = "queryDao")

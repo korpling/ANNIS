@@ -18,8 +18,11 @@ package annis.dao.autogenqueries;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.management.Query;
 
 import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
@@ -29,6 +32,7 @@ import annis.GraphHelper;
 import annis.dao.DBProvider;
 import annis.dao.QueryDao;
 import annis.dao.DBProvider.DB;
+import annis.dao.autogenqueries.QueriesGenerator.QueryBuilder;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
@@ -51,13 +55,15 @@ public class QueriesGenerator extends DBProvider {
   private final Logger log = LoggerFactory.getLogger(QueriesGenerator.class);
 
   // for executing AQL queries
-  private QueryDao queryDao;
+  private final QueryDao queryDao;
 
   // the name of the imported top level corpus
   private String corpusName;
 
   // a set of query builder, which generate the example queries.
   private Set<QueryBuilder> queryBuilder;
+  
+
 
   /**
    * All automatic generated queries must implement this interface.
@@ -106,6 +112,20 @@ public class QueriesGenerator extends DBProvider {
      * @return The final {@link ExampleQuery}, which is written to the database.
      */
     public ExampleQuery getExampleQuery();
+  }
+  
+  public QueriesGenerator(QueryDao queryDao) {
+      this.queryDao = queryDao;
+  }
+  
+  public static QueriesGenerator create(QueryDao queryDao) {
+      QueriesGenerator queriesGenerator = new QueriesGenerator(queryDao);
+      Set<QueryBuilder> queryBuilders = new LinkedHashSet<>();
+      queryBuilders.add(new AutoTokQuery());
+      queryBuilders.add(new AutoSimpleRegexQuery());
+      queriesGenerator.setQueryBuilder(queryBuilders);
+      
+      return queriesGenerator;
   }
 
   /**
@@ -250,12 +270,6 @@ public class QueriesGenerator extends DBProvider {
     return queryDao;
   }
 
-  /**
-   * @param queryDao the queryDao to set
-   */
-  public void setQueryDao(QueryDao queryDao) {
-    this.queryDao = queryDao;
-  }
 
   /**
    * @return the queryBuilder

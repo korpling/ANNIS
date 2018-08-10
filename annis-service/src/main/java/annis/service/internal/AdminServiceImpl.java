@@ -15,22 +15,6 @@
  */
 package annis.service.internal;
 
-import annis.administration.AdministrationDao;
-import annis.administration.CorpusAdministration;
-import annis.administration.DeleteCorpusDao;
-import annis.dao.QueryDao;
-import annis.security.ANNISSecurityManager;
-import annis.security.ANNISUserConfigurationManager;
-import annis.security.ANNISUserRealm;
-import annis.security.Group;
-import annis.security.User;
-import annis.security.UserConfig;
-import annis.service.AdminService;
-import annis.service.objects.AnnisCorpus;
-import annis.service.objects.ImportJob;
-import annis.utils.ANNISFormatHelper;
-import com.google.common.base.Joiner;
-import com.google.common.io.ByteStreams;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -51,9 +36,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha256Hash;
@@ -62,27 +49,38 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+
+import com.google.common.base.Joiner;
+import com.google.common.io.ByteStreams;
+
+import annis.administration.AdministrationDao;
+import annis.security.ANNISSecurityManager;
+import annis.security.ANNISUserConfigurationManager;
+import annis.security.ANNISUserRealm;
+import annis.security.Group;
+import annis.security.User;
+import annis.security.UserConfig;
+import annis.service.AdminService;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.ImportJob;
+import annis.utils.ANNISFormatHelper;
 
 /**
  * Methods for adminstration.
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Component
 @Path("annis/admin")
 public class AdminServiceImpl implements AdminService
 {
 
   private final static Logger log = LoggerFactory.getLogger(
     AdminServiceImpl.class);
+  
+  @Context
+  Configuration config;
+  
 
-  private AdministrationDao adminDao;
-  private DeleteCorpusDao deleteCorpusDao;
-
-  private CorpusAdministration corpusAdmin;
-
-  private QueryDao queryDao;
 
   private ImportWorker importWorker;
 
@@ -93,6 +91,7 @@ public class AdminServiceImpl implements AdminService
   {
     importWorker.start();
   }
+  
 
   @GET
   @Path("is-authenticated")
@@ -127,7 +126,7 @@ public class AdminServiceImpl implements AdminService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("admin:read:userconfig");
 
-    return adminDao.retrieveUserConfig((String) user.getPrincipal());
+    return getAdminDao().retrieveUserConfig((String) user.getPrincipal());
   }
 
   /**
@@ -143,7 +142,7 @@ public class AdminServiceImpl implements AdminService
 
     String userName = (String) user.getPrincipal();
     
-    adminDao.storeUserConfig(userName, config.getValue());
+    getAdminDao().storeUserConfig(userName, config.getValue());
     return Response.ok().build();
   }
 
@@ -255,7 +254,7 @@ public class AdminServiceImpl implements AdminService
         if (confManager.deleteUser(userName))
         {
           // also delete any possible user configs
-          adminDao.deleteUserConfig(userName);
+          getAdminDao().deleteUserConfig(userName);
           // if no error until here everything went well
           return Response.ok().build();
         }
@@ -401,7 +400,7 @@ public class AdminServiceImpl implements AdminService
     try
     {
 
-      deleteCorpusDao.deleteCorpora(Arrays.asList(corpusName));
+      getAdminDao().getDeleteCorpusDao().deleteCorpora(Arrays.asList(corpusName));
       return Response.status(Response.Status.OK).build();
     }
     catch (IllegalArgumentException ex)
@@ -481,7 +480,7 @@ public class AdminServiceImpl implements AdminService
         }
         String caption = Joiner.on(", ").join(allNames);
 
-        List<AnnisCorpus> existingCorpora = queryDao.listCorpora(new LinkedList<>(allNames));
+        List<AnnisCorpus> existingCorpora = getAdminDao().getQueryDao().listCorpora(new LinkedList<>(allNames));
      
         if (overwrite || existingCorpora == null || existingCorpora.isEmpty())
         {
@@ -495,7 +494,7 @@ public class AdminServiceImpl implements AdminService
           job.setStatusEmail(statusMail);
           job.setAlias(alias);
 
-          corpusAdmin.sendImportStatusMail(statusMail, caption,
+          getAdminDao().sendImportStatusMail(statusMail, caption,
             ImportJob.Status.WAITING, null);
 
           try
@@ -561,23 +560,15 @@ public class AdminServiceImpl implements AdminService
 
   public AdministrationDao getAdminDao()
   {
-    return adminDao;
+      Object prop = config.getProperty("adminDao");
+      if(prop instanceof AdministrationDao) {
+          return (AdministrationDao) prop;
+      } else {
+          return null;
+      }
   }
 
-  public void setAdminDao(AdministrationDao adminDao)
-  {
-    this.adminDao = adminDao;
-  }
 
-  public QueryDao getQueryDao()
-  {
-    return queryDao;
-  }
-
-  public void setQueryDao(QueryDao queryDao)
-  {
-    this.queryDao = queryDao;
-  }
 
   public ImportWorker getImportWorker()
   {
@@ -589,26 +580,5 @@ public class AdminServiceImpl implements AdminService
     this.importWorker = importWorker;
   }
 
-  public CorpusAdministration getCorpusAdmin()
-  {
-    return corpusAdmin;
-  }
-
-  public void setCorpusAdmin(CorpusAdministration corpusAdmin)
-  {
-    this.corpusAdmin = corpusAdmin;
-  }
-
-  public DeleteCorpusDao getDeleteCorpusDao()
-  {
-    return deleteCorpusDao;
-  }
-
-  public void setDeleteCorpusDao(DeleteCorpusDao deleteCorpusDao)
-  {
-    this.deleteCorpusDao = deleteCorpusDao;
-  }
-  
-  
 
 }

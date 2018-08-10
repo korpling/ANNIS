@@ -29,6 +29,9 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -36,19 +39,23 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
-import org.codehaus.jackson.map.AnnotationIntrospector;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.SimpleEmail;
 import org.corpus_tools.annis.ql.parser.QueryData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultiset;
@@ -57,13 +64,16 @@ import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Files;
 
-import annis.dao.DBProvider.DB;
+import annis.ServiceConfig;
+import annis.dao.QueryDao;
+import annis.dao.autogenqueries.AutoSimpleRegexQuery;
+import annis.dao.autogenqueries.AutoTokQuery;
 import annis.dao.autogenqueries.QueriesGenerator;
+import annis.dao.autogenqueries.QueriesGenerator.QueryBuilder;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
 import annis.security.UserConfig;
-import annis.service.objects.FrequencyTable;
-import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.ImportJob;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
@@ -76,11 +86,38 @@ import au.com.bytecode.opencsv.CSVReader;
 public class AdministrationDao extends AbstractAdminstrationDao {
 
     private static final Logger log = LoggerFactory.getLogger(AdministrationDao.class);
+    
+    private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
 
-    // if this is true, the staging area is not deleted
-    private boolean temporaryStagingArea;
-
+    
     private DeleteCorpusDao deleteCorpusDao;
+    
+    public AdministrationDao() {
+        this.queriesGenerator = QueriesGenerator.create(getQueryDao());
+        
+        this.mimeTypeMapping = new LinkedHashMap<>();
+        // TODO: make this configurable for the user
+        this.mimeTypeMapping.put("webm", "video/webm");
+        this.mimeTypeMapping.put("ogg", "audio/ogg");
+        this.mimeTypeMapping.put("wav", "audio/wav");
+        this.mimeTypeMapping.put("mp3", "audio/mpeg");
+        this.mimeTypeMapping.put("mp4", "video/mp4");
+        this.mimeTypeMapping.put("pdf", "application/pdf");
+        this.mimeTypeMapping.put("css", "text/css");
+        this.mimeTypeMapping.put("config", "application/x-config+text");
+        this.mimeTypeMapping.put("properties", "application/text+plain");
+        this.mimeTypeMapping.put("json", "application/json");
+        
+        this.generateExampleQueries = cfg.generateExampleQueries();
+    }
+    
+    public static AdministrationDao create(QueryDao queryDao, DeleteCorpusDao deleteCorpusDao) {
+        AdministrationDao adminDao = new AdministrationDao();
+        adminDao.setQueryDao(queryDao);
+        adminDao.setDeleteCorpusDao(deleteCorpusDao);
+        
+        return adminDao;
+    }
 
     /**
      * Searches for textes which are empty or only contains whitespaces. If that is
@@ -147,16 +184,13 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      */
     private EXAMPLE_QUERIES_CONFIG generateExampleQueries;
 
-    private String schemaVersion;
+    private final String schemaVersion = "3.4.3";
 
     /**
      * A mapping for file-endings to mime types.
      */
-    private Map<String, String> mimeTypeMapping;
+    private final Map<String, String> mimeTypeMapping;
 
-    private Map<String, String> tableInsertSelect;
-
-    private Map<String, String> tableInsertFrom;
 
     /**
      * Optional tab for example queries. If this tab not exist, a dummy file from
@@ -174,7 +208,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
-    private QueriesGenerator queriesGenerator;
+    private final QueriesGenerator queriesGenerator;
 
     private final Table resolverTable = new Table(FILE_RESOLVER_VIS_MAP)
             .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c(new Column("corpus").createIndex())
@@ -210,10 +244,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * Called when Spring configuration finished
      */
     public void init() {
-        AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
-        jsonMapper.setAnnotationIntrospector(introspector);
-        // the json should be as compact as possible in the database
-        jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, false);
+        jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     /**
@@ -788,15 +819,75 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             log.error("Could add alias {} for corpus", alias, corpusName, ex);
         }
     }
+    
+    public void sendImportStatusMail(String adress, String corpusPath, ImportJob.Status status, String additionalInfo) {
+        if (adress == null || adress.isEmpty() || corpusPath == null) {
+            return;
+        }
+
+        // check valid properties
+        if (cfg.mailSender() == null || cfg.mailSender().isEmpty()) {
+            log.warn("Could not send status mail because \"annis.mail-sender\" "
+                    + "property was not configured in conf/annis-service-properties.");
+            return;
+        }
+
+        try {
+            SimpleEmail mail = new SimpleEmail();
+            List<InternetAddress> to = new LinkedList<>();
+            to.add(new InternetAddress(adress));
+
+            StringBuilder sbMsg = new StringBuilder();
+            sbMsg.append("Dear Sir or Madam,\n");
+            sbMsg.append("\n");
+            sbMsg.append("this is the requested status update to the ANNIS corpus import "
+                    + "you have started. Please note that this message is automated and "
+                    + "if you have any question regarding the import you have to ask the "
+                    + "administrator of the ANNIS instance directly.\n\n");
+
+            mail.setTo(to);
+            if (status == ImportJob.Status.SUCCESS) {
+                mail.setSubject("ANNIS import finished successfully (" + corpusPath + ")");
+                sbMsg.append("Status:\nThe corpus \"").append(corpusPath)
+                        .append("\" was successfully imported and can be used from now on.\n");
+            } else if (status == ImportJob.Status.ERROR) {
+                mail.setSubject("ANNIS import *failed* (" + corpusPath + ")");
+                sbMsg.append("Status:\nUnfortunally the corpus \"").append(corpusPath)
+                        .append("\" could not be imported successfully. "
+                                + "You may ask the administrator of the ANNIS installation for "
+                                + "assistance why the corpus import failed.\n");
+            } else if (status == ImportJob.Status.RUNNING) {
+                mail.setSubject("ANNIS import started (" + corpusPath + ")");
+                sbMsg.append("Status:\nThe import of the corpus \"").append(corpusPath).append("\" was started.\n");
+            } else if (status == ImportJob.Status.WAITING) {
+                mail.setSubject("ANNIS import was scheduled (" + corpusPath + ")");
+                sbMsg.append("Status:\nThe import of the corpus \"").append(corpusPath)
+                        .append("\" was scheduled and is currently waiting for other imports to "
+                                + "finish. As soon as the previous imports are finished this import "
+                                + "job will be executed.\n");
+            } else {
+                // we don't know how to handle this, just don't send a message
+                return;
+            }
+            if (additionalInfo != null && !additionalInfo.isEmpty()) {
+                sbMsg.append("Addtional information:\n");
+                sbMsg.append(additionalInfo).append("\n");
+            }
+
+            sbMsg.append("\n\nSincerely yours,\n\nthe ANNIS import service.");
+            mail.setMsg(sbMsg.toString());
+            mail.setHostName("localhost");
+            mail.setFrom(cfg.mailSender());
+
+            mail.send();
+            log.info("Send status ({}) mail to {}.", new String[] { status.name(), adress });
+
+        } catch (AddressException | EmailException ex) {
+            log.warn("Could not send mail: " + ex.getMessage());
+        }
+    }
 
     ///// Getter / Setter
-    public boolean isTemporaryStagingArea() {
-        return temporaryStagingArea;
-    }
-
-    public void setTemporaryStagingArea(boolean temporaryStagingArea) {
-        this.temporaryStagingArea = temporaryStagingArea;
-    }
 
     /**
      * Get the name and version of the schema this @{link AdministrationDao} is
@@ -808,33 +899,12 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         return schemaVersion;
     }
 
-    public void setSchemaVersion(String schemaVersion) {
-        this.schemaVersion = schemaVersion;
-    }
 
     public Map<String, String> getMimeTypeMapping() {
         return mimeTypeMapping;
     }
 
-    public void setMimeTypeMapping(Map<String, String> mimeTypeMapping) {
-        this.mimeTypeMapping = mimeTypeMapping;
-    }
 
-    public Map<String, String> getTableInsertSelect() {
-        return tableInsertSelect;
-    }
-
-    public void setTableInsertSelect(Map<String, String> tableInsertSelect) {
-        this.tableInsertSelect = tableInsertSelect;
-    }
-
-    public Map<String, String> getTableInsertFrom() {
-        return tableInsertFrom;
-    }
-
-    public void setTableInsertFrom(Map<String, String> tableInsertFrom) {
-        this.tableInsertFrom = tableInsertFrom;
-    }
 
     /**
      * Generates example queries if no example queries tab file is defined by the
@@ -869,21 +939,14 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         return queriesGenerator;
     }
 
-    /**
-     * @param queriesGenerator
-     *            the queriesGenerator to set
-     */
-    public void setQueriesGenerator(QueriesGenerator queriesGenerator) {
-        this.queriesGenerator = queriesGenerator;
-    }
-
     public DeleteCorpusDao getDeleteCorpusDao() {
         return deleteCorpusDao;
     }
-
+    
     public void setDeleteCorpusDao(DeleteCorpusDao deleteCorpusDao) {
         this.deleteCorpusDao = deleteCorpusDao;
     }
+
 
     /**
      * Checks, if a already exists a corpus with the same name of the top level

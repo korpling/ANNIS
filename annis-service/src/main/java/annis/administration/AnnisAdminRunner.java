@@ -15,25 +15,18 @@
  */
 package annis.administration;
 
-import annis.AnnisBaseRunner;
-import annis.AnnisRunnerException;
-import annis.UsageException;
-import annis.dao.QueryDao;
-import annis.dao.autogenqueries.QueriesGenerator;
-import annis.service.objects.AnnisCorpus;
-import annis.utils.Utils;
-import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -43,8 +36,15 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+
+import annis.AnnisBaseRunner;
+import annis.AnnisRunnerException;
+import annis.UsageException;
+import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
+import annis.dao.autogenqueries.QueriesGenerator;
+import annis.service.objects.AnnisCorpus;
+import annis.utils.Utils;
 
 public class AnnisAdminRunner extends AnnisBaseRunner
 {
@@ -54,17 +54,26 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   // API for corpus administration
 
   private CorpusAdministration corpusAdministration;
-  private QueryDao queryDao;
+  private final QueryDao queryDao;
 
-  private QueriesGenerator queriesGenerator;
+  private final QueriesGenerator queriesGenerator;
+  
+  public AnnisAdminRunner() {
+      this.queryDao = QueryDaoImpl.create();
+      this.queriesGenerator = QueriesGenerator.create(this.queryDao);
+      
+      DeleteCorpusDao deleteCorpusDao = new DeleteCorpusDao();
+      AdministrationDao adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
+      
+      this.corpusAdministration = CorpusAdministration.create(adminDao);
+  }
   
   public static void main(String[] args)
   {
     // get Runner from Spring
     try
     {
-      AnnisBaseRunner.getInstance("annisAdminRunner", "file:" + Utils.
-        getAnnisFile("conf/spring/Admin.xml").getAbsolutePath()).run(args);
+      new AnnisAdminRunner().run(args);
     }
     catch(AnnisRunnerException ex)
     {
@@ -145,15 +154,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   public QueriesGenerator getQueriesGenerator()
   {
     return queriesGenerator;
-  }
-
-  /**
-   * @param queriesGenerator the queriesGenerator to set
-   */
-  public void setQueriesGenerator(
-    QueriesGenerator queriesGenerator)
-  {
-    this.queriesGenerator = queriesGenerator;
   }
 
   static class OptionBuilder
@@ -368,9 +368,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
   private void usage(String error)
   {
-    Resource resource = new ClassPathResource("annis/administration/usage.txt");
-    try(BufferedReader reader = new BufferedReader(new InputStreamReader(resource.
-        getInputStream(), "UTF-8"));)
+    InputStream resource = this.getClass().getResourceAsStream("/annis/administration/usage.txt");
+    try(BufferedReader reader = new BufferedReader(new InputStreamReader(resource, "UTF-8"));)
     {
       
       for (String line = reader.readLine(); line != null; line = reader.
@@ -465,10 +464,9 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   {
     return corpusAdministration;
   }
-
-  public void setCorpusAdministration(CorpusAdministration administration)
-  {
-    this.corpusAdministration = administration;
+  
+  public void setCorpusAdministration(CorpusAdministration corpusAdministration) {
+      this.corpusAdministration = corpusAdministration;
   }
 
   public QueryDao getQueryDao()
@@ -476,10 +474,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     return queryDao;
   }
 
-  public void setQueryDao(QueryDao queryDao)
-  {
-    this.queryDao = queryDao;
-  }
   
   
 }

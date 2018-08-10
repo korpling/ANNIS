@@ -294,4 +294,8 @@ public interface QueryDao
   public void exportCorpus(String toplevelCorpus, File outputDirectory);
   
   public void shutdown();
+  
+  public static QueryDao create() {
+      return QueryDaoImpl.create();
+  }
 }

@@ -15,35 +15,48 @@
  */
 package annis.service.internal;
 
-import annis.dao.QueryDao;
-import annis.model.Annotation;
-import annis.service.MetadataService;
-import annis.service.objects.AnnisBinaryMetaData;
 import java.util.List;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+
+import annis.dao.QueryDao;
+import annis.model.Annotation;
+import annis.service.MetadataService;
+import annis.service.objects.AnnisBinaryMetaData;
 
 /**
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-@Component
 @Path("annis/meta")
 public class MetadataServiceImpl implements MetadataService
 {
 
   private Logger log = LoggerFactory.getLogger(MetadataServiceImpl.class);
 
-  private QueryDao queryDao;
+  @Context
+  Configuration config;
+  
+  private QueryDao getQueryDao() {
+      Object prop = config.getProperty("queryDao");
+      if(prop instanceof QueryDao) {
+          return (QueryDao) prop;
+      } else {
+          return null;
+      }
+  }
 
   @GET
   @Path("corpus/{toplevel}/closure")
@@ -180,19 +193,4 @@ public class MetadataServiceImpl implements MetadataService
     log.info("ANNIS MetadataService loaded.");
   }
 
-  /**
-   * @return the queryDao
-   */
-  public QueryDao getQueryDao()
-  {
-    return queryDao;
-  }
-
-  /**
-   * @param queryDao the queryDao to set
-   */
-  public void setQueryDao(QueryDao queryDao)
-  {
-    this.queryDao = queryDao;
-  }
 }

@@ -15,22 +15,6 @@
  */
 package annis;
 
-import annis.dao.QueryDao;
-import annis.dao.autogenqueries.QueriesGenerator;
-import annis.model.QueryAnnotation;
-import annis.service.objects.AnnisCorpus;
-import annis.service.objects.FrequencyTable;
-import annis.service.objects.FrequencyTableQuery;
-import annis.service.objects.Match;
-import annis.service.objects.MatchAndDocumentCount;
-import annis.service.objects.MatchGroup;
-import annis.service.objects.OrderType;
-import annis.service.objects.SubgraphFilter;
-import annis.sqlgen.extensions.AnnotateQueryData;
-import annis.sqlgen.extensions.LimitOffsetQueryData;
-import annis.utils.Utils;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -56,6 +41,24 @@ import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+
+import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
+import annis.dao.autogenqueries.QueriesGenerator;
+import annis.model.QueryAnnotation;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.FrequencyTable;
+import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.Match;
+import annis.service.objects.MatchAndDocumentCount;
+import annis.service.objects.MatchGroup;
+import annis.service.objects.OrderType;
+import annis.service.objects.SubgraphFilter;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
+
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner {
 
@@ -66,7 +69,7 @@ public class AnnisRunner extends AnnisBaseRunner {
 
     // dependencies
 
-    private QueryDao queryDao;
+    private final QueryDao queryDao;
 
     private int context;
 
@@ -74,7 +77,7 @@ public class AnnisRunner extends AnnisBaseRunner {
 
     private int matchLimit;
 
-    private QueriesGenerator queriesGenerator;
+    private final QueriesGenerator queriesGenerator;
     // settings
 
     private int limit = 10;
@@ -110,13 +113,6 @@ public class AnnisRunner extends AnnisBaseRunner {
         return queriesGenerator;
     }
 
-    /**
-     * @param queriesGenerator
-     *            the queriesGenerator to set
-     */
-    public void setQueriesGenerator(QueriesGenerator queriesGenerator) {
-        this.queriesGenerator = queriesGenerator;
-    }
 
     public enum OS {
 
@@ -178,10 +174,8 @@ public class AnnisRunner extends AnnisBaseRunner {
     private static final int SEQUENTIAL_RUNS = 5;
 
     public static void main(String[] args) {
-        // get runner from Spring
         try {
-            String path = Utils.getAnnisFile("conf/spring/Shell.xml").getAbsolutePath();
-            AnnisBaseRunner.getInstance("annisRunner", "file:" + path).run(args);
+            new AnnisRunner().run(args);
         } catch (AnnisRunnerException ex) {
             log.error(ex.getMessage() + " (error code " + ex.getExitCode() + ")", ex);
             System.exit(ex.getExitCode());
@@ -194,6 +188,10 @@ public class AnnisRunner extends AnnisBaseRunner {
     public AnnisRunner() {
         corpusList = new LinkedList<>();
         benchmarks = new ArrayList<>();
+        
+        this.queryDao = QueryDao.create();
+
+        this.queriesGenerator = QueriesGenerator.create(this.queryDao);
     }
 
     ///// Commands
@@ -637,10 +635,6 @@ public class AnnisRunner extends AnnisBaseRunner {
 
     public QueryDao getQueryDao() {
         return queryDao;
-    }
-
-    public void setQueryDao(QueryDao queryDao) {
-        this.queryDao = queryDao;
     }
 
     public List<String> getCorpusList() {

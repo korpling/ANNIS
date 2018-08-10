@@ -27,14 +27,12 @@ import javax.annotation.Resource;
 import javax.ws.rs.core.MediaType;
 
 import org.corpus_tools.salt.common.SaltProject;
+import org.glassfish.jersey.internal.util.collection.StringKeyIgnoreCaseMultivaluedMap;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
@@ -43,7 +41,6 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 import com.google.common.io.ByteStreams;
-import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
 
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
@@ -58,12 +55,6 @@ import annis.test.TestHelper;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-// TODO: do not test context only for annopool
-@ContextConfiguration(locations = { "file:src/main/distribution/conf/spring/Common.xml",
-        "file:src/main/distribution/conf/spring/Dao.xml"
-
-}, loader = AnnisXmlContextLoader.class)
 @BenchmarkOptions(callgc = false, benchmarkRounds = 5, warmupRounds = 5)
 @BenchmarkMethodChart(filePrefix = "annis-benchmark")
 @BenchmarkHistoryChart(labelWith = LabelType.RUN_ID, maxRuns = 20)
@@ -88,7 +79,7 @@ public class BenchmarkTest {
 
     @Before
     public void setup() {
-        QueryDaoImpl springAnnisDao = (QueryDaoImpl) TestHelper.proxyTarget(annisDao);
+        QueryDaoImpl springAnnisDao = (QueryDaoImpl) annisDao;
 
         // get the id of the "pcc2" corpus
         pcc2Corpus = getExistingCorpora("pcc2");
