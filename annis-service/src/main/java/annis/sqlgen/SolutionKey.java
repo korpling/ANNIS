@@ -3,6 +3,8 @@ package annis.sqlgen;
 import java.sql.ResultSet;
 import java.util.List;
 
+import annis.model.QueryNode;
+
 public interface SolutionKey<KeyType>
 {
 
@@ -27,7 +29,7 @@ public interface SolutionKey<KeyType>
    *         the outer ANNOTATE query.
    */
   public abstract List<String> generateOuterQueryColumns(
-      TableAccessStrategy tableAccessStrategy, int size);
+      TableAccessStrategy tableAccessStrategy, List<QueryNode> alternative);
 
   /**
    * Retrieve (and validate) the annotation graph key from the current row
