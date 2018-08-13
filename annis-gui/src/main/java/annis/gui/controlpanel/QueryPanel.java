@@ -25,8 +25,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.jsclipboard.JSClipboard;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.FontAwesome;
@@ -237,13 +235,15 @@ public class QueryPanel extends GridLayout implements
     btCopy.setIcon(FontAwesome.COPY);
     
     clipboard.apply(btCopy, txtQuery);
-    txtQuery.addTextChangeListener(new TextChangeListener() {
+    clipboard.setText(state.getAql().getValue());
+    state.getAql().addValueChangeListener(new ValueChangeListener() {
 		
 		@Override
-		public void textChange(TextChangeEvent event) {
-			clipboard.setText(event.getText());
+		public void valueChange(ValueChangeEvent event) {
+			clipboard.setText(event.getProperty().getValue().toString());
 		}
 	});
+    
     clipboard.addSuccessListener(new JSClipboard.SuccessListener() {
 		
 		@Override
