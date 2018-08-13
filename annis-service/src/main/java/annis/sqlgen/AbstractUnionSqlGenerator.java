@@ -53,10 +53,10 @@ public abstract class AbstractUnionSqlGenerator extends AbstractSqlGenerator
     List<QueryNode> alternatives_nodes = new ArrayList<>();
     for (List<QueryNode> alternative : queryData.getAlternatives())
     {
-      int i = 1;
-      // duplicates in alternatives_nodes do not matter
-      // as it is only used for ORDER BY and LIMIT/OFFSET clauses
-      alternatives_nodes.addAll(alternative);
+      if(alternative.size() == queryData.getMaxWidth())
+      {
+          alternatives_nodes = alternative;
+      }
       alternatives.add(createSqlForAlternative(queryData, alternative, indent));
     }
     sb.append(StringUtils.join(alternatives, "\n" + indent + "UNION "));
