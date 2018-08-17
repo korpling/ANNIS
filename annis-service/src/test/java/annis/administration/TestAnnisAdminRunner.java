@@ -17,6 +17,8 @@ package annis.administration;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,7 +32,7 @@ public class TestAnnisAdminRunner {
 	private AnnisAdminRunner main;
 
 	@Before
-	public void setup() {
+	public void setup() throws GraphANNISException {
 		initMocks(this);
 
 		main = new AnnisAdminRunner();

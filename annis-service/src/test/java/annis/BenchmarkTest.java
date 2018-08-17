@@ -26,6 +26,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.ws.rs.core.MediaType;
 
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.salt.common.SaltProject;
 import org.glassfish.jersey.internal.util.collection.StringKeyIgnoreCaseMultivaluedMap;
 import org.junit.Before;
@@ -96,7 +97,7 @@ public class BenchmarkTest {
     }
 
     @Test
-    public void mapSalt_Pcc4282() {
+    public void mapSalt_Pcc4282() throws GraphANNISException {
         assumeTrue(pcc2Corpus.size() > 0);
 
         SaltProject p = annisDao.retrieveAnnotationGraph("pcc2", "4282", null);
@@ -105,7 +106,7 @@ public class BenchmarkTest {
     }
 
     @Test
-    public void mapSaltAndSaveXMI_Pcc4282() throws IOException {
+    public void mapSaltAndSaveXMI_Pcc4282() throws IOException, GraphANNISException {
         assumeTrue(ridgesCorpus.size() > 0);
 
         SaltProject p = annisDao.retrieveAnnotationGraph("pcc2", "4282", null);
@@ -114,7 +115,7 @@ public class BenchmarkTest {
     }
 
     @Test
-    public void mapSalt_SonderbaresKraeuterBuch() {
+    public void mapSalt_SonderbaresKraeuterBuch() throws GraphANNISException {
         assumeTrue(ridgesCorpus.size() > 0);
 
         SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
@@ -124,7 +125,7 @@ public class BenchmarkTest {
     }
 
     @Test
-    public void mapSaltAndSaveXMI_SonderbaresKraeuterBuch() throws IOException {
+    public void mapSaltAndSaveXMI_SonderbaresKraeuterBuch() throws IOException, GraphANNISException {
         assumeTrue(ridgesCorpus.size() > 0);
 
         SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",

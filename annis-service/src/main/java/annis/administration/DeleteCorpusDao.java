@@ -27,6 +27,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,7 +132,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
             
             conn.commit();
 
-        } catch (SQLException ex) {
+        } catch (SQLException  | GraphANNISException ex) {
             log.error("Error when deleting corpus {}", Joiner.on(",").join(names), ex);
         }
 

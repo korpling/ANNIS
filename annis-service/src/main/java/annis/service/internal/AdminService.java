@@ -60,7 +60,6 @@ import annis.security.ANNISUserRealm;
 import annis.security.Group;
 import annis.security.User;
 import annis.security.UserConfig;
-import annis.service.AdminService;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
 import annis.utils.ANNISFormatHelper;
@@ -71,11 +70,11 @@ import annis.utils.ANNISFormatHelper;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Path("annis/admin")
-public class AdminServiceImpl implements AdminService
+public class AdminService
 {
 
   private final static Logger log = LoggerFactory.getLogger(
-    AdminServiceImpl.class);
+    AdminService.class);
   
   @Context
   Configuration config;
@@ -168,7 +167,6 @@ public class AdminServiceImpl implements AdminService
   @PUT
   @Path("users/{userName}")
   @Consumes("application/xml")
-  @Override
   public Response updateOrCreateUser(
     User user,
     @PathParam("userName") String userName)
@@ -212,7 +210,6 @@ public class AdminServiceImpl implements AdminService
   @GET
   @Path("users/{userName}")
   @Produces("application/xml")
-  @Override
   public User getUser(@PathParam("userName")
     String userName)
   {
@@ -411,7 +408,6 @@ public class AdminServiceImpl implements AdminService
 
   @GET
   @Path("import/status")
-  @Override
   public List<ImportJob> currentImports()
   {
     Subject user = SecurityUtils.getSubject();
@@ -430,7 +426,6 @@ public class AdminServiceImpl implements AdminService
 
   @GET
   @Path("import/status/finished/{uuid}")
-  @Override
   public ImportJob finishedImport(@PathParam("uuid") String uuid)
   {
     Subject user = SecurityUtils.getSubject();
@@ -450,7 +445,6 @@ public class AdminServiceImpl implements AdminService
   {
     "application/zip"
   })
-  @Override
   public Response importCorpus(
     @QueryParam("overwrite") String overwriteRaw,
     @QueryParam("statusMail") String statusMail,

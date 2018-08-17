@@ -27,6 +27,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.servlet.ShiroFilter;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -71,11 +72,11 @@ public class AnnisServiceRunner extends ResourceConfig {
     private final ShortenerDao shortenerDao;
     
 
-    public AnnisServiceRunner() {
+    public AnnisServiceRunner() throws GraphANNISException {
         this(null, null);
     }
 
-    public AnnisServiceRunner(Integer port, CorpusAdministration corpusAdmin) {
+    public AnnisServiceRunner(Integer port, CorpusAdministration corpusAdmin) throws GraphANNISException {
         this.overridePort = port;
         boolean nosecurity = Boolean.parseBoolean(System.getProperty("annis.nosecurity", "false"));
         this.useAuthentification = !nosecurity;

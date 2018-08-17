@@ -28,12 +28,12 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import annis.dao.QueryDao;
 import annis.model.Annotation;
-import annis.service.MetadataService;
 import annis.service.objects.AnnisBinaryMetaData;
 
 /**
@@ -41,10 +41,10 @@ import annis.service.objects.AnnisBinaryMetaData;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @Path("annis/meta")
-public class MetadataServiceImpl implements MetadataService
+public class MetadataService
 {
 
-  private Logger log = LoggerFactory.getLogger(MetadataServiceImpl.class);
+  private Logger log = LoggerFactory.getLogger(MetadataService.class);
 
   @Context
   Configuration config;
@@ -65,7 +65,7 @@ public class MetadataServiceImpl implements MetadataService
     MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
   })
   public List<Annotation> getMetadata(
-    @PathParam("toplevel") String topLevelCorpus)
+    @PathParam("toplevel") String topLevelCorpus) throws GraphANNISException
   {
     return getMetadata(topLevelCorpus, true);
   }
@@ -77,7 +77,7 @@ public class MetadataServiceImpl implements MetadataService
     MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
   })
   public List<Annotation> getMetadataTopLevel(
-    @PathParam("toplevel") String topLevelCorpus)
+    @PathParam("toplevel") String topLevelCorpus) throws GraphANNISException
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);
@@ -85,10 +85,9 @@ public class MetadataServiceImpl implements MetadataService
     return getQueryDao().listCorpusAnnotations(topLevelCorpus);
   }
 
-  @Override
   public List<Annotation> getMetadata(
     @PathParam("toplevel") String topLevelCorpus,
-    @DefaultValue(value = "false") boolean closure)
+    @DefaultValue(value = "false") boolean closure) throws GraphANNISException
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);
@@ -102,9 +101,8 @@ public class MetadataServiceImpl implements MetadataService
     {
     MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
   })
-  @Override
   public List<Annotation> getDocNames(
-    @PathParam("toplevel") String topLevelCorpus)
+    @PathParam("toplevel") String topLevelCorpus) throws GraphANNISException
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);
@@ -118,7 +116,6 @@ public class MetadataServiceImpl implements MetadataService
     {
     MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
   })
-  @Override
   public List<AnnisBinaryMetaData> binaryMeta(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String doc)
@@ -135,7 +132,7 @@ public class MetadataServiceImpl implements MetadataService
     {
     MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
   })
-  public List<Annotation> getMetaDataDoc(@PathParam("toplevel") String topLevel)
+  public List<Annotation> getMetaDataDoc(@PathParam("toplevel") String topLevel) throws GraphANNISException
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevel);
@@ -151,7 +148,7 @@ public class MetadataServiceImpl implements MetadataService
   })
   public List<Annotation> getMetaDataDoc(
     @PathParam("toplevel") String topLevelCorpus,
-    @PathParam("doc") String doc)
+    @PathParam("doc") String doc) throws GraphANNISException
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);
@@ -166,14 +163,13 @@ public class MetadataServiceImpl implements MetadataService
     MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
   })
   public List<Annotation> getMetadataDoc(
-    @PathParam("toplevel") String toplevelCorpus, @PathParam("doc") String doc)
+    @PathParam("toplevel") String toplevelCorpus, @PathParam("doc") String doc) throws GraphANNISException
   {
     return getMetadataDoc(toplevelCorpus, doc, false);
   }
 
-  @Override
   public List<Annotation> getMetadataDoc(String topLevelCorpus, String docname,
-    boolean path)
+    boolean path) throws GraphANNISException
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("meta:" + topLevelCorpus);

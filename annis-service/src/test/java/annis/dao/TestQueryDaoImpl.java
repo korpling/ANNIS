@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class TestQueryDaoImpl {
 
     @SuppressWarnings("unchecked")
     @Before
-    public void setup() {
+    public void setup() throws GraphANNISException {
         initMocks(this);
 
         queryDao = new QueryDaoImpl();

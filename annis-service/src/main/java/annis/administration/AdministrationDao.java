@@ -49,6 +49,7 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -320,8 +321,14 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         importBinaryData(path, toplevelCorpusName);
 
-        convertToGraphANNIS(toplevelCorpusName, path, version);
-        computeCorpusStatistics(toplevelCorpusName, path);
+        try {
+            convertToGraphANNIS(toplevelCorpusName, path, version);
+            computeCorpusStatistics(toplevelCorpusName, path);
+        } catch (GraphANNISException e) {
+            log.error("Could not import graphANNIS", e);
+            return false;
+        }
+        
         importTexts(toplevelCorpusName, path, version);
         importResolverTable(toplevelCorpusName, path, version);
         importExampleQueries(toplevelCorpusName, path, version);
@@ -368,7 +375,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
     }
 
-    protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version) {
+    protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version) throws GraphANNISException {
 
         log.info("importing corpus into graphANNIS");
         getQueryDao().getCorpusStorageManager().importRelANNIS(corpusName, path);
@@ -627,7 +634,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
     }
 
-    void computeCorpusStatistics(String toplevelCorpusName, String path) {
+    void computeCorpusStatistics(String toplevelCorpusName, String path) throws GraphANNISException {
 
         File f = new File(path);
         String absolutePath = path;

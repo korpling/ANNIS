@@ -34,6 +34,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +59,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
   private final QueriesGenerator queriesGenerator;
   
-  public AnnisAdminRunner() {
+  public AnnisAdminRunner() throws GraphANNISException {
       this.queryDao = QueryDaoImpl.create();
       this.queriesGenerator = QueriesGenerator.create(this.queryDao);
       
@@ -264,6 +265,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       HelpFormatter helpFormatter = new HelpFormatter();
       helpFormatter.printHelp("annis-admin.sh export CORPUS DIR ...",
         options);
+    } catch (GraphANNISException e) {
+        log.error("Could not export corpus", e);
     }
   }
 

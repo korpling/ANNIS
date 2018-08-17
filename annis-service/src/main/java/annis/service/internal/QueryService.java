@@ -58,6 +58,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.corpus_tools.graphannis.api.NodeDesc;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.salt.common.SaltProject;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
@@ -74,7 +75,6 @@ import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import annis.service.QueryService;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
@@ -100,11 +100,11 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @Path("annis/query")
-public class QueryServiceImpl implements QueryService
+public class QueryService
 {
 
   private final static Logger log = LoggerFactory.getLogger(
-    QueryServiceImpl.class);
+    QueryService.class);
 
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
 
@@ -138,7 +138,7 @@ public class QueryServiceImpl implements QueryService
     log.info("ANNIS QueryService loaded.");
   }
   
-  public QueryServiceImpl() {
+  public QueryService() {
       defaultCorpusConfig = new CorpusConfig();
       defaultCorpusConfig.setConfig("max-context-left", "" + serviceConfig.maxContextLeft());
       defaultCorpusConfig.setConfig("max-context-right", "" + serviceConfig.maxContextLeft());
@@ -163,7 +163,6 @@ public class QueryServiceImpl implements QueryService
   @GET
   @Path("search/count")
   @Produces("application/xml")
-  @Override
   public Response count(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames)
   {
@@ -225,7 +224,6 @@ public class QueryServiceImpl implements QueryService
   @GET
   @Path("search/find")
   @Produces({"application/xml", "text/plain"})
-  @Override
   public Response find(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
@@ -296,6 +294,7 @@ public class QueryServiceImpl implements QueryService
    *                   Each element has the form <node-nr>:<anno-name>. The
    *                   annotation name can be set to "tok" to indicate that the
    *                   span should be used instead of an annotation.
+ * @throws GraphANNISException 
    */
   @GET
   @Path("search/frequency")
@@ -303,7 +302,7 @@ public class QueryServiceImpl implements QueryService
   public FrequencyTable frequency(
     @QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
-    @QueryParam("fields") String rawFields)
+    @QueryParam("fields") String rawFields) throws GraphANNISException
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
@@ -335,13 +334,12 @@ public class QueryServiceImpl implements QueryService
     "application/xml", "application/xmi+xml", "application/xmi+binary",
       "application/graphml+xml"
   })
-  @Override
   public SaltProject subgraph(
     MatchGroup matches,
     @QueryParam("segmentation") String segmentation, 
     @DefaultValue("0") @QueryParam("left") String leftRaw, 
     @DefaultValue("0") @QueryParam("right") String rightRaw, 
-    @DefaultValue("all") @QueryParam("filter") String filterRaw)
+    @DefaultValue("all") @QueryParam("filter") String filterRaw) throws GraphANNISException
   {
     
     // some robustness stuff
@@ -369,7 +367,7 @@ public class QueryServiceImpl implements QueryService
     @QueryParam("segmentation") String segmentation, 
     @DefaultValue("0") @QueryParam("left") String leftRaw, 
     @DefaultValue("0") @QueryParam("right") String rightRaw, 
-    @DefaultValue("all") @QueryParam("filter") String filterRaw)
+    @DefaultValue("all") @QueryParam("filter") String filterRaw) throws GraphANNISException
   {
     // some robustness stuff
     requiredParameter(matchRaw, "match", "definition of the match");
@@ -383,7 +381,7 @@ public class QueryServiceImpl implements QueryService
     @QueryParam("segmentation") String segmentation, 
     @DefaultValue("0") @QueryParam("left") String leftRaw, 
     @DefaultValue("0") @QueryParam("right") String rightRaw, 
-    @DefaultValue("all") @QueryParam("filter") String filterRaw)
+    @DefaultValue("all") @QueryParam("filter") String filterRaw) throws GraphANNISException
   {
     
     Subject user = SecurityUtils.getSubject();
@@ -437,7 +435,6 @@ public class QueryServiceImpl implements QueryService
     "application/xml", "application/xmi+xml", "application/xmi+binary",
     "application/graphml+xml"
   })
-  @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName,
     @QueryParam("filternodeanno") String filternodeanno)
@@ -627,12 +624,13 @@ public class QueryServiceImpl implements QueryService
    * @param query Query to check for validity
    * @param rawCorpusNames
    * @return Either "ok" or an error message.
+ * @throws GraphANNISException 
    */
   @GET
   @Produces("text/plain")
   @Path("check")
   public String check(@QueryParam("q") String query, 
-    @DefaultValue("") @QueryParam("corpora") String rawCorpusNames)
+    @DefaultValue("") @QueryParam("corpora") String rawCorpusNames) throws GraphANNISException
   {
     Subject user = SecurityUtils.getSubject();
     List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
@@ -655,12 +653,13 @@ public class QueryServiceImpl implements QueryService
    * @param query Query to get the query nodes for
    * @param rawCorpusNames 
    * @return
+ * @throws GraphANNISException 
    */
   @GET
   @Path("parse/nodes")
   @Produces("application/xml")
   public Response parseNodes(@QueryParam("q") String query,
-    @DefaultValue("") @QueryParam("corpora") String rawCorpusNames)
+    @DefaultValue("") @QueryParam("corpora") String rawCorpusNames) throws GraphANNISException
   {
     Subject user = SecurityUtils.getSubject();
     List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
@@ -725,7 +724,6 @@ public class QueryServiceImpl implements QueryService
    * @param rawLength how many bytes we take
    * @return AnnisBinary
    */
-  @Override
   public Response binary(
     String toplevelCorpusName,
     String corpusName,

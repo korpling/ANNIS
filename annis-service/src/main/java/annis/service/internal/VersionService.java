@@ -27,7 +27,7 @@ import annis.VersionInfo;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Path("annis/version")
-public class VersionServiceImpl
+public class VersionService
 { 
   
   @GET

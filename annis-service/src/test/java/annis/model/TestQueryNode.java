@@ -20,7 +20,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import org.corpus_tools.annis.ql.model.RankTableJoin;
 import org.junit.Before;
 import org.junit.Test;
 

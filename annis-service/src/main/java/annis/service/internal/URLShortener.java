@@ -47,7 +47,7 @@ import annis.dao.ShortenerDao;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Path("annis/shortener")
-public class URLShortenerImpl
+public class URLShortener
 {
   
   @Context

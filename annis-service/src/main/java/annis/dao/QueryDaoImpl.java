@@ -59,6 +59,7 @@ import org.corpus_tools.graphannis.api.Component;
 import org.corpus_tools.graphannis.api.CorpusStorageManager;
 import org.corpus_tools.graphannis.api.LogLevel;
 import org.corpus_tools.graphannis.capi.AnnisComponentType;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -127,7 +128,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     private final Escaper corpusNameEscaper = UrlEscapers.urlPathSegmentEscaper();
 
     @Override
-    public SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt) {
+    public SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt) throws GraphANNISException {
         SaltProject p = SaltFactory.createSaltProject();
 
         SCorpusGraph corpusGraph = p.createCorpusGraph();
@@ -149,7 +150,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         return p;
     }
 
-    private SDocumentGraph fetchDocumentWithContext(Match m, AnnotateQueryData annoExt) {
+    private SDocumentGraph fetchDocumentWithContext(Match m, AnnotateQueryData annoExt) throws GraphANNISException {
 
         String corpusName = null;
         // find all covered token
@@ -169,7 +170,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public List<Annotation> listDocuments(String toplevelCorpusName) {
+    public List<Annotation> listDocuments(String toplevelCorpusName) throws GraphANNISException {
 
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
 
@@ -353,7 +354,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     private final MetaByteHelper metaByteHelper = new MetaByteHelper();
 
-    protected QueryDaoImpl() {
+    protected QueryDaoImpl() throws GraphANNISException {
         File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
         this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
                 logfile.getAbsolutePath(), true, LogLevel.Debug);
@@ -362,7 +363,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         this.timeout = cfg.timeout();
     }
     
-    public static QueryDao create() {
+    public static QueryDao create() throws GraphANNISException {
         QueryDaoImpl result = new QueryDaoImpl();
         
         return result;
@@ -521,7 +522,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public FrequencyTable frequency(String aql, List<String> corpusList, FrequencyTableQuery freqQuery) {
+    public FrequencyTable frequency(String aql, List<String> corpusList, FrequencyTableQuery freqQuery) throws GraphANNISException {
         
         FrequencyTable result = new FrequencyTable();
         if(freqQuery.isEmpty()) {
@@ -671,7 +672,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     @Override
     public SaltProject retrieveAnnotationGraph(String toplevelCorpusName, String documentName,
-            List<String> nodeAnnotationFilter) {
+            List<String> nodeAnnotationFilter) throws GraphANNISException {
         URI docURI = SaltUtil.createSaltURI(toplevelCorpusName).appendSegment(documentName);
 
         SDocumentGraph graph = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString()));
@@ -725,7 +726,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName, boolean listRootCorpus) {
+    public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName, boolean listRootCorpus) throws GraphANNISException {
 
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
 
@@ -747,7 +748,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) {
+    public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) throws GraphANNISException {
         List<Annotation> result = new LinkedList<>();
 
         // select the document and all its parent corpora
@@ -774,7 +775,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public List<Annotation> listCorpusAnnotations(String toplevelCorpusName, String documentName, boolean exclude) {
+    public List<Annotation> listCorpusAnnotations(String toplevelCorpusName, String documentName, boolean exclude) throws GraphANNISException {
         
         boolean isToplevel = Objects.equals(toplevelCorpusName, documentName);
         // select the document and all its parent corpora
@@ -861,7 +862,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public void exportCorpus(String toplevelCorpus, File outputDirectory) {
+    public void exportCorpus(String toplevelCorpus, File outputDirectory) throws GraphANNISException {
 
         SaltProject corpusProject = SaltFactory.createSaltProject();
         SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
