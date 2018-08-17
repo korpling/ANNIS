@@ -57,6 +57,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.corpus_tools.graphannis.api.NodeDesc;
 import org.corpus_tools.salt.common.SaltProject;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
@@ -71,7 +72,6 @@ import annis.CommonHelper;
 import annis.ServiceConfig;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
-import annis.model.QueryNode;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.QueryService;
@@ -641,10 +641,11 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:parse:" + c);
     }
     Collections.sort(corpusNames);
-    
-    throw new UnsupportedOperationException();
-    //getQueryDao().parseAQL(query, corpusNames);
-    //return "ok";
+    if(getQueryDao().getCorpusStorageManager().validateQuery(corpusNames, query)) {
+        return "ok";
+    } else {
+        return "error";
+    }
   }
   
   /**
@@ -668,6 +669,8 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:parse:" + c);
     }
     Collections.sort(corpusNames);
+    
+    List<NodeDesc> desc = getQueryDao().getCorpusStorageManager().getNodeDescriptions(query);
     
     throw new UnsupportedOperationException();
 //    QueryData data = getQueryDao().parseAQL(query, corpusNames);
