@@ -15,9 +15,6 @@
  */
 package annis.dao;
 
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
@@ -25,8 +22,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
-import org.corpus_tools.annis.ql.parser.QueryData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,12 +38,9 @@ public class TestQueryDaoImpl {
     // simple SpringDao instance with mocked dependencies
     private QueryDaoImpl queryDao;
     @Mock
-    private AnnisParserAntlr annisParser;
-    @Mock
     private ListCorpusSqlHelper listCorpusHelper;
 
     // constants for flow control verification
-    private static final QueryData PARSE_RESULT = new QueryData();
     private static final String SQL = "SQL";
     private static final List<Long> CORPUS_LIST = new ArrayList<>();
 
@@ -59,7 +51,6 @@ public class TestQueryDaoImpl {
 
         queryDao = new QueryDaoImpl();
 
-        when(annisParser.parse(anyString(), anyList())).thenReturn(PARSE_RESULT);
 
     }
     @Test

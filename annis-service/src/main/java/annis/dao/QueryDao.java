@@ -15,9 +15,20 @@
  */
 package annis.dao;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
+
+import org.corpus_tools.graphannis.api.CorpusStorageManager;
+import org.corpus_tools.salt.common.SaltProject;
+
 import annis.administration.BinaryImportHelper;
 import annis.examplequeries.ExampleQuery;
-import annis.exceptions.AnnisException;
 import annis.model.Annotation;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
@@ -27,19 +38,12 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.FrequencyTable;
+import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
-import org.corpus_tools.annis.ql.parser.QueryData;
-import org.corpus_tools.graphannis.api.CorpusStorageManager;
-import org.corpus_tools.salt.common.SaltProject;
+import annis.service.objects.MatchGroup;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 
 public interface QueryDao
 {
@@ -134,15 +138,14 @@ public interface QueryDao
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
-  public QueryData parseAQL(String aql, List<String> corpusList);
 
-  int count(QueryData queryData);
+  int count(String aql, List<String> corpusList);
 
-  MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData);
+  MatchAndDocumentCount countMatchesAndDocuments(String aql, List<String> corpusList);
 
-  List<Match> find(QueryData queryData);
+  List<Match> find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset);
 
-  public boolean find(final QueryData queryData, final OutputStream out);
+  public boolean find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset, final OutputStream out);
 
   /**
    * Returns a part of a salt document according the saltIDs, we get with the 
@@ -152,9 +155,9 @@ public interface QueryDao
    * object
    * @return a salt graph
    */
-  SaltProject graph(QueryData queryData);
+  SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt);
 
-  FrequencyTable frequency(QueryData queryData);
+  FrequencyTable frequency(String aql, List<String> corpusList, FrequencyTableQuery freqTableQuery);
 
 
   /**

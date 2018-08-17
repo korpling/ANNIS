@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.corpus_tools.annis.ql.parser.QueryData;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -202,7 +201,6 @@ public class CountTest {
     }
 
     private int count(String aql, List<String> corpora) {
-        QueryData qd = annisDao.parseAQL(aql, corpora);
-        return annisDao.count(qd);
+        return annisDao.count(aql, corpora);
     }
 }

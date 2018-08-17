@@ -22,24 +22,18 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.management.Query;
-
 import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import annis.GraphHelper;
 import annis.dao.DBProvider;
 import annis.dao.QueryDao;
-import annis.dao.DBProvider.DB;
-import annis.dao.autogenqueries.QueriesGenerator.QueryBuilder;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import org.corpus_tools.annis.ql.parser.QueryData;
 
 /**
  * Controlls the generating of automatic generated queries.
@@ -222,22 +216,17 @@ public class QueriesGenerator extends DBProvider {
 
       // retrieve the aql query for analyzing purposes
       String aql = queryBuilder.getAQL();
-
+      
       // set some necessary extensions for generating complete sql
-      QueryData queryData = getQueryDao().parseAQL(aql, Arrays.asList(this.corpusName));
-      queryData.addExtension(queryBuilder.getLimitOffsetQueryData());
-
+      
       // retrieve the salt project to analyze
-      List<Match> matches = getQueryDao().find(queryData);
+      List<Match> matches = getQueryDao().find(aql, Arrays.asList(this.corpusName), queryBuilder.getLimitOffsetQueryData());
 
       if (matches.isEmpty()) {
         return;
       }
-
-      QueryData matchQueryData = GraphHelper.createQueryData(new MatchGroup(matches), queryDao);
-      matchQueryData.addExtension(queryBuilder.getAnnotateQueryData());
-
-      SaltProject saltProject = getQueryDao().graph(matchQueryData);
+      
+      SaltProject saltProject = getQueryDao().graph(new MatchGroup(matches), queryBuilder.getAnnotateQueryData());
       queryBuilder.analyzingQuery(saltProject);
 
       // set the corpus name

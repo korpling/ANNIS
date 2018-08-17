@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,6 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
-import org.corpus_tools.annis.ql.parser.QueryData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,10 +64,7 @@ import com.google.common.io.Files;
 
 import annis.ServiceConfig;
 import annis.dao.QueryDao;
-import annis.dao.autogenqueries.AutoSimpleRegexQuery;
-import annis.dao.autogenqueries.AutoTokQuery;
 import annis.dao.autogenqueries.QueriesGenerator;
-import annis.dao.autogenqueries.QueriesGenerator.QueryBuilder;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
 import annis.security.UserConfig;
@@ -645,9 +640,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         log.info("computing statistics for top-level corpus");
 
         // get number of tokens
-        QueryData tokQuery = getQueryDao().parseAQL("tok", null);
-        tokQuery.setCorpusList(Arrays.asList(toplevelCorpusName));
-        int tokCount = getQueryDao().count(tokQuery);
+        int tokCount = getQueryDao().count("tok", Arrays.asList(toplevelCorpusName));
         
         // get number of documents
         List<Annotation> documents = getQueryDao().listDocuments(toplevelCorpusName);

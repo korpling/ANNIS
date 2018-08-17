@@ -57,7 +57,6 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.corpus_tools.annis.ql.parser.QueryData;
 import org.corpus_tools.salt.common.SaltProject;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
@@ -69,7 +68,6 @@ import com.google.common.io.ByteStreams;
 import com.google.mimeparse.MIMEParse;
 
 import annis.CommonHelper;
-import annis.GraphHelper;
 import annis.ServiceConfig;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
@@ -181,9 +179,9 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:count:" + c);
     }
 
-    QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    List<String> corpusList = findCorporaFromQuery(rawCorpusNames);
     long start = new Date().getTime();
-    MatchAndDocumentCount count = getQueryDao().countMatchesAndDocuments(data);
+    MatchAndDocumentCount count = getQueryDao().countMatchesAndDocuments(query, corpusList);
     long end = new Date().getTime();
 
     logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames),
@@ -192,16 +190,17 @@ public class QueryServiceImpl implements QueryService
     return Response.ok(count).type(MediaType.APPLICATION_XML_TYPE).build();
   }
   
-  private StreamingOutput findRaw(final QueryData data, 
-    final String rawCorpusNames, final String query) throws IOException
+  private StreamingOutput findRaw(final String rawCorpusNames, 
+          final String query, final LimitOffsetQueryData limitOffset) throws IOException
   {
+    List<String> corpora = findCorporaFromQuery(rawCorpusNames);
     return new StreamingOutput()
     {
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException
       {
         long start = new Date().getTime();
-        getQueryDao().find(data, output);
+        getQueryDao().find(query, corpora, limitOffset, output);
         long end = new Date().getTime();
         logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames),
           end - start);
@@ -210,11 +209,12 @@ public class QueryServiceImpl implements QueryService
 
   }
 
-  private List<Match> findXml(QueryData data,
-    final String rawCorpusNames, final String query) throws IOException
+  private List<Match> findXml(final String rawCorpusNames, 
+          final String query, final LimitOffsetQueryData limitOffset) throws IOException
   {
+    List<String> corpora = findCorporaFromQuery(rawCorpusNames);
     long start = new Date().getTime();
-    List<Match> result = getQueryDao().find(data);
+    List<Match> result = getQueryDao().find(query, corpora, limitOffset);
     long end = new Date().getTime();
     logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
     return result;
@@ -261,9 +261,7 @@ public class QueryServiceImpl implements QueryService
         build());
     }
     
-    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    data.setCorpusConfiguration(getQueryDao().getCorpusConfiguration());
-    data.addExtension(new LimitOffsetQueryData(offset, limit, order));
+    LimitOffsetQueryData limitOffset =  new LimitOffsetQueryData(offset, limit, order);
     
     String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
     if (acceptHeader == null || acceptHeader.trim().isEmpty())
@@ -279,11 +277,11 @@ public class QueryServiceImpl implements QueryService
     
     if("text/plain".equals(bestMediaTypeMatch))
     {
-      return Response.ok(findRaw(data, rawCorpusNames, query), "text/plain").build();
+      return Response.ok(findRaw(rawCorpusNames, query, limitOffset), "text/plain").build();
     }
     else
     {
-      List<Match> result = findXml(data, rawCorpusNames, query);
+      List<Match> result = findXml(rawCorpusNames, query, limitOffset);
       return Response.ok().type("application/xml").entity(new GenericEntity<MatchGroup>(new MatchGroup(result)) {}).build();
     }
     
@@ -318,12 +316,11 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:matrix:" + c);
     }
     
-    QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    FrequencyTableQuery ext = FrequencyTableQuery.parse(rawFields);
-    data.addExtension(ext);
+    List<String> corpusList = findCorporaFromQuery(rawCorpusNames);
+    FrequencyTableQuery freqTableQuery = FrequencyTableQuery.parse(rawFields);
     
     long start = new Date().getTime();
-    FrequencyTable freqTable = getQueryDao().frequency(data);
+    FrequencyTable freqTable = getQueryDao().frequency(query, corpusList, freqTableQuery);
     long end = new Date().getTime();
     logQuery("FREQUENCY", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
     
@@ -395,10 +392,8 @@ public class QueryServiceImpl implements QueryService
     int right = Integer.parseInt(rightRaw);
     SubgraphFilter filter = SubgraphFilter.valueOf(filterRaw);
 
-    QueryData data = GraphHelper.createQueryData(matches, getQueryDao());
-
-    data.addExtension(new AnnotateQueryData(left, right,
-      segmentation, filter));
+    AnnotateQueryData annoExt = new AnnotateQueryData(left, right,
+      segmentation, filter);
 
     Set<String> corpusNames = new TreeSet<>();
 
@@ -418,13 +413,13 @@ public class QueryServiceImpl implements QueryService
 
     List<String> corpusNamesList = new LinkedList<>(corpusNames);
     
-    if(data.getCorpusList() == null || data.getCorpusList().isEmpty())
+    if(corpusNamesList == null || corpusNamesList.isEmpty())
     {
       throw new WebApplicationException(Response.Status.BAD_REQUEST.getStatusCode());
     }
     
     long start = new Date().getTime();
-    SaltProject p = getQueryDao().graph(data);
+    SaltProject p = getQueryDao().graph(matches, annoExt);
     long end = new Date().getTime();
     String options =
       "matches: " + matches.toString()
@@ -647,8 +642,9 @@ public class QueryServiceImpl implements QueryService
     }
     Collections.sort(corpusNames);
     
-    getQueryDao().parseAQL(query, corpusNames);
-    return "ok";
+    throw new UnsupportedOperationException();
+    //getQueryDao().parseAQL(query, corpusNames);
+    //return "ok";
   }
   
   /**
@@ -673,20 +669,20 @@ public class QueryServiceImpl implements QueryService
     }
     Collections.sort(corpusNames);
     
-    
-    QueryData data = getQueryDao().parseAQL(query, corpusNames);
-    List<QueryNode> nodes = new LinkedList<>();
-    int i=0;
-    for(List<QueryNode> alternative : data.getAlternatives())
-    {
-      for(QueryNode n : alternative)
-      {
-        n.setAlternativeNumber(i);
-        nodes.add(n);
-      }
-      i++;
-    }
-    return Response.ok(new GenericEntity<List<QueryNode>>(nodes) {}).build();
+    throw new UnsupportedOperationException();
+//    QueryData data = getQueryDao().parseAQL(query, corpusNames);
+//    List<QueryNode> nodes = new LinkedList<>();
+//    int i=0;
+//    for(List<QueryNode> alternative : data.getAlternatives())
+//    {
+//      for(QueryNode n : alternative)
+//      {
+//        n.setAlternativeNumber(i);
+//        nodes.add(n);
+//      }
+//      i++;
+//    }
+//    return Response.ok(new GenericEntity<List<QueryNode>>(nodes) {}).build();
   }
 
   @GET
@@ -969,17 +965,16 @@ public class QueryServiceImpl implements QueryService
   }
 
   /**
-   * Get the {@link QueryData} from a query and the corpus names
+   * Get the corpus names from the raw parameter
    *
-   * @param query The AQL query.
    * @param rawCorpusNames The name of the toplevel corpus names seperated by
    * ",".
-   * @return calculated {@link QueryData} for the given parametes.
+   * @return cleaned up list of corpora
    *
    * @throws WebApplicationException Thrown if some corpora are unknown to the
    * system.
    */
-  private QueryData queryDataFromParameters(String query, String rawCorpusNames)
+  private List<String> findCorporaFromQuery(String rawCorpusNames)
     throws WebApplicationException
   {
     List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
@@ -997,7 +992,7 @@ public class QueryServiceImpl implements QueryService
         "text/plain").entity("one ore more corpora are unknown to the system").
         build());
     }
-    return getQueryDao().parseAQL(query, corpusNames);
+    return corpusNames;
   }
 
   /**

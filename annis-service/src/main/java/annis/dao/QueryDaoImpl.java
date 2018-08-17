@@ -55,9 +55,6 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
-import org.corpus_tools.annis.ql.parser.AnnisParserAntlr;
-import org.corpus_tools.annis.ql.parser.QueryData;
-import org.corpus_tools.graphannis.QueryToJSON;
 import org.corpus_tools.graphannis.api.Component;
 import org.corpus_tools.graphannis.api.CorpusStorageManager;
 import org.corpus_tools.graphannis.api.LogLevel;
@@ -76,7 +73,6 @@ import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.DeserializationConfig;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
@@ -131,21 +127,17 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     private final Escaper corpusNameEscaper = UrlEscapers.urlPathSegmentEscaper();
 
     @Override
-    public SaltProject graph(QueryData data) {
+    public SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt) {
         SaltProject p = SaltFactory.createSaltProject();
 
         SCorpusGraph corpusGraph = p.createCorpusGraph();
         SCorpus rootCorpus = corpusGraph.createCorpus(null, "root");
 
-        List<MatchGroup> matchGroupList = data.getExtensions(MatchGroup.class);
-        List<AnnotateQueryData> annoExtList = data.getExtensions(AnnotateQueryData.class);
-        if (!matchGroupList.isEmpty() && !annoExtList.isEmpty()) {
-            MatchGroup mg = matchGroupList.get(0);
-            AnnotateQueryData annoExt = annoExtList.get(0);
-
+        if (matchGroup != null && annoExt != null) {
+            
             int i = 0;
 
-            for (Match m : mg.getMatches()) {
+            for (Match m : matchGroup.getMatches()) {
                 SDocumentGraph docGraph = fetchDocumentWithContext(m, annoExt);
                 SDocument doc = corpusGraph.createDocument(rootCorpus, "match" + i++);
                 doc.setDocumentGraph(docGraph);
@@ -354,7 +346,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     private final ListCorpusSqlHelper listCorpusSqlHelper = new ListCorpusSqlHelper();
 
-    private final AnnisParserAntlr aqlParser = new AnnisParserAntlr();
 
     private HashMap<String, Properties> corpusConfiguration;
 
@@ -409,27 +400,23 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         }
     }
 
-    protected List<String> escapedCorpusNames(QueryData queryData) {
+    protected List<String> escapedCorpusNames(List<String> originalCorpusList) {
         List<String> corpusList = new LinkedList<>();
-        for (String c : queryData.getCorpusList()) {
+        for (String c : originalCorpusList) {
             corpusList.add(corpusNameEscaper.escape(c));
         }
         return corpusList;
     }
 
     @Override
-    public List<Match> find(QueryData queryData) {
-        List<String> corpora = escapedCorpusNames(queryData);
-        String query = QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData());
+    public List<Match> find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset) {
+        List<String> corpora = escapedCorpusNames(corpusList);
 
-        List<LimitOffsetQueryData> ext = queryData.getExtensions(LimitOffsetQueryData.class);
-        Preconditions.checkArgument(ext != null && !ext.isEmpty(),
-                "Query data must contain a LimitOffsetQueryData extension");
-        LimitOffsetQueryData extQueryData = ext.get(0);
-
+        Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
+        
         Future<List<Match>> result = exec.submit(() -> {
-            String[] matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(),
-                    extQueryData.getLimit(), extQueryData.getOrder());
+            String[] matchesRaw = corpusStorageMgr.find(corpora, aql, limitOffset.getOffset(),
+                    limitOffset.getLimit(), limitOffset.getOrder());
 
             ArrayList<Match> data = new ArrayList<>((int) matchesRaw.length);
             for (int i = 0; i < matchesRaw.length; i++) {
@@ -451,18 +438,15 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public boolean find(final QueryData queryData, final OutputStream out) {
-        List<String> corpora = escapedCorpusNames(queryData);
-        String query = QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData());
+    public boolean find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset, final OutputStream out) {
+        List<String> corpora = escapedCorpusNames(corpusList);
 
-        List<LimitOffsetQueryData> ext = queryData.getExtensions(LimitOffsetQueryData.class);
-        Preconditions.checkArgument(ext != null && !ext.isEmpty(),
-                "Query data must contain a LimitOffsetQueryData extension");
-        LimitOffsetQueryData extQueryData = ext.get(0);
+        Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
+        
 
         Future<Boolean> result = exec.submit(() -> {
-            String[] matchesRaw = corpusStorageMgr.find(corpora, query, extQueryData.getOffset(),
-                    extQueryData.getLimit(), extQueryData.getOrder());
+            String[] matchesRaw = corpusStorageMgr.find(corpora, aql, limitOffset.getOffset(),
+                    limitOffset.getLimit(), limitOffset.getOrder());
 
             try {
                 PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
@@ -498,10 +482,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public int count(QueryData queryData) {
+    public int count(String aql, List<String> corpusList) {
         Future<Integer> result = exec.submit(() -> {
-            return (int) corpusStorageMgr.count(escapedCorpusNames(queryData),
-                    QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
+            return (int) corpusStorageMgr.count(escapedCorpusNames(corpusList), aql);
         });
 
         try {
@@ -517,11 +500,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData) {
+    public MatchAndDocumentCount countMatchesAndDocuments(String aql, List<String> corpusList) {
 
         Future<MatchAndDocumentCount> result = exec.submit(() -> {
-            CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(escapedCorpusNames(queryData),
-                    QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()));
+            CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(escapedCorpusNames(corpusList), aql);
 
             return new MatchAndDocumentCount((int) data.matchCount, (int) data.documentCount);
         });
@@ -539,18 +521,15 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public FrequencyTable frequency(QueryData queryData) {
+    public FrequencyTable frequency(String aql, List<String> corpusList, FrequencyTableQuery freqQuery) {
         
-        List<FrequencyTableQuery> freqQuery = queryData.getExtensions(FrequencyTableQuery.class);
         FrequencyTable result = new FrequencyTable();
         if(freqQuery.isEmpty()) {
             return result;
         }
         
-        for(String corpus : escapedCorpusNames(queryData)) {
-            FrequencyTable freqTableForCorpus = corpusStorageMgr.frequency(corpus, 
-                    QueryToJSON.serializeQuery(queryData.getAlternatives(), queryData.getMetaData()), 
-                    freqQuery.get(0));
+        for(String corpus : escapedCorpusNames(corpusList)) {
+            FrequencyTable freqTableForCorpus = corpusStorageMgr.frequency(corpus, aql, freqQuery);
             if(freqTableForCorpus != null) {
                 for(FrequencyTable.Entry e : freqTableForCorpus.getEntries()) {
                     result.addEntry(e);
@@ -560,11 +539,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         return result;
     }
 
-    @Override
-    public QueryData parseAQL(String aql, List<String> corpusList) {
-        // parse the query
-        return aqlParser.parse(aql, corpusList);
-    }
 
     @Override
     public List<AnnisCorpus> listCorpora() {
