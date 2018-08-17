@@ -670,22 +670,9 @@ public class QueryServiceImpl implements QueryService
     }
     Collections.sort(corpusNames);
     
-    List<NodeDesc> desc = getQueryDao().getCorpusStorageManager().getNodeDescriptions(query);
-    
-    throw new UnsupportedOperationException();
-//    QueryData data = getQueryDao().parseAQL(query, corpusNames);
-//    List<QueryNode> nodes = new LinkedList<>();
-//    int i=0;
-//    for(List<QueryNode> alternative : data.getAlternatives())
-//    {
-//      for(QueryNode n : alternative)
-//      {
-//        n.setAlternativeNumber(i);
-//        nodes.add(n);
-//      }
-//      i++;
-//    }
-//    return Response.ok(new GenericEntity<List<QueryNode>>(nodes) {}).build();
+    List<NodeDesc> nodes = getQueryDao().getCorpusStorageManager().getNodeDescriptions(query);
+    return Response.ok(new GenericEntity<List<NodeDesc>>(nodes) {}).build();
+
   }
 
   @GET
