@@ -70,7 +70,7 @@ public class AQLSyntaxErrorMapper implements ExceptionMapper<AQLSyntaxError> {
                String endCol = m.group("endcol");
                
                loc.setStartLine(Integer.parseInt(startLine));
-               loc.setStartColumn(Integer.parseInt(startCol));
+               loc.setStartColumn(Integer.parseInt(startCol)-1);
                
                if(endLine != null &&  endCol != null) {
                    loc.setEndLine(Integer.parseInt(endLine));
