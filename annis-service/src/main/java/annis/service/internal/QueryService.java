@@ -73,6 +73,7 @@ import annis.CommonHelper;
 import annis.ServiceConfig;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
+import annis.model.QueryNode;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
@@ -674,8 +675,14 @@ public class QueryService
     Collections.sort(corpusNames);
     
     List<NodeDesc> nodes = getQueryDao().getCorpusStorageManager().getNodeDescriptions(query);
-    return Response.ok(new GenericEntity<List<NodeDesc>>(nodes) {}).build();
-
+    List<QueryNode> result = new LinkedList<>();
+    for(NodeDesc n : nodes) {
+        QueryNode newNode = new QueryNode();
+        newNode.setVariable(n.getVariable());
+        newNode.setAlternativeNumber((int) n.getComponentNr()); 
+    }
+    
+    return Response.ok(new GenericEntity<List<QueryNode>>(result) {}).build();
   }
 
   @GET
