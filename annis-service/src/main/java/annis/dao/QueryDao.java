@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.corpus_tools.graphannis.api.CorpusStorageManager;
+import org.corpus_tools.graphannis.CorpusStorageManager;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.salt.common.SaltProject;
 

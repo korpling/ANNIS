@@ -57,7 +57,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.corpus_tools.graphannis.api.NodeDesc;
+import org.corpus_tools.graphannis.model.NodeDesc;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.salt.common.SaltProject;
 import org.glassfish.jersey.server.ResourceConfig;
