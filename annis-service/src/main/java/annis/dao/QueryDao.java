@@ -146,13 +146,13 @@ public interface QueryDao {
 
     public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
-    int count(String aql, List<String> corpusList);
+    int count(String aql, List<String> corpusList) throws GraphANNISException;
 
-    MatchAndDocumentCount countMatchesAndDocuments(String aql, List<String> corpusList);
+    MatchAndDocumentCount countMatchesAndDocuments(String aql, List<String> corpusList) throws GraphANNISException;
 
-    List<Match> find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset);
+    List<Match> find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset) throws GraphANNISException;
 
-    public boolean find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset, final OutputStream out);
+    public boolean find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset, final OutputStream out) throws GraphANNISException;
 
     /**
      * Returns a part of a salt document according the saltIDs, we get with the

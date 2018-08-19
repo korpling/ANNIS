@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -73,7 +74,7 @@ public class CountTest {
     }
 
     @Test
-    public void testAQLTestSuitePcc2() {
+    public void testAQLTestSuitePcc2() throws GraphANNISException {
         assumeTrue(pcc2CorpusID.size() > 0);
 
         assertEquals(7, countPcc2("Topic=\"ab\" & Inf-Stat=/[Nn]ew/ & #1 _i_ #2"));
@@ -134,7 +135,7 @@ public class CountTest {
     }
 
     @Test
-    public void testAQLTestSuiteTiger2() {
+    public void testAQLTestSuiteTiger2() throws GraphANNISException {
         assumeTrue(tiger2CorpusID.size() > 0);
 
         assertEquals(11558, countTiger2("cat=\"NP\" & cat=\"NP\" & #1 >[func=\"AG\"] #2"));
@@ -151,7 +152,7 @@ public class CountTest {
     }
 
     @Test
-    public void testNonReflexivityPcc2() {
+    public void testNonReflexivityPcc2() throws GraphANNISException {
 
         assumeTrue(pcc2CorpusID.size() > 0);
 
@@ -172,7 +173,7 @@ public class CountTest {
     }
 
     @Test
-    public void testReflexivityPcc2() {
+    public void testReflexivityPcc2() throws GraphANNISException {
         assumeTrue(pcc2CorpusID.size() > 0);
 
         // get token count as reference
@@ -190,17 +191,17 @@ public class CountTest {
         assertEquals(2, countPcc2("a#\"Karola\" & (b#lemma=\"Karola\" | b#pos=\"NE\") " + "& #a _=_ #b"));
     }
 
-    private int countPcc2(String aql) {
+    private int countPcc2(String aql) throws GraphANNISException {
         System.out.println("pcc2 query: " + aql);
         return count(aql, pcc2CorpusID);
     }
 
-    private int countTiger2(String aql) {
+    private int countTiger2(String aql) throws GraphANNISException {
         System.out.println("tiger2 query: " + aql);
         return count(aql, tiger2CorpusID);
     }
 
-    private int count(String aql, List<String> corpora) {
+    private int count(String aql, List<String> corpora) throws GraphANNISException {
         return annisDao.count(aql, corpora);
     }
 }

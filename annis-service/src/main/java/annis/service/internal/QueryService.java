@@ -164,7 +164,7 @@ public class QueryService
   @Path("search/count")
   @Produces("application/xml")
   public Response count(@QueryParam("q") String query,
-    @QueryParam("corpora") String rawCorpusNames)
+    @QueryParam("corpora") String rawCorpusNames) throws GraphANNISException
   {
 
     requiredParameter(query, "q", "AnnisQL query");
@@ -199,7 +199,11 @@ public class QueryService
       public void write(OutputStream output) throws IOException, WebApplicationException
       {
         long start = new Date().getTime();
-        getQueryDao().find(query, corpora, limitOffset, output);
+        try {
+            getQueryDao().find(query, corpora, limitOffset, output);
+        } catch (GraphANNISException e) {
+            throw new WebApplicationException(e);
+        }
         long end = new Date().getTime();
         logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames),
           end - start);
@@ -209,7 +213,7 @@ public class QueryService
   }
 
   private List<Match> findXml(final String rawCorpusNames, 
-          final String query, final LimitOffsetQueryData limitOffset) throws IOException
+          final String query, final LimitOffsetQueryData limitOffset) throws IOException, GraphANNISException
   {
     List<String> corpora = findCorporaFromQuery(rawCorpusNames);
     long start = new Date().getTime();
@@ -228,7 +232,7 @@ public class QueryService
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
     @DefaultValue("-1") @QueryParam("limit") String limitRaw,
-    @DefaultValue("ascending") @QueryParam("order") String orderRaw) throws IOException
+    @DefaultValue("ascending") @QueryParam("order") String orderRaw) throws IOException, GraphANNISException
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora",

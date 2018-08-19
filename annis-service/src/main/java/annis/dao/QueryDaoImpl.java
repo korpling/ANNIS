@@ -86,7 +86,6 @@ import com.google.common.net.UrlEscapers;
 import annis.CommonHelper;
 import annis.ServiceConfig;
 import annis.examplequeries.ExampleQuery;
-import annis.exceptions.AnnisException;
 import annis.exceptions.AnnisTimeoutException;
 import annis.model.Annotation;
 import annis.resolver.ResolverEntry;
@@ -410,7 +409,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public List<Match> find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset) {
+    public List<Match> find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset) throws GraphANNISException {
         List<String> corpora = escapedCorpusNames(corpusList);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
@@ -429,8 +428,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         try {
             return result.get(getTimeout(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-            if(ex.getCause() instanceof AnnisException) {
-                throw((AnnisException) ex.getCause());
+            if(ex.getCause() instanceof GraphANNISException) {
+                throw((GraphANNISException) ex.getCause());
             } else {
                 result.cancel(true);
                 throw (new AnnisTimeoutException());
@@ -439,7 +438,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public boolean find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset, final OutputStream out) {
+    public boolean find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset, final OutputStream out) throws GraphANNISException {
         List<String> corpora = escapedCorpusNames(corpusList);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
@@ -473,8 +472,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         try {
             return result.get(getTimeout(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-            if(ex.getCause() instanceof AnnisException) {
-                throw((AnnisException) ex.getCause());
+            if(ex.getCause() instanceof GraphANNISException) {
+                throw((GraphANNISException) ex.getCause());
             } else {
                 result.cancel(true);
                 throw (new AnnisTimeoutException());
@@ -483,7 +482,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public int count(String aql, List<String> corpusList) {
+    public int count(String aql, List<String> corpusList) throws GraphANNISException {
         Future<Integer> result = exec.submit(() -> {
             return (int) corpusStorageMgr.count(escapedCorpusNames(corpusList), aql);
         });
@@ -491,8 +490,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         try {
             return result.get(getTimeout(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
-            if(ex.getCause() instanceof AnnisException) {
-                throw((AnnisException) ex.getCause());
+            if(ex.getCause() instanceof GraphANNISException) {
+                throw((GraphANNISException) ex.getCause());
             } else {
                 result.cancel(true);
                 throw (new AnnisTimeoutException());
@@ -501,7 +500,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public MatchAndDocumentCount countMatchesAndDocuments(String aql, List<String> corpusList) {
+    public MatchAndDocumentCount countMatchesAndDocuments(String aql, List<String> corpusList) throws GraphANNISException {
 
         Future<MatchAndDocumentCount> result = exec.submit(() -> {
             CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(escapedCorpusNames(corpusList), aql);
@@ -512,8 +511,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         try {
             return result.get(getTimeout(), TimeUnit.MILLISECONDS);
         } catch (InterruptedException | ExecutionException | TimeoutException ex) { 
-            if(ex.getCause() instanceof AnnisException) {
-                throw((AnnisException) ex.getCause());
+            if(ex.getCause() instanceof GraphANNISException) {
+                throw((GraphANNISException) ex.getCause());
             } else {
                 result.cancel(true);
                 throw (new AnnisTimeoutException());
