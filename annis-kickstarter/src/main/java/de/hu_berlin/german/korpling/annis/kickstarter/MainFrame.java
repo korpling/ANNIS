@@ -18,61 +18,38 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Desktop;
+import java.awt.Font;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
-import org.corpus_tools.annis.ql.parser.QueryData;
-import org.corpus_tools.graphannis.api.CorpusStorageManager;
-import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.slf4j.LoggerFactory;
 
-import annis.AnnisBaseRunner;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.administration.DeleteCorpusDao;
 import annis.administration.ImportStatus;
 import annis.dao.QueryDao;
-import annis.dao.QueryDaoImpl;
-import annis.examplequeries.ExampleQuery;
-import annis.model.Annotation;
-import annis.resolver.ResolverEntry;
-import annis.resolver.SingleResolverRequest;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisBinaryMetaData;
-import annis.service.objects.AnnisCorpus;
-import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.DocumentBrowserConfig;
-import annis.service.objects.FrequencyTable;
-import annis.service.objects.Match;
-import annis.service.objects.MatchAndDocumentCount;
-import annis.utils.Utils;
-import java.awt.Font;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Toolkit;
-import javax.swing.UIDefaults;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 /**
  *
@@ -133,8 +110,9 @@ public class MainFrame extends javax.swing.JFrame {
 
     /**
      * Creates new form MainFrame
+     * @throws GraphANNISException 
      */
-    public MainFrame() {
+    public MainFrame() throws GraphANNISException {
         Integer[] sizes = new Integer[] { 192, 128, 64, 48, 32, 16, 14 };
         List<Image> allImages = new LinkedList<Image>();
 
@@ -454,8 +432,13 @@ public class MainFrame extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                MainFrame frame = new MainFrame();
-                frame.setVisible(true);
+                MainFrame frame;
+                try {
+                    frame = new MainFrame();
+                    frame.setVisible(true);
+                } catch (GraphANNISException e) {
+                    log.error("Could not start ANNIS", e);
+                }
             }
         });
     }
