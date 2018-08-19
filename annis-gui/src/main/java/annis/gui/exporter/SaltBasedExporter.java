@@ -48,11 +48,6 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 import annis.CommonHelper;
 import annis.TimelineReconstructor;
 import annis.exceptions.AnnisCorpusAccessException;
@@ -60,12 +55,17 @@ import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
-import annis.model.QueryNode;
+import annis.model.NodeDesc;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheException;
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.Element;
+import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
 /**
  * An abstract base class for exporters that use Salt subgraphs to produce
@@ -159,8 +159,8 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       
       //get node count for the query
       WebResource resource = Helper.getAnnisWebResource();
-      List<QueryNode> nodes = resource.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(queryAnnisQL))
-      	      .get(new GenericType<List<QueryNode>>() {});
+      List<NodeDesc> nodes = resource.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(queryAnnisQL))
+      	      .get(new GenericType<List<NodeDesc>>() {});
       Integer nodeCount = nodes.size();
                 
      

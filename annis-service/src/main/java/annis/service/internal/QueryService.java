@@ -675,14 +675,8 @@ public class QueryService
     Collections.sort(corpusNames);
     
     List<NodeDesc> nodes = getQueryDao().getCorpusStorageManager().getNodeDescriptions(query);
-    List<QueryNode> result = new LinkedList<>();
-    for(NodeDesc n : nodes) {
-        QueryNode newNode = new QueryNode();
-        newNode.setVariable(n.getVariable());
-        newNode.setAlternativeNumber((int) n.getComponentNr()); 
-    }
     
-    return Response.ok(new GenericEntity<List<QueryNode>>(result) {}).build();
+    return Response.ok(new GenericEntity<List<NodeDesc>>(nodes) {}).build();
   }
 
   @GET

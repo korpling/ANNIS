@@ -15,8 +15,16 @@
  */
 package annis.gui.components.codemirror;
 
-import annis.model.AqlParseError;
-import annis.model.QueryNode;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.data.Property;
@@ -24,15 +32,11 @@ import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
+
+import annis.model.AqlParseError;
+import annis.model.NodeDesc;
+import annis.model.QueryNode;
 import elemental.json.JsonArray;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A code editor component for the ANNIQ Query Language.
@@ -164,7 +168,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     }
   }
 
-  public void setNodes(List<QueryNode> nodes)
+  public void setNodes(List<NodeDesc> nodes)
   {
     getState().nodeMappings.clear();
     if(nodes != null)
@@ -173,29 +177,29 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     }
   }
 
-  private TreeMap<String, Integer> mapQueryNodes(List<QueryNode> nodes)
+  private TreeMap<String, Integer> mapQueryNodes(List<NodeDesc> nodes)
   {
     TreeMap<String, Integer> result = new TreeMap<>();
-    Map<Integer, TreeSet<Long>> alternative2Nodes = new HashMap<>();
+    Map<Long, TreeSet<String>> alternative2Nodes = new HashMap<>();
 
-    for (QueryNode n : nodes)
+    for (NodeDesc n : nodes)
     {
-      TreeSet<Long> orderedNodeSet = alternative2Nodes.get(n.
-        getAlternativeNumber());
+      TreeSet<String> orderedNodeSet = alternative2Nodes.get(n.
+        getComponentNr());
       if (orderedNodeSet == null)
       {
         orderedNodeSet = new TreeSet<>();
-        alternative2Nodes.put(n.getAlternativeNumber(), orderedNodeSet);
+        alternative2Nodes.put(n.getComponentNr(), orderedNodeSet);
       }
-      orderedNodeSet.add(n.getId());
+      orderedNodeSet.add(n.getVariable());
     }
 
-    for (TreeSet<Long> orderedNodeSet : alternative2Nodes.values())
+    for (TreeSet<String> orderedNodeSet : alternative2Nodes.values())
     {
       int newID = 1;
-      for (long var : orderedNodeSet)
+      for (String var : orderedNodeSet)
       {
-        result.put("" + var, newID);
+        result.put(var, newID);
         newID++;
       }
     }

@@ -76,6 +76,7 @@ import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.model.AqlParseError;
+import annis.model.NodeDesc;
 import annis.model.QueryNode;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.FrequencyTableEntry;
@@ -148,17 +149,17 @@ public class QueryController implements Serializable
       try
       {
         AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
-        Future<List<QueryNode>> future = annisResource.path("query").path(
+        Future<List<NodeDesc>> future = annisResource.path("query").path(
           "parse/nodes")
           .queryParam("q", Helper.encodeJersey(query))
-          .get(new GenericType<List<QueryNode>>()
+          .get(new GenericType<List<NodeDesc>>()
           {
           });
 
         // wait for maximal one seconds
         try
         {
-          List<QueryNode> nodes = future.get(1, TimeUnit.SECONDS);
+          List<NodeDesc> nodes = future.get(1, TimeUnit.SECONDS);
 
           qp.setNodes(nodes);
 

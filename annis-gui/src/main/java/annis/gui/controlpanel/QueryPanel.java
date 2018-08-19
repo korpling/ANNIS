@@ -54,7 +54,7 @@ import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import annis.model.AqlParseError;
-import annis.model.QueryNode;
+import annis.model.NodeDesc;
 
 /**
  *
@@ -353,7 +353,7 @@ public class QueryPanel extends GridLayout implements
     return "";
   }
   
-  public void setNodes(List<QueryNode> nodes)
+  public void setNodes(List<NodeDesc> nodes)
   {
     txtQuery.setNodes(nodes);
   }
