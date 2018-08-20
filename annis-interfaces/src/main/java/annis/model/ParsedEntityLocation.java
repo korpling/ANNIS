@@ -35,8 +35,8 @@ public class ParsedEntityLocation implements Serializable
   {
     this.startLine = 1;
     this.endLine = 1;
-    this.startColumn = 0;
-    this.endColumn = 0;
+    this.startColumn = 1;
+    this.endColumn = 1;
   }
 
   public ParsedEntityLocation(int startLine, int startColumn, int endLine, int endColumn)

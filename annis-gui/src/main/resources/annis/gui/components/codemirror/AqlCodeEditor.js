@@ -121,8 +121,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         var err = connector.getState().errors[i];
         var endColumn = err.endColumn+1;
         errorList.push({
-          from: CodeMirror.Pos(err.startLine-1, err.startColumn),
-          to: CodeMirror.Pos(err.endLine-1, endColumn),
+          from: CodeMirror.Pos(err.startLine-1, err.startColumn-1),
+          to: CodeMirror.Pos(err.endLine-1, endColumn-1),
           message: err.message
         });
       }
