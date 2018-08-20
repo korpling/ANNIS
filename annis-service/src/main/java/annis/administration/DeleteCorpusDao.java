@@ -125,9 +125,6 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
             log.info("deleting from graphANNIS");
             for (String corpusName : names) {
                 getQueryDao().getCorpusStorageManager().deleteCorpus(corpusName);
-                getQueryRunner().update(conn,
-                        "DELETE FROM text\n" + "WHERE\n" + "  corpus_path = ? OR corpus_path like ?", corpusName,
-                        corpusName + "/%");
             }
             
             conn.commit();
