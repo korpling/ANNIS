@@ -51,7 +51,8 @@ import au.com.bytecode.opencsv.CSVReader;
 public abstract class AbstractDao extends DBProvider {
   private final static Logger log = LoggerFactory.getLogger(AbstractDao.class);
   
-  private final DevelopConfig cfg = ConfigFactory.create(DevelopConfig.class);
+  protected final DevelopConfig devCfg = ConfigFactory.create(DevelopConfig.class, 
+          System.getProperties(), System.getenv());
 
   private StatementController statementController;
   
@@ -157,7 +158,7 @@ public abstract class AbstractDao extends DBProvider {
 
 
   public String getScriptPath() {
-    return cfg.scriptPath();
+    return devCfg.scriptPath();
   }
 
 

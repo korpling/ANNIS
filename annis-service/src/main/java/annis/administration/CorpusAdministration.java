@@ -70,13 +70,13 @@ public class CorpusAdministration {
 
     public CorpusAdministration() {
     }
-    
+
     public static CorpusAdministration create(AdministrationDao administrationDao) {
         CorpusAdministration corpusAdmin = new CorpusAdministration();
         corpusAdmin.setAdministrationDao(administrationDao);
-        
+
         corpusAdmin.checkDatabaseSchemaVersion();
-        
+
         return corpusAdmin;
     }
 
@@ -108,16 +108,19 @@ public class CorpusAdministration {
      *
      *
      * @param overwrite
-     *            If set to false, a conflicting corpus is not silently reimported.
+     *                              If set to false, a conflicting corpus is not
+     *                              silently reimported.
      * @param aliasName
-     *            An common alias name for all imported corpora or null
+     *                              An common alias name for all imported corpora or
+     *                              null
      * @param statusEmailAdress
-     *            an email adress for informating the admin about statuses
+     *                              an email adress for informating the admin about
+     *                              statuses
      * @param waitForOtherTasks
-     *            If true wait for other imports to finish, if false abort the
-     *            import.
+     *                              If true wait for other imports to finish, if
+     *                              false abort the import.
      * @param paths
-     *            Valid pathes to corpora.
+     *                              Valid pathes to corpora.
      * @return True if all corpora where imported successfully.
      */
     public ImportStatus importCorporaSave(boolean overwrite, String aliasName, String statusEmailAdress,
@@ -166,10 +169,12 @@ public class CorpusAdministration {
                 log.info("Importing corpus from: " + r.getPath());
                 if (getAdministrationDao().importCorpus(r.getPath(), aliasName, overwrite)) {
                     log.info("Finished import from: " + r.getPath());
-                    getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.SUCCESS, null);
+                    getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(),
+                            ImportJob.Status.SUCCESS, null);
                 } else {
                     importStats.setStatus(false);
-                    getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, null);
+                    getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
+                            null);
                 }
             }
 
@@ -177,12 +182,14 @@ public class CorpusAdministration {
                 importStats.setStatus(false);
                 importStats.addException(r.getPath(), ex);
                 log.error("Error on conflicting top level corpus name for {}", r.getPath());
-                getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, ex.getMessage());
+                getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
+                        ex.getMessage());
             } catch (Throwable ex) {
                 importStats.setStatus(false);
                 importStats.addException(r.getPath(), ex);
                 log.error("Error on importing corpus", ex);
-                getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, ex.getMessage());
+                getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
+                        ex.getMessage());
             }
         } // end for each corpus
 
@@ -193,9 +200,9 @@ public class CorpusAdministration {
      * Extract the zipped ANNIS corpus files to an output directory.
      *
      * @param outDir
-     *            The ouput directory.
+     *                   The ouput directory.
      * @param zip
-     *            ZIP-file to extract.
+     *                   ZIP-file to extract.
      * @return A list of root directories where the tab-files are located if found,
      *         null otherwise.
      */
@@ -392,7 +399,6 @@ public class CorpusAdministration {
         }
     }
 
-    
     public void sendCopyStatusMail(String adress, String origDBFile, ImportJob.Status status, String additionalInfo) {
         if (adress == null || origDBFile == null) {
             return;
@@ -474,16 +480,19 @@ public class CorpusAdministration {
      * Imports several corpora.
      *
      * @param overwrite
-     *            if false, a conflicting top level corpus is silently skipped.
+     *                              if false, a conflicting top level corpus is
+     *                              silently skipped.
      * @param aliasName
-     *            An common alias name for all imported corpora or null
+     *                              An common alias name for all imported corpora or
+     *                              null
      * @param statusEmailAdress
-     *            If not null the email adress of the user who started the import.
+     *                              If not null the email adress of the user who
+     *                              started the import.
      * @param waitForOtherTasks
-     *            If true wait for other imports to finish, if false abort the
-     *            import.
+     *                              If true wait for other imports to finish, if
+     *                              false abort the import.
      * @param paths
-     *            the paths to the corpora
+     *                              the paths to the corpora
      * @return True if all corpora where imported successfully.
      */
     public ImportStatus importCorporaSave(boolean overwrite, String aliasName, String statusEmailAdress,
@@ -525,6 +534,5 @@ public class CorpusAdministration {
     public DeleteCorpusDao getDeleteCorpusDao() {
         return administrationDao.getDeleteCorpusDao();
     }
-
 
 }
