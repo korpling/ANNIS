@@ -56,6 +56,7 @@ public class DBProvider {
 
     public Connection createConnection(File dbFile, boolean readonly) throws SQLException {
         SQLiteConfig conf = new SQLiteConfig();
+        conf.setReadOnly(readonly);
         SQLiteDataSource source = new SQLiteDataSource(conf);
         source.setUrl("jdbc:sqlite:" + dbFile.getAbsolutePath() + "?journal_mode=wal");
         return source.getConnection();

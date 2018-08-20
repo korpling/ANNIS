@@ -105,6 +105,9 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         this.mimeTypeMapping.put("json", "application/json");
         
         this.generateExampleQueries = cfg.generateExampleQueries();
+        
+        this.jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        
     }
     
     public static AdministrationDao create(QueryDao queryDao, DeleteCorpusDao deleteCorpusDao) {
@@ -236,12 +239,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private final Table corpusInfoTable = new Table("corpus_info").c(new Column("name").primaryKey()).c_int("docs")
             .c_int("tokens").c("source_path");
 
-    /**
-     * Called when Spring configuration finished
-     */
-    public void init() {
-        jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
-    }
 
     /**
      * Get the real schema name and version as used by the database.

@@ -75,6 +75,8 @@ public class CorpusAdministration {
         CorpusAdministration corpusAdmin = new CorpusAdministration();
         corpusAdmin.setAdministrationDao(administrationDao);
         
+        corpusAdmin.checkDatabaseSchemaVersion();
+        
         return corpusAdmin;
     }
 
