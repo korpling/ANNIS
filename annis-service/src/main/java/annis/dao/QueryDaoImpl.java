@@ -426,7 +426,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         });
 
         try {
-            return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+            if(getTimeout() > 0) {
+                return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+            } else {
+                return result.get();
+            }
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             if(ex.getCause() instanceof GraphANNISException) {
                 throw((GraphANNISException) ex.getCause());
@@ -470,7 +474,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         });
 
         try {
-            return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+            if(getTimeout() > 0) {
+                return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+            } else {
+                return result.get();
+            }
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             if(ex.getCause() instanceof GraphANNISException) {
                 throw((GraphANNISException) ex.getCause());
@@ -488,7 +496,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         });
 
         try {
-            return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+            if(getTimeout() > 0) {
+                return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+            } else {
+                return result.get();
+            }
         } catch (InterruptedException | ExecutionException | TimeoutException ex) {
             if(ex.getCause() instanceof GraphANNISException) {
                 throw((GraphANNISException) ex.getCause());
@@ -509,7 +521,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         });
 
         try {
-            return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+            if(getTimeout() > 0) {
+                return result.get(getTimeout(), TimeUnit.MILLISECONDS);
+            } else {
+                return result.get();
+            }
         } catch (InterruptedException | ExecutionException | TimeoutException ex) { 
             if(ex.getCause() instanceof GraphANNISException) {
                 throw((GraphANNISException) ex.getCause());
