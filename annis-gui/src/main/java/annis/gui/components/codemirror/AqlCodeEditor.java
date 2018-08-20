@@ -180,26 +180,28 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   private TreeMap<String, Integer> mapQueryNodes(List<NodeDesc> nodes)
   {
     TreeMap<String, Integer> result = new TreeMap<>();
-    Map<Long, TreeSet<String>> alternative2Nodes = new HashMap<>();
+    Map<Long, TreeSet<Integer>> alternative2Nodes = new HashMap<>();
 
+    int nodeIdx = 1;
     for (NodeDesc n : nodes)
     {
-      TreeSet<String> orderedNodeSet = alternative2Nodes.get(n.
+      TreeSet<Integer> orderedNodeSet = alternative2Nodes.get(n.
         getComponentNr());
       if (orderedNodeSet == null)
       {
         orderedNodeSet = new TreeSet<>();
         alternative2Nodes.put(n.getComponentNr(), orderedNodeSet);
       }
-      orderedNodeSet.add(n.getVariable());
+      // the nodes list is already ordered by the occurrence of the node in the AQL query stream
+      orderedNodeSet.add(nodeIdx++);
     }
 
-    for (TreeSet<String> orderedNodeSet : alternative2Nodes.values())
+    for (TreeSet<Integer> orderedNodeSet : alternative2Nodes.values())
     {
       int newID = 1;
-      for (String var : orderedNodeSet)
+      for (Integer idx : orderedNodeSet)
       {
-        result.put(var, newID);
+        result.put("" + idx, newID);
         newID++;
       }
     }
