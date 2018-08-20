@@ -17,14 +17,14 @@ package annis.rest.provider;
 
 import javax.ws.rs.ext.Provider;
 
-import org.corpus_tools.graphannis.errors.AQLSyntaxError;
+import org.corpus_tools.graphannis.errors.AQLSemanticError;
 
 /**
  *
  * @author thomas
  */
 @Provider
-public class AQLSyntaxErrorMapper extends AQLErrorMapperBase<AQLSyntaxError> {
-
-  
+public class AQLSemanticErrorMapper extends AQLErrorMapperBase<AQLSemanticError> {
+    
+    
 }
