@@ -103,7 +103,7 @@
   <logger name="org.glassfish.jersey" level="CONFIG">
   </logger>
 
-  <root level="CONFIG">
+  <root level="INFO">
     <appender-ref ref="LOGFILE"/>
     <appender-ref ref="ERROR"/>
     <!--<appender-ref ref="DEBUG"/>-->
