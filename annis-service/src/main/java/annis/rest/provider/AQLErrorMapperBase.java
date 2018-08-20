@@ -56,7 +56,7 @@ public abstract class AQLErrorMapperBase<T extends GraphANNISException> implemen
                    String endCol = m.group("endcol");
                    
                    loc.setStartLine(Integer.parseInt(startLine));
-                   loc.setStartColumn(Integer.parseInt(startCol)-1);
+                   loc.setStartColumn(Integer.parseInt(startCol));
                    
                    if(endLine != null &&  endCol != null) {
                        loc.setEndLine(Integer.parseInt(endLine));
