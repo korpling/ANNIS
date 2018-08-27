@@ -107,9 +107,12 @@ public class TestCorpusAdministration
     tmp.deleteOnExit();
     File root = new File(tmp, path);
     root.mkdirs();
+    root.deleteOnExit();
     
-    Files.append("0\t" + corpusName  + "\tCORPUS\tNULL\t0\t1", 
-      new File(root, "corpus.annis"), Charsets.UTF_8);
+    File corpusFile = new File(root, "corpus.annis");
+    corpusFile.deleteOnExit();
+    
+    Files.append("0\t" + corpusName  + "\tCORPUS\tNULL\t0\t1", corpusFile, Charsets.UTF_8);
     
     return root;
   }
