@@ -712,5 +712,8 @@ public class QueryNode implements Serializable
     this.parseLocation = parseLocation;
   }
   
-  
+  public boolean hasCustomName() {
+    String idAsString = "" + id;
+    return variable != null && !idAsString.equals(variable);
+  }
 }

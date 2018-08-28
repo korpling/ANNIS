@@ -21,10 +21,15 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -133,9 +138,51 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
 
     return sb.toString();
   }
+  
+  private List<QueryNode> getOrderedMaximumAlternative(QueryData queryData) {
+	    Map<String, QueryNode> alternative_named = new TreeMap<>();
+	    List<QueryNode> alternative_unnamed = new ArrayList<>();
+	    
+	    for(List<QueryNode> alternative : queryData.getAlternatives()) {
+		    
+		    for (QueryNode n: alternative) {
+		        if (n.hasCustomName()) {
+		            alternative_named.put(n.getVariable(), n);
+		        }
+		        else {
+		            alternative_unnamed.add(n);
+		        }
+		    }
+	    }
+	    List<QueryNode> alternative_ordered = new ArrayList<>(alternative_named.size() + alternative_unnamed.size());
+	    alternative_ordered.addAll(alternative_named.values());
+	    alternative_ordered.addAll(alternative_unnamed);
+	    
+	    return alternative_ordered;
+  }
+  
+  private List<QueryNode> getOrderedAlternative(List<QueryNode> originalAlternative) {
+	    Map<String, QueryNode> alternative_named = new TreeMap<>();
+	    List<QueryNode> alternative_unnamed = new ArrayList<>();
+	    
+	    for (QueryNode n: originalAlternative) {
+	        if (n.hasCustomName()) {
+	            alternative_named.put(n.getVariable(), n);
+	        }
+	        else {
+	            alternative_unnamed.add(n);
+	        }
+	    }
+	    
+	    List<QueryNode> alternative_ordered = new ArrayList<>(alternative_named.size() + alternative_unnamed.size());
+	    alternative_ordered.addAll(alternative_named.values());
+	    alternative_ordered.addAll(alternative_unnamed);
+	    
+	    return alternative_ordered;
+}
 
   @Override
-  public String fromClause(QueryData queryData, List<QueryNode> alternative,
+  public String fromClause(QueryData queryData, List<QueryNode> firstAlternative,
     String indent)
   {
     FrequencyTableQuery ext;
@@ -143,16 +190,31 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
     Validate.notNull(freqQueryData);
     Validate.notEmpty(freqQueryData);
     ext = freqQueryData.get(0);
+    
 
-    Multimap<FrequencyTableEntry, String> conditions = conditionsForEntries(ext, queryData, alternative);
+    Multimap<FrequencyTableEntry, String> conditions = conditionsForEntries(ext, queryData, getOrderedAlternative(firstAlternative));
 
     
     StringBuilder sb = new StringBuilder();
 
     sb.append(indent).append("(\n");
-    sb.append(indent);
+    // construct or own UNION generator that uses sorted alternatives
+    ListIterator<List<QueryNode>> itAlternatives = queryData.getAlternatives().listIterator();
+    while(itAlternatives.hasNext()) {
+    	List<QueryNode> alternative = getOrderedAlternative(itAlternatives.next());
+    	QueryData altQueryData = queryData.clone();
+    	altQueryData.setAlternatives(Arrays.asList(alternative));
+    	
+    	sb.append(getSolutionSqlGenerator().toSql(altQueryData, indent + TABSTOP));
+    	
+    	if(itAlternatives.hasNext()) {
+    		
+    	    sb.append(indent +  TABSTOP);
+    	    sb.append("UNION\n\n");
+    	}
+    }
 
-    sb.append(getSolutionSqlGenerator().toSql(queryData, indent + TABSTOP));
+    
     sb.append(indent).append(") AS solutions\n");
     
     int i = 1;
