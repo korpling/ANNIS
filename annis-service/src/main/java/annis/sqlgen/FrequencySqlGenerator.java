@@ -23,6 +23,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -139,28 +140,6 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
     return sb.toString();
   }
   
-  private List<QueryNode> getOrderedMaximumAlternative(QueryData queryData) {
-	    Map<String, QueryNode> alternative_named = new TreeMap<>();
-	    List<QueryNode> alternative_unnamed = new ArrayList<>();
-	    
-	    for(List<QueryNode> alternative : queryData.getAlternatives()) {
-		    
-		    for (QueryNode n: alternative) {
-		        if (n.hasCustomName()) {
-		            alternative_named.put(n.getVariable(), n);
-		        }
-		        else {
-		            alternative_unnamed.add(n);
-		        }
-		    }
-	    }
-	    List<QueryNode> alternative_ordered = new ArrayList<>(alternative_named.size() + alternative_unnamed.size());
-	    alternative_ordered.addAll(alternative_named.values());
-	    alternative_ordered.addAll(alternative_unnamed);
-	    
-	    return alternative_ordered;
-  }
-  
   private List<QueryNode> getOrderedAlternative(List<QueryNode> originalAlternative) {
 	    Map<String, QueryNode> alternative_named = new TreeMap<>();
 	    List<QueryNode> alternative_unnamed = new ArrayList<>();
@@ -175,8 +154,11 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
 	    }
 	    
 	    List<QueryNode> alternative_ordered = new ArrayList<>(alternative_named.size() + alternative_unnamed.size());
-	    alternative_ordered.addAll(alternative_named.values());
+	    // add unnamed first, so they retain their original position the list of alternatives
 	    alternative_ordered.addAll(alternative_unnamed);
+	    // add sorted names after
+	    alternative_ordered.addAll(alternative_named.values());
+	    
 	    
 	    return alternative_ordered;
 }
@@ -192,7 +174,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
     ext = freqQueryData.get(0);
     
 
-    Multimap<FrequencyTableEntry, String> conditions = conditionsForEntries(ext, queryData, getOrderedAlternative(firstAlternative));
+    Multimap<FrequencyTableEntry, String> conditions = conditionsForEntries(ext, queryData);
 
     
     StringBuilder sb = new StringBuilder();
@@ -251,20 +233,21 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
   
   private Multimap<FrequencyTableEntry, String> conditionsForEntries(
     List<FrequencyTableEntry> frequencyEntries,
-    QueryData queryData, List<QueryNode> alternative)
+    QueryData queryData)
   {
     Multimap<FrequencyTableEntry, String> conditions = LinkedHashMultimap.create();
+    
+    Map<String, Integer> var2index = new HashMap<>();
+    for(List<QueryNode> alt : queryData.getAlternatives()) 
+    {
+    	int altNr = 1;
+    	for(QueryNode n : getOrderedAlternative(alt)) {
+    		var2index.putIfAbsent(n.getVariable(), altNr);
+    		altNr++;
+    	}
+    }
+    
     int i = 1;
-
-    ImmutableMap<String, QueryNode> idxNodeVariables = Maps.uniqueIndex(
-      alternative.iterator(), new Function<QueryNode, String>()
-      {
-        @Override
-        public String apply(QueryNode input)
-        {
-          return input.getVariable();
-        }
-      });
 
     for (FrequencyTableEntry e : frequencyEntries)
     {
@@ -296,15 +279,15 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
         conditions.put(e, "v" + i + ".toplevel_corpus = solutions.toplevel_corpus");
 
         // join on node ID
-        QueryNode referencedNode = idxNodeVariables.get(e.getReferencedNode());
-        if (referencedNode == null)
+        Integer referencedNodePos = var2index.get(e.getReferencedNode());
+        if (referencedNodePos == null)
         {
           throw new AnnisQLSemanticsException("No such node \""
             + e.getReferencedNode() + "\". "
-            + "Your query contains " + alternative.size()
+            + "Your query contains " + queryData.getMaxWidth()
             + " node(s), make sure no node definition numbers are greater than this number");
         }
-        conditions.put(e, "v" + i + ".id = solutions.id" + referencedNode.getId());
+        conditions.put(e, "v" + i + ".id = solutions.id" + referencedNodePos);
 
         if (e.getType() == FrequencyTableEntryType.span)
         {
