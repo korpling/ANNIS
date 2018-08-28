@@ -140,24 +140,31 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
     return sb.toString();
   }
   
-  private List<QueryNode> getOrderedAlternative(List<QueryNode> originalAlternative) {
-	    Map<String, QueryNode> alternative_named = new TreeMap<>();
-	    List<QueryNode> alternative_unnamed = new ArrayList<>();
+  private List<QueryNode> getOrderedAlternative(List<QueryNode> originalAlternative, 
+		  List<FrequencyTableEntry> freqDef) {
+	  
+	  Set<String> referencedVars = new HashSet<>();
+	  for(FrequencyTableEntry e : freqDef) {
+		  referencedVars.add(e.getReferencedNode());
+	  }
+	  
+	    Map<String, QueryNode> alternative_referenced = new TreeMap<>();
+	    List<QueryNode> alternative_unreferenced = new ArrayList<>();
 	    
 	    for (QueryNode n: originalAlternative) {
-	        if (n.hasCustomName()) {
-	            alternative_named.put(n.getVariable(), n);
+	        if (referencedVars.contains(n.getVariable())) {
+	        	alternative_referenced.put(n.getVariable(), n);
 	        }
 	        else {
-	            alternative_unnamed.add(n);
+	        	alternative_unreferenced.add(n);
 	        }
 	    }
 	    
-	    List<QueryNode> alternative_ordered = new ArrayList<>(alternative_named.size() + alternative_unnamed.size());
-	    // add unnamed first, so they retain their original position the list of alternatives
-	    alternative_ordered.addAll(alternative_unnamed);
-	    // add sorted names after
-	    alternative_ordered.addAll(alternative_named.values());
+	    List<QueryNode> alternative_ordered = new ArrayList<>(alternative_referenced.size() + alternative_unreferenced.size());
+	    // add referenced first, so their order is deterministic
+	    alternative_ordered.addAll(alternative_referenced.values());
+	    // add unsorted after
+	    alternative_ordered.addAll(alternative_unreferenced);
 	    
 	    
 	    return alternative_ordered;
@@ -183,7 +190,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
     // construct or own UNION generator that uses sorted alternatives
     ListIterator<List<QueryNode>> itAlternatives = queryData.getAlternatives().listIterator();
     while(itAlternatives.hasNext()) {
-    	List<QueryNode> alternative = getOrderedAlternative(itAlternatives.next());
+    	List<QueryNode> alternative = getOrderedAlternative(itAlternatives.next(), ext);
     	QueryData altQueryData = queryData.clone();
     	altQueryData.setAlternatives(Arrays.asList(alternative));
     	
@@ -241,7 +248,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
     for(List<QueryNode> alt : queryData.getAlternatives()) 
     {
     	int altNr = 1;
-    	for(QueryNode n : getOrderedAlternative(alt)) {
+    	for(QueryNode n : getOrderedAlternative(alt, frequencyEntries)) {
     		var2index.putIfAbsent(n.getVariable(), altNr);
     		altNr++;
     	}
