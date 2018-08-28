@@ -711,4 +711,6 @@ public class QueryNode implements Serializable
   {
     this.parseLocation = parseLocation;
   }
+  
+  
 }
