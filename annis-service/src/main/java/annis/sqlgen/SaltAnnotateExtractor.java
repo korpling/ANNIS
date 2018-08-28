@@ -162,9 +162,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           graph = SaltFactory.createSDocumentGraph();
           document = SaltFactory.createSDocument();
           
-          document.setDocumentGraphLocation(org.eclipse.emf.common.util.URI.
-            createFileURI(Files.createTempDir().getAbsolutePath()));
-          
           List<String> path = corpusPathExtractor.extractCorpusPath(resultSet,
             "path");
 
