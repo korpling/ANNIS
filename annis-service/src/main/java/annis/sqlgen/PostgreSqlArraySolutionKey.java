@@ -4,12 +4,13 @@ import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import static java.util.Arrays.asList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import annis.model.QueryNode;
 
 /**
  * TODO Document semantics of of multiple ID columns TODO Code supporting
@@ -28,26 +29,35 @@ public class PostgreSqlArraySolutionKey<BaseType> extends AbstractSolutionKey<Ba
 
   @Override
   public List<String> generateOuterQueryColumns(
-    TableAccessStrategy tableAccessStrategy, int size)
+    TableAccessStrategy tableAccessStrategy, List<QueryNode> alternative)
   {
     List<String> columns = new ArrayList<>();
     String nameAlias = tableAccessStrategy.aliasedColumn("solutions",
       getIdColumnName());
-    columns.add(createKeyArray(nameAlias, keyColumnName, size));
+    columns.add(createKeyArray(nameAlias, keyColumnName, alternative));
     return columns;
   }
 
-  protected String createKeyArray(String column, String alias, int size)
+  protected String createKeyArray(String column, String alias, List<QueryNode> alternative)
   {
     StringBuilder sb = new StringBuilder();
     sb.append("ARRAY[");
-    sb.append(column);
-    sb.append(1);
-    for (int i = 2; i <= size; ++i)
-    {
-      sb.append(", ");
+    int i = 1;
+    for (Iterator<QueryNode> node_it = alternative.iterator(); node_it.hasNext();) {
       sb.append(column);
-      sb.append(i);
+
+      QueryNode n = node_it.next();
+      if (n.hasCustomName()) {
+        sb.append(n.getVariable());
+      }
+      else {
+        sb.append(i);
+        i++;
+      }
+
+      if (node_it.hasNext()) {
+        sb.append(", ");
+      }
     }
     sb.append("]");
     sb.append(" AS ");

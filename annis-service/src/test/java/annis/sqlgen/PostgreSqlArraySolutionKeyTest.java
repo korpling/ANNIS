@@ -19,6 +19,8 @@ import static org.mockito.Matchers.anyString;
 import org.mockito.Mock;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import annis.model.QueryNode;
+
 public class PostgreSqlArraySolutionKeyTest
 {
 
@@ -71,9 +73,9 @@ public class PostgreSqlArraySolutionKeyTest
     // given
     String nameAlias = uniqueString(3);
     given(tableAccessStrategy.aliasedColumn("solutions", idColumnName)).willReturn(nameAlias);
-    int size = 3;
+    List<QueryNode> alternative = asList(new QueryNode[] { new QueryNode(1), new QueryNode(2), new QueryNode(3) });
     // when
-    List<String> actual = key.generateOuterQueryColumns(tableAccessStrategy, size);
+    List<String> actual = key.generateOuterQueryColumns(tableAccessStrategy, alternative);
     // then
     List<String> expected = asList(
         "ARRAY[" + nameAlias + "1" + ", " + nameAlias + "2" + ", " + nameAlias + "3" + "] AS " + keyColumnName);

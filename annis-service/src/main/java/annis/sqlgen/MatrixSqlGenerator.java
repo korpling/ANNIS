@@ -142,7 +142,7 @@ public class MatrixSqlGenerator
     SolutionKey<?> key = createSolutionKey();
 //    TableAccessStrategy tas = createTableAccessStrategy();
     List<String> keyColumns =
-      key.generateOuterQueryColumns(tables, alternative.size());
+      key.generateOuterQueryColumns(tables, alternative);
 
     // key
     sb.append(indent).append(TABSTOP);
@@ -335,11 +335,19 @@ public class MatrixSqlGenerator
 
     sb.append(indent).append(TABSTOP).append(TABSTOP);
     List<String> ors = new ArrayList<>();
-    for (int i = 1; i <= queryData.getMaxWidth(); ++i)
+    int i = 0;
+    for (QueryNode node : alternative)
     {
+      String node_id;
+      if (node.hasCustomName()) {
+        node_id = node.getVariable();
+      }
+      else {
+        ++i;
+        node_id = "" + i;
+      }
       ors.add(
-        tables.aliasedColumn(NODE_TABLE, "id") + " = solutions.id" + String.
-        valueOf(i));
+      tables.aliasedColumn(NODE_TABLE, "id") + " = solutions.id" + node_id);
     }
     sb.append(StringUtils.join(ors, " OR\n" + indent + TABSTOP + TABSTOP));
     sb.append("\n");

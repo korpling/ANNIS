@@ -19,6 +19,8 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -58,15 +60,39 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
 
     List<String> cols = new ArrayList<>();
     int i = 0;
+    int named = 0;
 
     boolean needsDistinct = isDistinctNeeded(alternative);
-    
-    for (QueryNode node : alternative)
+
+    // sort the alternatives: named nodes go to the beginning in alphabetical order
+    Map<String, QueryNode> alternative_named = new TreeMap<>();
+    List<QueryNode> alternative_unnamed = new ArrayList<>(alternative.size());
+    for (QueryNode n: alternative) {
+        if (n.hasCustomName()) {
+            alternative_named.put(n.getVariable(), n);
+        }
+        else {
+            alternative_unnamed.add(n);
+        }
+    }
+    List<QueryNode> alternative_ordered = new ArrayList<>(alternative.size());
+    alternative_ordered.addAll(alternative_named.values());
+    alternative_ordered.addAll(alternative_unnamed);
+
+    for (QueryNode node : alternative_ordered)
     {
-      ++i;
+      String node_id;
+      if (node.hasCustomName()) {
+          node_id = node.getVariable();
+          ++named;
+      }
+      else {
+          ++i;
+          node_id = "" + i;
+      }
 
       TableAccessStrategy tblAccessStr = tables(node);
-      cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
+      cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + node_id);
       if (annoCondition != null)
       {
         if (node.getNodeAnnotations().isEmpty())
@@ -74,12 +100,12 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
           // If a query node is not using annotations, fallback to NULL as the value.
           // This is important for the DISTINCT clause, since we don't want to match 
           // the annotation itself but the node.
-          cols.add("NULL::int AS cat" + i);
+          cols.add("NULL::int AS cat" + node_id);
         }
         else
         {
           cols.add(
-            tblAccessStr.aliasedColumn("node_annotation", "category") + " AS cat" + i);
+            tblAccessStr.aliasedColumn("node_annotation", "category") + " AS cat" + node_id);
         }
       }
       if (outputNodeName)
@@ -88,24 +114,26 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
         if(needsDistinct)
         {
           cols.add("min(" + tblAccessStr.aliasedColumn(NODE_TABLE, "salt_id") 
-            + ") AS salt_id" + i);
+            + ") AS salt_id" + node_id);
         }
         else
         {
-          cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "salt_id") + " AS salt_id" + i);
+          cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "salt_id") + " AS salt_id" + node_id);
         }
       }
     }
 
     // add additional empty columns in or clauses with different node sizes
+    int id_i = 1;
     for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
-      cols.add("NULL::bigint AS id" + i);
-      cols.add("NULL::integer AS cat" + i);
+      cols.add("NULL::bigint AS id" + id_i);
+      cols.add("NULL::integer AS cat" + id_i);
       if (outputNodeName)
       {
-        cols.add("NULL::varchar AS salt_id" + i);
+        cols.add("NULL::varchar AS salt_id" + id_i);
       }
+      ++id_i;
     }
 
     if (!alternative.isEmpty() && outputNodeName)
@@ -217,12 +245,21 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
         ids.add("sourceIdx");
       }
       // add the node ID for each output node an the category ID
-      for (int i = 1; i <= queryData.getMaxWidth(); ++i)
+      int i = 0;
+      for (QueryNode node : alternative)
       {
-        ids.add("id" + i +  appendix);
+        String node_id;
+        if (node.hasCustomName()) {
+            node_id = node.getVariable();
+        }
+        else {
+          ++i;
+          node_id = "" + i;
+        }
+        ids.add("id" + node_id +  appendix);
         if (annoCondition != null)
         {
-          ids.add("cat" + i + appendix);
+          ids.add("cat" + node_id + appendix);
         }
       }
       return StringUtils.join(ids, ", ");
@@ -236,12 +273,21 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
     if(isDistinctNeeded(alternative))
     {
       List<String> ids = new ArrayList<>();
-      for (int i = 1; i <= queryData.getMaxWidth(); ++i)
+      int i = 0;
+      for (QueryNode node : alternative)
       {
-        ids.add("id" + i);
+        String node_id;
+        if (node.hasCustomName()) {
+          node_id = node.getVariable();
+        }
+        else {
+          ++i;
+          node_id = "" + i;
+        }
+        ids.add("id" + node_id);
         if (annoCondition != null)
         {
-          ids.add("cat" + i);
+          ids.add("cat" + node_id);
         }
       }
       return StringUtils.join(ids, ", "); 

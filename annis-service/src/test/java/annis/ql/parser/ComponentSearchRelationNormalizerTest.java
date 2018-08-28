@@ -86,10 +86,10 @@ public class ComponentSearchRelationNormalizerTest
     Assert.assertEquals(7, alt.size());
     
     Assert.assertEquals(6, alt.get(5).getId());
-    Assert.assertEquals("x6(2)", alt.get(5).getVariable());
+    Assert.assertEquals("2_x6", alt.get(5).getVariable());
     
     Assert.assertEquals(7, alt.get(6).getId());
-    Assert.assertEquals("x7(2)", alt.get(6).getVariable());
+    Assert.assertEquals("2_x7", alt.get(6).getVariable());
     
     
   }

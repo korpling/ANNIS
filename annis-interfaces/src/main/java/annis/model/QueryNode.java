@@ -320,7 +320,7 @@ public class QueryNode implements Serializable
     
     // check if we were given a custom name
     String idAsString = "" + id;
-    if(variable != null && !idAsString.equals(variable))
+    if(this.hasCustomName())
     {
       sb.append(variable).append("#");
     }
@@ -711,6 +711,11 @@ public class QueryNode implements Serializable
   {
     this.parseLocation = parseLocation;
   }
-  
-  
+
+  public boolean hasCustomName() {
+
+    String idAsString = "" + id;
+    return variable != null && !idAsString.equals(variable);
+  }
+
 }
