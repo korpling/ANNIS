@@ -87,7 +87,12 @@ public class CSVExporter implements ExporterPlugin, Serializable
     return "The CSV Exporter exports only the "
         + "values of the elements searched for by the user, ignoring the context "
         + "around search results. The values for all annotations of each of the "
-        + "found nodes is given in a comma-separated table (CSV). <br/><br/>"
+        + "found nodes is given in a comma-separated table (CSV). <br /><br />"
+        + "The columns are ordered in the same order as the attributes in the AQL query."
+        + "For queries with disjunctions (or-queries with the <pre>|</pre> operator), you have to be careful to use the same order of attributes "
+        + "in the query for each conjunction. E.g. <pre>(a#tok=\"the\" . b#tok=/h.*/) | (a#tok=\"a\" . b#tok=/d.*/)</pre> "
+        + "has the same order, but <pre>(a#tok=\"the\" . b#tok=/h.*/) | (b#tok=\"a\" . a#tok=/d.*/)</pre> has not."
+        + "<br/><br/>"
         + "Parameters: <br/>"
         + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
         + "<code>metakeys=title,documentname</code>)";
