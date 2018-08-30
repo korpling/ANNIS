@@ -229,7 +229,7 @@ public class QueryPanel extends GridLayout implements
     final JSClipboard clipboard = new JSClipboard();
     Button btCopy = new Button("");
     btCopy.setWidth("100%");
-    btCopy.setDescription("Click copy query to clipboard");
+    btCopy.setDescription("Copy query to clipboard");
     btShowKeyboard.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
     btCopy.addStyleName(ValoTheme.BUTTON_SMALL);
     btCopy.setIcon(FontAwesome.COPY);
