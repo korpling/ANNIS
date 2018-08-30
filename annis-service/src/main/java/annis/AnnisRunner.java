@@ -344,7 +344,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doDoc("NoSta-D-Kafka NoSta-D-Kafka");
+	doCorpus("pcc2");
+	doSet("freq-def to v:pos,n:pos");
+	doSql("frequency (n#pos=/N.*/ . v#pos=/V.*/) | (v#pos=/V.*/ & n#pos=/N./ & #n . #v)");
   }
 
   public void doParse(String annisQuery)

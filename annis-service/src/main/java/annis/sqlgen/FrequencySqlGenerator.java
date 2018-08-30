@@ -21,21 +21,24 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.dao.DataAccessException;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
@@ -116,22 +119,64 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator implements Where
 		return sb.toString();
 	}
 
+	private List<QueryNode> getOrderedAlternative(List<QueryNode> originalAlternative,
+			List<FrequencyTableEntry> freqDef) {
+
+		Set<String> referencedVars = new HashSet<>();
+		for (FrequencyTableEntry e : freqDef) {
+			referencedVars.add(e.getReferencedNode());
+		}
+
+		Map<String, QueryNode> alternative_referenced = new TreeMap<>();
+		List<QueryNode> alternative_unreferenced = new ArrayList<>();
+
+		for (QueryNode n : originalAlternative) {
+			if (referencedVars.contains(n.getVariable())) {
+				alternative_referenced.put(n.getVariable(), n);
+			} else {
+				alternative_unreferenced.add(n);
+			}
+		}
+
+		List<QueryNode> alternative_ordered = new ArrayList<>(
+				alternative_referenced.size() + alternative_unreferenced.size());
+		// add referenced first, so their order is deterministic
+		alternative_ordered.addAll(alternative_referenced.values());
+		// add unsorted after
+		alternative_ordered.addAll(alternative_unreferenced);
+
+		return alternative_ordered;
+	}
+
 	@Override
-	public String fromClause(QueryData queryData, List<QueryNode> alternative, String indent) {
+	public String fromClause(QueryData queryData, List<QueryNode> firstAlternative, String indent) {
 		FrequencyTableQuery ext;
 		List<FrequencyTableQuery> freqQueryData = queryData.getExtensions(FrequencyTableQuery.class);
 		Validate.notNull(freqQueryData);
 		Validate.notEmpty(freqQueryData);
 		ext = freqQueryData.get(0);
 
-		Multimap<FrequencyTableEntry, String> conditions = conditionsForEntries(ext, queryData, alternative);
+		Multimap<FrequencyTableEntry, String> conditions = conditionsForEntries(ext, queryData);
 
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(indent).append("(\n");
-		sb.append(indent);
+		// construct or own UNION generator that uses sorted alternatives
+		ListIterator<List<QueryNode>> itAlternatives = queryData.getAlternatives().listIterator();
+		while (itAlternatives.hasNext()) {
+			List<QueryNode> alternative = getOrderedAlternative(itAlternatives.next(), ext);
+			QueryData altQueryData = queryData.clone();
+			altQueryData.setAlternatives(Arrays.asList(alternative));
 
-		sb.append(getSolutionSqlGenerator().toSql(queryData, indent + TABSTOP));
+			sb.append(getSolutionSqlGenerator().toSql(altQueryData, indent + TABSTOP));
+
+			if (itAlternatives.hasNext()) {
+
+				sb.append(indent + TABSTOP);
+				sb.append("UNION\n\n");
+			}
+		}
+
 		sb.append(indent).append(") AS solutions\n");
 
 		int i = 1;
@@ -161,17 +206,19 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator implements Where
 	}
 
 	private Multimap<FrequencyTableEntry, String> conditionsForEntries(List<FrequencyTableEntry> frequencyEntries,
-			QueryData queryData, List<QueryNode> alternative) {
+			QueryData queryData) {
 		Multimap<FrequencyTableEntry, String> conditions = LinkedHashMultimap.create();
-		int i = 1;
 
-		ImmutableMap<String, QueryNode> idxNodeVariables = Maps.uniqueIndex(alternative.iterator(),
-				new Function<QueryNode, String>() {
-					@Override
-					public String apply(QueryNode input) {
-						return input.getVariable();
-					}
-				});
+		Map<String, Integer> var2index = new HashMap<>();
+		for (List<QueryNode> alt : queryData.getAlternatives()) {
+			int altNr = 1;
+			for (QueryNode n : getOrderedAlternative(alt, frequencyEntries)) {
+				var2index.putIfAbsent(n.getVariable(), altNr);
+				altNr++;
+			}
+		}
+
+		int i = 1;
 
 		for (FrequencyTableEntry e : frequencyEntries) {
 			if (e.getType() == FrequencyTableEntryType.meta) {
@@ -191,13 +238,13 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator implements Where
 				conditions.put(e, "v" + i + ".toplevel_corpus = solutions.toplevel_corpus");
 
 				// join on node ID
-				QueryNode referencedNode = idxNodeVariables.get(e.getReferencedNode());
-				if (referencedNode == null) {
+				Integer referencedNodePos = var2index.get(e.getReferencedNode());
+				if (referencedNodePos == null) {
 					throw new AnnisQLSemanticsException("No such node \"" + e.getReferencedNode() + "\". "
-							+ "Your query contains " + alternative.size()
+							+ "Your query contains " + queryData.getMaxWidth()
 							+ " node(s), make sure no node definition numbers are greater than this number");
 				}
-				conditions.put(e, "v" + i + ".id = solutions.id" + referencedNode.getId());
+				conditions.put(e, "v" + i + ".id = solutions.id" + referencedNodePos);
 
 				if (e.getType() == FrequencyTableEntryType.span) {
 					conditions.put(e, "v" + i + ".n_sample IS TRUE");
