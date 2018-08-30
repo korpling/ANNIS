@@ -91,7 +91,7 @@ public class CSVExporter implements ExporterPlugin, Serializable
         + "The columns are ordered in the same order as the attributes in the AQL query. "
         + "For queries with disjunctions (or-queries with the | operator), you have to be careful to use the same order of attributes "
         + "in the query for each conjunction. E.g. <pre>(a#tok=\"the\" . b#tok=/h.*/) | (a#tok=\"a\" . b#tok=/d.*/)</pre> "
-        + "has the same order, but <pre>(a#tok=\"the\" . b#tok=/h.*/) | (b#tok=\"a\" . a#tok=/d.*/)</pre> has not."
+        + "has the same order, but <pre>(a#tok=\"the\" . b#tok=/h.*/) |  b#tok=\"a\" & a#tok=/d.*/ & #a . #b )</pre> has not."
         + "<br/><br/>"
         + "Parameters: <br/>"
         + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
