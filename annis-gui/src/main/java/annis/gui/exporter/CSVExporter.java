@@ -88,7 +88,7 @@ public class CSVExporter implements ExporterPlugin, Serializable
         + "values of the elements searched for by the user, ignoring the context "
         + "around search results. The values for all annotations of each of the "
         + "found nodes is given in a comma-separated table (CSV). <br /><br />"
-        + "The columns are ordered in the same order as the attributes in the AQL query."
+        + "The columns are ordered in the same order as the attributes in the AQL query. "
         + "For queries with disjunctions (or-queries with the | operator), you have to be careful to use the same order of attributes "
         + "in the query for each conjunction. E.g. <pre>(a#tok=\"the\" . b#tok=/h.*/) | (a#tok=\"a\" . b#tok=/d.*/)</pre> "
         + "has the same order, but <pre>(a#tok=\"the\" . b#tok=/h.*/) | (b#tok=\"a\" . a#tok=/d.*/)</pre> has not."
