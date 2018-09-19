@@ -1,3 +1,12 @@
+Version 3.5.0-rc2
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/59?closed=1
+
+[Fixed Bugs]
+ #591 NullPointerException when not using virtual keyboard
+
 Version 3.5.0-rc1
 =================
 
