@@ -230,7 +230,7 @@ public class QueryPanel extends GridLayout implements
     Button btCopy = new Button("");
     btCopy.setWidth("100%");
     btCopy.setDescription("Copy query to clipboard");
-    btShowKeyboard.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+    btCopy.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
     btCopy.addStyleName(ValoTheme.BUTTON_SMALL);
     btCopy.setIcon(FontAwesome.COPY);
     
