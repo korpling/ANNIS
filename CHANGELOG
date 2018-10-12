@@ -1,3 +1,25 @@
+Version 3.5.0-rc2
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/59?closed=1
+
+[Fixed Bugs]
+ #591 NullPointerException when not using virtual keyboard
+
+Version 3.5.0-rc1
+=================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/58?closed=1
+
+[Fixed Bugs]
+ #589 Empty temporary directories created for each match in result, but never deleted
+ #587 Fix frequency query output when OR alternatives use different orders
+
+[Enhancements]
+ #586 Add button to copy AQL
+
 Version 3.5.0-preview7
 ======================
 
