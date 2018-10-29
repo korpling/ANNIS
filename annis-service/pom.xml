@@ -372,6 +372,6 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<annis.userconfig>/etc/annis/user_config/</annis.userconfig>
-		<graphannis.version>0.10.0</graphannis.version>
+		<graphannis.version>0.11.1</graphannis.version>
 	</properties>
 </project>

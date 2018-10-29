@@ -49,6 +49,7 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
+import org.corpus_tools.graphannis.CorpusStorageManager.ImportFormat;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -375,7 +376,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version) throws GraphANNISException {
 
         log.info("importing corpus into graphANNIS");
-        getQueryDao().getCorpusStorageManager().importRelANNIS(corpusName, path);
+        getQueryDao().getCorpusStorageManager().importFromFileSystem(path, ImportFormat.RelANNIS, corpusName);
 
     }
 
