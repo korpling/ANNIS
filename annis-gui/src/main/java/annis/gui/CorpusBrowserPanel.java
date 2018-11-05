@@ -203,7 +203,7 @@ public class CorpusBrowserPanel extends Panel {
                 metaAnnosKey.add(name);
                 CorpusBrowserEntry cbe = new CorpusBrowserEntry();
                 cbe.setName(name);
-                cbe.setExample("node & meta::" + name + "=\"" + getFirst(a.getValueSet()) + "\"");
+                cbe.setExample("node @* " + name + "=\"" + getFirst(a.getValueSet()) + "\"");
                 cbe.setCorpus(corpus);
                 containerMetaAnno.addBean(cbe);
             }
