@@ -26,7 +26,15 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.StandardWatchEventKinds;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchService;
+import java.nio.file.WatchEvent.Kind;
+import java.nio.file.WatchKey;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -50,11 +58,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.corpus_tools.graphannis.CorpusStorageManager;
 import org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage;
 import org.corpus_tools.graphannis.CorpusStorageManager.ResultOrder;
@@ -353,14 +364,83 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     private final ByteHelper byteHelper = new ByteHelper();
 
     private final MetaByteHelper metaByteHelper = new MetaByteHelper();
+    
+    private WatchService graphannisLogfileWatcher;
 
     protected QueryDaoImpl() throws GraphANNISException {
-        File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
+        final File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
         this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
-                logfile.getAbsolutePath(), true, LogLevel.Debug);
+                logfile.getAbsolutePath(), true, LogLevel.Info);
 
         // initialize timeout with value from config (can be overwritten by API)
         this.timeout = cfg.timeout();
+
+        // add a watcher for the logfile and emit a logging event whenever the logfile
+        // changes
+        try {
+            graphannisLogfileWatcher = FileSystems.getDefault().newWatchService();
+                 
+            final Path logfilePath = logfile.toPath();
+            logfilePath.getParent().register(graphannisLogfileWatcher, StandardWatchEventKinds.ENTRY_MODIFY);
+            // start a background thread
+            new Thread(() -> {
+                while (graphannisLogfileWatcher != null) {
+                    try {
+                        WatchKey wk = graphannisLogfileWatcher.take();
+                        for (WatchEvent<?> event : wk.pollEvents()) {
+                            if (event.context() instanceof Path) {
+                                Path changed = (Path) event.context();
+                                if (changed.toString().equals("graphannis.log")) {
+                                    // read the last line of the logfile and log it
+                                    try (ReversedLinesFileReader reader = new ReversedLinesFileReader(logfile, 4096,
+                                            StandardCharsets.UTF_8)) {
+                                        parseAndReportGraphANNISLogEntry(reader);
+                                    }
+                                }
+                            }
+                        }
+                        wk.reset();
+                    } catch (InterruptedException | IOException ex) {
+                        log.error("Error when reading graphANNIS logfile", ex);
+                    }
+                }
+            }).start();;
+        } catch (IOException ex) {
+            log.error("Could not register service to check the graphANNIS logfile", ex);
+        }
+
+    }
+
+    private void parseAndReportGraphANNISLogEntry(ReversedLinesFileReader reader) throws IOException {
+        String lastLine = reader.readLine();
+
+        Pattern formatPattern = Pattern.compile("^[0-9]+:[0-9]+:[0-9]+ \\[(.+)\\] (.*)");
+        while (lastLine != null) {
+
+            Matcher m = formatPattern.matcher(lastLine);
+            if (m.matches()) {
+                switch (m.group(1)) {
+                case "DEBUG":
+                    log.debug(m.group(2));
+                    break;
+                case "TRACE":
+                    log.trace(m.group(2));
+                    break;
+                case "WARN":
+                    log.warn(m.group(2));
+                    break;
+                case "ERROR":
+                    log.error(m.group(2));
+                    break;
+                default:
+                    log.info(m.group(2));
+                    break;
+                }
+                return;
+            }
+
+            lastLine = reader.readLine();
+        }
     }
 
     public static QueryDao create() throws GraphANNISException {
