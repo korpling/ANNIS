@@ -364,7 +364,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     private final ByteHelper byteHelper = new ByteHelper();
 
     private final MetaByteHelper metaByteHelper = new MetaByteHelper();
-    
+
     private WatchService graphannisLogfileWatcher;
 
     protected QueryDaoImpl() throws GraphANNISException {
@@ -379,7 +379,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         // changes
         try {
             graphannisLogfileWatcher = FileSystems.getDefault().newWatchService();
-                 
+
             final Path logfilePath = logfile.toPath();
             logfilePath.getParent().register(graphannisLogfileWatcher, StandardWatchEventKinds.ENTRY_MODIFY);
             // start a background thread
@@ -404,7 +404,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                         log.error("Error when reading graphANNIS logfile", ex);
                     }
                 }
-            }).start();;
+            }).start();
+            ;
         } catch (IOException ex) {
             log.error("Could not register service to check the graphANNIS logfile", ex);
         }
@@ -689,39 +690,54 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         List<AnnisAttribute> result = new LinkedList<>();
 
         {
-            Map<String, Set<String>> nodeAnnos = new TreeMap<>();
             for (String corpusName : corpusList) {
+
+                Map<String, Set<String>> nodeAnnos = new TreeMap<>();
 
                 List<Annotation> annoList = corpusStorageMgr.listNodeAnnotations(corpusName, listValues,
                         onlyMostFrequentValues);
                 for (Annotation anno : annoList) {
-                    String qname = anno.getQualifiedName();
-                    if (qname == null) {
-                        qname = anno.getName();
+                    if(!"annis".equals(anno.getNamespace())) {
+                        String qname = anno.getQualifiedName();
+                        if (qname == null) {
+                            qname = anno.getName();
+                        }
+                        if (qname != null) {
+                            Set<String> values = nodeAnnos.get(qname);
+                            if (values == null) {
+                                values = new LinkedHashSet<>();
+                                nodeAnnos.put(qname, values);
+                            }
+                            String val = anno.getValue();
+                            if (val != null) {
+                                values.add(val);
+                            }
+                        }
                     }
-                    if (qname != null) {
-                        Set<String> values = nodeAnnos.get(qname);
-                        if (values == null) {
-                            values = new LinkedHashSet<>();
-                            nodeAnnos.put(qname, values);
+                }
+
+                for (Entry<String, Set<String>> e : nodeAnnos.entrySet()) {
+                    AnnisAttribute att = new AnnisAttribute();
+                    
+                    att.setName(e.getKey());
+                    att.setValueSet(e.getValue());
+                    // check if the sub-type is a "normal" node or a meta-data annotation
+                    try {
+                        if(corpusStorageMgr.count(Arrays.asList(corpusName),
+                                e.getKey() + " _ident_ annis:node_type=\"corpus\"") > 0) {
+                            att.setType(Type.meta);
+                            att.setSubtype(SubType.m);
+                        } else {    
+                            att.setType(Type.node);
+                            att.setSubtype(SubType.n);
                         }
-                        String val = anno.getValue();
-                        if (val != null) {
-                            values.add(val);
-                        }
+                        result.add(att);
+                    } catch (GraphANNISException ex) {
+                        log.error("Could not determine if attribute is a node or meta attribute", ex);
                     }
                 }
             }
 
-            for (Entry<String, Set<String>> e : nodeAnnos.entrySet()) {
-                AnnisAttribute att = new AnnisAttribute();
-                att.setType(Type.node);
-                att.setName(e.getKey());
-                att.setValueSet(e.getValue());
-                att.setSubtype(SubType.n);
-
-                result.add(att);
-            }
         }
 
         Integer[] allComponentTypes = new Integer[] { AnnisComponentType.Dominance, AnnisComponentType.Pointing };
