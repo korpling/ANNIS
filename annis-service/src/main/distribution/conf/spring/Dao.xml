@@ -234,6 +234,7 @@
         <entry key="webm" value="video/webm"/>
         <entry key="ogg" value="audio/ogg"/>
         <entry key="wav" value="audio/wav"/>
+        <entry key="flac" value="audio/flac"/>
         <entry key="mp3" value="audio/mpeg"/>
         <entry key="mp4" value="video/mp4" />
         <entry key="pdf" value="application/pdf"/>
