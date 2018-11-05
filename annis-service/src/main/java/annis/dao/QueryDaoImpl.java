@@ -55,12 +55,13 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
-import org.corpus_tools.graphannis.model.Component;
 import org.corpus_tools.graphannis.CorpusStorageManager;
 import org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage;
+import org.corpus_tools.graphannis.CorpusStorageManager.ResultOrder;
 import org.corpus_tools.graphannis.LogLevel;
 import org.corpus_tools.graphannis.capi.AnnisComponentType;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
+import org.corpus_tools.graphannis.model.Component;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -104,6 +105,7 @@ import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
+import annis.service.objects.OrderType;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
@@ -407,6 +409,21 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         return corpusList;
     }
 
+    public ResultOrder convertOrder(OrderType type) {
+        switch (type) {
+        case ascending:
+            return ResultOrder.Normal;
+        case descending:
+            return ResultOrder.Inverted;
+        case random:
+            return ResultOrder.Randomized;
+        case unsorted:
+            return ResultOrder.NotSorted;
+        default:
+            return ResultOrder.Normal;
+        }
+    }
+
     @Override
     public List<Match> find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset)
             throws GraphANNISException {
@@ -414,9 +431,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
 
+        ResultOrder ordering = convertOrder(limitOffset.getOrder());
+
         Future<List<Match>> result = exec.submit(() -> {
             String[] matchesRaw = corpusStorageMgr.find(corpora, aql, limitOffset.getOffset(), limitOffset.getLimit(),
-                    limitOffset.getOrder());
+                    ordering);
 
             ArrayList<Match> data = new ArrayList<>((int) matchesRaw.length);
             for (int i = 0; i < matchesRaw.length; i++) {
@@ -448,9 +467,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
 
+        ResultOrder ordering = convertOrder(limitOffset.getOrder());
+
         Future<Boolean> result = exec.submit(() -> {
             String[] matchesRaw = corpusStorageMgr.find(corpora, aql, limitOffset.getOffset(), limitOffset.getLimit(),
-                    limitOffset.getOrder());
+                    ordering);
 
             try {
                 PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
