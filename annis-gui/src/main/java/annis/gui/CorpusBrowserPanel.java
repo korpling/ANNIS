@@ -37,10 +37,13 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.declarative.Design;
 
 import annis.gui.beans.CorpusBrowserEntry;
@@ -96,6 +99,12 @@ public class CorpusBrowserPanel extends Panel {
     private CitationLinkGenerator citationGenerator;
 
     private QueryController controller;
+    
+    private ProgressBar progress;
+    
+    private Accordion accordion;
+    
+    private VerticalLayout layout;
    
 
     public CorpusBrowserPanel() {
@@ -143,14 +152,18 @@ public class CorpusBrowserPanel extends Panel {
         tblEdgeTypes.setSortContainerPropertyId("name");
         tblEdgeAnno.setSortContainerPropertyId("name");
         
-        this.setVisible(false);
+        accordion.setVisible(false);
+        progress.setSizeFull();
+        layout.setSizeFull();
+        layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
+        
 
     }
 
     @Override
     public void attach() {
         super.attach();
-
+        
         Background.run(new AnnotationFetcher());
 
     }
@@ -169,7 +182,8 @@ public class CorpusBrowserPanel extends Panel {
                 @Override
                 public void run() {
                     
-                    CorpusBrowserPanel.this.setVisible(true);
+                    progress.setVisible(false);
+                    accordion.setVisible(true);
                     
                     boolean stripNodeAnno = true;
                     boolean stripEdgeName = true;
