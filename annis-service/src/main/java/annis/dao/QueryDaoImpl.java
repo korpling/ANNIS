@@ -73,6 +73,7 @@ import org.corpus_tools.graphannis.LogLevel;
 import org.corpus_tools.graphannis.capi.AnnisComponentType;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.graphannis.model.Component;
+import org.corpus_tools.graphannis.model.FrequencyTableEntry;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -650,10 +651,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         }
 
         for (String corpus : escapedCorpusNames(corpusList)) {
-            FrequencyTable freqTableForCorpus = corpusStorageMgr.frequency(corpus, aql, freqQuery, QueryLanguage.AQL);
+            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, aql, freqQuery.toString(), QueryLanguage.AQL);
             if (freqTableForCorpus != null) {
-                for (FrequencyTable.Entry e : freqTableForCorpus.getEntries()) {
-                    result.addEntry(e);
+                for (FrequencyTableEntry<String> e : freqTableForCorpus) {
+                    result.addEntry(new FrequencyTable.Entry(e.getTuple(), e.getCount()));
                 }
             }
         }
@@ -694,13 +695,15 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
                 Map<String, Set<String>> nodeAnnos = new TreeMap<>();
 
-                List<Annotation> annoList = corpusStorageMgr.listNodeAnnotations(corpusName, listValues,
+                List<org.corpus_tools.graphannis.model.Annotation> annoList = corpusStorageMgr.listNodeAnnotations(corpusName, listValues,
                         onlyMostFrequentValues);
-                for (Annotation anno : annoList) {
-                    if(!"annis".equals(anno.getNamespace())) {
-                        String qname = anno.getQualifiedName();
-                        if (qname == null) {
-                            qname = anno.getName();
+                for (org.corpus_tools.graphannis.model.Annotation anno : annoList) {
+                    if(!"annis".equals(anno.getKey().getNs())) {
+                        String qname;
+                        if (anno.getKey().getNs() == null || anno.getKey().getNs().isEmpty()) {
+                            qname = anno.getKey().getName();
+                        } else {
+                            qname = anno.getKey().getNs() + ":" + anno.getKey().getName();
                         }
                         if (qname != null) {
                             Set<String> values = nodeAnnos.get(qname);
@@ -753,12 +756,14 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
                     // also find all edge annotations for this component
                     Map<String, Set<String>> edgeAnnos = new TreeMap<>();
-                    List<Annotation> edgeAnnoList = corpusStorageMgr.listEdgeAnnotations(corpusName, ctype, c.getName(),
+                    List<org.corpus_tools.graphannis.model.Annotation> edgeAnnoList = corpusStorageMgr.listEdgeAnnotations(corpusName, ctype, c.getName(),
                             c.getLayer(), listValues, onlyMostFrequentValues);
-                    for (Annotation anno : edgeAnnoList) {
-                        String qname = anno.getQualifiedName();
-                        if (qname == null) {
-                            qname = anno.getName();
+                    for (org.corpus_tools.graphannis.model.Annotation anno : edgeAnnoList) {
+                        String qname;
+                        if (anno.getKey().getNs() == null || anno.getKey().getNs().isEmpty()) {
+                            qname = anno.getKey().getName();
+                        } else {
+                            qname = anno.getKey().getNs() + ":" + anno.getKey().getName();
                         }
                         if (qname != null) {
                             Set<String> values = edgeAnnos.get(qname);
