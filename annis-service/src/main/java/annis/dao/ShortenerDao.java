@@ -63,15 +63,15 @@ public class ShortenerDao extends AbstractDao {
                   + "Will abort since it seems that no new shortener IDs are available.");
 
           UUID randomUUID = UUID.randomUUID();
-          long existing = getQueryRunner().query(conn, "SELECT count(*) FROM url_shortener WHERE id = ?",
+          int existing = getQueryRunner().query(conn, "SELECT count(*) FROM url_shortener WHERE id = ?",
               new ScalarHandler<>(1), randomUUID);
-          if (existing == 0l) {
+          if (existing == 0) {
             result = randomUUID;
           }
           numberOfTries++;
         }
 
-        getQueryRunner().update("INSERT INTO url_shortener(id, \"owner\", created, url) VALUES(?, ?, ?, ?)", result,
+        getQueryRunner().update(conn, "INSERT INTO url_shortener(id, \"owner\", created, url) VALUES(?, ?, ?, ?)", result,
             userName, DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(new Date()), str);
         conn.commit();
       }
@@ -84,7 +84,7 @@ public class ShortenerDao extends AbstractDao {
   public String unshorten(UUID id) {
     try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
       
-      List<String> result = getQueryRunner().query("SELECT url FROM url_shortener WHERE id=? LIMIT 1",
+      List<String> result = getQueryRunner().query(conn, "SELECT url FROM url_shortener WHERE id=? LIMIT 1",
           new ColumnListHandler<>(1), id);
 
       return result.isEmpty() ? null : result.get(0);
