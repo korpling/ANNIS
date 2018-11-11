@@ -1,5 +1,6 @@
 var NAVTREEINDEX15 =
 {
+"functions_u.html":[4,2,0,19],
 "functions_v.html":[4,2,0,20],
 "functions_vars.html":[4,2,2],
 "functions_w.html":[4,2,0,21],
@@ -248,6 +249,5 @@ var NAVTREEINDEX15 =
 "interfaceannis_1_1sqlgen_1_1_solution_key.html":[4,0,0,15,48],
 "interfaceannis_1_1sqlgen_1_1_solution_key.html#a0a275fc5f26d57fb490d956f7946f264":[4,0,0,15,48,0],
 "interfaceannis_1_1sqlgen_1_1_solution_key.html#a2828fa3246e5c2e0dcedd31f9ee0a68f":[4,0,0,15,48,5],
-"interfaceannis_1_1sqlgen_1_1_solution_key.html#a337cae58bdf81f2dbf447f8c89bed597":[4,0,0,15,48,4],
-"interfaceannis_1_1sqlgen_1_1_solution_key.html#a47fdc16d4d4246f05cce1382661145e6":[4,0,0,15,48,3]
+"interfaceannis_1_1sqlgen_1_1_solution_key.html#a337cae58bdf81f2dbf447f8c89bed597":[4,0,0,15,48,4]
 };

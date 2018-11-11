@@ -17,5 +17,5 @@ var searchData=
   ['treeelementstyler',['TreeElementStyler',['../interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html',1,'annis::visualizers::component::tree']]],
   ['treesetconverter',['TreeSetConverter',['../classannis_1_1gui_1_1converter_1_1_tree_set_converter.html',1,'annis::gui::converter']]],
   ['tutorialpanel',['TutorialPanel',['../classannis_1_1gui_1_1tutorial_1_1_tutorial_panel.html',1,'annis::gui::tutorial']]],
-  ['type',['Type',['../classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type',1,'annis.service.objects.AnnisAttribute.Type'],['../classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type',1,'annis.visualizers.htmlvis.SpanHTMLOutputter.Type']]]
+  ['type',['Type',['../classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type',1,'annis.visualizers.htmlvis.SpanHTMLOutputter.Type'],['../classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type',1,'annis.service.objects.AnnisAttribute.Type']]]
 ];

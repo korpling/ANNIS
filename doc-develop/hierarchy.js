@@ -458,8 +458,8 @@ var hierarchy =
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
     ] ],
-    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
     [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
+    [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
     [ "UriFragmentChangedListener", null, [
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
     ] ],
@@ -766,17 +766,6 @@ var hierarchy =
       [ "annis.visualizers.component.rst.RSTPanel", "classannis_1_1visualizers_1_1component_1_1rst_1_1_r_s_t_panel.html", null ],
       [ "annis.visualizers.component.visjs.VisJsPanel", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_panel.html", null ]
     ] ],
-    [ "ParameterizedRowMapper", null, [
-      [ "annis.dao.DocumentNameMapRow", "classannis_1_1dao_1_1_document_name_map_row.html", null ],
-      [ "annis.sqlgen.ListCorpusAnnotationsSqlHelper", "classannis_1_1sqlgen_1_1_list_corpus_annotations_sql_helper.html", null ],
-      [ "annis.sqlgen.ListCorpusSqlHelper", "classannis_1_1sqlgen_1_1_list_corpus_sql_helper.html", null ],
-      [ "annis.sqlgen.ListDocumentsAnnotationsSqlHelper", "classannis_1_1sqlgen_1_1_list_documents_annotations_sql_helper.html", null ],
-      [ "annis.sqlgen.ListDocumentsSqlHelper", "classannis_1_1sqlgen_1_1_list_documents_sql_helper.html", null ],
-      [ "annis.sqlgen.ListExampleQueriesHelper", "classannis_1_1sqlgen_1_1_list_example_queries_helper.html", null ]
-    ] ],
-    [ "ParameterizedSingleColumnRowMapper", null, [
-      [ "annis.dao.ListCorpusByNameDaoHelper", "classannis_1_1dao_1_1_list_corpus_by_name_dao_helper.html", null ]
-    ] ],
     [ "Plugin", null, [
       [ "annis.gui.querybuilder.QueryBuilderPlugin< I extends Component >", "interfaceannis_1_1gui_1_1querybuilder_1_1_query_builder_plugin.html", [
         [ "annis.gui.flatquerybuilder.FlatQueryBuilderPlugin", "classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder_plugin.html", null ]
@@ -841,8 +830,14 @@ var hierarchy =
       [ "annis.security.ANNISUserRealm", "classannis_1_1security_1_1_a_n_n_i_s_user_realm.html", null ]
     ] ],
     [ "RowMapper", null, [
+      [ "annis.dao.DocumentNameMapRow", "classannis_1_1dao_1_1_document_name_map_row.html", null ],
       [ "annis.sqlgen.AnnotatedSpanExtractor", "classannis_1_1sqlgen_1_1_annotated_span_extractor.html", null ],
-      [ "annis.sqlgen.FindSqlGenerator", "classannis_1_1sqlgen_1_1_find_sql_generator.html", null ]
+      [ "annis.sqlgen.FindSqlGenerator", "classannis_1_1sqlgen_1_1_find_sql_generator.html", null ],
+      [ "annis.sqlgen.ListCorpusAnnotationsSqlHelper", "classannis_1_1sqlgen_1_1_list_corpus_annotations_sql_helper.html", null ],
+      [ "annis.sqlgen.ListCorpusSqlHelper", "classannis_1_1sqlgen_1_1_list_corpus_sql_helper.html", null ],
+      [ "annis.sqlgen.ListDocumentsAnnotationsSqlHelper", "classannis_1_1sqlgen_1_1_list_documents_annotations_sql_helper.html", null ],
+      [ "annis.sqlgen.ListDocumentsSqlHelper", "classannis_1_1sqlgen_1_1_list_documents_sql_helper.html", null ],
+      [ "annis.sqlgen.ListExampleQueriesHelper", "classannis_1_1sqlgen_1_1_list_example_queries_helper.html", null ]
     ] ],
     [ "Serializable", null, [
       [ "annis.administration.ImportStatus", "interfaceannis_1_1administration_1_1_import_status.html", null ],
@@ -1002,6 +997,9 @@ var hierarchy =
     ] ],
     [ "Set", null, [
       [ "annis.service.ifaces.AnnisResultSet", "interfaceannis_1_1service_1_1ifaces_1_1_annis_result_set.html", null ]
+    ] ],
+    [ "SingleColumnRowMapper", null, [
+      [ "annis.dao.ListCorpusByNameDaoHelper", "classannis_1_1dao_1_1_list_corpus_by_name_dao_helper.html", null ]
     ] ],
     [ "StyleImporter", null, [
       [ "annis.visualizers.component.visjs.VisJsComponent", "classannis_1_1visualizers_1_1component_1_1visjs_1_1_vis_js_component.html", null ]
