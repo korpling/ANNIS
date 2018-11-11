@@ -204,17 +204,17 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>8.1.16.v20140903</version>
+      <version>9.3.24.v20180605</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>8.1.16.v20140903</version>
+      <version>9.3.24.v20180605</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlets</artifactId>
-      <version>8.1.16.v20140903</version>
+      <version>9.3.24.v20180605</version>
     </dependency>
     
     
