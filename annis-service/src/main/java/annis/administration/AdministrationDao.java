@@ -15,18 +15,6 @@
  */
 package annis.administration;
 
-import annis.dao.autogenqueries.QueriesGenerator;
-import annis.examplequeries.ExampleQuery;
-import annis.exceptions.AnnisException;
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
-import annis.security.UserConfig;
-import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
-import com.google.common.io.Files;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -53,7 +41,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.sql.DataSource;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.apache.commons.io.FilenameUtils;
@@ -73,12 +63,26 @@ import org.springframework.core.io.WritableResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
+import com.google.common.io.Files;
+
+import annis.dao.autogenqueries.QueriesGenerator;
+import annis.examplequeries.ExampleQuery;
+import annis.exceptions.AnnisException;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
+import annis.security.UserConfig;
 
 /**
  *
@@ -939,7 +943,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
             // search for corpus_ref
             String sqlScript
               = "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
-            long corpusID = getJdbcTemplate().queryForLong(sqlScript);
+            long corpusID = getJdbcTemplate().queryForObject(sqlScript, Long.class);
 
             importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
               corpusID);
@@ -978,7 +982,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
                 // search for corpus_ref
                 String sqlScript
                   = "SELECT id FROM _corpus WHERE \"name\" = ? LIMIT 1";
-                long corpusID = getJdbcTemplate().queryForLong(sqlScript, doc.
+                long corpusID = getJdbcTemplate().queryForObject(sqlScript, Long.class, doc.
                   getName());
 
                 importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
@@ -1399,7 +1403,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     String sql = "SELECT id FROM corpus WHERE top_level = 'y'";
 
-    return getJdbcTemplate().query(sql, ParameterizedSingleColumnRowMapper.
+    return getJdbcTemplate().query(sql, SingleColumnRowMapper.
       newInstance(Long.class));
   }
 
@@ -1666,9 +1670,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
     return tables;
   }
 
-  private ParameterizedSingleColumnRowMapper<String> stringRowMapper()
+  private SingleColumnRowMapper<String> stringRowMapper()
   {
-    return ParameterizedSingleColumnRowMapper.newInstance(String.class);
+    return SingleColumnRowMapper.newInstance(String.class);
   }
 
   // executes an SQL script from $ANNIS_HOME/scripts
@@ -1816,7 +1820,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       + "AND i.tablename IN ( " + StringUtils.repeat("?", ",", tables.length)
       + " )";
     return getJdbcTemplate().query(sql, tables,
-      new ParameterizedSingleColumnRowMapper<String>());
+      new SingleColumnRowMapper<String>());
   }
 
   public List<String> listUsedIndexes(String... tables)
@@ -1830,7 +1834,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       + " ) "
       + "AND pg_stat_get_numscans(x.indexrelid) != 0";
     return getJdbcTemplate().query(sql, tables,
-      new ParameterizedSingleColumnRowMapper<String>());
+      new SingleColumnRowMapper<String>());
   }
 
   public boolean resetStatistics()

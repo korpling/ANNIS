@@ -15,14 +15,17 @@
  */
 package annis.sqlgen;
 
-import annis.model.Annotation;
 import static annis.sqlgen.SqlConstraints.sqlString;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import annis.model.Annotation;
 
 public class ListCorpusAnnotationsSqlHelper implements
-  ParameterizedRowMapper<Annotation>
+  RowMapper<Annotation>
 {
 
   public String createSqlQuery(String toplevelCorpusName, String corpusName,

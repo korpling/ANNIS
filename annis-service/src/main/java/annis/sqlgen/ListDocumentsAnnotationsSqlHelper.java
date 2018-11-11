@@ -15,8 +15,8 @@
  */
 package annis.sqlgen;
 
-import annis.model.Annotation;
 import static annis.sqlgen.SqlConstraints.sqlString;
+
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +24,10 @@ import java.sql.Types;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import annis.model.Annotation;
 
 /**
  * Lists all annotations of all sub documents of a specific corpus. Optionally
@@ -33,7 +36,7 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class ListDocumentsAnnotationsSqlHelper implements
-  ParameterizedRowMapper<Annotation>
+RowMapper<Annotation>
 {
 
   public String createSqlQuery(String toplevelCorpusName, boolean listRootCorpus)

@@ -36,7 +36,9 @@ import javax.servlet.DispatcherType;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.servlet.ShiroFilter;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.GzipFilter;
@@ -206,14 +208,17 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       // if the administrator wants to allow external acccess he *has* to
       // use a HTTP proxy which also should use SSL encryption
       InetSocketAddress addr = new InetSocketAddress("localhost", port);
-      server = new Server(addr);
-
+      server = new Server(new ExecutorThreadPool());
+      ServerConnector connector=new ServerConnector(server);
+      connector.setHost(addr.getHostName());
+      connector.setPort(addr.getPort());
+      server.setConnectors(new Connector[] {connector});
+      
       ServletContextHandler context =
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
       context.setContextPath("/");
 
       server.setHandler(context);
-      server.setThreadPool(new ExecutorThreadPool());
 
 
       ServletContainer jerseyContainer = new ServletContainer(rc)

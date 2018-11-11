@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 
 import annis.examplequeries.ExampleQuery;
 
@@ -30,7 +30,7 @@ import annis.examplequeries.ExampleQuery;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class ListExampleQueriesHelper implements
-  ParameterizedRowMapper<ExampleQuery>
+RowMapper<ExampleQuery>
 {
 
 
