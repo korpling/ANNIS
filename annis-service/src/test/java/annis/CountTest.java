@@ -74,7 +74,7 @@ public class CountTest
     {
       assumeNotNull(springAnnisDao.getJdbcTemplate());
 
-      springAnnisDao.getJdbcTemplate().queryForInt("SELECT 1");
+      springAnnisDao.getJdbcTemplate().queryForObject("SELECT 1", Integer.class);
 
     }
     catch (DataAccessException ex)

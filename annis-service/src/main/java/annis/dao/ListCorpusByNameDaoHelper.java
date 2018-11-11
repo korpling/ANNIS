@@ -16,14 +16,17 @@
 package annis.dao;
 
 import static annis.sqlgen.SqlConstraints.sqlString;
-import com.google.common.base.Joiner;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
-public class ListCorpusByNameDaoHelper extends ParameterizedSingleColumnRowMapper<Long>
+import org.apache.commons.lang3.Validate;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
+
+import com.google.common.base.Joiner;
+
+public class ListCorpusByNameDaoHelper extends SingleColumnRowMapper<Long>
 {
 
   public String createSql(List<String> corpusNames)

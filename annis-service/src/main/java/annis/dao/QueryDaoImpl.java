@@ -65,7 +65,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -519,7 +519,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   private List<SqlSessionModifier> sqlSessionModifiers;
 //  private SqlGenerator findSqlGenerator;
 
-  private ParameterizedSingleColumnRowMapper<String> planRowMapper;
+  private SingleColumnRowMapper<String> planRowMapper;
 
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
 
@@ -537,7 +537,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   public QueryDaoImpl()
   {
-    planRowMapper = new ParameterizedSingleColumnRowMapper<>();
+    planRowMapper = new SingleColumnRowMapper<>();
     sqlSessionModifiers = new ArrayList<>();
   }
 
@@ -1144,13 +1144,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     this.sqlGenerator = sqlGenerator;
   }
 
-  public ParameterizedSingleColumnRowMapper<String> getPlanRowMapper()
+  public SingleColumnRowMapper<String> getPlanRowMapper()
   {
     return planRowMapper;
   }
 
   public void setPlanRowMapper(
-    ParameterizedSingleColumnRowMapper<String> planRowMapper)
+		  SingleColumnRowMapper<String> planRowMapper)
   {
     this.planRowMapper = planRowMapper;
   }

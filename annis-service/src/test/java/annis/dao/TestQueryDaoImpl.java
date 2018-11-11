@@ -44,7 +44,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -89,7 +89,7 @@ public class TestQueryDaoImpl
   @Mock
   private SaltAnnotateExtractor saltAnnotateExtractor;
   @Mock
-  private ParameterizedSingleColumnRowMapper<String> planRowMapper;
+  private SingleColumnRowMapper<String> planRowMapper;
   @Mock
   private JdbcTemplate jdbcTemplate;
   @Mock
