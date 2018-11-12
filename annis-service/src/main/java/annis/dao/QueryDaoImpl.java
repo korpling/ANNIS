@@ -190,11 +190,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
 
         List<Annotation> result = new LinkedList<>();
-        for (SDocument doc : corpusGraph.getDocuments()) {
-            Annotation anno = new Annotation();
-            anno.setName(doc.getName());
-            anno.setAnnotationPath(doc.getPath().segmentsList());
-            result.add(anno);
+        if(corpusGraph != null) {
+            for (SDocument doc : corpusGraph.getDocuments()) {
+                Annotation anno = new Annotation();
+                anno.setName(doc.getName());
+                anno.setAnnotationPath(doc.getPath().segmentsList());
+                result.add(anno);
+            }
         }
 
         return result;
