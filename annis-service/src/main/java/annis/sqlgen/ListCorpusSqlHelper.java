@@ -15,15 +15,18 @@
  */
 package annis.sqlgen;
 
-import annis.service.objects.AnnisCorpus;
-import com.google.common.base.Joiner;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.commons.dbutils.handlers.AbstractListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+
+import annis.service.objects.AnnisCorpus;
 
 public class ListCorpusSqlHelper extends AbstractListHandler<AnnisCorpus> {
 

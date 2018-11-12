@@ -999,7 +999,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.7.13";
+	content: "7.7.15";
 }
 
 .v-widget {
@@ -2701,6 +2701,12 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-tooltip h1, .annis_embeddedvis .v-tooltip h2, .annis_embeddedvis .v-tooltip h3, .annis_embeddedvis .v-tooltip h4 {
 	color: inherit;
+}
+
+.annis_embeddedvis .v-tooltip pre.v-tooltip-pre {
+	font: inherit;
+	white-space: pre-wrap;
+	margin: 0;
 }
 
 .annis_embeddedvis .v-contextmenu {
@@ -9797,6 +9803,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-table-body {
 	border: 1px solid #d4d4d4;
+	overflow-anchor: none;
 	-webkit-user-select: text;
 	-moz-user-select: text;
 	-ms-user-select: text;

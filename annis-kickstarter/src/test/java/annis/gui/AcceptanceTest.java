@@ -51,185 +51,158 @@ import de.hu_berlin.german.korpling.annis.kickstarter.KickstartRunner;
  *
  * @author thomas
  */
-public class AcceptanceTest
-{
-  private static final Logger log = LoggerFactory.getLogger(AcceptanceTest.class);
-  
-  private static KickstartRunner runner;
-  private static WebDriver driver;
-  
-  private WebDriverWait wait;
-  
-  private final static int WEB_PORT = 8086;
-  private final static int SERVICE_PORT = 5722;
-  
-  private static final Set<String> corpora = new LinkedHashSet<>();
-  
-  @BeforeClass
-  public static void runKickstarter()
-  {
-    try
-    {
-      runner = new KickstartRunner(WEB_PORT, SERVICE_PORT, null);
-      
-      runner.startService();
-      runner.startJetty();
-      
-      // get all installed corpora
-      for(AnnisCorpus c : runner.getCorpora())
-      {
-        corpora.add(c.getName());
-      }
-      
-      DesiredCapabilities caps = new DesiredCapabilities();
-      caps.setCapability("takesScreenshot", true);
-      
-      
-      driver = new PhantomJSDriver(caps);
-      driver.manage().window().setSize(new Dimension(1024, 768));
-      
-    }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
-      runner = null;
-    }
-  }
-  
-  @Before
-  public void setup()
-  {
-    Assume.assumeNotNull(driver);
-    driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-    wait = new WebDriverWait(driver, 30);
-    
-    driver.get("http://localhost:" + WEB_PORT +  "/annis-gui/");
-    
-    wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("v-app")));
-  }
-  
-  protected void takeScreenshot(File outputFile) {
-    if(driver instanceof TakesScreenshot)
-    {
-      File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-      try
-      {
-        Files.copy(screenshot, outputFile);
-      }
-      catch (IOException ex)
-      {
-        log.error("Could not create screenshot", ex);
-      }
-    }
-  }
-  
-  @Test
-  public void testAboutWindow()
-  {
-    driver.findElement(By.id("SearchView:MainToolbar:btAboutAnnis")).click();
-    Assert.assertTrue(driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).isDisplayed());
-    driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).click();
-  }
-  
-  @Test
-  public void testOpenSourceWindow()
-  {
-    driver.findElement(By.id("SearchView:MainToolbar:btOpenSource")).click();
-    Assert.assertTrue(driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).isDisplayed());
-    driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).click();    
-  }
-  
-  @Test
-  public void testTokenSearchPcc2() throws IOException
-  {
-    JavascriptExecutor js = (JavascriptExecutor) driver;
+public class AcceptanceTest {
+	private static final Logger log = LoggerFactory.getLogger(AcceptanceTest.class);
 
-    // only execute this test if pcc2 corpus is imported
-    Assume.assumeTrue(corpora.contains("pcc2"));
-      
-    // execute a "tok" search on pcc2
-    WebElement codeMirror = driver.findElement(By.xpath("//div[@id='SearchView:ControlPanel:QueryPanel']//div[contains(@class,'CodeMirror')]"));
-    
-    // activate the code mirror field (so we can leave it later)
-    codeMirror.click();
-    // set text by javascript
-    js.executeScript("arguments[0].CodeMirror.setValue('tok');", codeMirror);
-    
-    // filter pcc2 corpus via text field to ensure it is visible in the table
-    WebElement filterInput = driver.findElement(By.id("SearchView:ControlPanel:TabSheet:CorpusListPanel:txtFilter"));
-    filterInput.click();
-    filterInput.sendKeys("pcc2");
-    
-    wait.until(ExpectedConditions.textToBePresentInElementLocated(By.xpath(
-      "//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']"
-        + "//table[contains(@class, 'v-table-table')]//tr"), "pcc2"));
-    
-    List<WebElement> corpusTableElements = driver.findElements(By.xpath("//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']//table[contains(@class, 'v-table-table')]//tr"));
-    WebElement tdPcc = null;
-    
-    for(WebElement elem : corpusTableElements)
-    {
-      // get div
-      WebElement div = elem.findElement(By.tagName("div"));
-      if(div != null && "pcc2".equals(div.getText()))
-      {
-        tdPcc = elem;
-      }
-    }
-    
-    Assert.assertNotNull(tdPcc);
-    tdPcc.click();
-    
-    driver.findElement(By.id("SearchView:ControlPanel:QueryPanel:btShowResult")).click();
-    
-    // wait until the result is loaded
-    By byGridTable = By.xpath("//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]//table");
-    wait.until(ExpectedConditions.visibilityOfElementLocated(byGridTable));
-    
-    WebElement gridTable = driver.findElement(byGridTable);
-    List<WebElement> firstRow = gridTable.findElements(By.xpath(".//tr[1]/td"));
-    Assert.assertEquals(7, firstRow.size());
-    Assert.assertEquals("Feigenblatt", firstRow.get(0).getText());
-    Assert.assertEquals("Die", firstRow.get(1).getText());
-    Assert.assertEquals("Jugendlichen", firstRow.get(2).getText());
-    Assert.assertEquals("in", firstRow.get(3).getText());
-    Assert.assertEquals("Zossen", firstRow.get(4).getText());
-    Assert.assertEquals("wollen", firstRow.get(5).getText());
-    Assert.assertEquals("ein", firstRow.get(6).getText());
-  }
-  
-  /**
-   * Make sure the "Show in ANNIS search interface" link is shown in embedded visualizer.
-   * Regression test for
-   * https://github.com/korpling/ANNIS/issues/509
-   * (Link from embedded visualization to search UI is gone in 3.4.0)
-   */
-  @Test
-  public void testRegression509()
-  {
-    // only execute this test if pcc2 corpus is imported
-    Assume.assumeTrue(corpora.contains("pcc2"));
-    
-    driver.get("http://localhost:" + WEB_PORT +  "/annis-gui/embeddedvis/grid?embedded_ns=exmaralda&embedded_instance=&embedded_salt=http%3A%2F%2Flocalhost%3A" + SERVICE_PORT + "%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dsalt%3A%2Fpcc2%2F11299%2F%2523tok_1%26left%3D5%26right%3D5&embedded_interface=http://localhost:8084/annis-gui/%23_q%3DdG9r%26_c%3DcGNjMg%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26m%3D0");
-    
-    // wait until page was loaded
-    wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("v-app")));
-    // wait until visualization is actually there
-    wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className(
-      "v-app-loading")));
-    
-    WebElement link = driver.findElement(By.xpath("//div[@id='VerticalLayout:Link']/a/span[2]"));
-    Assert.assertEquals("Show in ANNIS search interface", link.getText());
-    
-  }
-  
-  @AfterClass
-  public static void cleanup()
-  {
-    if(driver != null)
-    {
-      driver.quit();
-    }
-  }
-  
+	private static KickstartRunner runner;
+	private static WebDriver driver;
+
+	private WebDriverWait wait;
+
+	private final static int WEB_PORT = 8086;
+	private final static int SERVICE_PORT = 5722;
+
+	private static final Set<String> corpora = new LinkedHashSet<>();
+
+	@BeforeClass
+	public static void runKickstarter() {
+		try {
+			runner = new KickstartRunner(WEB_PORT, SERVICE_PORT, null);
+
+			runner.startService();
+			runner.startJetty();
+
+			// get all installed corpora
+			for (AnnisCorpus c : runner.getCorpora()) {
+				corpora.add(c.getName());
+			}
+
+			DesiredCapabilities caps = new DesiredCapabilities();
+			caps.setCapability("takesScreenshot", true);
+
+			driver = new PhantomJSDriver(caps);
+			driver.manage().window().setSize(new Dimension(1024, 768));
+
+		} catch (Exception ex) {
+			log.error(null, ex);
+			runner = null;
+		}
+	}
+
+	@Before
+	public void setup() {
+		Assume.assumeNotNull(driver);
+		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		wait = new WebDriverWait(driver, 30);
+
+		driver.get("http://localhost:" + WEB_PORT + "/annis-gui/");
+
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("v-app")));
+	}
+
+	protected void takeScreenshot(File outputFile) {
+		if (driver instanceof TakesScreenshot) {
+			File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+			try {
+				Files.copy(screenshot, outputFile);
+			} catch (IOException ex) {
+				log.error("Could not create screenshot", ex);
+			}
+		}
+	}
+
+	@Test
+	public void testAboutWindow() {
+		driver.findElement(By.id("SearchView:MainToolbar:btAboutAnnis")).click();
+		Assert.assertTrue(driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).isDisplayed());
+		driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).click();
+	}
+
+	@Test
+	public void testOpenSourceWindow() {
+		driver.findElement(By.id("SearchView:MainToolbar:btOpenSource")).click();
+		Assert.assertTrue(driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).isDisplayed());
+		driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).click();
+	}
+
+	@Test
+	public void testTokenSearchPcc2() throws IOException {
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+
+		// only execute this test if pcc2 corpus is imported
+		Assume.assumeTrue(corpora.contains("pcc2"));
+
+		// execute a "tok" search on pcc2
+		WebElement codeMirror = driver.findElement(
+				By.xpath("//div[@id='SearchView:ControlPanel:QueryPanel']//div[contains(@class,'CodeMirror')]"));
+
+		// activate the code mirror field (so we can leave it later)
+		codeMirror.click();
+		// set text by javascript
+		js.executeScript("arguments[0].CodeMirror.setValue('tok');", codeMirror);
+
+		// filter pcc2 corpus via text field to ensure it is visible in the table
+		WebElement filterInput = driver
+				.findElement(By.id("SearchView:ControlPanel:TabSheet:CorpusListPanel:txtFilter"));
+		filterInput.click();
+		filterInput.sendKeys("pcc2");
+
+		By pccTrXPath = By.xpath("//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']"
+				+ "//table[contains(@class, 'v-table-table')]//tr//div[contains(text(), 'pcc2')]");
+
+		wait.until(ExpectedConditions.visibilityOfElementLocated(pccTrXPath));
+
+		driver.findElement(pccTrXPath).click();
+
+		driver.findElement(By.id("SearchView:ControlPanel:QueryPanel:btShowResult")).click();
+
+		// wait until the result is loaded
+		By byGridTable = By.xpath(
+				"//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]//table");
+		wait.until(ExpectedConditions.visibilityOfElementLocated(byGridTable));
+
+		WebElement gridTable = driver.findElement(byGridTable);
+		List<WebElement> firstRow = gridTable.findElements(By.xpath(".//tr[1]/td"));
+		Assert.assertEquals(7, firstRow.size());
+		Assert.assertEquals("Feigenblatt", firstRow.get(0).getText());
+		Assert.assertEquals("Die", firstRow.get(1).getText());
+		Assert.assertEquals("Jugendlichen", firstRow.get(2).getText());
+		Assert.assertEquals("in", firstRow.get(3).getText());
+		Assert.assertEquals("Zossen", firstRow.get(4).getText());
+		Assert.assertEquals("wollen", firstRow.get(5).getText());
+		Assert.assertEquals("ein", firstRow.get(6).getText());
+	}
+
+	/**
+	 * Make sure the "Show in ANNIS search interface" link is shown in embedded
+	 * visualizer. Regression test for https://github.com/korpling/ANNIS/issues/509
+	 * (Link from embedded visualization to search UI is gone in 3.4.0)
+	 */
+	@Test
+	public void testRegression509() {
+		// only execute this test if pcc2 corpus is imported
+		Assume.assumeTrue(corpora.contains("pcc2"));
+
+		driver.get("http://localhost:" + WEB_PORT
+				+ "/annis-gui/embeddedvis/grid?embedded_ns=exmaralda&embedded_instance=&embedded_salt=http%3A%2F%2Flocalhost%3A"
+				+ SERVICE_PORT
+				+ "%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dsalt%3A%2Fpcc2%2F11299%2F%2523tok_1%26left%3D5%26right%3D5&embedded_interface=http://localhost:8084/annis-gui/%23_q%3DdG9r%26_c%3DcGNjMg%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26m%3D0");
+
+		// wait until page was loaded
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("v-app")));
+		// wait until visualization is actually there
+		wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("v-app-loading")));
+
+		WebElement link = driver.findElement(By.xpath("//div[@id='VerticalLayout:Link']/a/span[2]"));
+		Assert.assertEquals("Show in ANNIS search interface", link.getText());
+
+	}
+
+	@AfterClass
+	public static void cleanup() {
+		if (driver != null) {
+			driver.quit();
+		}
+	}
+
 }
