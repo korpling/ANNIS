@@ -39,7 +39,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
 
     private final static Logger log = LoggerFactory.getLogger(AdministrationDao.class);
     
-    protected DeleteCorpusDao() {
+    private DeleteCorpusDao() {
         
     }
     
@@ -89,6 +89,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
                 getQueryRunner().update(conn,
                         "DELETE FROM media_files\n" + "WHERE\n" + "  corpus_path = ? OR corpus_path like ?", corpusName,
                         corpusName + "/%");
+                
             }
 
             log.info("deleting resolver entries");
@@ -101,6 +102,14 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
 
             log.info("deleting example query entries");
             try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM example_queries WHERE corpus=?")) {
+                for (String n : names) {
+                    delStmt.setString(1, n);
+                    delStmt.executeUpdate();
+                }
+            }
+            
+            log.info("deleting annotation table entries");
+            try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM annotations WHERE corpus=?")) {
                 for (String n : names) {
                     delStmt.setString(1, n);
                     delStmt.executeUpdate();

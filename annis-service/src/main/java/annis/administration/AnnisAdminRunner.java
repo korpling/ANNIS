@@ -63,7 +63,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       this.queryDao = QueryDaoImpl.create();
       this.queriesGenerator = QueriesGenerator.create(this.queryDao);
       
-      DeleteCorpusDao deleteCorpusDao = new DeleteCorpusDao();
+      DeleteCorpusDao deleteCorpusDao = DeleteCorpusDao.create(queryDao);
       AdministrationDao adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
       
       this.corpusAdministration = CorpusAdministration.create(adminDao);
@@ -74,6 +74,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     // get Runner from Spring
     try
     {
+      AnnisBaseRunner.setupLogging(true);
       new AnnisAdminRunner().run(args);
     }
     catch(AnnisRunnerException ex)

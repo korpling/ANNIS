@@ -70,10 +70,10 @@ import annis.dao.autogenqueries.QueriesGenerator;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
 import annis.security.UserConfig;
+import annis.service.objects.AnnisAttribute;
 import annis.service.objects.ImportJob;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
-import annis.tabledefs.Column.Type;
 import annis.tabledefs.Table;
 import annis.utils.ANNISFormatHelper;
 import au.com.bytecode.opencsv.CSVReader;
@@ -218,8 +218,9 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private final Table textTable = new Table("text").c(new Column("corpus_path").createIndex()).c_int("id").c("name")
             .c("text");
 
-    private final Table annotationsTable = new Table("annotations").c(new Column("corpus").createIndex()).c("namespace")
-            .c("name").c("value").c("type").c("edge_namespace").c("edge_name");
+    private final Table annotationsTable = new Table("annotations").c(new Column("corpus").createIndex())
+            .c(new Column("name").createIndex())
+            .c("value").c("type").c("sub_type").c("edge_name");
 
     private final Table mediaFilesTable = new Table("media_files").c(new Column("filename").unique())
             .c(new Column("corpus_path").createIndex()).c(new Column("mime_type").createIndex())
@@ -343,6 +344,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
 
         analyzeTextTable(toplevelCorpusName);
+        generateAnnotationsTable(toplevelCorpusName);
         generateExampleQueries(toplevelCorpusName);
 
         if (aliasName != null && !aliasName.isEmpty()) {
@@ -616,6 +618,34 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                     }
                 }
             }
+        }
+    }
+    
+    private void generateAnnotationsTable(String corpusName) {
+        log.info("Generating annotations table for corpus {}", corpusName);
+        
+        // list annotations with most-used value in graphANNIS
+        List<AnnisAttribute> attributes = getQueryDao().listAnnotations(Arrays.asList(corpusName), true, true);
+        
+        try(Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
+            // cache these entries in the annotation table
+            PreparedStatement stmt = conn.prepareStatement("INSERT INTO annotations VALUES (?,?,?,?,?,?)");
+            
+            for(AnnisAttribute a : attributes) {
+                for(String val : a.getValueSet()) {
+                    stmt.setString(1, corpusName);
+                    stmt.setString(2, a.getName());
+                    stmt.setString(3, val);
+                    stmt.setString(4,  a.getType().name());
+                    stmt.setString(5, a.getSubtype().toString());
+                    stmt.setString(6, a.getEdgeName());
+                    
+                    stmt.executeUpdate();
+                }
+            }
+            
+        } catch(SQLException ex) {
+            log.error("Cannot generate annotations table", ex);
         }
     }
 
