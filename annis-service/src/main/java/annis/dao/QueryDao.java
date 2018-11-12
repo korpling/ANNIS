@@ -59,6 +59,8 @@ public interface QueryDao {
 
     public List<AnnisAttribute> listAnnotations(List<String> corpusList, boolean listValues,
             boolean onlyMostFrequentValues);
+    
+    public List<AnnisAttribute> listAnnotationsFromCache(List<String> corpusList);
 
     public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) throws GraphANNISException;
 

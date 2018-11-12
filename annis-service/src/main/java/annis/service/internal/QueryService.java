@@ -511,9 +511,14 @@ public class QueryService {
         Subject user = SecurityUtils.getSubject();
         user.checkPermission("query:annotations:" + toplevelCorpus);
 
-        return getQueryDao().listAnnotations(Arrays.asList(toplevelCorpus), Boolean.parseBoolean(fetchValues),
-                Boolean.parseBoolean(onlyMostFrequentValues));
-
+        boolean fv = Boolean.parseBoolean(fetchValues);
+        boolean omfv = Boolean.parseBoolean(onlyMostFrequentValues);
+        
+        if(fv && omfv) {
+            return getQueryDao().listAnnotationsFromCache(Arrays.asList(toplevelCorpus));
+        } else {
+            return getQueryDao().listAnnotations(Arrays.asList(toplevelCorpus), fv, omfv);
+        }
     }
 
     @GET

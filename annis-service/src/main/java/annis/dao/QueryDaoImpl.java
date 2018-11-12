@@ -117,6 +117,7 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.OrderType;
+import annis.sqlgen.AnnisAttributeHelper;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
@@ -130,6 +131,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     // generated sql for example queries and fetches the result
     private final ListExampleQueriesHelper listExampleQueriesHelper = new ListExampleQueriesHelper();
+    
+    private final AnnisAttributeHelper attributeHelper = new AnnisAttributeHelper();
 
     private int timeout;
 
@@ -400,7 +403,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                             }
                         }
                         wk.reset();
-                    } catch(ClosedWatchServiceException ex) {
+                    } catch (ClosedWatchServiceException ex) {
                         break;
                     } catch (InterruptedException | IOException ex) {
                         log.error("Error when reading graphANNIS logfile", ex);
@@ -461,7 +464,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public void shutdown() {
         exec.shutdownNow();
         try {
-            if(graphannisLogfileWatcher != null) {
+            if (graphannisLogfileWatcher != null) {
                 graphannisLogfileWatcher.close();
             }
         } catch (IOException ex) {
@@ -660,7 +663,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         }
 
         for (String corpus : escapedCorpusNames(corpusList)) {
-            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, aql, freqQuery.toString(), QueryLanguage.AQL);
+            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, aql,
+                    freqQuery.toString(), QueryLanguage.AQL);
             if (freqTableForCorpus != null) {
                 for (FrequencyTableEntry<String> e : freqTableForCorpus) {
                     result.addEntry(new FrequencyTable.Entry(e.getTuple(), e.getCount()));
@@ -704,10 +708,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
                 Map<String, Set<String>> nodeAnnos = new TreeMap<>();
 
-                List<org.corpus_tools.graphannis.model.Annotation> annoList = corpusStorageMgr.listNodeAnnotations(corpusName, listValues,
-                        onlyMostFrequentValues);
+                List<org.corpus_tools.graphannis.model.Annotation> annoList = corpusStorageMgr
+                        .listNodeAnnotations(corpusName, listValues, onlyMostFrequentValues);
                 for (org.corpus_tools.graphannis.model.Annotation anno : annoList) {
-                    if(!"annis".equals(anno.getKey().getNs())) {
+                    if (!"annis".equals(anno.getKey().getNs())) {
                         String qname;
                         if (anno.getKey().getNs() == null || anno.getKey().getNs().isEmpty()) {
                             qname = anno.getKey().getName();
@@ -730,16 +734,16 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
                 for (Entry<String, Set<String>> e : nodeAnnos.entrySet()) {
                     AnnisAttribute att = new AnnisAttribute();
-                    
+
                     att.setName(e.getKey());
                     att.setValueSet(e.getValue());
                     // check if the sub-type is a "normal" node or a meta-data annotation
                     try {
-                        if(corpusStorageMgr.count(Arrays.asList(corpusName),
+                        if (corpusStorageMgr.count(Arrays.asList(corpusName),
                                 e.getKey() + " _ident_ annis:node_type=\"corpus\"") > 0) {
                             att.setType(Type.meta);
                             att.setSubtype(SubType.m);
-                        } else {    
+                        } else {
                             att.setType(Type.node);
                             att.setSubtype(SubType.n);
                         }
@@ -765,8 +769,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
                     // also find all edge annotations for this component
                     Map<String, Set<String>> edgeAnnos = new TreeMap<>();
-                    List<org.corpus_tools.graphannis.model.Annotation> edgeAnnoList = corpusStorageMgr.listEdgeAnnotations(corpusName, ctype, c.getName(),
-                            c.getLayer(), listValues, onlyMostFrequentValues);
+                    List<org.corpus_tools.graphannis.model.Annotation> edgeAnnoList = corpusStorageMgr
+                            .listEdgeAnnotations(corpusName, ctype, c.getName(), c.getLayer(), listValues,
+                                    onlyMostFrequentValues);
                     for (org.corpus_tools.graphannis.model.Annotation anno : edgeAnnoList) {
                         String qname;
                         if (anno.getKey().getNs() == null || anno.getKey().getNs().isEmpty()) {
@@ -799,6 +804,24 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                     }
                 }
             }
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<AnnisAttribute> listAnnotationsFromCache(List<String> corpusList) {
+        List<AnnisAttribute> result = new LinkedList<>();
+
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
+
+            for (String corpus : corpusList) {
+
+                result.addAll(getQueryRunner().query(conn, "SELECT * FROM annotations WHERE corpus = ?", attributeHelper,
+                        corpus));
+            }
+        } catch (SQLException ex) {
+            log.error("Could not list annotations from cache", ex);
         }
 
         return result;
