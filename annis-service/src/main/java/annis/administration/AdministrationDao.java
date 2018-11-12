@@ -73,6 +73,7 @@ import annis.security.UserConfig;
 import annis.service.objects.ImportJob;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
+import annis.tabledefs.Column.Type;
 import annis.tabledefs.Table;
 import annis.utils.ANNISFormatHelper;
 import au.com.bytecode.opencsv.CSVReader;
@@ -83,15 +84,14 @@ import au.com.bytecode.opencsv.CSVReader;
 public class AdministrationDao extends AbstractAdminstrationDao {
 
     private static final Logger log = LoggerFactory.getLogger(AdministrationDao.class);
-    
+
     private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
 
-    
     private DeleteCorpusDao deleteCorpusDao;
-    
+
     public AdministrationDao() {
         this.queriesGenerator = QueriesGenerator.create(getQueryDao());
-        
+
         this.mimeTypeMapping = new LinkedHashMap<>();
         // TODO: make this configurable for the user
         this.mimeTypeMapping.put("webm", "video/webm");
@@ -105,18 +105,18 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         this.mimeTypeMapping.put("config", "application/x-config+text");
         this.mimeTypeMapping.put("properties", "application/text+plain");
         this.mimeTypeMapping.put("json", "application/json");
-        
+
         this.generateExampleQueries = cfg.generateExampleQueries();
-        
+
         this.jsonMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        
+
     }
-    
+
     public static AdministrationDao create(QueryDao queryDao, DeleteCorpusDao deleteCorpusDao) {
         AdministrationDao adminDao = new AdministrationDao();
         adminDao.setQueryDao(queryDao);
         adminDao.setDeleteCorpusDao(deleteCorpusDao);
-        
+
         return adminDao;
     }
 
@@ -128,7 +128,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      *
      *
      * @param corpusID
-     *            The id of the corpus which texts are analyzed.
+     *                     The id of the corpus which texts are analyzed.
      */
     private void analyzeTextTable(String toplevelCorpusName) {
         List<String> rawTexts = getQueryDao().getRawText(toplevelCorpusName);
@@ -192,7 +192,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      */
     private final Map<String, String> mimeTypeMapping;
 
-
     /**
      * Optional tab for example queries. If this tab not exist, a dummy file from
      * the resource folder is used.
@@ -219,6 +218,9 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private final Table textTable = new Table("text").c(new Column("corpus_path").createIndex()).c_int("id").c("name")
             .c("text");
 
+    private final Table annotationsTable = new Table("annotations").c(new Column("corpus").createIndex()).c("namespace")
+            .c("name").c("value").c("type").c("edge_namespace").c("edge_name");
+
     private final Table mediaFilesTable = new Table("media_files").c(new Column("filename").unique())
             .c(new Column("corpus_path").createIndex()).c(new Column("mime_type").createIndex())
             .c(new Column("title").createIndex());
@@ -240,7 +242,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     private final Table corpusInfoTable = new Table("corpus_info").c(new Column("name").primaryKey()).c_int("docs")
             .c_int("tokens").c("source_path");
-
 
     /**
      * Get the real schema name and version as used by the database.
@@ -282,13 +283,16 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * Reads ANNIS files from several directories.
      *
      * @param path
-     *            Specifies the path to the corpora, which should be imported.
+     *                              Specifies the path to the corpora, which should
+     *                              be imported.
      * @param aliasName
-     *            An alias name for this corpus. Can be null.
+     *                              An alias name for this corpus. Can be null.
      * @param overwrite
-     *            If set to true conflicting top level corpora are deleted.
+     *                              If set to true conflicting top level corpora are
+     *                              deleted.
      * @param waitForOtherTasks
-     *            If true wait for other tasks to finish, if false abort.
+     *                              If true wait for other tasks to finish, if false
+     *                              abort.
      *
      * @return true if successful
      */
@@ -327,7 +331,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             log.error("Could not import graphANNIS", e);
             return false;
         }
-        
+
         importTexts(toplevelCorpusName, path, version);
         importResolverTable(toplevelCorpusName, path, version);
         importExampleQueries(toplevelCorpusName, path, version);
@@ -355,26 +359,27 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      */
     protected void initSQLiteSchema() {
         try {
-            createTableIfNotExists(DB.SERVICE_DATA, repositoryMetaDataTable, new File(getScriptPath(), "repository_metadata.annis"),
-                    null);
+            createTableIfNotExists(DB.SERVICE_DATA, repositoryMetaDataTable,
+                    new File(getScriptPath(), "repository_metadata.annis"), null);
             createTableIfNotExists(DB.SERVICE_DATA, userConfigTable, null, null);
             createTableIfNotExists(DB.SERVICE_DATA, urlShortenerTable, null, null);
-            
+
             createTableIfNotExists(DB.CORPUS_REGISTRY, corpusInfoTable, null, null);
-            createTableIfNotExists(DB.CORPUS_REGISTRY, resolverTable, new File(getScriptPath(), "resolver_vis_map.annis"), null);
-            createTableIfNotExists(DB.CORPUS_REGISTRY,mediaFilesTable, null, null);
+            createTableIfNotExists(DB.CORPUS_REGISTRY, resolverTable,
+                    new File(getScriptPath(), "resolver_vis_map.annis"), null);
+            createTableIfNotExists(DB.CORPUS_REGISTRY, mediaFilesTable, null, null);
             createTableIfNotExists(DB.CORPUS_REGISTRY, exampleQueriesTable, null, null);
             createTableIfNotExists(DB.CORPUS_REGISTRY, corpusAliasTable, null, null);
             createTableIfNotExists(DB.CORPUS_REGISTRY, textTable, null, null);
-            
-            
-            
+            createTableIfNotExists(DB.CORPUS_REGISTRY, annotationsTable, null, null);
+
         } catch (SQLException ex) {
             log.error("Can not create SQL schema", ex);
         }
     }
 
-    protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version) throws GraphANNISException {
+    protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version)
+            throws GraphANNISException {
 
         log.info("importing corpus into graphANNIS");
         getQueryDao().getCorpusStorageManager().importFromFileSystem(path, ImportFormat.RelANNIS, corpusName);
@@ -415,8 +420,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         };
 
         try {
-            importSQLiteTable(DB.CORPUS_REGISTRY, resolverTable, new File(importDir, FILE_RESOLVER_VIS_MAP + version.getFileSuffix()),
-                    lineModifier);
+            importSQLiteTable(DB.CORPUS_REGISTRY, resolverTable,
+                    new File(importDir, FILE_RESOLVER_VIS_MAP + version.getFileSuffix()), lineModifier);
         } catch (SQLException ex) {
             log.error("Could not import resolver file {}", path, ex);
         }
@@ -562,7 +567,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         };
 
         try {
-            importSQLiteTable(DB.CORPUS_REGISTRY, textTable, new File(importDir, "text" + version.getFileSuffix()), lineModifier);
+            importSQLiteTable(DB.CORPUS_REGISTRY, textTable, new File(importDir, "text" + version.getFileSuffix()),
+                    lineModifier);
         } catch (SQLException ex) {
             log.error("Could not import text table {}", path, ex);
         }
@@ -617,9 +623,9 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * Imports a single binary file.
      *
      * @param file
-     *            Specifies the file to be imported.
+     *                               Specifies the file to be imported.
      * @param toplevelCorpusName
-     *            The toplevel corpus name
+     *                               The toplevel corpus name
      */
     private void importSingleFile(String file, String toplevelCorpusName) {
 
@@ -647,7 +653,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         // get number of tokens
         int tokCount = getQueryDao().count("tok", Arrays.asList(toplevelCorpusName));
-        
+
         // get number of documents
         List<Annotation> documents = getQueryDao().listDocuments(toplevelCorpusName);
         int documentCount = documents.size();
@@ -711,8 +717,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     public Multimap<String, String> listCorpusAlias(File dbFile) {
         Multimap<String, String> result = TreeMultimap.create();
 
-        try (Connection conn = dbFile == null ? createConnection(DB.CORPUS_REGISTRY, true) : 
-                createConnection(dbFile, true)) {
+        try (Connection conn = dbFile == null ? createConnection(DB.CORPUS_REGISTRY, true)
+                : createConnection(dbFile, true)) {
 
             ResultSetHandler<Multimap<String, String>> rsh = new ResultSetHandler<Multimap<String, String>>() {
                 @Override
@@ -818,7 +824,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             log.error("Could add alias {} for corpus", alias, corpusName, ex);
         }
     }
-    
+
     public void sendImportStatusMail(String adress, String corpusPath, ImportJob.Status status, String additionalInfo) {
         if (adress == null || adress.isEmpty() || corpusPath == null) {
             return;
@@ -898,12 +904,9 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         return schemaVersion;
     }
 
-
     public Map<String, String> getMimeTypeMapping() {
         return mimeTypeMapping;
     }
-
-
 
     /**
      * Generates example queries if no example queries tab file is defined by the
@@ -925,7 +928,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     /**
      * @param generateExampleQueries
-     *            the generateExampleQueries to set
+     *                                   the generateExampleQueries to set
      */
     public void setGenerateExampleQueries(EXAMPLE_QUERIES_CONFIG generateExampleQueries) {
         this.generateExampleQueries = generateExampleQueries;
@@ -941,11 +944,10 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     public DeleteCorpusDao getDeleteCorpusDao() {
         return deleteCorpusDao;
     }
-    
+
     public void setDeleteCorpusDao(DeleteCorpusDao deleteCorpusDao) {
         this.deleteCorpusDao = deleteCorpusDao;
     }
-
 
     /**
      * Checks, if a already exists a corpus with the same name of the top level

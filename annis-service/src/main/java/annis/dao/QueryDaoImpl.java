@@ -27,6 +27,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
@@ -399,8 +400,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                             }
                         }
                         wk.reset();
+                    } catch(ClosedWatchServiceException ex) {
+                        break;
                     } catch (InterruptedException | IOException ex) {
                         log.error("Error when reading graphANNIS logfile", ex);
+                        break;
                     }
                 }
             }).start();
@@ -456,6 +460,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public void shutdown() {
         exec.shutdownNow();
+        try {
+            if(graphannisLogfileWatcher != null) {
+                graphannisLogfileWatcher.close();
+            }
+        } catch (IOException ex) {
+            log.error("Could not close file system watch", ex);
+        }
     }
 
     @Override
