@@ -98,6 +98,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         this.mimeTypeMapping.put("ogg", "audio/ogg");
         this.mimeTypeMapping.put("wav", "audio/wav");
         this.mimeTypeMapping.put("mp3", "audio/mpeg");
+        this.mimeTypeMapping.put("flac", "audio/flac");
         this.mimeTypeMapping.put("mp4", "video/mp4");
         this.mimeTypeMapping.put("pdf", "application/pdf");
         this.mimeTypeMapping.put("css", "text/css");
