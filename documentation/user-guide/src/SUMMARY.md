@@ -1,7 +1,8 @@
 # Summary
-
+- [Introduction](./README.md)
 - [Installation](./installation/README.md)
     - [Installing a Local Version (ANNIS Kickstarter)](./installation/kickstarter.md)
+    - [Installing an ANNIS Server](./installation/server.md)
 - [Using the ANNIS interface](./interface/README.md)
     - [Search Form](./interface/search-form.md)
     - [Result Window](./interface/result-window.md)
@@ -15,4 +16,5 @@
     - [Exporting Results](./aql/export.md)
     - [Frequency Analysis](./aql/frequency.md)
     - [Complete List of Operators](./aql/operators.md)
-- [Advanced Configuration](./advanced_configuration.md)
+- [Advanced Configuration](./advanced-config/README.md)
+    - [PostgreSQL Server Configuration](./advanced-config/postgresql.md)
