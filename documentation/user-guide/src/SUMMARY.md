@@ -1,6 +1,7 @@
 # Summary
 
-- [Installation](./installation.md)
+- [Installation](./installation/README.md)
+    - [Installing a Local Version (ANNIS Kickstarter)](./installation/kickstarter.md)
 - [Using the ANNIS interface](./interface/README.md)
     - [Search Form](./interface/search-form.md)
     - [Result Window](./interface/result-window.md)
