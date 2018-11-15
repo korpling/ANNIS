@@ -1,1 +1,0 @@
-# ANNIS Query Language (AQL)
