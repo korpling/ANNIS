@@ -689,6 +689,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                     "INSERT INTO metadata_cache(corpus, path, type, namespace, name, value) VALUES (?,?,?,?,?,?)");
             
             for (SCorpus corpus : corpusGraph.getCorpora()) {
+               // add an entry for each meta annotation
                 for (SMetaAnnotation anno : corpus.getMetaAnnotations()) {
                     stmt.setString(1, corpusName);
                     stmt.setString(2, Joiner.on('/').join(corpus.getPath().segmentsList()));
@@ -701,6 +702,16 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             }
 
             for (SDocument document : corpusGraph.getDocuments()) {
+                // add an entry for the document itself
+                stmt.setString(1, corpusName);
+                stmt.setString(2, Joiner.on('/').join(document.getPath().segmentsList()));
+                stmt.setString(3, "DOCUMENT");
+                stmt.setString(4, "annis");
+                stmt.setString(5, "doc");
+                stmt.setString(6, document.getName());
+                stmt.executeUpdate();
+            
+                
                 for (SMetaAnnotation anno : document.getMetaAnnotations()) {
                     stmt.setString(1, corpusName);
                     stmt.setString(2, Joiner.on('/').join(document.getPath().segmentsList()));
@@ -755,8 +766,9 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         int tokCount = getQueryDao().count("tok", Arrays.asList(toplevelCorpusName));
 
         // get number of documents
-        List<Annotation> documents = getQueryDao().listDocuments(toplevelCorpusName);
-        int documentCount = documents.size();
+        SCorpusGraph corpusGraph = getQueryDao().getCorpusStorageManager().corpusGraph(toplevelCorpusName);
+
+        int documentCount = corpusGraph.getDocuments().size();
 
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
 

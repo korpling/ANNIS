@@ -120,6 +120,7 @@ import annis.service.objects.OrderType;
 import annis.sqlgen.AnnisAttributeHelper;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
+import annis.sqlgen.ListDocumentsHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.MetadataCacheHelper;
@@ -184,23 +185,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         return result;
     }
-
+    
     @Override
-    public List<Annotation> listDocuments(String toplevelCorpusName) throws GraphANNISException {
-
-        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
-
-        List<Annotation> result = new LinkedList<>();
-        if (corpusGraph != null) {
-            for (SDocument doc : corpusGraph.getDocuments()) {
-                Annotation anno = new Annotation();
-                anno.setName(doc.getName());
-                anno.setAnnotationPath(doc.getPath().segmentsList());
-                result.add(anno);
-            }
+    public List<Annotation> listDocuments(String toplevelCorpusName) {
+        
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
+            return getQueryRunner().query(conn,
+                    "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'DOCUMENT' AND namespace = 'annis' AND \"name\"='doc'",
+                    new ListDocumentsHelper(), toplevelCorpusName);
+        } catch (SQLException ex) {
+            log.error("Could not list documents from database", ex);
+            return new LinkedList<>();
         }
-
-        return result;
     }
 
     @Override
