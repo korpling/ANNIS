@@ -122,6 +122,7 @@ import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MetaByteHelper;
+import annis.sqlgen.MetadataCacheHelper;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 
@@ -131,7 +132,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     // generated sql for example queries and fetches the result
     private final ListExampleQueriesHelper listExampleQueriesHelper = new ListExampleQueriesHelper();
-    
+
     private final AnnisAttributeHelper attributeHelper = new AnnisAttributeHelper();
 
     private int timeout;
@@ -190,7 +191,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
 
         List<Annotation> result = new LinkedList<>();
-        if(corpusGraph != null) {
+        if (corpusGraph != null) {
             for (SDocument doc : corpusGraph.getDocuments()) {
                 Annotation anno = new Annotation();
                 anno.setName(doc.getName());
@@ -807,9 +808,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 }
             }
         }
-        
+
         List<String> segmentationNames = listSegmentationNames(corpusList);
-        for(String s : segmentationNames) {
+        for (String s : segmentationNames) {
             AnnisAttribute att = new AnnisAttribute();
             att.setType(Type.segmentation);
             att.setSubtype(SubType.unknown);
@@ -828,8 +829,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
             for (String corpus : corpusList) {
 
-                result.addAll(getQueryRunner().query(conn, "SELECT * FROM annotations WHERE corpus = ?", attributeHelper,
-                        corpus));
+                result.addAll(getQueryRunner().query(conn, "SELECT * FROM annotations WHERE corpus = ?",
+                        attributeHelper, corpus));
             }
         } catch (SQLException ex) {
             log.error("Could not list annotations from cache", ex);
@@ -870,90 +871,37 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     }
 
-    private List<Annotation> allAnnotationForCorpus(SNode corpus) {
-
-        String type = corpus instanceof SDocument ? "DOCUMENT" : "CORPUS";
-
-        List<Annotation> result = new LinkedList<>();
-
-        Set<SMetaAnnotation> metaAnnos = corpus.getMetaAnnotations();
-        if (metaAnnos.isEmpty()) {
-            // add single entry for the document without annotation value
-            Annotation anno = new Annotation();
-            anno.setCorpusName(corpus.getName());
-            anno.setAnnotationPath(corpus.getPath().segmentsList());
-            anno.setType(type);
-
-            result.add(anno);
-        } else {
-            // add all annotations of this document as value
-            for (SMetaAnnotation meta : metaAnnos) {
-                Annotation anno = new Annotation();
-                anno.setCorpusName(corpus.getName());
-                anno.setAnnotationPath(corpus.getPath().segmentsList());
-                anno.setType(type);
-
-                if (!"".equals(meta.getNamespace())) {
-                    anno.setNamespace(meta.getNamespace());
-                }
-                anno.setName(meta.getName());
-                anno.setValue(meta.getValue().toString());
-
-                result.add(anno);
-            }
-        }
-
-        return result;
-    }
-
     @Override
     public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName, boolean listRootCorpus)
             throws GraphANNISException {
 
-        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraph(toplevelCorpusName);
-
-        List<Annotation> result = new LinkedList<>();
-        for (SDocument doc : corpusGraph.getDocuments()) {
-            result.addAll(allAnnotationForCorpus(doc));
-        }
-
-        if (listRootCorpus) {
-            for (SNode n : corpusGraph.getRoots()) {
-                if (n instanceof SCorpus) {
-                    result.addAll(allAnnotationForCorpus(n));
-                    break;
-                }
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
+            if (listRootCorpus) {
+                return getQueryRunner().query(conn,
+                        "SELECT * FROM metadata_cache WHERE corpus = ? AND (\"type\" = DOCUMENT OR path=?)",
+                        new MetadataCacheHelper(), toplevelCorpusName, toplevelCorpusName);
+            } else {
+                return getQueryRunner().query(conn,
+                        "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = DOCUMENT",
+                        new MetadataCacheHelper(), toplevelCorpusName);
             }
+        } catch (SQLException ex) {
+            log.error("Could not list document annotations from database", ex);
+            return new LinkedList<>();
         }
-
-        return result;
     }
 
     @Override
     public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) throws GraphANNISException {
-        List<Annotation> result = new LinkedList<>();
-
-        // select the document and all its parent corpora
-        String aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=\"" + toplevelCorpusName + "\"";
-
-        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL);
-        if (corpusGraph != null) {
-            List<SNode> roots = corpusGraph.getRoots();
-            if (roots == null) {
-                for (SCorpus c : corpusGraph.getCorpora()) {
-                    result.addAll(allAnnotationForCorpus(c));
-                }
-            } else {
-                for (SNode n : roots) {
-                    if (n instanceof SCorpus) {
-                        result.addAll(allAnnotationForCorpus(n));
-                        break;
-                    }
-                }
-            }
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
+            return getQueryRunner().query(conn,
+                    "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = CORPUS AND path=?",
+                    new MetadataCacheHelper(), toplevelCorpusName, toplevelCorpusName);
+        
+        } catch (SQLException ex) {
+            log.error("Could not list corpus annotations from database", ex);
+            return new LinkedList<>();
         }
-
-        return result;
     }
 
     @Override
@@ -961,34 +909,28 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             throws GraphANNISException {
 
         boolean isToplevel = Objects.equals(toplevelCorpusName, documentName);
-        // select the document and all its parent corpora
-        String aql = isToplevel ? "annis:node_type=\"corpus\" @* annis:node_name=\"" + toplevelCorpusName + "\""
-                : "annis:doc=\"" + documentName + "\" @* annis:node_type=\"corpus\"";
-
-        List<Annotation> result = new LinkedList<>();
-        SCorpusGraph corpusGraph = corpusStorageMgr.corpusGraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL);
-
-        if (corpusGraph == null) {
-            return result;
-        }
-
-        if (!isToplevel) {
-            List<SDocument> documents = corpusGraph.getDocuments();
-            for (SDocument doc : documents) {
-                result.addAll(allAnnotationForCorpus(doc));
-            }
-        }
-
-        if (!exclude || isToplevel) {
-            for (SNode n : corpusGraph.getRoots()) {
-                if (n instanceof SCorpus) {
-                    result.addAll(allAnnotationForCorpus(n));
-                    break;
+        
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
+            if (isToplevel) {
+                return getQueryRunner().query(conn,
+                        "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'CORPUS' AND path=?",
+                        new MetadataCacheHelper(), toplevelCorpusName, toplevelCorpusName);
+            } else {
+                if(exclude) {
+                    return getQueryRunner().query(conn,
+                            "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'DOCUMENT' AND path LIKE ?",
+                            new MetadataCacheHelper(), toplevelCorpusName, "%/" + documentName);
+                } else {
+                    return getQueryRunner().query(conn,
+                            "SELECT * FROM metadata_cache WHERE corpus = ? AND "
+                            + "((\"type\" = 'DOCUMENT' AND path LIKE ?') OR (\"type\"= 'CORPUS' AND path = ?))",
+                            new MetadataCacheHelper(), toplevelCorpusName, "%/" + documentName, toplevelCorpusName);
                 }
             }
+        } catch (SQLException ex) {
+            log.error("Could not list corpus annotations from database", ex);
+            return new LinkedList<>();
         }
-
-        return result;
     }
 
     @Override

@@ -115,6 +115,14 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
                     delStmt.executeUpdate();
                 }
             }
+            
+            log.info("deleting metadata_cache table entries");
+            try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM metadata_cache WHERE corpus=?")) {
+                for (String n : names) {
+                    delStmt.setString(1, n);
+                    delStmt.executeUpdate();
+                }
+            }
 
             log.info("deleting texts");
             for (String corpusName : names) {

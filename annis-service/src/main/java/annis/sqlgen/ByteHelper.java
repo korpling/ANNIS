@@ -11,11 +11,6 @@ import annis.service.objects.AnnisBinaryMetaData;
 
 public class ByteHelper implements ResultSetHandler<AnnisBinaryMetaData> {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ByteHelper.class);
-
-    private static final int[] ARG_TYPES = new int[] { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR,
-            Types.VARCHAR };
-
     public static final String SQL = "SELECT\n" + "filename, title, mime_type\n" + "FROM media_files\n" + "WHERE\n"
             + "  corpus_path = ? AND\n" + "  (? IS NULL OR mime_type = ?) AND \n" + "  (? IS NULL OR title = ?)";;
 

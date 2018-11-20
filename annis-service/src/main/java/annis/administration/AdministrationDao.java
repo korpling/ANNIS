@@ -51,12 +51,17 @@ import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.corpus_tools.graphannis.CorpusStorageManager.ImportFormat;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
+import org.corpus_tools.salt.common.SCorpus;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multimap;
@@ -221,6 +226,10 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private final Table annotationsTable = new Table("annotations").c(new Column("corpus").createIndex())
             .c(new Column("name").createIndex()).c("value").c("type").c("sub_type").c("edge_name");
 
+    private final Table metaDataCache = new Table("metadata_cache").c(new Column("corpus").createIndex())
+            .c(new Column("path").createIndex()).c(new Column("type").createIndex()).c("namespace").c("name")
+            .c("value");
+
     private final Table mediaFilesTable = new Table("media_files").c(new Column("filename").unique())
             .c(new Column("corpus_path").createIndex()).c(new Column("mime_type").createIndex())
             .c(new Column("title").createIndex());
@@ -343,6 +352,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
 
         analyzeTextTable(toplevelCorpusName);
+        generateMetadataCache(toplevelCorpusName);
         generateAnnotationsTable(toplevelCorpusName);
         generateExampleQueries(toplevelCorpusName);
 
@@ -373,6 +383,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             createTableIfNotExists(DB.CORPUS_REGISTRY, corpusAliasTable, null, null);
             createTableIfNotExists(DB.CORPUS_REGISTRY, textTable, null, null);
             createTableIfNotExists(DB.CORPUS_REGISTRY, annotationsTable, null, null);
+            createTableIfNotExists(DB.CORPUS_REGISTRY, metaDataCache, null, null);
 
         } catch (SQLException ex) {
             log.error("Can not create SQL schema", ex);
@@ -656,6 +667,45 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             }
 
         } catch (SQLException ex) {
+            log.error("Cannot generate annotations table", ex);
+        }
+    }
+
+    private void generateMetadataCache(String corpusName) {
+        log.info("Generating metadata_cache table for corpus {}", corpusName);
+
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
+            SCorpusGraph corpusGraph = getQueryDao().getCorpusStorageManager().corpusGraph(corpusName);
+
+            // cache these entries in the metadata_cache table
+            PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO metadata_cache(corpus, path, type, namespace, name, value) VALUES (?,?,?,?,?,?)");
+
+            for (SCorpus corpus : corpusGraph.getCorpora()) {
+                for (SMetaAnnotation anno : corpus.getMetaAnnotations()) {
+                    stmt.setString(1, corpusName);
+                    stmt.setString(2, Joiner.on('/').join(corpus.getPath().segmentsList()));
+                    stmt.setString(3, "CORPUS");
+                    stmt.setString(4, anno.getNamespace());
+                    stmt.setString(5, anno.getName());
+                    stmt.setString(6, anno.getValue_STEXT());
+                    stmt.executeUpdate();
+                }
+            }
+
+            for (SDocument document : corpusGraph.getDocuments()) {
+                for (SMetaAnnotation anno : document.getMetaAnnotations()) {
+                    stmt.setString(1, corpusName);
+                    stmt.setString(2, Joiner.on('/').join(document.getPath().segmentsList()));
+                    stmt.setString(3, "DOCUMENT");
+                    stmt.setString(4, anno.getNamespace());
+                    stmt.setString(5, anno.getName());
+                    stmt.setString(6, anno.getValue_STEXT());
+                    stmt.executeUpdate();
+                }
+            }
+
+        } catch (SQLException | GraphANNISException ex) {
             log.error("Cannot generate annotations table", ex);
         }
     }

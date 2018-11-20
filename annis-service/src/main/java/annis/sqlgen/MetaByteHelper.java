@@ -11,12 +11,6 @@ import org.slf4j.LoggerFactory;
 public class MetaByteHelper extends AbstractListHandler<AnnisBinaryMetaData>
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaByteHelper.class);
-  
-  private static final int[] ARG_TYPES = new int [] {
-    Types.VARCHAR
-  };
-  
 
   public static final String SQL =
         "SELECT\n"
