@@ -26,6 +26,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLType;
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -694,7 +696,11 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                     stmt.setString(1, corpusName);
                     stmt.setString(2, Joiner.on('/').join(corpus.getPath().segmentsList()));
                     stmt.setString(3, "CORPUS");
-                    stmt.setString(4, anno.getNamespace());
+                    if(anno.getNamespace() == null || anno.getNamespace().isEmpty()) {
+                        stmt.setNull(4, Types.VARCHAR);
+                    } else {
+                        stmt.setString(4, anno.getNamespace());
+                    }
                     stmt.setString(5, anno.getName());
                     stmt.setString(6, anno.getValue_STEXT());
                     stmt.executeUpdate();
@@ -716,7 +722,11 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                     stmt.setString(1, corpusName);
                     stmt.setString(2, Joiner.on('/').join(document.getPath().segmentsList()));
                     stmt.setString(3, "DOCUMENT");
-                    stmt.setString(4, anno.getNamespace());
+                    if(anno.getNamespace() == null || anno.getNamespace().isEmpty()) {
+                        stmt.setNull(4, Types.VARCHAR);
+                    } else {
+                        stmt.setString(4, anno.getNamespace());
+                    }
                     stmt.setString(5, anno.getName());
                     stmt.setString(6, anno.getValue_STEXT());
                     stmt.executeUpdate();
