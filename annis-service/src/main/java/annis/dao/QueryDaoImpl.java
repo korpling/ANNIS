@@ -807,6 +807,15 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 }
             }
         }
+        
+        List<String> segmentationNames = listSegmentationNames(corpusList);
+        for(String s : segmentationNames) {
+            AnnisAttribute att = new AnnisAttribute();
+            att.setType(Type.segmentation);
+            att.setSubtype(SubType.unknown);
+            att.setName(s);
+            result.add(att);
+        }
 
         return result;
     }
@@ -829,8 +838,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         return result;
     }
 
-    @Override
-    public List<String> listSegmentationNames(List<String> corpusList) {
+    private List<String> listSegmentationNames(List<String> corpusList) {
         LinkedList<String> result = new LinkedList<>();
         for (String corpus : corpusList) {
             for (Component orderRelComponent : corpusStorageMgr.getAllComponentsByType(corpus,

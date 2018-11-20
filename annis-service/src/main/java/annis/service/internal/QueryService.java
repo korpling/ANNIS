@@ -57,9 +57,9 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.corpus_tools.graphannis.model.NodeDesc;
 import org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
+import org.corpus_tools.graphannis.model.NodeDesc;
 import org.corpus_tools.salt.common.SaltProject;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.slf4j.Logger;
@@ -74,10 +74,10 @@ import annis.CommonHelper;
 import annis.ServiceConfig;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
-import annis.model.QueryNode;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisAttribute.Type;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
@@ -528,8 +528,16 @@ public class QueryService {
 
         Subject user = SecurityUtils.getSubject();
         user.checkPermission("query:annotations:" + toplevelCorpus);
+        
+        List<AnnisAttribute> cachedAttributes = getQueryDao().listAnnotationsFromCache(Arrays.asList(toplevelCorpus));
+        LinkedList<String> segmentations = new LinkedList<>();
+        for(AnnisAttribute att : cachedAttributes) {
+            if(att.getType() == Type.segmentation) {
+                segmentations.add(att.getName());
+            }
+        }
 
-        return new SegmentationList(getQueryDao().listSegmentationNames(Arrays.asList(toplevelCorpus)));
+        return new SegmentationList(segmentations);
 
     }
 

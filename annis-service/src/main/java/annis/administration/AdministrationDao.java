@@ -219,8 +219,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             .c("text");
 
     private final Table annotationsTable = new Table("annotations").c(new Column("corpus").createIndex())
-            .c(new Column("name").createIndex())
-            .c("value").c("type").c("sub_type").c("edge_name");
+            .c(new Column("name").createIndex()).c("value").c("type").c("sub_type").c("edge_name");
 
     private final Table mediaFilesTable = new Table("media_files").c(new Column("filename").unique())
             .c(new Column("corpus_path").createIndex()).c(new Column("mime_type").createIndex())
@@ -620,31 +619,43 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             }
         }
     }
-    
+
     private void generateAnnotationsTable(String corpusName) {
         log.info("Generating annotations table for corpus {}", corpusName);
-        
+
         // list annotations with most-used value in graphANNIS
         List<AnnisAttribute> attributes = getQueryDao().listAnnotations(Arrays.asList(corpusName), true, true);
-        
-        try(Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
+
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
             // cache these entries in the annotation table
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO annotations VALUES (?,?,?,?,?,?)");
-            
-            for(AnnisAttribute a : attributes) {
-                for(String val : a.getValueSet()) {
+
+            for (AnnisAttribute a : attributes) {
+                if (a.getValueSet().isEmpty()) {
                     stmt.setString(1, corpusName);
                     stmt.setString(2, a.getName());
-                    stmt.setString(3, val);
-                    stmt.setString(4,  a.getType().name());
+                    stmt.setString(3, null);
+                    stmt.setString(4, a.getType().name());
                     stmt.setString(5, a.getSubtype().toString());
                     stmt.setString(6, a.getEdgeName());
-                    
+
                     stmt.executeUpdate();
+
+                } else {
+                    for (String val : a.getValueSet()) {
+                        stmt.setString(1, corpusName);
+                        stmt.setString(2, a.getName());
+                        stmt.setString(3, val);
+                        stmt.setString(4, a.getType().name());
+                        stmt.setString(5, a.getSubtype().toString());
+                        stmt.setString(6, a.getEdgeName());
+
+                        stmt.executeUpdate();
+                    }
                 }
             }
-            
-        } catch(SQLException ex) {
+
+        } catch (SQLException ex) {
             log.error("Cannot generate annotations table", ex);
         }
     }

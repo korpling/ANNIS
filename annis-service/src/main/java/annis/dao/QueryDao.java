@@ -64,8 +64,6 @@ public interface QueryDao {
 
     public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) throws GraphANNISException;
 
-    public List<String> listSegmentationNames(List<String> corpusList);
-
     /**
      * Gets annotations of corpora.
      *
