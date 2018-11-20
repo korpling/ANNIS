@@ -216,29 +216,29 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private final QueriesGenerator queriesGenerator;
 
     private final Table resolverTable = new Table(FILE_RESOLVER_VIS_MAP)
-            .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c(new Column("corpus").createIndex())
+            .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c("corpus").index("corpus")
             .c("version").c("namespace").c("element").c(new Column("vis_type").notNull())
             .c(new Column("display_name").notNull()).c("visibility").c_int("order").c("mappings");
 
-    private final Table textTable = new Table("text").c(new Column("corpus_path").createIndex()).c_int("id").c("name")
+    private final Table textTable = new Table("text").c("corpus_path").index("corpus_path").c_int("id").c("name")
             .c("text");
 
-    private final Table annotationsTable = new Table("annotations").c(new Column("corpus").createIndex())
-            .c(new Column("name").createIndex()).c("value").c("type").c("sub_type").c("edge_name");
+    private final Table annotationsTable = new Table("annotations").c("corpus").index("corpus")
+            .c("name").index("name").c("value").c("type").c("sub_type").c("edge_name");
 
-    private final Table metaDataCache = new Table("metadata_cache").c(new Column("corpus").createIndex())
-            .c(new Column("path").createIndex()).c(new Column("type").createIndex()).c("namespace").c("name")
-            .c("value");
+    private final Table metaDataCache = new Table("metadata_cache").c("corpus").index("corpus")
+            .c("path").c("type").c("namespace").c("name")
+            .c("value").index("corpus", "type", "path").index("corpus", "type").index("corpus", "path");
 
     private final Table mediaFilesTable = new Table("media_files").c(new Column("filename").unique())
-            .c(new Column("corpus_path").createIndex()).c(new Column("mime_type").createIndex())
-            .c(new Column("title").createIndex());
+            .c("corpus_path").index("corpus_path").c("mime_type").index("mime_type")
+            .c("title").index("title");
 
     private final Table repositoryMetaDataTable = new Table("repository_metadata").c(new Column("name").unique())
             .c("value");
 
     private final Table urlShortenerTable = new Table("url_shortener").c(new Column("id").primaryKey()).c("owner")
-            .c("created").c(new Column("url").createIndex());
+            .c("created").c("url").index("url");
 
     private final Table exampleQueriesTable = new Table(EXAMPLE_QUERIES_TAB)
             .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c(new Column("example_query").notNull())
@@ -247,7 +247,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private final Table userConfigTable = new Table("user_config").c(new Column("id").primaryKey()).c("config");
 
     private final Table corpusAliasTable = new Table("corpus_alias").c(new Column("alias").primaryKey())
-            .c(new Column("corpus").createIndex());
+            .c("corpus").index("corpus");
 
     private final Table corpusInfoTable = new Table("corpus_info").c(new Column("name").primaryKey()).c_int("docs")
             .c_int("tokens").c("source_path");
@@ -638,6 +638,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         List<AnnisAttribute> attributes = getQueryDao().listAnnotations(Arrays.asList(corpusName), true, true);
 
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
+            conn.setAutoCommit(false);
+            
             // cache these entries in the annotation table
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO annotations VALUES (?,?,?,?,?,?)");
 
@@ -665,6 +667,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                     }
                 }
             }
+            
+            conn.commit();
 
         } catch (SQLException ex) {
             log.error("Cannot generate annotations table", ex);
@@ -675,12 +679,15 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         log.info("Generating metadata_cache table for corpus {}", corpusName);
 
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
+            conn.setAutoCommit(false);
+            
             SCorpusGraph corpusGraph = getQueryDao().getCorpusStorageManager().corpusGraph(corpusName);
 
+            
             // cache these entries in the metadata_cache table
             PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO metadata_cache(corpus, path, type, namespace, name, value) VALUES (?,?,?,?,?,?)");
-
+            
             for (SCorpus corpus : corpusGraph.getCorpora()) {
                 for (SMetaAnnotation anno : corpus.getMetaAnnotations()) {
                     stmt.setString(1, corpusName);
@@ -704,6 +711,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                     stmt.executeUpdate();
                 }
             }
+            
+            conn.commit();
 
         } catch (SQLException | GraphANNISException ex) {
             log.error("Cannot generate annotations table", ex);

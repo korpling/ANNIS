@@ -14,15 +14,18 @@ public class Table implements Serializable {
 
     private final String name;
     private final ArrayList<Column> columns;
+    private final ArrayList<ArrayList<Column>> indexes;
 
     public Table(String name) {
         this.name = name;
         this.columns = new ArrayList<>();
+        this.indexes = new ArrayList<>();
     }
 
     public Table(Table orig) {
         this.name = orig.name;
         this.columns = new ArrayList<>(orig.columns);
+        this.indexes = new ArrayList<>(orig.indexes);
     }
 
     public Table c(Column column) {
@@ -64,6 +67,24 @@ public class Table implements Serializable {
     public Table c_int_uniq(String name) {
         return c(name, Column.Type.INTEGER, true);
     }
+    
+    public Table index(String... columnNames) {
+        Table copy = new Table(this);
+        
+        ArrayList<Column> idx = new ArrayList<>();
+        for(String cname : columnNames) {
+            for(Column c : copy.columns) {
+                if(cname.equals(c.getName())) {
+                    idx.add(c);
+                    break;
+                }
+            }
+        }
+        if(!idx.isEmpty()) {
+            copy.indexes.add(idx);
+        }
+        return copy;
+    }
 
     public ArrayList<Column> getColumns() {
         return new ArrayList<>(columns);
@@ -78,15 +99,9 @@ public class Table implements Serializable {
         }
         return result;
     }
-
-    public ArrayList<Column> getIndexedColumns() {
-        ArrayList<Column> result = new ArrayList<>(columns.size());
-        for (Column c : columns) {
-            if (c.isCreateIndex()) {
-                result.add(c);
-            }
-        }
-        return result;
+    
+    public ArrayList<ArrayList<Column>> getIndexes() {
+        return this.indexes;
     }
 
     public String getName() {
