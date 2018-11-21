@@ -66,7 +66,6 @@ public class BenchmarkTest {
     @Rule
     public TestRule benchmarkRun = new BenchmarkRule();
 
-    @Resource(name = "queryDao")
     QueryDao annisDao;
 
     private List<AnnisCorpus> pcc2Corpus;
@@ -79,8 +78,8 @@ public class BenchmarkTest {
     private final MediaType typeXMI = new MediaType("application", "xmi+xml");
 
     @Before
-    public void setup() {
-        QueryDaoImpl springAnnisDao = (QueryDaoImpl) annisDao;
+    public void setup() throws GraphANNISException {
+        annisDao = QueryDaoImpl.create();
 
         // get the id of the "pcc2" corpus
         pcc2Corpus = getExistingCorpora("pcc2");

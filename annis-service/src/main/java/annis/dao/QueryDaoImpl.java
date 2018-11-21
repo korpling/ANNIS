@@ -185,10 +185,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         return result;
     }
-    
+
     @Override
     public List<Annotation> listDocuments(String toplevelCorpusName) {
-        
+
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             return getQueryRunner().query(conn,
                     "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'DOCUMENT' AND namespace = 'annis' AND \"name\"='doc'",
@@ -680,7 +680,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         } catch (SQLException ex) {
             log.error("Listing corpora failed", ex);
         }
-        ;
         return new LinkedList<>();
     }
 
@@ -893,7 +892,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             return getQueryRunner().query(conn,
                     "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = CORPUS AND path=?",
                     new MetadataCacheHelper(), toplevelCorpusName, toplevelCorpusName);
-        
+
         } catch (SQLException ex) {
             log.error("Could not list corpus annotations from database", ex);
             return new LinkedList<>();
@@ -905,21 +904,21 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             throws GraphANNISException {
 
         boolean isToplevel = Objects.equals(toplevelCorpusName, documentName);
-        
+
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             if (isToplevel) {
                 return getQueryRunner().query(conn,
                         "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'CORPUS' AND path=?",
                         new MetadataCacheHelper(), toplevelCorpusName, toplevelCorpusName);
             } else {
-                if(exclude) {
+                if (exclude) {
                     return getQueryRunner().query(conn,
                             "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'DOCUMENT' AND path LIKE ?",
                             new MetadataCacheHelper(), toplevelCorpusName, "%/" + documentName);
                 } else {
                     return getQueryRunner().query(conn,
                             "SELECT * FROM metadata_cache WHERE corpus = ? AND "
-                            + "((\"type\" = 'DOCUMENT' AND path LIKE ?') OR (\"type\"= 'CORPUS' AND path = ?))",
+                                    + "((\"type\" = 'DOCUMENT' AND path LIKE ?') OR (\"type\"= 'CORPUS' AND path = ?))",
                             new MetadataCacheHelper(), toplevelCorpusName, "%/" + documentName, toplevelCorpusName);
                 }
             }

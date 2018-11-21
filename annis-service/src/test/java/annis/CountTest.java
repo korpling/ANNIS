@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
 import annis.service.objects.AnnisCorpus;
 
 
@@ -44,7 +45,6 @@ public class CountTest {
 
     Logger log = LoggerFactory.getLogger(CountTest.class);
 
-    @Resource(name = "queryDao")
     QueryDao annisDao;
 
     private List<String> pcc2CorpusID;
@@ -52,7 +52,9 @@ public class CountTest {
     private List<String> tiger2CorpusID;
 
     @Before
-    public void setup() {
+    public void setup() throws GraphANNISException {
+        
+        annisDao = QueryDaoImpl.create();
         
         // get the id of the "pcc2" corpus
         pcc2CorpusID = getCorpusIDs("pcc2");

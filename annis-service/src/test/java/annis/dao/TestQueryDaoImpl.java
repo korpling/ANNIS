@@ -33,8 +33,6 @@ import annis.sqlgen.ListCorpusSqlHelper;
 
 public class TestQueryDaoImpl {
 
-    @Resource(name = "queryDao")
-    private QueryDao queryDaoBean;
 
     // simple SpringDao instance with mocked dependencies
     private QueryDaoImpl queryDao;
@@ -49,10 +47,6 @@ public class TestQueryDaoImpl {
     @Before
     public void setup() throws GraphANNISException {
         initMocks(this);
-
-        queryDao = new QueryDaoImpl();
-
-
     }
     @Test
     public void getDefaultDocBrowserConfiguration() {
