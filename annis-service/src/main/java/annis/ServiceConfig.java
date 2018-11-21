@@ -58,4 +58,12 @@ public interface ServiceConfig extends Config {
     @DefaultValue("true")
     boolean browseDocuments();
     
+    @Key("max-corpus-cache-size")
+    @DefaultValue("-1")
+    long maxCorpusCacheSize();
+    
+    @Key("parallel-query-execution")
+    @DefaultValue("true")
+    boolean parallelQueryExecution();
+    
 }

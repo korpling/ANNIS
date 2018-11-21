@@ -371,9 +371,17 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     protected QueryDaoImpl() throws GraphANNISException {
         final File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
-        this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
-                logfile.getAbsolutePath(), true, LogLevel.Info);
-
+        
+        if(cfg.maxCorpusCacheSize() >= 0) {
+            // use the specific maximum size, convert frim MB into Bytes
+            long maxSize = cfg.maxCorpusCacheSize() * 1024 * 1024;
+            this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
+                    logfile.getAbsolutePath(), maxSize, cfg.parallelQueryExecution(), LogLevel.Info);
+        } else {
+            // use automatic mode
+            this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
+                    logfile.getAbsolutePath(), cfg.parallelQueryExecution(), LogLevel.Info);
+        }
         // initialize timeout with value from config (can be overwritten by API)
         this.timeout = cfg.timeout();
 
