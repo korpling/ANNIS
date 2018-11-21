@@ -81,7 +81,7 @@ public class AdminService
   
 
 
-  private ImportWorker importWorker;
+  private final ImportWorker importWorker = new ImportWorker();
 
   @Context
   HttpServletRequest request;
@@ -560,18 +560,6 @@ public class AdminService
       } else {
           return null;
       }
-  }
-
-
-
-  public ImportWorker getImportWorker()
-  {
-    return importWorker;
-  }
-
-  public void setImportWorker(ImportWorker importWorker)
-  {
-    this.importWorker = importWorker;
   }
 
 
