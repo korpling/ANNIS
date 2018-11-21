@@ -31,7 +31,7 @@ import annis.libgui.visualizers.VisualizerInput;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public abstract class AbstractImageVisualizer extends AbstractVisualizer<ImagePanel>
 {

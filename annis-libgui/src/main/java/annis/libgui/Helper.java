@@ -131,10 +131,10 @@ public class Helper {
             .addEscape('%', "%25").build();
 
     /**
-     * Creates an authentificiated REST client
+     * Creates an authenticated REST client
      *
-     * @param userName
-     * @param password
+     * @param userName user name to authenticate with
+     * @param password password to authenticate with
      * @return A newly created client.
      */
     public static Client createRESTClient(String userName, String password) {
@@ -160,7 +160,7 @@ public class Helper {
     }
 
     /**
-     * Create a REST web service client which is not authentificated.
+     * Create a REST web service client which is not authenticated.
      *
      * @return A newly created client.
      */
@@ -608,8 +608,8 @@ public class Helper {
      *
      * Fragments have the form key1=value&key2=test ...
      *
-     * @param fragment
-     * @return
+     * @param fragment fragment to parse
+     * @return a map with the keys and values of the fragment
      */
     public static Map<String, String> parseFragment(String fragment) {
         Map<String, String> result = new TreeMap<String, String>();
@@ -644,8 +644,8 @@ public class Helper {
      * Returns a formatted string containing the type of the exception, the message
      * and the stacktrace.
      *
-     * @param ex
-     * @return
+     * @param ex Exception
+     * @return message
      */
     public static String convertExceptionToMessage(Throwable ex) {
         StringBuilder sb = new StringBuilder();
@@ -682,10 +682,10 @@ public class Helper {
     }
 
     /**
-     * Get the qualified name seperated by a single ":" when a namespace exists.
+     * Get the qualified name separated by a single ":" when a namespace exists.
      *
-     * @param anno
-     * @return
+     * @param anno annotation
+     * @return qualified name
      */
     public static String getQualifiedName(SAnnotation anno) {
         if (anno != null) {
@@ -701,7 +701,7 @@ public class Helper {
     /**
      * Returns true if the right-to-left heuristic should be disabled.
      *
-     * @return
+     * @return True if RTL is disabled
      */
     public static boolean isRTLDisabled() {
         String disableRtl = (String) VaadinSession.getCurrent().getAttribute("disable-rtl");
@@ -713,8 +713,8 @@ public class Helper {
      * "{...}") and the percent character. Both would not be esccaped by jersey
      * and/or would cause an error when this is not a valid template.
      *
-     * @param v
-     * @return
+     * @param v the value
+     * @return encoded value
      */
     public static String encodeJersey(String v) {
         String encoded = jerseyExtraEscape.escape(v);
@@ -722,10 +722,10 @@ public class Helper {
     }
 
     /**
-     * Encodes a String so it can be used as path param.
+     * Encodes a String so it can be used as path parameter.
      *
-     * @param v
-     * @return
+     * @param v value
+     * @return encoded value
      */
     public static String encodePath(String v) {
         String encoded = urlPathEscape.escape(v);
@@ -733,10 +733,10 @@ public class Helper {
     }
 
     /**
-     * Encodes a String so it can be used as query param.
+     * Encodes a String so it can be used as query parameter.
      *
-     * @param v
-     * @return
+     * @param v value
+     * @return encoded value
      */
     public static String encodeQueryParam(String v) {
         String encoded = UrlEscapers.urlFormParameterEscaper().escape(v);
@@ -744,7 +744,7 @@ public class Helper {
     }
 
     /**
-     * Casts a list of Annotations to the Type <code>List<Annotation></code>
+     * Casts a list of Annotations to the Type <code>{@literal List<Annotation>}</code>
      */
     public static class AnnotationListType extends GenericType<List<Annotation>> {
 

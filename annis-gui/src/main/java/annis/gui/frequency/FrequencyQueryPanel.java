@@ -71,7 +71,7 @@ import annis.service.objects.FrequencyTable;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener
 {

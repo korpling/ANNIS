@@ -81,7 +81,7 @@ import annis.service.objects.OrderType;
 /**
  * The view which shows the search interface.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class SearchView extends GridLayout implements View,
   MimeTypeErrorListener,

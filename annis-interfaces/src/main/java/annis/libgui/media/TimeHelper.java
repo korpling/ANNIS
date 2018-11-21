@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Helper class for getting time annotations on {@link SSpan} from
  * the covered token.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class TimeHelper
 {

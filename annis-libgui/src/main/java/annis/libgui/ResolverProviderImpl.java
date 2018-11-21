@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class ResolverProviderImpl implements ResolverProvider, Serializable
 {

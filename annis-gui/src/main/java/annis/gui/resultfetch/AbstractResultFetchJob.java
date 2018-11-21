@@ -25,7 +25,7 @@ import org.corpus_tools.salt.common.SaltProject;
 /**
  * Asks for salt graphs for a given {@link MatchGroup}.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public abstract class AbstractResultFetchJob
 {

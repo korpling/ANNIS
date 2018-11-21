@@ -36,7 +36,7 @@ import org.corpus_tools.salt.core.SNode;
  * <p>Description:
  * <code>search for the word "der"</code></p>
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class AutoTokQuery extends AbstractAutoQuery
 {

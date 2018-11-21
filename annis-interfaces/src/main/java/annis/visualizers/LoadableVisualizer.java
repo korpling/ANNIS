@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * A visualizer that can callback their owners when they are loaded.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface LoadableVisualizer
 {
@@ -28,7 +28,10 @@ public interface LoadableVisualizer
 
   public void clearCallbacks();
 
-  /** Return true if visualizer is ready. */
+  /** Returns if the visualizer is ready. 
+   *
+   * @return True if loaded.
+   */
   public boolean isLoaded();
 
   public interface Callback extends Serializable

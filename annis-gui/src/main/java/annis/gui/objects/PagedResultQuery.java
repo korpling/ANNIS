@@ -25,7 +25,7 @@ import annis.service.objects.OrderType;
 /**
  * Parameters for a query that shows the result to the user
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class PagedResultQuery extends ContextualizedQuery
 {  

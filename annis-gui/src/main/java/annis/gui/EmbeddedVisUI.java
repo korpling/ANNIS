@@ -79,7 +79,7 @@ import annis.visualizers.htmlvis.HTMLVis;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Theme("annis_embeddedvis")
 @Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)

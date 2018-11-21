@@ -19,7 +19,7 @@ import java.util.Objects;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ContextualizedQuery extends Query
 {

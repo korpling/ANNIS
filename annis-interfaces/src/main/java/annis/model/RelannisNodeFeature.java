@@ -23,7 +23,7 @@ import org.corpus_tools.salt.core.SNode;
 
 /**
  * Common Features included in the Salt graph that are available
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * 
  * @deprecated 
  */
@@ -159,7 +159,7 @@ public class RelannisNodeFeature implements Serializable
 
   /**
    * Returns the number of the query node if matched or null if otherwise.
-   * @return 
+   * @return matched node number
    */
   public Long getMatchedNode()
   {

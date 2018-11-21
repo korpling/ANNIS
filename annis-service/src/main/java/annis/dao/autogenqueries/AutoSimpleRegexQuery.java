@@ -37,7 +37,7 @@ import org.corpus_tools.salt.core.SNode;
  * <p>Description:
  * <code>Search for the "sie" with upper or lower-case 's' (regular expression)</code></p>
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class AutoSimpleRegexQuery extends AbstractAutoQuery
 {

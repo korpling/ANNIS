@@ -66,8 +66,8 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * nodes which carry this annotation are searched for pointing relations and
  * instead of the token span the annotation value is used.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels{@literal <b.pixeldrama@gmail.com>}
  * @author Kim Gerdes
  */
 @PluginImplementation

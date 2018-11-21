@@ -21,7 +21,7 @@ import net.xeoh.plugins.base.Plugin;
 /**
  * Offers a annis-gui wide interface for controlling pdf viewer.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public interface PDFController extends Plugin, Serializable
 {

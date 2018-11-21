@@ -65,7 +65,7 @@ import org.corpus_tools.salt.core.SRelation;
  * the default tokens.
  * </p>
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @PluginImplementation
 public class TigerTreeVisualizer extends AbstractImageVisualizer

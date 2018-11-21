@@ -167,7 +167,7 @@ public class QueryNode implements Serializable
   
   /**
    * Copy constructor
-   * @param other 
+   * @param other other node to copy from
    */
   public QueryNode(QueryNode other)
   {
@@ -181,8 +181,8 @@ public class QueryNode implements Serializable
   
   /**
    * Copy constructor that allows to change the ID.
-   * @param newId
-   * @param other 
+   * @param newId new ID
+   * @param other other node to copy from 
    */
   public QueryNode(long newId, QueryNode other)
   {
@@ -442,7 +442,7 @@ public class QueryNode implements Serializable
 
   /**
    * Returns if this query node was artificially created by some normalization process.
-   * @return 
+   * @return True if artificially created.
    */
   public boolean isArtificial()
   {
@@ -456,7 +456,7 @@ public class QueryNode implements Serializable
 
   /**
    * If set return the number of the (normalized) alternative this node belongs to.
-   * @return 
+   * @return the number of the alternative
    */
   public Integer getAlternativeNumber()
   {

@@ -54,7 +54,7 @@ import annis.test.TestHelper;
 /**
  * This will execute tests on a real database and check if the counts are OK.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @BenchmarkOptions(callgc = false, benchmarkRounds = 5, warmupRounds = 5)
 @BenchmarkMethodChart(filePrefix = "annis-benchmark")

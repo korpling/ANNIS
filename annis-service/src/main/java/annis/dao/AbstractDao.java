@@ -48,7 +48,7 @@ import au.com.bytecode.opencsv.CSVReader;
 /**
  * Common functions used by all data access objects.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public abstract class AbstractDao extends DBProvider {
     private final static Logger log = LoggerFactory.getLogger(AbstractDao.class);

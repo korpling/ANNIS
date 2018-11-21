@@ -32,7 +32,7 @@ import org.json.JSONException;
  * An video/audio player based on the medialement.js library
  * ({@link http://mediaelementjs.com/})
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @JavaScript(
 {

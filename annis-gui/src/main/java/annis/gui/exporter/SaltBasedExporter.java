@@ -70,7 +70,7 @@ import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 /**
  * An abstract base class for exporters that use Salt subgraphs to produce
  * some kind of textual output.
- * @author Thomas Krause <thomaskrause@posteo.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 
 @IgnoreSizeOf 

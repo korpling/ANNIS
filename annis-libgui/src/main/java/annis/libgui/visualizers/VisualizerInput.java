@@ -34,7 +34,7 @@ import annis.service.objects.RawTextWrapper;
 /**
  * Contains all needed data for a visualizer to perform the visualization.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class VisualizerInput implements Serializable
 {

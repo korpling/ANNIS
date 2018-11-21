@@ -24,7 +24,7 @@ import org.corpus_tools.salt.core.SRelation;
 /**
  * Common Features included in the Salt graph that are available
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * 
  * @deprecated 
  */
@@ -64,7 +64,7 @@ public class RelannisEdgeFeature implements Serializable
    * The pre order inside of the corresponding artificial relANNIS component if
    * this was a dominance relation.
    *
-   * @return
+   * @return pre-order
    */
   public Long getArtificialDominancePre()
   {
@@ -80,7 +80,7 @@ public class RelannisEdgeFeature implements Serializable
    * The ID of the corresponding artificial relANNIS component if this was a
    * dominance relation.
    *
-   * @return
+   * @return component ID
    */
   public Long getArtificialDominanceComponent()
   {

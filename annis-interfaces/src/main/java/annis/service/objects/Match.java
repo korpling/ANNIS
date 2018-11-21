@@ -41,7 +41,7 @@ import com.google.common.escape.Escapers;
 /**
  * Represents a single match of an AQL query.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @XmlRootElement
 @XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)
@@ -106,7 +106,7 @@ public class Match implements Serializable
 
   /**
    * Get Salt IDs of the nodes that are part of the match.
-   * @return 
+   * @return a list of IDs as URI
    */
   @XmlElement(name="id")
   public List<URI> getSaltIDs()
@@ -116,7 +116,7 @@ public class Match implements Serializable
 
   /**
    * @see #getSaltIDs() 
-   * @param saltIDs 
+   * @param saltIDs the list of IDs as URI
    */
   public void setSaltIDs(List<URI> saltIDs)
   {
@@ -127,7 +127,7 @@ public class Match implements Serializable
    * Get the fully qualified annotation matched annotation names.
    * This list must be the same size as {@link #getSaltIDs() }.
    * If no annotation is matched, the list contains an entry with an empty string.
-   * @return 
+   * @return list of annotation names
    */
   @XmlElement(name="anno")
   public List<String> getAnnos()
@@ -249,8 +249,8 @@ public class Match implements Serializable
   }
 
   /**
-   * Returns a space seperated list of all Salt IDs.
-   * @return 
+   * Returns a space separated list of all Salt IDs.
+   * @return list of IDs as string
    */
   @Override
   public String toString()

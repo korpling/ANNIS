@@ -31,7 +31,7 @@ import org.corpus_tools.salt.core.SRelation;
 
 /**
  *
- * @author Thomas Krause <thomaskrause@posteo.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class SubgraphExtractor implements GraphTraverseHandler
 {

@@ -31,7 +31,7 @@ import annis.service.objects.AnnisCorpus;
 /**
  * Contains common functions used in the different adminstration DAOs
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public abstract class AbstractAdminstrationDao extends AbstractDao
 {

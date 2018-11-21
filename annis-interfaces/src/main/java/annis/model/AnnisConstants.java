@@ -26,7 +26,7 @@ public class AnnisConstants
 
   /**
    * Comma-sperated list of matched node Salt-IDs. Feature is applied to
-   * {@link SDocument}.
+   * instances of the SDocument class.
    */
   public static final String FEAT_MATCHEDIDS = "matchedids";
   
@@ -34,13 +34,13 @@ public class AnnisConstants
    * Comma-sperated list of matched annotations. 
    * If the node itself and not an annotation was matched the string is empty.
    * 
-   * Feature is applied to {@link SDocument}.
+   * Feature is applied to instances of the SDocument class
    */
   public static final String FEAT_MATCHEDANNOS = "matchedannos";
 
   /**
    * The number of the query node if matched. Feature is applied to
-   * {@link SNode} and {@link SAnnotation}.
+   * {instances of the SNode and SAnnotation classes.
    */
   public static final String FEAT_MATCHEDNODE = "matchednode";
   

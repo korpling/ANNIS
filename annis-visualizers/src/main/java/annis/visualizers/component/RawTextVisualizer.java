@@ -46,7 +46,7 @@ import org.corpus_tools.salt.common.SaltProject;
  * alignment of multiple text, e. g. for parralel corpora it is a convenient
  * visualization<./p>
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @PluginImplementation
 public class RawTextVisualizer extends AbstractVisualizer<Panel> {

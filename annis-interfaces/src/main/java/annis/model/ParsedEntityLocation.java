@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * The location of some entity in the query when it was parsed.
  * Can be used to define e.g. error locations.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @XmlRootElement
 public class ParsedEntityLocation implements Serializable

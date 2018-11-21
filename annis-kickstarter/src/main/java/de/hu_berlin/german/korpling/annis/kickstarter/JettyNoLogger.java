@@ -20,7 +20,7 @@ import org.eclipse.jetty.util.log.Logger;
 /**
  * A "logger" for Jetty that does not log anything.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class JettyNoLogger implements Logger {
 

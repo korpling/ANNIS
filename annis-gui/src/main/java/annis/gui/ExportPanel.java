@@ -58,7 +58,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ExportPanel extends GridLayout
 {

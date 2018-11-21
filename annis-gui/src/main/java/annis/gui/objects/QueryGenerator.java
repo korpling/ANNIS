@@ -26,7 +26,7 @@ import annis.service.objects.OrderType;
 
 /**
  * Helper class to construct new {@link Query} objects (or one of the child classes)
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @param <T> The type of the class to generate
  * @param <QG> The final type of the generator
  */

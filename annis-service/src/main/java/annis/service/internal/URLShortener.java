@@ -44,7 +44,7 @@ import annis.dao.ShortenerDao;
  * The frontend is able to decode it's state using URL query parameters and fragments.
  * Unfortunally these can get quite long so this service allows to shorten
  * these URLs to a unique ID which is stored in a special table in the database.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Path("annis/shortener")
 public class URLShortener

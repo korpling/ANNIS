@@ -24,7 +24,7 @@ import com.vaadin.shared.ui.Connect;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Connect(AutoHeightIFrame.class)
 public class AutoHeightIFrameConnector extends AbstractComponentConnector

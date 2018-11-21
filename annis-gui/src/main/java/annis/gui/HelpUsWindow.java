@@ -33,7 +33,7 @@ import annis.libgui.IDGenerator;
 /**
  * A window displaying an invitation to participate in the development of ANNIS.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class HelpUsWindow extends Window
 {

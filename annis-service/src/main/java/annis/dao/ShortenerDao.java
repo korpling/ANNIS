@@ -31,7 +31,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * A DAO for retrieving and adding URL shortener information from the database.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ShortenerDao extends AbstractDao {
 

@@ -63,8 +63,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Utilities class for non-gui operations.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class CommonHelper {
 
@@ -79,8 +79,7 @@ public class CommonHelper {
      *
      * </p>
      *
-     * @param str
-     *                The string to be checked.
+     * @param str The string to be checked.
      * @return returns true, if arabic characters are detected.
      */
     public static boolean containsRTLText(String str) {
@@ -317,8 +316,9 @@ public class CommonHelper {
      * Finds the {@link STextualDS} for a given node. The node must dominate a token
      * of this text.
      *
-     * @param node
-     * @return
+     * @param node Salt node to find the textual data source for
+     * @param graph document graph
+     * @return textual datasource or null if not connected to one
      */
     public static STextualDS getTextualDSForNode(SNode node, SDocumentGraph graph) {
         if (node != null) {
@@ -339,8 +339,8 @@ public class CommonHelper {
      * Returns a file name that is safe to use and does not have any invalid
      * characters.
      *
-     * @param orig
-     * @return
+     * @param orig original file name
+     * @return encoded file name
      */
     public static String getSafeFileName(String orig) {
         if (orig != null) {
@@ -353,7 +353,7 @@ public class CommonHelper {
     /**
      * Gets all names of a corpus from a salt project.
      *
-     * @param p
+     * @param p Salt project
      * @return returns an empty list if project is empty or null.
      */
     public static Set<String> getToplevelCorpusNames(SaltProject p) {
@@ -376,10 +376,9 @@ public class CommonHelper {
      * Takes a map of salt node IDs to a value and return a new map that uses the
      * SNodes as keys instead of the IDs.
      *
-     * @param       <V>
-     * @param map
-     * @param graph
-     * @return
+     * @param map Map of node IDs
+     * @param graph document graph
+     * @return map with SNodes as key
      */
     public static <V> Map<SNode, V> createSNodeMapFromIDs(Map<String, V> map, SDocumentGraph graph) {
         HashMap<SNode, V> result = new LinkedHashMap<>();

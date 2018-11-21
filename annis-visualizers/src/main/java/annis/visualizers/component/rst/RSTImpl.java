@@ -107,7 +107,7 @@ import java.util.HashMap;
  * }
  * </pre>
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class RSTImpl extends Panel implements GraphTraverseHandler {
 

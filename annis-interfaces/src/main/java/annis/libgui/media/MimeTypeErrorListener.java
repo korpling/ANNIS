@@ -17,7 +17,7 @@ package annis.libgui.media;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface MimeTypeErrorListener
 {

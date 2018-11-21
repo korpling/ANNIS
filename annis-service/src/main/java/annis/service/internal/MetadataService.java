@@ -38,7 +38,7 @@ import annis.service.objects.AnnisBinaryMetaData;
 
 /**
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Path("annis/meta")
 public class MetadataService

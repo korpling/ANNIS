@@ -67,7 +67,7 @@ import annis.utils.ANNISFormatHelper;
 /**
  * Methods for adminstration.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Path("annis/admin")
 public class AdminService {

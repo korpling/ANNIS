@@ -56,7 +56,7 @@ import annis.service.objects.AnnisCorpus;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @DesignRoot
 public class CorpusBrowserPanel extends Panel {

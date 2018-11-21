@@ -39,7 +39,7 @@ import annis.CommonHelper;
  * </p>
  *
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @author Benjamin Weißenfels <p.pixeldrama@gmail.com>
  */
 public class BinaryImportHelper {

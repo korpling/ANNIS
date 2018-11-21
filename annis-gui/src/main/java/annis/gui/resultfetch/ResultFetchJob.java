@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * A thread that queries for the matches, fetches the the subgraph for the
  * matches and updates the GUI at certain points.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
 {

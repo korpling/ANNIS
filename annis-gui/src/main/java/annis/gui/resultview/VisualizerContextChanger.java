@@ -27,7 +27,7 @@ import org.corpus_tools.salt.common.SaltProject;
  *
  * @see SingleResultPanel
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public interface VisualizerContextChanger extends Serializable
 {

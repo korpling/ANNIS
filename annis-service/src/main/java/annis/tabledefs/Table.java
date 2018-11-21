@@ -6,7 +6,7 @@ import java.util.ArrayList;
 /**
  * A known table definition for SQLite.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  *
  */
 @SuppressWarnings("serial")

@@ -62,8 +62,8 @@ import org.slf4j.LoggerFactory;
  *
  * // TODO cleanup the toplevelCorpus side effects.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class MetaDataPanel extends Panel implements Property.ValueChangeListener {
 

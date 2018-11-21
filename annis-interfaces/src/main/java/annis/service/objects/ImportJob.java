@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Describes an import job.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @XmlRootElement
 public class ImportJob
@@ -64,7 +64,7 @@ public class ImportJob
 
   /**
    * Get the unique identifier of this job.
-   * @return 
+   * @return  the UUID
    */
   public String getUuid()
   {
@@ -73,7 +73,7 @@ public class ImportJob
 
   /**
    * @see #getUuid() 
-   * @param uuid 
+   * @param uuid  the UUID
    */
   public void setUuid(String uuid)
   {
@@ -82,7 +82,7 @@ public class ImportJob
 
   /**
    * Get the directory where the corpora to import are located
-   * @return 
+   * @return a reference to the directory
    */
   @XmlTransient
   public File getImportRootDirectory()
@@ -92,7 +92,7 @@ public class ImportJob
 
   /**
    * @see #getImportRootDirectory() 
-   * @param importRootDirectory 
+   * @param importRootDirectory  the root directory
    */
   public void setImportRootDirectory(File importRootDirectory)
   {
@@ -104,7 +104,7 @@ public class ImportJob
   /**
    * Get the visible caption of the import job.
    * The caption can be e.g. the corpus name.
-   * @return 
+   * @return the caption
    */
   public String getCaption()
   {
@@ -113,7 +113,7 @@ public class ImportJob
 
   /**
    * @see #getCaption() 
-   * @param caption 
+   * @param caption the caption to set
    */
   public void setCaption(String caption)
   {
@@ -122,7 +122,7 @@ public class ImportJob
 
   /**
    * Current status of the import.
-   * @return 
+   * @return the status
    */
   public Status getStatus()
   {
@@ -131,7 +131,7 @@ public class ImportJob
 
   /**
    * @see #getStatus()
-   * @param status 
+   * @param status the status to set
    */
   public void setStatus(Status status)
   {
@@ -140,7 +140,7 @@ public class ImportJob
 
   /**
    * A list of messages that where produces during the import process.
-   * @return 
+   * @return list of messages as string
    */
   @XmlElementWrapper(name = "messages")
   @XmlElement(name="m")
@@ -152,7 +152,7 @@ public class ImportJob
   /**
    * Get if the import is configured in a way that the corpus will be overwritten
    * when it already exists.
-   * @return 
+   * @return True if overwrite configured
    */
   public boolean isOverwrite()
   {
@@ -161,7 +161,7 @@ public class ImportJob
 
   /**
    * @see #isOverwrite() 
-   * @param overwrite 
+   * @param overwrite whether to overwrite an existing corpus
    */
   public void setOverwrite(boolean overwrite)
   {
@@ -170,7 +170,7 @@ public class ImportJob
 
   /**
    * Get the email address to which status reports should be send.
-   * @return 
+   * @return the e-mail status address
    */
   public String getStatusEmail()
   {
@@ -179,7 +179,7 @@ public class ImportJob
 
   /**
    * @see #getStatusEmail() 
-   * @param statusEmail 
+   * @param statusEmail the e-mail status address
    */
   public void setStatusEmail(String statusEmail)
   {
@@ -188,7 +188,7 @@ public class ImportJob
 
   /**
    * Get alias name of the corpus as defined by the import request.
-   * @return 
+   * @return the alias
    */
   public String getAlias()
   {
@@ -197,7 +197,7 @@ public class ImportJob
 
   /**
    * @see #getAlias() 
-   * @param alias 
+   * @param alias the alias
    */
   public void setAlias(String alias)
   {

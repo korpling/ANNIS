@@ -42,7 +42,7 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
  * {@link QueryBuilder} interface and register the new class in the
  * CommonDAO.xml file.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class QueriesGenerator extends DBProvider {
 

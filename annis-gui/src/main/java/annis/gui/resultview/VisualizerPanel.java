@@ -76,8 +76,8 @@ import annis.visualizers.LoadableVisualizer;
  * Controls the visibility of visualizer plugins and provides some control
  * methods for the media visualizers.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  *
  */
 public class VisualizerPanel extends CssLayout

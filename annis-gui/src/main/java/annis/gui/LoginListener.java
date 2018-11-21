@@ -19,7 +19,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface LoginListener extends Serializable
 {

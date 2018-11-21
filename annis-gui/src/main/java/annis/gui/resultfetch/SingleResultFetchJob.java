@@ -38,7 +38,7 @@ import annis.service.objects.SubgraphFilter;
  * @see ResultFetchJob
  * @see LegacyQueryController
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class SingleResultFetchJob extends AbstractResultFetchJob implements
   Callable<SaltProject>

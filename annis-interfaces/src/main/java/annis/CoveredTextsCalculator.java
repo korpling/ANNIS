@@ -32,7 +32,7 @@ import org.corpus_tools.salt.core.SRelation;
 /**
  * Traverses the Salt graph and gets the covered {@link STextualDS} for a list
  * of nodes. 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CoveredTextsCalculator implements GraphTraverseHandler
 {

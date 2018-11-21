@@ -36,7 +36,7 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
  * A realm for the property based user authentification and authorization
  * pattern used by ANNIS.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ANNISUserRealm extends AuthorizingRealm implements
   RolePermissionResolverAware

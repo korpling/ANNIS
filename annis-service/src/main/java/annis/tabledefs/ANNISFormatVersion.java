@@ -29,7 +29,7 @@ import jline.internal.InputStreamReader;
 /**
  * Definies the schemata of different ANNIS import format versions.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public enum ANNISFormatVersion
 {

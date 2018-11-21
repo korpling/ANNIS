@@ -25,7 +25,7 @@ import annis.examplequeries.ExampleQuery;
 /**
  * Generates SQL query for example queries
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class ListExampleQueriesHelper extends AbstractListHandler<ExampleQuery> {
 

@@ -18,7 +18,7 @@ package annis.gui;
 
 /**
  * A general interface for a sidebar which can be hidden.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface Sidebar
 {

@@ -57,7 +57,7 @@ import annis.service.objects.Visualizer;
 /**
  * Represents a global controller for the doc browser feature.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class DocBrowserController implements Serializable
 {

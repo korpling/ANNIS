@@ -57,7 +57,7 @@ import annis.service.objects.Match;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ShareSingleMatchGenerator extends Window implements
   SelectionEvent.SelectionListener

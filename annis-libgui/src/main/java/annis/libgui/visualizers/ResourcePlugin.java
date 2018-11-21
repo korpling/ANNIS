@@ -19,7 +19,7 @@ import net.xeoh.plugins.base.Plugin;
 
 /**
  * Base interface for all plugins that have resources in their package
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface ResourcePlugin extends Plugin
 {

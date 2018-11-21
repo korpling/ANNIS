@@ -27,7 +27,7 @@ import java.util.Set;
  * This objects holds all relevant information about the state of the UI
  * related to querying, e.g. the AQL, the search options and the type of the query.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class Query implements Serializable, Cloneable
 {

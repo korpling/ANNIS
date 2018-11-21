@@ -24,7 +24,7 @@ import org.apache.commons.lang3.math.NumberUtils;
  * 
  * Ported by Tom Zellman <tzellman@gmail.com>.
  * 
- * Adjusted to Apache Commons Lang3 by Thomas Krause <krauseto@hu-berlin.de>
+ * Adjusted to Apache Commons Lang3 by Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * 
  */
 public final class MIMEParse

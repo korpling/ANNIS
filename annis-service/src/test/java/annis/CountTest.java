@@ -40,7 +40,7 @@ import annis.service.objects.AnnisCorpus;
 /**
  * This will execute tests on a real database and check if the counts are OK.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 // TODO: do not test context only for annopool
 public class CountTest {

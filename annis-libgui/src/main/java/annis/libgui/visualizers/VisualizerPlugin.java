@@ -43,7 +43,7 @@ import net.xeoh.plugins.base.Plugin;
  * implementation of the {@link Component} interface. The
  * {@link annis.gui.visualizers.component.KWICPanel} is an example for that.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public interface VisualizerPlugin<I extends Component> extends Plugin, Serializable {
 

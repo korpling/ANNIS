@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Wraps the auto generated queries.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class ExampleQueriesPanel extends CssLayout
 {

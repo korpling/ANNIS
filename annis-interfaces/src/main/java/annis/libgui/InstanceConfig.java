@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * instances which behave differently. This is meant to provide a more specialized
  * presentation for different projects while still using only one ANNIS installation.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @XmlRootElement
 public class InstanceConfig implements Serializable

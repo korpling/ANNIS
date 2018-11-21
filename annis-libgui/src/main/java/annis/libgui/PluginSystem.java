@@ -24,20 +24,31 @@ import net.xeoh.plugins.base.PluginManager;
  * ANNIS plugin system interface for getting plugins or specific 
  * visualizers.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface PluginSystem extends Serializable
 {
   
   public final static String DEFAULT_VISUALIZER = "grid";
   
-  /** Get the JSPF Plugin Manager */
+  /**
+   *  Get the JSPF Plugin Manager 
+   * @return plugin manager
+   */
   public PluginManager getPluginManager();
   
-  /** Gets a visualizer by its short name */
+  /** 
+   * Gets a visualizer by its short name 
+   * @param shortName short name of the visualizer
+   * @return visualizer
+   */
   public VisualizerPlugin getVisualizer(String shortName); 
   
-  /** Gets the plugin instance of an exporter by it's class */
+  /** 
+   * Gets the plugin instance of an exporter by it's class 
+   * @param clazz class of the exporter
+   * @return exporter
+   */
   public ExporterPlugin getExporter(Class<? extends ExporterPlugin> clazz);
   
 }

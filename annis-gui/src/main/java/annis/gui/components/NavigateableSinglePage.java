@@ -54,7 +54,7 @@ import elemental.json.JsonValue;
  *
  * This is e.g. usefull for documentation.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class NavigateableSinglePage extends VerticalLayout
 {

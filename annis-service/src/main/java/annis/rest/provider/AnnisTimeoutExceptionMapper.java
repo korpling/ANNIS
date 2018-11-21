@@ -23,7 +23,7 @@ import annis.exceptions.AnnisTimeoutException;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Provider
 public class AnnisTimeoutExceptionMapper implements ExceptionMapper<AnnisTimeoutException>

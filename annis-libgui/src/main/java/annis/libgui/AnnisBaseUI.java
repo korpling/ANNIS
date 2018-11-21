@@ -375,7 +375,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    * 
    * This will not log the exception, only display information to the user.
    * 
-   * @param ex
+   * @param ex exception to handle
    * @return True if error was handled, false otherwise.
    */
   public static boolean handleCommonError(Throwable ex, String action)
@@ -424,7 +424,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    * Inject CSS into the UI. 
    * This function will not add multiple style-elements if the
    * exact CSS string was already added.
-   * @param cssContent 
+   * @param cssContent CSS as string
    */
   public void injectUniqueCSS(String cssContent)
   {
@@ -435,7 +435,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    * Inject CSS into the UI. 
    * This function will not add multiple style-elements if the
    * exact CSS string was already added.
-   * @param cssContent 
+   * @param cssContent CSS as string
    * @param wrapperClass Name of the wrapper class (a CSS class that is applied to a parent element)
    */
   public void injectUniqueCSS(String cssContent, String wrapperClass)

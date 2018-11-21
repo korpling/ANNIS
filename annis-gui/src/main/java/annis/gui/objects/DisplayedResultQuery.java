@@ -22,7 +22,7 @@ import java.util.TreeSet;
 
 /**
  * The query state of the actual displayed result query.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class DisplayedResultQuery extends PagedResultQuery
 {

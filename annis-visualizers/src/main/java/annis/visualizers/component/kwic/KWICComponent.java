@@ -30,8 +30,8 @@ import annis.visualizers.component.grid.GridComponent;
  * A component to visualize matched token and their context as "Keyword in
  * context"
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class KWICComponent extends GridComponent implements KWICInterface {
 

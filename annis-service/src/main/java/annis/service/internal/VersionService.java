@@ -24,7 +24,7 @@ import annis.VersionInfo;
 /**
  * This service part only provides a method to get the version of this 
  * ANNIS instance.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Path("annis/version")
 public class VersionService

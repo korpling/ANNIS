@@ -46,10 +46,10 @@ import annis.model.AnnisConstants;
  * help of SFeatures and {@link AnnisConstants} and build a mapping from these
  * intervalls to the sspan.</li>
  * <li>Get the best fitting intervall for a specific span.</li>
- * <ul>
+ * </ul>
  *
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class PDFPageHelper {
 
@@ -70,9 +70,9 @@ public class PDFPageHelper {
     
 
     /**
-     * Returns the value of page annotiation for a node. It takes the visualizer
-     * mappings into account. If no mapping is used, this definition is used:
-     * {@link #PAGE_NUMBER_ANNOATATION_NAME}
+     * Returns the value of page annotation for a node. It takes the visualizer
+     * mappings into account. If no mapping is defined, this default definition is used:
+     * {@link #DEFAULT_PAGE_NUMBER_ANNOTATION_NAME}
      *
      */
     public String getPageFromAnnotation(SNode node) {
@@ -104,7 +104,7 @@ public class PDFPageHelper {
 
    
     /**
-     * Gets the pdf page annotation name. It takes into acount the mappings defined
+     * Gets the pdf page annotation name. It takes into account the mappings defined
      * in {@link VisualizerInput#mappings}.
      *
      */
@@ -143,11 +143,11 @@ public class PDFPageHelper {
      *
      * <p>
      * The page annotation is detected with
-     * {@link #getPageFromAnnotation(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan)}
+     * {@link #getPageFromAnnotation(SNode)}
      * </p>
      *
      * @return A String which represents the start and the end page of a pdf,
-     *         seperated by {@link #PAGE_NUMBER_SEPERATOR}. If there is no end page,
+     *         Separated by {@link #PAGE_NUMBER_SEPERATOR}. If there is no end page,
      *         or exactly one page annotation, only a String with one number is
      *         returned.
      */

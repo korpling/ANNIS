@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 /**
  * List documents for a specific corpus.
  *
- * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels{@literal <b.pixeldrama@gmail.com>}
  */
 public class DocBrowserTable extends Table
 {

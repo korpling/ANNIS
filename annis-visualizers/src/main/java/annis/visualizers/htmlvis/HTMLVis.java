@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * </p>
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @PluginImplementation
 public class HTMLVis extends AbstractVisualizer<Panel>

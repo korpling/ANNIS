@@ -37,8 +37,8 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * This visualizer has the same mappings as the
  * {@link annis.visualizers.component.grid.GridVisualizer}.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @PluginImplementation
 public class KWICVisualizer extends AbstractVisualizer<KWICInterface> {

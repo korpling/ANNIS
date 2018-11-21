@@ -30,7 +30,7 @@ import com.vaadin.ui.Component;
  * {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)}
  * method for pure Vaadin component plugins.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public abstract class AbstractVisualizer<I extends Component> implements VisualizerPlugin<I>,
   FilteringVisualizerPlugin

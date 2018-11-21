@@ -51,7 +51,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
 /**
  * GUI for searching in corpora.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Theme("annis")
 @Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)

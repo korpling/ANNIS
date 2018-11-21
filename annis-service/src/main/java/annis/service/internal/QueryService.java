@@ -98,8 +98,8 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
 /**
  * Methods for querying the database.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Path("annis/query")
 public class QueryService {

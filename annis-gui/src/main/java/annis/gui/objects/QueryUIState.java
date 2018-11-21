@@ -39,7 +39,7 @@ import annis.service.objects.OrderType;
 
 /**
  * Helper class to bundle all query relevant state information of the UI.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class QueryUIState implements Serializable
 {

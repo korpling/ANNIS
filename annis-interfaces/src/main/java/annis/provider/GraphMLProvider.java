@@ -35,7 +35,7 @@ import org.corpus_tools.salt.util.internal.persistence.GraphMLWriter;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Provider
 public class GraphMLProvider implements MessageBodyWriter<SaltProject>

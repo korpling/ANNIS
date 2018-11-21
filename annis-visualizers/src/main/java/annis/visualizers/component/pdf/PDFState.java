@@ -19,7 +19,7 @@ import com.vaadin.shared.ui.JavaScriptComponentState;
 
 /**
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class PDFState extends JavaScriptComponentState {
 

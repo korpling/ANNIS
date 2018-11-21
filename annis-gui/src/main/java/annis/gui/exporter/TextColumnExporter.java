@@ -57,7 +57,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * This is useful for getting references of texts where the normal token based
  * text exporter doesn't work since there are multiple speakers or normalizations.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @author irina
  */
 @PluginImplementation

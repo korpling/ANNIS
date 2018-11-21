@@ -51,8 +51,8 @@ import annis.service.objects.SegmentationList;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class SearchOptionsPanel extends FormLayout
 {

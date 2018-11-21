@@ -41,8 +41,8 @@ import org.slf4j.LoggerFactory;
  * The following fields are skipped:
  * <ul>
  * <li>fields annotated with @Transient</li>
- * <li>Logger instances</i>
- * <li>serialVersionUID</i>
+ * <li>Logger instances</li>
+ * <li>serialVersionUID</li>
  * </ul>
  */
 public class DataObject implements Serializable 

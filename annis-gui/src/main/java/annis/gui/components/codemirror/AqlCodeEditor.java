@@ -41,7 +41,7 @@ import elemental.json.JsonArray;
 /**
  * A code editor component for the ANNIQ Query Language.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @JavaScript(
   {

@@ -88,7 +88,7 @@ import annis.service.objects.MatchAndDocumentCount;
 /**
  * A controller to modifiy the query UI state.
  *s
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class QueryController implements Serializable
 {

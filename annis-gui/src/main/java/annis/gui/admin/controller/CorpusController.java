@@ -29,7 +29,7 @@ import java.util.Set;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CorpusController
   implements CorpusListView.Listener, UIView.Listener

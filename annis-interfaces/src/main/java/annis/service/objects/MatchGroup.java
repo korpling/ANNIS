@@ -30,8 +30,8 @@ import com.google.common.base.Splitter;
 /**
  * Describes a group of matches for an AQL query.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @XmlRootElement(name = "match-group")
 public class MatchGroup implements Serializable
@@ -77,7 +77,7 @@ public class MatchGroup implements Serializable
    * salt://id5 salt://id6
    * }
    * 
-   * @param raw
+   * @param raw string representation of the {@link MatchGroup}
    * @return 
    */
   public static MatchGroup parseString(String raw)
@@ -94,7 +94,7 @@ public class MatchGroup implements Serializable
   /**
    * Generates a string where each group is separated by new line  and each ID inside a group by space.
    * This string can be parsed by {@link #parseString(java.lang.String) }.
-   * @return 
+   * @return a string representation
    */
   @Override
   public String toString()

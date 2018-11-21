@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * A column definition for SQLite.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  *
  */
 @SuppressWarnings("serial")
