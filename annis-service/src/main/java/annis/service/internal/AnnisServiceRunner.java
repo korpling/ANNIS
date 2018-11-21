@@ -72,6 +72,8 @@ public class AnnisServiceRunner extends ResourceConfig {
     private final AdministrationDao adminDao;
     private final DeleteCorpusDao deleteCorpusDao;
     private final ShortenerDao shortenerDao;
+    private final CorpusAdministration corpusAdministration;
+    private final ImportWorker importWorker;
     
 
     public AnnisServiceRunner() throws GraphANNISException {
@@ -88,16 +90,24 @@ public class AnnisServiceRunner extends ResourceConfig {
             this.deleteCorpusDao = DeleteCorpusDao.create(this.queryDao);
             this.adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
             this.shortenerDao = new ShortenerDao();
+            this.corpusAdministration = CorpusAdministration.create(this.adminDao);
         } else {
             this.queryDao = corpusAdmin.getAdministrationDao().getQueryDao();
             this.deleteCorpusDao = corpusAdmin.getAdministrationDao().getDeleteCorpusDao();
             this.adminDao = corpusAdmin.getAdministrationDao();
             this.shortenerDao = new ShortenerDao();
+            this.corpusAdministration = corpusAdmin;
         }
+        this.importWorker = new ImportWorker(this.corpusAdministration);
+        this.importWorker.start();
         
         property("queryDao", this.queryDao);
         property("adminDao", this.adminDao);
         property("shortenerDao", this.shortenerDao);
+        property("corpusAdministration", this.corpusAdministration);
+        property("importWorker", this.importWorker);
+        
+        
 
         packages("annis.service.internal", "annis.provider", "annis.rest.provider");
 
