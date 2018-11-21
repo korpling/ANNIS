@@ -26,7 +26,9 @@ import javax.annotation.Resource;
 
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Incubating;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +78,7 @@ public class CountTest {
     }
 
     @Test
+    @Ignore
     public void testAQLTestSuitePcc2() throws GraphANNISException {
         assumeTrue(pcc2CorpusID.size() > 0);
 
@@ -137,6 +140,7 @@ public class CountTest {
     }
 
     @Test
+    @Ignore
     public void testAQLTestSuiteTiger2() throws GraphANNISException {
         assumeTrue(tiger2CorpusID.size() > 0);
 
@@ -154,6 +158,7 @@ public class CountTest {
     }
 
     @Test
+    @Ignore
     public void testNonReflexivityPcc2() throws GraphANNISException {
 
         assumeTrue(pcc2CorpusID.size() > 0);
@@ -175,6 +180,7 @@ public class CountTest {
     }
 
     @Test
+    @Ignore
     public void testReflexivityPcc2() throws GraphANNISException {
         assumeTrue(pcc2CorpusID.size() > 0);
 
