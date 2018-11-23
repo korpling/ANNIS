@@ -15,17 +15,17 @@
  */
 package annis.service.objects;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 
 /**
  * Describes a group of matches for an AQL query.
@@ -36,8 +36,6 @@ import org.slf4j.LoggerFactory;
 @XmlRootElement(name = "match-group")
 public class MatchGroup implements Serializable
 {
-  private static final Logger log = LoggerFactory.getLogger(MatchGroup.class);
-  
   private List<Match> matches;
   
   public final static Splitter lineSplitter = Splitter.on('\n').trimResults().omitEmptyStrings();

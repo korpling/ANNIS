@@ -42,7 +42,17 @@
     <property name="connectionProperties" value="#{ $dao{datasource.ssl} ? 'ssl=true' : ''}" />
     
     <property name="validationQuery" value="SELECT 1;" />
+    <property name="testOnCreate" value="true" />
+    <property name="testOnBorrow" value="true" />
+    <property name="testOnReturn" value="true" />
+    <property name="testWhileIdle" value="true" />
+    
+    <!-- resource and connection related exceptions will fail fast-->
+    <property name="fastFailValidation" value="true" />
+    <property name="disconnectionSqlCodes" value="53000,53300,53400,08000,08003,08006,08001,08004,08007,08P01" />
+    
     <property name="accessToUnderlyingConnectionAllowed" value="true" />
+    
     
     <property name="connectionInitSqls" ref="schemaInitSQL"/>
   </bean>

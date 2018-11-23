@@ -15,7 +15,6 @@
  */
 package annis.sqlgen;
 
-import annis.model.Annotation;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,13 +22,16 @@ import java.sql.Types;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import annis.model.Annotation;
 
 /**
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class ListDocumentsSqlHelper implements ParameterizedRowMapper<Annotation>
+public class ListDocumentsSqlHelper implements RowMapper<Annotation>
 {
 
   public String createSql(String topLevelCorpusName)

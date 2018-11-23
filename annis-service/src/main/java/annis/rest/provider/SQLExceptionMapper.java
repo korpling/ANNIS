@@ -23,6 +23,8 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -31,6 +33,7 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public class SQLExceptionMapper implements ExceptionMapper<SQLException>
 {
+  private final Logger log = LoggerFactory.getLogger(SQLExceptionMapper.class);
   /**
    * Maps an exception to a response or returns null if it wasn't handled
    * @param sqlEx
@@ -68,7 +71,8 @@ public class SQLExceptionMapper implements ExceptionMapper<SQLException>
     }
  
     // default
-    return Response.status(500).entity(sqlEx.getMessage()).build();
+    log.error("Unhandled SQLException", sqlEx);
+    return Response.status(500).entity("error " + sqlEx.getSQLState() + ":" +  sqlEx.getMessage()).build();
     
   }
   

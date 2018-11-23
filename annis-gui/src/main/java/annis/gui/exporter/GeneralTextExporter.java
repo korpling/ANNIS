@@ -15,27 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
-import annis.libgui.Helper;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.Match;
-import annis.service.objects.MatchGroup;
-import annis.service.objects.SubgraphFilter;
-import annis.utils.LegacyGraphConverter;
-import com.google.common.base.Splitter;
-import com.google.common.base.Stopwatch;
-import com.google.common.escape.Escaper;
-import com.google.common.eventbus.EventBus;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,22 +27,47 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
 import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SaltProject;
-import org.slf4j.LoggerFactory;
 
-public abstract class GeneralTextExporter implements Exporter, Serializable
+import com.google.common.base.Splitter;
+import com.google.common.base.Stopwatch;
+import com.google.common.escape.Escaper;
+import com.google.common.eventbus.EventBus;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+
+import annis.exceptions.AnnisCorpusAccessException;
+import annis.exceptions.AnnisQLSemanticsException;
+import annis.exceptions.AnnisQLSyntaxException;
+import annis.libgui.Helper;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.model.AnnisNode;
+import annis.model.Annotation;
+import annis.service.ifaces.AnnisResult;
+import annis.service.ifaces.AnnisResultSet;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.CorpusConfig;
+import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
+import annis.service.objects.SubgraphFilter;
+import annis.utils.LegacyGraphConverter;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+
+public abstract class GeneralTextExporter implements ExporterPlugin, Serializable
 {
-  
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(GeneralTextExporter.class);
-
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   
   @Override
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, List<String> keys, String argsAsString,
-    WebResource annisResource, Writer out, EventBus eventBus)
+    Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc, 
+    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
     try
     {
@@ -160,7 +164,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
               res = res.queryParam("filter", filter.name());
             }
 
-            Stopwatch stopwatch = new Stopwatch();
+            Stopwatch stopwatch = Stopwatch.createUnstarted();
             stopwatch.start();
             SaltProject p = res.post(SaltProject.class, currentMatches);
             stopwatch.stop();
@@ -326,6 +330,11 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
     return true;
   }
   
+  @Override
+  public String getFileEnding()
+  {
+    return "txt";
+  }
   
   
   public abstract SubgraphFilter getSubgraphFilter();

@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
     "lib/lint/lint.css",
     "AqlCodeEditor.css"
   })
+//basic server-side component
 public class AqlCodeEditor extends AbstractJavaScriptComponent
   implements FieldEvents.TextChangeNotifier, Property.Viewer,
   Property.ValueChangeListener
@@ -72,19 +73,24 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     addStyleName("aql-code-editor");
 
     AqlCodeEditor.this.setPropertyDataSource(
-      new ObjectProperty("", String.class));
+      new ObjectProperty<String>("", String.class));
 
     // init to one so the client (which starts with 0) at initialization always uses
     // the the values provided by the server state
     AqlCodeEditor.this.getState().serverRequestCounter = 1;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void setPropertyDataSource(Property newDataSource)
   {
     if (newDataSource == null)
     {
       throw new IllegalArgumentException("Data source must not be null");
+    }
+    if(newDataSource.getType() != String.class)
+    {
+      throw new IllegalArgumentException("Data source must be of type String");
     }
 
     if (this.dataSource instanceof Property.ValueChangeNotifier)

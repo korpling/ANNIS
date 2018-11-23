@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="package-mapping" content="annis:annis.gui">
+</head>
+<body>
+	<vaadin-panel size-full>
+		<vaadin-accordion size-full _id="accordion">
+                <tab caption="Node Annotations" selected>
+                	<vaadin-vertical-layout size-full>
+                    	<annis-example-table _id="tblNodeAnno" />
+                    	<vaadin-label _id="lblNoNodeAnno" 
+                    		size-auto plain-text :middle :center visible="false">(No Node Annotations)</vaadin-label>
+                    </vaadin-vertical-layout>
+                </tab>
+                <tab caption="Edge Annotations">
+                	<vaadin-vertical-layout size-full>
+                    	<annis-example-table _id="tblEdgeAnno" />
+                    	<vaadin-label _id="lblNoEdgeAnno" size-auto plain-text :middle :center visible="false">(No Edge Annotations)</vaadin-label>
+                    </vaadin-vertical-layout>
+                </tab>
+                <tab caption="Edge Types">
+                	<vaadin-vertical-layout size-full>
+	                    <annis-example-table _id="tblEdgeTypes"/>
+	                    <vaadin-label _id="lblNoEdgeTypes" size-auto plain-text :middle :center visible="false">(No Edge Types)</vaadin-label>
+	                </vaadin-vertical-layout>
+                </tab>
+                <tab caption="Meta Annotations">
+                	<vaadin-vertical-layout size-full>
+	                    <annis-example-table _id="tblMetaAnno" />
+	                    <vaadin-label _id="lblNoMetaAnno" size-auto plain-text :middle :center visible="false">(No Meta Annotations)</vaadin-label>
+	                </vaadin-vertical-layout>
+                </tab>
+            </vaadin-accordion>
+	</vaadin-panel>
+</body>
+</html>
+

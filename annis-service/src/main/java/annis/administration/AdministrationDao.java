@@ -15,18 +15,6 @@
  */
 package annis.administration;
 
-import annis.dao.autogenqueries.QueriesGenerator;
-import annis.examplequeries.ExampleQuery;
-import annis.exceptions.AnnisException;
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
-import annis.security.UserConfig;
-import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
-import com.google.common.io.Files;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -38,6 +26,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -52,7 +41,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.sql.DataSource;
+
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.apache.commons.io.FilenameUtils;
@@ -72,12 +63,26 @@ import org.springframework.core.io.WritableResource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
+import com.google.common.io.Files;
+
+import annis.dao.autogenqueries.QueriesGenerator;
+import annis.examplequeries.ExampleQuery;
+import annis.exceptions.AnnisException;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
+import annis.security.UserConfig;
 
 /**
  *
@@ -183,8 +188,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   private Map<String, String> tableInsertFrom;
 
-  // all files have to carry this suffix.
-  private String annisFileSuffix = ".annis";
   /**
    * Optional tab for example queries. If this tab not exist, a dummy file from
    * the resource folder is used.
@@ -320,15 +323,35 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
       new FileSystemResource(new File(getScriptPath(),
-          FILE_RESOLVER_VIS_MAP + annisFileSuffix)));
+          FILE_RESOLVER_VIS_MAP + ".annis")));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
 
     log.info(
       "creating immutable functions for extracting annotations");
-    executeSqlFromScript("functions_get.sql");
+    
+    try(Connection conn = getJdbcTemplate().getDataSource().getConnection();)
+    {
+      
+      DatabaseMetaData meta = conn.getMetaData();
+      if(meta.getDatabaseMajorVersion() >= 10)
+      {
+        // there are some new regex functions in PostgreSQL 10 that don't exist in earlier versions
+        executeSqlFromScript("functions_get_pg10.sql");
+      }
+      else
+      {
+        executeSqlFromScript("functions_get.sql");
+      }
+    }
+    catch (SQLException ex)
+    {
+      log.error("could not get database version", ex);
+    }
+    
+    
   }
-
+  
   /**
    * Get the real schema name and version as used by the database.
    *
@@ -474,7 +497,16 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
     result.setUsername(user);
     result.setPassword(password);
-    result.setValidationQuery("SELECT 1;");
+    
+    result.setValidationQuery("SELECT 1;");   
+    result.setTestOnCreate(true);
+    result.setTestOnBorrow(true);
+    result.setTestOnReturn(true);
+    result.setTestWhileIdle(true);
+    result.setFastFailValidation(true);
+    result.setDisconnectionSqlCodes(Arrays.asList("53000","53300","53400","08000","08003","08006","08001","08004",
+      "08007","08P01"));
+    
     result.setAccessToUnderlyingConnectionAllowed(true);
     if (schema == null)
     {
@@ -539,7 +571,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     boolean overwrite,
     ANNISFormatVersion version)
   {
-    this.annisFileSuffix = ".annis";
     createStagingAreaV33(temporaryStagingArea);
     bulkImport(path, version);
 
@@ -622,8 +653,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     boolean overwrite,
     ANNISFormatVersion version)
   {
-    this.annisFileSuffix = ".tab";
-
     createStagingAreaV32(temporaryStagingArea);
     bulkImport(path, version);
 
@@ -770,15 +799,15 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
       {
-        importResolverVisMapTable(path, table);
+        importResolverVisMapTable(path, table, version.getFileSuffix());
       }
       // check if example query exists. If not copy it from the resource folder.
       else if (table.equalsIgnoreCase(EXAMPLE_QUERIES_TAB))
       {
-        File f = new File(path, table + annisFileSuffix);
+        File f = new File(path, table + version.getFileSuffix());
         if (f.exists())
         {
-          log.info(table + annisFileSuffix + " file exists");
+          log.info(table + version.getFileSuffix() + " file exists");
           bulkloadTableFromResource(tableInStagingArea(table),
             new FileSystemResource(f));
 
@@ -794,7 +823,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
             generateExampleQueries = EXAMPLE_QUERIES_CONFIG.TRUE;
           }
 
-          log.info(table + annisFileSuffix + " file not found");
+          log.info(table + version.getFileSuffix() + " file not found");
         }
       }
       else if (table.equalsIgnoreCase("node"))
@@ -804,7 +833,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       else
       {
         bulkloadTableFromResource(tableInStagingArea(table),
-          new FileSystemResource(new File(path, table + annisFileSuffix)));
+          new FileSystemResource(new File(path, table + version.getFileSuffix())));
       }
     }
   }
@@ -812,7 +841,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private void bulkImportNode(String path, ANNISFormatVersion version)
   {
     // check column number by reading first line
-    File nodeTabFile = new File(path, "node" + annisFileSuffix);
+    File nodeTabFile = new File(path, "node" + version.getFileSuffix());
     try (BufferedReader reader
       = new BufferedReader(new InputStreamReader(
           new FileInputStream(nodeTabFile), "UTF-8"));)
@@ -865,7 +894,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       else
       {
         throw new RuntimeException("Illegal number of columns in node"
-          + annisFileSuffix + ", "
+          + version.getFileSuffix() + ", "
           + "should be 13 or 10 but was " + columnNumber);
       }
         }
@@ -914,7 +943,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
             // search for corpus_ref
             String sqlScript
               = "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
-            long corpusID = getJdbcTemplate().queryForLong(sqlScript);
+            long corpusID = getJdbcTemplate().queryForObject(sqlScript, Long.class);
 
             importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
               corpusID);
@@ -953,7 +982,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
                 // search for corpus_ref
                 String sqlScript
                   = "SELECT id FROM _corpus WHERE \"name\" = ? LIMIT 1";
-                long corpusID = getJdbcTemplate().queryForLong(sqlScript, doc.
+                long corpusID = getJdbcTemplate().queryForObject(sqlScript, Long.class, doc.
                   getName());
 
                 importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
@@ -1291,18 +1320,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     getJdbcTemplate().execute("ANALYZE facts_" + corpusID);
   }
 
-  /**
-   * Update the statistics for the "facts" table as a whole.
-   */
-  @Transactional(propagation = Propagation.REQUIRED)
-  public void analyzeParentFacts()
-  {
-    log.info("analyzing parent facts table");
-    // explicitly unset any timeout. Since this function might be called independent
-    // from the import process we have to set it manually.
-    getJdbcTemplate().update("SET statement_timeout TO 0");
-    getJdbcTemplate().execute("ANALYZE facts");
-  }
   
   void adjustDistinctLeftRightToken(long corpusID)
   {
@@ -1361,7 +1378,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     log.info("indexing the new facts table (general indexes)");
     executeSqlFromScript("indexes.sql", args);
-
+    
     log.info("indexing the new facts table (edge related indexes)");
     executeSqlFromScript("indexes_edge.sql", args);
 
@@ -1386,7 +1403,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     String sql = "SELECT id FROM corpus WHERE top_level = 'y'";
 
-    return getJdbcTemplate().query(sql, ParameterizedSingleColumnRowMapper.
+    return getJdbcTemplate().query(sql, SingleColumnRowMapper.
       newInstance(Long.class));
   }
 
@@ -1653,9 +1670,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
     return tables;
   }
 
-  private ParameterizedSingleColumnRowMapper<String> stringRowMapper()
+  private SingleColumnRowMapper<String> stringRowMapper()
   {
-    return ParameterizedSingleColumnRowMapper.newInstance(String.class);
+    return SingleColumnRowMapper.newInstance(String.class);
   }
 
   // executes an SQL script from $ANNIS_HOME/scripts
@@ -1803,7 +1820,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       + "AND i.tablename IN ( " + StringUtils.repeat("?", ",", tables.length)
       + " )";
     return getJdbcTemplate().query(sql, tables,
-      new ParameterizedSingleColumnRowMapper<String>());
+      new SingleColumnRowMapper<String>());
   }
 
   public List<String> listUsedIndexes(String... tables)
@@ -1817,7 +1834,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       + " ) "
       + "AND pg_stat_get_numscans(x.indexrelid) != 0";
     return getJdbcTemplate().query(sql, tables,
-      new ParameterizedSingleColumnRowMapper<String>());
+      new SingleColumnRowMapper<String>());
   }
 
   public boolean resetStatistics()
@@ -1985,7 +2002,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    * @param path The path to the ANNIS file.
    * @param table The final table in the database of the resolver_vis_map table.
    */
-  private void importResolverVisMapTable(String path, String table)
+  private void importResolverVisMapTable(String path, String table, String annisFileSuffix)
   {
     try
     {

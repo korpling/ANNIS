@@ -15,10 +15,6 @@
  */
 package annis;
 
-import annis.dao.objects.AnnotatedMatch;
-import annis.dao.objects.AnnotatedSpan;
-import annis.model.Annotation;
-import au.com.bytecode.opencsv.CSVWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,9 +25,15 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import annis.dao.objects.AnnotatedMatch;
+import annis.dao.objects.AnnotatedSpan;
+import annis.model.Annotation;
+import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  *
@@ -58,20 +60,25 @@ public class CSVHelper
         {
           columnsByNodePos.put(j, new TreeSet<String>());
         }
-        for(Annotation annotation : span.getAnnotations())
+        if(span != null)
         {
-          columnsByNodePos.get(j).add("anno_" + annotation.getQualifiedName());
-        }
+          for(Annotation annotation : span.getAnnotations())
+          {
+            columnsByNodePos.get(j).add("anno_" + annotation.getQualifiedName());
+          }
 
-        for(Annotation meta : span.getMetadata())
-        {
-          columnsByNodePos.get(j).add("meta_" + meta.getQualifiedName());
+          for(Annotation meta : span.getMetadata())
+          {
+            columnsByNodePos.get(j).add("meta_" + meta.getQualifiedName());
+          }
         }
-
       }
     }
-    
+
+    // important: don't close the wrapper CSVWriter!
+    @SuppressWarnings("resource")
     CSVWriter csvWriter = new CSVWriter(w, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
+  
     // print column names and data types
     int count = columnsByNodePos.keySet().size();
     ArrayList<String> headerLine = new ArrayList<>();
@@ -88,7 +95,8 @@ public class CSVHelper
       }
     }
     csvWriter.writeNext(headerLine.toArray(new String[headerLine.size()]));
-        
+     
+    
     return columnsByNodePos;
   }
   

@@ -26,10 +26,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class SqlConstraints
 {
-
-  private static boolean disableBetweenSymmetricPredicate = false;
-  private static boolean disableBetweenPredicate = false;
-
   /**
    * Test a column for true.
    *
@@ -75,9 +71,9 @@ public class SqlConstraints
     return lhs + " " + op + " " + rhs;
   }
 
-   public static String mirrorJoin(String op, String lhs, String rhs)
+  public static String mirrorJoin(String op, String lhs, String rhs)
   {
-    return "(" + lhs + " " + op + " " + rhs + " OR " + rhs + " " + op + " " + lhs + ")";
+    return or(lhs + " " + op + " " + rhs, rhs + " " + op + " " + lhs);
   }
 
   public static String numberJoin(String op, String lhs, String rhs, int offset)
@@ -85,11 +81,10 @@ public class SqlConstraints
     String plus = offset >= 0 ? " + " : " - ";
     return join(op, lhs, rhs) + plus + String.valueOf(Math.abs(offset));
   }
-
-  public static String numberMirrorJoin(String op, String lhs, String rhs, int offset)
+  
+  public static String or(String lhs, String rhs)
   {
-    String plus = offset >= 0 ? " + " : " - ";
-    return "(" + join(op, lhs, rhs) + plus + String.valueOf(Math.abs(offset)) + " OR " + join(op, rhs, lhs) + plus + String.valueOf(Math.abs(offset)) + ")";
+    return "((" + lhs + ") OR (" + rhs + "))";
   }
 
   public static String bitSelect(String column, boolean[] bits)
@@ -105,83 +100,19 @@ public class SqlConstraints
 
   public static String between(String lhs, String rhs, int min, int max)
   {
-    if ((disableBetweenSymmetricPredicate || disableBetweenPredicate)
-      && min > max)
-    {
-      int tmp = min;
-      min = max;
-      max = tmp;
-    }
     String minPlus = min >= 0 ? " + " : " - ";
     String maxPlus = max >= 0 ? " + " : " - ";
-    if (disableBetweenPredicate)
-    {
-      return lhs + " >= " + rhs + minPlus + String.valueOf(Math.abs(min))
-        + " AND " + lhs + " <= " + rhs + maxPlus
-        + String.valueOf(Math.abs(max));
-    }
-    else
-    {
-      String betweenPredicate = disableBetweenSymmetricPredicate ? "BETWEEN"
-        : "BETWEEN SYMMETRIC";
-      return lhs + " " + betweenPredicate + " " + rhs + minPlus
-        + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
-        + String.valueOf(Math.abs(max));
-    }
-  }
-
-    public static String betweenMirror(String lhs, String rhs, int min, int max)
-  {
-    if ((disableBetweenSymmetricPredicate || disableBetweenPredicate)
-      && min > max)
-    {
-      int tmp = min;
-      min = max;
-      max = tmp;
-    }
-    String minPlus = min >= 0 ? " + " : " - ";
-    String maxPlus = max >= 0 ? " + " : " - ";
-    if (disableBetweenPredicate)
-    {
-      return "((" + lhs + " >= " + rhs + minPlus + String.valueOf(Math.abs(min))
-        + " AND " + lhs + " <= " + rhs + maxPlus
-        + String.valueOf(Math.abs(max)) + ") OR (" 
-        + rhs + " >= " + lhs + minPlus + String.valueOf(Math.abs(min))
-        + " AND " + rhs + " <= " + lhs + maxPlus
-        + String.valueOf(Math.abs(max)) + "))";
-    }
-    else
-    {
-      String betweenPredicate = disableBetweenSymmetricPredicate ? "BETWEEN"
-        : "BETWEEN SYMMETRIC";
-      return "((" + lhs + " " + betweenPredicate + " " + rhs + minPlus
-        + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
-        + String.valueOf(Math.abs(max)) + ") OR ("
-        + rhs + " " + betweenPredicate + " " + lhs + minPlus
-        + String.valueOf(Math.abs(min)) + " AND " + lhs + maxPlus
-        + String.valueOf(Math.abs(max)) + "))";
-    }
+    
+    return lhs + " " + "BETWEEN SYMMETRIC" + " " + rhs + minPlus
+      + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
+      + String.valueOf(Math.abs(max));
+    
   }
 
   public static String between(String lhs, int min, int max)
   {
-    if ((disableBetweenSymmetricPredicate || disableBetweenPredicate)
-      && min > max)
-    {
-      int tmp = min;
-      min = max;
-      max = tmp;
-    }
-    if (disableBetweenPredicate)
-    {
-      return lhs + " >= " + min + " AND " + lhs + " <= " + max;
-    }
-    else
-    {
-      String betweenPredicate = disableBetweenSymmetricPredicate ? "BETWEEN"
-        : "BETWEEN SYMMETRIC";
-      return lhs + " " + betweenPredicate + " " + min + " AND " + max;
-    }
+    return lhs + " " + "BETWEEN SYMMETRIC" + " " + min + " AND " + max;
+
   }
 
   public static String in(String lhs, String rhs)
@@ -221,26 +152,5 @@ public class SqlConstraints
       string = "^(" + string + ")$";
     }
     return sqlString(string);
-  }
-
-  public static boolean isDisableBetweenSymmetricPredicate()
-  {
-    return disableBetweenSymmetricPredicate;
-  }
-
-  public static void setDisableBetweenSymmetricPredicate(
-    boolean disableBetweenPredicate)
-  {
-    SqlConstraints.disableBetweenSymmetricPredicate = disableBetweenPredicate;
-  }
-
-  public static boolean isDisableBetweenPredicate()
-  {
-    return disableBetweenPredicate;
-  }
-
-  public static void setDisableBetweenPredicate(boolean disableBetweenPredicate)
-  {
-    SqlConstraints.disableBetweenPredicate = disableBetweenPredicate;
   }
 }

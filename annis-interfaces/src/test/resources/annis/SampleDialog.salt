@@ -1,0 +1,1318 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xmi:XMI xmlns:sDocumentStructure="sDocumentStructure" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:saltCore="saltCore" xmi:version="2.0">
+<sDocumentStructure:SDocumentGraph xmlns:sDocumentStructure="sDocumentStructure" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:saltCore="saltCore" xmi:version="2.0">
+	<labels xsi:type="saltCore:SFeature" namespace="annis" name="matchedannos" value="T::annis::instructor_dipl,annis::instructee_dipl,annis::instructee_dipl"/>
+	
+	<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A"/>
+	<labels xsi:type="saltCore:SFeature" namespace="annis" name="matchedids" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1871,salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3138,salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3140"/>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhF4AAAAAAAAAUAAAAAAAAABQAAAAAAAAAFAAAAAAAAAAUAAAAAAAAAA5AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX2RpcGw="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1867"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="first_node_segmentation_chain" value="T::instructor_dipl"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1867"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_dipl" value="T::in"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGAAAAAAAAAAUAAAAAAAAABQAAAAAAAAAFAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_lemma" value="T::in"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan53"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan53"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGEAAAAAAAAAUAAAAAAAAABQAAAAAAAAAFAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_pos" value="T::APPR"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan692"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan692"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhF0AAAAAAAAAUAAAAAAAAABQAAAAAAAAAFQAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_utt" value="T::utt"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1294"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1294"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGMAAAAAAAAAUQAAAAAAAABRAAAAAAAAAFEAAAAAAAAAUQAAAAAAAAA6AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX2RpcGw="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1868"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1868"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_dipl" value="T::Richtung"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGUAAAAAAAAAUQAAAAAAAABRAAAAAAAAAFEAAAAAAAAAUQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_lemma" value="T::Richtung"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan54"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan54"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGYAAAAAAAAAUQAAAAAAAABRAAAAAAAAAFEAAAAAAAAAUQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_pos" value="T::NN"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan693"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan693"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGgAAAAAAAAAUgAAAAAAAABSAAAAAAAAAFIAAAAAAAAAUgAAAAAAAAA7AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX2RpcGw="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1869"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1869"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_dipl" value="T::des"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGoAAAAAAAAAUgAAAAAAAABSAAAAAAAAAFIAAAAAAAAAUgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_lemma" value="T::die"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan55"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan55"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGsAAAAAAAAAUgAAAAAAAABSAAAAAAAAAFIAAAAAAAAAUgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_pos" value="T::ART"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan694"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan694"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhG0AAAAAAAAAUwAAAAAAAABTAAAAAAAAAFMAAAAAAAAAUwAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX2RpcGw="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1870"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1870"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_dipl" value="T::Toasters"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhG8AAAAAAAAAUwAAAAAAAABTAAAAAAAAAFMAAAAAAAAAUwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_lemma" value="T::Toaster"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan56"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan56"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHAAAAAAAAAAUwAAAAAAAABTAAAAAAAAAFMAAAAAAAAAUwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_pos" value="T::NN"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan695"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan695"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHIAAAAAAAAAVAAAAAAAAABUAAAAAAAAAFQAAAAAAAAAVAAAAAAAAAA9AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX2RpcGw="/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="matchednode" value="N::1"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1871"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1871"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_dipl" value="T::gehst"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHQAAAAAAAAAVAAAAAAAAABUAAAAAAAAAFQAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_lemma" value="T::gehen"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan57"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan57"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHUAAAAAAAAAVAAAAAAAAABUAAAAAAAAAFQAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_pos" value="T::VVFIN"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan696"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan696"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhH0AAAAAAAAAVwAAAAAAAABXAAAAAAAAAFcAAAAAAAAAVwAAAAAAAAA+AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX2RpcGw="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1872"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1872"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_dipl" value="T::ja"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhH8AAAAAAAAAVwAAAAAAAABXAAAAAAAAAFcAAAAAAAAAVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_lemma" value="T::ja"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan58"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan58"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIAAAAAAAAAAVwAAAAAAAABXAAAAAAAAAFcAAAAAAAAAVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_pos" value="T::ADV"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan697"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan697"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHwAAAAAAAAAVwAAAAAAAABXAAAAAAAAAFcAAAAAAAAAVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_utt" value="T::utt"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1295"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1295"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIUAAAAAAAAAWQAAAAAAAABZAAAAAAAAAFsAAAAAAAAAWwAAAAAAAAA/AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX2RpcGw="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1873"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1873"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_dipl" value="T::gehst"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIcAAAAAAAAAWQAAAAAAAABZAAAAAAAAAFsAAAAAAAAAWwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_lemma" value="T::gehen"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan59"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan59"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIgAAAAAAAAAWQAAAAAAAABZAAAAAAAAAFsAAAAAAAAAWwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_pos" value="T::VVFIN"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan698"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan698"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIQAAAAAAAAAWQAAAAAAAABZAAAAAAAAAFsAAAAAAAAAWwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructor_utt" value="T::utt"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1296"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1296"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhF8AAAAAAAAAUAAAAAAAAABQAAAAAAAAAFAAAAAAAAAAUAAAAAAAAAA0AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_norm" value="T::in"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan2533"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="first_node_segmentation_chain" value="T::instructor_norm"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan2533"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGQAAAAAAAAAUQAAAAAAAABRAAAAAAAAAFEAAAAAAAAAUQAAAAAAAAA1AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_norm" value="T::Richtung"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan2534"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan2534"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGkAAAAAAAAAUgAAAAAAAABSAAAAAAAAAFIAAAAAAAAAUgAAAAAAAAA2AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_norm" value="T::des"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan2535"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan2535"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhG4AAAAAAAAAUwAAAAAAAABTAAAAAAAAAFMAAAAAAAAAUwAAAAAAAAA3AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_norm" value="T::Toasters"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan2536"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan2536"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHMAAAAAAAAAVAAAAAAAAABUAAAAAAAAAFQAAAAAAAAAVAAAAAAAAAA4AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_norm" value="T::gehst"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan2537"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan2537"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhH4AAAAAAAAAVwAAAAAAAABXAAAAAAAAAFcAAAAAAAAAVwAAAAAAAAA5AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_norm" value="T::ja"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan2538"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan2538"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIYAAAAAAAAAWQAAAAAAAABZAAAAAAAAAFsAAAAAAAAAWwAAAAAAAAA6AAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdG9yX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructor_norm" value="T::gehst"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan2539"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan2539"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHoAAAAAAAAAVgAAAAAAAABWAAAAAAAAAFYAAAAAAAAAVgAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX2RpcGw="/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="matchednode" value="N::2"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_dipl" value="T::mhm"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3138"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="first_node_segmentation_chain" value="T::instructee_dipl"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3138"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHkAAAAAAAAAVgAAAAAAAABWAAAAAAAAAFYAAAAAAAAAVgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_utt" value="T::utt"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1745"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1745"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhI0AAAAAAAAAWgAAAAAAAABaAAAAAAAAAFoAAAAAAAAAWgAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX2RpcGw="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_dipl" value="T::ich"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3139"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3139"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_lemma" value="T::ich"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIoAAAAAAAAAWgAAAAAAAABaAAAAAAAAAFoAAAAAAAAAWgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1414"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1414"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIsAAAAAAAAAWgAAAAAAAABaAAAAAAAAAFoAAAAAAAAAWgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_pos" value="T::PPER"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1580"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1580"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIwAAAAAAAAAWgAAAAAAAABaAAAAAAAAAGEAAAAAAAAAYQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_utt" value="T::utt"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1746"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1746"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJIAAAAAAAAAWwAAAAAAAABbAAAAAAAAAFwAAAAAAAAAXAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX2RpcGw="/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="matchednode" value="N::3"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_dipl" value="T::geh"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3140"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3140"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_lemma" value="T::gehen"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJAAAAAAAAAAWwAAAAAAAABbAAAAAAAAAFwAAAAAAAAAXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1415"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1415"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJEAAAAAAAAAWwAAAAAAAABbAAAAAAAAAFwAAAAAAAAAXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_pos" value="T::VVFIN"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1581"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1581"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJgAAAAAAAAAXQAAAAAAAABdAAAAAAAAAF0AAAAAAAAAXQAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX2RpcGw="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_dipl" value="T::in"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3141"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3141"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_lemma" value="T::in"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJYAAAAAAAAAXQAAAAAAAABdAAAAAAAAAF0AAAAAAAAAXQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1416"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1416"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJcAAAAAAAAAXQAAAAAAAABdAAAAAAAAAF0AAAAAAAAAXQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_pos" value="T::APPR"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1582"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1582"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJ0AAAAAAAAAXgAAAAAAAABeAAAAAAAAAF4AAAAAAAAAXgAAAAAAAAALAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX2RpcGw="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_dipl" value="T::Richtung"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3142"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3142"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_lemma" value="T::Richtung"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJsAAAAAAAAAXgAAAAAAAABeAAAAAAAAAF4AAAAAAAAAXgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1417"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1417"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJwAAAAAAAAAXgAAAAAAAABeAAAAAAAAAF4AAAAAAAAAXgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_pos" value="T::NN"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1583"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1583"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKIAAAAAAAAAXwAAAAAAAABfAAAAAAAAAF8AAAAAAAAAXwAAAAAAAAAMAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX2RpcGw="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_dipl" value="T::des"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3143"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3143"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_lemma" value="T::die"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKAAAAAAAAAAXwAAAAAAAABfAAAAAAAAAF8AAAAAAAAAXwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1418"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1418"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKEAAAAAAAAAXwAAAAAAAABfAAAAAAAAAF8AAAAAAAAAXwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_pos" value="T::ART"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1584"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1584"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKcAAAAAAAAAYAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAYAAAAAAAAAANAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX2RpcGw="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_dipl" value="T::Toasters"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3144"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3144"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_lemma" value="T::Toaster"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKUAAAAAAAAAYAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1419"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1419"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKYAAAAAAAAAYAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_pos" value="T::NN"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1585"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1585"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKwAAAAAAAAAYQAAAAAAAABhAAAAAAAAAGEAAAAAAAAAYQAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX2RpcGw="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_dipl" value="T::okay"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3145"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3145"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_lemma" value="T::Okay"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKoAAAAAAAAAYQAAAAAAAABhAAAAAAAAAGEAAAAAAAAAYQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1420"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1420"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKsAAAAAAAAAYQAAAAAAAABhAAAAAAAAAGEAAAAAAAAAYQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="default_ns" name="instructee_pos" value="T::NE"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan1586"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan1586"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhI4AAAAAAAAAWgAAAAAAAABaAAAAAAAAAFoAAAAAAAAAWgAAAAAAAAAFAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_norm" value="T::ich"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3324"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="first_node_segmentation_chain" value="T::instructee_norm"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3324"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJMAAAAAAAAAWwAAAAAAAABbAAAAAAAAAFwAAAAAAAAAXAAAAAAAAAAGAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_norm" value="T::gehe"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3325"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3325"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJkAAAAAAAAAXQAAAAAAAABdAAAAAAAAAF0AAAAAAAAAXQAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_norm" value="T::in"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3326"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3326"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJ4AAAAAAAAAXgAAAAAAAABeAAAAAAAAAF4AAAAAAAAAXgAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_norm" value="T::Richtung"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3327"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3327"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKMAAAAAAAAAXwAAAAAAAABfAAAAAAAAAF8AAAAAAAAAXwAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_norm" value="T::des"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3328"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3328"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKgAAAAAAAAAYAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAYAAAAAAAAAAKAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_norm" value="T::Toasters"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3329"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3329"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhK0AAAAAAAAAYQAAAAAAAABhAAAAAAAAAGEAAAAAAAAAYQAAAAAAAAALAAAAAAAAAAAAAAAAAAAAAHB0AA9pbnN0cnVjdGVlX25vcm0="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_norm" value="T::okay"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3330"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3330"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="instructee_extra" value="T::zeichnet"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIIAAAAAAAAAWAAAAAAAAABYAAAAAAAAAFgAAAAAAAAAWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHB0ABBpbnN0cnVjdGVlX2V4dHJh"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3487"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="first_node_segmentation_chain" value="T::instructee_extra"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3487"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhFsAAAAAAAAATwAAAAAAAABPAAAAAAAAAE8AAAAAAAAATwAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAAHB0AAVicmVhaw=="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="break" value="T::0,7"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3505"/>
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="first_node_segmentation_chain" value="T::break"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3505"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SSpan" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHcAAAAAAAAAVQAAAAAAAABVAAAAAAAAAFUAAAAAAAAAVQAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAAHB0AAVicmVhaw=="/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="break" value="T::0,5"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpan3506"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpan3506"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhFwAAAAAAAAATwAAAAAAAABPAAAAAAAAAE8AAAAAAAAATwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT3Bw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::49.75235536153987-50.54016606166636"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1889"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1889"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGIAAAAAAAAAUAAAAAAAAABQAAAAAAAAAFAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::50.54016606166636-50.63841893392833"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1890"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1890"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGcAAAAAAAAAUQAAAAAAAABRAAAAAAAAAFEAAAAAAAAAUQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUXBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::50.63841893392833-51.042110083004665"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1891"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1891"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhGwAAAAAAAAAUgAAAAAAAABSAAAAAAAAAFIAAAAAAAAAUgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUnBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::51.042110083004665-51.22366430348873"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1892"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1892"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHEAAAAAAAAAUwAAAAAAAABTAAAAAAAAAFMAAAAAAAAAUwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAU3Bw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::51.22366430348873-51.82316495661779"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1893"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1893"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHYAAAAAAAAAVAAAAAAAAABUAAAAAAAAAFQAAAAAAAAAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::51.82316495661779-52.28239033784219"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1894"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1894"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHgAAAAAAAAAVQAAAAAAAABVAAAAAAAAAFUAAAAAAAAAVQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVXBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::52.28239033784219-52.79680174123974"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1895"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1895"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhHsAAAAAAAAAVgAAAAAAAABWAAAAAAAAAFYAAAAAAAAAVgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVnBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::52.79680174123974-53.39272677082862"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1896"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1896"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIEAAAAAAAAAVwAAAAAAAABXAAAAAAAAAFcAAAAAAAAAVwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAV3Bw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::53.39272677082862-53.61913556343227"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1897"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1897"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIMAAAAAAAAAWAAAAAAAAABYAAAAAAAAAFgAAAAAAAAAWAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::53.61913556343227-54.47281212523901"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1898"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1898"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhIkAAAAAAAAAWQAAAAAAAABZAAAAAAAAAFkAAAAAAAAAWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWXBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::54.47281212523901-54.70040224090706"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1899"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1899"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhI8AAAAAAAAAWgAAAAAAAABaAAAAAAAAAFoAAAAAAAAAWgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWnBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::54.70040224090706-54.80501624279921"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1900"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1900"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJQAAAAAAAAAWwAAAAAAAABbAAAAAAAAAFsAAAAAAAAAWwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAW3Bw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::54.80501624279921-54.839844399722246"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1901"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1901"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJUAAAAAAAAAXAAAAAAAAABcAAAAAAAAAFwAAAAAAAAAXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::54.839844399722246-54.876155243819056"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1902"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1902"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJoAAAAAAAAAXQAAAAAAAABdAAAAAAAAAF0AAAAAAAAAXQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXXBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::54.876155243819056-54.98081591209811"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1903"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1903"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhJ8AAAAAAAAAXgAAAAAAAABeAAAAAAAAAF4AAAAAAAAAXgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXnBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::54.98081591209811-55.22004029673594"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1904"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1904"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKQAAAAAAAAAXwAAAAAAAABfAAAAAAAAAF8AAAAAAAAAXwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAX3Bw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::55.22004029673594-55.33965248905485"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1905"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1905"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhKkAAAAAAAAAYAAAAAAAAABgAAAAAAAAAGAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYHBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::55.33965248905485-55.777518550222304"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1906"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1906"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:SToken" layers="/0/@layers.0">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_node" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc05vZGVGZWF0dXJlAAAAAAAAAAACAAxaAApjb250aW51b3VzSgAJY29ycHVzUmVmSgAKaW50ZXJuYWxJREoABGxlZnRKAAlsZWZ0VG9rZW5KAAVyaWdodEoACnJpZ2h0VG9rZW5KAAhzZWdJbmRleEoAB3RleHRSZWZKAAp0b2tlbkluZGV4TAALbWF0Y2hlZE5vZGV0ABBMamF2YS9sYW5nL0xvbmc7TAAHc2VnTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAAAAABFuAAAAAAAKhK4AAAAAAAAAYQAAAAAAAABhAAAAAAAAAGEAAAAAAAAAYQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYXBw"/>
+		<labels xsi:type="saltCore:SAnnotation" namespace="annis" name="time" value="T::55.777518550222304-56.01674293486013"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTok1907"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTok1907"/>
+	</nodes>
+	<nodes xsi:type="sDocumentStructure:STextualDS">
+		<labels xsi:type="saltCore:SFeature" namespace="saltCommon" name="SDATA" value="T::                  "/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sText0"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sText0"/>
+	</nodes>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.0" target="/0/@nodes.66" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAsAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel1"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel1"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.1" target="/0/@nodes.66" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAsQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel2"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel2"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.2" target="/0/@nodes.66" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAsgAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel3"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel3"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.3" target="/0/@nodes.66" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAswAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel4"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel4"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.3" target="/0/@nodes.67" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAswAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel5"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel5"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.3" target="/0/@nodes.68" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAswAAAAAAAAADcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel6"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel6"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.3" target="/0/@nodes.69" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAswAAAAAAAAAEcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel7"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel7"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.3" target="/0/@nodes.70" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAswAAAAAAAAAFcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel8"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel8"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.4" target="/0/@nodes.67" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAtAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel9"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel9"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.5" target="/0/@nodes.67" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAtQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel10"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel10"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.6" target="/0/@nodes.67" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAtgAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel11"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel11"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.7" target="/0/@nodes.68" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAtwAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel12"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel12"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.8" target="/0/@nodes.68" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAuAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel13"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel13"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.9" target="/0/@nodes.68" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAuQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel14"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel14"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.10" target="/0/@nodes.69" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAugAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel15"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel15"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.11" target="/0/@nodes.69" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAuwAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel16"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel16"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.12" target="/0/@nodes.69" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAvAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel17"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel17"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.13" target="/0/@nodes.70" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAvQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel18"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel18"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.14" target="/0/@nodes.70" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAvgAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel19"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel19"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.15" target="/0/@nodes.70" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAvwAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel20"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel20"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.16" target="/0/@nodes.73" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAwAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel21"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel21"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.17" target="/0/@nodes.73" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAwQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel22"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel22"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.18" target="/0/@nodes.73" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAwgAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel23"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel23"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.19" target="/0/@nodes.73" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAwwAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel24"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel24"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.20" target="/0/@nodes.75" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel25"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel25"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.20" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxAAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel26"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel26"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.20" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxAAAAAAAAAADcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel27"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel27"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.21" target="/0/@nodes.75" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel28"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel28"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.21" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxQAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel29"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel29"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.21" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxQAAAAAAAAADcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel30"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel30"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.22" target="/0/@nodes.75" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxgAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel31"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel31"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.22" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxgAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel32"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel32"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.22" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxgAAAAAAAAADcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel33"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel33"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.23" target="/0/@nodes.75" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxwAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel34"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel34"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.23" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxwAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel35"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel35"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.23" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAAxwAAAAAAAAADcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel36"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel36"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.24" target="/0/@nodes.66" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAIUwAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel37"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel37"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.25" target="/0/@nodes.67" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAIVAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel38"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel38"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.26" target="/0/@nodes.68" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAIVQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel39"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel39"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.27" target="/0/@nodes.69" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAIVgAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel40"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel40"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.28" target="/0/@nodes.70" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAIVwAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel41"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel41"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.29" target="/0/@nodes.73" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAIWAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel42"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel42"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.30" target="/0/@nodes.75" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAIWQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel43"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel43"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.30" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAIWQAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel44"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel44"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.30" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAIWQAAAAAAAAADcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel45"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel45"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.31" target="/0/@nodes.72" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK5gAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel46"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel46"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.32" target="/0/@nodes.72" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK5wAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel47"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel47"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.33" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6AAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel48"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel48"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.34" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6QAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel49"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel49"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.35" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6gAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel50"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel50"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.36" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6wAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel51"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel51"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.36" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6wAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel52"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel52"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.36" target="/0/@nodes.78" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6wAAAAAAAAADcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel53"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel53"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.36" target="/0/@nodes.79" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6wAAAAAAAAAEcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel54"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel54"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.36" target="/0/@nodes.80" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6wAAAAAAAAAFcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel55"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel55"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.36" target="/0/@nodes.81" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6wAAAAAAAAAGcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel56"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel56"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.36" target="/0/@nodes.82" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6wAAAAAAAAAHcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel57"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel57"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.36" target="/0/@nodes.83" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK6wAAAAAAAAAIcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel58"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel58"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.37" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK7AAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel59"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel59"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.37" target="/0/@nodes.78" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK7AAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel60"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel60"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.38" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK7QAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel61"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel61"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.38" target="/0/@nodes.78" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK7QAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel62"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel62"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.39" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK7gAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel63"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel63"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.39" target="/0/@nodes.78" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK7gAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel64"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel64"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.40" target="/0/@nodes.79" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK7wAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel65"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel65"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.41" target="/0/@nodes.79" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK8AAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel66"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel66"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.42" target="/0/@nodes.79" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK8QAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel67"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel67"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.43" target="/0/@nodes.80" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK8gAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel68"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel68"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.44" target="/0/@nodes.80" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK8wAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel69"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel69"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.45" target="/0/@nodes.80" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK9AAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel70"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel70"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.46" target="/0/@nodes.81" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK9QAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel71"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel71"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.47" target="/0/@nodes.81" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK9gAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel72"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel72"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.48" target="/0/@nodes.81" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK9wAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel73"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel73"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.49" target="/0/@nodes.82" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK+AAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel74"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel74"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.50" target="/0/@nodes.82" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK+QAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel75"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel75"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.51" target="/0/@nodes.82" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK+gAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel76"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel76"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.52" target="/0/@nodes.83" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK+wAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel77"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel77"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.53" target="/0/@nodes.83" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK/AAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel78"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel78"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.54" target="/0/@nodes.83" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAK/QAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel79"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel79"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.55" target="/0/@nodes.76" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAM+wAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel80"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel80"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.56" target="/0/@nodes.77" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAM/AAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel81"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel81"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.56" target="/0/@nodes.78" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAM/AAAAAAAAAACcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel82"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel82"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.57" target="/0/@nodes.79" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAM/QAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel83"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel83"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.58" target="/0/@nodes.80" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAM/gAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel84"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel84"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.59" target="/0/@nodes.81" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAAM/wAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel85"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel85"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.60" target="/0/@nodes.82" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAANAAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel86"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel86"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.61" target="/0/@nodes.83" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAANAQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel87"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel87"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.62" target="/0/@nodes.74" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAANngAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel88"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel88"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.63" target="/0/@nodes.65" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAANsAAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel89"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel89"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SSpanningRelation" source="/0/@nodes.64" target="/0/@nodes.71" layers="/0/@layers.1">
+		<labels xsi:type="saltCore:SFeature" namespace="annis" name="relannis_edge" value="O::rO0ABXNyAB9hbm5pcy5tb2RlbC5SZWxhbm5pc0VkZ2VGZWF0dXJlAAAAAAAAAAACAARKAAtjb21wb25lbnRJREoAA3ByZUwAHGFydGlmaWNpYWxEb21pbmFuY2VDb21wb25lbnR0ABBMamF2YS9sYW5nL0xvbmc7TAAWYXJ0aWZpY2lhbERvbWluYW5jZVByZXEAfgABeHAAAAAAAAANsQAAAAAAAAABcHA="/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sSpanRel90"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sSpanRel90"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.65" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::0"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_0"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_0"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::0"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.66" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::1"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_1"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_1"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::1"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.67" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::2"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_2"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_2"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::2"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.68" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::3"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_3"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_3"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::3"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.69" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::4"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_4"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_4"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::4"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.70" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::5"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_5"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_5"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::5"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.71" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::6"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_6"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_6"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::6"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.72" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::7"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_7"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_7"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::7"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.73" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::8"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_8"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_8"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::8"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.74" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::9"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_9"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_9"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::9"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.75" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::10"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_10"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_10"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::10"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.76" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::11"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_11"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_11"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::11"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.77" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::12"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_12"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_12"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::12"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.78" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::13"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_13"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_13"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::13"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.79" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::14"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_14"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_14"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::14"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.80" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::15"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_15"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_15"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::15"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.81" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::16"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_16"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_16"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::16"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.82" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::17"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_17"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_17"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::17"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:STextualRelation" source="/0/@nodes.83" target="/0/@nodes.84">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SSTART" value="N::18"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sTextRel0_18"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sTextRel0_18"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SEND" value="N::18"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.63" target="/0/@nodes.64">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel0"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel0"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::break"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.31" target="/0/@nodes.33">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel1"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel1"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.33" target="/0/@nodes.37">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel2"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel2"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.37" target="/0/@nodes.40">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel3"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel3"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.40" target="/0/@nodes.43">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel4"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel4"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.43" target="/0/@nodes.46">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel5"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel5"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.46" target="/0/@nodes.49">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel6"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel6"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.49" target="/0/@nodes.52">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel7"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel7"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.55" target="/0/@nodes.56">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel8"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel8"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.56" target="/0/@nodes.57">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel9"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel9"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.57" target="/0/@nodes.58">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel10"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel10"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.58" target="/0/@nodes.59">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel11"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel11"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.59" target="/0/@nodes.60">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel12"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel12"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.60" target="/0/@nodes.61">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel13"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel13"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructee_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.0" target="/0/@nodes.4">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel14"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel14"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.4" target="/0/@nodes.7">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel15"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel15"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.7" target="/0/@nodes.10">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel16"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel16"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.10" target="/0/@nodes.13">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel17"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel17"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.13" target="/0/@nodes.16">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel18"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel18"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.16" target="/0/@nodes.20">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel19"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel19"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_dipl"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.24" target="/0/@nodes.25">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel20"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel20"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.25" target="/0/@nodes.26">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel21"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel21"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.26" target="/0/@nodes.27">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel22"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel22"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.27" target="/0/@nodes.28">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel23"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel23"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.28" target="/0/@nodes.29">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel24"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel24"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_norm"/>
+	</edges>
+	<edges xsi:type="sDocumentStructure:SOrderRelation" source="/0/@nodes.29" target="/0/@nodes.30">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::sOrderRel25"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/BeMaTaC_L1_2013-01/2011-12-14-A#sOrderRel25"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="STYPE" value="T::instructor_norm"/>
+	</edges>
+	<layers xsi:type="saltCore:SLayer" nodes="/0/@nodes.81 /0/@nodes.75 /0/@nodes.76 /0/@nodes.78 /0/@nodes.69 /0/@nodes.79 /0/@nodes.68 /0/@nodes.71 /0/@nodes.83 /0/@nodes.80 /0/@nodes.66 /0/@nodes.77 /0/@nodes.74 /0/@nodes.70 /0/@nodes.72 /0/@nodes.67 /0/@nodes.82 /0/@nodes.73 /0/@nodes.65">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::token"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::l1"/>
+	</layers>
+	<layers xsi:type="saltCore:SLayer" nodes="/0/@nodes.24 /0/@nodes.26 /0/@nodes.8 /0/@nodes.41 /0/@nodes.20 /0/@nodes.1 /0/@nodes.52 /0/@nodes.63 /0/@nodes.25 /0/@nodes.50 /0/@nodes.49 /0/@nodes.40 /0/@nodes.56 /0/@nodes.29 /0/@nodes.47 /0/@nodes.42 /0/@nodes.61 /0/@nodes.57 /0/@nodes.36 /0/@nodes.62 /0/@nodes.15 /0/@nodes.35 /0/@nodes.46 /0/@nodes.58 /0/@nodes.2 /0/@nodes.37 /0/@nodes.51 /0/@nodes.23 /0/@nodes.5 /0/@nodes.64 /0/@nodes.44 /0/@nodes.32 /0/@nodes.21 /0/@nodes.11 /0/@nodes.34 /0/@nodes.16 /0/@nodes.55 /0/@nodes.9 /0/@nodes.27 /0/@nodes.22 /0/@nodes.53 /0/@nodes.3 /0/@nodes.4 /0/@nodes.6 /0/@nodes.28 /0/@nodes.33 /0/@nodes.17 /0/@nodes.19 /0/@nodes.38 /0/@nodes.59 /0/@nodes.31 /0/@nodes.7 /0/@nodes.39 /0/@nodes.18 /0/@nodes.12 /0/@nodes.54 /0/@nodes.10 /0/@nodes.30 /0/@nodes.48 /0/@nodes.45 /0/@nodes.0 /0/@nodes.14 /0/@nodes.43 /0/@nodes.60 /0/@nodes.13" edges="//@edges.6 //@edges.53 //@edges.4 //@edges.28 //@edges.46 //@edges.10 //@edges.50 //@edges.36 //@edges.79 //@edges.51 //@edges.1 //@edges.26 //@edges.25 //@edges.85 //@edges.75 //@edges.12 //@edges.43 //@edges.20 //@edges.13 //@edges.47 //@edges.52 //@edges.22 //@edges.62 //@edges.59 //@edges.14 //@edges.74 //@edges.16 //@edges.8 //@edges.34 //@edges.87 //@edges.76 //@edges.0 //@edges.60 //@edges.24 //@edges.45 //@edges.33 //@edges.48 //@edges.82 //@edges.55 //@edges.77 //@edges.65 //@edges.80 //@edges.38 //@edges.83 //@edges.18 //@edges.41 //@edges.63 //@edges.72 //@edges.9 //@edges.73 //@edges.58 //@edges.54 //@edges.5 //@edges.89 //@edges.78 //@edges.35 //@edges.84 //@edges.57 //@edges.15 //@edges.68 //@edges.3 //@edges.29 //@edges.67 //@edges.42 //@edges.64 //@edges.66 //@edges.56 //@edges.23 //@edges.7 //@edges.17 //@edges.11 //@edges.30 //@edges.37 //@edges.31 //@edges.27 //@edges.69 //@edges.40 //@edges.21 //@edges.88 //@edges.70 //@edges.39 //@edges.86 //@edges.61 //@edges.2 //@edges.32 //@edges.44 //@edges.49 //@edges.81 //@edges.71 //@edges.19">
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::default_ns"/>
+		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::l0"/>
+	</layers>
+</sDocumentStructure:SDocumentGraph></xmi:XMI>

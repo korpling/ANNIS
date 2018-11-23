@@ -15,20 +15,13 @@
  */
 package annis.gui;
 
-import static annis.gui.SidebarState.AUTO_HIDDEN;
-import static annis.gui.SidebarState.AUTO_VISIBLE;
-import static annis.gui.SidebarState.HIDDEN;
-import static annis.gui.SidebarState.VISIBLE;
-import annis.gui.components.ScreenshotMaker;
-import annis.gui.components.SettingsStorage;
-import annis.libgui.AnnisBaseUI;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
-import annis.libgui.AnnisUser;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.libgui.IDGenerator;
-import annis.libgui.LoginDataLostException;
-import annis.security.User;
+
+import java.util.LinkedHashSet;
+
+import org.json.JSONException;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.eventbus.Subscribe;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.validator.EmailValidator;
@@ -47,10 +40,17 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
+
+import annis.gui.components.ScreenshotMaker;
+import annis.gui.components.SettingsStorage;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.AnnisUser;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.libgui.LoginDataLostException;
+import annis.security.User;
 import elemental.json.JsonArray;
-import java.util.LinkedHashSet;
-import org.json.JSONException;
-import org.slf4j.LoggerFactory;
 
 /**
  * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists),
@@ -234,7 +234,7 @@ public class MainToolbar extends HorizontalLayout
     btLogout.setStyleName(ValoTheme.BUTTON_SMALL);
     btLogout.setIcon(FontAwesome.USER);
 
-    btOpenSource = new Button("Help us to make ANNIS better!");
+    btOpenSource = new Button("Help us make ANNIS better!");
     btOpenSource.setStyleName(BaseTheme.BUTTON_LINK);
     btOpenSource.addClickListener(new Button.ClickListener()
     {
@@ -242,7 +242,7 @@ public class MainToolbar extends HorizontalLayout
       public void buttonClick(Button.ClickEvent event)
       {
         Window w = new HelpUsWindow();
-        w.setCaption("Help us to make ANNIS better!");
+        w.setCaption("Help us make ANNIS better!");
         w.setModal(true);
         w.setResizable(true);
         w.setWidth("600px");

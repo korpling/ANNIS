@@ -4,10 +4,10 @@
   <parent>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
     <artifactId>annis-all</artifactId>
-    <version>3.4.4</version>
+    <version>3.5.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <groupId>de.hu-berlin.german.korpling.annis</groupId>
+  
   <artifactId>annis-visualizers</artifactId>
   <name>annis-visualizers</name>
   <url>http://maven.apache.org</url>
@@ -24,6 +24,7 @@
   </distributionManagement>
     
   <build>
+         
     <plugins>
       <plugin>
         <groupId>org.antlr</groupId>
@@ -40,7 +41,62 @@
           </execution>
         </executions>
       </plugin>
-    </plugins>
+      
+      
+   
+       <!--theme for visjs-visualizer -->  
+       
+       <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.outputDirectory}/VAADIN</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>src/main/webapp/VAADIN</directory>          
+                  <filtering>true</filtering>
+                </resource>       
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
+      </plugin>      
+         
+       <plugin>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-maven-plugin</artifactId>
+        <version>${vaadin.version}</version>
+        <executions>
+          <execution>
+          
+            <goals>
+              <goal>clean</goal>
+              <goal>resources</goal>
+              <goal>update-theme</goal>
+              <goal>compile-theme</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>         
+          <optimizationLevel>9</optimizationLevel>
+          <style>OBF</style>
+        </configuration>
+      </plugin>
+     
+    </plugins>  
+    
+    
+     
+   
+     
+      
   </build>
 
   <dependencies>
@@ -107,8 +163,9 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
+    
   </dependencies>
 </project>

@@ -24,7 +24,9 @@
       </Or>
       <Or>
         <Class name="annis.gui.admin.EditSingleGroup"/>
-        <Class name="annis.gui.admin.EditSingleUser"/>  
+        <Class name="annis.gui.admin.EditSingleUser"/>
+        <Class name="annis.gui.HistoryPanel"/>
+        <Class name="annis.gui.CorpusBrowserPanel"/>  
       </Or>
       
     </And>

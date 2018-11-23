@@ -13,24 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.exporter;
+package annis.libgui.exporter;
 
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.WebResource;
+
+import annis.service.objects.CorpusConfig;
+import net.xeoh.plugins.base.Plugin;
+
 import java.io.Writer;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface Exporter
+public interface ExporterPlugin extends Plugin
 {
   public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight, 
-   Set<String> corpora, List<String> keys, String args, 
-   WebResource annisResource, Writer out, EventBus eventBus);
+   Set<String> corpora, List<String> keys, String args, boolean alignmc,
+   WebResource annisResource, Writer out, EventBus eventBus,
+   Map<String, CorpusConfig> corpusConfigs);
   
   public boolean isCancelable();
+  
+  public boolean isAlignable();
+  
+  public String getHelpMessage();
+  
+  public String getFileEnding();
   
 }

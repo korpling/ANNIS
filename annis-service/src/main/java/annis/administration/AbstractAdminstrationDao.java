@@ -15,18 +15,19 @@
  */
 package annis.administration;
 
-import annis.dao.AbstractDao;
-import annis.dao.QueryDao;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+
+import annis.dao.AbstractDao;
+import annis.dao.QueryDao;
 
 /**
  * Contains common functions used in the different adminstration DAOs

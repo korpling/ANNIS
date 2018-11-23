@@ -309,11 +309,6 @@ public class ProielDependecyTree extends AbstractDotVisualizer
     dot.append(s);
   }
 
-  private void w(long l)
-  {
-    dot.append(l);
-  }
-
   private void wAtt(String key, String value)
   {
     w(key);

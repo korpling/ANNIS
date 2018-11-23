@@ -301,7 +301,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
         cbName.addItem(n);
       }
       cbName.setValue("tok");
-      cbName.addListener((ValueChangeListener) this);
+      cbName.addValueChangeListener((ValueChangeListener) this);
       
       
       cbOperator = new ComboBox();
@@ -313,11 +313,11 @@ public class NodeWindow extends Panel implements Button.ClickListener
         cbOperator.addItem(o);
       }
       cbOperator.setValue(NODE_OPERATORS[0]);
-      cbOperator.addListener((ValueChangeListener) this);
+      cbOperator.addValueChangeListener((ValueChangeListener) this);
       
       txtValue = new TextField();
       txtValue.setImmediate(true);
-      txtValue.addListener((ValueChangeListener) this);
+      txtValue.addValueChangeListener((ValueChangeListener) this);
       
       cbOperator.setWidth("4em");
       cbName.setWidth("100%");

@@ -15,6 +15,35 @@
  */
 package annis.gui.controlpanel;
 
+import java.util.List;
+
+import org.vaadin.hene.popupbutton.PopupButton;
+
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.event.ShortcutListener;
+import com.vaadin.jsclipboard.JSClipboard;
+import com.vaadin.server.ClassResource;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ValoTheme;
+
 import annis.gui.AnnisUI;
 import annis.gui.ExportPanel;
 import annis.gui.HistoryPanel;
@@ -28,31 +57,6 @@ import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import annis.model.AqlParseError;
 import annis.model.QueryNode;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.event.ShortcutAction.ModifierKey;
-import com.vaadin.event.ShortcutListener;
-import com.vaadin.server.ClassResource;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.ListSelect;
-import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ValoTheme;
-import java.util.List;
-import org.slf4j.LoggerFactory;
-import org.vaadin.hene.popupbutton.PopupButton;
 
 /**
  *
@@ -61,8 +65,6 @@ import org.vaadin.hene.popupbutton.PopupButton;
 public class QueryPanel extends GridLayout implements 
   ValueChangeListener
 {
-
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(QueryPanel.class);
 
   public static final int MAX_HISTORY_MENU_ITEMS = 5;
 
@@ -224,6 +226,31 @@ public class QueryPanel extends GridLayout implements
       btShowKeyboard.setIcon(new ClassResource(VirtualKeyboardCodeEditor.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
     }
+    final JSClipboard clipboard = new JSClipboard();
+    Button btCopy = new Button("");
+    btCopy.setWidth("100%");
+    btCopy.setDescription("Copy query to clipboard");
+    btCopy.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+    btCopy.addStyleName(ValoTheme.BUTTON_SMALL);
+    btCopy.setIcon(FontAwesome.COPY);
+    
+    clipboard.apply(btCopy, txtQuery);
+    clipboard.setText(state.getAql().getValue());
+    state.getAql().addValueChangeListener(new ValueChangeListener() {
+		
+		@Override
+		public void valueChange(ValueChangeEvent event) {
+			clipboard.setText(event.getProperty().getValue().toString());
+		}
+	});
+    
+    clipboard.addSuccessListener(new JSClipboard.SuccessListener() {
+		
+		@Override
+		public void onSuccess() {
+			Notification.show("Copied AQL to clipboard");
+		}
+	});
     
     Button btShowQueryBuilder = new Button("Query<br />Builder");
     btShowQueryBuilder.setHtmlContentAllowed(true);
@@ -267,37 +294,46 @@ public class QueryPanel extends GridLayout implements
      * Q: Query text field
      * QB: Button to toggle query builder // TODO
      * KEY: Button to show virtual keyboard
+     * COPY: Button for copying the text
      * SEA: "Search" button
      * MOR: "More actions" button 
      * HIST: "History" button
      * STAT: Text field with the real status
      * PROG: indefinite progress bar (spinning circle)
      * 
-     *   \  0  |  1  |  2  |  3  
+     *  \   0  |  1  |  2  |  3  
      * --+-----+---+---+---+-----
      * 0 |  Q  |  Q  |  Q  | QB 
      * --+-----+-----+-----+-----
      * 1 |  Q  |  Q  |  Q  | KEY 
      * --+-----+-----+-----+-----
-     * 2 | SEA | MOR | HIST|     
+     * 2 |  Q  |  Q  |  Q  | COPY
      * --+-----+-----+-----+-----
-     * 3 | STAT| STAT| STAT| PROG
+     * 3 | SEA | MOR | HIST|     
+     * --+-----+-----+-----+-----
+     * 4 | STAT| STAT| STAT| PROG
      */
-    addComponent(txtQuery, 0, 0, 2, 1);
-    addComponent(txtStatus, 0, 3, 2, 3);
-    addComponent(btShowResult, 0, 2);
-    addComponent(btMoreActions, 1, 2);
-    addComponent(btHistory, 2, 2);
-    addComponent(piCount, 3, 3);
+    addComponent(txtQuery, 0, 0, 2, 2);
+    addComponent(txtStatus, 0, 4, 2, 4);
+    addComponent(btShowResult, 0, 3);
+    addComponent(btMoreActions, 1, 3);
+    addComponent(btHistory, 2, 3);
+    addComponent(piCount, 3, 4);
     addComponent(btShowQueryBuilder, 3, 0);
     if(btShowKeyboard != null)
     {
       addComponent(btShowKeyboard, 3, 1);
+      addComponent(btCopy, 3, 2);
+    }
+    else
+    {
+      addComponent(btCopy, 3, 1);
     }
 
     // alignment
     setRowExpandRatio(0, 0.0f);
-    setRowExpandRatio(1, 1.0f);
+    setRowExpandRatio(1, 0.0f);
+    setRowExpandRatio(2, 1.0f);
     setColumnExpandRatio(0, 1.0f);
     setColumnExpandRatio(1, 0.0f);
     setColumnExpandRatio(2, 0.0f);
@@ -484,7 +520,7 @@ public class QueryPanel extends GridLayout implements
       if(panel == null)
       {
         panel = new ExportPanel(QueryPanel.this, 
-          ui.getQueryController(), state);
+          ui.getQueryController(), state, ui);
       }
       
       final TabSheet tabSheet = ui.getSearchView().getMainTab();

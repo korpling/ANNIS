@@ -33,6 +33,7 @@ import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
@@ -77,8 +78,6 @@ public class SingleResultPanel extends CssLayout implements
 {
   private static final long serialVersionUID = 2L;
 
-  private static final String HIDE_KWIC = "hide_kwic";
-
   private static final String INITIAL_OPEN = "initial_open";
 
   private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
@@ -104,10 +103,6 @@ public class SingleResultPanel extends CssLayout implements
   private String segmentationName;
 
   private final HorizontalLayout infoBar;
-
-  private final String corpusName;
-
-  private final String documentName;
 
   private final QueryController queryController;
 
@@ -203,8 +198,6 @@ public class SingleResultPanel extends CssLayout implements
      */
     path = CommonHelper.getCorpusPath(result.getGraph(), result);
     Collections.reverse(path);
-    corpusName = path.get(0);
-    documentName = path.get(path.size() - 1);
 
     MinMax minMax = getIds(result.getDocumentGraph());
 
@@ -252,7 +245,7 @@ public class SingleResultPanel extends CssLayout implements
     }
 
     int lftContextIdx = query == null ? 0 : query.getLeftContext();
-    lftCtxContainer.addItemAt(lftContextIdx, lftContextIdx);
+    lftCtxContainer.addItem(lftContextIdx);
     lftCtxContainer.sort(new Object[]
     {
       "number"
@@ -432,7 +425,7 @@ public class SingleResultPanel extends CssLayout implements
         String htmlID = "resolver-" + resultNumber + "_" + i;
 
         VisualizerPanel p = new VisualizerPanel(
-          entries[i], result, corpusName, documentName,
+          entries[i], result, match,
           visibleTokenAnnos, markedAndCovered,
           markedCoveredMap, markedExactMap,
           htmlID, resultID, this, segmentationName, ps, instanceConfig);
@@ -539,22 +532,26 @@ public class SingleResultPanel extends CssLayout implements
         else
         {
 
-          combobox.getContainerDataSource().addItem(i).
-            getItemProperty("number").setValue(i);
-
-          if (combobox.getContainerDataSource() instanceof IndexedContainer)
+          Item it = combobox.getContainerDataSource().addItem(i);
+          // check if the item was actually added or might have been available before.
+          if(it != null)
           {
-            ((IndexedContainer) combobox.getContainerDataSource()).sort(
-              new Object[]
-              {
-                "number"
-              }, new boolean[]
-              {
-                true
-              });
-          }
+            it.getItemProperty("number").setValue(i);
 
-          combobox.select(i);
+            if (combobox.getContainerDataSource() instanceof IndexedContainer)
+            {
+              ((IndexedContainer) combobox.getContainerDataSource()).sort(
+                new Object[]
+                {
+                  "number"
+                }, new boolean[]
+                {
+                  true
+                });
+            }
+
+            combobox.select(i);
+          }
         }
       }
       catch (NumberFormatException ex)

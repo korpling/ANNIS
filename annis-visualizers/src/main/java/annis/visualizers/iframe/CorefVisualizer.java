@@ -126,12 +126,6 @@ public class CorefVisualizer extends WriterVisualizer
   {
     private String name;
     private String value;
-
-    public SerializableAnnotation(String name, String value)
-    {
-      this.name = name;
-      this.value = value;
-    }
     
     public SerializableAnnotation(SAnnotation orig)
     {
@@ -144,21 +138,11 @@ public class CorefVisualizer extends WriterVisualizer
       return name;
     }
 
-    public void setName(String name)
-    {
-      this.name = name;
-    }
 
     public String getValue()
     {
       return value;
     }
-
-    public void setValue(String value)
-    {
-      this.value = value;
-    }
-    
     
   }
 
@@ -353,7 +337,7 @@ public class CorefVisualizer extends WriterVisualizer
         
         for(STextualDS t : texts)
         {
-          DataSourceSequence sequence= new DataSourceSequence(t, 0,
+          DataSourceSequence<Integer> sequence= new DataSourceSequence<>(t, 0,
             (t.getText()!= null) ? t.getText().length():0);
           List<SToken> token = saltGraph.getSortedTokenByText(saltGraph.getTokensBySequence(sequence));
 

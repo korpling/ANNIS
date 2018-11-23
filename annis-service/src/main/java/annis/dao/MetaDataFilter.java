@@ -15,11 +15,13 @@
  */
 package annis.dao;
 
+import java.util.List;
+
+import org.springframework.jdbc.core.SingleColumnRowMapper;
+
 import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.SubQueryCorpusSelectionStrategy;
-import java.util.List;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
 /**
  *
@@ -48,7 +50,7 @@ public class MetaDataFilter extends AbstractDao
       {
         String documentsWithMetaDataSql = subQueryCorpusSelectionStrategy.buildSubQuery(corpusList, metaData);
         List<Long> documents = getJdbcTemplate()
-          .query(documentsWithMetaDataSql, ParameterizedSingleColumnRowMapper.newInstance(Long.class));
+          .query(documentsWithMetaDataSql, SingleColumnRowMapper.newInstance(Long.class));
 
         return documents;
       }

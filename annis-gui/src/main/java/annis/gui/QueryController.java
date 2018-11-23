@@ -15,40 +15,24 @@
  */
 package annis.gui;
 
-import annis.gui.components.ExceptionDialog;
-import annis.gui.controller.CountCallback;
-import annis.gui.controller.ExportBackgroundJob;
-import annis.gui.controller.FrequencyBackgroundJob;
-import annis.gui.controller.SpecificPagingCallback;
-import annis.gui.controlpanel.QueryPanel;
-import annis.gui.controlpanel.SearchOptionsPanel;
-import annis.gui.exporter.Exporter;
-import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.frequency.UserGeneratedFrequencyEntry;
-import annis.gui.objects.ContextualizedQuery;
-import annis.gui.objects.DisplayedResultQuery;
-import annis.gui.objects.ExportQuery;
-import annis.gui.objects.FrequencyQuery;
-import annis.gui.objects.PagedResultQuery;
-import annis.gui.objects.Query;
-import annis.gui.objects.QueryGenerator;
-import annis.gui.objects.QueryUIState;
-import annis.gui.resultfetch.ResultFetchJob;
-import annis.gui.resultfetch.SingleResultFetchJob;
-import annis.gui.resultview.ResultViewPanel;
-import annis.gui.resultview.VisualizerContextChanger;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.libgui.media.MediaController;
-import annis.libgui.visualizers.IFrameResourceMap;
-import annis.model.AqlParseError;
-import annis.model.QueryNode;
-import annis.service.objects.CorpusConfig;
-import annis.service.objects.FrequencyTableEntry;
-import annis.service.objects.FrequencyTableEntryType;
-import annis.service.objects.FrequencyTableQuery;
-import annis.service.objects.Match;
-import annis.service.objects.MatchAndDocumentCount;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SaltProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Joiner;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.FutureCallback;
@@ -63,27 +47,46 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.salt.common.SaltProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.components.ExceptionDialog;
+import annis.gui.controller.CountCallback;
+import annis.gui.controller.ExportBackgroundJob;
+import annis.gui.controller.FrequencyBackgroundJob;
+import annis.gui.controller.SpecificPagingCallback;
+import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
+import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.DisplayedResultQuery;
+import annis.gui.objects.ExportQuery;
+import annis.gui.objects.FrequencyQuery;
+import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.Query;
+import annis.gui.objects.QueryGenerator;
+import annis.gui.objects.QueryUIState;
+import annis.gui.resultfetch.ResultFetchJob;
+import annis.gui.resultfetch.SingleResultFetchJob;
+import annis.gui.resultview.ResultViewPanel;
+import annis.gui.resultview.VisualizerContextChanger;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.libgui.media.MediaController;
+import annis.libgui.visualizers.IFrameResourceMap;
+import annis.model.AqlParseError;
+import annis.model.QueryNode;
+import annis.service.objects.CorpusConfig;
+import annis.service.objects.FrequencyTableEntry;
+import annis.service.objects.FrequencyTableEntryType;
+import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.Match;
+import annis.service.objects.MatchAndDocumentCount;
 
 /**
  * A controller to modifiy the query UI state.
- *
+ *s
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class QueryController implements Serializable
@@ -96,8 +99,6 @@ public class QueryController implements Serializable
   private final AnnisUI ui;
 
   private final QueryUIState state;
-
-  private final Map<String, Exporter> exporterMap = new HashMap<>();
 
   public QueryController(SearchView searchView, AnnisUI ui)
   {
@@ -124,22 +125,7 @@ public class QueryController implements Serializable
         validateQuery();
       }
     });
-
-    for (Exporter e : SearchView.EXPORTER)
-    {
-      String name = e.getClass().getSimpleName();
-      exporterMap.put(name, e);
-    }
     
-    this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
-    {
-
-      @Override
-      public void valueChange(Property.ValueChangeEvent event)
-      {
-        // TODO: check if the corpus is actually available to the user
-      }
-    });
   }
 
   public void validateQuery()
@@ -195,7 +181,11 @@ public class QueryController implements Serializable
         }
         catch (ExecutionException ex)
         {
-          if (ex.getCause() instanceof UniformInterfaceException)
+          if(AnnisBaseUI.handleCommonError(ex, "validate query"))
+          {
+            log.error(null, ex);
+          }
+          else if (ex.getCause() instanceof UniformInterfaceException)
           {
             reportServiceException((UniformInterfaceException) ex.getCause(),
               false);
@@ -236,54 +226,54 @@ public class QueryController implements Serializable
     String caption = null;
     String description = null;
 
-    if (ex.getResponse().getStatus() == 400)
+    if(!AnnisBaseUI.handleCommonError(ex, "execute query"))
     {
-      List<AqlParseError> errors
-        = ex.getResponse().getEntity(
-          new GenericType<List<AqlParseError>>()
+      switch (ex.getResponse().getStatus())
+      {
+        case 400:
+          List<AqlParseError> errors
+            = ex.getResponse().getEntity(
+              new GenericType<List<AqlParseError>>()
+              {
+              });
+          caption = "Parsing error";
+          description = Joiner.on("\n").join(errors);
+          qp.setStatus(description);
+          qp.setErrors(errors);
+          break;
+        case 504:
+          caption = "Timeout";
+          description = "Query execution took too long.";
+          qp.setStatus(caption + ": " + description);
+          break;
+        case 403:
+          if(Helper.getUser() == null)
           {
-          });
-      caption = "Parsing error";
-      description = Joiner.on("\n").join(errors);
-      qp.setStatus(description);
-      qp.setErrors(errors);
-    }
-    else if (ex.getResponse().getStatus() == 504)
-    {
-      caption = "Timeout";
-      description = "Query execution took too long.";
-      qp.setStatus(caption + ": " + description);
-    }
-    else if (ex.getResponse().getStatus() == 403)
-    {
-      
-      if(Helper.getUser() == null)
-      {
-        // not logged in
-        qp.setStatus("You don't have the access rights to query this corpus. " 
-        + "You might want to login to access more corpora.");
-        searchView.getMainToolbar().showLoginWindow(true);
+            // not logged in
+            qp.setStatus("You don't have the access rights to query this corpus. "
+              + "You might want to login to access more corpora.");
+            searchView.getMainToolbar().showLoginWindow(true);
+          }
+          else
+          {
+            // logged in but wrong user
+            caption = "You don't have the access rights to query this corpus. "
+              + "You might want to login as another user to access more corpora.";
+            qp.setStatus(caption);
+          } break;
+        default:
+          log.error(
+            "Exception when communicating with service", ex);
+          qp.setStatus("Unexpected exception:  " + ex.getMessage());
+          ExceptionDialog.show(ex,
+            "Exception when communicating with service.");
+          break;
       }
-      else
-      {
-        // logged in but wrong user
-        caption = "You don't have the access rights to query this corpus. " 
-        + "You might want to login as another user to access more corpora.";
-        qp.setStatus(caption);
-      }
-    }
-    else
-    {
-      log.error(
-        "Exception when communicating with service", ex);
-      qp.setStatus("Unexpected exception:  " + ex.getMessage());
-      ExceptionDialog.show(ex,
-        "Exception when communicating with service.");
-    }
 
-    if (showNotification && caption != null)
-    {
-      Notification.show(caption, description, Notification.Type.WARNING_MESSAGE);
+      if (showNotification && caption != null)
+      {
+        Notification.show(caption, description, Notification.Type.WARNING_MESSAGE);
+      }
     }
 
   }
@@ -327,10 +317,11 @@ public class QueryController implements Serializable
     }
     if (q instanceof ExportQuery)
     {
-      setIfNew(state.getExporterName(), ((ExportQuery) q).getExporterName());
+      setIfNew(state.getExporter(), ((ExportQuery) q).getExporter());
       setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).
         getAnnotationKeys());
       setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
+      setIfNew(state.getAlignmc(), ((ExportQuery) q).getAlignmc());
     }
   }
   
@@ -369,9 +360,10 @@ public class QueryController implements Serializable
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
       .segmentation(state.getVisibleBaseText().getValue())
-      .exporter(state.getExporterName().getValue())
+      .exporter(state.getExporter().getValue())
       .annotations(state.getExportAnnotationKeys().getValue())
       .param(state.getExportParameters().getValue())
+      .alignmc(state.getAlignmc().getValue())
       .build();
   }
 
@@ -511,9 +503,11 @@ public class QueryController implements Serializable
     ExportQuery query = getExportQuery();
 
     addHistoryEntry(query);
-
+    
+    ExporterPlugin exporterImpl = ui.getExporter(query.getExporter());
+    
     exportFuture = Background.call(new ExportBackgroundJob(query,
-      getExporterByName(query.getExporterName()), ui, eventBus, panel));
+      exporterImpl, ui, eventBus, panel));
     state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
   }
 
@@ -584,11 +578,6 @@ public class QueryController implements Serializable
 
     freqFuture = Background.call(job);
     state.getExecutedTasks().put(QueryUIState.QueryType.FREQUENCY, freqFuture);
-  }
-
-  public Exporter getExporterByName(String name)
-  {
-    return exporterMap.get(name);
   }
 
   private List<ResultViewPanel> getResultPanels()

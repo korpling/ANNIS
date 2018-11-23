@@ -16,6 +16,9 @@
 package annis.gui.objects;
 
 import com.google.common.base.Splitter;
+
+import annis.libgui.exporter.ExporterPlugin;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -25,10 +28,11 @@ import java.util.Objects;
  */
 public class ExportQuery extends ContextualizedQuery
 {
-  private String exporterName;
+  private Class<? extends ExporterPlugin> exporter;
   
   private List<String> annotationKeys;
   private String parameters;
+  private boolean alignmc;
 
   public List<String> getAnnotationKeys()
   {
@@ -48,18 +52,29 @@ public class ExportQuery extends ContextualizedQuery
   public void setParameters(String parameters)
   {
     this.parameters = parameters;
-  }
-
-  public String getExporterName()
+  } 
+  
+  public boolean getAlignmc()
   {
-    return exporterName;
-  }
-
-  public void setExporterName(String exporterName)
-  {
-    this.exporterName = exporterName;
+	  return alignmc;
   }
   
+  public void setAlignmc (boolean alignmc)
+  {
+	  this.alignmc = alignmc;
+  }
+
+  
+  public Class<? extends ExporterPlugin> getExporter()
+  {
+    return exporter;
+  }
+
+  public void setExporter(Class<? extends ExporterPlugin> exporter)
+  {
+    this.exporter = exporter;
+  }
+
   public ExportQuery annotationKeys(String annotationKeys)
   {
     this.annotationKeys = Splitter.on(',').omitEmptyStrings()
@@ -73,9 +88,15 @@ public class ExportQuery extends ContextualizedQuery
     return this;
   }
   
-  public ExportQuery exporter(String exporter)
+  public ExportQuery alignmc(boolean alignmc)
   {
-    this.exporterName = exporter;
+    this.alignmc = alignmc;
+    return this;
+  }
+  
+  public ExportQuery exporter(Class<? extends ExporterPlugin> exporter)
+  {
+    this.exporter = exporter;
     return this;
   }
   
@@ -83,7 +104,7 @@ public class ExportQuery extends ContextualizedQuery
   public int hashCode()
   {
     return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(), 
-      getAnnotationKeys(), getExporterName(), getParameters());
+      getAnnotationKeys(), getExporter(), getParameters());
   }
 
   @Override
@@ -105,7 +126,7 @@ public class ExportQuery extends ContextualizedQuery
       && Objects.equals(getRightContext(), other.getRightContext())
       && Objects.equals(getSegmentation(), other.getSegmentation())
       && Objects.equals(getAnnotationKeys(), other.getAnnotationKeys())
-      && Objects.equals(getExporterName(), other.getExporterName())
+      && Objects.equals(getExporter(), other.getExporter())
       && Objects.equals(getParameters(), other.getParameters());
   }
   

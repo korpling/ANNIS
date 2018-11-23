@@ -5,11 +5,10 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.4.4</version>
+    <version>3.5.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   
-  <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-libgui</artifactId>
   <name>annis-libgui</name>
   <packaging>jar</packaging>
@@ -149,7 +148,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

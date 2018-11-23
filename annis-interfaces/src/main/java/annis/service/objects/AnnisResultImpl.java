@@ -35,8 +35,6 @@ public class AnnisResultImpl implements AnnisResult
 	// the wrapped graph object
 	private AnnotationGraph graph;
 
-	// cache paula string
-	private String paulaString = null;
 
 	public AnnisResultImpl()
 	{

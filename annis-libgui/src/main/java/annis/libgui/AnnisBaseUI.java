@@ -15,30 +15,6 @@
  */
 package annis.libgui;
 
-import annis.VersionInfo;
-import annis.libgui.media.MediaController;
-import annis.libgui.visualizers.VisualizerPlugin;
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
-import com.google.common.base.Charsets;
-import com.google.common.eventbus.EventBus;
-import com.google.common.hash.Hashing;
-import com.google.common.io.Files;
-import com.vaadin.annotations.Theme;
-import com.vaadin.sass.internal.ScssStylesheet;
-import com.vaadin.server.ClassResource;
-import com.vaadin.server.Page;
-import com.vaadin.server.RequestHandler;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinResponse;
-import com.vaadin.server.VaadinService;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.ComponentContainer;
-import com.vaadin.ui.HasComponents;
-import com.vaadin.ui.UI;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -46,8 +22,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -57,13 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.xeoh.plugins.base.Plugin;
-import net.xeoh.plugins.base.PluginManager;
-import net.xeoh.plugins.base.impl.PluginManagerFactory;
-import net.xeoh.plugins.base.util.PluginManagerUtil;
+
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.AnnotationIntrospector;
@@ -73,6 +41,38 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import com.google.common.base.Charsets;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.MutableClassToInstanceMap;
+import com.google.common.eventbus.EventBus;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.vaadin.annotations.Theme;
+import com.vaadin.sass.internal.ScssStylesheet;
+import com.vaadin.server.ClassResource;
+import com.vaadin.server.Page;
+import com.vaadin.server.RequestHandler;
+import com.vaadin.server.Resource;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
+
+import annis.VersionInfo;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.libgui.visualizers.VisualizerPlugin;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import net.xeoh.plugins.base.Plugin;
+import net.xeoh.plugins.base.PluginManager;
+import net.xeoh.plugins.base.impl.PluginManagerFactory;
+import net.xeoh.plugins.base.util.PluginManagerUtil;
 /**
  * Basic UI functionality.
  * 
@@ -98,16 +98,18 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   public final static String WEBSERVICEURL_KEY = "annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY";
 
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
+  
+  public final static Resource PINGUIN_IMAGE = new ClassResource("/annis/libgui/penguins.png");
 
   private transient PluginManager pluginManager;
+  
+  private transient ClassToInstanceMap<ExporterPlugin> exporterRegistryCache;
   
   private static final Map<String, VisualizerPlugin> visualizerRegistry =
     Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
 
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
-
-  private transient MediaController mediaController;
 
   private transient ObjectMapper jsonMapper;
   
@@ -368,6 +370,57 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   }
   
   /**
+   * Handle common errors like database/service connection problems and display a unified
+   * error message.
+   * 
+   * This will not log the exception, only display information to the user.
+   * 
+   * @param ex
+   * @return True if error was handled, false otherwise.
+   */
+  public static boolean handleCommonError(Throwable ex, String action)
+  {
+    if(ex != null)
+    {
+      Throwable rootCause = ex;
+      while(rootCause.getCause() != null)
+      {
+        rootCause = rootCause.getCause();
+      }
+
+      if(rootCause instanceof UniformInterfaceException)
+      {
+        UniformInterfaceException uniEx = (UniformInterfaceException) rootCause;
+        
+        if(uniEx.getResponse() != null)
+        {
+          if(uniEx.getResponse().getStatus() == 503)
+          {
+            // database connection error
+            Notification n = new Notification(
+                "Can't execute " + (action == null ? "" : "\"" + action + "\"" ) 
+                + " action because database server is not responding.<br/>"
+                + "There might be too many users using this service right now.", 
+                Notification.Type.WARNING_MESSAGE);
+            n.setDescription("<p><strong>Please try again later.</strong> If the error persists inform the administrator of this server.</p>"
+                + "<p>Click on this message to close it.</p>"
+                + "<p style=\"font-size:9pt;color:gray;\">Pinguin picture by Polar Cruises [CC BY 2.0 (http://creativecommons.org/licenses/by/2.0)], via Wikimedia Commons</p>");
+            n.setIcon(PINGUIN_IMAGE);
+            n.setHtmlContentAllowed(true);
+            n.setDelayMsec(15000);
+           
+            n.show(Page.getCurrent());
+            
+            return true;
+          }
+        }
+       
+      }
+    }
+    return false;
+  }
+  
+  /**
    * Inject CSS into the UI. 
    * This function will not add multiple style-elements if the
    * exact CSS string was already added.
@@ -452,6 +505,21 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   public VisualizerPlugin getVisualizer(String shortName)
   {
     return visualizerRegistry.get(shortName);
+  }
+  
+  @Override
+  public ExporterPlugin getExporter(Class<? extends ExporterPlugin> clazz)
+  {
+    if(exporterRegistryCache == null)
+    {
+      exporterRegistryCache = MutableClassToInstanceMap.create();
+      PluginManagerUtil util = new PluginManagerUtil(getPluginManager());
+      for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class))
+      {
+        exporterRegistryCache.put(e.getClass(), e);
+      }
+    }
+    return exporterRegistryCache.get(clazz);
   }
 
   public ObjectMapper getJsonMapper()

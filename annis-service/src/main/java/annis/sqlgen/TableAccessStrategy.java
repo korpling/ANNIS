@@ -75,17 +75,18 @@ public class TableAccessStrategy {
     return tableName(tableAliases, table);
 	}
   
+  @Deprecated
   public String partitionTableName(String table, List<Long> corpusList) 
   {
     return partitionTableName(tableAliases, tablePartitioned, table, corpusList);
 	}
   
-  public static String tableName(Map<String, String> tableAliases, String table)
+  private static String tableName(Map<String, String> tableAliases, String table)
   {
     return tableAliases.containsKey(table) ? tableAliases.get(table) : table;
   }
   
-   public static String  partitionTableName(Map<String, String> tableAliases,
+   private static String  partitionTableName(Map<String, String> tableAliases,
      Map<String, Boolean> tablePartitioned,
      String table, List<Long> corpusList) 
   {

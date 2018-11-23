@@ -4,7 +4,6 @@
  */
 package annis.sqlgen;
 
-import annis.model.AnnisConstants;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN;
 import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
@@ -12,19 +11,12 @@ import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_EDGE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-import annis.model.RelannisEdgeFeature;
-import annis.model.RelannisNodeFeature;
-import annis.service.objects.Match;
-import annis.service.objects.MatchGroup;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-import com.google.common.base.Joiner;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.io.Files;
+
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -38,6 +30,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.corpus_tools.salt.SaltFactory;
@@ -69,6 +62,16 @@ import org.corpus_tools.salt.graph.Relation;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.io.Files;
+
+import annis.model.RelannisEdgeFeature;
+import annis.model.RelannisNodeFeature;
+import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
 
 /**
  *
@@ -159,9 +162,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           graph = SaltFactory.createSDocumentGraph();
           document = SaltFactory.createSDocument();
           
-          document.setDocumentGraphLocation(org.eclipse.emf.common.util.URI.
-            createFileURI(Files.createTempDir().getAbsolutePath()));
-          
           List<String> path = corpusPathExtractor.extractCorpusPath(resultSet,
             "path");
 
@@ -193,7 +193,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           tokenTexts,
           tokenByIndex, nodeBySegmentationPath,
           key, nodeByRankID);
-        long pre = longValue(resultSet, RANK_TABLE, "pre");
         long rankID = longValue(resultSet, RANK_TABLE, "id");
         long componentID = longValue(resultSet, COMPONENT_TABLE, "id");
         if (!resultSet.wasNull())
@@ -348,7 +347,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     List<String> allUrisAsString = new LinkedList<>();
     for (URI u : match.getSaltIDs())
     {
-      allUrisAsString.add(u.toASCIIString());
+      allUrisAsString.add(u.toASCIIString().replace(",", "%2C"));
     }
     // set the matched keys
     SFeature featIDs = SaltFactory.createSFeature();
@@ -611,17 +610,17 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     node.addFeature(feat);
   }
 
-  private void addStringSFeature(SNode node, String name,
-    String value) throws SQLException
-  {
-    SFeature feat = SaltFactory.createSFeature();
-    feat.setNamespace(ANNIS_NS);
-    feat.setName(name);
-    feat.setValue(value);
-    node.addFeature(feat);
-  }
-
-// non used functions, commmented out in order to avoid some findbugs warnings 
+//non used functions, commmented out in order to avoid some findbugs warnings 
+//  private void addStringSFeature(SNode node, String name,
+//    String value) throws SQLException
+//  {
+//    SFeature feat = SaltFactory.createSFeature();
+//    feat.setNamespace(ANNIS_NS);
+//    feat.setName(name);
+//    feat.setValue(value);
+//    node.addFeature(feat);
+//  }
+//  
 //  private void addLongSFeature(SNode node, ResultSet resultSet, String name,
 //    String table, String tupleName) throws SQLException
 //  {

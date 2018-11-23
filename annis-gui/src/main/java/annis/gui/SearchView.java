@@ -15,35 +15,26 @@
  */
 package annis.gui;
 
-import annis.VersionInfo;
-import annis.gui.controlpanel.ControlPanel;
-import annis.gui.docbrowser.DocBrowserController;
-import annis.gui.exporter.CSVExporter;
-import annis.gui.exporter.Exporter;
-import annis.gui.exporter.GridExporter;
-import annis.gui.exporter.SimpleTextExporter;
-import annis.gui.exporter.TokenExporter;
-import annis.gui.exporter.WekaExporter;
-import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.objects.DisplayedResultQuery;
-import annis.gui.objects.PagedResultQuery;
-import annis.gui.objects.Query;
-import annis.gui.objects.QueryGenerator;
-import annis.gui.resultview.ResultViewPanel;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.libgui.InstanceConfig;
-import annis.libgui.media.MediaController;
-import annis.libgui.media.MediaControllerImpl;
-import annis.libgui.media.MimeTypeErrorListener;
-import annis.libgui.media.PDFController;
-import annis.libgui.media.PDFControllerImpl;
-import annis.service.objects.AnnisCorpus;
-import annis.service.objects.OrderType;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -66,20 +57,26 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.LoggerFactory;
+
+import annis.VersionInfo;
+import annis.gui.controlpanel.ControlPanel;
+import annis.gui.docbrowser.DocBrowserController;
+import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.objects.DisplayedResultQuery;
+import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.Query;
+import annis.gui.objects.QueryGenerator;
+import annis.gui.resultview.ResultViewPanel;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.MediaControllerImpl;
+import annis.libgui.media.MimeTypeErrorListener;
+import annis.libgui.media.PDFController;
+import annis.libgui.media.PDFControllerImpl;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.OrderType;
 
 /**
  * The view which shows the search interface.
@@ -98,15 +95,6 @@ public class SearchView extends GridLayout implements View,
     SearchView.class);
 
   public static final String NAME = "";
-
-  static final Exporter[] EXPORTER = new Exporter[]
-  {
-    new WekaExporter(),
-    new CSVExporter(),
-    new TokenExporter(),
-    new GridExporter(),
-    new SimpleTextExporter()
-  };
 
   private final static Escaper urlPathEscape = UrlEscapers.
     urlPathSegmentEscaper();

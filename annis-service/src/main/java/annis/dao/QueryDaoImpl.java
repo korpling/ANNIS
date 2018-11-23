@@ -15,6 +15,65 @@
  */
 package annis.dao;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Properties;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.UUID;
+
+import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpus;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.SaltUtil;
+import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
+import org.eclipse.emf.common.util.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ConnectionCallback;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.io.ByteStreams;
+
 import annis.CSVHelper;
 import annis.CommonHelper;
 import annis.WekaHelper;
@@ -54,64 +113,9 @@ import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
+import annis.sqlgen.SelectedFactsFromClauseGenerator;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
-import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.io.ByteStreams;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Properties;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.UUID;
-import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.corpus_tools.salt.SaltFactory;
-import org.corpus_tools.salt.common.SCorpus;
-import org.corpus_tools.salt.common.SCorpusGraph;
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SNode;
-import org.corpus_tools.salt.core.SRelation;
-import org.corpus_tools.salt.util.SaltUtil;
-import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
-import org.eclipse.emf.common.util.URI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
 public class QueryDaoImpl extends AbstractDao implements QueryDao,
@@ -166,7 +170,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   /**
    * @param graphSqlGenerator the graphSqlGenerator to set
    */
-  public void setGraphSqlGenerator(AnnotateSqlGenerator graphSqlGenerator)
+  public void setGraphSqlGenerator(AnnotateSqlGenerator<SaltProject> graphSqlGenerator)
   {
     this.graphSqlGenerator = graphSqlGenerator;
   }
@@ -515,7 +519,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
   private List<SqlSessionModifier> sqlSessionModifiers;
 //  private SqlGenerator findSqlGenerator;
 
-  private ParameterizedSingleColumnRowMapper<String> planRowMapper;
+  private SingleColumnRowMapper<String> planRowMapper;
 
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
 
@@ -533,7 +537,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
 
   public QueryDaoImpl()
   {
-    planRowMapper = new ParameterizedSingleColumnRowMapper<>();
+    planRowMapper = new SingleColumnRowMapper<>();
     sqlSessionModifiers = new ArrayList<>();
   }
 
@@ -826,8 +830,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     String corpusListStr = corpusList == null || corpusList.isEmpty()
       ? "NULL" : Joiner.on(", ").join(corpusList);
 
+    String annotationsTable = SelectedFactsFromClauseGenerator.inheritedTables("annotations", corpusList, "");
+    
     String sql = "SELECT DISTINCT \"name\"\n"
-      + "FROM annotations\n"
+      + "FROM " + annotationsTable + " AS annotations \n"
       + "WHERE\n"
       + "  toplevel_corpus IN (" + corpusListStr + ")\n"
       + "  AND type='segmentation'";
@@ -1138,13 +1144,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao,
     this.sqlGenerator = sqlGenerator;
   }
 
-  public ParameterizedSingleColumnRowMapper<String> getPlanRowMapper()
+  public SingleColumnRowMapper<String> getPlanRowMapper()
   {
     return planRowMapper;
   }
 
   public void setPlanRowMapper(
-    ParameterizedSingleColumnRowMapper<String> planRowMapper)
+		  SingleColumnRowMapper<String> planRowMapper)
   {
     this.planRowMapper = planRowMapper;
   }

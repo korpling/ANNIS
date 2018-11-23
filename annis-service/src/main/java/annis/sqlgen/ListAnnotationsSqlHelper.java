@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-public class ListAnnotationsSqlHelper implements ResultSetExtractor
+public class ListAnnotationsSqlHelper implements ResultSetExtractor<ArrayList<AnnisAttribute>>
 {
 
   private static Logger log = LoggerFactory.getLogger(
@@ -38,6 +38,8 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
   public String createSqlQuery(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValue)
   {
+    String annotationsTable = SelectedFactsFromClauseGenerator.inheritedTables("annotations", corpusList, "");
+    
     String sqlAnnos = "select namespace, name, value, \"type\", subtype, edge_namespace, edge_name from\n"
       + "(\n"
       + "  select *, row_number() OVER (PARTITION BY namespace, name, edge_namespace, edge_name) as row_num\n"
@@ -46,7 +48,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       + "    select\n"
       + "    namespace, name, \"type\", subtype, edge_name, edge_namespace, "
       + "    occurences, :value AS value\n"
-      + "    FROM annotations\n"
+      + "    FROM " +  annotationsTable + " AS annotations \n"
       + "    WHERE\n"
       + "    (value IS NULL OR value <> '--')\n"
       + (corpusList.isEmpty() ? "\n" : "    AND toplevel_corpus IN (:corpora)\n")
@@ -83,7 +85,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
   }
 
   @Override
-  public Object extractData(ResultSet resultSet) throws SQLException,
+  public ArrayList<AnnisAttribute> extractData(ResultSet resultSet) throws SQLException,
     DataAccessException
   {
     Map<String, AnnisAttribute> attributesByName = new HashMap<>();

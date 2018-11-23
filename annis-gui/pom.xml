@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.4.4</version>
+    <version>3.5.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -190,6 +190,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+
+    <dependency>
+      <groupId>com.github.vaadin4qbanos</groupId>
+      <artifactId>jsclipboard</artifactId>
+      <version>1.0.12</version>
+    </dependency>
     
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
@@ -215,7 +221,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.11</version>
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     
@@ -230,6 +236,12 @@
       <artifactId>selenium-htmlunit-driver</artifactId>
       <version>2.49.0</version>
       <scope>test</scope>
+    </dependency>
+    
+     <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <version>2.6.11</version>
     </dependency>
     
  

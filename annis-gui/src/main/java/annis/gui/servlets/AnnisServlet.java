@@ -15,21 +15,23 @@
  */
 package annis.gui.servlets;
 
-import annis.gui.requesthandler.ShortenerRequestHandler;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
-import com.vaadin.server.VaadinService;
-import com.vaadin.server.VaadinServlet;
-import com.vaadin.server.VaadinSession;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
+
 import javax.servlet.ServletException;
+
+import com.vaadin.server.ServiceException;
+import com.vaadin.server.SessionInitEvent;
+import com.vaadin.server.SessionInitListener;
+import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.VaadinSession;
+
+import annis.gui.requesthandler.ShortenerRequestHandler;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
 
 /**
  *

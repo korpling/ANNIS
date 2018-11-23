@@ -126,9 +126,6 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     return resultSet.getString(tableAccessStrategy.columnName(table, column));
   }
   
-  private boolean booleanValue(ResultSet resultSet, String table, String column, TableAccessStrategy tableAccessStrategy) throws SQLException {
-    return resultSet.getBoolean(tableAccessStrategy.columnName(table, column));
-  }
 
   @Override
   public List<AnnotationGraph> extractData(ResultSet resultSet)

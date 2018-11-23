@@ -74,7 +74,7 @@ public class CountTest
     {
       assumeNotNull(springAnnisDao.getJdbcTemplate());
 
-      springAnnisDao.getJdbcTemplate().queryForInt("SELECT 1");
+      springAnnisDao.getJdbcTemplate().queryForObject("SELECT 1", Integer.class);
 
     }
     catch (DataAccessException ex)
@@ -160,6 +160,14 @@ public class CountTest
     assertEquals(2, countPcc2("\"wollen\" & tok & tok \n" +
 "& #1 ->dep[func=\"obja\"] #2 \n" +
 "& #1 ->dep[func=\"sbj\"] #3"));
+    
+    assertEquals(17, countPcc2("NP ^ PP "));
+    assertEquals(118, countPcc2("NP ^1,10 PP "));
+    assertEquals(477, countPcc2("NP ^* PP "));
+    assertEquals(3, countPcc2("\"in\" ^ Inf-Stat=\"new\""));
+    assertEquals(29, countPcc2("pos=\"NN\" ^ pos=\"ART\""));
+    assertEquals(520, countPcc2("pos=\"NN\" ^* pos=\"ART\""));
+    
     
   }
 

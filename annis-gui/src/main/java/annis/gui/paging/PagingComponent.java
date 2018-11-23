@@ -167,7 +167,7 @@ public class PagingComponent extends Panel implements
     txtPage = new TextField();
     txtPage.setDescription("current page");
     txtPage.setHeight("-1px");
-    txtPage.setWidth(5.f, UNITS_EM);
+    txtPage.setWidth(5.f, Unit.EM);
     Validator pageValidator = new PageValidator(
       "must be an integer greater than zero");
     txtPage.addValidator(pageValidator);

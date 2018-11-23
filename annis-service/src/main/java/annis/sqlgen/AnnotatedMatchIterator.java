@@ -32,7 +32,7 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
 {
-  private ResultSetTypedIterator<AnnotatedSpan> itSpan;
+  private final ResultSetTypedIterator<AnnotatedSpan> itSpan;
   private AnnotatedSpan lastSpan;
   
   public AnnotatedMatchIterator(ResultSet rs, RowMapper<AnnotatedSpan> mapper)
@@ -65,9 +65,16 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
     if(lastSpan != null)
     {
       key = lastSpan.getKey();
-      matchedSpans = new AnnotatedSpan[key.size()];
-     
-      setSpanForAllMatchedPositions(key, matchedSpans, lastSpan);
+      if(key == null)
+      {
+        matchedSpans = new AnnotatedSpan[0];
+      }
+      else
+      {
+        matchedSpans = new AnnotatedSpan[key.size()];
+
+        setSpanForAllMatchedPositions(key, matchedSpans, lastSpan);
+      }
       
       lastSpan = null;
     }
@@ -101,7 +108,10 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
     // HACK: delete metadata spans for non-first nodes 
     for(int i=1; i < matchedSpans.length; i++)
     {
-      matchedSpans[i].setMetadata(new LinkedList<Annotation>());
+      if(matchedSpans[i] != null)
+      {
+        matchedSpans[i].setMetadata(new LinkedList<Annotation>());
+      }
     }
     
     return new AnnotatedMatch(matchedSpans);    
@@ -119,11 +129,15 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
     // set annotation spans for *all* positions of the id
     // (node could have matched several times)
     int i=0;
-    for(long l : key)
+    for(Long lRaw : key)
     {
-      if(l == span.getId())
+      if(lRaw != null)
       {
-        matchedSpans[i] = new AnnotatedSpan(span);
+        long l = (long) lRaw;
+        if(l == span.getId())
+        {
+          matchedSpans[i] = new AnnotatedSpan(span);
+        }
       }
       i++;
     }

@@ -86,7 +86,6 @@ public class BenchmarkTest
 
   private final OutputStream nullStream = ByteStreams.nullOutputStream();
   private final MediaType typeXMI = new MediaType("application", "xmi+xml");
-  private final MediaType typeBinary = new MediaType("application", "xmi+binary");
 
   @Before
   public void setup()
@@ -98,7 +97,7 @@ public class BenchmarkTest
     {
       assumeNotNull(springAnnisDao.getJdbcTemplate());
 
-      springAnnisDao.getJdbcTemplate().queryForInt("SELECT 1");
+      springAnnisDao.getJdbcTemplate().queryForObject("SELECT 1", Integer.class);
 
     }
     catch (DataAccessException ex)

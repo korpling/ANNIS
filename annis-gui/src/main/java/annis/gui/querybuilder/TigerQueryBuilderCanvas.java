@@ -138,11 +138,7 @@ public class TigerQueryBuilderCanvas extends Panel
         }
 
       }
-      catch(UniformInterfaceException ex)
-      {
-        log.error(null, ex);
-      }
-      catch(ClientHandlerException ex)
+      catch(UniformInterfaceException | ClientHandlerException ex)
       {
         log.error(null, ex);
       }
@@ -393,7 +389,6 @@ public class TigerQueryBuilderCanvas extends Panel
 
     //creating node definitions
     int componentCount = 0;
-    int nodeID = 1;
     for (NodeWindow nodeWindow : nodes.keySet())
     {
       List<NodeWindow.ConstraintLayout> constraints =
@@ -454,8 +449,6 @@ public class TigerQueryBuilderCanvas extends Panel
         query.append("node");
       }
       nodeComponentMap.put(nodeWindow, componentCount);
-
-      nodeID++;
     }
     query.append(nodeIdentityOperations);
 

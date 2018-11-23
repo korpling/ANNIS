@@ -1,0 +1,29 @@
+ .legend {
+	 position: relative;
+	 left: 10px;				
+	 top: 10px;
+	 height: 50px !important;
+	 width: 70px !important;	
+	 text-align: center;
+}
+
+.legend-label { 	
+	 text-align: left;	 
+ } 
+		
+ .legend-token { 
+	 background:#CCFF99 !important; 
+	 
+ }  
+
+ .legend-span { 
+	 background:#dbdcff !important;
+ }
+ 
+ .legend-struct { 
+	 background:#ffff7d !important;
+	 
+ }
+
+
+
