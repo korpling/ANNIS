@@ -12,7 +12,7 @@ var classannis_1_1administration_1_1_corpus_administration =
     [ "getSchemeFixer", "classannis_1_1administration_1_1_corpus_administration.html#aaa809a9d1e4eddfdcc8f38be3dac2239", null ],
     [ "getStatusMailSender", "classannis_1_1administration_1_1_corpus_administration.html#a3d8edca0b3cf6ebdd2cb0cc20f880dae", null ],
     [ "importCorporaSave", "classannis_1_1administration_1_1_corpus_administration.html#a11a20c525ae1971903acb6dbff1d367f", null ],
-    [ "importCorporaSave", "classannis_1_1administration_1_1_corpus_administration.html#adb8efa13627214c9b5354d741a65bb1c", null ],
+    [ "importCorporaSave", "classannis_1_1administration_1_1_corpus_administration.html#ae01a61879e2649fbbeda1c2367dfe857", null ],
     [ "initializeDatabase", "classannis_1_1administration_1_1_corpus_administration.html#a7eb1026aace884def15e8d82f55b8785", null ],
     [ "listCorpusStats", "classannis_1_1administration_1_1_corpus_administration.html#a26b4412ea5fc2778dba438080256b1d7", null ],
     [ "listCorpusStats", "classannis_1_1administration_1_1_corpus_administration.html#af9b553a37f70390a462877d352203d78", null ],

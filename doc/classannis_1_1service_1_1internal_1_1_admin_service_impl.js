@@ -1,6 +1,6 @@
 var classannis_1_1service_1_1internal_1_1_admin_service_impl =
 [
-    [ "changePassword", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a9793ca9a79f03294d56d8c6193182bf3", null ],
+    [ "changePassword", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a6418f1e0784a9f7b6021d9cd8052eee0", null ],
     [ "currentImports", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#aa571f18001da459cf96088dce425362a", null ],
     [ "deleteCorpus", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#ad1d0f1ad7fb87c6b56642dfebd81333a", null ],
     [ "deleteGroup", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#ab8e232683b3cdb6a15477d5366a39ad9", null ],
@@ -13,7 +13,7 @@ var classannis_1_1service_1_1internal_1_1_admin_service_impl =
     [ "getQueryDao", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a48c7ad3f345f68d3dca42a9c6007a9e7", null ],
     [ "getUser", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a2d715c8a06cd917148152a3cfef252d9", null ],
     [ "getUserConfig", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a81fba39cd9fbe7973e4dcf7bec15687b", null ],
-    [ "importCorpus", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a32c54972e351f479354ec9a73ccd4818", null ],
+    [ "importCorpus", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a66ec8a8d1b4fc42c9d7e002be957e0c5", null ],
     [ "init", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#ac07e530cbc7324ce1495c98466f8ed16", null ],
     [ "isAuthenticated", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#aef5d76ce892a509079684952477e3bb4", null ],
     [ "listGroups", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#ac1f9718d5275efb921a43b0aede3147f", null ],
@@ -24,6 +24,6 @@ var classannis_1_1service_1_1internal_1_1_admin_service_impl =
     [ "setImportWorker", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a4398c6628b7055af5ad05a6bfce9d120", null ],
     [ "setQueryDao", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a59f92c362a45310d61709081e9f33e13", null ],
     [ "setUserConfig", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#adac0f4f0bd5c0fa47c781abb539c89f5", null ],
-    [ "updateOrCreateGroup", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#adbb68de8babcbbe4f1e585f052f41c69", null ],
-    [ "updateOrCreateUser", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#aacca65a149960e9632c3f2a1f6aa4e6d", null ]
+    [ "updateOrCreateGroup", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#ad59bce2116bed6299b65f821de50f10d", null ],
+    [ "updateOrCreateUser", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#ad167e62d3da5a62f2dbf810e8353b420", null ]
 ];

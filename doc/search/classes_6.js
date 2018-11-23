@@ -23,5 +23,6 @@ var searchData=
   ['groupcontroller',['GroupController',['../classannis_1_1gui_1_1admin_1_1controller_1_1_group_controller.html',1,'annis::gui::admin::controller']]],
   ['grouplistview',['GroupListView',['../interfaceannis_1_1gui_1_1admin_1_1view_1_1_group_list_view.html',1,'annis::gui::admin::view']]],
   ['groupmanagement',['GroupManagement',['../classannis_1_1gui_1_1admin_1_1model_1_1_group_management.html',1,'annis::gui::admin::model']]],
-  ['groupmanagementpanel',['GroupManagementPanel',['../classannis_1_1gui_1_1admin_1_1_group_management_panel.html',1,'annis::gui::admin']]]
+  ['groupmanagementpanel',['GroupManagementPanel',['../classannis_1_1gui_1_1admin_1_1_group_management_panel.html',1,'annis::gui::admin']]],
+  ['guavaescapermarshallerprovider',['GuavaEscaperMarshallerProvider',['../classannis_1_1rest_1_1provider_1_1_guava_escaper_marshaller_provider.html',1,'annis::rest::provider']]]
 ];

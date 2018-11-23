@@ -1,6 +1,7 @@
 var searchData=
 [
   ['saltannotateextractor',['SaltAnnotateExtractor',['../classannis_1_1sqlgen_1_1_salt_annotate_extractor.html',1,'annis::sqlgen']]],
+  ['saltbasedexporter',['SaltBasedExporter',['../classannis_1_1gui_1_1exporter_1_1_salt_based_exporter.html',1,'annis::gui::exporter']]],
   ['saltprojectprovider',['SaltProjectProvider',['../classannis_1_1provider_1_1_salt_project_provider.html',1,'annis::provider']]],
   ['samespan',['SameSpan',['../classannis_1_1sqlgen_1_1model_1_1_same_span.html',1,'annis::sqlgen::model']]],
   ['samplewhereclause',['SampleWhereClause',['../classannis_1_1sqlgen_1_1_sample_where_clause.html',1,'annis::sqlgen']]],

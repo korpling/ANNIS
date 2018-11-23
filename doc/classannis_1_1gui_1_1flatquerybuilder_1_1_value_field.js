@@ -1,8 +1,6 @@
 var classannis_1_1gui_1_1flatquerybuilder_1_1_value_field =
 [
-    [ "ValueMode", "classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode", [
-      [ "NORMAL", "classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#af3454bbd5a040cf993076d4db22f4fe6", null ]
-    ] ],
+    [ "ValueMode", "enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode.html", "enumannis_1_1gui_1_1flatquerybuilder_1_1_value_field_1_1_value_mode" ],
     [ "ValueField", "classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a12fe2c423fa6d864f6658657b8dc52ed", null ],
     [ "ValueField", "classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#aa9f97f1f2e6d685d15e1cedada64702f", null ],
     [ "buttonClick", "classannis_1_1gui_1_1flatquerybuilder_1_1_value_field.html#a5899f2bb779cd721010c93bce5f2b406", null ],

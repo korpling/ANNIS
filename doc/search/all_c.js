@@ -2,8 +2,7 @@ var searchData=
 [
   ['making_20a_20new_20annis_20release',['Making a new ANNIS release',['../dev-release.html',1,'dev']]],
   ['main',['main',['../classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_exception_dialog.html#ae8eb650052ef998726052e29bfb59574',1,'de.hu_berlin.german.korpling.annis.kickstarter.ExceptionDialog.main()'],['../classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_main_frame.html#a16d7e7e0125cb7d1ea4485804fd13886',1,'de.hu_berlin.german.korpling.annis.kickstarter.MainFrame.main()']]],
-  ['mainframe',['MainFrame',['../classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_main_frame.html',1,'de::hu_berlin::german::korpling::annis::kickstarter']]],
-  ['mainframe',['MainFrame',['../classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_main_frame.html#a08fa6a1f5952434bb98e734e7e3b9fc5',1,'de::hu_berlin::german::korpling::annis::kickstarter::MainFrame']]],
+  ['mainframe',['MainFrame',['../classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_main_frame.html',1,'de.hu_berlin.german.korpling.annis.kickstarter.MainFrame'],['../classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_main_frame.html#a08fa6a1f5952434bb98e734e7e3b9fc5',1,'de.hu_berlin.german.korpling.annis.kickstarter.MainFrame.MainFrame()']]],
   ['maintoolbar',['MainToolbar',['../classannis_1_1gui_1_1_main_toolbar.html',1,'annis::gui']]],
   ['makelabel',['makeLabel',['../classannis_1_1visualizers_1_1component_1_1tree_1_1backends_1_1staticimg_1_1_java2d_backend.html#a9bad29a98d09bd47befb34ca7e5a7f60',1,'annis.visualizers.component.tree.backends.staticimg.Java2dBackend.makeLabel()'],['../interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_graphics_backend.html#a8c7292d8ef2cc3a7c0680071fa2e7a4e',1,'annis.visualizers.component.tree.GraphicsBackend.makeLabel()']]],
   ['map',['map',['../classannis_1_1rest_1_1provider_1_1_s_q_l_exception_mapper.html#aba7654f8c2f22b2f33bb6a94f6489219',1,'annis::rest::provider::SQLExceptionMapper']]],
@@ -15,7 +14,7 @@ var searchData=
   ['matchcorefvisualizer',['MatchCorefVisualizer',['../classannis_1_1visualizers_1_1iframe_1_1_match_coref_visualizer.html',1,'annis::visualizers::iframe']]],
   ['matchednodecolors',['MatchedNodeColors',['../enumannis_1_1libgui_1_1_matched_node_colors.html',1,'annis::libgui']]],
   ['matchgroup',['MatchGroup',['../classannis_1_1service_1_1objects_1_1_match_group.html',1,'annis::service::objects']]],
-  ['matrix',['matrix',['../classannis_1_1service_1_1internal_1_1_query_service_impl.html#a383835a98f37ecccadffef94b25c1a15',1,'annis::service::internal::QueryServiceImpl']]],
+  ['matrix',['matrix',['../classannis_1_1service_1_1internal_1_1_query_service_impl.html#ad6a96fa7314cf241690016ac39a53688',1,'annis::service::internal::QueryServiceImpl']]],
   ['matrixquerydata',['MatrixQueryData',['../classannis_1_1sqlgen_1_1_matrix_query_data.html',1,'annis::sqlgen']]],
   ['matrixsqlgenerator',['MatrixSqlGenerator',['../classannis_1_1sqlgen_1_1_matrix_sql_generator.html',1,'annis::sqlgen']]],
   ['mediacontroller',['MediaController',['../interfaceannis_1_1libgui_1_1media_1_1_media_controller.html',1,'annis::libgui::media']]],

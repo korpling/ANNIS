@@ -6,8 +6,10 @@ var classannis_1_1gui_1_1widgets_1_1grid_1_1_row =
     [ "canMerge", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#ab5f3810e27c2068970a1b21e0ea89dda", null ],
     [ "getEvents", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#ae591229ea7b82df0349a46ac90072f49", null ],
     [ "getOccupancyGridCopy", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#a3d62d40ce389ddd4bea9ca3ba17e9eb6", null ],
+    [ "getStyle", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#a727a3a8878d9a492ba08726c6baf41e2", null ],
     [ "getTextIDs", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#a3088bf7073e63b0a2c39e29c0931cb8c", null ],
     [ "merge", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#a49326f6704293ee66394061178954cce", null ],
     [ "removeEvent", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#a0a2cd757d1f315a0befd22d99aa0a405", null ],
-    [ "removeEvent", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#a29aa7f3b4a3f0188d9f0af894c86ca94", null ]
+    [ "removeEvent", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#a29aa7f3b4a3f0188d9f0af894c86ca94", null ],
+    [ "setStyle", "classannis_1_1gui_1_1widgets_1_1grid_1_1_row.html#a19cb119185fd1357428063373b4a565a", null ]
 ];

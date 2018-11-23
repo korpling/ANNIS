@@ -5,6 +5,7 @@ var classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter =
       [ "CONSTANT", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#a20fdf2f2b0e0c5b49a2890df2474e2f7", null ],
       [ "EMPTY", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#a756d1af75c4a703dee50b934c78d62d3", null ],
       [ "ESCAPED_VALUE", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#a402b7eccd1f1ca082442b39b6227a74f", null ],
+      [ "HTML_TEMPLATE", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#ad0f2faa5b8b6c3e2825f56a9aea0dfe8", null ],
       [ "META_NAME", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#a8f86a51b6c959b1b31ece1d2d43b57df", null ],
       [ "VALUE", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#ab3e084e2ef45b686feab87c7c9c33aac", null ]
     ] ],

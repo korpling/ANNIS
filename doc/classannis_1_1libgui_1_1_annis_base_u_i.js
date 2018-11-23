@@ -3,6 +3,7 @@ var classannis_1_1libgui_1_1_annis_base_u_i =
     [ "addCustomUIPlugins", "classannis_1_1libgui_1_1_annis_base_u_i.html#a2f8e9b91176327c2522a01e384a563c2", null ],
     [ "attach", "classannis_1_1libgui_1_1_annis_base_u_i.html#aeb742c9bc96c7d3370ab22ed0b3c355d", null ],
     [ "close", "classannis_1_1libgui_1_1_annis_base_u_i.html#a4db21fea3beac1eda312b1980e72c355", null ],
+    [ "getExporter", "classannis_1_1libgui_1_1_annis_base_u_i.html#a57bb88a99b46e3895e244f24a6617ef9", null ],
     [ "getJsonMapper", "classannis_1_1libgui_1_1_annis_base_u_i.html#a6bd34eb147b2421b97c8b7eb40ac71b8", null ],
     [ "getLoginDataLostBus", "classannis_1_1libgui_1_1_annis_base_u_i.html#a79e13f92c344a80ebfd32be79199eccd", null ],
     [ "getPluginManager", "classannis_1_1libgui_1_1_annis_base_u_i.html#a8ea9708e16ebbbe97bae42efafc879b8", null ],

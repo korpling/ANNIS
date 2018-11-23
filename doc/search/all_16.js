@@ -1,6 +1,8 @@
 var searchData=
 [
   ['waiting',['WAITING',['../classannis_1_1service_1_1objects_1_1_import_job.html#a0786aedace79f3b53028d53e065d1ddb',1,'annis::service::objects::ImportJob::Status']]],
+  ['webfont',['WebFont',['../classannis_1_1visualizers_1_1htmlvis_1_1_web_font.html',1,'annis::visualizers::htmlvis']]],
+  ['webfontlist',['WebFontList',['../classannis_1_1visualizers_1_1htmlvis_1_1_web_font_list.html',1,'annis::visualizers::htmlvis']]],
   ['webresourceprovider',['WebResourceProvider',['../interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html',1,'annis::gui::admin::model']]],
   ['wekaexporter',['WekaExporter',['../classannis_1_1gui_1_1exporter_1_1_weka_exporter.html',1,'annis::gui::exporter']]],
   ['wekahelper',['WekaHelper',['../classannis_1_1_weka_helper.html',1,'annis']]],

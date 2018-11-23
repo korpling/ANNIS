@@ -1,5 +1,9 @@
 var classannis_1_1_annis_runner =
 [
+    [ "BenchmarkMode", "classannis_1_1_annis_runner.html#enumannis_1_1_annis_runner_1_1_benchmark_mode", [
+      [ "sequential_random", "classannis_1_1_annis_runner.html#a0dbf0644b4ef67f15c41dc9716ab6b72", null ],
+      [ "warmup_random", "classannis_1_1_annis_runner.html#a48e46cfcff2710d5281880f1b930e31a", null ]
+    ] ],
     [ "OS", "classannis_1_1_annis_runner.html#enumannis_1_1_annis_runner_1_1_o_s", [
       [ "linux", "classannis_1_1_annis_runner.html#a39c98adebe89cb40598616c950fe0c00", null ],
       [ "other", "classannis_1_1_annis_runner.html#add0b49b8163777ede8e3593e56d94fca", null ]
