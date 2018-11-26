@@ -18,6 +18,8 @@
     - [Frequency Analysis](./aql/frequency.md)
     - [Complete List of Operators](./aql/operators.md)
 - [Configuration and Administration](./config/README.md)
+    - [Configuring Visualizations](./config/visualizations/README.md)
+        - [List of Visualizations](./config/visualizations/list.md)
     - [User Configuration](./config/user.md)
     - [Document Browser](./config/documentbrowser.md)
     - [Create and Configure Instances](./config/instances.md) 
