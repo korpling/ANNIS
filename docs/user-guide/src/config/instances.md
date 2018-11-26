@@ -1,4 +1,4 @@
-# Create and configure instances
+# Create and Configure Instances
 
 When multiple corpora from different sources are hosted on one server it is often
 still desired to group the corpora by their origin and present them differently.

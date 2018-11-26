@@ -1,4 +1,4 @@
-# Error Codes of the administrator tools
+# Error Codes of the administration tools
 
 Additional to textual output the administration tools will return an error code when exiting in an error condition.
 On Linux you can query the exit code of the last command with

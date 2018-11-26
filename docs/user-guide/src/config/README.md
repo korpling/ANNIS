@@ -3,6 +3,12 @@
 ANNIS consists of a front-end web-application, a back-end service and the PostgreSQL server.
 The behavior of these components can be customized changing their configuration.
 
+## Back-end service
+
+There is a configuration folder `conf/` in the installation directory with the main configuration file `annis-service.properties`.
+In addition, there is the `shiro.info` file to change the location of the [user configuration](user.md).
+You should not need to change any of the other files in this directory.
+
 ## Front-end web-application
 
 The ANNIS front-end will search in different folders for it's configuration.
@@ -18,11 +24,6 @@ or [JSON](http://www.json.org/) format. Configuration files from the user direct
 overwrite the global configuration and the global configuration overwrites the
 default configuration.
 
-## Back-end service
-
-There is a configuration folder `conf/` in the installation directory with the main configuration file `annis-service.properties`.
-In addition, there is the `shiro.info` file to change the location of the [user configuration](user.md).
-You should not need to change any of the other files in this directory.
 
 ## PostgreSQL
 
