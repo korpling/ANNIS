@@ -29,6 +29,10 @@
               <resource>
                 <directory>src/mdbook/</directory>
                 <filtering>true</filtering>
+                <excludes>
+                  <exclude>user-guide/book/</exclude>
+                  <exclude>developer-guide/book/</exclude>
+                </excludes>
               </resource>
             </resources>
           </configuration>
