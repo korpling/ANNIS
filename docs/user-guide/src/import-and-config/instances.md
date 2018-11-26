@@ -6,7 +6,20 @@ You should not be forced to have an ANNIS frontend and service installation for
 each of this groups. Instead the administrator can define so called instances.
 
 An instance is defined by a JSON file inside the instances sub-folder in one of
-the *front-end configuration locations*. The name of the file also defines the instance name.
+the *front-end configuration locations*, e.g. the home folder of the user running the ANNIS front-end
+ (on a server often the Tomcat user, or under Windows Kickstarter, in
+`C:\Users\username\.annis` , or under Mac OSX under `/Users/username/.annis/`,
+which is a hidden folder; to view hidden folders you may need to reconfigure your
+Finder application).
+In ANNIS server scenarios where it is not possible to deploy the
+home directory of the user running the front-end (e.g. no home folder for Tomcat), you
+may prefer to manually set the configuration path parameter `ANNIS_CFG` for ANNIS,
+by adding something like the following to the shell script starting ANNIS
+~~~bash
+export ANNIS_CFG=/etc/my_annis_cfg_path/
+~~~
+Instances can then be specified under this folder.
+The name of the file also defines the instance name.
 Thus the file `instances/falko.json` defines the instance named "falko".
 
 ~~~json

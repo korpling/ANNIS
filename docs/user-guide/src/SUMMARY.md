@@ -29,7 +29,6 @@
     - [Multiple Instances of the Interface](./import-and-config/instances.md) 
 - [Advanced Topics](./advanced/README.md)
     - [User Configuration](./advanced/user.md)
-    - [Create and Configure Instances](./advanced/instances.md) 
     - [Using Web Fonts in the Interface](./advanced/webfonts.md)
     - [PostgreSQL Server Configuration](./advanced/postgresql.md)
     - [Error Codes of the administration tools](./advanced/errorcodes.md)
