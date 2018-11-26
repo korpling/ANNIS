@@ -53,3 +53,14 @@ for triggering the visualization
 (low to high)
 - *mappings* provides additional parameters for some visualizations: (separate
 multiple values using a semicolon), see the [list of visualizations](list.md) for parameters for a specific visualizer
+- *visibility* is optional and can be set to:
+    - *hidden* - the default setting: the visualizer is not shown, but can be
+expanded by clicking on its plus symbol.
+    - *permanent* - always shown, not closable
+    - *visible* - shown initially, but closable by clicking on its minus symbol.
+    - *removed* - not shown; this can be used to hide the KWIC visualization in
+corpora which require a grid by default (e.g. dialogue corpora)
+    - *preloaded* - like hidden, but actually rendered in the background even
+before its plus symbol is clicked. This is useful for multimedia player
+visualizations, as the player can be invoked and a file may be loaded
+before the user prompts the playing action.
