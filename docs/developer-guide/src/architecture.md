@@ -8,7 +8,6 @@ to try out the system without installing a full server.
 
 ## Backend Service
 
-
 The service runs on a web server such as Tomcat or Jetty and
 communicates with a relational database, using the open source DB
 PostgreSQL. PostgreSQL (Version 9.4 or larger) must be installed for ANNIS to work. For
@@ -17,7 +16,8 @@ the Administration Guide in the documentation.
 
 ## Web Front-end
 
-The web front-end runs in a normal browser (we recommend Mozilla Firefox) and communicates with the backend server.
+The ANNIS front-end is a web application implemented in Java and the [Vaadin](https://vaadin.com/) framework and runs in a normal browser (we recommend Mozilla Firefox). 
+The server running the web-application communicates with the backend service via a REST interface.
 
 ## ANNIS Kickstarter
 

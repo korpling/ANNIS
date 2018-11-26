@@ -34,3 +34,18 @@ While you can use any text editor of your choice to change ANNIS and compile
 it completely on the command line using Maven, a proper IDE will be a huge help
 for you. You can use any IDE which has a good support for Maven. The ANNIS
 main developers currently recommend Eclipse Proton or the Netbeans 9 IDE for development.
+
+## Running an embedded Jetty instance for local access
+
+This way of running the front-end is very useful, if you want to access Annis on
+you local machine as a single user.
+
+You don't need to install Jetty or Tomcat by yourself using this method.
+
+~~~bash
+cd <unzipped source>/annis-gui/
+mvn jetty:run
+~~~
+
+Now you can access the site under [http://localhost:8080/annis-gui/](http://localhost:8080/annis-gui/). The Jetty
+server might be stopped by pressing "CTRL-C".
