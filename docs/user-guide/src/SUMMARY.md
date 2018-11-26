@@ -25,6 +25,8 @@
 - [Importing and Configuring Corpora](./import/README.md)
     - [Converting Corpora for ANNIS using Pepper](./import/convert.md)
     - [Importing Corpora in the relANNIS format](./import/import.md)
+    - [Configuring Settings for a Corpus](./import/corpus-config.md)
+    - [Multiple Instances of the Interface](./import/instances.md) 
 - [Advanced Configuration and Administration](./config/README.md)
     - [User Configuration](./config/user.md)
     - [Create and Configure Instances](./config/instances.md) 
