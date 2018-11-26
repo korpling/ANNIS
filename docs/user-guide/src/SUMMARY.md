@@ -19,5 +19,6 @@
     - [Complete List of Operators](./aql/operators.md)
 - [Configuration and Administration](./config/README.md)
     - [User Configuration](./config/user.md)
+    - [Create and configure instances](./config/instances.md) 
     - [PostgreSQL Server Configuration](./config/postgresql.md)
     - [Error Codes of the administrator tools](./config/errorcodes.md)
