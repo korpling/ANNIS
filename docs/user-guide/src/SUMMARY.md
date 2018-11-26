@@ -18,5 +18,6 @@
     - [Frequency Analysis](./aql/frequency.md)
     - [Complete List of Operators](./aql/operators.md)
 - [Advanced Configuration and administration](./advanced-config/README.md)
+    - [User Configuration](./advanced-config/user.md)
     - [PostgreSQL Server Configuration](./advanced-config/postgresql.md)
     - [Error Codes of the administrator tools](./advanced-config/errorcodes.md)
