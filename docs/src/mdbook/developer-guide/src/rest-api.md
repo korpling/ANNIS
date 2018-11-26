@@ -15,8 +15,8 @@ You can omit any authentication data. In this case you have the same rights as t
 
 The following APIs are currently available:
 
-- Corpus queries as described by the `annis.service.QueryService` interface
-- Administrative tasks as described by the `annis.service.AdminService`
+- Corpus queries as described by the `annis.service.QueryService` [interface](http://static.javadoc.io/de.hu-berlin.german.korpling.annis/annis-interfaces/${project.version}/annis/service/QueryService.html)
+- Administrative tasks as described by the `annis.service.AdminService` [interface](http://static.javadoc.io/de.hu-berlin.german.korpling.annis/annis-interfaces/${project.version}/annis/service/AdminService.html)
 
 ANNIS uses the [semantic versioning scheme](http://semver.org/). Minor version updates of ANNIS will be backwards-compatible
 to the APIs described by this documentation. There might be further un-official API calls that might change without any

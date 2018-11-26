@@ -89,7 +89,7 @@ Original revision is ${buildNumber}.</checkinComment>
               </execution>
             </executions>
           </plugin>
-          <!-- use the filtered source files to actually generate the doxygen output -->
+          <!-- use the filtered source files to actually generate the mdbook output -->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
