@@ -22,6 +22,7 @@
         - [List of Visualizations](./config/visualizations/list.md)
         - [Changing Maximal Context Size, Context Steps and Result Page Sizes](./config/visualizations/context.md)
         - [Document Browser](./config/visualizations/documentbrowser.md)
+        - [Configuring Right-to-Left Visualizations](./config/visualizations/rtl.md)
     - [User Configuration](./config/user.md)
     - [Create and Configure Instances](./config/instances.md) 
     - [Using Web Fonts in the Interface](./config/webfonts.md)
