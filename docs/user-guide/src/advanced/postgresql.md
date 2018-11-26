@@ -1,5 +1,7 @@
 # PostgreSQL Server Configuration
 
+See the [PostgreSQL documentation](https://www.postgresql.org/docs/9.6/runtime-config.html) for more information about how to change the
+PostgreSQL configuration in general. 
 
 ## Performance tuning
 

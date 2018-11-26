@@ -1,6 +1,11 @@
-# Configuration and Administration
+# Importing and Configuring Corpora
 
-ANNIS consists of a front-end web-application, a back-end service and the PostgreSQL server.
+Before a corpus can be used in ANNIS, it has to be imported once.
+This section describes how you can create corpora for ANNIS from existing
+corpora in different formats, how you import it and various corpus-related configuration options.
+
+ANNIS consists of a front-end web-application and a back-end service.
+In the Kickstarter version, both components are combined into one application.
 The behavior of these components can be customized changing their configuration.
 
 ## Back-end service
@@ -24,9 +29,3 @@ or [JSON](http://www.json.org/) format. Configuration files from the user direct
 overwrite the global configuration and the global configuration overwrites the
 default configuration.
 
-
-## PostgreSQL
-
-See the [PostgreSQL documentation](https://www.postgresql.org/docs/9.6/runtime-config.html) for more information about how to change the
-PostgreSQL configuration in general. 
-We provide a [guide for tuning PostgreSQL for ANNIS](postgresql.md).
