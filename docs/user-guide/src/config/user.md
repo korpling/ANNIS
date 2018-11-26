@@ -15,8 +15,8 @@ and the usage of external authorization services like LDAP.
 
 There is a central location where the user configuration files are stored.
 Configure the path to this location in the `conf/shiro.info` configuration file of
-the ANNIS service. The default path is `/etc/annis/user_config/` and
-can be changed in the configuration file.
+the ANNIS back-end service. The default path is `/etc/annis/user_config/` and
+can be changed in the back-end configuration file.
 
 ~~~ini
 [main]

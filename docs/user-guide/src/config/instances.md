@@ -6,7 +6,7 @@ You should not be forced to have an ANNIS frontend and service installation for
 each of this groups. Instead the administrator can define so called instances.
 
 An instance is defined by a JSON file inside the instances sub-folder in one of
-the configuration locations. The name of the file also defines the instance name.
+the *front-end configuration locations*. The name of the file also defines the instance name.
 Thus the file `instances/falko.json` defines the instance named "falko".
 
 ~~~json
