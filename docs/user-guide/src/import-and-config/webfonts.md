@@ -1,11 +1,12 @@
-# Using Web Fonts in the Interface
+# Embedding Web Fonts
 
-The configuration of web fonts is placed within an [instance file](instances.md). 
-Thus a web font is applied to a specific instance. If you not want to define
-an extra instance, it is possible to add the font configuration to the
-default.json file in the *instance* directory. If no *instance*
-directory or default.json file exists, create it. Add a property
-**font** to the config with the following parameters:
+It is also possible to set an embedded font for query result display in your instance,
+using the same [JSON instance file](instances.md) file described in the previous section.
+Thus a web font is applied to a specific instance. 
+If you not want to define an extra instance, it is possible to add the font configuration to the
+`default.json` file in the *instance* directory. If no *instance*
+directory or `default.json` file exists, create it. 
+Add a property **font** to the config with the following parameters:
 
 ~~~json
 {
