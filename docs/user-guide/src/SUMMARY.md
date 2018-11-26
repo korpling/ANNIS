@@ -24,3 +24,4 @@
     - [Using Web Fonts in the Interface](./config/webfonts.md)
     - [PostgreSQL Server Configuration](./config/postgresql.md)
     - [Error Codes of the administration tools](./config/errorcodes.md)
+    - [Provide your own login-system](./config/custom-login.md)
