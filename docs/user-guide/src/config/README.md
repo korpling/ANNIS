@@ -1,4 +1,4 @@
-# Advanced Configuration
+# Configuration and Administration
 
 ANNIS consists of a front-end web-application, a back-end service and the PostgreSQL server.
 The behavior of these components can be customized changing their configuration.
