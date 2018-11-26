@@ -46,13 +46,13 @@ password=$shiro1$SHA-256$1$tQNwUIxEQhrDn6FKcY1yNg==$Xq8ZCb3RFBwn3GfQ7pav3G3vHg4T
 permissions=adm:*,query:*
 expires=2015-04-25
 ~~~
+***Notes:***
   - A superuser who has access to every corpus can be created with `groups=*`
-  - The password must be hashed with SHA256 (one iteration and using a Salt) and formatted in the [Shiro1CryptFormat](http://shiro.apache.org/static/current/
-apidocs/org/apache/shiro/crypto/hash/format/Shiro1CryptFormat.html).
+  - The password must be hashed with SHA256 (one iteration and using a Salt) and formatted in the [Shiro1CryptFormat](http://shiro.apache.org/static/1.3.2/apidocs/org/apache/shiro/crypto/hash/format/Shiro1CryptFormat.html).
   - Additional permissions for the user are given as comma seperated list in the `permissions` field.
   - With `expires` you can define when an account will expire. The format must be in encoded according to the [ISO-8601 standard](http://en.wikipedia.org/wiki/ISO_8601).
 
-  The easiest way to generate the passwort hash is to use the
+The easiest way to generate the passwort hash is to use the
 [Apache Shiro command line hasher](http://shiro.apache.org/command-line-hasher.html) which can be downloaded from 
 [here](http://shiro.apache.org/download.html#Download-1.2.1.BinaryDistribution).
 
