@@ -20,6 +20,7 @@
 - [Configuration and Administration](./config/README.md)
     - [Configuring Visualizations](./config/visualizations/README.md)
         - [List of Visualizations](./config/visualizations/list.md)
+        - [Changing Maximal Context Size, Context Steps and Result Page Sizes](./config/visualizations/context.md)
     - [User Configuration](./config/user.md)
     - [Document Browser](./config/documentbrowser.md)
     - [Create and Configure Instances](./config/instances.md) 
