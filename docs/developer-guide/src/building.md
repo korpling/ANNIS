@@ -1,10 +1,9 @@
-Building  {#dev-building}
-========
+# Building
 
 ANNIS uses [Maven3](http://maven.apache.org/)  as build tool. Maven itself is
 based on Java and should run on every major operating system. You have to
 download and install the appropriate version for your operating system from
-http://maven.apache.org/download.html before you can build ANNIS. Maven will
+[http://maven.apache.org/download.html](http://maven.apache.org/download.html) before you can build ANNIS. Maven will
 download all needed dependencies from central servers on the first build so you
 will need to have a working internet connection. The dependencies are cached
 locally once their are downloaded.
@@ -28,5 +27,3 @@ configuration files.
 Some sub-projects don't provide a library but will produce a zip or tar/gz-
 file when they are compiled. These assembly steps (see [Maven Assembly documentation](http://maven.apache.org/plugins/maven-assembly-plugin/)) are automatically
 invoked on `mvn install`.
-
-
