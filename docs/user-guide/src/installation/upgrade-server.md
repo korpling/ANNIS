@@ -1,31 +1,29 @@
-Upgrading an ANNIS installation {#admin-upgrade}
-==========
-
-[TOC]
+# Upgrading an ANNIS Server installation
 
 These instructions are a guideline for upgrading the installation of ANNIS on a UNIX-like server. 
-If you use the [local ANNIS Kickstarter version](@ref admin-install-kickstarter) 
+If you use the [ANNIS Kickstarter version](kickstarter.md) 
 just download the new version and re-initialize the database.
-Please read [the installation instructions](@ref admin-install-server) first if you
+Please read [the installation instructions](server.md) first if you
 haven't done so yet.
 
 
-Automatic upgrade {#admin-upgrade-automatic}
-=================
+## Automatic upgrade 
 
 Upgrading the ANNIS service is more complex than deploying the user interface WAR file.
 Therefore a Python script is available for an automatic upgrade. This script needs as least Python 3.2.
 
-<!-- TODO: replace "develop" with "master" once released -->
-1. Download the latest version of the script from GitHub: https://raw.githubusercontent.com/korpling/ANNIS/develop/Misc/upgrade_service.py
-2. Download the new ANNIS release files (```annis-service-<VERSION>.tar.gz``` and ```annis-gui-<VERSION>.war```) 
-3. Run the script \code{.sh}python3 upgrade_service.py --cleanup-data <installation-directory> annis-service-<VERSION>.tar.gz\endcode
+1. Download the [latest version of the script](https://raw.githubusercontent.com/korpling/ANNIS/master/Misc/upgrade_service.py). 
+2. Download the new ANNIS release files (`annis-service-<VERSION>.tar.gz` and `annis-gui-<VERSION>.war`) 
+3. Run the script 
+   ~~~bash
+   python3 upgrade_service.py --cleanup-data <installation-directory> annis-service-<VERSION>.tar.gz
+   ~~~
    If the new release uses a new database schema the update might take some time. Thus it might be better to execute the script in the background:
-   \code{.sh}
+   ~~~bash
    nohup python3 upgrade_service.py --cleanup-data <installation-directory> annis-service-<VERSION>.tar.gz &
    tail -f nohup.out
-   \endcode
-4. If succesful undeploy the old WAR file and deploy the new one.
+   ~~~
+4. If successful undeploy the old WAR file and deploy the new one.
 
 
 In case the upgrade script needed to update the database (it will tell you so), 
@@ -35,18 +33,19 @@ following command in your PostgreSQL-Client:
 DROP SCHEMA <oldschema>;
 \endcode
 
-\remarks To learn more about the (additional) parameters of the script run: \code{.sh}python3 upgrade_service.py --help\endcode
+***Note:*** To learn more about the (additional) parameters of the script run: 
+~~~bash
+python3 upgrade_service.py --help
+~~~
 
-Manual upgrade {#admin-upgrade-manual}
-==============
+## Manual upgrade
 
 When Python is not available it is still possible to execute the steps
 of the upgrade process manually.
 The upgrade path described here tries to have a minimum downtime.
 
 
-Upgrade for minor version updates {#admin-upgrade-minor}
----------------------------------
+### Upgrade for minor version updates
 
 For minor version updates, e.g. from 3.1.0 to 3.1.1 (thus only
 the last version number changes) you can use the database from the older version
@@ -63,17 +62,16 @@ without any modifications. Thus an upgrade only consists of the following steps
 9. start the ANNIS service again
 10. undeploy the old WAR file and deploy the new WAR file
 
-Full upgrade {#admin-upgrade-full}
--------------
+### Full upgrade
 
 Whenever the first or second number of the version changes you have to re-import
 the corpora into a newly initialized database.
 
-### 1. Download
+#### 1. Download
 Download both the `annis-service-<VERSION>.tar.gz` and the `annis-gui-<VERSION>.war`
 to a folder of your choice, e.g. `/tmp/`.
 
-### 2. Install the new service
+#### 2. Install the new service
 
 Unzip the annis service to a new  directory (don't delete or stop the old service)
 and install it. 
@@ -91,11 +89,11 @@ annis-admin.sh init -u <username> -d <dbname> -p <user password> --schema <new s
 \endcode
 Please re-use the old database name, the user name and the password for the existing user (they can be found
 in the `conf/database.properties` file of the old installation).
-The parameter `--schema` allows you to define a new [PostgreSQL schema](http://www.postgresql.org/docs/9.1/static/ddl-schemas.html)
+The parameter `--schema` allows you to define a new [PostgreSQL schema](http://www.postgresql.org/docs/9.6/static/ddl-schemas.html)
 which will be used for the new installation. 
 A good name could be something like "v32" if the version is 3.2.0.
 
-### 3. Copy old corpora
+#### 3. Copy old corpora
 
 With the command
 \code{.sh}
@@ -113,31 +111,31 @@ will be given. If there where any errors please try to import the corpus
 manually. When all corpora are imported, proceed to the next step.
 
 Additionally copy  the "user_config" and "url_shortener" tables from the
-old installation, e.g. with the PostgreSQL `COPY` command (http://www.postgresql.org/docs/9.3/static/sql-copy.html#AEN69268)
+old installation, e.g. with the [PostgreSQL `COPY` command](http://www.postgresql.org/docs/9.6/static/sql-copy.html#AEN69268)
 
-### 4. Switch service
+#### 4. Switch service
 
 Stop the old service and start the
 new service. Remember to set the `ANNIS_HOME` variable to the right value in
 both cases before you call `annis-service.sh start/stop` command.
 
-### 5. Upgrade front-end
+#### 5. Upgrade front-end
 
 Undeploy the old WAR file and deploy the new WAR file.
 
-### 6. Cleanup
+#### 6. Cleanup
 
 If everything works as expected you can delete the old installation files. You
 should also remove the contents of the old database by deleting the schema from the
 PostgreSQL client:
-\code{.sql}
+~~~sql
 DROP SCHEMA <oldschema>;
-\endcode
+~~~
 
 To delete all unused external data files execute
-\code{.sh}
+~~~bash
 annis-admin.sh cleanup-data
-\endcode
+~~~
 \warning This will delete all data files not known to the current instance of ANNIS.
 If you have multiple parallel installations and did not use different values for
 the `annis.external-data-path` variable in the `conf/annis-service.properties`
