@@ -1,5 +1,7 @@
 # Multiple Instances of the Interface
 
+## Creating instances
+
 When multiple corpora from different sources are hosted on one server it is often
 still desired to group the corpora by their origin and present them differently.
 You should not be forced to have an ANNIS frontend and service installation for
@@ -64,3 +66,59 @@ Any defined instance is assigned a special URL at which it can be accessed:
 additionally accessible by not specifying any instance name in the URL. You can
 configure your web server (e.g. Apache) to rewrite the URLs if you need a more
 project specific and less "technical" URL (e.g. `http://<server>/falko`).
+
+## Embedding Web Fonts
+
+It is also possible to set an embedded font for query result display in your instance,
+using the same JSON instance file file described in the previous section.
+Thus a web font is applied to a specific instance. 
+If you not want to define an extra instance, it is possible to add the font configuration to the
+`default.json` file in the *instance* directory. If no *instance*
+directory or `default.json` file exists, create it. 
+Add a property **font** to the config with the following parameters:
+
+~~~json
+{
+ ...
+
+ "font" :
+ {
+   "name" : "foo",
+   "url": "https://example.com/foo.css",
+   "size": "12pt" // optional
+ }
+}
+~~~
+
+You must also provide a css file, which contains the `@font-face` rule
+und is reachable under the defined link in the instance config:
+
+~~~css
+@font-face {
+  font-family: 'bar';
+  font-style: normal;
+  font-weight: normal;
+  font-size: larger;
+  src:
+	local('bar'),
+	url(bar.woff) format('woff');
+}
+~~~
+
+Further explantation about the `@font-face` rule is available on the [MDN web docs
+](https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face).
+
+If you need to have a different font configuration for the frequency chart
+just add a `frequency-font` entry. It has the same structure as `font`.
+
+## Using Corpus Groups
+
+It is possible to group corpora into groups, which are selected above the corpus list in
+the search form:
+
+![corpus group selection](corpus-group.png)
+
+While any user can group corpora into corpus sets for their own use, you can define
+corpus sets for the whole instance using the "corpus-sets" in the JSON file described
+above. Each corpus set is itself a JSON-object with a name and a list of corpora that
+belong to the corpus set.

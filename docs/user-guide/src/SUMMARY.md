@@ -27,7 +27,6 @@
     - [Importing Corpora in the relANNIS format](./import-and-config/import.md)
     - [Configuring Settings for a Corpus](./import-and-config/corpus-config.md)
     - [Multiple Instances of the Interface](./import-and-config/instances.md) 
-    - [Embedding Web Fonts](./import-and-config/webfonts.md)
 - [Advanced Topics](./advanced/README.md)
     - [User Configuration](./advanced/user.md)
     - [PostgreSQL Server Configuration](./advanced/postgresql.md)
