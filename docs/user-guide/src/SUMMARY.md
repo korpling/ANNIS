@@ -34,3 +34,4 @@
     - [Error Codes of the administration tools](./advanced/errorcodes.md)
     - [Provide your own login-system](./advanced/custom-login.md)
     - [Links to queries](./advanced/links-to-queries.md)
+    - [Embed ANNIS visualizations](./advanced/embed-vis.md)
