@@ -3,44 +3,6 @@ Configure front-end web-application {#admin-configure-webapp}
 
 [TOC]
 
-Configuring Tomcat or Jetty as application container {#admin-configure-container}
-====================================================
-
-We are providing a WAR-file that is deployable by every common Java Servlet
-Container like Tomcat or Jetty. Please use the documentation of the web
-application container of your choice how to deploy these war-files.
-
-## Tomcat: UTF8 encoding in server.xml ## {#admin-configure-tomcat-utf8}
-
-If using Tomcat make sure the UTF-8 encoding is used for URLs. Some
-installations of Tomcat don't use UTF-8 for the encoding of the URLs and that will
-cause problems when searching for non-ASCII characters. In order to avoid this
-the Connector-configuration needs the property "URIEncoding" set to "UTF-8"
-like in this example (`$CATALINA_HOME/server.xml`):
-
-\code{.xml}
-<Connector port="8080" protocol="HTTP/1.1"
-connectionTimeout="20000"
-URIEncoding="UTF-8"
-redirectPort="8443"
-executor="tomcatThreadPool" />
-\endcode
-
-General configuration advices {#admin-configure-general}
-=============================
-
-The ANNIS frontend will search in different folders for it's configuration.
-
-Folder | Description
------- | -----------
-`<Installation>/WEB-INF/conf/` | Default configuration inside the deployed web application folder. Should not be changed.
-`$ANNIS_CFG` or `/etc/annis/` | The global configuration folder defined by the environment variable `ANNIS_CFG` or a default path if not set.
-`~/.annis/` | User specific configuration inside the `.annis` sub-folder inside the home folder of the user who is running the frontend.
-
-Configuration files can be either in the [Java Properties](http://en.wikipedia.org/w/index.php?title=.properties&oldid=521500688)
-or [JSON](http://www.json.org/) format. Configuration files from the user directory can
-overwrite the global configuration and the global configuration overwrites the
-default configuration.
 
 Create and configure instances {#admin-configure-instance}
 ==============================

@@ -56,6 +56,22 @@ the servlet container you use).
 ***Note:*** We also strongly recommend reconfiguring the PostgreSQL server’s default
 settings as described [here](../advanced-config/postgresql.md).
 
+## Tomcat: UTF8 encoding in server.xml
+
+If using Tomcat make sure the UTF-8 encoding is used for URLs. Some
+installations of Tomcat don't use UTF-8 for the encoding of the URLs and that will
+cause problems when searching for non-ASCII characters. In order to avoid this
+the Connector-configuration needs the property "URIEncoding" set to "UTF-8"
+like in this example (`$CATALINA_HOME/server.xml`):
+
+~~~xml
+<Connector port="8080" protocol="HTTP/1.1"
+connectionTimeout="20000"
+URIEncoding="UTF-8"
+redirectPort="8443"
+executor="tomcatThreadPool" />
+~~~
+
 ## Install ANNIS Service and Web front-end on different servers
 
 It is possible to install the service and the front-end on different servers.
