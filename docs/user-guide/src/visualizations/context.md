@@ -1,4 +1,4 @@
-# Changing Maximal Context Size, Context Steps and Result Page Sizes
+# Maximal Context Size, Context Steps and Result Page Sizes
 
 The maximal context size of ±n tokens from each search result (for the KWIC view,
 but also for other visualizations) can be set for the ANNIS service in the file

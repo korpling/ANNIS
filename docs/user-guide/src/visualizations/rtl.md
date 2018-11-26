@@ -1,4 +1,4 @@
-# Configuring Right-to-Left Visualizations
+# Right-to-Left Visualizations
 
 The KWIC, grid and tree visualizers support right to left layouting of Arabic and
 Hebrew characters. As soon as such a character is recognized in a search result, the
