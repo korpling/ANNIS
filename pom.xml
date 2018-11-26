@@ -292,7 +292,7 @@
     <module>annis-widgets</module>
     <module>annis-visualizers</module>
     <module>annis-libgui</module>
-    <module>doc</module>
+    <module>docs</module>
   </modules>
 
 </project>

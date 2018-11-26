@@ -7,58 +7,49 @@
     <version>3.6.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-
-
   <name>annis-doc</name>
   <packaging>pom</packaging>
   <artifactId>annis-docs</artifactId>
-  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<site.path>doc-develop</site.path>
-	<!-- override in your settings -->
+    <site.path>doc-develop</site.path>
+    <!-- override in your settings -->
     <siteMainDirectory>${user.home}</siteMainDirectory>
-	<scmPubCheckoutDirectory>\${siteMainDirectory}/annis-content-scm</scmPubCheckoutDirectory>
+    <scmPubCheckoutDirectory>\${siteMainDirectory}/annis-content-scm</scmPubCheckoutDirectory>
   </properties>
-
   <build>
     <pluginManagement>
-          
       <plugins>
-            
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>2.7</version>
+          <version>3.1.0</version>
           <configuration>
-            <outputDirectory>${basedir}/target/doxygen-generated</outputDirectory>
-            <resources>          
+            <outputDirectory>${project.build.directory}/mdbook-generated</outputDirectory>
+            <resources>
               <resource>
-                <directory>src/doxygen/</directory>
+                <directory>src/mdbook/</directory>
                 <filtering>true</filtering>
               </resource>
-            </resources>              
-          </configuration>            
-
+            </resources>
+          </configuration>
         </plugin>
-            
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-scm-publish-plugin</artifactId>
-          <version>1.1</version>
+          <version>3.0.0</version>
           <extensions>true</extensions>
-          <configuration>              
+          <configuration>
             <pubScmUrl>scm:git:ssh://git@github.com/korpling/ANNIS.git</pubScmUrl>
             <scmBranch>gh-pages</scmBranch>
-            <content>${project.build.directory}/doxygen/</content>
+            <content>${project.build.directory}/mdbook/</content>
             <ignorePathsToDelete>
               <path>doc</path>
               <path>doc-develop</path>
               <path>index.html</path>
-              <path>doxygen_sqlite3.db</path>
               <path>.gitignore</path>
             </ignorePathsToDelete>
-			<tryUpdate>true</tryUpdate>
-			<checkoutDirectory>${scmPubCheckoutDirectory}</checkoutDirectory>
+            <tryUpdate>true</tryUpdate>
+            <checkoutDirectory>${scmPubCheckoutDirectory}</checkoutDirectory>
             <checkinComment>update documentation for version ${project.version} (${site.path})
               
 Original revision is ${buildNumber}.</checkinComment>
@@ -67,17 +58,13 @@ Original revision is ${buildNumber}.</checkinComment>
       </plugins>
     </pluginManagement>
   </build>
-
-  
   <profiles>
-    
     <profile>
       <id>release</id>
       <properties>
         <site.path>doc</site.path>
       </properties>
     </profile>
-    
     <!-- preview releases still push their documentation to doc-develop -->
     <profile>
       <id>preview</id>
@@ -85,13 +72,10 @@ Original revision is ${buildNumber}.</checkinComment>
         <site.path>doc-develop</site.path>
       </properties>
     </profile>
-    
     <profile>
-      <id>doxygen</id>
-      
+      <id>mdbook</id>
       <build>
         <plugins>
-          
           <!-- make sure all paths are correct by replacing the properties -->
           <plugin>
             <artifactId>maven-resources-plugin</artifactId>
@@ -101,59 +85,52 @@ Original revision is ${buildNumber}.</checkinComment>
                 <phase>generate-sources</phase>
                 <goals>
                   <goal>copy-resources</goal>
-                </goals>           
+                </goals>
               </execution>
             </executions>
           </plugin>
-          
           <!-- use the filtered source files to actually generate the doxygen output -->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>1.4.0</version>
+            <version>1.6.0</version>
             <executions>
               <execution>
+                <id>compile-user-guide</id>
                 <phase>compile</phase>
                 <goals>
                   <goal>exec</goal>
                 </goals>
+                <configuration>
+                  <executable>mdbook</executable>
+                  <workingDirectory>${project.build.directory}</workingDirectory>
+                  <arguments>
+                    <argument>build</argument>
+                    <argument>-d</argument>
+                    <argument>${project.build.directory}/mdbook/user-guide/</argument>
+                    <argument>mdbook-generated/user-guide/</argument>
+                  </arguments>
+                </configuration>
               </execution>
-            </executions>
-            <configuration>
-              <executable>doxygen</executable>
-              <workingDirectory>${project.build.directory}/doxygen/</workingDirectory>
-              <arguments>
-                <argument>${project.build.directory}/doxygen-generated/Doxyfile</argument>
-              </arguments>
-            </configuration>
-          </plugin>
-          
-          <!-- some doxygen versions don't delete the huge doxygen_sqlite3.db file -->
-          <plugin>
-            <artifactId>maven-clean-plugin</artifactId>
-            <version>2.6.1</version>
-            <executions>
               <execution>
-                <id>remove-doxygen-sqlitedb</id>
-                <phase>prepare-package</phase>
+                <id>compile-developer-guide</id>
+                <phase>compile</phase>
                 <goals>
-                  <goal>clean</goal>
+                  <goal>exec</goal>
                 </goals>
                 <configuration>
-                  <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                  <filesets>
-                    <fileset>
-                      <directory>${project.build.directory}/doxygen/</directory>
-                      <includes>
-                        <include>**/doxygen_sqlite3.db</include>
-                      </includes>
-                    </fileset>
-                  </filesets>
+                  <executable>mdbook</executable>
+                  <workingDirectory>${project.build.directory}</workingDirectory>
+                  <arguments>
+                    <argument>build</argument>
+                    <argument>-d</argument>
+                    <argument>${project.build.directory}/mdbook/developer-guide/</argument>
+                    <argument>mdbook-generated/developer-guide/</argument>
+                  </arguments>
                 </configuration>
               </execution>
             </executions>
           </plugin>
-          
           <!-- upload the generated documentation to GitHub -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -168,10 +145,8 @@ Original revision is ${buildNumber}.</checkinComment>
               </execution>
             </executions>
           </plugin>
-          
         </plugins>
       </build>
-      
     </profile>
   </profiles>
 </project>
