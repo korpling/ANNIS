@@ -16,5 +16,6 @@
     - [Exporting Results](./aql/export.md)
     - [Frequency Analysis](./aql/frequency.md)
     - [Complete List of Operators](./aql/operators.md)
-- [Advanced Configuration](./advanced-config/README.md)
+- [Advanced Configuration and administration](./advanced-config/README.md)
     - [PostgreSQL Server Configuration](./advanced-config/postgresql.md)
+    - [Error Codes of the administrator tools](./advanced-config/errorcodes.md)

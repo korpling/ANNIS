@@ -1,19 +1,18 @@
-Error codes of the administrator tools {#admin-errorcodes}
-==========
+# Error Codes of the administrator tools
 
 Additional to textual output the administration tools will return an error code when exiting in an error condition.
 On Linux you can query the exit code of the last command with
-\code{.sh}
+~~~bash
 echo $?
-\endcode
+~~~
 An exit code of "0" means normal exit, everything else is an error indication.
 
 
 exit code | description
 ----------|-------------
 1         | General error, no specific information.
-2         | The "annis.home" property was not set. This means the "ANNIS_HOME" environment variable was not set when the startup script was called.
-3         | The location where the "annis.home"/"ANNIS_HOME" variable points to is not an existing directory.
+2         | The `annis.home` property was not set. This means the `ANNIS_HOME` environment variable was not set when the startup script was called.
+3         | The location where the `annis.home`/`ANNIS_HOME` variable points to is not an existing directory.
 4         | Wrong use of command line arguments.
 5         | Could not access the database.
 6         | Could not access a file.
