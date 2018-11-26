@@ -36,8 +36,8 @@ anonymous=pcc2,falko
 This example means that a member of group group1 will have access to
 corpora with the names pcc3,falko, tiger2 (corpus names can be displayed
 with the `annis-admin.sh list` command).
-1. Create a subdirectory `users`
-2. You have to create a file for each user inside the users subdirectory where
+2. Create a subdirectory `users`
+3. You have to create a file for each user inside the users subdirectory where
 the user's name is *exactly* the file name (no file endings).
 ~~~ini
 groups=group1,group3
