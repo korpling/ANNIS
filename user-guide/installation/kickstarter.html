@@ -1,0 +1,242 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Installing a Local Version (ANNIS Kickstarter) - ANNIS User Guide</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "../";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="../installation/index.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li><a href="../installation/kickstarter.html" class="active"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li><a href="../installation/server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li><a href="../installation/upgrade-server.html"><strong aria-hidden="true">2.3.</strong> Upgrading an ANNIS Server installation</a></li></ol></li><li><a href="../interface/index.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="../interface/search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li><a href="../interface/result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li><a href="../interface/query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li><a href="../aql/index.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="../aql/word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li><a href="../aql/annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li><a href="../aql/regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li><a href="../aql/trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li><a href="../aql/pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li><a href="../aql/export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li><a href="../aql/frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li><a href="../aql/operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li></ol></li><li><a href="../visualizations/index.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li><a href="../visualizations/list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li><a href="../visualizations/context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li><a href="../visualizations/documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li><a href="../visualizations/rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li><a href="../import-and-config/index.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li><a href="../import-and-config/convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li><a href="../import-and-config/import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li><a href="../import-and-config/corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li><a href="../import-and-config/instances.html"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li><a href="../import-and-config/user.html"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li><a href="../import-and-config/admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li><a href="../advanced/index.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li><a href="../advanced/postgresql.html"><strong aria-hidden="true">7.1.</strong> PostgreSQL Server Configuration</a></li><li><a href="../advanced/errorcodes.html"><strong aria-hidden="true">7.2.</strong> Error Codes of the administration tools</a></li><li><a href="../advanced/custom-login.html"><strong aria-hidden="true">7.3.</strong> Provide your own login-system</a></li><li><a href="../advanced/links-to-queries.html"><strong aria-hidden="true">7.4.</strong> Links to queries</a></li><li><a href="../advanced/embed-vis.html"><strong aria-hidden="true">7.5.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">ANNIS User Guide</h1> 
+
+                        <div class="right-buttons">
+                            <a href="../print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#installing-a-local-version-annis-kickstarter" id="installing-a-local-version-annis-kickstarter"><h1>Installing a Local Version (ANNIS Kickstarter)</h1></a>
+<p>Local users who do not wish to make their corpora available online can install ANNIS
+Kickstarter under  most   versions   of  Linux,   Windows and  MacOS.
+To install Kickstarter follow these steps:</p>
+<ol>
+<li>Download and install PostgreSQL 9.4 (or above)
+for your operating system from <a href="http://www.postgresql.org/download/">http://www.postgresql.org/download/</a> and <strong>make a note of the administrator password</strong> you set during the installation. After installation, PostgreSQL may automatically launch the PostgreSQL Stack Builder to download additional components – you can safely skip this step and cancel the Stack Builder if you wish. You may need to restart your OS if the PostgreSQL installer tells you to.</li>
+</ol>
+<p><strong><em>Note:</em></strong> Under Linux, you might have to set the PostgreSQL password manually.
+E.g. on Ubuntu you can achieve this with by running the following commands:</p>
+<pre><code class="language-bash">sudo -u postgres psql
+\password
+\q
+</code></pre>
+<ol start="2">
+<li>Download and unzip the ANNIS Kickstarter ZIP-file from the ANNIS website.</li>
+<li>Start AnnisKickstarter.bat if you’re using Windows, AnnisKickstarter.cmd on
+Mac or run the bash script AnnisKickstarter.sh otherwise (this may take a few
+seconds the first time you run Kickstarter). At this point your Firewall may try
+to block Kickstarter and offer you to unblock it – do so and Kickstarter should
+start up.</li>
+</ol>
+<p><strong><em>Note:</em></strong> For most users it is a good idea to give Java more memory (if this is not
+already the default). You can do this by editing the script AnnisKickstarter and
+typing the following after the call to start java (after java or javaw in the .sh
+or .bat script respectively):</p>
+<pre><code>-Xss1024k -Xmx1024m
+</code></pre>
+<p>(To accelerate searches it is also possible to give the PostgreSQL database
+more memory, see the next section below).</p>
+<ol start="4">
+<li>Once the program has started, if this is the first time you run Kickstarter, press
+“Init Database” and supply your PostgreSQL administrator password from step 1. If you are upgrading from version 3.0.1 of ANNIS Kickstarter or higher, you will be given the option to reimport your corpora, assuming they can still be found at the paths from which they were originally imported.</li>
+<li>Download and unzip the GUM demo corpus from the ANNIS website:
+<a href="http://corpus-tools.org/annis/corpora.html">http://corpus-tools.org/annis/corpora.html</a>.</li>
+<li>Press “Import Corpus” and navigate to the directory containing the directory
+<code>GUM_annis/</code>. Select this directory (but do not go into it) and press OK.</li>
+<li>Once import is complete, press “Launch Annis frontend” test the corpus (click
+on one of the example queries displayed on the screen, or try selecting the
+GUM corpus, typing <code>pos=&quot;NN&quot;</code> in the AnnisQL box at the top left and clicking
+“Show Result”. See the sections <a href="../interface/index.html">“Using the ANNIS interface”</a>and <a href="../aql/index.html">“ANNIS Query Language (AQL)”</a> in this guide for some more example queries, or press the Tutorial button in the
+Help/Examples tab of the interface for more information).</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../installation/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../installation/server.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="../installation/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="../installation/server.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

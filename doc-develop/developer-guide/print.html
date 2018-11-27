@@ -1,0 +1,519 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>ANNIS Developer Guide</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="architecture.html"><strong aria-hidden="true">1.</strong> Architecture</a></li><li><a href="building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li><a href="release.html"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li><a href="annisimportformat.html"><strong aria-hidden="true">4.</strong> ANNIS import format version 3.3</a></li><li><a href="querybuilder.html"><strong aria-hidden="true">5.</strong> Create new query builder</a></li><li><a href="rest-api.html"><strong aria-hidden="true">6.</strong> Public REST API</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">ANNIS Developer Guide</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#architecture" id="architecture"><h1>Architecture</h1></a>
+<p>ANNIS is a web-based search and visualization architecture for
+multi-layer corpora. ANNIS consists of two major components: a backend
+service and a web front-end. There is also a local version, ANNIS
+Kickstarter, which is a simple starting point for new users who want
+to try out the system without installing a full server.</p>
+<a class="header" href="#backend-service" id="backend-service"><h2>Backend Service</h2></a>
+<p>The service runs on a web server such as Tomcat or Jetty and
+communicates with a relational database, using the open source DB
+PostgreSQL. PostgreSQL (Version 9.4 or larger) must be installed for ANNIS to work. For
+more information on installing and managing the backend service, see
+the Administration Guide in the documentation.</p>
+<a class="header" href="#web-front-end" id="web-front-end"><h2>Web Front-end</h2></a>
+<p>The ANNIS front-end is a web application implemented in Java and the <a href="https://vaadin.com/">Vaadin</a> framework and runs in a normal browser (we recommend Mozilla Firefox).
+The server running the web-application communicates with the backend service via a REST interface.</p>
+<a class="header" href="#annis-kickstarter" id="annis-kickstarter"><h2>ANNIS Kickstarter</h2></a>
+<p>ANNIS Kickstarter is a cross-platform local version which requires
+nothing but a PostgreSQL installation to run. It will run under LINUX,
+Windows and Mac. For a quick tutorial to get started with Kickstarter,
+see the ANNIS User Guide.</p>
+<a class="header" href="#building" id="building"><h1>Building</h1></a>
+<p>ANNIS uses <a href="http://maven.apache.org/">Maven3</a>  as build tool. Maven itself is
+based on Java and should run on every major operating system. You have to
+download and install the appropriate version for your operating system from
+<a href="http://maven.apache.org/download.html">http://maven.apache.org/download.html</a> before you can build ANNIS. Maven will
+download all needed dependencies from central servers on the first build so you
+will need to have a working internet connection. The dependencies are cached
+locally once their are downloaded.</p>
+<p>When you have downloaded or checked out the source of ANNIS the top-level
+directory of the source code is the parent project for all ANNIS sub-projects. If
+you want to build every project that is part of ANNIS just execute</p>
+<pre><code class="language-{.sh}">cd &lt;annis-sources&gt;/
+mvn install
+</code></pre>
+<p>This might take a while on the first execution. <code>mvn clean</code> will remove all compiled
+code if necessary.</p>
+<p>If you only want to compile a sub-project execute <code>mvn install</code> in the
+corresponding sub-directory. Every folder with a sub-project will have a pom.xml
+file. These files configure the whole build process. The Maven documenation
+contains detailed explanations of the structure and possible content of the
+configuration files.</p>
+<p>Some sub-projects don't provide a library but will produce a zip or tar/gz-
+file when they are compiled. These assembly steps (see <a href="http://maven.apache.org/plugins/maven-assembly-plugin/">Maven Assembly documentation</a>) are automatically
+invoked on <code>mvn install</code>.</p>
+<a class="header" href="#using-and-ide" id="using-and-ide"><h2>Using and IDE</h2></a>
+<p>While you can use any text editor of your choice to change ANNIS and compile
+it completely on the command line using Maven, a proper IDE will be a huge help
+for you. You can use any IDE which has a good support for Maven. The ANNIS
+main developers currently recommend Eclipse Proton or the Netbeans 9 IDE for development.</p>
+<a class="header" href="#running-an-embedded-jetty-instance-for-local-access" id="running-an-embedded-jetty-instance-for-local-access"><h2>Running an embedded Jetty instance for local access</h2></a>
+<p>This way of running the front-end is very useful, if you want to access Annis on
+you local machine as a single user.</p>
+<p>You don't need to install Jetty or Tomcat by yourself using this method.</p>
+<pre><code class="language-bash">cd &lt;unzipped source&gt;/annis-gui/
+mvn jetty:run
+</code></pre>
+<p>Now you can access the site under <a href="http://localhost:8080/annis-gui/">http://localhost:8080/annis-gui/</a>. The Jetty
+server might be stopped by pressing &quot;CTRL-C&quot;.</p>
+<a class="header" href="#making-a-new-annis-release" id="making-a-new-annis-release"><h1>Making a new ANNIS release</h1></a>
+<a class="header" href="#introduction" id="introduction"><h2>Introduction</h2></a>
+<p>Unfortunately creating a new release requires some manual work. We used to invoke the Maven Release plugin in the process,
+but the only real useful task was the version update and we still needed to do a lot of manual work.
+Thus we decided to write down the necessary steps to perform a new ANNIS release instead of
+relaying to a half-working solution with the Maven Release plugin.</p>
+<p>The release process might take several days and includes fixing bugs that are only discovered in the
+release testing process. <strong>Never ever add new features in this release process</strong>, there is the separate
+&quot;develop&quot; branch which you can use for this purposes.</p>
+<p>You must have <a href="https://github.com/rust-lang-nursery/mdBook">mdBook</a> installed to make a release.
+Otherwise the documentation can't be created.</p>
+<a class="header" href="#general-techniques" id="general-techniques"><h2>General techniques</h2></a>
+<a class="header" href="#updating-the-version" id="updating-the-version"><h3>Updating the version</h3></a>
+<ol>
+<li>Update the parent pom.xml and set the version there</li>
+<li>execute</li>
+</ol>
+<pre><code class="language-bash">mvn versions:update-child-modules
+</code></pre>
+<a class="header" href="#creating-a-changelog-entry" id="creating-a-changelog-entry"><h3>Creating a changelog entry</h3></a>
+<ol>
+<li>Get the GitHub Milestone id associated the release (is visible in the URL if you view the issues of the release tracking milestone).</li>
+<li>replace the ID in the <code>Misc/changelog.py</code> script</li>
+<li>execute this script</li>
+<li>add the output to the <code>CHANGELOG</code> file</li>
+</ol>
+<a class="header" href="#stable-release-process" id="stable-release-process"><h2>Stable Release Process</h2></a>
+<a class="header" href="#initialization-phase" id="initialization-phase"><h3>Initialization phase</h3></a>
+<ol>
+<li>Make a new branch for the release in the GitHub main repository named with the complete release number
+Normally commit and push the changes after each major step.</li>
+<li>Update the version as described in the <a href="#updating-the-version">general techniques section</a></li>
+<li>Update the licenses in the <code>THIRD-PARTY</code> folder and commit/push to release branch</li>
+</ol>
+<pre><code class="language-bash">mvn license:add-third-party
+mvn license:download-licenses
+</code></pre>
+<ol start="4">
+<li>Add new changelog entry as described in the <a href="#creating-a-changelog-entry">general techniques section</a>,
+if some important information is missing create an enhancement issue in GitHub and repeat</li>
+</ol>
+<a class="header" href="#testing-cycle" id="testing-cycle"><h3>Testing cycle</h3></a>
+<ol>
+<li>Build the complete project <em>with</em> tests.</li>
+</ol>
+<pre><code class="language-bash">mvn clean
+mvn -DskipTests=true install
+mvn test
+</code></pre>
+<ol start="2">
+<li>Do manual tests. If you have to fix any bug document it in the issue tracker, <a href="#creating-a-changelog-entry">update the changelog</a> and start over at step 1.
+If no known bugs are left to fix go to the next section.</li>
+</ol>
+<a class="header" href="#finish-phase" id="finish-phase"><h3>Finish phase</h3></a>
+<ol>
+<li>Deploy release to Maven Central
+\code{.sh}
+mvn deploy -P release,mdbook
+\endcode</li>
+<li>Tag the release and merge it into the <code>master</code> branch, publish the new <code>master</code> branch</li>
+<li>Reintegrate the &quot;master&quot; branch into the &quot;develop&quot; branch and set the &quot;develop&quot; branch to the <a href="#updating-the-version">next SNAPSHOT version</a></li>
+<li>Create a new release on GitHub including the changelog. Upload the binaries from Maven repository to GitHub release as well.</li>
+</ol>
+<a class="header" href="#preview-release-process" id="preview-release-process"><h2>Preview Release Process</h2></a>
+<p>Preview releases are like named Snapshots of the the <code>develop</code> branch.
+They have the version number of the next upcoming release but with the
+appendix &quot;-previewX&quot; (X is a number).
+An example preview release number is &quot;3.4.0-preview2&quot;.
+Preview releases are not published in the master branch but are deployed to Maven Central.</p>
+<a class="header" href="#initialization-phase-1" id="initialization-phase-1"><h3>Initialization phase</h3></a>
+<ol>
+<li>Pull latest updates from the <code>develop</code> branch</li>
+<li>Update the version as described in the <a href="#updating-the-version">general techniques section</a></li>
+<li>Update the licenses in the <code>THIRD-PARTY</code> folder and commit/push to release branch</li>
+</ol>
+<pre><code class="language-bash">mvn license:add-third-party
+mvn license:download-licenses
+</code></pre>
+<ol start="4">
+<li>Add new changelog entry as described in the <a href="#creating-a-changelog-entry">general techniques section</a>,
+if some important information is missing create an enhancement issue in GitHub and repeat.
+Preview releases have their own milestones and thus also their own changelog section.</li>
+</ol>
+<a class="header" href="#testing-cycle-1" id="testing-cycle-1"><h3>Testing cycle</h3></a>
+<ol>
+<li>Build the complete project <em>with</em> tests.</li>
+</ol>
+<pre><code class="language-bash">mvn clean
+mvn -DskipTests=true install 
+mvn test
+</code></pre>
+<ol start="2">
+<li>Do manual tests. If you have to fix any bug document it in the issue tracker, <a href="#creating-a-changelog-entry">update the changelog</a> and start over at step 1.
+If no known bugs are left to fix go to the next section.</li>
+</ol>
+<a class="header" href="#finish-phase-1" id="finish-phase-1"><h3>Finish phase</h3></a>
+<ol>
+<li>Deploy release to Maven Central</li>
+</ol>
+<pre><code class="language-bash">mvn deploy -P release,preview,mdbook
+</code></pre>
+<ol start="3">
+<li>Tag the release and push it to the <code>develop</code> branch. If new commits have been introduced in <code>develop</code> merge them (but don't use rebasing).</li>
+<li>Set the &quot;develop&quot; branch to the <a href="#updating-the-version">previous SNAPSHOT version</a></li>
+<li>Create a new release on GitHub including the changelog. Mark this release as &quot;pre-release&quot;. Upload the binaries from Maven repository to GitHub release as well.</li>
+</ol>
+<a class="header" href="#annis-import-format-version-33" id="annis-import-format-version-33"><h1>ANNIS import format version 3.3</h1></a>
+<p>The ANNIS import format is inspired by the Salt meta-data model an ANNIS uses Salt internally to represent a matched graph from the database. However there are some restrictions which ANNIS has but Salt doesn't.</p>
+<ul>
+<li>node names must be unique per document</li>
+<li>document names must be unique per top-level corpus</li>
+<li>a ANNIS corpus contains only one top-level corpus</li>
+<li>there are no meta-data for nodes</li>
+<li>string identifiers such as annotation or layer names have a limited number of allowed characters and should match the regular expression
+\verbatim
+[a-zA-Z_][a-zA-Z0-9_-]*
+\endverbatim
+in order to be searchable with AQL</li>
+</ul>
+<p>An ANNIS corpus can be either a zip file or a directory which includes the following files</p>
+<a class="header" href="#annisversion" id="annisversion"><h2><code>annis.version</code></h2></a>
+<p>First line is exactly &quot;3.3&quot;, the next lines can contain human readable text.</p>
+<p><em>Pure UTF-8 encoded text file</em></p>
+<a class="header" href="#corpusannis" id="corpusannis"><h2><code>corpus.annis</code></h2></a>
+<p>Contains structural information about the corpus and its documents.</p>
+<p>*TAB-separated file as described in <a href="https://www.postgresql.org/docs/9.6/sql-copy.html">&quot;Text Format&quot; section of the PostgreSQL documentation</a></p>
+<table><thead><tr><th> column    </th><th> type    </th><th> unique </th><th> not NULL </th><th> description                         </th></tr></thead><tbody>
+<tr><td> id        </td><td> integer </td><td> X      </td><td> X        </td><td> primary key                         </td></tr>
+<tr><td> name      </td><td> text    </td><td> X      </td><td> X        </td><td> unique name (per corpus)            </td></tr>
+<tr><td> type      </td><td> text    </td><td>        </td><td> X        </td><td> CORPUS, DOCUMENT                    </td></tr>
+<tr><td> version   </td><td> text    </td><td>        </td><td>          </td><td> version number (currently not used) </td></tr>
+<tr><td> pre       </td><td> integer </td><td>        </td><td> X        </td><td> pre order of the corpus tree        </td></tr>
+<tr><td> post      </td><td> integer </td><td>        </td><td> X        </td><td> post order of the corpus tree       </td></tr>
+<tr><td> top_level </td><td> boolean </td><td>        </td><td> X        </td><td> true for the toplevel corpus        </td></tr>
+</tbody></table>
+<a class="header" href="#corpus_annotationannis" id="corpus_annotationannis"><h2><code>corpus_annotation.annis</code></h2></a>
+<p>Contains meta-data on the corpus and the documents.</p>
+<p><em>TAB-separated file as described in <a href="https://www.postgresql.org/docs/9.6/sql-copy.html">&quot;Text Format&quot; section of the PostgreSQL documentation</a></em></p>
+<table><thead><tr><th> column     </th><th> type    </th><th> unique </th><th> not NULL </th><th> description              </th></tr></thead><tbody>
+<tr><td> corpus_ref </td><td> integer </td><td> X      </td><td>          </td><td> foreign key to corpus.id </td></tr>
+<tr><td> namespace  </td><td> text    </td><td>        </td><td>          </td><td>                          </td></tr>
+<tr><td> name       </td><td> text    </td><td>        </td><td>          </td><td>                          </td></tr>
+<tr><td> value      </td><td> text    </td><td>        </td><td>          </td><td>                          </td></tr>
+</tbody></table>
+<a class="header" href="#textannis" id="textannis"><h2><code>text.annis</code></h2></a>
+<p>Describes all texts that are included in the corpus.</p>
+<p><em>TAB-separated file as described in <a href="https://www.postgresql.org/docs/9.6/sql-copy.html">&quot;Text Format&quot; section of the PostgreSQL documentation</a></em></p>
+<table><thead><tr><th> column     </th><th> type    </th><th> unique </th><th> not NULL </th><th> description                                                                                  </th></tr></thead><tbody>
+<tr><td> corpus_ref </td><td> integer </td><td>        </td><td> X        </td><td> foreign key to corpus.id. The corpus id should be the id of the document in the corpus table </td></tr>
+<tr><td> id         </td><td> integer </td><td>        </td><td> X        </td><td> restart from 0 for every corpus_ref                                                          </td></tr>
+<tr><td> name       </td><td> text    </td><td>        </td><td>          </td><td> name of the text                                                                             </td></tr>
+<tr><td> text       </td><td> text    </td><td>        </td><td>          </td><td> content of the text                                                                          </td></tr>
+</tbody></table>
+<p>primary key: corpus_ref, id</p>
+<a class="header" href="#nodeannis" id="nodeannis"><h2><code>node.annis</code></h2></a>
+<p>Every node in the corpus will have exactly one entry in this table.</p>
+<p><em>TAB-separated file as described in <a href="https://www.postgresql.org/docs/9.6/sql-copy.html">&quot;Text Format&quot; section of the PostgreSQL documentation</a></em></p>
+<table><thead><tr><th> column      </th><th> type    </th><th> unique </th><th> not NULL </th><th> description                                                                                             </th></tr></thead><tbody>
+<tr><td> id          </td><td> bigint  </td><td> X      </td><td> X        </td><td> primary key                                                                                             </td></tr>
+<tr><td> text_ref    </td><td> integer </td><td>        </td><td> X        </td><td> foreign key to text.id                                                                                  </td></tr>
+<tr><td> corpus_ref  </td><td> integer </td><td>        </td><td> X        </td><td> foreign key to corpus.id                                                                                </td></tr>
+<tr><td> layer       </td><td> text    </td><td>        </td><td>          </td><td>                                                                                                         </td></tr>
+<tr><td> name        </td><td> text    </td><td>        </td><td>          </td><td> A human readable identfier of the node. Must be unique for each document.                               </td></tr>
+<tr><td> left        </td><td> integer </td><td>        </td><td> X        </td><td> position of first covered character                                                                     </td></tr>
+<tr><td> right       </td><td> integer </td><td>        </td><td> X        </td><td> position of the character after the last covered character                                              </td></tr>
+<tr><td> token_index </td><td> integer </td><td>        </td><td>          </td><td> index of this token (if it is a token, otherwise NULL)                                                  </td></tr>
+<tr><td> left_token  </td><td> integer </td><td>        </td><td> X        </td><td> index of first covered token, for token, this value is the token_index                                  </td></tr>
+<tr><td> right_token </td><td> integer </td><td>        </td><td> X        </td><td> index of last covered token, for token, this value is the token_index                                   </td></tr>
+<tr><td> seg_index   </td><td> integer </td><td>        </td><td>          </td><td> index of this segment (if it is a segment, i.e. there is some SOrderingRelation connected to this node) </td></tr>
+<tr><td> seg_name    </td><td> text    </td><td>        </td><td>          </td><td> name of the segment path this segment belongs to                                                        </td></tr>
+<tr><td> span        </td><td> text    </td><td>        </td><td>          </td><td> for tokens or node with a segmentation index: substring of the covered original text                    </td></tr>
+<tr><td> root        </td><td> boolean </td><td>        </td><td> X        </td><td> True if this node has no parents in <em>all</em> components                                                    </td></tr>
+</tbody></table>
+<a class="header" href="#componentannis" id="componentannis"><h2><code>component.annis</code></h2></a>
+<p>Lists the components (connected sub-graphs) of the graph.</p>
+<p><em>TAB-separated file as described in <a href="https://www.postgresql.org/docs/9.6/sql-copy.html">&quot;Text Format&quot; section of the PostgreSQL documentation</a></em></p>
+<table><thead><tr><th> column </th><th> type    </th><th> unique </th><th> not NULL </th><th> description                                                                              </th></tr></thead><tbody>
+<tr><td> id     </td><td> bigint  </td><td> X      </td><td> X        </td><td> primary key                                                                              </td></tr>
+<tr><td> type   </td><td> char(1) </td><td>        </td><td>          </td><td> edge type: c, d, p                                                                       </td></tr>
+<tr><td> layer  </td><td> text    </td><td>        </td><td> X        </td><td> Could be set to e.g. &quot;default_layer&quot; if not in any Salt layer                            </td></tr>
+<tr><td> name   </td><td> text    </td><td>        </td><td>          </td><td> The sType of the component, e.g anaphoric for a some kind of pointing relation component </td></tr>
+</tbody></table>
+<a class="header" href="#rankannis" id="rankannis"><h2><code>rank.annis</code></h2></a>
+<p>A rank entry describes one of the positions of a node in a component tree. There is one rank entry for each edge. Furthermore,
+every component has a virtual relation and thus an additional rank entry where the parent attribute is NULL and the level is 0.</p>
+<p><em>TAB-separated file as described in <a href="https://www.postgresql.org/docs/9.6/sql-copy.html">&quot;Text Format&quot; section of the PostgreSQL documentation</a></em></p>
+<table><thead><tr><th> column        </th><th> type    </th><th> unique </th><th> not NULL </th><th> description                                                                                         </th></tr></thead><tbody>
+<tr><td> id            </td><td> bigint  </td><td> X      </td><td> X        </td><td> primary key                                                                                         </td></tr>
+<tr><td> pre           </td><td> integer </td><td>        </td><td> X        </td><td> the preorder of the target node. the root of the component tree should always have a pre-order of 0 </td></tr>
+<tr><td> post          </td><td> integer </td><td>        </td><td> X        </td><td> the post-order or the target node                                                                   </td></tr>
+<tr><td> node_ref      </td><td> bigint  </td><td>        </td><td> X        </td><td> the node.id of the target node                                                                      </td></tr>
+<tr><td> component_ref </td><td> bigint  </td><td>        </td><td> X        </td><td>                                                                                                     </td></tr>
+<tr><td> parent        </td><td> bigint  </td><td>        </td><td>          </td><td> <em>id</em> of the parent rank entry                                                                       </td></tr>
+<tr><td> level         </td><td> integer </td><td>        </td><td>          </td><td> level of this rank entry (not node!) in the component tree                                          </td></tr>
+</tbody></table>
+<p>Rank entries with the type 'c' (coverage spans) <em>must</em> be ommitted, if the referenced node is a token and if the parent coverage span is continuous. Continuous means the range of covered token has no gaps, thus it includes all token between the first and the last covered token. The idea behind this is, that you can recover the needed information using the &quot;left_token&quot; and &quot;right_token&quot; from the span together with the &quot;token_index&quot; (all in the node.annis table) if the span is continuous.</p>
+<a class="header" href="#node_annotationannis" id="node_annotationannis"><h2><code>node_annotation.annis</code></h2></a>
+<p>Contains all annotations per node.</p>
+<p><em>TAB-separated file as described in <a href="https://www.postgresql.org/docs/9.6/sql-copy.html">&quot;Text Format&quot; section of the PostgreSQL documentation</a></em></p>
+<table><thead><tr><th> column    </th><th> type   </th><th> unique </th><th> not NULL </th><th> description             </th></tr></thead><tbody>
+<tr><td> node_ref  </td><td> bigint </td><td>        </td><td> X        </td><td> foreign key to _node.id </td></tr>
+<tr><td> namespace </td><td> text   </td><td>        </td><td>          </td><td>                         </td></tr>
+<tr><td> name      </td><td> text   </td><td>        </td><td> X        </td><td>                         </td></tr>
+<tr><td> value     </td><td> text   </td><td>        </td><td>          </td><td>                         </td></tr>
+</tbody></table>
+<p>unique(node_ref, namespace, name)</p>
+<a class="header" href="#edge_annotationannis" id="edge_annotationannis"><h2><code>edge_annotation.annis</code></h2></a>
+<p>Contains all annotations per edge (which is represented by a rank entry)</p>
+<p><em>TAB-separated file as described in <a href="https://www.postgresql.org/docs/9.6/sql-copy.html">&quot;Text Format&quot; section of the PostgreSQL documentation</a></em></p>
+<table><thead><tr><th> column    </th><th> type   </th><th> unique </th><th> not NULL </th><th> description            </th></tr></thead><tbody>
+<tr><td> rank_ref  </td><td> bigint </td><td>        </td><td> X        </td><td> foreign key to rank.id </td></tr>
+<tr><td> namespace </td><td> text   </td><td>        </td><td>          </td><td>                        </td></tr>
+<tr><td> name      </td><td> text   </td><td>        </td><td> X        </td><td>                        </td></tr>
+<tr><td> value     </td><td> text   </td><td>        </td><td>          </td><td>                        </td></tr>
+</tbody></table>
+<a class="header" href="#resolver_vis_mapannis" id="resolver_vis_mapannis"><h2><code>resolver_vis_map.annis</code></h2></a>
+<p>Describes which visualizers to trigger depending of the namespace of a node or edge occuring in the search results.</p>
+<p><em>TAB-separated file as described in <a href="https://www.postgresql.org/docs/9.6/sql-copy.html">&quot;Text Format&quot; section of the PostgreSQL documentation</a></em></p>
+<table><thead><tr><th> column       </th><th> type   </th><th> unique </th><th> not NULL </th><th> description                                                                            </th></tr></thead><tbody>
+<tr><td> corpus       </td><td> text   </td><td>        </td><td>          </td><td> the name of the supercorpus                                                            </td></tr>
+<tr><td> version      </td><td> text   </td><td>        </td><td>          </td><td> the version of the corpus                                                              </td></tr>
+<tr><td> namespace    </td><td> text   </td><td>        </td><td>          </td><td> the several layers of the  corpus                                                      </td></tr>
+<tr><td> element      </td><td> text   </td><td>        </td><td>          </td><td> the type of the entry: &quot;node&quot; or &quot;edge&quot;                                                </td></tr>
+<tr><td> vis_type     </td><td> text   </td><td>        </td><td> X        </td><td> the abstract type of visualization: &quot;tree&quot;, &quot;discourse&quot;, &quot;grid&quot;, ...                   </td></tr>
+<tr><td> display_name </td><td> text   </td><td>        </td><td> X        </td><td> the name of the layer which shall be shown for display                                 </td></tr>
+<tr><td> visibility   </td><td> text   </td><td>        </td><td>          </td><td> either &quot;permanent&quot;, &quot;visible&quot;, &quot;hidden&quot;, &quot;removed&quot; or &quot;preloaded&quot;, default is &quot;hidden&quot; </td></tr>
+<tr><td> order        </td><td> bigint </td><td>        </td><td>          </td><td> the order of the layers, in which they shall be shown                                  </td></tr>
+<tr><td> mappings     </td><td> text   </td><td>        </td><td>          </td><td>                                                                                        </td></tr>
+</tbody></table>
+<a class="header" href="#extdata-folder" id="extdata-folder"><h2><code>ExtData</code> folder</h2></a>
+<hr />
+<p>Contains the media files that are connected with this corpus including their binary content.</p>
+<p>Each file directly inside the ExtData folder belongs to the toplevel corpus.
+A sub-folder corresponds to a document and each file inside a sub-folder belongs to the document with the same name.</p>
+<a class="header" href="#create-new-query-builder" id="create-new-query-builder"><h1>Create new query builder</h1></a>
+<p>A query builder is a class that</p>
+<ol>
+<li>implements the <code>QueryBuilderPlugin</code> interface</li>
+<li>has the <code>@PluginImplementation</code> annotation</li>
+</ol>
+<p>When implementing the interface you have to provide a short name, a caption
+and a callback function that creates new Vaadin components. You get an object
+of the type <code>QueryController</code> which you can use to set new queries from your
+component.</p>
+<p>A query builder plugin must be either registered in the <code>addCustomUIPlugins()</code> function
+of the <code>SearchUI</code> (if the plugin is part of the annis-gui project) or must be
+added to a JAR-file that is located at one of the following locations:</p>
+<ul>
+<li>the plugins folder inside the deployed web application</li>
+<li>the path defined in the <code>ANNIS_PLUGINS</code> environment variable</li>
+</ul>
+<p>Please also note that it is possible to configure a default query builder for an
+instance. Further information can be found in the User Guide.</p>
+<a class="header" href="#public-rest-api" id="public-rest-api"><h1>Public REST API</h1></a>
+<p>The ANNIS-service has an public REST API that can be accessed by third-party applications.</p>
+<a class="header" href="#authentication" id="authentication"><h2>Authentication</h2></a>
+<p>Some of the API calls are protected resources. HTTP user/password authentification is used in this case.
+The users of the REST service can be configured as described in the User Guide.
+Whenever a user is not permitted to perform a certain action a <code>403 Forbidden</code> HTTP response is sent.
+On some actions (like &quot;list all corpora&quot;) only the resources that are available to the user are shown.</p>
+<p>You can omit any authentication data. In this case you have the same rights as the &quot;anonymous&quot; user.</p>
+<a class="header" href="#available-apis" id="available-apis"><h2>Available APIs</h2></a>
+<p>The following APIs are currently available:</p>
+<ul>
+<li>Corpus queries as described by the <code>annis.service.QueryService</code> <a href="http://static.javadoc.io/de.hu-berlin.german.korpling.annis/annis-interfaces/3.6.0-SNAPSHOT/annis/service/QueryService.html">interface</a></li>
+<li>Administrative tasks as described by the <code>annis.service.AdminService</code> <a href="http://static.javadoc.io/de.hu-berlin.german.korpling.annis/annis-interfaces/3.6.0-SNAPSHOT/annis/service/AdminService.html">interface</a></li>
+</ul>
+<p>ANNIS uses the <a href="http://semver.org/">semantic versioning scheme</a>. Minor version updates of ANNIS will be backwards-compatible
+to the APIs described by this documentation. There might be further un-official API calls that might change without any
+notice.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+        
+        
+
+    </body>
+</html>
