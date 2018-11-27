@@ -16,10 +16,19 @@
  */
 package annis.gui.flatquerybuilder;
 
-import annis.gui.QueryController;
-import annis.gui.objects.Query;
-import annis.libgui.Helper;
-import annis.service.objects.AnnisAttribute;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -34,16 +43,11 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import annis.gui.QueryController;
+import annis.gui.objects.Query;
+import annis.libgui.Helper;
+import annis.service.objects.AnnisAttribute;
 
 /*
  * @author martin klotz (martin.klotz@hu-berlin.de)
@@ -1005,15 +1009,15 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
         HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<>();
         VerticalNode vn=null;
         Collection<String> annonames = getAvailableAnnotationNames();        
-        for(int i : constraints.keySet())
+        for(Map.Entry<Integer, Constraint> e : constraints.entrySet())
         {          
-          Constraint con = constraints.get(i);                    
+          Constraint con = e.getValue();                    
           if(!annonames.contains(con.getLevel()))
           {
             throw new UnknownLevelException(con.getLevel());
             //is that a good idea? YES
           }
-          if(!indexedVnodes.containsKey(i))
+          if(!indexedVnodes.containsKey(e.getKey()))
           {            
             vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(), con.isNegative());
             if(con.isRegEx())
@@ -1030,14 +1034,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
                 sb.setValue(mvalue); 
               }              
             }
-            indexedVnodes.put(i, vn);
+            indexedVnodes.put(e.getKey(), vn);
           }
 
           for(Relation rel : eRelations)
           {
-            if(rel.contains(i))
+            if(rel.contains(e.getKey()))
             {
-              int b = rel.whosMyFriend(i);              
+              int b = rel.whosMyFriend(e.getKey());              
               if(!indexedVnodes.containsKey(b))
               {
                 indexedVnodes.put(b, null);
