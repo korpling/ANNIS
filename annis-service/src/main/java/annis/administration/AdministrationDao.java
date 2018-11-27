@@ -931,78 +931,86 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       // import toplevel corpus media files
       File[] topFiles = extData.listFiles((FileFilter) FileFileFilter.FILE);
-      for (File data : topFiles)
+      if(topFiles != null)
       {
-        String extension = FilenameUtils.getExtension(data.getName());
-        try
-        {
-          if (mimeTypeMapping.containsKey(extension))
-          {
-            log.info("import " + data.getCanonicalPath() + " to staging area");
-
-            // search for corpus_ref
-            String sqlScript
-              = "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
-            long corpusID = getJdbcTemplate().queryForObject(sqlScript, Long.class);
-
-            importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
-              corpusID);
-          }
-          else
-          {
-            log.warn(
-              "not importing " + data.getCanonicalPath()
-              + " since file type is unknown");
-          }
-        }
-        catch (IOException ex)
-        {
-          log.error("no canonical path given", ex);
-        }
-      }
-
+	      for (File data : topFiles)
+	      {
+	        String extension = FilenameUtils.getExtension(data.getName());
+	        try
+	        {
+	          if (mimeTypeMapping.containsKey(extension))
+	          {
+	            log.info("import " + data.getCanonicalPath() + " to staging area");
+	
+	            // search for corpus_ref
+	            String sqlScript
+	              = "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
+	            long corpusID = getJdbcTemplate().queryForObject(sqlScript, Long.class);
+	
+	            importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
+	              corpusID);
+	          }
+	          else
+	          {
+	            log.warn(
+	              "not importing " + data.getCanonicalPath()
+	              + " since file type is unknown");
+	          }
+	        }
+	        catch (IOException ex)
+	        {
+	          log.error("no canonical path given", ex);
+	        }
+	      }
+	  }
       // get each subdirectory (which corresponds to an document name)
       File[] documents = extData.listFiles(
         (FileFilter) DirectoryFileFilter.DIRECTORY);
-      for (File doc : documents)
+      if(documents != null)
       {
-        if (doc.isDirectory() && doc.canRead())
-        {
-          File[] dataFiles = doc.listFiles((FileFilter) FileFileFilter.FILE);
-          for (File data : dataFiles)
-          {
-            String extension = FilenameUtils.getExtension(data.getName());
-            try
-            {
-              if (mimeTypeMapping.containsKey(extension))
-              {
-                log.info(
-                  "import " + data.getCanonicalPath() + " to staging area");
-
-                // search for corpus_ref
-                String sqlScript
-                  = "SELECT id FROM _corpus WHERE \"name\" = ? LIMIT 1";
-                long corpusID = getJdbcTemplate().queryForObject(sqlScript, Long.class, doc.
-                  getName());
-
-                importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
-                  corpusID);
-              }
-              else
-              {
-                log.
-                  warn(
-                    "not importing " + data.getCanonicalPath()
-                    + " since file type is unknown");
-              }
-            }
-            catch (IOException ex)
-            {
-              log.error("no canonical path given", ex);
-            }
-          }
-        }
-      }
+	      for (File doc : documents)
+	      {
+	        if (doc.isDirectory() && doc.canRead())
+	        {
+	          File[] dataFiles = doc.listFiles((FileFilter) FileFileFilter.FILE);
+	          if(dataFiles != null)
+	          {
+		          for (File data : dataFiles)
+		          {
+		            String extension = FilenameUtils.getExtension(data.getName());
+		            try
+		            {
+		              if (mimeTypeMapping.containsKey(extension))
+		              {
+		                log.info(
+		                  "import " + data.getCanonicalPath() + " to staging area");
+		
+		                // search for corpus_ref
+		                String sqlScript
+		                  = "SELECT id FROM _corpus WHERE \"name\" = ? LIMIT 1";
+		                long corpusID = getJdbcTemplate().queryForObject(sqlScript, Long.class, doc.
+		                  getName());
+		
+		                importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
+		                  corpusID);
+		              }
+		              else
+		              {
+		                log.
+		                  warn(
+		                    "not importing " + data.getCanonicalPath()
+		                    + " since file type is unknown");
+		              }
+		            }
+		            catch (IOException ex)
+		            {
+		              log.error("no canonical path given", ex);
+		            }
+		          }
+	          }
+	        }
+	      }
+    	}
     }
   }
 
