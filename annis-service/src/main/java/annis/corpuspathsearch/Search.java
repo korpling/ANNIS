@@ -18,90 +18,75 @@ import org.slf4j.LoggerFactory;
  * Searches for ANNIS corpora in file system locations.
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class Search
-{
-  
-  private static final Logger log = LoggerFactory.getLogger(Search.class);
+public class Search {
 
-  private final List<File> rootPaths;
-  private final Map<String, File> corpusPaths;
-  private boolean wasSearched;
+	private static final Logger log = LoggerFactory.getLogger(Search.class);
 
-  public Search(List<File> rootPaths)
-  {
-    this.rootPaths = rootPaths;
-    this.corpusPaths = new TreeMap<>();
-    this.wasSearched = false;
-  }
+	private final List<File> rootPaths;
+	private final Map<String, File> corpusPaths;
+	private boolean wasSearched;
 
-  public void startSearch()
-  {
-    corpusPaths.clear();
-    for (File f : rootPaths)
-    {
-      searchPath(f);
-    }
-    wasSearched = true;
-  }
+	public Search(List<File> rootPaths) {
+		this.rootPaths = rootPaths;
+		this.corpusPaths = new TreeMap<>();
+		this.wasSearched = false;
+	}
 
-  private void searchPath(File path)
-  {
-    if (path != null && path.canRead())
-    {
-      if (path.isDirectory())
-      {
-        // search all subdirectories
-        File[] children = path.listFiles();
-        for (File f : children)
-        {
-          log.debug("seaching in "+ f.getPath() + " for corpora");
-          searchPath(f);
-        }
-      }
-      else if (path.isFile() && "corpus.tab".equals(path.getName()))
-      {
-        try
-        {
-          String toplevel = ANNISFormatHelper.extractToplevelCorpusNames(new FileInputStream(path));
-          corpusPaths.put(toplevel, path);
-        }
-        catch (FileNotFoundException ex)
-        {
-          log.error(null, ex);
-        }
+	public void startSearch() {
+		corpusPaths.clear();
+		for (File f : rootPaths) {
+			searchPath(f);
+		}
+		wasSearched = true;
+	}
 
-      }
-    }
-  }
+	private void searchPath(File path) {
+		if (path != null && path.canRead()) {
+			if (path.isDirectory()) {
+				// search all subdirectories
+				File[] children = path.listFiles();
+				if (children != null) {
+					for (File f : children) {
+						log.debug("seaching in " + f.getPath() + " for corpora");
+						searchPath(f);
+					}
+				}
+			} else if (path.isFile() && "corpus.tab".equals(path.getName())) {
+				try {
+					String toplevel = ANNISFormatHelper.extractToplevelCorpusNames(new FileInputStream(path));
+					corpusPaths.put(toplevel, path);
+				} catch (FileNotFoundException ex) {
+					log.error(null, ex);
+				}
 
-  public Map<String, File> getCorpusPaths()
-  {
-    return corpusPaths;
-  }
+			}
+		}
 
-  public boolean isWasSearched()
-  {
-    return wasSearched;
-  }
+	}
 
-  public void setWasSearched(boolean wasSearched)
-  {
-    this.wasSearched = wasSearched;
-  }
-  
-  @Override
-  public String toString()
-  {
-    StringBuilder sb = new StringBuilder();
+	public Map<String, File> getCorpusPaths() {
+		return corpusPaths;
+	}
 
-    for (Map.Entry<String, File> e : corpusPaths.entrySet())
-    {
-      sb.append(e.getKey());
-      sb.append("\t");
-      sb.append(e.getValue().getParentFile().getAbsolutePath());
-      sb.append("\n");
-    }
+	public boolean isWasSearched() {
+		return wasSearched;
+	}
 
-    return sb.toString();
-  }
+	public void setWasSearched(boolean wasSearched) {
+		this.wasSearched = wasSearched;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+
+		for (Map.Entry<String, File> e : corpusPaths.entrySet()) {
+			sb.append(e.getKey());
+			sb.append("\t");
+			sb.append(e.getValue().getParentFile().getAbsolutePath());
+			sb.append("\n");
+		}
+
+		return sb.toString();
+	}
 }

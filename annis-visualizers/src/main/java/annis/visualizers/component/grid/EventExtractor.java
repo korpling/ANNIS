@@ -605,7 +605,7 @@ public class EventExtractor {
                     return +1;
                 }
 
-                return ((Integer) o1.getLeft()).compareTo(o2.getLeft());
+                return Integer.compare(o1.getLeft(), o2.getLeft());
             }
         });
     }

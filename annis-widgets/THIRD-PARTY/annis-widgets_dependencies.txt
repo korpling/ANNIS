@@ -17,7 +17,7 @@ Lists of 38 third-party dependencies.
      (GWT Terms) gwt-user (com.vaadin.external.gwt:gwt-user:2.7.0.vaadin7 - http://www.gwtproject.org/gwt-user/)
      (The Apache Software License, Version 2.0) Apache Commons Codec (commons-codec:commons-codec:1.9 - http://commons.apache.org/proper/commons-codec/)
      (The Apache Software License, Version 2.0) Commons IO (commons-io:commons-io:1.3.2 - http://jakarta.apache.org/commons/io/)
-     (The Apache Software License, Version 2.0) annis-interfaces (de.hu-berlin.german.korpling.annis:annis-interfaces:3.5.0-rc3 - http://corpus-tools.org/annis/annis-interfaces/)
+     (The Apache Software License, Version 2.0) annis-interfaces (de.hu-berlin.german.korpling.annis:annis-interfaces:3.5.0 - http://corpus-tools.org/annis/annis-interfaces/)
      (Apache License, Version 2.0) Bean Validation API (javax.validation:validation-api:1.0.0.GA - no url defined)
      (CDDL License) jsr311-api (javax.ws.rs:jsr311-api:1.1.1 - https://jsr311.dev.java.net)
      (Apache 2) Joda-Time (joda-time:joda-time:2.4 - http://www.joda.org/joda-time/)

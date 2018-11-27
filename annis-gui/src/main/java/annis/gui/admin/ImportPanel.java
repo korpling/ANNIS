@@ -263,10 +263,10 @@ public class ImportPanel extends Panel
     {
       res = res.queryParam("alias", alias);
     }
-    try
+    try(FileInputStream tmpFileStream = new FileInputStream(temporaryCorpusFile))
     {
       ClientResponse response 
-        = res.entity(new FileInputStream(temporaryCorpusFile)).type(
+        = res.entity(tmpFileStream).type(
           "application/zip").post(ClientResponse.class);
       
       if(response.getStatus() == Response.Status.ACCEPTED.getStatusCode())
@@ -286,7 +286,7 @@ public class ImportPanel extends Panel
       }
       
     }
-    catch (FileNotFoundException ex)
+    catch (IOException ex)
     {
       log.error(null, ex);
     }

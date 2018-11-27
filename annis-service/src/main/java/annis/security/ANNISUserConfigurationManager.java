@@ -42,368 +42,293 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ANNISUserConfigurationManager
-{
+public class ANNISUserConfigurationManager {
 
-  private final static org.slf4j.Logger log = LoggerFactory.getLogger(
-    ANNISUserConfigurationManager.class);
+	private final static org.slf4j.Logger log = LoggerFactory.getLogger(ANNISUserConfigurationManager.class);
 
-  private String resourcePath;
+	private String resourcePath;
 
-  private File groupsFile;
+	private File groupsFile;
 
-  private final Map<String, Group> groups = new TreeMap<>();
+	private final Map<String, Group> groups = new TreeMap<>();
 
-  private Date lastTimeReloaded = null;
-  
-  private Set<String> useShortenerWithoutLogin;
-  
-  private final ReadWriteLock lock = new ReentrantReadWriteLock();
+	private Date lastTimeReloaded = null;
 
-  private void checkConfiguration()
-  {
-    boolean reload = false;
+	private Set<String> useShortenerWithoutLogin;
 
-    // get a read lock that does not block anyone else to find out if we need an update
-    lock.readLock().lock();
-    try
-    {
-      if (groupsFile == null)
-      {
-        return;
-      }
+	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-      if (lastTimeReloaded == null || FileUtils.isFileNewer(groupsFile,
-        lastTimeReloaded))
-      {
-        reload = true;
-      }
-    }
-    finally
-    {
-      lock.readLock().unlock();
-    }
+	private void checkConfiguration() {
+		boolean reload = false;
 
-    if (reload)
-    {
-      reloadGroupsFromFile();
-    }
-  }
+		// get a read lock that does not block anyone else to find out if we need an
+		// update
+		lock.readLock().lock();
+		try {
+			if (groupsFile == null) {
+				return;
+			}
 
-  private void reloadGroupsFromFile()
-  {
-    lock.writeLock().lock();
-    try
-    {
+			if (lastTimeReloaded == null || FileUtils.isFileNewer(groupsFile, lastTimeReloaded)) {
+				reload = true;
+			}
+		} finally {
+			lock.readLock().unlock();
+		}
 
-      Properties propGroups = new Properties();
-      try (FileInputStream inStream = new FileInputStream(groupsFile);)
-      {
+		if (reload) {
+			reloadGroupsFromFile();
+		}
+	}
 
-        propGroups.load(inStream);
-        lastTimeReloaded = new Date(groupsFile.lastModified());
+	private void reloadGroupsFromFile() {
+		lock.writeLock().lock();
+		try {
 
-        groups.clear();
-        for (String k : propGroups.stringPropertyNames())
-        {
-          groups.put(k, new Group(k, propGroups.getProperty(k)));
-        }
+			Properties propGroups = new Properties();
+			try (FileInputStream inStream = new FileInputStream(groupsFile);) {
 
-      }
-      catch (IOException ex)
-      {
-        log.error(null, ex);
-      }
-    }
-    finally
-    {
-      lock.writeLock().unlock();
-    }
-  }
+				propGroups.load(inStream);
+				lastTimeReloaded = new Date(groupsFile.lastModified());
 
-  public ImmutableMap<String, Group> getGroups()
-  {
-    checkConfiguration();
-    ImmutableMap<String, Group> result = ImmutableMap.of();
-    lock.readLock().lock();
-    try
-    {
-      result = ImmutableMap.copyOf(groups);
-    }
-    finally
-    {
-      lock.readLock().unlock();
-    }
-    return result;
-  }
-  
-  public boolean writeGroup(Group group)
-  {
-    if (groupsFile != null)
-    {
+				groups.clear();
+				for (String k : propGroups.stringPropertyNames()) {
+					groups.put(k, new Group(k, propGroups.getProperty(k)));
+				}
 
-      lock.writeLock().lock();
-      try
-      {
-        // make sure to have the newest version of the groups
-        reloadGroupsFromFile();
-        
-        // update/create the new group
-        groups.put(group.getName(), group);
-        
-        return writeGroupFile();
-        
-      }
-      finally
-      {
-        lock.writeLock().unlock();
-      }
-    } // end if resourcePath not null
-    return false;
-  }
-  
-  private boolean writeGroupFile()
-  {
-    if (groupsFile != null)
-    {
+			} catch (IOException ex) {
+				log.error(null, ex);
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
 
-      lock.writeLock().lock();
-      try
-      {
-        
-        Properties props = new Properties();
-        for(Group g : groups.values())
-        {
-          props.put(g.getName(), Joiner.on(',').join(g.getCorpora()));
-        }
-        
-        try(FileOutputStream outStream = new FileOutputStream(groupsFile))
-        {
-          props.store(outStream, "");
-          outStream.close();
+	public ImmutableMap<String, Group> getGroups() {
+		checkConfiguration();
+		ImmutableMap<String, Group> result = ImmutableMap.of();
+		lock.readLock().lock();
+		try {
+			result = ImmutableMap.copyOf(groups);
+		} finally {
+			lock.readLock().unlock();
+		}
+		return result;
+	}
 
-          // update the last modification time
-          lastTimeReloaded = new Date(groupsFile.lastModified());
-          return true;
-        }
-        catch(IOException ex)
-        {
-          log.error("Could not write groups file", ex);
-        }
-      }
-      finally
-      {
-        lock.writeLock().unlock();
-      }
-    } // end if resourcePath not null
-    return false;
-  }
-  
-  /**
-   * Writes the user to the disk
-   * @param user
-   * @return True if successful.
-   */
-  public boolean writeUser(User user)
-  {
-    // save user info to file
-    if (resourcePath != null)
-    {
+	public boolean writeGroup(Group group) {
+		if (groupsFile != null) {
 
-      lock.writeLock().lock();
-      try
-      {
-        File userDir = new File(resourcePath, "users");
-        if (userDir.isDirectory())
-        {
-          // get the file which corresponds to the user
-          File userFile = new File(userDir.getAbsolutePath(), user.getName());
-          Properties props = user.toProperties();
-          try (FileOutputStream out = new FileOutputStream(userFile))
-          {
-            props.store(out, "");
-            return true;
-          }
-          catch (IOException ex)
-          {
-            log.error("Could not write users file", ex);
-          }          
-        }
-      }
-      finally
-      {
-        lock.writeLock().unlock();
-      }
-    } // end if resourcePath not null
-    return false;
-  }
-  
-  /**
-   * Deletes the user from the disk
-   * @param userName
-   * @return True if successful.
-   */
-  public boolean deleteUser(String userName)
-  {
-    // load user info from file
-    if (resourcePath != null)
-    {
+			lock.writeLock().lock();
+			try {
+				// make sure to have the newest version of the groups
+				reloadGroupsFromFile();
 
-      lock.writeLock().lock();
-      try
-      {
-        File userDir = new File(resourcePath, "users");
-        if (userDir.isDirectory())
-        {
-          // get the file which corresponds to the user
-          File userFile = new File(userDir.getAbsolutePath(), userName);
-          return userFile.delete();
-        }
-      }
-      finally
-      {
-        lock.writeLock().unlock();
-      }
-    } // end if resourcePath not null
-    return false;
-  }
-  
-  /**
-   * Deletes the group from the disk
-   * @param groupName
-   * @return True if successful.
-   */
-  public boolean deleteGroup(String groupName)
-  {
-    if (groupsFile != null)
-    {
-      lock.writeLock().lock();
-      try
-      {
-        reloadGroupsFromFile();
-        groups.remove(groupName);
-        return writeGroupFile();
-      }
-      finally
-      {
-        lock.writeLock().unlock();
-      }
-    } // end if resourcePath not null
-    return false;
-  }
+				// update/create the new group
+				groups.put(group.getName(), group);
 
-  public User getUser(String userName)
-  {
-    // load user info from file
-    if (resourcePath != null)
-    {
+				return writeGroupFile();
 
-      lock.readLock().lock();
-      try
-      {
-        File userDir = new File(resourcePath, "users");
-        if (userDir.isDirectory())
-        {
-          // get the file which corresponds to the user
-          File userFile = new File(userDir.getAbsolutePath(), userName);
-          return getUserFromFile(userFile);
-        }
-      }
-      finally
-      {
-        lock.readLock().unlock();
-      }
-    } // end if resourcePath not null
+			} finally {
+				lock.writeLock().unlock();
+			}
+		} // end if resourcePath not null
+		return false;
+	}
 
-    return null;
-  }
-  
-  /**
-   * Internal helper function to parse a user file.
-   * It assumes the calling function already has handled the locking.
-   * @param userFile
-   * @return 
-   */
-  private User getUserFromFile(File userFile)
-  {
-    if (userFile.isFile() && userFile.canRead())
-    {
-      try (FileInputStream userFileIO = new FileInputStream(userFile);)
-      {
-        Properties userProps = new Properties();
-        userProps.load(userFileIO);
-        return new User(userFile.getName(), userProps);
-      }
-      catch (IOException ex)
-      {
-        log.error(null, ex);
-      }
-    }
-    return null;
-  }
+	private boolean writeGroupFile() {
+		if (groupsFile != null) {
 
-  public List<User> listAllUsers()
-  {
-    List<User> result = new LinkedList<>();
-    // load user info from file
-    if (resourcePath != null)
-    {
+			lock.writeLock().lock();
+			try {
 
-      lock.readLock().lock();
-      try
-      {
-        File userDir = new File(resourcePath, "users");
-        if (userDir.isDirectory())
-        {
-          // get all the files within this directory
-          for(File f : userDir.listFiles())
-          {
-            // the filename is the user name, so check it
-            User u = getUserFromFile(f);
-            if(u != null)
-            {
-              result.add(u);
-            }
-          }
-        }
-      }
-      finally
-      {
-        lock.readLock().unlock();
-      }
-    } // end if resourcePath not null
+				Properties props = new Properties();
+				for (Group g : groups.values()) {
+					props.put(g.getName(), Joiner.on(',').join(g.getCorpora()));
+				}
 
-    return result;
-  }
+				try (FileOutputStream outStream = new FileOutputStream(groupsFile)) {
+					props.store(outStream, "");
+					outStream.close();
 
-  public String getResourcePath()
-  {
-    return resourcePath;
-  }
+					// update the last modification time
+					lastTimeReloaded = new Date(groupsFile.lastModified());
+					return true;
+				} catch (IOException ex) {
+					log.error("Could not write groups file", ex);
+				}
+			} finally {
+				lock.writeLock().unlock();
+			}
+		} // end if resourcePath not null
+		return false;
+	}
 
-  public void setResourcePath(String resourcePath)
-  {
-    lock.writeLock().lock();
-    try
-    {
-      this.resourcePath = resourcePath;
-      this.groupsFile = new File(resourcePath, "groups");
-    }
-    finally
-    {
-      lock.writeLock().unlock();
-    }
-  }
+	/**
+	 * Writes the user to the disk
+	 * 
+	 * @param user
+	 * @return True if successful.
+	 */
+	public boolean writeUser(User user) {
+		// save user info to file
+		if (resourcePath != null) {
 
-  public Set<String> getUseShortenerWithoutLogin()
-  {
-    return useShortenerWithoutLogin;
-  }
+			lock.writeLock().lock();
+			try {
+				File userDir = new File(resourcePath, "users");
+				if (userDir.isDirectory()) {
+					// get the file which corresponds to the user
+					File userFile = new File(userDir.getAbsolutePath(), user.getName());
+					Properties props = user.toProperties();
+					try (FileOutputStream out = new FileOutputStream(userFile)) {
+						props.store(out, "");
+						return true;
+					} catch (IOException ex) {
+						log.error("Could not write users file", ex);
+					}
+				}
+			} finally {
+				lock.writeLock().unlock();
+			}
+		} // end if resourcePath not null
+		return false;
+	}
 
-  public void setUseShortenerWithoutLogin(Set<String> useShortenerWithoutLogin)
-  {
-    this.useShortenerWithoutLogin = useShortenerWithoutLogin;
-  }
+	/**
+	 * Deletes the user from the disk
+	 * 
+	 * @param userName
+	 * @return True if successful.
+	 */
+	public boolean deleteUser(String userName) {
+		// load user info from file
+		if (resourcePath != null) {
 
-  
+			lock.writeLock().lock();
+			try {
+				File userDir = new File(resourcePath, "users");
+				if (userDir.isDirectory()) {
+					// get the file which corresponds to the user
+					File userFile = new File(userDir.getAbsolutePath(), userName);
+					return userFile.delete();
+				}
+			} finally {
+				lock.writeLock().unlock();
+			}
+		} // end if resourcePath not null
+		return false;
+	}
+
+	/**
+	 * Deletes the group from the disk
+	 * 
+	 * @param groupName
+	 * @return True if successful.
+	 */
+	public boolean deleteGroup(String groupName) {
+		if (groupsFile != null) {
+			lock.writeLock().lock();
+			try {
+				reloadGroupsFromFile();
+				groups.remove(groupName);
+				return writeGroupFile();
+			} finally {
+				lock.writeLock().unlock();
+			}
+		} // end if resourcePath not null
+		return false;
+	}
+
+	public User getUser(String userName) {
+		// load user info from file
+		if (resourcePath != null) {
+
+			lock.readLock().lock();
+			try {
+				File userDir = new File(resourcePath, "users");
+				if (userDir.isDirectory()) {
+					// get the file which corresponds to the user
+					File userFile = new File(userDir.getAbsolutePath(), userName);
+					return getUserFromFile(userFile);
+				}
+			} finally {
+				lock.readLock().unlock();
+			}
+		} // end if resourcePath not null
+
+		return null;
+	}
+
+	/**
+	 * Internal helper function to parse a user file. It assumes the calling
+	 * function already has handled the locking.
+	 * 
+	 * @param userFile
+	 * @return
+	 */
+	private User getUserFromFile(File userFile) {
+		if (userFile.isFile() && userFile.canRead()) {
+			try (FileInputStream userFileIO = new FileInputStream(userFile);) {
+				Properties userProps = new Properties();
+				userProps.load(userFileIO);
+				return new User(userFile.getName(), userProps);
+			} catch (IOException ex) {
+				log.error(null, ex);
+			}
+		}
+		return null;
+	}
+
+	public List<User> listAllUsers() {
+		List<User> result = new LinkedList<>();
+		// load user info from file
+		if (resourcePath != null) {
+
+			lock.readLock().lock();
+			try {
+				File userDir = new File(resourcePath, "users");
+				if (userDir.isDirectory()) {
+					// get all the files within this directory
+					File[] userDirFiles = userDir.listFiles();
+					if(userDirFiles != null) {
+						for (File f : userDirFiles) {
+							// the filename is the user name, so check it
+							User u = getUserFromFile(f);
+							if (u != null) {
+								result.add(u);
+							}
+						}
+					}
+				}
+			} finally {
+				lock.readLock().unlock();
+			}
+		} // end if resourcePath not null
+
+		return result;
+	}
+
+	public String getResourcePath() {
+		return resourcePath;
+	}
+
+	public void setResourcePath(String resourcePath) {
+		lock.writeLock().lock();
+		try {
+			this.resourcePath = resourcePath;
+			this.groupsFile = new File(resourcePath, "groups");
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	public Set<String> getUseShortenerWithoutLogin() {
+		return useShortenerWithoutLogin;
+	}
+
+	public void setUseShortenerWithoutLogin(Set<String> useShortenerWithoutLogin) {
+		this.useShortenerWithoutLogin = useShortenerWithoutLogin;
+	}
+
 }

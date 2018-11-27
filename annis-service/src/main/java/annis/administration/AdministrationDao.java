@@ -594,38 +594,44 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         if (extData.canRead() && extData.isDirectory()) {
             // import toplevel corpus media files
             File[] topFiles = extData.listFiles((FileFilter) FileFileFilter.FILE);
-            for (File data : topFiles) {
-                String extension = FilenameUtils.getExtension(data.getName());
-                try {
-                    if (mimeTypeMapping.containsKey(extension)) {
-                        log.info("import " + data.getCanonicalPath() + " to staging area");
-
-                        importSingleFile(data.getCanonicalPath(), toplevelCorpusName);
-                    } else {
-                        log.warn("not importing " + data.getCanonicalPath() + " since file type is unknown");
+            if(topFiles != null) {
+                for (File data : topFiles) {
+                    String extension = FilenameUtils.getExtension(data.getName());
+                    try {
+                        if (mimeTypeMapping.containsKey(extension)) {
+                            log.info("import " + data.getCanonicalPath() + " to staging area");
+    
+                            importSingleFile(data.getCanonicalPath(), toplevelCorpusName);
+                        } else {
+                            log.warn("not importing " + data.getCanonicalPath() + " since file type is unknown");
+                        }
+                    } catch (IOException ex) {
+                        log.error("no canonical path given", ex);
                     }
-                } catch (IOException ex) {
-                    log.error("no canonical path given", ex);
                 }
             }
 
             // get each subdirectory (which corresponds to an document name)
             File[] documents = extData.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
-            for (File doc : documents) {
-                if (doc.isDirectory() && doc.canRead()) {
-                    File[] dataFiles = doc.listFiles((FileFilter) FileFileFilter.FILE);
-                    for (File data : dataFiles) {
-                        String extension = FilenameUtils.getExtension(data.getName());
-                        try {
-                            if (mimeTypeMapping.containsKey(extension)) {
-                                log.info("import " + data.getCanonicalPath() + " to staging area");
-
-                                importSingleFile(data.getCanonicalPath(), toplevelCorpusName + "/" + doc.getName());
-                            } else {
-                                log.warn("not importing " + data.getCanonicalPath() + " since file type is unknown");
+            if(documents != null) {
+                for (File doc : documents) {
+                    if (doc.isDirectory() && doc.canRead()) {
+                        File[] dataFiles = doc.listFiles((FileFilter) FileFileFilter.FILE);
+                        if(dataFiles != null) {
+                            for (File data : dataFiles) {
+                                String extension = FilenameUtils.getExtension(data.getName());
+                                try {
+                                    if (mimeTypeMapping.containsKey(extension)) {
+                                        log.info("import " + data.getCanonicalPath() + " to staging area");
+        
+                                        importSingleFile(data.getCanonicalPath(), toplevelCorpusName + "/" + doc.getName());
+                                    } else {
+                                        log.warn("not importing " + data.getCanonicalPath() + " since file type is unknown");
+                                    }
+                                } catch (IOException ex) {
+                                    log.error("no canonical path given", ex);
+                                }
                             }
-                        } catch (IOException ex) {
-                            log.error("no canonical path given", ex);
                         }
                     }
                 }
