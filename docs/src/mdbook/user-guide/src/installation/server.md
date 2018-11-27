@@ -54,7 +54,7 @@ from our website and deploy it to your Java servlet container (this depends on
 the servlet container you use).
 
 ***Note:*** We also strongly recommend reconfiguring the PostgreSQL server’s default
-settings as described [here](../config/postgresql.md).
+settings as described [here](../advanced/postgresql.md).
 
 ## Tomcat: UTF8 encoding in server.xml
 
