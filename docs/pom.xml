@@ -49,6 +49,7 @@
             <ignorePathsToDelete>
               <path>doc</path>
               <path>doc-develop</path>
+              <path>doc-snapshot</path>
               <path>index.html</path>
               <path>.gitignore</path>
             </ignorePathsToDelete>
@@ -111,7 +112,7 @@ Original revision is ${buildNumber}.</checkinComment>
                   <arguments>
                     <argument>build</argument>
                     <argument>-d</argument>
-                    <argument>${project.build.directory}/mdbook/user-guide/</argument>
+                    <argument>${project.build.directory}/mdbook/${site.path}/user-guide/</argument>
                     <argument>mdbook-generated/user-guide/</argument>
                   </arguments>
                 </configuration>
@@ -128,7 +129,7 @@ Original revision is ${buildNumber}.</checkinComment>
                   <arguments>
                     <argument>build</argument>
                     <argument>-d</argument>
-                    <argument>${project.build.directory}/mdbook/developer-guide/</argument>
+                    <argument>${project.build.directory}/mdbook/${site.path}/developer-guide/</argument>
                     <argument>mdbook-generated/developer-guide/</argument>
                   </arguments>
                 </configuration>
