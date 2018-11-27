@@ -701,7 +701,7 @@ public class EventExtractor {
           return +1;
         }
 
-        return ((Integer) o1.getLeft()).compareTo(o2.getLeft());
+        return Integer.compare(o1.getLeft(), o2.getLeft());
       }
     });
   }
@@ -837,7 +837,7 @@ public class EventExtractor {
           long tokenIndex1 = feat1.getTokenIndex();
           long tokenIndex2 = feat2.getTokenIndex();
 
-          return ((Long) (tokenIndex1)).compareTo(tokenIndex2);
+          return Long.compare(tokenIndex1, tokenIndex2);
         }
       });
 
