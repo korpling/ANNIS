@@ -165,8 +165,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       List<SRelation<SNode,SNode>> out = s.getGraph().getOutRelations(s.getId());
 
       for (SRelation e : out) {
-        if (e instanceof SRelation
-                && ((SRelation) e).getTarget() instanceof SToken) {
+        if (e != null && e.getTarget() instanceof SToken) {
           SToken tok = ((SToken) ((SRelation) e).getTarget());
           
           RelannisNodeFeature feat = 
@@ -541,7 +540,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     }
 
     for (SRelation<SNode, SNode> edge : out) {
-      if (!(edge instanceof SRelation) || edge.getTarget() instanceof SToken) {
+      if (edge.getTarget() instanceof SToken) {
         continue;
       }
 
