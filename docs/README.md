@@ -1,7 +1,7 @@
 ANNIS Documentation
 ===================
 
-The documentation is split in three parts:
+The documentation is split in two parts:
 
 - User Guide for users (including administrators) of the ANNIS servier version and the Kickstarter
 - Developer Guide for people who want to participate and or extend ANNIS
