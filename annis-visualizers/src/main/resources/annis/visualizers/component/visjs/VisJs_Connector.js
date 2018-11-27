@@ -85,9 +85,12 @@ enabled: true
 }
 },
 interaction: {
-  navigationButtons: true,
-  keyboard: true
-        },
+    navigationButtons: true,
+    keyboard: {
+        enabled: true,
+        bindToWindow: false
+    }
+},
 layout: {
 hierarchical:{
      direction: 'UD',
