@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>de.hu-berlin.german.korpling.annis</groupId>
-  <artifactId>annis-all</artifactId>
-  <packaging>pom</packaging>
-  <name>ANNIS corpus search</name>
-  <version>3.6.0-SNAPSHOT</version>
-  <description>
+	<groupId>de.hu-berlin.german.korpling.annis</groupId>
+	<artifactId>annis-all</artifactId>
+	<packaging>pom</packaging>
+	<name>ANNIS corpus search</name>
+	<version>3.6.0-SNAPSHOT</version>
+	<description>
     ANNIS is an open source, versatile web browser-based search and
     visualization architecture for complex multilevel linguistic corpora with
     diverse types of annotation. ANNIS, which stands for ANNotation of Information
@@ -21,278 +23,257 @@
     annotations is also required.
   </description>
 
-  <url>http://corpus-tools.org/annis/</url>
-  
-   <developers>
-    <developer>
-      <name>Thomas Krause</name>
-      <email>krauseto@hu-berlin.de</email>
-      <organization>Humboldt-Universität zu Berlin</organization>
-      <organizationUrl>https://www.hu-berlin.de</organizationUrl>
-    </developer>
-  </developers>
+	<url>http://corpus-tools.org/annis/</url>
 
-  <scm>
-    <connection>scm:git:https://github.com/korpling/ANNIS.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/korpling/ANNIS.git</developerConnection>
-    <url>https://github.com/korpling/ANNIS</url>
-  </scm>
+	<developers>
+		<developer>
+			<name>Thomas Krause</name>
+			<email>krauseto@hu-berlin.de</email>
+			<organization>Humboldt-Universität zu Berlin</organization>
+			<organizationUrl>https://www.hu-berlin.de</organizationUrl>
+		</developer>
+	</developers>
 
-  <organization>
-    <name>SFB 632</name>
-    <url>http://www.sfb632.uni-potsdam.de/</url>
-  </organization>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
+	<scm>
+		<connection>scm:git:https://github.com/korpling/ANNIS.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/korpling/ANNIS.git</developerConnection>
+		<url>https://github.com/korpling/ANNIS</url>
+	</scm>
 
-  <distributionManagement>    
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
+	<organization>
+		<name>SFB 632</name>
+		<url>http://www.sfb632.uni-potsdam.de/</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 
-  <repositories>
-    <repository>
-      <id>korpling</id>
-      <url>http://korpling.german.hu-berlin.de/maven2/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>oss-snapshot</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
-  
-  <properties>
-    <servlet.version>3.0.1</servlet.version>
-    <vaadin.version>7.7.15</vaadin.version>
-  </properties>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
-  <build>
+	<repositories>
+		<repository>
+			<id>korpling</id>
+			<url>http://korpling.german.hu-berlin.de/maven2/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>oss-snapshot</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+	</repositories>
 
-    <plugins>
+	<properties>
+		<servlet.version>3.0.1</servlet.version>
+		<vaadin.version>7.7.15</vaadin.version>
+	</properties>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+				</configuration>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+							<report>summary</report>
+							<report>license</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
 
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>2.3.7</version>
-        <extensions>true</extensions>
-      </plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>3.0.5</version>
+				<configuration>
+					<excludeFilterFile>${basedir}/src/findbugs/excludeFilter.xml</excludeFilterFile>
+				</configuration>
+			</plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.5.1</version>
-        <configuration>
-          <reportPlugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-project-info-reports-plugin</artifactId>
-              <version>2.4</version>
-              <configuration>
-                <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-              </configuration>
-              <reports>
-                <report>index</report>
-                <report>summary</report>
-                <report>license</report>
-              </reports>
-            </plugin>
+		</plugins>
+	</reporting>
+	<build>
 
-            <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>findbugs-maven-plugin</artifactId>
-              <version>2.5.3</version>
-              <configuration>
-                <excludeFilterFile>${basedir}/src/findbugs/excludeFilter.xml</excludeFilterFile>
-              </configuration>
-            </plugin>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<additionalparam>${javadoc.opts}</additionalparam>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.7</version>
+				<extensions>true</extensions>
+			</plugin>
 
 
-          </reportPlugins>
-        </configuration>
-      </plugin>
+			<!-- update this with mvn license:add-third-party license:download-licenses -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>1.4</version>
+				<configuration>
+					<useMissingFile>true</useMissingFile>
+					<missingFile>${basedir}/src/license/THIRD-PARTY.properties</missingFile>
+					<licensesConfigFile>${basedir}/src/licenses.xml</licensesConfigFile>
+					<outputDirectory>${basedir}/THIRD-PARTY</outputDirectory>
+					<thirdPartyFilename>${project.name}_dependencies.txt</thirdPartyFilename>
+					<licensesOutputDirectory>${basedir}/THIRD-PARTY/licenses</licensesOutputDirectory>
+				</configuration>
+			</plugin>
 
-      <!-- update this with
-      mvn license:add-third-party license:download-licenses
-      -->
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>license-maven-plugin</artifactId>
-        <version>1.4</version>
-        <configuration>
-          <useMissingFile>true</useMissingFile>
-          <missingFile>${basedir}/src/license/THIRD-PARTY.properties</missingFile>
-          <licensesConfigFile>${basedir}/src/licenses.xml</licensesConfigFile>
-          <outputDirectory>${basedir}/THIRD-PARTY</outputDirectory>
-          <thirdPartyFilename>${project.name}_dependencies.txt</thirdPartyFilename>
-          <licensesOutputDirectory>${basedir}/THIRD-PARTY/licenses</licensesOutputDirectory>
-        </configuration>
-      </plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+					<timestampFormat>{0, time, yyyy-MM-dd_HH-mm-ss}</timestampFormat>
+					<shortRevisionLength>10</shortRevisionLength>
+				</configuration>
+			</plugin>
 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>buildnumber-maven-plugin</artifactId>
-        <version>1.3</version>
-        <executions>
-          <execution>
-            <phase>validate</phase>
-            <goals>
-              <goal>create</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <doCheck>false</doCheck>
-          <doUpdate>false</doUpdate>
-          <timestampFormat>{0, time, yyyy-MM-dd_HH-mm-ss}</timestampFormat>
-          <shortRevisionLength>10</shortRevisionLength>
-        </configuration>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.5</version>
-        <extensions>true</extensions>
-        <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-	  <autoReleaseAfterClose>false</autoReleaseAfterClose>
-	  <stagingProgressTimeoutMinutes>120</stagingProgressTimeoutMinutes>
-        </configuration>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.7</version>
-        <configuration>
-          <reportPlugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <configuration>
-                <additionalparam>${javadoc.opts}</additionalparam>
-              </configuration>
-            </plugin>
-          </reportPlugins>
-        </configuration>
-      </plugin>
-      
-    </plugins>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0</version>
-      </extension>
-    </extensions>
-  </build>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.5</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>false</autoReleaseAfterClose>
+					<stagingProgressTimeoutMinutes>120</stagingProgressTimeoutMinutes>
+				</configuration>
+			</plugin>
 
-  <profiles>
-    <profile>
-      <id>java8-doclint-disabled</id>
-      <activation>
-        <jdk>[1.8,)</jdk>
-      </activation>
-      <properties>
-        <javadoc.opts>-Xdoclint:none</javadoc.opts>
-      </properties>
-    </profile>
-    <profile>
-      <id>release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.4</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-      
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.10.4</version>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-                <configuration>
-                    <additionalparam>${javadoc.opts}</additionalparam>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-      
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh-external</artifactId>
+				<version>1.0</version>
+			</extension>
+		</extensions>
+	</build>
 
-  <modules>
-    <module>annis-interfaces</module>
-    <module>annis-service</module>
-    <module>annis-kickstarter</module>
-    <module>annis-gui</module>
-    <module>annis-widgets</module>
-    <module>annis-visualizers</module>
-    <module>annis-libgui</module>
-    <module>docs</module>
-  </modules>
+	<profiles>
+		<profile>
+			<id>java8-doclint-disabled</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<properties>
+				<javadoc.opts>-Xdoclint:none</javadoc.opts>
+			</properties>
+		</profile>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<modules>
+		<module>annis-interfaces</module>
+		<module>annis-service</module>
+		<module>annis-kickstarter</module>
+		<module>annis-gui</module>
+		<module>annis-widgets</module>
+		<module>annis-visualizers</module>
+		<module>annis-libgui</module>
+		<module>docs</module>
+	</modules>
 
 </project>
