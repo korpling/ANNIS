@@ -61,7 +61,7 @@ If no known bugs are left to fix go to the next section.
 
 1. Deploy release to Maven Central
 \code{.sh}
-mvn deploy -P release,doxygen
+mvn deploy -P release,mdbook
 \endcode
 3. Tag the release and merge it into the `master` branch, publish the new `master` branch
 5. Reintegrate the "master" branch into the "develop" branch and set the "develop" branch to the [next SNAPSHOT version](#updating-the-version)
@@ -103,7 +103,7 @@ If no known bugs are left to fix go to the next section.
 
 1. Deploy release to Maven Central
 ~~~bash
-mvn deploy -P release,preview,doxygen
+mvn deploy -P release,preview,mdbook
 ~~~
 3. Tag the release and push it to the `develop` branch. If new commits have been introduced in `develop` merge them (but don't use rebasing).
 5. Set the "develop" branch to the [previous SNAPSHOT version](#updating-the-version)
