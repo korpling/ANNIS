@@ -1,5 +1,7 @@
 var NAVTREEINDEX8 =
 {
+"classannis_1_1model_1_1_query_node.html#ad523fb44a7e2b236d5b630b32c7d38cc":[4,0,0,8,10,22],
+"classannis_1_1model_1_1_query_node.html#adc6e0d8a8359af8bb52d6d11707a7cc5":[4,0,0,8,10,33],
 "classannis_1_1model_1_1_query_node.html#adceb184ae03aa82d268869e95fdadc2a":[4,0,0,8,10,12],
 "classannis_1_1model_1_1_query_node.html#ae9762ee7950c43631e7521ce5b8a0b2a":[4,0,0,8,10,5],
 "classannis_1_1model_1_1_query_node.html#aea512fa92d34c5b77f978286ab001b62":[4,0,0,8,10,14],
@@ -247,7 +249,5 @@ var NAVTREEINDEX8 =
 "classannis_1_1rest_1_1provider_1_1_guava_escaper_marshaller_provider.html":[4,0,0,12,0,3],
 "classannis_1_1rest_1_1provider_1_1_guava_escaper_marshaller_provider.html#a96fb720939303d549262e5d94a35542a":[4,0,0,12,0,3,0],
 "classannis_1_1rest_1_1provider_1_1_s_q_l_exception_mapper.html":[4,0,0,12,0,4],
-"classannis_1_1rest_1_1provider_1_1_s_q_l_exception_mapper.html#abd53bb1831bad302c3094bac7bc0e448":[4,0,0,12,0,4,0],
-"classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html":[4,0,0,13,0],
-"classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#a19b1e95b2346ee9ddb03995d99e7ea14":[4,0,0,13,0,2]
+"classannis_1_1rest_1_1provider_1_1_s_q_l_exception_mapper.html#abd53bb1831bad302c3094bac7bc0e448":[4,0,0,12,0,4,0]
 };

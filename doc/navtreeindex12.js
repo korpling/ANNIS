@@ -1,5 +1,7 @@
 var NAVTREEINDEX12 =
 {
+"classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#a2967fc667b93b7b95cd79c313c0e44c7":[4,0,0,15,0,0,6],
+"classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#a57b7b92254063ff24a935ba7655271c9":[4,0,0,15,0,0,5],
 "classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#a5ea124a474bb89787c2f7180ba5aa7c3":[4,0,0,15,0,0,8],
 "classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#a7b454cbe863c4a0d2fc01b0b4715a842":[4,0,0,15,0,0,4],
 "classannis_1_1sqlgen_1_1extensions_1_1_annotate_query_data.html#ab0f476e89d69e737b02aa10007e560d2":[4,0,0,15,0,0,0],
@@ -247,7 +249,5 @@ var NAVTREEINDEX12 =
 "classannis_1_1visualizers_1_1component_1_1tree_1_1_annis_graph_tools.html#a40b148b1713f35690cae53bbe8192610":[4,0,0,17,0,7,1,0],
 "classannis_1_1visualizers_1_1component_1_1tree_1_1_annis_graph_tools.html#a5a1b7e2e47f6a15a9a9c875a9bc73d29":[4,0,0,17,0,7,1,2],
 "classannis_1_1visualizers_1_1component_1_1tree_1_1_annis_graph_tools.html#a6b8e58c30892443c6a87e266ffa09413":[4,0,0,17,0,7,1,3],
-"classannis_1_1visualizers_1_1component_1_1tree_1_1_annis_graph_tools.html#a94f121152c6d6f0246a181541a3f3a78":[4,0,0,17,0,7,1,4],
-"classannis_1_1visualizers_1_1component_1_1tree_1_1_annis_graph_tools.html#aedbf1fca6e563c807b04261691c9f66f":[4,0,0,17,0,7,1,1],
-"classannis_1_1visualizers_1_1component_1_1tree_1_1_constituent_layouter.html":[4,0,0,17,0,7,2]
+"classannis_1_1visualizers_1_1component_1_1tree_1_1_annis_graph_tools.html#a94f121152c6d6f0246a181541a3f3a78":[4,0,0,17,0,7,1,4]
 };

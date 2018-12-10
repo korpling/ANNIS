@@ -1,5 +1,7 @@
 var NAVTREEINDEX10 =
 {
+"classannis_1_1service_1_1objects_1_1_annis_result_impl.html#ace1203e680a1e8603b417d7dff3dee46":[4,0,0,14,2,4,11],
+"classannis_1_1service_1_1objects_1_1_annis_result_impl.html#acefffcd44564852f0c10eca3bf15629b":[4,0,0,14,2,4,8],
 "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#acf775af84e38023fd4e891af96715207":[4,0,0,14,2,4,1],
 "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#ad07286df7018e0fa07bec8c394090859":[4,0,0,14,2,4,4],
 "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#aeddaa33767b3c13baa73a5b78c2d2b4b":[4,0,0,14,2,4,9],
@@ -247,7 +249,5 @@ var NAVTREEINDEX10 =
 "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#aec38eb96b96b646d9adb74a51e95a70d":[4,0,0,15,12,12],
 "classannis_1_1sqlgen_1_1_annotate_sql_generator.html#af5e8bdb3f9799b6a910896edbd75b0bd":[4,0,0,15,12,9],
 "classannis_1_1sqlgen_1_1_annotated_match_iterator.html":[4,0,0,15,8],
-"classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a23368dfd94a2ad99171c8c0892d6f87b":[4,0,0,15,8,1],
-"classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a25c6b23d651a313f598b46c4868a3920":[4,0,0,15,8,0],
-"classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a5895a7a2f66f8b90fb2328bd8f2da208":[4,0,0,15,8,2]
+"classannis_1_1sqlgen_1_1_annotated_match_iterator.html#a23368dfd94a2ad99171c8c0892d6f87b":[4,0,0,15,8,1]
 };

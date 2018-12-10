@@ -1,5 +1,7 @@
 var NAVTREEINDEX9 =
 {
+"classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html":[4,0,0,13,0],
+"classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#a19b1e95b2346ee9ddb03995d99e7ea14":[4,0,0,13,0,2],
 "classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#a97ceca6a3982984d82655be80be5c94c":[4,0,0,13,0,0],
 "classannis_1_1security_1_1_a_n_n_i_s_role_permission_resolver.html#ab766cd581972184f7aad1821625f8579":[4,0,0,13,0,1],
 "classannis_1_1security_1_1_a_n_n_i_s_security_manager.html":[4,0,0,13,1],
@@ -247,7 +249,5 @@ var NAVTREEINDEX9 =
 "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#a439c149e005b53ec276df8fa01a73852":[4,0,0,14,2,4,10],
 "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#a6d2effd6f2fb2feb9748039bc33aebcb":[4,0,0,14,2,4,0],
 "classannis_1_1service_1_1objects_1_1_annis_result_impl.html#aa185cf373c11780a1d61ac99d0e7e0a7":[4,0,0,14,2,4,3],
-"classannis_1_1service_1_1objects_1_1_annis_result_impl.html#ac3ad93fb36d92457075281d2cc6f772c":[4,0,0,14,2,4,12],
-"classannis_1_1service_1_1objects_1_1_annis_result_impl.html#ace1203e680a1e8603b417d7dff3dee46":[4,0,0,14,2,4,11],
-"classannis_1_1service_1_1objects_1_1_annis_result_impl.html#acefffcd44564852f0c10eca3bf15629b":[4,0,0,14,2,4,8]
+"classannis_1_1service_1_1objects_1_1_annis_result_impl.html#ac3ad93fb36d92457075281d2cc6f772c":[4,0,0,14,2,4,12]
 };
