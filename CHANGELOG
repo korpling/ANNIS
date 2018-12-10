@@ -1,3 +1,12 @@
+Version 3.5.1
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/61?closed=1
+
+[Fixed Bugs]
+ #596 Grid hides annotation layer with the name "tok" if configured to hide the tokenization
+
 Version 3.5.0
 =============
 
