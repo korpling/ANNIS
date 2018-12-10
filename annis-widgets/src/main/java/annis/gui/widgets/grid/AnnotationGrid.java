@@ -18,6 +18,8 @@ package annis.gui.widgets.grid;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
+
+import com.google.common.base.Preconditions;
 import com.vaadin.server.PaintException;
 import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
@@ -322,6 +324,15 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   public void setAnnosWithNamespace(Set<String> annosWithNamespace)
   {
     this.annosWithNamespace = annosWithNamespace;
+  }
+  
+  public String getTokRowKey() {
+	return tokRowKey;
+  }
+  
+  public void setTokRowKey(String tokRowKey) {
+	Preconditions.checkNotNull(tokRowKey);
+	this.tokRowKey = tokRowKey;
   }
 
   
