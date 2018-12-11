@@ -33,7 +33,7 @@ Annotation grid, with annotations spanning multiple tokens.
 
 It is possible to specify the order of annotation layers in each grid.
 Use `annos: anno_name1, anno_name2, anno_name3` to specify the
-order or annotation layers. If `anno:` is used, additional annotation layers
+order or annotation layers. If `annos:` is used, additional annotation layers
 not present in the list will not be visualized. If mappings is left empty,
 layers will be ordered alphabetically. It is also possible to add
 annotations applying to the tokens to the visualization, rather than only
@@ -54,6 +54,18 @@ A grid visualizing hierarchical tree annotations as ordered grid layers.
 Specify the name of the annotation to be visualized in the
 grid with `node_key:name`. Note that all grid levels visualize the same
 annotation name at different hierarchical depths.
+
+## `sentstructurejs`
+
+Visualization for token-token alignments between parallel
+texts using [SentStructure.js](https://gitlab.cl.uzh.ch/sparcling/SentStructure.js)
+
+![sentstructurejs visualizer for parallel corpus alignment](vis-sentstructurejs.png)
+
+### Mappings
+
+Use `alignment_label` to specify the edge annotation name that should be displayed.
+
 
 ## `discourse` 
 
