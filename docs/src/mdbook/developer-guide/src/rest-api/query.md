@@ -88,6 +88,47 @@ One line per match, each ID is separated by space. An ID can be prepended by the
 
 - `POST annis/query/search/subgraph`
 
+## Request body
+
+accepts `application/xml`:
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<match-group>
+  <!-- each match is enclosed in an match tag -->
+  <match>
+    <!-- the first matched node of match 1 did not match an annotation -->
+    <anno></anno>
+    <!-- the second matched node of match 1 was a match on the 'tiger::pos' annotation-->
+    <anno>tiger::pos</anno>
+    <!-- ID of first matched node of match 1 -->
+    <id>salt:/pcc2/11299/#tok_1</id>
+    <!-- ID of second matched noded  of match 1 -->
+    <id>salt:/pcc2/11299/#tok_2</id>
+  </match>
+  <match>
+    <anno></anno>
+    <anno>tiger::pos</anno>
+    <!-- ID of first matched noded of match 2 -->
+    <id>salt:/pcc2/11299/#tok_2</id>
+    <!-- ID of second matched noded of match 2-->
+    <id>salt:/pcc2/11299/#tok_3</id>
+  </match>
+  <!-- and so on -->
+</match-group>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<match-group>
+```
+
+*or* accepts text/plain:
+
+```
+salt:/pcc2/11299/#tok_1 tiger::pos::salt:/pcc2/11299/#tok_2
+salt:/pcc2/11299/#tok_2 tiger::pos::salt:/pcc2/11299/#tok_3
+salt:/pcc2/11299/#tok_3 tiger::pos::salt:/pcc2/11299/#tok_4
+```
+
+One line per match, each ID is separated by space. An ID can be prepended by the fully qualified annotation name (which is separated with '::' from the ID).
 
 ### Parameters
 
