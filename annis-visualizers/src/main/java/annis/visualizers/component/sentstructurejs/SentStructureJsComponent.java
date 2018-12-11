@@ -203,11 +203,13 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent implem
 		// to JSON for SentStructure.js as "alignments"
 		List<List<String>> alignmentsList = new ArrayList<>();
 
-		for (Pair<SToken, SToken> p : tokenPRelations.keySet()) {
+		for (Map.Entry<Pair<SToken, SToken>, String> entry : tokenPRelations.entrySet()) {
+			Pair<SToken, SToken> p = entry.getKey();
+			
 			List<String> alignment = new ArrayList<>();
 			alignment.add(p.getLeft().getLayers().iterator().next().getId() + "_" + stripId(p.getLeft().getId()));
 			alignment.add(p.getRight().getLayers().iterator().next().getId() + "_" + stripId(p.getRight().getId()));
-			alignment.add(tokenPRelations.get(p));
+			alignment.add(entry.getValue());
 
 			alignmentsList.add(alignment);
 		}
