@@ -8,3 +8,4 @@ List of third-party JavaScript dependencies.
      (Apache License, Version 2.0) pdf.js (http://mozilla.github.io/pdf.js/)
      (MIT License) MediaElement.js (http://mediaelementjs.com/)
      (Apache License, Version 2.0) SentStructure.js (https://gitlab.cl.uzh.ch/sparcling/SentStructure.js)
+     (BSD licence) D3.js (https://d3js.org/)
