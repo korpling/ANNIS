@@ -145,8 +145,10 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent implem
 		// SentStructure.js
 		Map<String, List<Map<String, String>>> segmentsMap = new HashMap<>();
 
-		for (SLayer layer : tokensByLayer.keySet()) {
-			List<SToken> lTokens = tokensByLayer.get(layer);
+		for (Map.Entry<SLayer, List<SToken>> entry : tokensByLayer.entrySet()) {
+			SLayer layer = entry.getKey();
+			
+			List<SToken> lTokens = entry.getValue();
 
 			segmentsMap.put(layer.getId(), new ArrayList<Map<String, String>>());
 
