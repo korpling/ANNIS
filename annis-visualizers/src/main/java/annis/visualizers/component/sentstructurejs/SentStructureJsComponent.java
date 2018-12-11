@@ -99,7 +99,7 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent implem
 	// 3rd for dominance relations
 	private final List<String> configurations = new ArrayList<String>();
 
-	private final String MAPPING_ALIGNMENT_LABEL = "alignment_label";
+	private final static String MAPPING_ALIGNMENT_LABEL = "alignment_label";
 
 	private Properties mappings;
 
