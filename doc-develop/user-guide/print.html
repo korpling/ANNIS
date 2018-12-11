@@ -1016,7 +1016,7 @@ the namespace. Multiple instructions are separated using semicolons.</p>
 <a class="header" href="#mappings-1" id="mappings-1"><h3>Mappings</h3></a>
 <p>It is possible to specify the order of annotation layers in each grid.
 Use <code>annos: anno_name1, anno_name2, anno_name3</code> to specify the
-order or annotation layers. If <code>anno:</code> is used, additional annotation layers
+order or annotation layers. If <code>annos:</code> is used, additional annotation layers
 not present in the list will not be visualized. If mappings is left empty,
 layers will be ordered alphabetically. It is also possible to add
 annotations applying to the tokens to the visualization, rather than only
@@ -1031,6 +1031,12 @@ hide the tokens that normally appear at the bottom of the grid using
 <p>Specify the name of the annotation to be visualized in the
 grid with <code>node_key:name</code>. Note that all grid levels visualize the same
 annotation name at different hierarchical depths.</p>
+<a class="header" href="#sentstructurejs" id="sentstructurejs"><h2><code>sentstructurejs</code></h2></a>
+<p>Visualization for token-token alignments between parallel
+texts using <a href="https://gitlab.cl.uzh.ch/sparcling/SentStructure.js">SentStructure.js</a></p>
+<p><img src="vis-sentstructurejs.png" alt="sentstructurejs visualizer for parallel corpus alignment" /></p>
+<a class="header" href="#mappings-3" id="mappings-3"><h3>Mappings</h3></a>
+<p>Use <code>alignment_label</code> to specify the edge annotation name that should be displayed.</p>
 <a class="header" href="#discourse" id="discourse"><h2><code>discourse</code></h2></a>
 <p>A view of the entire text of a document, possibly with interactive coreference links.</p>
 <p><img src="vis-discourse.png" alt="discourse visualizer" /></p>
@@ -1039,7 +1045,7 @@ annotation name at different hierarchical depths.</p>
 <p>Dependency tree with labeled arches between tokens;
 requires SVG enabled browser.</p>
 <p><img src="vis-arch_dependency.png" alt="arch_dependency visualizer" /></p>
-<a class="header" href="#mappings-3" id="mappings-3"><h3>Mappings</h3></a>
+<a class="header" href="#mappings-4" id="mappings-4"><h3>Mappings</h3></a>
 <p>To use a different annotation layer (e.g. <em>my_annotation</em>) for the leaves of the tree instead of the default tokens,
 enter <code>node_key:my_annotation</code>.</p>
 <a class="header" href="#audio" id="audio"><h2><code>audio</code></h2></a>
@@ -1052,7 +1058,7 @@ enter <code>node_key:my_annotation</code>.</p>
 <p>A linked pdf file, showing either a specific page aligned
 with an annotation or an entire pdf document respectively.</p>
 <p><img src="vis-pdf.png" alt="pdf visualizer" /></p>
-<a class="header" href="#mappings-4" id="mappings-4"><h3>Mappings</h3></a>
+<a class="header" href="#mappings-5" id="mappings-5"><h3>Mappings</h3></a>
 <p>It is possible to configure the height of the pdf window
 using the <code>height</code> instruction (in pixels), as well as the name (<code>node_key</code>)
 of the node annotation to be used to give individual page numbers
@@ -1064,7 +1070,7 @@ shows all pages). The instructions can be combined as follows:
 of either just the search result with context or the entire document
 respectively.</p>
 <p><img src="vis-rst.png" alt="rst visualizer" /></p>
-<a class="header" href="#mappings-5" id="mappings-5"><h3>Mappings</h3></a>
+<a class="header" href="#mappings-6" id="mappings-6"><h3>Mappings</h3></a>
 <p>The names of rst edges can be configured with the setting
 <code>edge</code>. Additionally, some graphical parameters can be modified:
 <code>siblingOffet</code> defines the distance between sibling nodes; <code>subTreeOffset</code>
@@ -1079,7 +1085,7 @@ of either the immediate search result context or the entire document
 respectively; see the ANNIS HTML Visualization Guide for more
 details and some example stylesheets.</p>
 <p><img src="vis-html.png" alt="html visualizer" /></p>
-<a class="header" href="#mappings-6" id="mappings-6"><h3>Mappings</h3></a>
+<a class="header" href="#mappings-7" id="mappings-7"><h3>Mappings</h3></a>
 <p>You must specify the name of the css stylesheet (<em>.css)
 and configuration file (</em>.config) for the visualization, which are place in
 the ExtData folder of the relANNIS corpus (see HTML Visualization
