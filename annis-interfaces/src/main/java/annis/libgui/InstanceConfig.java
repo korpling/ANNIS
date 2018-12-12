@@ -25,210 +25,216 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- * Hold information about the configuration of a specific (sub-) instance of ANNIS.
+ * Hold information about the configuration of a specific (sub-) instance of
+ * ANNIS.
  * 
- * Each physical installation (speak deployment) of ANNIS is able to have several
- * instances which behave differently. This is meant to provide a more specialized
- * presentation for different projects while still using only one ANNIS installation.
+ * Each physical installation (speak deployment) of ANNIS is able to have
+ * several instances which behave differently. This is meant to provide a more
+ * specialized presentation for different projects while still using only one
+ * ANNIS installation.
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
-public class InstanceConfig implements Serializable
-{
-  private String instanceName;
-  private String instanceDisplayName;
-  private String defaultQueryBuilder;
-  private List<CorpusSet> corpusSets;
-  private String defaultCorpusSet;
-  private FontConfig font;
-  private FontConfig frequencyFont;
-  private String keyboardLayout;
-  private boolean loginOnStart;
-  
-  public InstanceConfig()
-  {
-    instanceName = "";
-    instanceDisplayName = "";
-    defaultQueryBuilder = "";
-    corpusSets = new LinkedList<>();
-    defaultCorpusSet = "";
-    loginOnStart = false;
-  }
+public class InstanceConfig implements Serializable {
+	private String instanceName;
+	private String instanceDisplayName;
+	private String defaultQueryBuilder;
+	private List<CorpusSet> corpusSets;
+	private String defaultCorpusSet;
+	private FontConfig font;
+	private FontConfig frequencyFont;
+	private String keyboardLayout;
+	private boolean loginOnStart;
+	private String helpUrl;
 
-  /**
-   * Get the internal short name of this instance.
-   * @return 
-   */
-  @XmlTransient
-  public String getInstanceName()
-  {
-    return instanceName;
-  }
+	public InstanceConfig() {
+		instanceName = "";
+		instanceDisplayName = "";
+		defaultQueryBuilder = "";
+		corpusSets = new LinkedList<>();
+		defaultCorpusSet = "";
+		loginOnStart = false;
+	}
 
-  /**
-   * @param instanceName
-   * @see #getInstanceName()  
-   */
-  public void setInstanceName(String instanceName)
-  {
-    this.instanceName = instanceName;
-  }
+	/**
+	 * Get the internal short name of this instance.
+	 * 
+	 * @return
+	 */
+	@XmlTransient
+	public String getInstanceName() {
+		return instanceName;
+	}
 
-  /** 
-   * Get the external display name (used e.g. in the user interface) of this instance. 
-   * @return 
-   */
-  @XmlElement(name="display-name")
-  public String getInstanceDisplayName()
-  {
-    return instanceDisplayName;
-  }
+	/**
+	 * @param instanceName
+	 * @see #getInstanceName()
+	 */
+	public void setInstanceName(String instanceName) {
+		this.instanceName = instanceName;
+	}
 
-  /**
-   * @param instanceDisplayName 
-   * @see #getInstanceDisplayName() 
-   */
-  public void setInstanceDisplayName(String instanceDisplayName)
-  {
-    this.instanceDisplayName = instanceDisplayName;
-  }
+	/**
+	 * Get the external display name (used e.g. in the user interface) of this
+	 * instance.
+	 * 
+	 * @return
+	 */
+	@XmlElement(name = "display-name")
+	public String getInstanceDisplayName() {
+		return instanceDisplayName;
+	}
 
-  /**
-   * Get the short name of the query builder that should be selected by default.
-   * @return 
-   */
-  @XmlElement(name="default-querybuilder")
-  public String getDefaultQueryBuilder()
-  {
-    return defaultQueryBuilder;
-  }
+	/**
+	 * @param instanceDisplayName
+	 * @see #getInstanceDisplayName()
+	 */
+	public void setInstanceDisplayName(String instanceDisplayName) {
+		this.instanceDisplayName = instanceDisplayName;
+	}
 
-  /**
-   * @param defaultQueryBuilder
-   * @see #getDefaultQueryBuilder()  
-   */
-  public void setDefaultQueryBuilder(String defaultQueryBuilder)
-  {
-    this.defaultQueryBuilder = defaultQueryBuilder;
-  }
+	/**
+	 * Get the short name of the query builder that should be selected by default.
+	 * 
+	 * @return
+	 */
+	@XmlElement(name = "default-querybuilder")
+	public String getDefaultQueryBuilder() {
+		return defaultQueryBuilder;
+	}
 
-  /**
-   * Get the corpus sets that are pre-defined by the instance.
-   * @return 
-   */
-  @XmlElementWrapper(name="corpus-sets")
-  public List<CorpusSet> getCorpusSets()
-  {
-    return corpusSets;
-  }
+	/**
+	 * @param defaultQueryBuilder
+	 * @see #getDefaultQueryBuilder()
+	 */
+	public void setDefaultQueryBuilder(String defaultQueryBuilder) {
+		this.defaultQueryBuilder = defaultQueryBuilder;
+	}
 
-  /**
-   * @param corpusSets
-   * @see #getCorpusSets()  
-   */
-  public void setCorpusSets(List<CorpusSet> corpusSets)
-  {
-    this.corpusSets = corpusSets;
-  }
+	/**
+	 * Get the corpus sets that are pre-defined by the instance.
+	 * 
+	 * @return
+	 */
+	@XmlElementWrapper(name = "corpus-sets")
+	public List<CorpusSet> getCorpusSets() {
+		return corpusSets;
+	}
 
-  /**
-   * Get the name of the corpus set that should be activated by default.
-   * @return 
-   */
-  @XmlElement(name="default-corpusset")
-  public String getDefaultCorpusSet()
-  {
-    return defaultCorpusSet;
-  }
+	/**
+	 * @param corpusSets
+	 * @see #getCorpusSets()
+	 */
+	public void setCorpusSets(List<CorpusSet> corpusSets) {
+		this.corpusSets = corpusSets;
+	}
 
-  /**
-   * @param defaultCorpusSet
-   * @see #getDefaultCorpusSet()  
-   */
-  public void setDefaultCorpusSet(String defaultCorpusSet)
-  {
-    this.defaultCorpusSet = defaultCorpusSet;
-  }
+	/**
+	 * Get the name of the corpus set that should be activated by default.
+	 * 
+	 * @return
+	 */
+	@XmlElement(name = "default-corpusset")
+	public String getDefaultCorpusSet() {
+		return defaultCorpusSet;
+	}
 
-  /**
-   * Get the special font used by this instance.
-   * @return 
-   */
-  @XmlElement(name="font")
-  public FontConfig getFont()
-  {
-    return font;
-  }
+	/**
+	 * @param defaultCorpusSet
+	 * @see #getDefaultCorpusSet()
+	 */
+	public void setDefaultCorpusSet(String defaultCorpusSet) {
+		this.defaultCorpusSet = defaultCorpusSet;
+	}
 
-  /**
-   * @see #getFont() 
-   * @param font 
-   */
-  public void setFont(FontConfig font)
-  {
-    this.font = font;
-  }
+	/**
+	 * Get the special font used by this instance.
+	 * 
+	 * @return
+	 */
+	@XmlElement(name = "font")
+	public FontConfig getFont() {
+		return font;
+	}
 
-  /**
-   * Default keyboard layout used for the virtual keyboard. 
-   * 
-   * Do not set {@code null} to disable virtual keyboards.
-   * @return 
-   */
-  @XmlElement(name = "keyboard-layout")
-  public String getKeyboardLayout()
-  {
-    return keyboardLayout;
-  }
+	/**
+	 * @see #getFont()
+	 * @param font
+	 */
+	public void setFont(FontConfig font) {
+		this.font = font;
+	}
 
-  /**
-   * @see #getKeyboardLayout() 
-   * @param keyboardLayout 
-   */
-  public void setKeyboardLayout(String keyboardLayout)
-  {
-    this.keyboardLayout = keyboardLayout;
-  }
+	/**
+	 * Default keyboard layout used for the virtual keyboard.
+	 * 
+	 * Do not set {@code null} to disable virtual keyboards.
+	 * 
+	 * @return
+	 */
+	@XmlElement(name = "keyboard-layout")
+	public String getKeyboardLayout() {
+		return keyboardLayout;
+	}
 
-  /**
-   * Get a special font config that should be used in the frequency chart.
-   * Might return {@code null}, in this case you should use the default font
-   * from {@link #getFont() }.
-   * @return 
-   */
-  @XmlElement(name = "frequency-font")
-  public FontConfig getFrequencyFont()
-  {
-    return frequencyFont;
-  }
+	/**
+	 * @see #getKeyboardLayout()
+	 * @param keyboardLayout
+	 */
+	public void setKeyboardLayout(String keyboardLayout) {
+		this.keyboardLayout = keyboardLayout;
+	}
 
-  /**
-   * @see #getFrequencyFont() 
-   * @param frequencyFont 
-   */
-  public void setFrequencyFont(FontConfig frequencyFont)
-  {
-    this.frequencyFont = frequencyFont;
-  }
+	/**
+	 * Get a special font config that should be used in the frequency chart. Might
+	 * return {@code null}, in this case you should use the default font from
+	 * {@link #getFont() }.
+	 * 
+	 * @return
+	 */
+	@XmlElement(name = "frequency-font")
+	public FontConfig getFrequencyFont() {
+		return frequencyFont;
+	}
 
-  /**
-   * If true the login window is shown at each startup automatically.
-   * @return 
-   */
-  @XmlElement(name = "login-on-start")
-  public boolean isLoginOnStart()
-  {
-    return loginOnStart;
-  }
+	/**
+	 * @see #getFrequencyFont()
+	 * @param frequencyFont
+	 */
+	public void setFrequencyFont(FontConfig frequencyFont) {
+		this.frequencyFont = frequencyFont;
+	}
 
-  /**
-   * @see #isLoginOnStart() 
-   * @param loginOnStart 
-   */
-  public void setLoginOnStart(boolean loginOnStart)
-  {
-    this.loginOnStart = loginOnStart;
-  }
-  
+	/**
+	 * If true the login window is shown at each startup automatically.
+	 * 
+	 * @return
+	 */
+	@XmlElement(name = "login-on-start")
+	public boolean isLoginOnStart() {
+		return loginOnStart;
+	}
+
+	/**
+	 * @see #isLoginOnStart()
+	 * @param loginOnStart
+	 */
+	public void setLoginOnStart(boolean loginOnStart) {
+		this.loginOnStart = loginOnStart;
+	}
+	
+	/**
+	 * The URL to use for the internal help page.
+	 * @return
+	 */
+	@XmlElement(name = "help-url")
+	public String getHelpUrl() {
+		return helpUrl;
+	}
+	
+	public void setHelpUrl(String helpUrl) {
+		this.helpUrl = helpUrl;
+	}
+
 }
