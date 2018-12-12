@@ -117,19 +117,44 @@ The response has the MIME type `application/xml` and the following format:
 
 When the import is not finished yet or if status was finished and already queries, a 404 HTTP status code will be sent.
 
-## Information about existing *users* 
+## *User* managment 
 
 ### Path(s)
 
 1. `GET` annis/admin/users/**{userName}**
+2. `PUT` annis/admin/users/**{userName}**
 
-Gets information about an existing user with the name **{userName}**.
+Gets information about an existing user with the name **{userName}** (1) or updates/creates a new user with this name (2).
+
+### Request body
+
+The `PUT` action accepts the user information in XML (MIME type`application/xml`). 
+The fields correspond to the fields of the single user configuration file. 
+Please have a look at the general user configuration information in the ANNIS user guide for a more detailed explanation.
+
+```xml
+<user>
+  <!-- User name (must be the same as the "userName" parameter) -->
+  <name>myusername</name>
+  <!-- hashed password in the Shiro1CryptFormat -->
+  <passwordHash>$shiro1$SHA-256$1$tQNwU[...]</passwordHash>
+  <!-- A list of groups the users should belong to. -->
+  <group>group1</group>
+  <group>group2</group>
+  <group>group3</group>
+  <!-- A list of explicit permission the users should have. -->
+  <permission>admin:*</permission>
+  <permission>query:*</permission>
+  <!-- Optional expiration date encoded in the ISO-8601 standard</a> -->
+  <expires>2015-02-12T00:00:00.000+01:00</expires>
+</user>
+```
 
 ### Responses
 
 #### Code 200
 
-If a user exists, return the user information with the MIME type `application/xml`.
+If the `GET` variant is used and the queried user exists, return the user information with the MIME type `application/xml`.
 The fields correspond to the fields of the single user configuration file. 
 Please have a look at the general user configuration information in the ANNIS user guide for a more detailed explanation.
 
