@@ -98,7 +98,7 @@ An ID can be prefixed by the fully qualified annotation name (which is separated
 
 ### Request body
 
-Accepts `application/xml`:
+Consumes `application/xml`:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -126,7 +126,7 @@ Accepts `application/xml`:
 </match-group>
 ```
 
-*or* accepts `text/plain`:
+*or* consumes `text/plain`:
 
 ```
 salt:/pcc2/11299/#tok_1 tiger::pos::salt:/pcc2/11299/#tok_2
