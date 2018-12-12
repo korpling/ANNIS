@@ -19,7 +19,9 @@ All paths for this part of the service start with the `annis/query/` prefix.
 ### Result
 
 Produces an XML representation of the total matches and the number of documents that contain matches (`application/xml`):
+
 ```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <matchAndDocumentCount>
   <!-- the number of documents that contain matches -->
   <documentCount>2</documentCount>
@@ -48,6 +50,7 @@ Produces an XML representation of the total matches and the number of documents 
 produces `application/xml`:
 
 ```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <match-group>
   <!-- each match is enclosed in an match tag -->
   <match>
@@ -70,8 +73,6 @@ produces `application/xml`:
   </match>
   <!-- and so on -->
 </match-group>
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<match-group>
 ```
 
 *or* produces: text/plain:
@@ -116,11 +117,9 @@ accepts `application/xml`:
   </match>
   <!-- and so on -->
 </match-group>
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<match-group>
 ```
 
-*or* accepts text/plain:
+*or* accepts `text/plain`:
 
 ```
 salt:/pcc2/11299/#tok_1 tiger::pos::salt:/pcc2/11299/#tok_2
@@ -138,3 +137,5 @@ One line per match, each ID is separated by space. An ID can be prepended by the
 - `filter` - Optional parameter with value "all" or "token". If "token" only token will be fetched. Default is "all". 
 
 ### Result
+
+Returns a representation of the [Salt](http://corpus-tools.org/salt/) annotation graph in the EMF XMI format and with MIME type `application/xml` or `application/xmi+xml`. 
