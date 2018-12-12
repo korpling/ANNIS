@@ -45,7 +45,7 @@ public class HelpPanel extends Accordion {
 
 	public HelpPanel(AnnisUI ui) {
 		setSizeFull();
-
+		
 		
 		if (ui instanceof AnnisUI) {
 			InstanceConfig cfg = ((AnnisUI) ui).getInstanceConfig();
@@ -85,11 +85,14 @@ public class HelpPanel extends Accordion {
 				addTab(help, "Help", FontAwesome.BOOK);
 			}
 		}
-
+		
 		examples = new ExampleQueriesPanel(ui, this);
 		examples.setHeight("99%");
 		
 		addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
+		
+
+
 		addStyleName("help-tab");
 	}
 
