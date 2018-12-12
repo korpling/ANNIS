@@ -191,10 +191,6 @@ In the latter case, you can specify the **{offset}** and the **{length}** of the
 - **{offset}** - Defines the offset from the the binary chunk starts (in bytes).
 - **{length}** - Defines the length of the binary chunk (in bytes).
 
-### Parameters
-
-No parameters.
-
 ### Responses
 
 #### Code 200
