@@ -15,15 +15,18 @@
  */
 package annis.gui.tutorial;
 
-import annis.gui.components.NavigateableSinglePage;
-import com.vaadin.server.VaadinService;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.VaadinService;
+import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  *
@@ -34,19 +37,16 @@ public class TutorialPanel extends VerticalLayout
 
   private static final Logger log = LoggerFactory.getLogger(TutorialPanel.class);
 
-  private NavigateableSinglePage embedded;
+  private BrowserFrame embedded;
 
   public TutorialPanel()
   {
     setSizeFull();
-    
 
-    String localBasePath = VaadinService.getCurrent()
-                  .getBaseDirectory().getAbsolutePath();
     URI appURI = UI.getCurrent().getPage().getLocation();
     URI tutorialURI;
     
-    String relativeFile = "/VAADIN/tutorial/index.html";
+    String relativeFile = "/VAADIN/help/index.html";
     
     try
     {
@@ -66,13 +66,12 @@ public class TutorialPanel extends VerticalLayout
         oldPath + relativeFile,
         null,
         null);
-      embedded = new NavigateableSinglePage(new File(localBasePath + relativeFile), 
-        tutorialURI);
+      embedded = new BrowserFrame(null, new ExternalResource(tutorialURI.toURL()));
       embedded.setSizeFull();
       addComponent(embedded);
 
     }
-    catch (URISyntaxException ex)
+    catch (URISyntaxException | MalformedURLException ex)
     {
       log.error("Invalid tutorial URI", ex);
     }
