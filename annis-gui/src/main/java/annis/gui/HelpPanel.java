@@ -15,39 +15,71 @@
  */
 package annis.gui;
 
-import annis.gui.tutorial.TutorialPanel;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Accordion;
+import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.UI;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class HelpPanel extends Accordion
-{
-  private final TutorialPanel tutorial;
-  private final ExampleQueriesPanel examples;
-  
-  public HelpPanel(AnnisUI ui)
-  {
-    setSizeFull();
-    
-    tutorial = new TutorialPanel();
-    tutorial.setHeight("99%");
-    
-    examples = new ExampleQueriesPanel(ui, this);
-    examples.setHeight("99%");
-    
-    addTab(tutorial, "Tutorial", FontAwesome.BOOK);
-    addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
-    setSelectedTab(examples);
-    addStyleName("help-tab");
-    
-  }
+public class HelpPanel extends Accordion {
+	
+	private static final Logger log = LoggerFactory.getLogger(HelpPanel.class);
 
-  public ExampleQueriesPanel getExamples()
-  {
-    return examples;
-  }
-  
+	private BrowserFrame help;
+	private final ExampleQueriesPanel examples;
+
+	public HelpPanel(AnnisUI ui) {
+		setSizeFull();
+
+		URI appURI = UI.getCurrent().getPage().getLocation();
+		URI tutorialURI;
+
+		String relativeFile = "/VAADIN/help/index.html";
+
+		try {
+			String oldPath = VaadinService.getCurrentRequest().getContextPath();
+			if (oldPath == null) {
+				oldPath = "";
+			}
+			if (oldPath.endsWith("/")) {
+				oldPath = oldPath.substring(0, oldPath.length() - 1);
+			}
+			tutorialURI = new URI(appURI.getScheme(), appURI.getUserInfo(), appURI.getHost(), appURI.getPort(),
+					oldPath + relativeFile, null, null);
+			help = new BrowserFrame(null, new ExternalResource(tutorialURI.toURL()));
+			help.setSizeFull();
+			addComponent(help);
+
+		} catch (URISyntaxException | MalformedURLException ex) {
+			log.error("Invalid tutorial URI", ex);
+		}
+
+		help.setHeight("99%");
+
+		examples = new ExampleQueriesPanel(ui, this);
+		examples.setHeight("99%");
+
+		addTab(help, "Help", FontAwesome.BOOK);
+		addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
+		setSelectedTab(examples);
+		addStyleName("help-tab");
+
+	}
+
+	public ExampleQueriesPanel getExamples() {
+		return examples;
+	}
+
 }
