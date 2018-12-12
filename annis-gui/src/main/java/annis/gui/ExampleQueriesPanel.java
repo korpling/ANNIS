@@ -195,11 +195,6 @@ public class ExampleQueriesPanel extends CssLayout
         // FIXME: this should be added by the constructor or by the panel that adds this tab
         // tab.getComponent().addStyleName("example-queries-tab");
         tab.setEnabled(true);
-
-        if (!(parentTab.getSelectedTab() instanceof ResultViewPanel))
-        {
-          parentTab.setSelectedTab(tab);
-        }
       }
     }
   }
