@@ -88,10 +88,9 @@ public class HelpPanel extends Accordion {
 
 		examples = new ExampleQueriesPanel(ui, this);
 		examples.setHeight("99%");
-
+		
 		addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
 		addStyleName("help-tab");
-
 	}
 
 	@Override
