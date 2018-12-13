@@ -119,7 +119,7 @@ just add a `frequency-font` entry. It has the same structure as `font`.
 It is possible to group corpora into groups, which are selected above the corpus list in
 the search form:
 
-![corpus group selection](corpus-group.png)
+![corpus group selection](/images/corpus-group.png)
 
 While any user can group corpora into corpus sets for their own use, you can define
 corpus sets for the whole instance using the "corpus-sets" in the JSON file described
