@@ -25,14 +25,18 @@ window.annis_gui_components_StatefulBrowserComponent_IFrameComponent = function 
       var iframeContent = iframe.contents();
 
       // remember the currently loaded URL
-      var newUrl = iframe[0].contentWindow.location.href;
-      if (newUrl == connector.getState().source) {
-        // re-select last scrolled position
-        if (connector.getState().lastScrollPos) {
-          iframeContent.scrollTop(connector.getState().lastScrollPos);
+      try {
+        var newUrl = iframe[0].contentWindow.location.href;
+        if (newUrl == connector.getState().source) {
+          // re-select last scrolled position
+          if (connector.getState().lastScrollPos) {
+            iframeContent.scrollTop(connector.getState().lastScrollPos);
+          }
+        } else {
+          connector.urlChanged(newUrl);
         }
-      } else {
-        connector.urlChanged(newUrl);
+      } catch(e) {
+        // ignore security exception
       }
 
       iframeContent.on('scroll', function () {
