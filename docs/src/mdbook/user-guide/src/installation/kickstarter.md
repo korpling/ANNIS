@@ -4,7 +4,9 @@ Local users who do not wish to make their corpora available online can install A
 Kickstarter under  most   versions   of  Linux,   Windows and  MacOS. 
 To install Kickstarter follow these steps:
 1. Download and install PostgreSQL 9.4 (or above)
-for your operating system from [http://www.postgresql.org/download/](http://www.postgresql.org/download/) and **make a note of the administrator password** you set during the installation. After installation, PostgreSQL may automatically launch the PostgreSQL Stack Builder to download additional components – you can safely skip this step and cancel the Stack Builder if you wish. You may need to restart your OS if the PostgreSQL installer tells you to.
+for your operating system from [http://www.postgresql.org/download/](http://www.postgresql.org/download/) and **make a note of the administrator password** you set during the installation.
+Some Linux distributions already package PostgreSQL, e.g. on Ubuntu Linux, you can install PostgreSQL with `sudo apt install postgresql`.
+ After installation, PostgreSQL may automatically launch the PostgreSQL Stack Builder to download additional components – you can safely skip this step and cancel the Stack Builder if you wish. You may need to restart your OS if the PostgreSQL installer tells you to.
 
 ***Note:*** Under Linux, you might have to set the PostgreSQL password manually.
 E.g. on Ubuntu you can achieve this with by running the following commands:
