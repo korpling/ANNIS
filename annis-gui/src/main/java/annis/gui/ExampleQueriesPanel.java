@@ -54,353 +54,295 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class ExampleQueriesPanel extends CssLayout
-{
+public class ExampleQueriesPanel extends CssLayout {
 
-  private final String COLUMN_EXAMPLE_QUERY = "exampleQuery";
+	private final String COLUMN_EXAMPLE_QUERY = "exampleQuery";
 
-  private final String COLUMN_OPEN_CORPUS_BROWSER = "open corpus browser";
+	private final String COLUMN_OPEN_CORPUS_BROWSER = "open corpus browser";
 
-  private final String COLUMN_DESCRIPTION = "description";
+	private final String COLUMN_DESCRIPTION = "description";
 
-  //main ui window
-  private final AnnisUI ui;
+	// main ui window
+	private final AnnisUI ui;
 
-  private final Table table;
+	private final Table table;
 
-  private final ProgressBar loadingIndicator;
+	private final ProgressBar loadingIndicator;
 
-  /**
-   * Bean Container for example queries. Key is the corpus name.
-   */
-  private final BeanItemContainer<ExampleQuery> egContainer;
+	/**
+	 * Bean Container for example queries. Key is the corpus name.
+	 */
+	private final BeanItemContainer<ExampleQuery> egContainer;
 
-  // gets the
-  private final static Logger log = LoggerFactory.
-    getLogger(ExampleQueriesPanel.class);
+	// gets the
+	private final static Logger log = LoggerFactory.getLogger(ExampleQueriesPanel.class);
 
-  // reference to the tab which holds this component
-  private TabSheet.Tab tab;
+	// reference to the tab which holds this component
+	private TabSheet.Tab tab;
 
-  // hold the parent tab of annis3
-  private final HelpPanel parentTab;
+	// hold the parent tab of annis3
+	private final HelpPanel parentTab;
 
-  private static final Resource SEARCH_ICON = FontAwesome.SEARCH;
+	private static final Resource SEARCH_ICON = FontAwesome.SEARCH;
 
-  public ExampleQueriesPanel(AnnisUI ui,
-    HelpPanel parentTab)
-  {
-    super();
-    this.ui = ui;
-    this.parentTab = parentTab;
+	public ExampleQueriesPanel(AnnisUI ui, HelpPanel parentTab) {
+		super();
+		this.ui = ui;
+		this.parentTab = parentTab;
 
-    loadingIndicator = new ProgressBar();
-    loadingIndicator.setIndeterminate(true);
-    loadingIndicator.setCaption("Loading example queries...");
-    loadingIndicator.setVisible(false);
-    addComponent(loadingIndicator);
+		loadingIndicator = new ProgressBar();
+		loadingIndicator.setIndeterminate(true);
+		loadingIndicator.setCaption("Loading example queries...");
+		loadingIndicator.setVisible(false);
+		addComponent(loadingIndicator);
 
-    table = new Table();
-    table.setVisible(true);
-    //
-    egContainer = new BeanItemContainer<>(ExampleQuery.class);
-    table.setContainerDataSource(egContainer);
-    addComponent(table);
+		table = new Table();
+		table.setVisible(true);
+		//
+		egContainer = new BeanItemContainer<>(ExampleQuery.class);
+		table.setContainerDataSource(egContainer);
+		addComponent(table);
 
-    setUpTable();
-  }
+		setUpTable();
+	}
 
-  /**
-   * Sets some layout properties.
-   */
-  private void setUpTable()
-  {
-    setSizeFull();
-    // expand the table
-    table.setSizeFull();
+	/**
+	 * Sets some layout properties.
+	 */
+	private void setUpTable() {
+		setSizeFull();
+		// expand the table
+		table.setSizeFull();
 
-    // Allow selecting items from the table.
-    table.setSelectable(false);
+		// Allow selecting items from the table.
+		table.setSelectable(false);
 
-    // Send changes in selection immediately to server.
-    table.setImmediate(true);
+		// Send changes in selection immediately to server.
+		table.setImmediate(true);
 
-    // set custom style
-    table.addStyleName("example-queries-table");
+		// set custom style
+		table.addStyleName("example-queries-table");
 
-    // put stripes to the table
-    table.addStyleName(ChameleonTheme.TABLE_STRIPED);
+		// put stripes to the table
+		table.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
-    // configure columns
-    table.
-      addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
+		// configure columns
+		table.addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
 
-    table.addGeneratedColumn(COLUMN_EXAMPLE_QUERY, new QueryColumn());
+		table.addGeneratedColumn(COLUMN_EXAMPLE_QUERY, new QueryColumn());
 
-    table.addGeneratedColumn(COLUMN_DESCRIPTION, new Table.ColumnGenerator()
-    {
-      @Override
-      public Object generateCell(Table source, Object itemId, Object columnId)
-      {
-        ExampleQuery eQ = (ExampleQuery) itemId;
-        Label l = new Label(eQ.getDescription());
-        l.setContentMode(ContentMode.TEXT);
-        l.addStyleName(Helper.CORPUS_FONT_FORCE);
-        return l;
-      }
-    });
+		table.addGeneratedColumn(COLUMN_DESCRIPTION, new Table.ColumnGenerator() {
+			@Override
+			public Object generateCell(Table source, Object itemId, Object columnId) {
+				ExampleQuery eQ = (ExampleQuery) itemId;
+				Label l = new Label(eQ.getDescription());
+				l.setContentMode(ContentMode.TEXT);
+				l.addStyleName(Helper.CORPUS_FONT_FORCE);
+				return l;
+			}
+		});
 
-    table.setVisibleColumns(new Object[]
-    {
-      COLUMN_EXAMPLE_QUERY,
-      COLUMN_DESCRIPTION,
-      COLUMN_OPEN_CORPUS_BROWSER
-    });
+		table.setVisibleColumns(new Object[] { COLUMN_EXAMPLE_QUERY, COLUMN_DESCRIPTION, COLUMN_OPEN_CORPUS_BROWSER });
 
-    table.setColumnExpandRatio(table.getVisibleColumns()[0], 0.40f);
-    table.setColumnExpandRatio(table.getVisibleColumns()[1], 0.40f);
+		table.setColumnExpandRatio(table.getVisibleColumns()[0], 0.40f);
+		table.setColumnExpandRatio(table.getVisibleColumns()[1], 0.40f);
 
-    table.setColumnHeader(table.getVisibleColumns()[0], "Example Query");
-    table.setColumnHeader(table.getVisibleColumns()[1], "Description");
-    table.setColumnHeader(table.getVisibleColumns()[2], "open corpus browser");
+		table.setColumnHeader(table.getVisibleColumns()[0], "Example Query");
+		table.setColumnHeader(table.getVisibleColumns()[1], "Description");
+		table.setColumnHeader(table.getVisibleColumns()[2], "open corpus browser");
 
-  }
+	}
 
-  /**
-   * Add items if there are any and put the example query tab in the foreground.
-   */
-  private void addItems(List<ExampleQuery> examples)
-  {
-    if (examples != null && examples.size() > 0)
-    {
-      egContainer.addAll(examples);
-      showTab();
-    }
-    else
-    {
-      hideTabSheet();
-    }
-  }
+	/**
+	 * Add items if there are any and put the example query tab in the foreground.
+	 */
+	private void addItems(List<ExampleQuery> examples) {
+		if (examples != null && examples.size() > 0) {
+			egContainer.addAll(examples);
+			showTab();
+		} else {
+			hideTabSheet();
+		}
+	}
 
-  /**
-   * Shows the tab and put into the foreground, if no query is executed yet.
-   */
-  private void showTab()
-  {
-    if (parentTab != null)
-    {
-      tab = parentTab.getTab(this);
-      if (tab != null)
-      {
-        // FIXME: this should be added by the constructor or by the panel that adds this tab
-        // tab.getComponent().addStyleName("example-queries-tab");
-        tab.setEnabled(true);
-      }
-    }
-  }
+	/**
+	 * Shows the tab and put into the foreground, if no query is executed yet.
+	 */
+	private void showTab() {
+		if (parentTab != null) {
+			tab = parentTab.getTab(this);
+			if (tab != null) {
+				// FIXME: this should be added by the constructor or by the panel that adds this
+				// tab
+				// tab.getComponent().addStyleName("example-queries-tab");
+				tab.setEnabled(true);
 
-  private void hideTabSheet()
-  {
-    if (parentTab != null)
-    {
-      tab = parentTab.getTab(this);
+				if (!(parentTab.getSelectedTab() instanceof ResultViewPanel)) {
+					parentTab.setSelectedTab(tab);
+				}
+			}
+		}
 
-      if (tab != null)
-      {
-        tab.setEnabled(false);
-      }
-    }
-  }
+	}
 
-  private Component getOpenCorpusPanel(final String corpusName)
-  {
-    final Button btn = new Button(corpusName);
+	private void hideTabSheet() {
+		if (parentTab != null) {
+			tab = parentTab.getTab(this);
 
-    btn.setStyleName(BaseTheme.BUTTON_LINK);
-    btn.addClickListener(new Button.ClickListener()
-    {
-      @Override
-      public void buttonClick(Button.ClickEvent event)
-      {
-        CorpusListPanel corpusList = ui.getSearchView().getControlPanel().
-          getCorpusList();
-        corpusList.initCorpusBrowser(corpusName, btn);
-      }
-    });
+			if (tab != null) {
+				tab.setEnabled(false);
+			}
+		}
+	}
 
-    return btn;
-  }
+	private Component getOpenCorpusPanel(final String corpusName) {
+		final Button btn = new Button(corpusName);
 
-  /**
-   * Loads the available example queries for a specific corpus.
-   *
-   * @param corpusNames Specifies the corpora example queries are fetched for.
-   * If it is null or empty all available example queries are fetched.
-   */
-  private static List<ExampleQuery> loadExamplesFromRemote(
-    Set<String> corpusNames)
-  {
-    List<ExampleQuery> result = new LinkedList<>();
-    WebResource service = Helper.getAnnisWebResource();
-    try
-    {
-      if (corpusNames == null || corpusNames.isEmpty())
-      {
-        result = service.path("query").path("corpora").path(
-          "example-queries").get(new GenericType<List<ExampleQuery>>()
-          {
-          });
-      }
-      else
-      {
-        String concatedCorpusNames = StringUtils.join(corpusNames, ",");
-        result = service.path("query").path("corpora").path(
-          "example-queries").queryParam("corpora", concatedCorpusNames).get(
-            new GenericType<List<ExampleQuery>>()
-            {
-            });
-      }
-    }
-    catch (UniformInterfaceException ex)
-    {
-      // ignore
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.error("problems with getting example queries from remote for {}",
-        corpusNames, ex);
-    }
-    return result;
-  }
+		btn.setStyleName(BaseTheme.BUTTON_LINK);
+		btn.addClickListener(new Button.ClickListener() {
+			@Override
+			public void buttonClick(Button.ClickEvent event) {
+				CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();
+				corpusList.initCorpusBrowser(corpusName, btn);
+			}
+		});
 
-  /**
-   * Sets the selected corpora and causes a reload
-   *
-   * @param selectedCorpora Specifies the corpora example queries are fetched
-   * for. If it is null, all available example queries are fetched.
-   */
-  public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
-  {
-    loadingIndicator.setVisible(true);
-    table.setVisible(false);
-    Background.run(new ExampleFetcher(selectedCorpora, UI.getCurrent()));
-  }
+		return btn;
+	}
 
-  private class ExampleFetcher implements Runnable
-  {
+	/**
+	 * Loads the available example queries for a specific corpus.
+	 *
+	 * @param corpusNames Specifies the corpora example queries are fetched for. If
+	 *                    it is null or empty all available example queries are
+	 *                    fetched.
+	 */
+	private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames) {
+		List<ExampleQuery> result = new LinkedList<>();
+		WebResource service = Helper.getAnnisWebResource();
+		try {
+			if (corpusNames == null || corpusNames.isEmpty()) {
+				result = service.path("query").path("corpora").path("example-queries")
+						.get(new GenericType<List<ExampleQuery>>() {
+						});
+			} else {
+				String concatedCorpusNames = StringUtils.join(corpusNames, ",");
+				result = service.path("query").path("corpora").path("example-queries")
+						.queryParam("corpora", concatedCorpusNames).get(new GenericType<List<ExampleQuery>>() {
+						});
+			}
+		} catch (UniformInterfaceException ex) {
+			// ignore
+		} catch (ClientHandlerException ex) {
+			log.error("problems with getting example queries from remote for {}", corpusNames, ex);
+		}
+		return result;
+	}
 
-    private final Set<String> selectedCorpora;
+	/**
+	 * Sets the selected corpora and causes a reload
+	 *
+	 * @param selectedCorpora Specifies the corpora example queries are fetched for.
+	 *                        If it is null, all available example queries are
+	 *                        fetched.
+	 */
+	public void setSelectedCorpusInBackground(final Set<String> selectedCorpora) {
+		loadingIndicator.setVisible(true);
+		table.setVisible(false);
+		Background.run(new ExampleFetcher(selectedCorpora, UI.getCurrent()));
+	}
 
-    private UI ui;
+	private class ExampleFetcher implements Runnable {
 
-    public ExampleFetcher(Set<String> selectedCorpora, UI ui)
-    {
-      this.selectedCorpora = selectedCorpora;
-      this.ui = ui;
-    }
+		private final Set<String> selectedCorpora;
 
-    @Override
-    public void run()
-    {
-      final List<ExampleQuery> result = new LinkedList<>();
-      try
-      {
-        result.addAll(loadExamplesFromRemote(selectedCorpora));
-      }
-      finally
-      {
-        ui.access(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            loadingIndicator.setVisible(false);
-            table.setVisible(true);
+		private UI ui;
 
-            try
-            {
-              table.removeAllItems();
-              addItems(result);
-            }
-            catch (Exception ex)
-            {
-              log.error("removing or adding of example queries failed for {}",
-                selectedCorpora, ex);
-            }
-          }
-        });
-      }
+		public ExampleFetcher(Set<String> selectedCorpora, UI ui) {
+			this.selectedCorpora = selectedCorpora;
+			this.ui = ui;
+		}
 
-    }
+		@Override
+		public void run() {
+			final List<ExampleQuery> result = new LinkedList<>();
+			try {
+				result.addAll(loadExamplesFromRemote(selectedCorpora));
+			} finally {
+				ui.access(new Runnable() {
+					@Override
+					public void run() {
+						loadingIndicator.setVisible(false);
+						table.setVisible(true);
 
-  }
+						try {
+							table.removeAllItems();
+							addItems(result);
+						} catch (Exception ex) {
+							log.error("removing or adding of example queries failed for {}", selectedCorpora, ex);
+						}
+					}
+				});
+			}
 
-  private class QueryColumn implements Table.ColumnGenerator
-  {
+		}
 
-    @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
-    {
-      final ExampleQuery eQ = (ExampleQuery) itemId;
-      Button btn = new Button();
-      btn.setDescription("show corpus browser for " + eQ.getCorpusName());
-      btn.addStyleName(ChameleonTheme.BUTTON_LINK);
-      btn.setIcon(SEARCH_ICON);
-      btn.setCaption(eQ.getExampleQuery());
-      btn.setDescription("show results for \"" + eQ.getExampleQuery()
-        + "\" in " + eQ.getCorpusName());
-      btn.addStyleName(Helper.CORPUS_FONT_FORCE);
+	}
 
-      btn.addClickListener(new Button.ClickListener()
-      {
-        @Override
-        public void buttonClick(Button.ClickEvent event)
-        {
-          if (ui != null)
-          {
-            ControlPanel controlPanel = ui.getSearchView().getControlPanel();
-            QueryPanel queryPanel;
+	private class QueryColumn implements Table.ColumnGenerator {
 
-            if (controlPanel == null)
-            {
-              log.error("controlPanel is not initialized");
-              return;
-            }
+		@Override
+		public Object generateCell(Table source, Object itemId, Object columnId) {
+			final ExampleQuery eQ = (ExampleQuery) itemId;
+			Button btn = new Button();
+			btn.setDescription("show corpus browser for " + eQ.getCorpusName());
+			btn.addStyleName(ChameleonTheme.BUTTON_LINK);
+			btn.setIcon(SEARCH_ICON);
+			btn.setCaption(eQ.getExampleQuery());
+			btn.setDescription("show results for \"" + eQ.getExampleQuery() + "\" in " + eQ.getCorpusName());
+			btn.addStyleName(Helper.CORPUS_FONT_FORCE);
 
-            queryPanel = controlPanel.getQueryPanel();
-            if (queryPanel == null)
-            {
-              log.error("queryPanel is not initialized");
-              return;
-            }
+			btn.addClickListener(new Button.ClickListener() {
+				@Override
+				public void buttonClick(Button.ClickEvent event) {
+					if (ui != null) {
+						ControlPanel controlPanel = ui.getSearchView().getControlPanel();
+						QueryPanel queryPanel;
 
-            Set<String> corpusNameSet = new HashSet<>();
-            corpusNameSet.add(eQ.getCorpusName());
-            if (ui.getQueryController() != null)
-            {
-              ui.getQueryController().setQuery(new Query(eQ.getExampleQuery(),
-                corpusNameSet));
-              // ensure the selected corpus is shown
-              ui.getSearchView().getControlPanel().getCorpusList().scrollToSelectedCorpus();
-              
-              // execute query
-              ui.getQueryController().executeSearch(true, true);
-            }
-          }
-        }
-      });
-      return btn;
-    }
-  }
+						if (controlPanel == null) {
+							log.error("controlPanel is not initialized");
+							return;
+						}
 
-  private class ShowCorpusBrowser implements Table.ColumnGenerator
-  {
+						queryPanel = controlPanel.getQueryPanel();
+						if (queryPanel == null) {
+							log.error("queryPanel is not initialized");
+							return;
+						}
 
-    @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
-    {
-      ExampleQuery eQ = (ExampleQuery) itemId;
-      return getOpenCorpusPanel(eQ.getCorpusName());
-    }
-  }
+						Set<String> corpusNameSet = new HashSet<>();
+						corpusNameSet.add(eQ.getCorpusName());
+						if (ui.getQueryController() != null) {
+							ui.getQueryController().setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
+							// ensure the selected corpus is shown
+							ui.getSearchView().getControlPanel().getCorpusList().scrollToSelectedCorpus();
+
+							// execute query
+							ui.getQueryController().executeSearch(true, true);
+						}
+					}
+				}
+			});
+			return btn;
+		}
+	}
+
+	private class ShowCorpusBrowser implements Table.ColumnGenerator {
+
+		@Override
+		public Object generateCell(Table source, Object itemId, Object columnId) {
+			ExampleQuery eQ = (ExampleQuery) itemId;
+			return getOpenCorpusPanel(eQ.getCorpusName());
+		}
+	}
 }

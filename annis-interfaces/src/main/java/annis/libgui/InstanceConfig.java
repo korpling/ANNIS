@@ -226,6 +226,8 @@ public class InstanceConfig implements Serializable {
 	
 	/**
 	 * The URL to use for the internal help page.
+	 * 
+	 * Must be located under the same domain as the ANNIS interface.
 	 * @return
 	 */
 	@XmlElement(name = "help-url")
