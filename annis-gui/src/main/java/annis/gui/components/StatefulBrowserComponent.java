@@ -81,6 +81,7 @@ public class StatefulBrowserComponent extends VerticalLayout
         public void call(JsonArray arguments) throws JSONException
         {
           getState().setSource(arguments.get(0).asString());
+          getState().setLastScrollPos(0);
         }
       });
       addFunction("scrolled", new JavaScriptFunction()
