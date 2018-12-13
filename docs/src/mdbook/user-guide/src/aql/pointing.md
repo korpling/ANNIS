@@ -31,7 +31,7 @@ larger one ('the Seeburgers and some Groß-Glienickers'), and each
 referent has its own underline. Annotations of the coreference edges of
 each relation can be viewed by hovering of the appropriate underline.
 
-![](coref.png)
+![](/images/coref.png)
 
 The pointing relation operator can also search for longer chains of
 coreference, using the asterisk extension shown below:
@@ -67,4 +67,4 @@ type 'dep' (for dependency) between the two, annotated with
 with the arch dependency visualizer, which shows the verb 'shows' and
 its object 'location'.
 
-![](dep_vis.png)
+![](/images/dep_vis.png)

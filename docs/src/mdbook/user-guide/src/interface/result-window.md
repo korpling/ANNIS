@@ -1,6 +1,6 @@
 # Result Window
 
-![ANNIS result window toolbar](search_bar.png)
+![ANNIS result window toolbar](/images/search_bar.png)
 
 The result window shows search results in pages of 10 hits each by
 default (this can be changed in the Search Form). The toolbar at the top
@@ -15,7 +15,7 @@ If your corpus contains multiple alternative text layers or
 segmentations (e.g. normalized and un-normalized text), you may switch
 between these on the fly by using the \"base text\" menu.
 
-![KWIC concordance in ANNIS](KWIC_narrow.png)
+![KWIC concordance in ANNIS](/images/KWIC_narrow.png)
 
 The result list itself initially shows a KWIC (key word in context)
 concordance of matching positions in the selected corpora, with the
@@ -32,4 +32,4 @@ level\'s name, e.g. dependencies and referent information for the
 annotations in the dependency tree and grid views in the picture below.
 
 ![visualization of different annotation
-levels](annotation_levels.png)
+levels](/images/annotation_levels.png)
