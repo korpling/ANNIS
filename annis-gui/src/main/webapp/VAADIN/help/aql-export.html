@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Using the ANNIS interface - ANNIS Help</title>
+        <title>Exporting Results - ANNIS Help</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -72,7 +72,7 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="interface.html"><strong aria-hidden="true">1.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">1.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">1.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">1.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">2.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">2.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">2.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">2.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">2.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">2.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">2.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">2.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">2.8.</strong> Complete List of Operators</a></li></ol></li></ol>
+            <ol class="chapter"><li><a href="interface.html"><strong aria-hidden="true">1.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">1.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">1.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">1.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">2.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">2.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">2.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">2.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">2.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">2.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html" class="active"><strong aria-hidden="true">2.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">2.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">2.8.</strong> Complete List of Operators</a></li></ol></li></ol>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -136,17 +136,101 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#using-the-annis-interface" id="using-the-annis-interface"><h1>Using the ANNIS interface</h1></a>
-<p>The ANNIS interface is comprised of several areas, the most important of
-which are the search form on the left side and the results tab on the right side.</p>
-<p><img src="images/annis3_interface.png" alt="Screenshot of the ANNIS user interface" /></p>
+                        <a class="header" href="#exporting-results" id="exporting-results"><h1>Exporting Results</h1></a>
+<p>To export search results, open the menu &quot;More&quot; between the Search and
+History buttons and select &quot;Export&quot;:</p>
+<p><img src="images/export.png" alt="" /></p>
+<p>Enter the query whose results you want to export as usual in the AQL
+box. Note that you <strong>do not need to carry out the query first</strong>. You can
+enter the query and export without pressing Search before. Several
+exporter modules can be selected from the Export tab shown below.</p>
+<p><img src="images/export2.png" alt="" /></p>
+<p>The SimpleTextExporter simply gives the text for all tokens in each
+search result, including context, in a one-row-per-hit format. The
+tokens covered by the match area are marked with square brackets and the
+results are numbered, as in the following
+example:</p>
+<pre><code>    0. of the International Brotherhood of [Magicians] Wednesday , October 9 , 
+    1. Magic Month in the United [States] . Wikinews spoke with William 
+    2. of the International Brotherhood of [Magicians] , about the current state 
+    3. - &quot; Scarne on Card [Tricks] &quot; and &quot; Scarne on 
+    4. and &quot; Scarne on Magic [Tricks] &quot; . That started me 
+</code></pre>
+<p>The TextExporter adds all annotations of each token separated by slashes
+(e.g. dogs/NNS/dog for a token dogs annotated with a part-of-speech NNS
+and a lemma dog).</p>
+<p>The GridExporter adds all annotations available for the span of
+retrieved tokens, with each annotation layer in a separate line.
+Annotations are separated by spaces and the hierarchical order of
+annotations is lost, though the span of tokens covered by each
+annotation may optionally be given in square brackets (to turn this off
+use the optional parameter <code>numbers=false</code> in the ‘Parameters’ box). The
+user can specify annotation layers to be exported in the additional
+‘Annotation Keys’ box, and annotation names should be separated by
+comas, as in the image above. Metadata annotations can also be exported
+by entering “metakeys=” and a list of comma separated metadata names in
+the Parameters box. If nothing is specified, all available annotations
+and no metadata will be exported. Multiple options are separated by a
+semicolon, e.g. the Parameters <code>metakeys=type,docname;numbers=false</code>. An
+example output with token numbers and the part of speech (pos) and
+syntactic category annotations looks as follows.</p>
+<pre><code>0.   tok  of the International Brotherhood of Magicians Wednesday 
+    pos  IN[1-1] DT[2-2] NP[3-3] NP[4-4] IN[5-5] NPS[6-6] NP[7-7] 
+    cat  S[1-6] VP[1-6] NP[1-6] PP[1-6] NP[2-4] PP[5-6] NP[6-6] NP[7-12] 
+</code></pre>
+<p>Meaning that the annotation cat=&quot;NP&quot; applies to tokens 1-6 in the search
+result, and so on. Note that when specifying annotation layers, if the
+reserved name 'tok' is not specified, the tokens themselves will not be
+exported (annotations only).</p>
+<p>The WekaExporter outputs the format used by the <a href="http://www.cs.waikato.ac.nz/ml/weka/">WEKA machine learning
+tool</a>. Only the attributes of the
+search elements (#1, #2 etc. in AQL) are outputted, and are separated
+by commas. The order and name of the attributes is declared in the
+beginning of the export text, as in this example:</p>
+<pre><code>@relation name
+
+@attribute #1_id string
+@attribute #1_span string
+@attribute #1_anno_const:cat string
+@attribute #2_id string
+@attribute #2_span string
+@attribute #2_anno_GUM:claws5 string
+@attribute #2_anno_GUM:lemma string
+@attribute #2_anno_GUM:pos string
+
+@data
+
+'11318611','the current state','NP','11318616','current','AJ0','current','JJ'
+'11318686','magic','NP','11318688','magic','AJ0','magic','JJ'
+'11318757','some basic tricks','NP','11318760','basic','AJ0','basic','JJ'
+</code></pre>
+<p>The export shows the properties of an NP node dominating a token with
+the part-of-speech JJ. Since the token also has other attributes, such
+as the lemma and part of speech tags, these are also retrieved.</p>
+<p>It is also possible to output metadata annotations per hit using the
+WekaExporter. To do so, use the parameter metakeys=meta1,meta2 etc. For
+example, if your documents have a metadata annotation called 'genre',
+you may export it for each search result as a further column using
+metakeys=genre in the parameters box.</p>
+<p>The CSVExporter behaves much like the WekaExporter, except that the Weka
+header specifying the content of the columns is not used (useful for
+importing into spreadsheet programs such as Excel or Calc).</p>
+<p>Note that exporting may be slow if the result set is large.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
+                            <a rel="prev" href="aql-pointing.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
 
+                        
+                            <a rel="next" href="aql-frequency.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -156,7 +240,15 @@ which are the search form on the left side and the results tab on the right side
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
+                    <a href="aql-pointing.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
 
+                
+                    <a href="aql-frequency.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 
