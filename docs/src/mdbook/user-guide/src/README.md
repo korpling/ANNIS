@@ -5,6 +5,6 @@ multi-layer corpora, developed at Humboldt-Universität zu Berlin, Georgetown
 University and Potsdam University. It can be used to search for complex graph
 structures of annotated nodes and edges forming a variety of linguistic structures, such as constituent or dependency syntax trees, coreference, rhetorical structure and parallel alignment edges, span annotations and associated multi-modal data (audio/video). 
 
-![ANNIS user interface](./annis3_full.png)
+![ANNIS user interface](images/annis3_full.png)
 
 This user guide provides an overview of the current ANNIS system, first steps for installing either a local instance or an ANNIS server with a demo corpus, as well as tutorials for converting data for ANNIS and running queries with AQL (ANNIS Query Language).

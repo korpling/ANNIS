@@ -6,20 +6,20 @@ interface, use the URL of you ANNIS webapp and add /admin or from ANNIS 3.4.X
 and above, press the Administration button next to ‘About ANNIS’ (this button is only
 shown if you are a logged in administrator). You should see the screen below:
 
-![import in web-adminstration interface](/images/web-admin-import.png)
+![import in web-adminstration interface](images/web-admin-import.png)
 
 Here you can upload a zipped relANNIS corpus for import and set the e-mail address
 in the configuration file. The corpus management tab allows you to select corpora for
 deletion:
 
-![select corpora for deletion](/images/web-admin-corpus-select.png)
+![select corpora for deletion](images/web-admin-corpus-select.png)
 
 And finally the user and group management tabs allow you to add or remove users,
 give them special permissions, and determine which groups can see which corpora.
 
-![group management](/images/web-admin-groups.png)
+![group management](images/web-admin-groups.png)
 
-![user management](/images/web-admin-users.png)
+![user management](images/web-admin-users.png)
 
 These functions edit the files described in the [User Configuration section](user.md). Note that the user management
 function treats any file in the users/ directory from the [User Configuration section](user.md) as a user entry, and no

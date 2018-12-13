@@ -4,13 +4,13 @@
 
 Default key-word in context view.
 
-![kwic visualizer](/images/vis-kwic.png)
+![kwic visualizer](images/vis-kwic.png)
 
 ## `tree` 
 
 Constituent syntax tree.
 
-![tree visualizer](/images/vis-tree.png)
+![tree visualizer](images/vis-tree.png)
 
 ### Mappings
 
@@ -27,7 +27,7 @@ the namespace. Multiple instructions are separated using semicolons.
 
 Annotation grid, with annotations spanning multiple tokens.
 
-![grid visualizer](/images/vis-grid.png)
+![grid visualizer](images/vis-grid.png)
 
 ### Mappings
 
@@ -45,7 +45,7 @@ hide the tokens that normally appear at the bottom of the grid using
     
 A grid visualizing hierarchical tree annotations as ordered grid layers.
 
-![grid_tree visualizer](/images/vis-grid_tree.png)
+![grid_tree visualizer](images/vis-grid_tree.png)
 
 ***Note:***  all layers represent the same annotation name at different hierarchical depths, marked level: 0,1,2,... etc. on the left
 
@@ -60,7 +60,7 @@ annotation name at different hierarchical depths.
 Visualization for token-token alignments between parallel
 texts using [SentStructure.js](https://gitlab.cl.uzh.ch/sparcling/SentStructure.js)
 
-![sentstructurejs visualizer for parallel corpus alignment](/images/vis-sentstructurejs.png)
+![sentstructurejs visualizer for parallel corpus alignment](images/vis-sentstructurejs.png)
 
 ### Mappings
 
@@ -71,7 +71,7 @@ Use `alignment_label` to specify the edge annotation name that should be display
 
 A view of the entire text of a document, possibly with interactive coreference links.
 
-![discourse visualizer](/images/vis-discourse.png)
+![discourse visualizer](images/vis-discourse.png)
 
 It is possible to use this visualization to view entire texts even if you do not have coreference annotations)
 
@@ -80,7 +80,7 @@ It is possible to use this visualization to view entire texts even if you do not
 Dependency tree with labeled arches between tokens;
 requires SVG enabled browser.
 
-![arch_dependency visualizer](/images/vis-arch_dependency.png)
+![arch_dependency visualizer](images/vis-arch_dependency.png)
 
 ### Mappings
 
@@ -91,20 +91,20 @@ enter `node_key:my_annotation`.
 
 A linked audio file.
 
-![audio visualizer](/images/vis-audio.png)
+![audio visualizer](images/vis-audio.png)
 
 ## `video`
 
 A linked video file.
 
-![video visualizer](/images/vis-video.png)
+![video visualizer](images/vis-video.png)
 
 ## `pdf` or `pdfdoc`
 
 A linked pdf file, showing either a specific page aligned
 with an annotation or an entire pdf document respectively.
 
-![pdf visualizer](/images/vis-pdf.png)
+![pdf visualizer](images/vis-pdf.png)
 
 ### Mappings
 
@@ -121,7 +121,7 @@ A visualization for rhetorical structure theory annotations,
 of either just the search result with context or the entire document
 respectively.
 
-![rst visualizer](/images/vis-rst.png)
+![rst visualizer](images/vis-rst.png)
 
 ### Mappings
 
@@ -141,7 +141,7 @@ of either the immediate search result context or the entire document
 respectively; see the ANNIS HTML Visualization Guide for more
 details and some example stylesheets.
 
-![html visualizer](/images/vis-html.png)
+![html visualizer](images/vis-html.png)
 
 ### Mappings
 

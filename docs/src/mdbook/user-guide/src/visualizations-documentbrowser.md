@@ -6,7 +6,7 @@ document browser for a corpus, click on the document icon in the corpus list nex
 each corpus. By default, a list as shown below is generated with a link to a plain text
 representation of each document.
 
-![document browser](/images/document-browser.png)
+![document browser](images/document-browser.png)
 
 The default configuration for the document browser is stored in the
 `conf/document_browser.json` file in the *back-end configuration*. 

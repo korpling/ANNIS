@@ -36,7 +36,7 @@ ANNIS servers replace “anniskickstart” with your database name, determined a
 PostgreSQL password to gain access. Right click on the table and select *View Data >
 View All Rows*. The table should look like this:
 
-![pgAdmin resolver table](/images/pgadmin-resolver.png)
+![pgAdmin resolver table](images/pgadmin-resolver.png)
 
 The columns in the table (or the file `resolver_vis_map.annis` before import) can be
 filled out as follows:

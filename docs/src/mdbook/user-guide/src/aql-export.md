@@ -3,14 +3,14 @@
 To export search results, open the menu "More" between the Search and
 History buttons and select "Export":
 
-![](/images/export.png)
+![](images/export.png)
 
 Enter the query whose results you want to export as usual in the AQL
 box. Note that you **do not need to carry out the query first**. You can
 enter the query and export without pressing Search before. Several
 exporter modules can be selected from the Export tab shown below.
 
-![](/images/export2.png)
+![](images/export2.png)
 
 The SimpleTextExporter simply gives the text for all tokens in each
 search result, including context, in a one-row-per-hit format. The
