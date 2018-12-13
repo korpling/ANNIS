@@ -32,6 +32,7 @@
                 <excludes>
                   <exclude>user-guide/book/</exclude>
                   <exclude>developer-guide/book/</exclude>
+                  <exclude>online-help/book/</exclude>
                 </excludes>
               </resource>
             </resources>
@@ -131,6 +132,23 @@ Original revision is ${buildNumber}.</checkinComment>
                     <argument>-d</argument>
                     <argument>${project.build.directory}/mdbook/${site.path}/developer-guide/</argument>
                     <argument>mdbook-generated/developer-guide/</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>compile-online-help</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>mdbook</executable>
+                  <workingDirectory>${project.build.directory}</workingDirectory>
+                  <arguments>
+                    <argument>build</argument>
+                    <argument>-d</argument>
+                    <argument>${project.basedir}/../annis-gui/src/main/webapp/VAADIN/help/</argument>
+                    <argument>mdbook-generated/online-help/</argument>
                   </arguments>
                 </configuration>
               </execution>
