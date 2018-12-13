@@ -21,24 +21,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.1.0</version>
-          <configuration>
-            <outputDirectory>${project.build.directory}/mdbook-generated</outputDirectory>
-            <resources>
-              <resource>
-                <directory>src/mdbook/</directory>
-                <filtering>true</filtering>
-                <excludes>
-                  <exclude>user-guide/book/</exclude>
-                  <exclude>developer-guide/book/</exclude>
-                  <exclude>online-help/book/</exclude>
-                </excludes>
-              </resource>
-            </resources>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-scm-publish-plugin</artifactId>
           <version>3.0.0</version>
@@ -100,13 +82,44 @@ Original revision is ${buildNumber}.</checkinComment>
           <!-- make sure all paths are correct by replacing the properties -->
           <plugin>
             <artifactId>maven-resources-plugin</artifactId>
+            <version>3.1.0</version>
             <executions>
               <execution>
-                <id>copy-resources</id>
+                <id>copy-mdbook-to-generated</id>
                 <phase>generate-sources</phase>
                 <goals>
                   <goal>copy-resources</goal>
                 </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/mdbook-generated</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/mdbook/</directory>
+                      <filtering>true</filtering>
+                      <excludes>
+                        <exclude>user-guide/book/</exclude>
+                        <exclude>developer-guide/book/</exclude>
+                        <exclude>online-help/book/</exclude>
+                      </excludes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-index-html</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/mdbook</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/html</directory>
+                      <filtering>true</filtering>
+                    </resource>
+                  </resources>
+                </configuration>
               </execution>
             </executions>
           </plugin>
