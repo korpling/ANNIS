@@ -154,6 +154,19 @@ Original revision is ${buildNumber}.</checkinComment>
               </execution>
             </executions>
           </plugin>
+           <!-- the online help directory should be cleaned as well -->
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>3.1.0</version>
+            <configuration>
+              <filesets>
+                <fileset>                 
+                  <directory>${project.basedir}/../annis-gui/src/main/webapp/VAADIN/help/</directory>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
+              </filesets>
+            </configuration>
+          </plugin>
           <!-- upload the generated documentation to GitHub -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
