@@ -48,7 +48,7 @@ public class HelpPanel extends Accordion {
 		setSizeFull();
 		
 		
-		if (ui instanceof AnnisUI) {
+		if (ui != null) {
 			InstanceConfig cfg = ((AnnisUI) ui).getInstanceConfig();
 			
 			URI url = null;
