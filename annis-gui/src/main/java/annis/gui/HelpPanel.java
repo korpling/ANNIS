@@ -30,6 +30,7 @@ import com.vaadin.ui.Accordion;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.UI;
 
+import annis.gui.components.StatefulBrowserComponent;
 import annis.libgui.InstanceConfig;
 
 /**
@@ -40,7 +41,7 @@ public class HelpPanel extends Accordion {
 
 	private static final Logger log = LoggerFactory.getLogger(HelpPanel.class);
 
-	private BrowserFrame help;
+	private StatefulBrowserComponent help;
 	private final ExampleQueriesPanel examples;
 
 	public HelpPanel(AnnisUI ui) {
@@ -50,11 +51,11 @@ public class HelpPanel extends Accordion {
 		if (ui instanceof AnnisUI) {
 			InstanceConfig cfg = ((AnnisUI) ui).getInstanceConfig();
 			
-			URL url = null;
+			URI url = null;
 			if(cfg.getHelpUrl() != null && !cfg.getHelpUrl().isEmpty()) {
 				try {
-					url = new URL(cfg.getHelpUrl());
-				} catch (MalformedURLException ex) {
+					url = new URI(cfg.getHelpUrl());
+				} catch (URISyntaxException ex) {
 					log.error("Invalid help URL {} provided in instance configuration", cfg.getHelpUrl(), ex);
 				}
 			} else {
@@ -70,19 +71,19 @@ public class HelpPanel extends Accordion {
 						oldPath = oldPath.substring(0, oldPath.length() - 1);
 					}
 					url = new URI(appURI.getScheme(), appURI.getUserInfo(), appURI.getHost(), appURI.getPort(),
-							oldPath + relativeFile, null, null).toURL();
+							oldPath + relativeFile, null, null);
 		
-				} catch (URISyntaxException | MalformedURLException ex) {
+				} catch (URISyntaxException ex) {
 					log.error("Invalid help URI", ex);
-				}
-			}
+				}	}
 			
 			if(url != null) {
-				help = new BrowserFrame(null, new ExternalResource(url));
+				help = new StatefulBrowserComponent(url);
 				help.setSizeFull();
 				addComponent(help);
 				help.setHeight("99%");
 				addTab(help, "Help", FontAwesome.BOOK);
+				setSelectedTab(help);
 			}
 		}
 		
@@ -90,20 +91,7 @@ public class HelpPanel extends Accordion {
 		examples.setHeight("99%");
 		
 		addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
-		
-
-
 		addStyleName("help-tab");
-	}
-
-	@Override
-	public void attach() {
-		super.attach();
-		if(help != null) {
-			setSelectedTab(help);
-		} else if(examples != null) {
-			setSelectedTab(examples);
-		}
 	}
 
 	public ExampleQueriesPanel getExamples() {
