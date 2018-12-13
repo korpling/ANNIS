@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Using the ANNIS interface - ANNIS Help</title>
+        <title>Searching using Regular Expressions - ANNIS Help</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -72,7 +72,7 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="interface.html"><strong aria-hidden="true">1.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">1.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">1.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">1.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">2.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">2.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">2.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">2.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">2.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">2.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">2.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">2.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">2.8.</strong> Complete List of Operators</a></li></ol></li></ol>
+            <ol class="chapter"><li><a href="interface.html"><strong aria-hidden="true">1.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">1.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">1.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">1.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">2.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">2.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">2.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html" class="active"><strong aria-hidden="true">2.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">2.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">2.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">2.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">2.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">2.8.</strong> Complete List of Operators</a></li></ol></li></ol>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -136,17 +136,80 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#using-the-annis-interface" id="using-the-annis-interface"><h1>Using the ANNIS interface</h1></a>
-<p>The ANNIS interface is comprised of several areas, the most important of
-which are the search form on the left side and the results tab on the right side.</p>
-<p><img src="images/annis3_interface.png" alt="Screenshot of the ANNIS user interface" /></p>
+                        <a class="header" href="#searching-using-regular-expressions" id="searching-using-regular-expressions"><h1>Searching using Regular Expressions</h1></a>
+<p>When searching for word forms and annotation values, it is possible to
+employ wildcards as placeholders for a variety of characters, using
+Regular Expression syntax (see
+<a href="http://www.regular-expressions.info/">here</a> for detailed information).
+To search for wildcards use slashes instead of quotation marks to
+surround your search term. For example, you can use the <strong>period (<code>.</code>)</strong>
+to replace any single character:</p>
+<pre><code>tok=/ca./
+</code></pre>
+<p>This finds word forms such as &quot;cat&quot;, &quot;can&quot;, &quot;car&quot;, &quot;cap&quot; etc. It is also
+possible to make characters optional by following them with a <strong>question
+mark (<code>?</code>)</strong>. The following example finds cases of &quot;car&quot; and &quot;cart&quot;,
+since the &quot;t&quot; is optional:</p>
+<pre><code>tok=/cart?/
+</code></pre>
+<p>It is also possible to specify an arbitrary number of repetitions, with
+an <strong>asterisk (<code>*</code>)</strong> signifying zero or more occurrences and a <strong>plus
+(<code>+</code>)</strong> signifying at least one occurrence. For example, the first query
+below finds &quot;o&quot;, &quot;of&quot;, and &quot;off&quot; (since the asterisk means zero or more
+times the preceding &quot;f&quot;), while the second finds &quot;of&quot; and &quot;off&quot;, since
+at least one &quot;f&quot; must be found:</p>
+<pre><code>tok=/of*/
+</code></pre>
+<pre><code>tok=/of+/
+</code></pre>
+<p>It is possible to combine these operators with the period operator to
+mean any number of occurrences of an arbitrary character. For example,
+the query below searches for pos (part-of-speech) annotations that begin
+with &quot;VV&quot;, corresponding to all forms of lexical verbs (the auxiliaries
+&quot;be&quot; and &quot;have&quot; are tagged VB... and VH... respectively). The string
+&quot;VV&quot; means that the result must begin with &quot;VV&quot;, the period stands for
+any character, and the asterisk means that 'any character' can be
+repeated zero or more time, as above.</p>
+<pre><code>pos=/VV.*/
+</code></pre>
+<p>This finds both finite verbs (&quot;VVZ&quot;, &quot;VVP&quot;, &quot;VVD&quot;) and non-finite ones
+(&quot;VV&quot;) or gerunds (&quot;VVG&quot;). It is also possible to search for explicit
+alternatives by either specifying characters in <strong>square brackets</strong> or
+longer strings in <strong>round brackets separated by pipe symbols</strong>. The
+first example below finds either &quot;of&quot; or &quot;on&quot; (i.e. &quot;o&quot; followed by
+either &quot;f&quot; or &quot;n&quot;) while the second example finds lemma annotations that
+are either &quot;be&quot; or &quot;have&quot;.</p>
+<pre><code>tok=/o[nf]/
+</code></pre>
+<pre><code>lemma=/(be|have)/
+</code></pre>
+<p>Finally, negative searches can be used as usual with the exclamation
+point, and regular expressions can generally be used also in edge
+annotations. For example, if we search for trees (see also <a href="aql-trees.html">Searching
+for Trees</a>) where a lexical verb dominates another
+token with a dependency edge not containing 'obj', we can use a wildcard
+to rule out all edges labels containing those letters. This will give us
+all non-object dependants of lexical verbs:</p>
+<pre><code>pos=/VV.*/ &amp; tok &amp; #1 -&gt;dep[func!=/.*obj.*/] #2
+</code></pre>
+<p>OR (using a shortcut):</p>
+<pre><code>pos=/VV.*/ -&gt;dep[func!=/.*obj.*/] tok
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
+                            <a rel="prev" href="aql-annotations.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
 
+                        
+                            <a rel="next" href="aql-trees.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -156,7 +219,15 @@ which are the search form on the left side and the results tab on the right side
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
+                    <a href="aql-annotations.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
 
+                
+                    <a href="aql-trees.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 

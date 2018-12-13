@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Using the ANNIS interface - ANNIS Help</title>
+        <title>Result Window - ANNIS Help</title>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -72,7 +72,7 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="interface.html"><strong aria-hidden="true">1.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">1.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">1.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">1.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">2.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">2.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">2.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">2.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">2.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">2.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">2.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">2.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">2.8.</strong> Complete List of Operators</a></li></ol></li></ol>
+            <ol class="chapter"><li><a href="interface.html"><strong aria-hidden="true">1.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">1.1.</strong> Search Form</a></li><li><a href="interface-result-window.html" class="active"><strong aria-hidden="true">1.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">1.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">2.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">2.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">2.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">2.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">2.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">2.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">2.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">2.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">2.8.</strong> Complete List of Operators</a></li></ol></li></ol>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -136,17 +136,48 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#using-the-annis-interface" id="using-the-annis-interface"><h1>Using the ANNIS interface</h1></a>
-<p>The ANNIS interface is comprised of several areas, the most important of
-which are the search form on the left side and the results tab on the right side.</p>
-<p><img src="images/annis3_interface.png" alt="Screenshot of the ANNIS user interface" /></p>
+                        <a class="header" href="#result-window" id="result-window"><h1>Result Window</h1></a>
+<p><img src="images/search_bar.png" alt="ANNIS result window toolbar" /></p>
+<p>The result window shows search results in pages of 10 hits each by
+default (this can be changed in the Search Form). The toolbar at the top
+of the window allows you to navigate between these pages. The &quot;Token
+Annotations&quot; button on the toolbar allows you to toggle the token based
+annotations, such as lemmas and parts-of-speech, on or off for you
+convenience. You can use hyperlinks to your queries by copying the
+current browser URL for e-mail or citation purposes, allowing others to
+reproduce your query.</p>
+<p>If your corpus contains multiple alternative text layers or
+segmentations (e.g. normalized and un-normalized text), you may switch
+between these on the fly by using the &quot;base text&quot; menu.</p>
+<p><img src="images/KWIC_narrow.png" alt="KWIC concordance in ANNIS" /></p>
+<p>The result list itself initially shows a KWIC (key word in context)
+concordance of matching positions in the selected corpora, with the
+matching regions marked in color and the context in black on either
+side. Colors in the result match the colors of search expressions in the
+search box (red for the search item #1, purple for #2, etc.).</p>
+<p>Context can be adjusted for individual search results up to the maximum
+allowed for the current corpus. Token annotations are displayed in gray
+under each token, and hovering over them with the mouse will show the
+annotation name and namespace. More complex annotation levels can be
+expanded, if available, by clicking on the plus icon next to the
+level's name, e.g. dependencies and referent information for the
+annotations in the dependency tree and grid views in the picture below.</p>
+<p><img src="images/annotation_levels.png" alt="visualization of different annotation levels" /></p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
+                            <a rel="prev" href="interface-search-form.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
 
+                        
+                            <a rel="next" href="interface-query-builder.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
                         
 
                         <div style="clear: both"></div>
@@ -156,7 +187,15 @@ which are the search form on the left side and the results tab on the right side
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
+                    <a href="interface-search-form.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
 
+                
+                    <a href="interface-query-builder.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
                 
             </nav>
 
