@@ -1,0 +1,293 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Installing an ANNIS Server - ANNIS User Guide</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">var path_to_root = "";</script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = 'light'; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li><a href="installation-kickstarter.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li><a href="installation-server.html" class="active"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li><a href="installation-upgrade-server.html"><strong aria-hidden="true">2.3.</strong> Upgrading an ANNIS Server installation</a></li></ol></li><li><a href="interface.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li></ol></li><li><a href="visualizations.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li><a href="visualizations-list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li><a href="visualizations-context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li><a href="visualizations-documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li><a href="visualizations-rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li><a href="import-and-config.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li><a href="import-and-config-convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li><a href="import-and-config-import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li><a href="import-and-config-corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li><a href="import-and-config-instances.html"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li><a href="import-and-config-user.html"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li><a href="import-and-config-admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li><a href="advanced.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li><a href="advanced-postgresql.html"><strong aria-hidden="true">7.1.</strong> PostgreSQL Server Configuration</a></li><li><a href="advanced-errorcodes.html"><strong aria-hidden="true">7.2.</strong> Error Codes of the administration tools</a></li><li><a href="advanced-custom-login.html"><strong aria-hidden="true">7.3.</strong> Provide your own login-system</a></li><li><a href="advanced-links-to-queries.html"><strong aria-hidden="true">7.4.</strong> Links to queries</a></li><li><a href="advanced-embed-vis.html"><strong aria-hidden="true">7.5.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light <span class="default">(default)</span></button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">ANNIS User Guide</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#installing-an-annis-server" id="installing-an-annis-server"><h1>Installing an ANNIS Server</h1></a>
+<p>The ANNIS server version can be installed on UNIX based servers, or else under
+Windows using <a href="http://www.cygwin.com/">Cygwin</a>, the freely available UNIX emulator. To install the ANNIS server:</p>
+<ol>
+<li>Download and install PostgreSQL 9.4 (or above)
+for your operating system from <a href="http://www.postgresql.org/download/">http://www.postgresql.org/download/</a> and <strong>make a note of the administrator password</strong> you set during the installation. After installation, PostgreSQL may automatically launch the PostgreSQL Stack Builder to download additional components – you can safely skip this step and cancel the Stack Builder if you wish. You may need to restart your OS if the PostgreSQL installer tells you to.</li>
+</ol>
+<p><strong><em>Note:</em></strong> Under Linux, you might have to set the PostgreSQL password manually.
+E.g. on Ubuntu you can achieve this with by running the following commands:</p>
+<pre><code class="language-bash">sudo -u postgres psql
+\password
+\q
+</code></pre>
+<ol start="2">
+<li>Install a Java Servlet Container (&quot;Java web server&quot;) such as Tomcat or Jetty</li>
+<li>Download the ANNIS service distribution file <code>annis-service-&lt;version&gt;- distribution.tar.gz</code> from the website and then unzip the downloaded file:</li>
+</ol>
+<pre><code class="language-bash">tar xzvf annis-service-&lt;version&gt;-distribution.tar.gz -C &lt;installation directory&gt;
+</code></pre>
+<ol start="4">
+<li>Set the environment variables (each time when starting up)</li>
+</ol>
+<pre><code class="language-bash">export ANNIS_HOME=&lt;installation directory&gt;
+
+export PATH=$PATH:$ANNIS_HOME/bin
+</code></pre>
+<ol start="5">
+<li>Next initialize your ANNIS database (only the first time you use the system):</li>
+</ol>
+<pre><code class="language-bash">annis-admin.sh init -u &lt;username&gt; -d &lt;dbname&gt; -p &lt;new user password&gt; -P &lt;postgres superuser password&gt;
+</code></pre>
+<p>You can omit the PostgreSQL administrator password option (<code>-P</code>). Then the
+database and user must already exist. E.g. you should execute the following as
+PostgreSQL administrator:</p>
+<pre><code class="language-sql">CREATE LANGUAGE plpgsql; -- ignore the error if the language is already installed
+CREATE USER myuser PASSWORD 'mypassword';
+CREATE DATABASE mydb OWNER myuser ENCODING 'UTF8';
+</code></pre>
+<p>Now you can import some corpora:</p>
+<pre><code class="language-bash">annis-admin.sh import path/to/corpus1 path/to/corpus2 ...
+</code></pre>
+<p><strong><em>Warning:</em></strong> The above import-command calls other PostgreSQL database commands. If
+you abort the import script with Ctrl+C, these SQL processes will not be
+automatically terminated; instead they might keep hanging and prevent access
+to the database. The same might happen if you close your shell before the
+import script terminates, so you will want to prefix it with the &quot;nohup&quot;-
+command.</p>
+<ol start="6">
+<li>Now you can start the ANNIS service:</li>
+</ol>
+<pre><code class="language-bash">annis-service.sh start
+</code></pre>
+<ol start="7">
+<li>To get the ANNIS front-end running, first download <code>annis-gui-&lt;version&gt;.war</code>
+from our website and deploy it to your Java servlet container (this depends on
+the servlet container you use).</li>
+</ol>
+<p><strong><em>Note:</em></strong> We also strongly recommend reconfiguring the PostgreSQL server’s default
+settings as described <a href="advanced-postgresql.html">here</a>.</p>
+<a class="header" href="#tomcat-utf8-encoding-in-serverxml" id="tomcat-utf8-encoding-in-serverxml"><h2>Tomcat: UTF8 encoding in server.xml</h2></a>
+<p>If using Tomcat make sure the UTF-8 encoding is used for URLs. Some
+installations of Tomcat don't use UTF-8 for the encoding of the URLs and that will
+cause problems when searching for non-ASCII characters. In order to avoid this
+the Connector-configuration needs the property &quot;URIEncoding&quot; set to &quot;UTF-8&quot;
+like in this example (<code>$CATALINA_HOME/server.xml</code>):</p>
+<pre><code class="language-xml">&lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;
+connectionTimeout=&quot;20000&quot;
+URIEncoding=&quot;UTF-8&quot;
+redirectPort=&quot;8443&quot;
+executor=&quot;tomcatThreadPool&quot; /&gt;
+</code></pre>
+<a class="header" href="#install-annis-service-and-web-front-end-on-different-servers" id="install-annis-service-and-web-front-end-on-different-servers"><h2>Install ANNIS Service and Web front-end on different servers</h2></a>
+<p>It is possible to install the service and the front-end on different servers.
+Per-default the ANNIS service is only listening to connections from localhost for security reasons.
+You should use a proxy server if you want to enable access from outside.
+E.g. the Apache configuration could look like this:</p>
+<pre><code class="language-Apache">ProxyPass /annis3-service http://localhost:5711
+&lt;location /annis3-service&gt;
+ SSLRequireSSL
+&lt;/location&gt;
+</code></pre>
+<p>If you your server is <code>example.com</code> this configuration would result in the service URL <code>https://example.com/annis3-service/annis/</code></p>
+<p>The service is responsible for the authentication and authorization (see <a href="import-and-config-user.html">the user configuration</a> for more information), thus the corpora are only accessible by the
+service if the user can provide the appropriate credentials.
+<a href="http://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Authentication</a> is used for transporting the user name and password as clear text over the network.
+<strong>Thus you should always make sure to enforce encrypted SSL (HTTPS) connections for the public accessable service.</strong></p>
+<p>After you made the service available for other servers you have to configure the front-end to use this non-default service URL.
+Change the file <code>WEB-INF/conf/annis-gui.properties</code> and set the <code>AnnisWebService.URL</code> to the right value:</p>
+<pre><code class="language-Ini">AnnisWebService.URL=https://example.com/annis3-service/annis/
+DotPath=dot
+# set to an valid e-mail adress in order to enable the &quot;Report a bug&quot; button
+bug-e-mail=
+</code></pre>
+<p>If you want to secure your service even further you might want to setup a firewall in a way that only the server running the front-end is allowed to access the HTTP(S) port on the server running the backend service.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="installation-kickstarter.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="installation-upgrade-server.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="installation-kickstarter.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="installation-upgrade-server.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
