@@ -47,6 +47,7 @@
             <pubScmUrl>scm:git:ssh://git@github.com/korpling/ANNIS.git</pubScmUrl>
             <scmBranch>gh-pages</scmBranch>
             <content>${project.build.directory}/mdbook/</content>
+            <skipDeletedFiles>true</skipDeletedFiles>
             <ignorePathsToDelete>
               <path>doc</path>
               <path>index.html</path>
