@@ -4,7 +4,7 @@ In corpora containing hierarchical structures, annotations such as
 syntax trees can be searched for by defining terminal or none-terminal
 node annotations, functional dependencies and their values (for
 dependencies see see [Searching for Pointing
-Relations](./pointing.md)). A simple search for
+Relations](aql-pointing.md)). A simple search for
 prepostional phrases in the GUM corpus looks like this:
 ```
 const:cat="PP"

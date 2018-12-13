@@ -6,7 +6,7 @@ This is achieved by a special sub website of ANNIS which has the URL
 ~~~
 <annis-base-url>/embeddedvis/<visualizer-short-name>
 ~~~
-The possible values for the short name are the same as the ones listed in the ["Configuring Visualizations" chapter](../visualizations/index.md) chapter.
+The possible values for the short name are the same as the ones listed in the ["Configuring Visualizations" chapter](visualizations.md) chapter.
 Additional parameters are used to configure how the visualization should be displayed.
 
 ## Parameters
@@ -38,11 +38,11 @@ salt:/pcc2/11299/#tok_1 tiger::pos::salt:/pcc2/11299/#tok_2
 ### embedded_instance
 
 Name of an ANNIS sub-instance that should be used.
-See the ["Multiple Instances of the Interface" chapter](../import-and-config/instances.html) for more information.
+See the ["Multiple Instances of the Interface" chapter](import-and-config-instances.md) for more information.
 
 ### embedded_ns
 
-Namespace which is "triggering" the visualization (see the ["Configuring Visualizations" chapter](../visualizations/index.md))
+Namespace which is "triggering" the visualization (see the ["Configuring Visualizations" chapter](visualizations.md))
 
 ### embedded_base
 

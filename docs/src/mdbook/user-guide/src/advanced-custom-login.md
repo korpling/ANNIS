@@ -1,6 +1,6 @@
 # Provide your own login-system
 
-Per default ANNIS can be used with either no logins at all or with a system where there are users which have a password and can belong to certain groups. The configuration for the default login is system is described [here](user.md).
+Per default ANNIS can be used with either no logins at all or with a system where there are users which have a password and can belong to certain groups. The configuration for the default login is system is described [here](import-and-config-user.md).
 
 This documentation provides the proposed way of using external authentication systems like [Shibboleth](http://shibboleth.net/) or [OpenID](http://openid.net/) with ANNIS. ANNIS is using a REST webservice internally. 
 This webservice is secured with HTTP user/password authentication. When logging into ANNIS via the web frontend, the credentials are

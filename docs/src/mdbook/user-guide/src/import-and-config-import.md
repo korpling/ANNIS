@@ -13,7 +13,7 @@ first corpus must be deleted before a new one with the same name is imported.
 
 
 ## Importing a relANNIS Corpus into an ANNIS Server
-Follow the steps described in the [installation section](../installation/server.md) for importing the demo corpus GUM 
+Follow the steps described in the [installation section](installation-server.md) for importing the demo corpus GUM 
 (can be downloaded from [http://corpus-tools.org/annis/corpora.html](http://corpus-tools.org/annis/corpora.html)).
 
 Multiple corpora can be imported with `annis-admin.sh` by supplying a space-separated

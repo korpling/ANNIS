@@ -40,5 +40,5 @@ more memory, see the next section below).
 7. Once import is complete, press “Launch Annis frontend” test the corpus (click
 on one of the example queries displayed on the screen, or try selecting the
 GUM corpus, typing `pos="NN"` in the AnnisQL box at the top left and clicking
-“Show Result”. See the sections [“Using the ANNIS interface”](../interface/index.md)and [“ANNIS Query Language (AQL)”](../aql/index.md) in this guide for some more example queries, or press the Tutorial button in the
+“Show Result”. See the sections [“Using the ANNIS interface”](interface.md)and [“ANNIS Query Language (AQL)”](aql.md) in this guide for some more example queries, or press the Tutorial button in the
 Help/Examples tab of the interface for more information).
