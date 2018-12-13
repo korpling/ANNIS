@@ -64,7 +64,7 @@ embedded_interface=https://korpling.german.hu-berlin.de/annis3-snapshot/%23_q%3D
 ~~~
 
 the following web page is [shown](https://korpling.german.hu-berlin.de/annis3-snapshot/embeddedvis/grid?embedded_ns=tei&embedded_instance=&embedded_salt=http%3A%2F%2Flocalhost%3A5713%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dtei%3A%3Asic%3A%3Asalt%3A%2FGUM%2FGUM_whow_languages%2F%2523sic_487%26left%3D5%26right%3D5&embedded_interface=https://korpling.german.hu-berlin.de/annis3-snapshot/%23_q%3Dc2lj%26_c%3DR1VN%26cl%3D5%26cr%3D5%26s%3D10%26l%3D10%26m%3D12):
-![Embed example 1](/images/embed_example1.png)
+![Embed example 1](images/embed_example1.png)
 
 The namespace is "tei", the instance is the default one (empty name).
 There is a dynamic URL to the REST web service running at `localhost` (the service must be reachable by the web server, not the client)
@@ -85,4 +85,4 @@ config=dipl
 
 `embedded_salt` refers to the graph function `annis.service.QueryService.graph(...)` and this example uses the configuration from the "scriptorium2" instance.
 The additional parameter `config` is a mapping parameter of the `htmldoc` visualizer.
-![Embed example 2](/images/embed_example2.png)
+![Embed example 2](images/embed_example2.png)
