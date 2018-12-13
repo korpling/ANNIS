@@ -70,7 +70,7 @@ lemma=/(be|have)/
 Finally, negative searches can be used as usual with the exclamation
 point, and regular expressions can generally be used also in edge
 annotations. For example, if we search for trees (see also [Searching
-for Trees](./trees.md)) where a lexical verb dominates another
+for Trees](aql-trees.md)) where a lexical verb dominates another
 token with a dependency edge not containing 'obj', we can use a wildcard
 to rule out all edges labels containing those letters. This will give us
 all non-object dependants of lexical verbs:

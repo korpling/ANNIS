@@ -15,7 +15,7 @@ using the pipe sign ( `|` ):
 "do" | "Do"
 ```
 
-or else you can use [regular expressions](./regex.md), which must
+or else you can use [regular expressions](aql-regex.md), which must
 be surrounded by slashes ( `/` ) instead of quotation marks:
 ```
 /[Dd]o/

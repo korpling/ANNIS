@@ -21,7 +21,7 @@ give them special permissions, and determine which groups can see which corpora.
 
 ![user management](images/web-admin-users.png)
 
-These functions edit the files described in the [User Configuration section](user.md). Note that the user management
-function treats any file in the users/ directory from the [User Configuration section](user.md) as a user entry, and no
+These functions edit the files described in the [User Configuration section](import-and-config-user.md). Note that the user management
+function treats any file in the users/ directory from the [User Configuration section](import-and-config-user.md) as a user entry, and no
 files except for user files may exist in that directory (otherwise the administration
 functions will not load correctly).

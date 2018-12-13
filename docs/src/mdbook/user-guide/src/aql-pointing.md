@@ -67,4 +67,4 @@ type 'dep' (for dependency) between the two, annotated with
 with the arch dependency visualizer, which shows the verb 'shows' and
 its object 'location'.
 
-![](dep_vis.png)
+![](images/dep_vis.png)

@@ -47,12 +47,12 @@ apply to all corpora, otherwise the name of the relevant corpus)
 visualization
 - *element* determines if a node or an edge should carry the relevant annotation
 for triggering the visualization
-- *vis_type* determines the visualizer module used, see the [list of visualizations](list.md) for possible values
+- *vis_type* determines the visualizer module used, see the [list of visualizations](visualizations-list.md) for possible values
 - *display_name* determines the heading that is shown for each visualizer in the interface
 - *order* determines the order in which visualizers are rendered in the interface
 (low to high)
 - *mappings* provides additional parameters for some visualizations: (separate
-multiple values using a semicolon), see the [list of visualizations](list.md) for parameters for a specific visualizer
+multiple values using a semicolon), see the [list of visualizations](visualizations-list.md) for parameters for a specific visualizer
 - *visibility* is optional and can be set to:
     - *hidden* - the default setting: the visualizer is not shown, but can be
 expanded by clicking on its plus symbol.

@@ -1,9 +1,9 @@
 # Upgrading an ANNIS Server installation
 
 These instructions are a guideline for upgrading the installation of ANNIS on a UNIX-like server. 
-If you use the [ANNIS Kickstarter version](kickstarter.md) 
+If you use the [ANNIS Kickstarter version](installation-kickstarter.md) 
 just download the new version and re-initialize the database.
-Please read [the installation instructions](server.md) first if you
+Please read [the installation instructions](installation-server.md) first if you
 haven't done so yet.
 
 

@@ -11,7 +11,7 @@ The behavior of these components can be customized changing their configuration.
 ## Back-end service
 
 There is a configuration folder `conf/` in the installation directory with the main configuration file `annis-service.properties`.
-In addition, there is the `shiro.info` file to change the location of the [user configuration](user.md).
+In addition, there is the `shiro.info` file to change the location of the [user configuration](import-and-config-user.md).
 You should not need to change any of the other files in this directory.
 
 ## Front-end web-application

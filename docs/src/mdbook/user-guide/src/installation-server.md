@@ -54,7 +54,7 @@ from our website and deploy it to your Java servlet container (this depends on
 the servlet container you use).
 
 ***Note:*** We also strongly recommend reconfiguring the PostgreSQL server’s default
-settings as described [here](../advanced/postgresql.md).
+settings as described [here](advanced-postgresql.md).
 
 ## Tomcat: UTF8 encoding in server.xml
 
@@ -86,7 +86,7 @@ ProxyPass /annis3-service http://localhost:5711
 ~~~ 
 If you your server is `example.com` this configuration would result in the service URL `https://example.com/annis3-service/annis/`
 
-The service is responsible for the authentication and authorization (see [the user configuration](../config/user.md) for more information), thus the corpora are only accessible by the 
+The service is responsible for the authentication and authorization (see [the user configuration](import-and-config-user.md) for more information), thus the corpora are only accessible by the 
 service if the user can provide the appropriate credentials.
 [HTTP Basic Authentication](http://en.wikipedia.org/wiki/Basic_access_authentication) is used for transporting the user name and password as clear text over the network.
 **Thus you should always make sure to enforce encrypted SSL (HTTPS) connections for the public accessable service.**

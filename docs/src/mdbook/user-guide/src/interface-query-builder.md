@@ -9,8 +9,7 @@ immediately update the AQL field in the Search Form with your query,
 though updating the query on the Search Form will not create a new graph
 in the Query Builder.
 
-![The Query Builder tab and the Create Node
-button](query_builder_empty.png)
+![The Query Builder tab and the Create Node button](images/query_builder_empty.png)
 
 In each node you create you may click on ![The Add Node button](images/list-add.png) to specify an 
 annotation value. The annotation name can be typed in or selected from a drop down list once a corpus is
@@ -20,7 +19,7 @@ Expressions (the \'\~\' symbol). The annotation value is given on the
 right, and should **NOT** be surrounded by quotations (see the example
 below). It is also possible to specify multiple annotations applying to
 the same position by clicking on ![The Add Node button](images/list-add.png)
-multiple times. Clicking on ![The Clear all nodes button](images/images/edit-clear.png)
+multiple times. Clicking on ![The Clear all nodes button](images/edit-clear.png)
  will delete the values in the node. To search
 for word forms, simply choose \"tok\" as the field name on the left. A
 node with no data entered will match any node, that is an underspecified
