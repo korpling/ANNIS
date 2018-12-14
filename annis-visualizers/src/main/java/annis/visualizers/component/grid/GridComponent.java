@@ -138,7 +138,6 @@ public class GridComponent extends Panel {
         SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
         List<SNode> sortedSegmentationNodes = CommonHelper.getSortedSegmentationNodes(this.segmentationName, graph);
-        
 
         Map<SToken, Integer> token2index = Helper.createToken2IndexMap(graph);
         Preconditions.checkArgument(!token2index.isEmpty(), "Token list must be non-empty");
@@ -207,21 +206,29 @@ public class GridComponent extends Panel {
         // add tokens as row
         Row tokenRow = computeTokenRow(sortedSegmentationNodes, graph, rowsByAnnotation, token2index);
 
+        String tokenRowCaption = "tok";
         if (isHidingToken()) {
+
+            // We have to add the invisible token row avoid issues with the layout
+            // (see https://github.com/korpling/ANNIS/issues/524)
+            // but we don't want the invisible token layer to override an actual "tok"
+            // annotation layer (see https://github.com/korpling/ANNIS/issues/596)
             tokenRow.setStyle("invisible_token");
+            tokenRowCaption = "";
+            grid.setTokRowKey("");
         }
 
         if (isTokenFirst()) {
             // copy original list but add token row at the beginning
             LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<>();
 
-            newList.put("tok", Lists.newArrayList(tokenRow));
+            newList.put(tokenRowCaption, Lists.newArrayList(tokenRow));
             newList.putAll(rowsByAnnotation);
             rowsByAnnotation = newList;
 
         } else {
             // just add the token row to the end of the list
-            rowsByAnnotation.put("tok", Lists.newArrayList(tokenRow));
+            rowsByAnnotation.put(tokenRowCaption, Lists.newArrayList(tokenRow));
         }
 
         EventExtractor.removeEmptySpace(rowsByAnnotation, tokenRow);
@@ -238,25 +245,25 @@ public class GridComponent extends Panel {
             lblEmptyToken.setVisible(tokenRowIsEmpty);
         }
         grid.setRowsByAnnotation(rowsByAnnotation);
-        
+
         return !tokenRowIsEmpty;
     }
-    
+
     private boolean hasSegmentation(SNode node, String segmentation) {
-        if(segmentation == null) {
+        if (segmentation == null) {
             return node instanceof SToken;
         }
-        
-        for(SRelation<?, ?> outRel : node.getOutRelations()) {
-            if(outRel instanceof SOrderRelation) {
-                if(segmentation.equals(outRel.getType())) {
+
+        for (SRelation<?, ?> outRel : node.getOutRelations()) {
+            if (outRel instanceof SOrderRelation) {
+                if (segmentation.equals(outRel.getType())) {
                     return true;
                 }
             }
         }
-        for(SRelation<?, ?> inRel : node.getInRelations()) {
-            if(inRel instanceof SOrderRelation) {
-                if(segmentation.equals(inRel.getType())) {
+        for (SRelation<?, ?> inRel : node.getInRelations()) {
+            if (inRel instanceof SOrderRelation) {
+                if (segmentation.equals(inRel.getType())) {
                     return true;
                 }
             }
@@ -300,21 +307,21 @@ public class GridComponent extends Panel {
             // only add token if text ID matches the valid one
             if (tokenText != null && validTextIDs.contains(tokenText.getId())
                     && hasSegmentation(t, this.segmentationName)) {
-                
+
                 Range<Integer> coveredRange = Helper.getLeftRightSpan(t, graph, token2index);
 
                 String text;
-                if(this.segmentationName == null) {
+                if (this.segmentationName == null) {
                     text = graph.getText(t);
                 } else {
                     SAnnotation anno = t.getAnnotation(this.segmentationName);
-                    if(anno == null) {
+                    if (anno == null) {
                         text = "";
                     } else {
                         text = anno.getValue_STEXT();
                     }
                 }
-                GridEvent event = new GridEvent(t.getId(), coveredRange.lowerEndpoint(), coveredRange.upperEndpoint(), 
+                GridEvent event = new GridEvent(t.getId(), coveredRange.lowerEndpoint(), coveredRange.upperEndpoint(),
                         text);
                 event.setTextID(tokenText.getId());
                 // check if the token is a matched node

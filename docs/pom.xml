@@ -12,7 +12,7 @@
   <artifactId>annis-docs</artifactId>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <site.path>doc-develop</site.path>
+    <site.path>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}-develop</site.path>
     <!-- override in your settings -->
     <siteMainDirectory>${user.home}</siteMainDirectory>
     <scmPubCheckoutDirectory>\${siteMainDirectory}/annis-content-scm</scmPubCheckoutDirectory>
@@ -20,23 +20,6 @@
   <build>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>3.1.0</version>
-          <configuration>
-            <outputDirectory>${project.build.directory}/mdbook-generated</outputDirectory>
-            <resources>
-              <resource>
-                <directory>src/mdbook/</directory>
-                <filtering>true</filtering>
-                <excludes>
-                  <exclude>user-guide/book/</exclude>
-                  <exclude>developer-guide/book/</exclude>
-                </excludes>
-              </resource>
-            </resources>
-          </configuration>
-        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-scm-publish-plugin</artifactId>
@@ -46,10 +29,9 @@
             <pubScmUrl>scm:git:ssh://git@github.com/korpling/ANNIS.git</pubScmUrl>
             <scmBranch>gh-pages</scmBranch>
             <content>${project.build.directory}/mdbook/</content>
+            <skipDeletedFiles>true</skipDeletedFiles>
             <ignorePathsToDelete>
               <path>doc</path>
-              <path>doc-develop</path>
-              <path>doc-snapshot</path>
               <path>index.html</path>
               <path>.gitignore</path>
             </ignorePathsToDelete>
@@ -62,19 +44,35 @@ Original revision is ${buildNumber}.</checkinComment>
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <id>parse-version</id>
+            <goals>
+              <goal>parse-version</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
   <profiles>
     <profile>
       <id>release</id>
       <properties>
-        <site.path>doc</site.path>
+        <!-- set the site.path variable to "major.minor" version -->
+        <site.path>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</site.path>
       </properties>
     </profile>
     <!-- preview releases still push their documentation to doc-develop -->
     <profile>
       <id>preview</id>
       <properties>
-        <site.path>doc-develop</site.path>
+        <site.path>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}-develop</site.path>
       </properties>
     </profile>
     <profile>
@@ -84,13 +82,44 @@ Original revision is ${buildNumber}.</checkinComment>
           <!-- make sure all paths are correct by replacing the properties -->
           <plugin>
             <artifactId>maven-resources-plugin</artifactId>
+            <version>3.1.0</version>
             <executions>
               <execution>
-                <id>copy-resources</id>
+                <id>copy-mdbook-to-generated</id>
                 <phase>generate-sources</phase>
                 <goals>
                   <goal>copy-resources</goal>
                 </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/mdbook-generated</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/mdbook/</directory>
+                      <filtering>true</filtering>
+                      <excludes>
+                        <exclude>user-guide/book/</exclude>
+                        <exclude>developer-guide/book/</exclude>
+                        <exclude>online-help/book/</exclude>
+                      </excludes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-index-html</id>
+                <phase>generate-sources</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/mdbook/${site.path}</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/html</directory>
+                      <filtering>true</filtering>
+                    </resource>
+                  </resources>
+                </configuration>
               </execution>
             </executions>
           </plugin>
@@ -134,7 +163,37 @@ Original revision is ${buildNumber}.</checkinComment>
                   </arguments>
                 </configuration>
               </execution>
+              <execution>
+                <id>compile-online-help</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>mdbook</executable>
+                  <workingDirectory>${project.build.directory}</workingDirectory>
+                  <arguments>
+                    <argument>build</argument>
+                    <argument>-d</argument>
+                    <argument>${project.basedir}/../annis-gui/src/main/webapp/VAADIN/help/</argument>
+                    <argument>mdbook-generated/online-help/</argument>
+                  </arguments>
+                </configuration>
+              </execution>
             </executions>
+          </plugin>
+          <!-- the online help directory should be cleaned as well -->
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>3.1.0</version>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${project.basedir}/../annis-gui/src/main/webapp/VAADIN/help/</directory>
+                  <followSymlinks>false</followSymlinks>
+                </fileset>
+              </filesets>
+            </configuration>
           </plugin>
           <!-- upload the generated documentation to GitHub -->
           <plugin>

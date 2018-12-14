@@ -164,6 +164,13 @@
     
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
+      <artifactId>annis-docs</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+    </dependency>
+
+    <dependency>
+      <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-visualizers</artifactId>
       <version>${project.version}</version>
       <type>jar</type>
