@@ -1,5 +1,6 @@
 # Summary
 
+- [Introduction](README.md)
 - [Using the ANNIS interface](interface.md)
     - [Search Form](./interface-search-form.md)
     - [Result Window](./interface-result-window.md)
