@@ -2,8 +2,8 @@
 
 When searching for word forms and annotation values, it is possible to
 employ wildcards as placeholders for a variety of characters, using
-Regular Expression syntax (see
-[here](http://www.regular-expressions.info/) for detailed information).
+Regular Expression syntax (see e.g.
+[http://www.regular-expressions.info/](http://www.regular-expressions.info/) for detailed information).
 To search for wildcards use slashes instead of quotation marks to
 surround your search term. For example, you can use the **period (`.`)**
 to replace any single character:
