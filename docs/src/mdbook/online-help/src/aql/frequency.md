@@ -1,1 +1,0 @@
-{{#include ../../../user-guide/src/aql/frequency.md}}
