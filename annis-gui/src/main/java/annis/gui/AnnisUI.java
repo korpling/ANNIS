@@ -201,8 +201,9 @@ public class AnnisUI extends CommonUI
     super.addCustomUIPlugins(pluginManager);
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).
       toURI());
-    pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
-      toURI());
+    // TODO: enable flat query builder when problems with fetching all annotation values are resolved
+    // pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
+    //   toURI());
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
