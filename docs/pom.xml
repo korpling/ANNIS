@@ -112,7 +112,7 @@ Original revision is ${buildNumber}.</checkinComment>
                   <goal>copy-resources</goal>
                 </goals>
                 <configuration>
-                  <outputDirectory>${project.build.directory}/mdbook</outputDirectory>
+                  <outputDirectory>${project.build.directory}/mdbook/${site.path}</outputDirectory>
                   <resources>
                     <resource>
                       <directory>src/html</directory>
