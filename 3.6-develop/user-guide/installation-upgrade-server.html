@@ -160,10 +160,9 @@ tail -f nohup.out
 </ol>
 <p>In case the upgrade script needed to update the database (it will tell you so),
 you should delete the old schema from your PostgreSQL database by running the
-following command in your PostgreSQL-Client:
-\code{.sql}
-DROP SCHEMA <oldschema>;
-\endcode</p>
+following command in your PostgreSQL-Client:</p>
+<pre><code class="language-sql">DROP SCHEMA &lt;oldschema&gt;;
+</code></pre>
 <p><strong><em>Note:</em></strong> To learn more about the (additional) parameters of the script run:</p>
 <pre><code class="language-bash">python3 upgrade_service.py --help
 </code></pre>
