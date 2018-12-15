@@ -29,9 +29,9 @@ Therefore a Python script is available for an automatic upgrade. This script nee
 In case the upgrade script needed to update the database (it will tell you so), 
 you should delete the old schema from your PostgreSQL database by running the 
 following command in your PostgreSQL-Client:
-\code{.sql}
+```sql
 DROP SCHEMA <oldschema>;
-\endcode
+```
 
 ***Note:*** To learn more about the (additional) parameters of the script run: 
 ~~~bash
