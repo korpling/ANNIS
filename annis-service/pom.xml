@@ -4,6 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>annis-service</artifactId>
+	<name>annis-service</name>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<annis.userconfig>/etc/annis/user_config/</annis.userconfig>
+		<graphannis.version>0.14.2</graphannis.version>
+	</properties>
 
 	<parent>
 		<artifactId>annis-all</artifactId>
@@ -380,10 +386,4 @@
 		</extensions>
 
 	</build>
-	<name>annis-service</name>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<annis.userconfig>/etc/annis/user_config/</annis.userconfig>
-		<graphannis.version>0.14.1</graphannis.version>
-	</properties>
 </project>
