@@ -26,7 +26,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLType;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -75,10 +74,10 @@ import annis.ServiceConfig;
 import annis.dao.QueryDao;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.exceptions.AnnisException;
-import annis.model.Annotation;
 import annis.security.UserConfig;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.ImportJob;
+import annis.service.objects.QueryLanguage;
 import annis.tabledefs.ANNISFormatVersion;
 import annis.tabledefs.Column;
 import annis.tabledefs.Table;
@@ -779,7 +778,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         log.info("computing statistics for top-level corpus");
 
         // get number of tokens
-        int tokCount = getQueryDao().count("tok", Arrays.asList(toplevelCorpusName));
+        int tokCount = getQueryDao().count("tok", QueryLanguage.AQL, Arrays.asList(toplevelCorpusName));
 
         // get number of documents
         SCorpusGraph corpusGraph = getQueryDao().getCorpusStorageManager().corpusGraph(toplevelCorpusName);

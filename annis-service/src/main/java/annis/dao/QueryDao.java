@@ -43,6 +43,7 @@ import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
+import annis.service.objects.QueryLanguage;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 
@@ -146,13 +147,13 @@ public interface QueryDao {
 
     public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
-    int count(String aql, List<String> corpusList) throws GraphANNISException;
+    int count(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException;
 
-    MatchAndDocumentCount countMatchesAndDocuments(String aql, List<String> corpusList) throws GraphANNISException;
+    MatchAndDocumentCount countMatchesAndDocuments(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException;
 
-    List<Match> find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset) throws GraphANNISException;
+    List<Match> find(String query, QueryLanguage queryLanguage, List<String> corpusList, LimitOffsetQueryData limitOffset) throws GraphANNISException;
 
-    public boolean find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset, final OutputStream out) throws GraphANNISException;
+    public boolean find(String query, QueryLanguage queryLanguage, List<String> corpusList, LimitOffsetQueryData limitOffset, final OutputStream out) throws GraphANNISException;
 
     /**
      * Returns a part of a salt document according the saltIDs, we get with the
@@ -166,7 +167,7 @@ public interface QueryDao {
      */
     SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt) throws GraphANNISException;
 
-    FrequencyTable frequency(String aql, List<String> corpusList, FrequencyTableQuery freqTableQuery) throws GraphANNISException;
+    FrequencyTable frequency(String query, QueryLanguage queryLanguage, List<String> corpusList, FrequencyTableQuery freqTableQuery) throws GraphANNISException;
 
     /**
      * Gets the corpus configuration from all imported corpora.

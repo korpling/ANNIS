@@ -11,12 +11,16 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
                 
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated-sources/annotations"/>
-                
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated-test-sources/test-annotations"/>
+        <dependent-module archiveName="annis-libgui-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-libgui/annis-libgui">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="annis-widgets-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-widgets/annis-widgets">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="annis-interfaces-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-interfaces/annis-interfaces">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="annis-visualizers-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-visualizers/annis-visualizers">
             <dependency-type>uses</dependency-type>
         </dependent-module>
                 

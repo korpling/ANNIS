@@ -14,7 +14,9 @@ All paths for this part of the service start with the "annis/query/" prefix.
 ### Parameters
 
 - `q` - The query in the ANNIS Query Language (AQL)
+- `query-language` - Query language to use. Currently "AQL" and "AQLQuirksV3" are supported as value. The latter one emulates the behavior of the ANNIS 3 version of AQL. Default is "AQL".
 - `corpora` - A comma separated list of corpus names 
+
 
 ### Responses
 
@@ -42,6 +44,7 @@ Produces an XML representation of the total matches and the number of documents 
 ### Parameters
 
 - `q` - The query in the ANNIS Query Language (AQL)
+- `query-language` - Query language to use. Currently "AQL" and "AQLQuirksV3" are supported as value. The latter one emulates the behavior of the ANNIS 3 version of AQL. Default is "AQL".
 - `corpora` - A comma separated list of corpus names 
 - `offset` - Optional offset from where to start the matches. Default is 0. 
 - `limit` - Optional limit of the number of returned matches. Set to -1 if unlimited. Default is -1. 

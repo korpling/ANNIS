@@ -22,19 +22,17 @@ import static org.junit.Assume.assumeTrue;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Incubating;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.QueryLanguage;
 
 
 /**
@@ -210,6 +208,6 @@ public class CountTest {
     }
 
     private int count(String aql, List<String> corpora) throws GraphANNISException {
-        return annisDao.count(aql, corpora);
+        return annisDao.count(aql, QueryLanguage.AQL, corpora);
     }
 }

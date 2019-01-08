@@ -66,7 +66,6 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.corpus_tools.graphannis.CorpusStorageManager;
-import org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage;
 import org.corpus_tools.graphannis.CorpusStorageManager.ResultOrder;
 import org.corpus_tools.graphannis.LogLevel;
 import org.corpus_tools.graphannis.capi.AnnisComponentType;
@@ -117,6 +116,7 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.OrderType;
+import annis.service.objects.QueryLanguage;
 import annis.sqlgen.AnnisAttributeHelper;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
@@ -126,6 +126,7 @@ import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.MetadataCacheHelper;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import net.sf.ehcache.search.Query;
 
 public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
@@ -371,8 +372,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     protected QueryDaoImpl() throws GraphANNISException {
         final File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
-        
-        if(cfg.maxCorpusCacheSize() >= 0) {
+
+        if (cfg.maxCorpusCacheSize() >= 0) {
             // use the specific maximum size, convert frim MB into Bytes
             long maxSize = cfg.maxCorpusCacheSize() * 1024 * 1024;
             this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
@@ -524,19 +525,32 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             return ResultOrder.Normal;
         }
     }
+    
+    public CorpusStorageManager.QueryLanguage convertQueryLanguage(QueryLanguage ql) {
+        switch (ql) {
+        case AQL:
+            return CorpusStorageManager.QueryLanguage.AQL;
+        case AQLQuirksV3:
+            return CorpusStorageManager.QueryLanguage.AQLQuirksV3;
+        default:
+            return CorpusStorageManager.QueryLanguage.AQL;
+        }
+    }
 
     @Override
-    public List<Match> find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset)
-            throws GraphANNISException {
+    public List<Match> find(String query, QueryLanguage queryLanguage, List<String> corpusList,
+            LimitOffsetQueryData limitOffset) throws GraphANNISException {
         List<String> corpora = escapedCorpusNames(corpusList);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
+        
+        final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
 
         ResultOrder ordering = convertOrder(limitOffset.getOrder());
 
         Future<List<Match>> result = exec.submit(() -> {
-            String[] matchesRaw = corpusStorageMgr.find(corpora, aql, limitOffset.getOffset(), limitOffset.getLimit(),
-                    ordering);
+            String[] matchesRaw = corpusStorageMgr.find(corpora, query, limitOffset.getOffset(), limitOffset.getLimit(),
+                    ordering, ql);
 
             ArrayList<Match> data = new ArrayList<>((int) matchesRaw.length);
             for (int i = 0; i < matchesRaw.length; i++) {
@@ -562,17 +576,19 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public boolean find(String aql, List<String> corpusList, LimitOffsetQueryData limitOffset, final OutputStream out)
-            throws GraphANNISException {
+    public boolean find(String query, QueryLanguage queryLanguage, List<String> corpusList,
+            LimitOffsetQueryData limitOffset, final OutputStream out) throws GraphANNISException {
         List<String> corpora = escapedCorpusNames(corpusList);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
+        
+        final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
 
         ResultOrder ordering = convertOrder(limitOffset.getOrder());
 
         Future<Boolean> result = exec.submit(() -> {
-            String[] matchesRaw = corpusStorageMgr.find(corpora, aql, limitOffset.getOffset(), limitOffset.getLimit(),
-                    ordering);
+            String[] matchesRaw = corpusStorageMgr.find(corpora, query, limitOffset.getOffset(), limitOffset.getLimit(),
+                    ordering, ql);
 
             try {
                 PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
@@ -612,9 +628,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public int count(String aql, List<String> corpusList) throws GraphANNISException {
+    public int count(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException {
+        final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
+        
         Future<Integer> result = exec.submit(() -> {
-            return (int) corpusStorageMgr.count(escapedCorpusNames(corpusList), aql);
+            return (int) corpusStorageMgr.count(escapedCorpusNames(corpusList), query, ql);
         });
 
         try {
@@ -634,12 +652,14 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public MatchAndDocumentCount countMatchesAndDocuments(String aql, List<String> corpusList)
-            throws GraphANNISException {
+    public MatchAndDocumentCount countMatchesAndDocuments(String query, QueryLanguage queryLanguage,
+            List<String> corpusList) throws GraphANNISException {
+        
+        final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
 
         Future<MatchAndDocumentCount> result = exec.submit(() -> {
-            CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(escapedCorpusNames(corpusList), aql,
-                    QueryLanguage.AQL);
+            CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(escapedCorpusNames(corpusList), query,
+                    ql);
 
             return new MatchAndDocumentCount((int) data.matchCount, (int) data.documentCount);
         });
@@ -661,17 +681,19 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public FrequencyTable frequency(String aql, List<String> corpusList, FrequencyTableQuery freqQuery)
-            throws GraphANNISException {
-
+    public FrequencyTable frequency(String query, QueryLanguage queryLanguage, List<String> corpusList,
+            FrequencyTableQuery freqQuery) throws GraphANNISException {
+        
+        final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
+        
         FrequencyTable result = new FrequencyTable();
         if (freqQuery.isEmpty()) {
             return result;
         }
 
         for (String corpus : escapedCorpusNames(corpusList)) {
-            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, aql,
-                    freqQuery.toString(), QueryLanguage.AQL);
+            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, query,
+                    freqQuery.toString(), ql);
             if (freqTableForCorpus != null) {
                 for (FrequencyTableEntry<String> e : freqTableForCorpus) {
                     result.addEntry(new FrequencyTable.Entry(e.getTuple(), e.getCount()));

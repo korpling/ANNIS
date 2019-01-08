@@ -57,7 +57,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
-import org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage;
+import org.corpus_tools.graphannis.CorpusStorageManager;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.graphannis.model.NodeDesc;
 import org.corpus_tools.salt.common.SaltProject;
@@ -89,6 +89,7 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.OrderType;
+import annis.service.objects.QueryLanguage;
 import annis.service.objects.RawTextWrapper;
 import annis.service.objects.SegmentationList;
 import annis.service.objects.SubgraphFilter;
@@ -162,8 +163,8 @@ public class QueryService {
     @GET
     @Path("search/count")
     @Produces("application/xml")
-    public Response count(@QueryParam("q") String query, @QueryParam("corpora") String rawCorpusNames)
-            throws GraphANNISException {
+    public Response count(@QueryParam("q") String query, @QueryParam("corpora") String rawCorpusNames,
+            @QueryParam("query-language") @DefaultValue("AQL") QueryLanguage queryLanguage) throws GraphANNISException {
 
         requiredParameter(query, "q", "AnnisQL query");
         requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
@@ -176,7 +177,7 @@ public class QueryService {
 
         List<String> corpusList = findCorporaFromQuery(rawCorpusNames);
         long start = new Date().getTime();
-        MatchAndDocumentCount count = getQueryDao().countMatchesAndDocuments(query, corpusList);
+        MatchAndDocumentCount count = getQueryDao().countMatchesAndDocuments(query, queryLanguage, corpusList);
         long end = new Date().getTime();
 
         logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
@@ -185,6 +186,7 @@ public class QueryService {
     }
 
     private StreamingOutput findRaw(final String rawCorpusNames, final String query,
+            QueryLanguage queryLanguage,
             final LimitOffsetQueryData limitOffset) throws IOException {
         List<String> corpora = findCorporaFromQuery(rawCorpusNames);
         return new StreamingOutput() {
@@ -192,7 +194,7 @@ public class QueryService {
             public void write(OutputStream output) throws IOException, WebApplicationException {
                 long start = new Date().getTime();
                 try {
-                    getQueryDao().find(query, corpora, limitOffset, output);
+                    getQueryDao().find(query, queryLanguage, corpora, limitOffset, output);
                 } catch (GraphANNISException e) {
                     throw new WebApplicationException(e);
                 }
@@ -207,7 +209,7 @@ public class QueryService {
             throws IOException, GraphANNISException {
         List<String> corpora = findCorporaFromQuery(rawCorpusNames);
         long start = new Date().getTime();
-        List<Match> result = getQueryDao().find(query, corpora, limitOffset);
+        List<Match> result = getQueryDao().find(query, QueryLanguage.AQL, corpora, limitOffset);
         long end = new Date().getTime();
         logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
         return result;
@@ -216,8 +218,9 @@ public class QueryService {
     @GET
     @Path("search/find")
     @Produces({ "application/xml", "text/plain" })
-    public Response find(@QueryParam("q") String query, @QueryParam("corpora") String rawCorpusNames,
-            @DefaultValue("0") @QueryParam("offset") String offsetRaw,
+    public Response find(@QueryParam("q") String query,
+            @QueryParam("query-language") @DefaultValue("AQL") QueryLanguage queryLanguage,
+            @QueryParam("corpora") String rawCorpusNames, @DefaultValue("0") @QueryParam("offset") String offsetRaw,
             @DefaultValue("-1") @QueryParam("limit") String limitRaw,
             @DefaultValue("ascending") @QueryParam("order") String orderRaw) throws IOException, GraphANNISException {
         requiredParameter(query, "q", "AnnisQL query");
@@ -255,7 +258,7 @@ public class QueryService {
         String bestMediaTypeMatch = MIMEParse.bestMatch(knownTypes, acceptHeader);
 
         if ("text/plain".equals(bestMediaTypeMatch)) {
-            return Response.ok(findRaw(rawCorpusNames, query, limitOffset), "text/plain").build();
+            return Response.ok(findRaw(rawCorpusNames, query, queryLanguage, limitOffset), "text/plain").build();
         } else {
             List<Match> result = findXml(rawCorpusNames, query, limitOffset);
             return Response.ok().type("application/xml").entity(new GenericEntity<MatchGroup>(new MatchGroup(result)) {
@@ -293,7 +296,7 @@ public class QueryService {
         FrequencyTableQuery freqTableQuery = FrequencyTableQuery.parse(rawFields);
 
         long start = new Date().getTime();
-        FrequencyTable freqTable = getQueryDao().frequency(query, corpusList, freqTableQuery);
+        FrequencyTable freqTable = getQueryDao().frequency(query, QueryLanguage.AQL, corpusList, freqTableQuery);
         long end = new Date().getTime();
         logQuery("FREQUENCY", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
 
@@ -513,8 +516,8 @@ public class QueryService {
 
         boolean fv = Boolean.parseBoolean(fetchValues);
         boolean omfv = Boolean.parseBoolean(onlyMostFrequentValues);
-        
-        if(fv && omfv) {
+
+        if (fv && omfv) {
             return getQueryDao().listAnnotationsFromCache(Arrays.asList(toplevelCorpus));
         } else {
             return getQueryDao().listAnnotations(Arrays.asList(toplevelCorpus), fv, omfv);
@@ -528,11 +531,11 @@ public class QueryService {
 
         Subject user = SecurityUtils.getSubject();
         user.checkPermission("query:annotations:" + toplevelCorpus);
-        
+
         List<AnnisAttribute> cachedAttributes = getQueryDao().listAnnotationsFromCache(Arrays.asList(toplevelCorpus));
         LinkedList<String> segmentations = new LinkedList<>();
-        for(AnnisAttribute att : cachedAttributes) {
-            if(att.getType() == Type.segmentation) {
+        for (AnnisAttribute att : cachedAttributes) {
+            if (att.getType() == Type.segmentation) {
                 segmentations.add(att.getName());
             }
         }
@@ -561,7 +564,8 @@ public class QueryService {
             user.checkPermission("query:parse:" + c);
         }
         Collections.sort(corpusNames);
-        if (getQueryDao().getCorpusStorageManager().validateQuery(corpusNames, query, QueryLanguage.AQL)) {
+        if (getQueryDao().getCorpusStorageManager().validateQuery(corpusNames, query,
+                CorpusStorageManager.QueryLanguage.AQL)) {
             return "ok";
         } else {
             return "error";
@@ -590,7 +594,8 @@ public class QueryService {
         }
         Collections.sort(corpusNames);
 
-        List<NodeDesc> nodes = getQueryDao().getCorpusStorageManager().getNodeDescriptions(query, QueryLanguage.AQL);
+        List<NodeDesc> nodes = getQueryDao().getCorpusStorageManager().getNodeDescriptions(query,
+                CorpusStorageManager.QueryLanguage.AQL);
 
         return Response.ok(new GenericEntity<List<NodeDesc>>(nodes) {
         }).build();
