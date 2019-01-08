@@ -15,7 +15,9 @@
  */
 package annis.gui.exporter;
 
-import annis.CommonHelper;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +34,12 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SFeature;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
@@ -43,24 +50,19 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 
+import annis.CommonHelper;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import annis.model.Annotation;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
+import annis.service.objects.QueryLanguage;
 import annis.service.objects.SubgraphFilter;
-import org.corpus_tools.salt.common.SCorpusGraph;
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SToken;
-import org.corpus_tools.salt.core.SFeature;
 
 public abstract class GeneralTextExporter implements ExporterPlugin, Serializable
 {
@@ -68,7 +70,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   
   
   @Override
-  public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
+  public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc, 
     WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
@@ -131,6 +133,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
       InputStream matchStream = annisResource.path("search/find/")
         .queryParam("q", Helper.encodeJersey(queryAnnisQL))
         .queryParam("corpora", StringUtils.join(corpora, ","))
+        .queryParam("query-language", queryLanguage.name())
         .accept(MediaType.TEXT_PLAIN_TYPE)
         .get(InputStream.class);
       

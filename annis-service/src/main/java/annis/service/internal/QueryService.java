@@ -185,8 +185,7 @@ public class QueryService {
         return Response.ok(count).type(MediaType.APPLICATION_XML_TYPE).build();
     }
 
-    private StreamingOutput findRaw(final String rawCorpusNames, final String query,
-            QueryLanguage queryLanguage,
+    private StreamingOutput findRaw(final String rawCorpusNames, final String query, QueryLanguage queryLanguage,
             final LimitOffsetQueryData limitOffset) throws IOException {
         List<String> corpora = findCorporaFromQuery(rawCorpusNames);
         return new StreamingOutput() {
@@ -281,6 +280,7 @@ public class QueryService {
     @Path("search/frequency")
     @Produces("application/xml")
     public FrequencyTable frequency(@QueryParam("q") String query, @QueryParam("corpora") String rawCorpusNames,
+            @QueryParam("query-language") @DefaultValue("AQL") QueryLanguage queryLanguage,
             @QueryParam("fields") String rawFields) throws GraphANNISException {
         requiredParameter(query, "q", "AnnisQL query");
         requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
@@ -296,7 +296,7 @@ public class QueryService {
         FrequencyTableQuery freqTableQuery = FrequencyTableQuery.parse(rawFields);
 
         long start = new Date().getTime();
-        FrequencyTable freqTable = getQueryDao().frequency(query, QueryLanguage.AQL, corpusList, freqTableQuery);
+        FrequencyTable freqTable = getQueryDao().frequency(query, queryLanguage, corpusList, freqTableQuery);
         long end = new Date().getTime();
         logQuery("FREQUENCY", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
 

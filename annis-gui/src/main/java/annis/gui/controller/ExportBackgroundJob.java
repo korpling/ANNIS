@@ -75,7 +75,7 @@ public class ExportBackgroundJob implements Callable<File>
     try (final OutputStreamWriter outWriter = new OutputStreamWriter(new FileOutputStream(currentTmpFile),
       "UTF-8"))
     {
-      exportError = exporter.convertText(query.getQuery(), query.getLeftContext(),
+      exportError = exporter.convertText(query.getQuery(), query.getQueryLanguage(), query.getLeftContext(),
         query.getRightContext(), query.getCorpora(), query.getAnnotationKeys(),
         query.getParameters(), query.getAlignmc(), Helper.getAnnisWebResource().path("query"),
         outWriter, eventBus, corpusConfigs);

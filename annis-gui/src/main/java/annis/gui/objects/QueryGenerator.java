@@ -71,6 +71,13 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
   }
   
   
+  public QG queryLanguage(QueryLanguage queryLanguage)
+  {
+    current.setQueryLanguage(queryLanguage);;
+    return (QG) this;
+  }
+  
+  
   protected T getCurrent()
   {
     return current;
@@ -125,12 +132,6 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     public QG order(OrderType order)
     {
       getCurrent().setOrder(order);
-      return (QG) this;
-    }
-    
-    public QG queryLanguage(QueryLanguage queryLanguage)
-    {
-      getCurrent().setQueryLanguage(queryLanguage);
       return (QG) this;
     }
     

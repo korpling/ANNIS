@@ -32,7 +32,6 @@ public class PagedResultQuery extends ContextualizedQuery {
     private long offset;
     private int limit;
     private OrderType order = OrderType.ascending;
-    private QueryLanguage queryLanguage = QueryLanguage.AQL;
 
     public PagedResultQuery() {
 
@@ -75,14 +74,6 @@ public class PagedResultQuery extends ContextualizedQuery {
         this.order = order;
     }
 
-    public QueryLanguage getQueryLanguage() {
-        return queryLanguage;
-    }
-    
-    public void setQueryLanguage(QueryLanguage queryLanguage) {
-        Preconditions.checkNotNull(queryLanguage, "The query language of a paged result query must never be null.");
-        this.queryLanguage = queryLanguage;
-    }
 
     @Override
     public int hashCode() {

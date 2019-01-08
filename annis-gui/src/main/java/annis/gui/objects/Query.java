@@ -21,6 +21,10 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.google.common.base.Preconditions;
+
+import annis.service.objects.QueryLanguage;
+
 /**
  * A POJO representing a query.
  * 
@@ -33,6 +37,8 @@ public class Query implements Serializable, Cloneable
 {
   private String query;
   private Set<String> corpora;
+  private QueryLanguage queryLanguage = QueryLanguage.AQL;
+  
 
   public Query()
   {
@@ -66,11 +72,20 @@ public class Query implements Serializable, Cloneable
   {
     this.corpora = corpora == null ? new LinkedHashSet<String>() : corpora;
   }
+  
+  public QueryLanguage getQueryLanguage() {
+      return queryLanguage;
+  }
+  
+  public void setQueryLanguage(QueryLanguage queryLanguage) {
+      Preconditions.checkNotNull(queryLanguage, "The query language of a paged result query must never be null.");
+      this.queryLanguage = queryLanguage;
+  }
 
   @Override
   public int hashCode()
   {
-    return Objects.hash(corpora, query);
+    return Objects.hash(corpora, query, queryLanguage);
   }
 
   
@@ -88,7 +103,8 @@ public class Query implements Serializable, Cloneable
     final Query other = (Query) obj;
     
     return Objects.equals(this.query, other.query)
-      && Objects.equals(this.corpora, other.corpora);
+      && Objects.equals(this.corpora, other.corpora)
+      && Objects.equals(this.queryLanguage, other.queryLanguage);
   }
 
   @Override

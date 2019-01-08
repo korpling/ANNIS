@@ -60,6 +60,7 @@ import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
+import annis.service.objects.QueryLanguage;
 import annis.service.objects.SubgraphFilter;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
@@ -82,7 +83,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   @Override
-  public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
+  public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc,
     WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
   {
@@ -154,6 +155,7 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
       InputStream matchStream = annisResource.path("search/find/")
         .queryParam("q", Helper.encodeJersey(queryAnnisQL))
         .queryParam("corpora", StringUtils.join(corpora, ","))
+        .queryParam("query-language", queryLanguage.name())
         .accept(MediaType.TEXT_PLAIN_TYPE)
         .get(InputStream.class);
       

@@ -337,6 +337,7 @@ public class QueryController implements Serializable
     return QueryGenerator.displayed()
       .query(state.getAql().getValue())
       .corpora(state.getSelectedCorpora().getValue())
+      .queryLanguage(state.getQueryLanguage().getValue())
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
       .segmentation(state.getContextSegmentation().getValue())
@@ -344,7 +345,6 @@ public class QueryController implements Serializable
       .limit(state.getLimit().getValue())
       .offset(state.getOffset().getValue())
       .order(state.getOrder().getValue())
-      .queryLanguage(state.getQueryLanguage().getValue())
       .selectedMatches(state.getSelectedMatches().getValue())
       .build();
   }
@@ -359,6 +359,7 @@ public class QueryController implements Serializable
     return QueryGenerator.export()
       .query(state.getAql().getValue())
       .corpora(state.getSelectedCorpora().getValue())
+      .queryLanguage(state.getQueryLanguage().getValue())
       .left(state.getLeftContext().getValue())
       .right(state.getRightContext().getValue())
       .segmentation(state.getVisibleBaseText().getValue())
@@ -573,6 +574,7 @@ public class QueryController implements Serializable
     FrequencyQuery query = QueryGenerator
       .frequency().query(state.getAql().getValue())
       .corpora(state.getSelectedCorpora().getValue())
+      .queryLanguage(state.getQueryLanguage().getValue())
       .def(freqDefinition).build();
 
     addHistoryEntry(query);
