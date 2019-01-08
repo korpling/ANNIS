@@ -530,7 +530,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         switch (ql) {
         case AQL:
             return CorpusStorageManager.QueryLanguage.AQL;
-        case AQLQuirksV3:
+        case AQL_QUIRKS_V3:
             return CorpusStorageManager.QueryLanguage.AQLQuirksV3;
         default:
             return CorpusStorageManager.QueryLanguage.AQL;

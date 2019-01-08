@@ -1,5 +1,5 @@
 package annis.service.objects;
 
 public enum QueryLanguage {
-    AQL, AQLQuirksV3
+    AQL, AQL_QUIRKS_V3
 }

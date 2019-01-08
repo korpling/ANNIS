@@ -297,6 +297,7 @@ public class QueryController implements Serializable
   {
     // only change the values if actually changed (the value change listeners should not be triggered if not necessary)
     setIfNew(state.getAql(), q.getQuery());
+    setIfNew(state.getQueryLanguage(), q.getQueryLanguage());
     setIfNew(state.getSelectedCorpora(), q.getCorpora());
    
     if (q instanceof ContextualizedQuery)

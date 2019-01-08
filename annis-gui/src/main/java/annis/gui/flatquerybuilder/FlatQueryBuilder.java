@@ -48,6 +48,7 @@ import annis.gui.QueryController;
 import annis.gui.objects.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.QueryLanguage;
 
 /*
  * @author martin klotz (martin.klotz@hu-berlin.de)
@@ -500,7 +501,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
   public void updateQuery()
   {
     try{
-      cp.setQuery(new Query(getAQLQuery(), cp.getState().getSelectedCorpora().getValue()));
+      cp.setQuery(new Query(getAQLQuery(), QueryLanguage.AQL,  cp.getState().getSelectedCorpora().getValue()));
     } catch (java.lang.NullPointerException ex) {
       Notification.show(INCOMPLETE_QUERY_WARNING);      
     }

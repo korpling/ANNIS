@@ -88,6 +88,7 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.OrderType;
+import annis.service.objects.QueryLanguage;
 import annis.service.objects.RawTextWrapper;
 import elemental.json.JsonValue;
 import org.corpus_tools.salt.SALT_TYPE;
@@ -133,8 +134,10 @@ public class Helper {
     /**
      * Creates an authenticated REST client
      *
-     * @param userName user name to authenticate with
-     * @param password password to authenticate with
+     * @param userName
+     *                     user name to authenticate with
+     * @param password
+     *                     password to authenticate with
      * @return A newly created client.
      */
     public static Client createRESTClient(String userName, String password) {
@@ -327,12 +330,13 @@ public class Helper {
         return "";
     }
 
-    public static List<String> citationFragment(String aql, Set<String> corpora, int contextLeft, int contextRight,
-            String segmentation, String visibleBaseText, long start, int limit, OrderType order,
-            Set<Long> selectedMatches) {
+    public static List<String> citationFragment(String aql, QueryLanguage queryLanguage, Set<String> corpora,
+            int contextLeft, int contextRight, String segmentation, String visibleBaseText, long start, int limit,
+            OrderType order, Set<Long> selectedMatches) {
         List<String> result = new ArrayList<>();
         try {
             result.add("_q=" + encodeBase64URL(aql));
+            result.add("ql=" + URLEncoder.encode(queryLanguage.name().toLowerCase(), "UTF-8"));
             result.add("_c=" + encodeBase64URL(StringUtils.join(corpora, ",")));
             result.add("cl=" + URLEncoder.encode("" + contextLeft, "UTF-8"));
             result.add("cr=" + URLEncoder.encode("" + contextRight, "UTF-8"));
@@ -358,14 +362,14 @@ public class Helper {
         return result;
     }
 
-    public static URI generateCitation(String aql, Set<String> corpora, int contextLeft, int contextRight,
-            String segmentation, String visibleBaseText, long start, int limit, OrderType order,
+    public static URI generateCitation(String aql, QueryLanguage queryLanguage, Set<String> corpora, int contextLeft,
+            int contextRight, String segmentation, String visibleBaseText, long start, int limit, OrderType order,
             Set<Long> selectedMatches) {
         try {
             URI appURI = UI.getCurrent().getPage().getLocation();
 
             return new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), appURI.getPath(), null,
-                    StringUtils.join(citationFragment(aql, corpora, contextLeft, contextRight, segmentation,
+                    StringUtils.join(citationFragment(aql, queryLanguage, corpora, contextLeft, contextRight, segmentation,
                             visibleBaseText, start, limit, order, selectedMatches), "&"));
         } catch (URISyntaxException ex) {
             log.error(null, ex);
@@ -608,7 +612,8 @@ public class Helper {
      *
      * Fragments have the form key1=value&key2=test ...
      *
-     * @param fragment fragment to parse
+     * @param fragment
+     *                     fragment to parse
      * @return a map with the keys and values of the fragment
      */
     public static Map<String, String> parseFragment(String fragment) {
@@ -644,7 +649,8 @@ public class Helper {
      * Returns a formatted string containing the type of the exception, the message
      * and the stacktrace.
      *
-     * @param ex Exception
+     * @param ex
+     *               Exception
      * @return message
      */
     public static String convertExceptionToMessage(Throwable ex) {
@@ -684,7 +690,8 @@ public class Helper {
     /**
      * Get the qualified name separated by a single ":" when a namespace exists.
      *
-     * @param anno annotation
+     * @param anno
+     *                 annotation
      * @return qualified name
      */
     public static String getQualifiedName(SAnnotation anno) {
@@ -713,7 +720,8 @@ public class Helper {
      * "{...}") and the percent character. Both would not be esccaped by jersey
      * and/or would cause an error when this is not a valid template.
      *
-     * @param v the value
+     * @param v
+     *              the value
      * @return encoded value
      */
     public static String encodeJersey(String v) {
@@ -724,7 +732,8 @@ public class Helper {
     /**
      * Encodes a String so it can be used as path parameter.
      *
-     * @param v value
+     * @param v
+     *              value
      * @return encoded value
      */
     public static String encodePath(String v) {
@@ -735,7 +744,8 @@ public class Helper {
     /**
      * Encodes a String so it can be used as query parameter.
      *
-     * @param v value
+     * @param v
+     *              value
      * @return encoded value
      */
     public static String encodeQueryParam(String v) {
@@ -744,7 +754,8 @@ public class Helper {
     }
 
     /**
-     * Casts a list of Annotations to the Type <code>{@literal List<Annotation>}</code>
+     * Casts a list of Annotations to the Type
+     * <code>{@literal List<Annotation>}</code>
      */
     public static class AnnotationListType extends GenericType<List<Annotation>> {
 
@@ -805,7 +816,8 @@ public class Helper {
         final Map<SToken, Integer> token2index = Helper.createToken2IndexMap(doc.getDocumentGraph());
 
         // calculate covered nodes
-        CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(doc.getDocumentGraph(), initialCovered, token2index);
+        CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(doc.getDocumentGraph(), initialCovered,
+                token2index);
         Map<SNode, Long> covered = cmc.getMatchedAndCovered();
 
         if (segmentationName != null) {
@@ -820,14 +832,14 @@ public class Helper {
 
             for (SNode segNode : segNodes) {
                 if (!covered.containsKey(segNode)) {
-                    
+
                     Range<Integer> segRange = Helper.getLeftRightSpan(segNode, doc.getDocumentGraph(), token2index);
                     int leftTok = segRange.lowerEndpoint();
                     int rightTok = segRange.upperEndpoint();
 
                     // check for each covered token if this segment is covering it
                     for (Map.Entry<SToken, Long> e : coveredToken.entrySet()) {
-                        Range<Integer> tokRange = Helper.getLeftRightSpan(e.getKey(), doc.getDocumentGraph(), 
+                        Range<Integer> tokRange = Helper.getLeftRightSpan(e.getKey(), doc.getDocumentGraph(),
                                 token2index);
                         long entryTokenIndex = tokRange.lowerEndpoint();
                         if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok) {
@@ -899,7 +911,8 @@ public class Helper {
             }
         };
 
-        public CoveredMatchesCalculator(SDocumentGraph graph, Map<SNode, Long> initialMatches, Map<SToken, Integer> token2index) {
+        public CoveredMatchesCalculator(SDocumentGraph graph, Map<SNode, Long> initialMatches,
+                Map<SToken, Integer> token2index) {
             this.graph = graph;
             this.matchedAndCovered = initialMatches;
             this.token2index = token2index;
@@ -918,9 +931,8 @@ public class Helper {
         }
 
         @Override
-        public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode, 
-                @SuppressWarnings("rawtypes") SRelation edge,
-                SNode fromNode, long order) {
+        public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
+                @SuppressWarnings("rawtypes") SRelation edge, SNode fromNode, long order) {
             if (fromNode != null && matchedAndCovered.containsKey(fromNode) && currNode != null) {
                 long currentMatchPos = matchedAndCovered.get(fromNode);
 

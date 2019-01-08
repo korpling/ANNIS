@@ -53,6 +53,7 @@ import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.QueryLanguage;
 
 /**
  *
@@ -358,7 +359,7 @@ public class CorpusBrowserPanel extends Panel {
                 corpusNameSet.add(corpus.getName());
             }
             if (controller != null && cbe != null) {
-                controller.setQuery(new Query(cbe.getExample(), corpusNameSet));
+                controller.setQuery(new Query(cbe.getExample(), QueryLanguage.AQL,  corpusNameSet));
             }
         }
     }

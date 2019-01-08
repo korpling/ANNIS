@@ -45,11 +45,12 @@ public class Query implements Serializable, Cloneable
     corpora = new HashSet<>();
   }
 
-  public Query(String query,
+  public Query(String query, QueryLanguage queryLanguage,
     Set<String> corpora)
   {
     this.query = query == null ? "" : query;
     this.corpora = corpora == null ?  new LinkedHashSet<String>() : corpora;
+    this.queryLanguage = queryLanguage;
   }
 
   
