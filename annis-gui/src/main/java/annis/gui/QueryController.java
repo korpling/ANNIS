@@ -344,6 +344,7 @@ public class QueryController implements Serializable
       .limit(state.getLimit().getValue())
       .offset(state.getOffset().getValue())
       .order(state.getOrder().getValue())
+      .queryLanguage(state.getQueryLanguage().getValue())
       .selectedMatches(state.getSelectedMatches().getValue())
       .build();
   }
@@ -479,7 +480,8 @@ public class QueryController implements Serializable
     AsyncWebResource countRes = res.path("query").path("search").
       path("count").
       queryParam("q", Helper.encodeJersey(displayedQuery.getQuery()))
-      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")));
+      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")))
+      .queryParam("query-language", displayedQuery.getQueryLanguage().name());
     Future<MatchAndDocumentCount> futureCount = countRes.get(
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);

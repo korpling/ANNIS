@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.OrderType;
+import annis.service.objects.QueryLanguage;
 
 /**
  * Helper class to construct new {@link Query} objects (or one of the child classes)
@@ -126,6 +127,13 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
       getCurrent().setOrder(order);
       return (QG) this;
     }
+    
+    public QG queryLanguage(QueryLanguage queryLanguage)
+    {
+      getCurrent().setQueryLanguage(queryLanguage);
+      return (QG) this;
+    }
+    
   }
   
   public static class DisplayedResultQueryGenerator

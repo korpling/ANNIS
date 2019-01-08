@@ -80,6 +80,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       .queryParam("limit", "" + query.getLimit())
       .queryParam("corpora", Helper.encodeJersey(StringUtils.join(query.getCorpora(), ",")))
       .queryParam("order", query.getOrder().toString())
+      .queryParam("query-language", query.getQueryLanguage().name())
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(MatchGroup.class);
 

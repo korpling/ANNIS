@@ -21,97 +21,90 @@ import java.util.Set;
 import com.google.common.base.Preconditions;
 
 import annis.service.objects.OrderType;
+import annis.service.objects.QueryLanguage;
 
 /**
  * Parameters for a query that shows the result to the user
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class PagedResultQuery extends ContextualizedQuery
-{  
-  private long offset;
-  private int limit;
-  private OrderType order = OrderType.ascending;
-  
+public class PagedResultQuery extends ContextualizedQuery {
+    private long offset;
+    private int limit;
+    private OrderType order = OrderType.ascending;
+    private QueryLanguage queryLanguage = QueryLanguage.AQL;
 
-  public PagedResultQuery()
-  {
-    
-  }
+    public PagedResultQuery() {
 
-  public PagedResultQuery(int contextLeft, int contextRight, long offset,
-    int limit, String segmentation, String query,
-    Set<String> corpora)
-  {
-    super.setLeftContext(contextLeft);
-    super.setRightContext(contextRight);
-    super.setSegmentation(segmentation);
-    super.setQuery(query);
-    super.setCorpora(corpora);
-    
-    this.offset = offset;
-    this.limit = limit;
-  }
-
-  public long getOffset()
-  {
-    return offset;
-  }
-
-  public void setOffset(long offset)
-  {
-    this.offset = offset;
-  }
-
-  public int getLimit()
-  {
-    return limit;
-  }
-
-  public void setLimit(int limit)
-  {
-    this.limit = limit;
-  }
-
-  public OrderType getOrder()
-  {
-    return order;
-  }
-
-  public void setOrder(OrderType order)
-  {
-    Preconditions.checkNotNull(order, "The order of a paged result query must never be null.");
-    this.order = order;
-  }
-  
-  @Override
-  public int hashCode()
-  {
-    return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(), 
-      getLimit(), getOffset(), getOrder());
-  }
-
-  @Override
-  public boolean equals(Object obj)
-  {
-    if (obj == null)
-    {
-      return false;
     }
-    if (getClass() != obj.getClass())
-    {
-      return false;
+
+    public PagedResultQuery(int contextLeft, int contextRight, long offset, int limit, String segmentation,
+            String query, Set<String> corpora) {
+        super.setLeftContext(contextLeft);
+        super.setRightContext(contextRight);
+        super.setSegmentation(segmentation);
+        super.setQuery(query);
+        super.setCorpora(corpora);
+
+        this.offset = offset;
+        this.limit = limit;
     }
-    final PagedResultQuery other = (PagedResultQuery) obj;
-    return
-      Objects.equals(getQuery(), other.getQuery())
-      && Objects.equals(getCorpora(), other.getCorpora())
-      && Objects.equals(getLeftContext(), other.getLeftContext())
-      && Objects.equals(getRightContext(), other.getRightContext())
-      && Objects.equals(getSegmentation(), other.getSegmentation())
-      && Objects.equals(getLimit(), other.getLimit())
-      && Objects.equals(getOffset(), other.getOffset())
-      && Objects.equals(getOrder(), other.getOrder());
-  }
-  
+
+    public long getOffset() {
+        return offset;
+    }
+
+    public void setOffset(long offset) {
+        this.offset = offset;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public OrderType getOrder() {
+        return order;
+    }
+
+    public void setOrder(OrderType order) {
+        Preconditions.checkNotNull(order, "The order of a paged result query must never be null.");
+        this.order = order;
+    }
+
+    public QueryLanguage getQueryLanguage() {
+        return queryLanguage;
+    }
+    
+    public void setQueryLanguage(QueryLanguage queryLanguage) {
+        Preconditions.checkNotNull(queryLanguage, "The query language of a paged result query must never be null.");
+        this.queryLanguage = queryLanguage;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(),
+                getLimit(), getOffset(), getOrder());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final PagedResultQuery other = (PagedResultQuery) obj;
+        return Objects.equals(getQuery(), other.getQuery()) && Objects.equals(getCorpora(), other.getCorpora())
+                && Objects.equals(getLeftContext(), other.getLeftContext())
+                && Objects.equals(getRightContext(), other.getRightContext())
+                && Objects.equals(getSegmentation(), other.getSegmentation())
+                && Objects.equals(getLimit(), other.getLimit()) && Objects.equals(getOffset(), other.getOffset())
+                && Objects.equals(getOrder(), other.getOrder());
+    }
+
 }
