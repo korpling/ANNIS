@@ -18,7 +18,6 @@ package annis.visualizers.component.gridtree;
 import static annis.CommonHelper.getSpannedText;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,6 +28,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
@@ -38,6 +38,7 @@ import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 
+import com.google.common.collect.Range;
 import com.vaadin.ui.Panel;
 
 import annis.gui.widgets.grid.AnnotationGrid;
@@ -47,7 +48,6 @@ import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.RelannisNodeFeature;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -83,8 +83,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
     }
 
     @Override
-    public Panel createComponent(VisualizerInput visInput,
-            VisualizationToggle visToggle) {
+    public Panel createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
         return new GridTreePanel(visInput, visToggle);
     }
 
@@ -117,47 +116,43 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             List<SNode> roots = graph.getRoots();
 
             /**
-             * This abstract representation is used by the AnnotationGrid for
-             * creating the html table at the end. The should be sorted by the
-             * row height, which is represented as the a string value of the row
-             * integer. The would only work up to 10 rows.
+             * This abstract representation is used by the AnnotationGrid for creating the
+             * html table at the end. The should be sorted by the row height, which is
+             * represented as the a string value of the row integer. The would only work up
+             * to 10 rows.
              */
             final Map<String, ArrayList<Row>> table = new TreeMap<String, ArrayList<Row>>();
 
+            final Map<SToken, Integer> token2index = Helper.createToken2IndexMap(graph);
+
             /**
-             * Get a list of sorted token for retrieving the token index of the
-             * most left token and fetch the token index of the first token, so
-             * we have can calculate the offset of each token index. Also the
-             * token index of the last token is fetched.
+             * Get a list of sorted token for retrieving the token index of the most left
+             * token and fetch the token index of the first token, so we have can calculate
+             * the offset of each token index. Also the token index of the last token is
+             * fetched.
              */
             List<SToken> sortedToken = graph.getSortedTokenByText();
             int startIdx = -1;
             int endIdx = -1;
 
             if (sortedToken != null && sortedToken.get(0) != null) {
-                RelannisNodeFeature f = (RelannisNodeFeature) sortedToken.get(0).
-                        getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-                startIdx = (int) f.getTokenIndex();
-
-                f = (RelannisNodeFeature) sortedToken.get(sortedToken.size() - 1).
-                        getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-                endIdx = (int) f.getTokenIndex();
+                startIdx = token2index.get(sortedToken.get(0));
+                endIdx = token2index.get(sortedToken.get(sortedToken.size() - 1));
             }
 
             // init the traversal
-            GraphTraverseHandler traverse = new Traverse(startIdx, endIdx,
-                    getNodeKey(), input.getNamespace(), table);
+            GraphTraverseHandler traverse = new Traverse(startIdx, endIdx, getNodeKey(), input.getNamespace(), table,
+                    token2index );
 
             // TODO build the grid tree above the token/annotation level
-            graph.traverse(roots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-                    "gridtree", traverse);
+            graph.traverse(roots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "gridtree", traverse);
 
             // add the last row, TODO extend to arbitrary nodes not only token level
-            ArrayList<Row> baseRows = createBaseRows();
+            ArrayList<Row> baseRows = createBaseRows(token2index);
 
             /**
-             * Add the last row. For placing it to the bottom of the table, we
-             * need to get the string representation of the last index.
+             * Add the last row. For placing it to the bottom of the table, we need to get
+             * the string representation of the last index.
              */
             table.put(getTokKey(), baseRows);
 
@@ -178,13 +173,14 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         /**
          * Sets the covered ids for gridtree spans.
          *
-         * @param baseRowIdx the index of the row from which the salt ids are
-         * extracted. Most of the time the index would be "tok".
-         * @param table abstract representation of the table which is rendered
-         * by {@link AnnotationGrid}
+         * @param baseRowIdx
+         *                       the index of the row from which the salt ids are
+         *                       extracted. Most of the time the index would be "tok".
+         * @param table
+         *                       abstract representation of the table which is rendered
+         *                       by {@link AnnotationGrid}
          */
-        private void addCoveredIDs(String baseRowIdx,
-                Map<String, ArrayList<Row>> table) {
+        private void addCoveredIDs(String baseRowIdx, Map<String, ArrayList<Row>> table) {
 
             if (!table.containsKey(baseRowIdx)) {
                 throw new IllegalArgumentException("table index does not exist");
@@ -208,8 +204,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
                     int rightIdx = event.getRight();
 
                     for (GridEvent baseEvent : baseRow.getEvents()) {
-                        if (leftIdx <= baseEvent.getLeft()
-                                && baseEvent.getRight() <= rightIdx) {
+                        if (leftIdx <= baseEvent.getLeft() && baseEvent.getRight() <= rightIdx) {
                             event.getCoveredIDs().add(baseEvent.getId());
                         }
                     }
@@ -238,7 +233,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             return false;
         }
 
-        private ArrayList<Row> createBaseRows() {
+        private ArrayList<Row> createBaseRows(Map<SToken, Integer> token2index) {
             ArrayList<Row> baseRows = new ArrayList<Row>();
             Row baseRow = new Row();
             baseRows.add(baseRow);
@@ -246,27 +241,20 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             if (getTokKey().equals("tok")) {
 
                 for (SToken t : graph.getSortedTokenByText()) {
-                    RelannisNodeFeature f = (RelannisNodeFeature) t.getFeature(
-                            ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-
-                    int idx = (int) f.getTokenIndex();
-                    baseRow.
-                            addEvent(new GridEvent(t.getId(), idx, idx, getSpannedText(t)));
+                    int idx = token2index.get(t);
+                    baseRow.addEvent(new GridEvent(t.getId(), idx, idx, getSpannedText(t)));
                 }
             } else {
 
                 List<SSpan> sSpans = graph.getSpans();
                 if (sSpans != null) {
-                    for (SNode n : sSpans) {
+                    for (SSpan n : sSpans) {
                         if (hasAnno(n)) {
-                            RelannisNodeFeature f = (RelannisNodeFeature) n.getFeature(
-                                    ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+                            Range<Integer> overlappedSpan = Helper.getLeftRightSpan(n, n.getGraph(), token2index);
+                            int leftIdx = overlappedSpan.lowerEndpoint();
+                            int rightIdx = overlappedSpan.upperEndpoint();
 
-                            int leftIdx = (int) f.getLeftToken();
-                            int rightIdx = (int) f.getRightToken();
-                            baseRow.
-                                    addEvent(new GridEvent(n.getId(), leftIdx, rightIdx,
-                                    getAnnoText(n)));
+                            baseRow.addEvent(new GridEvent(n.getId(), leftIdx, rightIdx, getAnnoText(n)));
                         }
                     }
                 }
@@ -293,9 +281,9 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
     private static class Traverse implements GraphTraverseHandler {
 
         /**
-         * Tracks the depth of the traversal. Steps are counted, when the node
-         * containes the defined annotation key. This value is later used for
-         * the row index in the {@link AnnotationGrid}.
+         * Tracks the depth of the traversal. Steps are counted, when the node containes
+         * the defined annotation key. This value is later used for the row index in the
+         * {@link AnnotationGrid}.
          */
         int depth = 0;
         // the token index of the last token
@@ -307,33 +295,40 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         Map<String, ArrayList<Row>> table;
         // tracks all nodes which was visited.
         Set<SNode> visited = new HashSet<SNode>();
+        final Map<SToken, Integer> token2index;
 
         /**
          * Init a traverse handler for building a tree of topological fields.
          *
-         * @param startIdx the most left token index
-         * @param endIdx the most right index
-         * @param nodeKey the annotation key. Only nodes which contain this key
-         * will be taken into account
-         * @param namespace the namespace which triggered this visualization
-         * @param table the abstract representation of the table
+         * @param startIdx
+         *                      the most left token index
+         * @param endIdx
+         *                      the most right index
+         * @param nodeKey
+         *                      the annotation key. Only nodes which contain this key
+         *                      will be taken into account
+         * @param namespace
+         *                      the namespace which triggered this visualization
+         * @param table
+         *                      the abstract representation of the table
          */
-        private Traverse(int startIdx, int endIdx, String nodeKey, String namespace,
-                Map<String, ArrayList<Row>> table) {
+        private Traverse(int startIdx, int endIdx, String nodeKey, String namespace, Map<String, ArrayList<Row>> table,
+                Map<SToken, Integer> token2index) {
             this.startIdx = startIdx;
             this.endIdx = endIdx;
             this.annotationKey = nodeKey;
             this.table = table;
+            this.token2index = token2index;
         }
 
         @Override
-        public void nodeReached(GRAPH_TRAVERSE_TYPE g, String string,
-                SNode currNode, SRelation edge, SNode fromNode, long l) {
+        public void nodeReached(GRAPH_TRAVERSE_TYPE g, String string, SNode currNode, SRelation edge, SNode fromNode,
+                long l) {
 
             // retrieve the annotation by the node key
             SAnnotation anno = getAnno(currNode);
 
-            if (anno != null) {
+            if (anno != null && currNode != null && currNode.getGraph() instanceof SDocumentGraph) {
 
                 String rIdx = String.valueOf(depth);
 
@@ -343,20 +338,17 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
                     table.put(rIdx, rows);
                 }
 
-                RelannisNodeFeature f = (RelannisNodeFeature) currNode.
-                        getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-
+                Range<Integer> overlappedSpan = Helper.getLeftRightSpan(currNode, (SDocumentGraph) currNode.getGraph(),
+                        token2index);
                 // cut off the most left and right indexes
-                int leftIdx = Math.max(((int) f.getLeftToken()), startIdx);
-                int rightIdx = Math.min(((int) f.getRightToken()), endIdx);
+                int leftIdx = Math.max(overlappedSpan.lowerEndpoint(), startIdx);
+                int rightIdx = Math.min(overlappedSpan.upperEndpoint(), endIdx);
 
-                GridEvent e = new GridEvent(currNode.getId(), leftIdx, rightIdx, anno.
-                        getValue_STEXT());
+                GridEvent e = new GridEvent(currNode.getId(), leftIdx, rightIdx, anno.getValue_STEXT());
 
                 // add match id
                 SFeature featMatched = currNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-                Long match = featMatched == null ? null : featMatched.
-                        getValue_SNUMERIC();
+                Long match = featMatched == null ? null : featMatched.getValue_SNUMERIC();
                 e.setMatch(match);
 
                 // set tooltip
@@ -374,8 +366,8 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         }
 
         @Override
-        public void nodeLeft(GRAPH_TRAVERSE_TYPE g, String string,
-                SNode currNode, SRelation edge, SNode fromNode, long l) {
+        public void nodeLeft(GRAPH_TRAVERSE_TYPE g, String string, SNode currNode, SRelation edge, SNode fromNode,
+                long l) {
             assert depth >= 0;
             if (visited.contains(currNode)) {
                 visited.remove(currNode);
@@ -384,9 +376,12 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         }
 
         @Override
-        public boolean checkConstraint(GRAPH_TRAVERSE_TYPE g, String string,
-                SRelation sr, SNode snode, long l) {
-            return true;
+        public boolean checkConstraint(GRAPH_TRAVERSE_TYPE g, String string, SRelation sr, SNode snode, long l) {
+            if(sr == null || sr instanceof SDominanceRelation) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
         private SAnnotation getAnno(SNode n) {
