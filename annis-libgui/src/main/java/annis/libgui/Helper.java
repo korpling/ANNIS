@@ -17,7 +17,6 @@ package annis.libgui;
 
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -58,7 +57,6 @@ import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Range;
 import com.google.common.escape.Escaper;
@@ -82,7 +80,6 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
 import annis.model.Annotation;
-import annis.model.RelannisNodeFeature;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
@@ -91,8 +88,6 @@ import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;
 import annis.service.objects.RawTextWrapper;
 import elemental.json.JsonValue;
-import org.corpus_tools.salt.SALT_TYPE;
-import org.corpus_tools.salt.util.DataSourceSequence;
 
 /**
  *

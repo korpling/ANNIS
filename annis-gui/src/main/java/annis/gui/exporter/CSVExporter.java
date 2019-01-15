@@ -15,29 +15,29 @@
  */
 package annis.gui.exporter;
 
-import annis.CommonHelper;
-import annis.libgui.Helper;
-import annis.model.AnnisConstants;
-import annis.model.Annotation;
-import annis.model.RelannisNodeFeature;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
-import java.util.Map;
-
-import annis.service.objects.SubgraphFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SNode;
+
+import annis.CommonHelper;
+import annis.libgui.Helper;
+import annis.model.AnnisConstants;
+import annis.model.Annotation;
+import annis.service.objects.SubgraphFilter;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  * A csv-exporter that will export the text of the underlying token
