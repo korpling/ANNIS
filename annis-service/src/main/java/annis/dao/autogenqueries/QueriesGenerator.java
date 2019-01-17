@@ -218,8 +218,6 @@ public class QueriesGenerator extends DBProvider {
             // retrieve the aql query for analyzing purposes
             String aql = queryBuilder.getAQL();
 
-            // set some necessary extensions for generating complete sql
-
             // retrieve the salt project to analyze
             List<Match> matches = getQueryDao().find(aql, QueryLanguage.AQL, Arrays.asList(this.corpusName),
                     queryBuilder.getLimitOffsetQueryData());

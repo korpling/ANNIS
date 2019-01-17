@@ -95,9 +95,9 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     private DeleteCorpusDao deleteCorpusDao;
 
-    public AdministrationDao() {
-        this.queriesGenerator = QueriesGenerator.create(getQueryDao());
-
+    public AdministrationDao(QueriesGenerator queriesGenerator) {
+        this.queriesGenerator = queriesGenerator;
+      
         this.mimeTypeMapping = new LinkedHashMap<>();
         // TODO: make this configurable for the user
         this.mimeTypeMapping.put("webm", "video/webm");
@@ -119,7 +119,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     }
 
     public static AdministrationDao create(QueryDao queryDao, DeleteCorpusDao deleteCorpusDao) {
-        AdministrationDao adminDao = new AdministrationDao();
+        AdministrationDao adminDao = new AdministrationDao(QueriesGenerator.create(queryDao));
         adminDao.setQueryDao(queryDao);
         adminDao.setDeleteCorpusDao(deleteCorpusDao);
 
