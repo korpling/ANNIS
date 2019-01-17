@@ -145,6 +145,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     private final Escaper corpusNameEscaper = UrlEscapers.urlPathSegmentEscaper();
 
+    private final Pattern validQNamePattern = Pattern.compile("[a-zA-Z_%][a-zA-Z0-9_\\-%:]*");
+
     @Override
     public SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt) throws GraphANNISException {
         SaltProject p = SaltFactory.createSaltProject();
@@ -525,7 +527,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             return ResultOrder.Normal;
         }
     }
-    
+
     public CorpusStorageManager.QueryLanguage convertQueryLanguage(QueryLanguage ql) {
         switch (ql) {
         case AQL:
@@ -543,7 +545,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         List<String> corpora = escapedCorpusNames(corpusList);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
-        
+
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
 
         ResultOrder ordering = convertOrder(limitOffset.getOrder());
@@ -581,7 +583,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         List<String> corpora = escapedCorpusNames(corpusList);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
-        
+
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
 
         ResultOrder ordering = convertOrder(limitOffset.getOrder());
@@ -630,7 +632,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public int count(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException {
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
-        
+
         Future<Integer> result = exec.submit(() -> {
             return (int) corpusStorageMgr.count(escapedCorpusNames(corpusList), query, ql);
         });
@@ -654,7 +656,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public MatchAndDocumentCount countMatchesAndDocuments(String query, QueryLanguage queryLanguage,
             List<String> corpusList) throws GraphANNISException {
-        
+
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
 
         Future<MatchAndDocumentCount> result = exec.submit(() -> {
@@ -683,9 +685,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public FrequencyTable frequency(String query, QueryLanguage queryLanguage, List<String> corpusList,
             FrequencyTableQuery freqQuery) throws GraphANNISException {
-        
+
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
-        
+
         FrequencyTable result = new FrequencyTable();
         if (freqQuery.isEmpty()) {
             return result;
@@ -765,20 +767,28 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
                     att.setName(e.getKey());
                     att.setValueSet(e.getValue());
-                    // check if the sub-type is a "normal" node or a meta-data annotation
-                    try {
-                        if (corpusStorageMgr.count(Arrays.asList(corpusName),
-                                e.getKey() + " _ident_ annis:node_type=\"corpus\"") > 0) {
-                            att.setType(Type.meta);
-                            att.setSubtype(SubType.m);
-                        } else {
-                            att.setType(Type.node);
-                            att.setSubtype(SubType.n);
+
+                    boolean isMeta = false;
+                    if (validQNamePattern.matcher(e.getKey()).matches()) {
+                        String query = e.getKey() + " _ident_ annis:node_type=\"corpus\"";
+                        // check if the sub-type is a "normal" node or a meta-data annotation
+                        try {
+                            if (corpusStorageMgr.count(Arrays.asList(corpusName), query) > 0) {
+                                isMeta = true;
+                            }
+                        } catch (GraphANNISException ex) {
+                            log.error("Could not determine if attribute is a node or meta attribute. Query:\n{}", query,
+                                    ex);
                         }
-                        result.add(att);
-                    } catch (GraphANNISException ex) {
-                        log.error("Could not determine if attribute is a node or meta attribute", ex);
                     }
+                    if (isMeta) {
+                        att.setType(Type.meta);
+                        att.setSubtype(SubType.m);
+                    } else {
+                        att.setType(Type.node);
+                        att.setSubtype(SubType.n);
+                    }
+                    result.add(att);
                 }
             }
 
