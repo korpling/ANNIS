@@ -24,7 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.corpus_tools.graphannis.model.Component;
 import org.corpus_tools.graphannis.model.ComponentType;
 import org.corpus_tools.graphannis.model.Edge;
@@ -390,31 +389,29 @@ public class SaltExport {
 		addNodeLayers();
 	}
 
-	private static SCorpus addCorpusAndParents(SCorpusGraph cg, int id, Map<Integer, Integer> parentOfNode,
-			Map<Integer, SCorpus> id2corpus, Map<Integer, Map<QName, String>> node2labels) {
+	private static SCorpus addCorpusAndParents(SCorpusGraph cg, Node node, Map<Node, Node> parentOfNode,
+			Map<Integer, SCorpus> id2corpus) {
 
-		if (id2corpus.containsKey(id)) {
-			return id2corpus.get(id);
+		if (id2corpus.containsKey(node.getId())) {
+			return id2corpus.get(node.getId());
 		}
 
-		Map<QName, String> labels = node2labels.get(id);
-		if (labels == null) {
-			return null;
-		}
 
 		// create parents first
-		Integer parentID = parentOfNode.get(id);
+		Node parentNode = parentOfNode.get(node);
 		SCorpus parent = null;
-		if (parentID != null) {
-			parent = addCorpusAndParents(cg, parentID, parentOfNode, id2corpus, node2labels);
+		if (parentNode != null) {
+			parent = addCorpusAndParents(cg, parentNode, parentOfNode, id2corpus);
 		}
 
-		String corpusName = labels.getOrDefault(new ImmutablePair<>("annis", "node_name"), "corpus");
+		String corpusName = node.getName();
 		List<String> corpusNameSplitted = Splitter.on('/').trimResults().splitToList(corpusName);
 		// use last part of the path as name
 		SCorpus newCorpus = cg.createCorpus(parent, corpusNameSplitted.get(corpusNameSplitted.size() - 1));
-		id2corpus.put(id, newCorpus);
+		mapLabels(newCorpus, node.getLabels(), true);
 
+		id2corpus.put(node.getId(), newCorpus);
+		
 		return newCorpus;
 
 	}
@@ -425,47 +422,37 @@ public class SaltExport {
 		}
 		SCorpusGraph cg = SaltFactory.createSCorpusGraph();
 
-		Map<Integer, Map<QName, String>> node2labels = new LinkedHashMap<>();
-		Map<Integer, Integer> parentOfNode = new LinkedHashMap<>();
+		Map<Node, Node> parentOfNode = new LinkedHashMap<>();
 
 		// iterate over all nodes and get their outgoing edges
 		Iterator<Node> itNodes = orig.getNodesByType("corpus");
 		while (itNodes.hasNext()) {
 			Node n = itNodes.next();
-			Map<QName, String> nodeLabels = n.getLabels();
-			node2labels.put(n.getId(), nodeLabels);
 
 			List<Edge> outEdges = orig.getOutgoingEdges(n, ComponentType.PartOfSubcorpus);
 			for (Edge edge : outEdges) {
-				parentOfNode.put(edge.getSourceID(), edge.getTargetID());
+				parentOfNode.put(edge.getSource(), edge.getTarget());
 			}
 		}
 
 		Map<Integer, SCorpus> id2corpus = new HashMap<>();
 		// add all non-documents first
-		for (Integer id : parentOfNode.values()) {
-			addCorpusAndParents(cg, id, parentOfNode, id2corpus, node2labels);
-		}
-		for (Map.Entry<Integer, SCorpus> e : id2corpus.entrySet()) {
-			Map<QName, String> labels = node2labels.get(e.getKey());
-			if (labels != null) {
-				mapLabels(e.getValue(), labels, true);
-			}
+		for (Node node : parentOfNode.values()) {
+			addCorpusAndParents(cg, node, parentOfNode, id2corpus);
 		}
 
 		// add all documents next
-		for (Map.Entry<Integer, Integer> edge : parentOfNode.entrySet()) {
-			long childID = edge.getKey();
-			long parentID = edge.getValue();
+		for (Map.Entry<Node, Node> edge : parentOfNode.entrySet()) {
+			int childID = edge.getKey().getId();
+			int parentID = edge.getValue().getId();
 			if (!id2corpus.containsKey(childID)) {
-				Map<QName, String> labels = node2labels.get(childID);
-				if (labels != null) {
-					String docName = labels.getOrDefault(new ImmutablePair<>("annis", "doc"), "document");
-					SCorpus parent = id2corpus.get(parentID);
-					SDocument doc = cg.createDocument(parent, docName);
+				Map<QName, String> labels = edge.getKey().getLabels();
+				String docName = labels.getOrDefault(new QName("annis", "doc"), "document");
+				SCorpus parent = id2corpus.get(parentID);
+				SDocument doc = cg.createDocument(parent, docName);
 
-					mapLabels(doc, labels, true);
-				}
+				mapLabels(doc, labels, true);
+			
 			}
 		}
 
