@@ -174,7 +174,7 @@ public class SearchOptionsPanel extends FormLayout {
         cbQueryLanguage.setNullSelectionAllowed(false);
         cbQueryLanguage.setImmediate(true);
         cbQueryLanguage.setItemCaption(QueryLanguage.AQL, "AQL (latest)");
-        cbQueryLanguage.setItemCaption(QueryLanguage.AQL_QUIRKS_V3, "AQL (compatibility mode");
+        cbQueryLanguage.setItemCaption(QueryLanguage.AQL_QUIRKS_V3, "AQL (compatibility mode)");
 
         cbLeftContext.setVisible(false);
         cbRightContext.setVisible(false);

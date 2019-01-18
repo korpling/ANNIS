@@ -17,6 +17,7 @@
     - [Exporting Results](./aql-export.md)
     - [Frequency Analysis](./aql-frequency.md)
     - [Complete List of Operators](./aql-operators.md)
+    - [Differences in Compatibility Mode](./aql-compatibility-mode.md)
 - [Configuring Visualizations](./visualizations.md)
     - [List of Visualizations](./visualizations-list.md)
     - [Maximal Context Size, Context Steps and Result Page Sizes](./visualizations-context.md)
