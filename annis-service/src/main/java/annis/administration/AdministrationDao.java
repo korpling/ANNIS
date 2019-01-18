@@ -72,6 +72,7 @@ import com.google.common.io.Files;
 
 import annis.ServiceConfig;
 import annis.dao.QueryDao;
+import annis.dao.SaltExport;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.exceptions.AnnisException;
 import annis.security.UserConfig;
@@ -97,7 +98,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     public AdministrationDao(QueriesGenerator queriesGenerator) {
         this.queriesGenerator = queriesGenerator;
-      
+
         this.mimeTypeMapping = new LinkedHashMap<>();
         // TODO: make this configurable for the user
         this.mimeTypeMapping.put("webm", "video/webm");
@@ -217,23 +218,22 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private final QueriesGenerator queriesGenerator;
 
     private final Table resolverTable = new Table(FILE_RESOLVER_VIS_MAP)
-            .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c("corpus").index("corpus")
-            .c("version").c("namespace").c("element").c(new Column("vis_type").notNull())
-            .c(new Column("display_name").notNull()).c("visibility").c_int("order").c("mappings");
+            .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c("corpus").index("corpus").c("version")
+            .c("namespace").c("element").c(new Column("vis_type").notNull()).c(new Column("display_name").notNull())
+            .c("visibility").c_int("order").c("mappings");
 
     private final Table textTable = new Table("text").c("corpus_path").index("corpus_path").c_int("id").c("name")
             .c("text");
 
-    private final Table annotationsTable = new Table("annotations").c("corpus").index("corpus")
-            .c("name").index("name").c("value").c("type").c("sub_type").c("edge_name");
+    private final Table annotationsTable = new Table("annotations").c("corpus").index("corpus").c("name").index("name")
+            .c("value").c("type").c("sub_type").c("edge_name");
 
-    private final Table metaDataCache = new Table("metadata_cache").c("corpus").index("corpus")
-            .c("path").c("type").c("namespace").c("name")
-            .c("value").index("corpus", "type", "path").index("corpus", "type").index("corpus", "path");
+    private final Table metaDataCache = new Table("metadata_cache").c("corpus").index("corpus").c("path").c("type")
+            .c("namespace").c("name").c("value").index("corpus", "type", "path").index("corpus", "type")
+            .index("corpus", "path");
 
-    private final Table mediaFilesTable = new Table("media_files").c(new Column("filename").unique())
-            .c("corpus_path").index("corpus_path").c("mime_type").index("mime_type")
-            .c("title").index("title");
+    private final Table mediaFilesTable = new Table("media_files").c(new Column("filename").unique()).c("corpus_path")
+            .index("corpus_path").c("mime_type").index("mime_type").c("title").index("title");
 
     private final Table repositoryMetaDataTable = new Table("repository_metadata").c(new Column("name").unique())
             .c("value");
@@ -247,8 +247,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     private final Table userConfigTable = new Table("user_config").c(new Column("id").primaryKey()).c("config");
 
-    private final Table corpusAliasTable = new Table("corpus_alias").c(new Column("alias").primaryKey())
-            .c("corpus").index("corpus");
+    private final Table corpusAliasTable = new Table("corpus_alias").c(new Column("alias").primaryKey()).c("corpus")
+            .index("corpus");
 
     private final Table corpusInfoTable = new Table("corpus_info").c(new Column("name").primaryKey()).c_int("docs")
             .c_int("tokens").c("source_path");
@@ -593,13 +593,13 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         if (extData.canRead() && extData.isDirectory()) {
             // import toplevel corpus media files
             File[] topFiles = extData.listFiles((FileFilter) FileFileFilter.FILE);
-            if(topFiles != null) {
+            if (topFiles != null) {
                 for (File data : topFiles) {
                     String extension = FilenameUtils.getExtension(data.getName());
                     try {
                         if (mimeTypeMapping.containsKey(extension)) {
                             log.info("import " + data.getCanonicalPath() + " to staging area");
-    
+
                             importSingleFile(data.getCanonicalPath(), toplevelCorpusName);
                         } else {
                             log.warn("not importing " + data.getCanonicalPath() + " since file type is unknown");
@@ -612,20 +612,22 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
             // get each subdirectory (which corresponds to an document name)
             File[] documents = extData.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
-            if(documents != null) {
+            if (documents != null) {
                 for (File doc : documents) {
                     if (doc.isDirectory() && doc.canRead()) {
                         File[] dataFiles = doc.listFiles((FileFilter) FileFileFilter.FILE);
-                        if(dataFiles != null) {
+                        if (dataFiles != null) {
                             for (File data : dataFiles) {
                                 String extension = FilenameUtils.getExtension(data.getName());
                                 try {
                                     if (mimeTypeMapping.containsKey(extension)) {
                                         log.info("import " + data.getCanonicalPath() + " to staging area");
-        
-                                        importSingleFile(data.getCanonicalPath(), toplevelCorpusName + "/" + doc.getName());
+
+                                        importSingleFile(data.getCanonicalPath(),
+                                                toplevelCorpusName + "/" + doc.getName());
                                     } else {
-                                        log.warn("not importing " + data.getCanonicalPath() + " since file type is unknown");
+                                        log.warn("not importing " + data.getCanonicalPath()
+                                                + " since file type is unknown");
                                     }
                                 } catch (IOException ex) {
                                     log.error("no canonical path given", ex);
@@ -646,7 +648,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
             conn.setAutoCommit(false);
-            
+
             // cache these entries in the annotation table
             PreparedStatement stmt = conn.prepareStatement("INSERT INTO annotations VALUES (?,?,?,?,?,?)");
 
@@ -674,7 +676,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                     }
                 }
             }
-            
+
             conn.commit();
 
         } catch (SQLException ex) {
@@ -687,21 +689,21 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
             conn.setAutoCommit(false);
-            
-            SCorpusGraph corpusGraph = getQueryDao().getCorpusStorageManager().corpusGraph(corpusName);
 
-            
+            SCorpusGraph corpusGraph = SaltExport
+                    .mapCorpusGraph(getQueryDao().getCorpusStorageManager().corpusGraph(corpusName));
+
             // cache these entries in the metadata_cache table
             PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO metadata_cache(corpus, path, type, namespace, name, value) VALUES (?,?,?,?,?,?)");
-            
+
             for (SCorpus corpus : corpusGraph.getCorpora()) {
-               // add an entry for each meta annotation
+                // add an entry for each meta annotation
                 for (SMetaAnnotation anno : corpus.getMetaAnnotations()) {
                     stmt.setString(1, corpusName);
                     stmt.setString(2, Joiner.on('/').join(corpus.getPath().segmentsList()));
                     stmt.setString(3, "CORPUS");
-                    if(anno.getNamespace() == null || anno.getNamespace().isEmpty()) {
+                    if (anno.getNamespace() == null || anno.getNamespace().isEmpty()) {
                         stmt.setNull(4, Types.VARCHAR);
                     } else {
                         stmt.setString(4, anno.getNamespace());
@@ -721,13 +723,12 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                 stmt.setString(5, "doc");
                 stmt.setString(6, document.getName());
                 stmt.executeUpdate();
-            
-                
+
                 for (SMetaAnnotation anno : document.getMetaAnnotations()) {
                     stmt.setString(1, corpusName);
                     stmt.setString(2, Joiner.on('/').join(document.getPath().segmentsList()));
                     stmt.setString(3, "DOCUMENT");
-                    if(anno.getNamespace() == null || anno.getNamespace().isEmpty()) {
+                    if (anno.getNamespace() == null || anno.getNamespace().isEmpty()) {
                         stmt.setNull(4, Types.VARCHAR);
                     } else {
                         stmt.setString(4, anno.getNamespace());
@@ -737,7 +738,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
                     stmt.executeUpdate();
                 }
             }
-            
+
             conn.commit();
 
         } catch (SQLException | GraphANNISException ex) {
@@ -781,7 +782,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         int tokCount = getQueryDao().count("tok", QueryLanguage.AQL, Arrays.asList(toplevelCorpusName));
 
         // get number of documents
-        SCorpusGraph corpusGraph = getQueryDao().getCorpusStorageManager().corpusGraph(toplevelCorpusName);
+        SCorpusGraph corpusGraph = SaltExport
+                .mapCorpusGraph(getQueryDao().getCorpusStorageManager().corpusGraph(toplevelCorpusName));
 
         int documentCount = corpusGraph.getDocuments().size();
 

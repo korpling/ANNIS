@@ -68,7 +68,7 @@ import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.corpus_tools.graphannis.CorpusStorageManager;
 import org.corpus_tools.graphannis.CorpusStorageManager.ResultOrder;
 import org.corpus_tools.graphannis.LogLevel;
-import org.corpus_tools.graphannis.capi.AnnisComponentType;
+import org.corpus_tools.graphannis.model.ComponentType;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.graphannis.model.Component;
 import org.corpus_tools.graphannis.model.FrequencyTableEntry;
@@ -183,8 +183,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             matchedIDs.add(id.toASCIIString());
         }
 
-        SDocumentGraph result = corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(),
-                annoExt.getRight());
+        SDocumentGraph result = SaltExport
+                .map(corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight()));
 
         return result;
     }
@@ -794,9 +794,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         }
 
-        Integer[] allComponentTypes = new Integer[] { AnnisComponentType.Dominance, AnnisComponentType.Pointing };
+        ComponentType[] allComponentTypes = new ComponentType[] { ComponentType.Dominance, ComponentType.Pointing };
         for (String corpusName : corpusList) {
-            for (int ctype : allComponentTypes) {
+            for (ComponentType ctype : allComponentTypes) {
                 for (Component c : corpusStorageMgr.getAllComponentsByType(corpusName, ctype)) {
                     AnnisAttribute att = new AnnisAttribute();
                     att.setType(Type.edge);
@@ -836,7 +836,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                         attAnno.setEdgeName(c.getName());
                         attAnno.setName(e.getKey());
                         attAnno.setValueSet(e.getValue());
-                        attAnno.setSubtype(ctype == AnnisComponentType.Dominance ? SubType.d : SubType.p);
+                        attAnno.setSubtype(ctype == ComponentType.Dominance ? SubType.d : SubType.p);
 
                         result.add(attAnno);
                     }
@@ -878,7 +878,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         LinkedList<String> result = new LinkedList<>();
         for (String corpus : corpusList) {
             for (Component orderRelComponent : corpusStorageMgr.getAllComponentsByType(corpus,
-                    AnnisComponentType.Ordering)) {
+                    ComponentType.Ordering)) {
                 if (!orderRelComponent.getName().isEmpty()) {
                     result.add(orderRelComponent.getName());
                 }
@@ -892,7 +892,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             List<String> nodeAnnotationFilter) throws GraphANNISException {
         URI docURI = SaltUtil.createSaltURI(toplevelCorpusName).appendSegment(documentName);
 
-        SDocumentGraph graph = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString()));
+        SDocumentGraph graph = SaltExport
+                .map(corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString())));
 
         // wrap the single document into a SaltProject
         SaltProject project = SaltFactory.createSaltProject();
