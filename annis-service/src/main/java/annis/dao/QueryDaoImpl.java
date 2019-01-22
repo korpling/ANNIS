@@ -68,18 +68,17 @@ import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.corpus_tools.graphannis.CorpusStorageManager;
 import org.corpus_tools.graphannis.CorpusStorageManager.ResultOrder;
 import org.corpus_tools.graphannis.LogLevel;
-import org.corpus_tools.graphannis.model.ComponentType;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.graphannis.model.Component;
+import org.corpus_tools.graphannis.model.ComponentType;
 import org.corpus_tools.graphannis.model.FrequencyTableEntry;
+import org.corpus_tools.graphannis.model.Graph;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SMetaAnnotation;
-import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.eclipse.emf.common.util.URI;
@@ -126,7 +125,6 @@ import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.MetadataCacheHelper;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
-import net.sf.ehcache.search.Query;
 
 public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
@@ -892,8 +890,26 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             List<String> nodeAnnotationFilter) throws GraphANNISException {
         URI docURI = SaltUtil.createSaltURI(toplevelCorpusName).appendSegment(documentName);
 
-        SDocumentGraph graph = SaltExport
-                .map(corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString())));
+        Graph rawGraph;
+        if (nodeAnnotationFilter == null || nodeAnnotationFilter.isEmpty()) {
+            rawGraph = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString()));
+        } else {
+            StringBuilder aql = new StringBuilder("(a#tok");
+            for(String nodeAnno : nodeAnnotationFilter) {
+                aql.append(" | a#");
+                aql.append(nodeAnno);
+            }
+            aql.append(") & d#annis:node_name=\"");
+            aql.append(toplevelCorpusName);
+            aql.append("/");
+            aql.append(documentName);
+            aql.append("\" & #a @* #d");
+            
+            rawGraph = corpusStorageMgr.subGraphForQuery(toplevelCorpusName, aql.toString(),
+                    org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage.AQL);
+        }
+
+        SDocumentGraph graph = SaltExport.map(rawGraph);
 
         // wrap the single document into a SaltProject
         SaltProject project = SaltFactory.createSaltProject();
