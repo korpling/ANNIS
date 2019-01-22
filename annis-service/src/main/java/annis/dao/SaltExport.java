@@ -130,8 +130,8 @@ public class SaltExport {
 	}
 
 	private void mapAndAddEdge(Edge origEdge) {
-		SNode source = nodesByID.get(origEdge.getSource().getId());
-		SNode target = nodesByID.get(origEdge.getTarget().getId());
+		SNode source = nodesByID.get(origEdge.getSourceID());
+		SNode target = nodesByID.get(origEdge.getTargetID());
 
 		String edgeType = origEdge.getComponent().getName();
 		if (source != null && target != null && source != target) {
@@ -358,7 +358,10 @@ public class SaltExport {
 
 			SNode n = mapNode(node);
 			nodesByID.put(node.getId(), n);
-			edges.addAll(orig.getOutgoingEdges(node));
+			edges.addAll(orig.getOutgoingEdges(node, ComponentType.Dominance));
+			edges.addAll(orig.getOutgoingEdges(node, ComponentType.Coverage));
+			edges.addAll(orig.getOutgoingEdges(node, ComponentType.Pointing));
+			edges.addAll(orig.getOutgoingEdges(node, ComponentType.Ordering));
 		}
 
 		// add nodes to the graph
