@@ -891,7 +891,22 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         URI docURI = SaltUtil.createSaltURI(toplevelCorpusName).appendSegment(documentName);
 
         Graph rawGraph;
-        if (nodeAnnotationFilter == null || nodeAnnotationFilter.isEmpty()) {
+        
+        boolean fallbackToAll = false;
+        if(nodeAnnotationFilter == null || nodeAnnotationFilter.isEmpty()) {
+            fallbackToAll = true;
+        } else {
+            for(String nodeAnno : nodeAnnotationFilter) {
+                if(!validQNamePattern.matcher(nodeAnno).matches() ) {
+                    // If we can't produce a valid query for this annotation name fallback
+                    // to retrieve all annotations.
+                    fallbackToAll = true;
+                    break;
+                }
+            }
+        }
+        
+        if (fallbackToAll) {
             rawGraph = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString()));
         } else {
             StringBuilder aql = new StringBuilder("(a#tok");
