@@ -8,7 +8,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<annis.userconfig>/etc/annis/user_config/</annis.userconfig>
-		<graphannis.version>0.16.0</graphannis.version>
+		<graphannis.version>0.17.0</graphannis.version>
 	</properties>
 
 	<parent>
