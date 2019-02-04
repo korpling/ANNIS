@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.corpus_tools.graphannis.model.Component;
 import org.corpus_tools.graphannis.model.ComponentType;
 import org.corpus_tools.graphannis.model.Edge;
@@ -130,8 +131,8 @@ public class SaltExport {
 	}
 
 	private void mapAndAddEdge(Edge origEdge) {
-		SNode source = nodesByID.get(origEdge.getSourceID());
-		SNode target = nodesByID.get(origEdge.getTargetID());
+		SNode source = nodesByID.get(origEdge.getSource().getId());
+		SNode target = nodesByID.get(origEdge.getTarget().getId());
 
 		String edgeType = origEdge.getComponent().getName();
 		if (source != null && target != null && source != target) {
@@ -358,10 +359,7 @@ public class SaltExport {
 
 			SNode n = mapNode(node);
 			nodesByID.put(node.getId(), n);
-			edges.addAll(orig.getOutgoingEdges(node, ComponentType.Dominance));
-			edges.addAll(orig.getOutgoingEdges(node, ComponentType.Coverage));
-			edges.addAll(orig.getOutgoingEdges(node, ComponentType.Pointing));
-			edges.addAll(orig.getOutgoingEdges(node, ComponentType.Ordering));
+			edges.addAll(orig.getOutgoingEdges(node));
 		}
 
 		// add nodes to the graph
@@ -392,29 +390,31 @@ public class SaltExport {
 		addNodeLayers();
 	}
 
-	private static SCorpus addCorpusAndParents(SCorpusGraph cg, Node node, Map<Node, Node> parentOfNode,
-			Map<Integer, SCorpus> id2corpus) {
+	private static SCorpus addCorpusAndParents(SCorpusGraph cg, int id, Map<Integer, Integer> parentOfNode,
+			Map<Integer, SCorpus> id2corpus, Map<Integer, Map<QName, String>> node2labels) {
 
-		if (id2corpus.containsKey(node.getId())) {
-			return id2corpus.get(node.getId());
+		if (id2corpus.containsKey(id)) {
+			return id2corpus.get(id);
 		}
 
+		Map<QName, String> labels = node2labels.get(id);
+		if (labels == null) {
+			return null;
+		}
 
 		// create parents first
-		Node parentNode = parentOfNode.get(node);
+		Integer parentID = parentOfNode.get(id);
 		SCorpus parent = null;
-		if (parentNode != null) {
-			parent = addCorpusAndParents(cg, parentNode, parentOfNode, id2corpus);
+		if (parentID != null) {
+			parent = addCorpusAndParents(cg, parentID, parentOfNode, id2corpus, node2labels);
 		}
 
-		String corpusName = node.getName();
+		String corpusName = labels.getOrDefault(new ImmutablePair<>("annis", "node_name"), "corpus");
 		List<String> corpusNameSplitted = Splitter.on('/').trimResults().splitToList(corpusName);
 		// use last part of the path as name
 		SCorpus newCorpus = cg.createCorpus(parent, corpusNameSplitted.get(corpusNameSplitted.size() - 1));
-		mapLabels(newCorpus, node.getLabels(), true);
+		id2corpus.put(id, newCorpus);
 
-		id2corpus.put(node.getId(), newCorpus);
-		
 		return newCorpus;
 
 	}
@@ -425,37 +425,47 @@ public class SaltExport {
 		}
 		SCorpusGraph cg = SaltFactory.createSCorpusGraph();
 
-		Map<Node, Node> parentOfNode = new LinkedHashMap<>();
+		Map<Integer, Map<QName, String>> node2labels = new LinkedHashMap<>();
+		Map<Integer, Integer> parentOfNode = new LinkedHashMap<>();
 
 		// iterate over all nodes and get their outgoing edges
 		Iterator<Node> itNodes = orig.getNodesByType("corpus");
 		while (itNodes.hasNext()) {
 			Node n = itNodes.next();
+			Map<QName, String> nodeLabels = n.getLabels();
+			node2labels.put(n.getId(), nodeLabels);
 
 			List<Edge> outEdges = orig.getOutgoingEdges(n, ComponentType.PartOfSubcorpus);
 			for (Edge edge : outEdges) {
-				parentOfNode.put(edge.getSource(), edge.getTarget());
+				parentOfNode.put(edge.getSourceID(), edge.getTargetID());
 			}
 		}
 
 		Map<Integer, SCorpus> id2corpus = new HashMap<>();
 		// add all non-documents first
-		for (Node node : parentOfNode.values()) {
-			addCorpusAndParents(cg, node, parentOfNode, id2corpus);
+		for (Integer id : parentOfNode.values()) {
+			addCorpusAndParents(cg, id, parentOfNode, id2corpus, node2labels);
+		}
+		for (Map.Entry<Integer, SCorpus> e : id2corpus.entrySet()) {
+			Map<QName, String> labels = node2labels.get(e.getKey());
+			if (labels != null) {
+				mapLabels(e.getValue(), labels, true);
+			}
 		}
 
 		// add all documents next
-		for (Map.Entry<Node, Node> edge : parentOfNode.entrySet()) {
-			int childID = edge.getKey().getId();
-			int parentID = edge.getValue().getId();
+		for (Map.Entry<Integer, Integer> edge : parentOfNode.entrySet()) {
+			long childID = edge.getKey();
+			long parentID = edge.getValue();
 			if (!id2corpus.containsKey(childID)) {
-				Map<QName, String> labels = edge.getKey().getLabels();
-				String docName = labels.getOrDefault(new QName("annis", "doc"), "document");
-				SCorpus parent = id2corpus.get(parentID);
-				SDocument doc = cg.createDocument(parent, docName);
+				Map<QName, String> labels = node2labels.get(childID);
+				if (labels != null) {
+					String docName = labels.getOrDefault(new ImmutablePair<>("annis", "doc"), "document");
+					SCorpus parent = id2corpus.get(parentID);
+					SDocument doc = cg.createDocument(parent, docName);
 
-				mapLabels(doc, labels, true);
-			
+					mapLabels(doc, labels, true);
+				}
 			}
 		}
 
