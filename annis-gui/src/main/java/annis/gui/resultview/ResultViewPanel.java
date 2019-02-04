@@ -376,13 +376,15 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
                 if (g != null) {
                     List<SNode> orderRoots = g.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
                     // collect the start nodes of a segmentation chain of length 1
-                    for (SNode n : orderRoots) {
-                        for (SRelation<?, ?> rel : n.getOutRelations()) {
-                            if (rel instanceof SOrderRelation) {
-                                // the type is the name of the relation
-                                result.add(rel.getType());
-                            }
-                        }
+                    if (orderRoots != null) {
+	                    for (SNode n : orderRoots) {
+	                        for (SRelation<?, ?> rel : n.getOutRelations()) {
+	                            if (rel instanceof SOrderRelation) {
+	                                // the type is the name of the relation
+	                                result.add(rel.getType());
+	                            }
+	                        }
+	                    }
                     }
                 } // end if graph not null
             }
