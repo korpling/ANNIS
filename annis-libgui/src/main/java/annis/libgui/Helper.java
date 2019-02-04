@@ -770,10 +770,11 @@ public class Helper {
         }
 
         List<SToken> sortedTokens = graph.getSortedTokenByText();
-
-        int i = 0;
-        for (SToken t : sortedTokens) {
-            token2index.put(t, i++);
+        if(sortedTokens != null) {
+            int i = 0;
+            for (SToken t : sortedTokens) {
+                token2index.put(t, i++);
+            }
         }
         return token2index;
     }
