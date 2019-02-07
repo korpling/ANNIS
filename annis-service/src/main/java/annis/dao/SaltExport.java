@@ -144,7 +144,8 @@ public class SaltExport {
 					// between the same nodes which has a type.
 					List<Edge> domOutEdges = orig.getOutgoingEdges(origEdge.getSource(), ComponentType.Dominance);
 					for (Edge outEdge : domOutEdges) {
-						if (outEdge.getTargetID() == origEdge.getTargetID() && !outEdge.getComponent().getName().isEmpty()) {
+						if (outEdge.getTargetID() == origEdge.getTargetID()
+								&& !outEdge.getComponent().getName().isEmpty()) {
 							// exclude this relation
 							return;
 						}
@@ -193,13 +194,15 @@ public class SaltExport {
 		for (SNode n : nodeList) {
 			SFeature featLayer = n.getFeature("annis", "layer");
 			if (featLayer != null) {
-				SLayer layer = docGraph.getLayer(featLayer.getValue_STEXT());
-				if (layer == null) {
-					layer = SaltFactory.createSLayer();
-					layer.setName(featLayer.getValue_STEXT());
-					docGraph.addLayer(layer);
+				String layerName = featLayer.getValue_STEXT();
+				List<SLayer> layer = docGraph.getLayerByName(layerName);
+				if (layer == null || layer.isEmpty()) {
+					SLayer newLayer = SaltFactory.createSLayer();
+					newLayer.setName(layerName);
+					docGraph.addLayer(newLayer);
+					layer = Arrays.asList(newLayer);
 				}
-				layer.addNode(n);
+				layer.get(0).addNode(n);
 			}
 		}
 	}
@@ -399,7 +402,6 @@ public class SaltExport {
 			return id2corpus.get(node.getId());
 		}
 
-
 		// create parents first
 		Node parentNode = parentOfNode.get(node);
 		SCorpus parent = null;
@@ -414,7 +416,7 @@ public class SaltExport {
 		mapLabels(newCorpus, node.getLabels(), true);
 
 		id2corpus.put(node.getId(), newCorpus);
-		
+
 		return newCorpus;
 
 	}
@@ -455,7 +457,7 @@ public class SaltExport {
 				SDocument doc = cg.createDocument(parent, docName);
 
 				mapLabels(doc, labels, true);
-			
+
 			}
 		}
 
