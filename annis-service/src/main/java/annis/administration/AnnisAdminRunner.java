@@ -222,17 +222,23 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
     void doMigrateUrlShortener(List<String> commandArgs) {
         Options options = new OptionBuilder()
                 .addToggle("i", "ignore-errors", false, "Migrate a short URL even if validation fails.")
-                .createOptions();
+                .addLongParameter("service-url",
+                        "Get the paths to import from the ANNIS service accessible by this URL. This helps to migrate "
+                                + "corpora from an older instance. "
+                                + "Make sure that the ANNIS Service and this script run on the same machine (otherwise the paths are not valid.")
+                .addLongParameter("service-username", "Optional username when using the ANNIS service")
+                .addLongParameter("service-password", "Optional password when using the ANNIS service").createOptions();
 
         try {
             CommandLineParser parser = new PosixParser();
             CommandLine cmdLine = parser.parse(options, commandArgs.toArray(new String[commandArgs.size()]));
 
             List<String> urlShortenerFiles = cmdLine.getArgList();
-            if(urlShortenerFiles.isEmpty()) {
+            if (urlShortenerFiles.isEmpty()) {
                 throw new ParseException("Where can I find the url shortener export files you want to migrate?");
             }
-            corpusAdministration.migrateUrlShortener(urlShortenerFiles);
+            corpusAdministration.migrateUrlShortener(urlShortenerFiles, cmdLine.getOptionValue("service-url"),
+                    cmdLine.getOptionValue("service-username"), cmdLine.getOptionValue("service-password"));
 
         } catch (ParseException ex) {
             HelpFormatter helpFormatter = new HelpFormatter();

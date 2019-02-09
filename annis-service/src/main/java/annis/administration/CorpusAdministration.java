@@ -38,17 +38,22 @@ import java.util.zip.ZipFile;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+
+import com.google.common.base.Joiner;
+import com.google.common.io.ByteStreams;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Joiner;
-import com.google.common.io.ByteStreams;
 
 import annis.AnnisRunnerException;
 import annis.CommonHelper;
@@ -57,9 +62,9 @@ import annis.exceptions.AnnisException;
 import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
+import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.QueryLanguage;
 import annis.utils.ANNISFormatHelper;
-import au.com.bytecode.opencsv.CSVParser;
 import au.com.bytecode.opencsv.CSVReader;
 
 /**
@@ -202,15 +207,14 @@ public class CorpusAdministration {
         return importStats;
     }
 
-
     private Query queryFromShortenerURL(String url) {
-        if(url.startsWith("/embeddedvis")) {
-            
-        } else if(url.startsWith("/#")) {
+        if (url.startsWith("/embeddedvis")) {
+            // TODO: parse embedded vis linked query
+        } else if (url.startsWith("/#")) {
             Map<String, String> args = CommonHelper.parseFragment(url.substring("/#".length()));
             String corporaRaw = args.get("c");
             String aql = args.get("q");
-            if(corporaRaw != null && aql != null) {
+            if (corporaRaw != null && aql != null) {
                 Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
                 Query q = new Query();
                 q.setCorpora(corpora);
@@ -222,22 +226,47 @@ public class CorpusAdministration {
         return null;
     }
 
-
-    public void migrateUrlShortener(List<String> paths) {
-        if (paths == null) {
+    public void migrateUrlShortener(List<String> paths, String serviceURL, String username, String password) {
+        if (paths == null || serviceURL == null) {
             return;
         }
+
+        Client client = ClientBuilder.newClient();
+        if (username != null && password != null) {
+            HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basic(username, password);
+            client.register(authFeature);
+        }
+        WebTarget countTarget = client.target(serviceURL).path("annis").path("query").path("search").path("count");
+
+        int sucessfull = 0;
         for (String p : paths) {
             File urlShortenerFile = new File(p);
             if (urlShortenerFile.isFile()) {
-                try(CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {
+                try (CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {
                     String[] line;
-                    while((line = csvReader.readNext()) != null) {
-                        if(line.length == 4) {
+                    while ((line = csvReader.readNext()) != null) {
+                        if (line.length == 4) {
                             // parse URL
                             Query q = queryFromShortenerURL(line[3]);
-                            if(q != null) {
-                                log.info("Query: {}", q.getQuery());
+                            if (q != null) {
+                                log.info("test");
+                                // check the query
+                                try {
+                                    int countGraphANNIS = getAdministrationDao().getQueryDao().count(q.getQuery(),
+                                            QueryLanguage.AQL, new LinkedList<>(q.getCorpora()));
+                                    MatchAndDocumentCount countLegacy = countTarget.queryParam("q", q.getQuery())
+                                            .queryParam("corpora", Joiner.on(",").join(q.getCorpora())).request()
+                                            .get(MatchAndDocumentCount.class);
+                                    if (countGraphANNIS != countLegacy.getMatchCount()) {
+                                        log.error("Count mismatch on corpus {}:\n{}",
+                                                Joiner.on(",").join(q.getCorpora()), q.getQuery());
+
+                                        // TODO: check the actual match IDs
+                                        // TODO: check in quirks mode and rewrite if necessary
+                                    }
+                                } catch (GraphANNISException ex) {
+                                    log.error("Executing query {} failed", q.getQuery(), ex);
+                                }
                             }
                         }
                     }
@@ -249,6 +278,9 @@ public class CorpusAdministration {
                 }
             }
         }
+
+        // TODO: output summary
+        // TODO: insert URLs into new database
     }
 
     /**
