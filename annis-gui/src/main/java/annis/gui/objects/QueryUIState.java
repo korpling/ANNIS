@@ -34,6 +34,7 @@ import annis.gui.controlpanel.CorpusSorter;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.libgui.exporter.ExporterPlugin;
+import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;
@@ -180,6 +181,5 @@ public class QueryUIState implements Serializable {
     public ObjectProperty<QueryLanguage> getQueryLanguage() {
         return queryLanguage;
     }
-    
 
 }

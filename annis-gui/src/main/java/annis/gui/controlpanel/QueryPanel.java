@@ -50,7 +50,7 @@ import annis.gui.HistoryPanel;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.objects.Query;
+import annis.model.Query;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.libgui.Helper;

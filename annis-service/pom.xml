@@ -70,13 +70,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.9</version>
-			<scope>compile</scope>
-		</dependency>
-
 
 		<!-- provide a binary replacement for commons-logging based on slf4j -->
 		<dependency>

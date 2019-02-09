@@ -385,32 +385,6 @@ public class Helper {
         }
         return "ERROR";
     }
-
-    public static String generateClassicCitation(String aql, List<String> corpora, int contextLeft, int contextRight) {
-        StringBuilder sb = new StringBuilder();
-
-        URI appURI = UI.getCurrent().getPage().getLocation();
-
-        sb.append(getContext());
-        sb.append("/Cite/AQL(");
-        sb.append(aql);
-        sb.append("),CIDS(");
-        sb.append(StringUtils.join(corpora, ","));
-        sb.append("),CLEFT(");
-        sb.append(contextLeft);
-        sb.append("),CRIGHT(");
-        sb.append(contextRight);
-        sb.append(")");
-
-        try {
-            return new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), sb.toString(), null, null)
-                    .toASCIIString();
-        } catch (URISyntaxException ex) {
-            log.error(null, ex);
-        }
-        return "ERROR";
-    }
-
     /**
      * Retrieve the meta data for a given document of a corpus.
      *
@@ -602,43 +576,7 @@ public class Helper {
         return corpusConfigurations;
     }
 
-    /**
-     * Parses the fragment.
-     *
-     * Fragments have the form key1=value&key2=test ...
-     *
-     * @param fragment
-     *                     fragment to parse
-     * @return a map with the keys and values of the fragment
-     */
-    public static Map<String, String> parseFragment(String fragment) {
-        Map<String, String> result = new TreeMap<String, String>();
-
-        fragment = StringUtils.removeStart(fragment, "!");
-
-        String[] split = StringUtils.split(fragment, "&");
-        for (String s : split) {
-            String[] parts = s.split("=", 2);
-            String name = parts[0].trim();
-            String value = "";
-            if (parts.length == 2) {
-                try {
-                    // every name that starts with "_" is base64 encoded
-                    if (name.startsWith("_")) {
-                        value = new String(Base64.decodeBase64(parts[1]), "UTF-8");
-                    } else {
-                        value = URLDecoder.decode(parts[1], "UTF-8");
-                    }
-                } catch (UnsupportedEncodingException ex) {
-                    log.error(ex.getMessage(), ex);
-                }
-            }
-            name = StringUtils.removeStart(name, "_");
-
-            result.put(name, value);
-        }
-        return result;
-    }
+   
 
     /**
      * Returns a formatted string containing the type of the exception, the message

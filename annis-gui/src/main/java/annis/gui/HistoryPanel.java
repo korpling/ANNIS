@@ -29,7 +29,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.declarative.Design;
 
-import annis.gui.objects.Query;
+import annis.model.Query;
 import annis.libgui.Helper;
 
 /**

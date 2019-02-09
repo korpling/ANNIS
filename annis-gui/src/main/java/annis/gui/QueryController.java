@@ -62,7 +62,7 @@ import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.ExportQuery;
 import annis.gui.objects.FrequencyQuery;
 import annis.gui.objects.PagedResultQuery;
-import annis.gui.objects.Query;
+import annis.model.Query;
 import annis.gui.objects.QueryGenerator;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultfetch.ResultFetchJob;

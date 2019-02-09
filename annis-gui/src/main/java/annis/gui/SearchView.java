@@ -58,13 +58,14 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
+import annis.CommonHelper;
 import annis.VersionInfo;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.PagedResultQuery;
-import annis.gui.objects.Query;
+import annis.model.Query;
 import annis.gui.objects.QueryGenerator;
 import annis.gui.querybuilder.AQLOperator;
 import annis.gui.resultview.ResultViewPanel;
@@ -472,7 +473,7 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
             return;
         }
 
-        Map<String, String> args = Helper.parseFragment(fragment);
+        Map<String, String> args = CommonHelper.parseFragment(fragment);
 
         if (args.containsKey("c")) {
             String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");

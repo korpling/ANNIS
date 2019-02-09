@@ -17,74 +17,61 @@ package annis.gui.objects;
 
 import java.util.Objects;
 
+import annis.model.Query;
+
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ContextualizedQuery extends Query
-{
+public class ContextualizedQuery extends Query {
   private int leftContext;
   private int rightContext;
   private String segmentation;
-  
-  public ContextualizedQuery()
-  {
-    
+
+  public ContextualizedQuery() {
+
   }
 
-  public int getLeftContext()
-  {
+  public int getLeftContext() {
     return leftContext;
   }
 
-  public void setLeftContext(int leftContext)
-  {
+  public void setLeftContext(int leftContext) {
     this.leftContext = leftContext;
   }
 
-  public int getRightContext()
-  {
+  public int getRightContext() {
     return rightContext;
   }
 
-  public void setRightContext(int rightContext)
-  {
+  public void setRightContext(int rightContext) {
     this.rightContext = rightContext;
   }
 
-  public String getSegmentation()
-  {
+  public String getSegmentation() {
     return segmentation;
   }
 
-  public void setSegmentation(String segmentation)
-  {
+  public void setSegmentation(String segmentation) {
     this.segmentation = segmentation;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     return Objects.hash(getCorpora(), getQuery(), leftContext, rightContext, segmentation);
   }
 
   @Override
-  public boolean equals(Object obj)
-  {
-    if (obj == null)
-    {
+  public boolean equals(Object obj) {
+    if (obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass())
-    {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     final ContextualizedQuery other = (ContextualizedQuery) obj;
-    return 
-      Objects.equals(getQuery(), other.getQuery())
-      && Objects.equals(getCorpora(), other.getCorpora())
-      && Objects.equals(leftContext, other.leftContext)
-      && Objects.equals(rightContext, other.rightContext)
-      && Objects.equals(segmentation, other.segmentation);
+    return Objects.equals(getQuery(), other.getQuery()) && Objects.equals(getCorpora(), other.getCorpora())
+        && Objects.equals(leftContext, other.leftContext) && Objects.equals(rightContext, other.rightContext)
+        && Objects.equals(segmentation, other.segmentation);
   }
 }

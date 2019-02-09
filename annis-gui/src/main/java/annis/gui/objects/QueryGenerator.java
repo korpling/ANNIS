@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import annis.libgui.exporter.ExporterPlugin;
+import annis.model.Query;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;

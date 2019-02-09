@@ -15,11 +15,6 @@
  */
 package annis;
 
-import annis.model.AnnisConstants;
-import annis.service.objects.Match;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Range;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -33,8 +28,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
+
+import com.google.common.base.Joiner;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
@@ -60,6 +60,9 @@ import org.corpus_tools.salt.util.DataSourceSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import annis.model.AnnisConstants;
+import annis.service.objects.Match;
+
 /**
  * Utilities class for non-gui operations.
  *
@@ -79,7 +82,8 @@ public class CommonHelper {
      *
      * </p>
      *
-     * @param str The string to be checked.
+     * @param str
+     *                The string to be checked.
      * @return returns true, if arabic characters are detected.
      */
     public static boolean containsRTLText(String str) {
@@ -132,14 +136,14 @@ public class CommonHelper {
         } else {
             // get the very first node of the order relation chain
             Set<SNode> startNodes = new LinkedHashSet<SNode>();
-            if(graph != null) {
+            if (graph != null) {
                 List<SNode> orderRoots = graph.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
                 // collect the start nodes of a segmentation chain of length 1
                 for (SNode n : orderRoots) {
                     for (SRelation<?, ?> rel : n.getOutRelations()) {
                         if (rel instanceof SOrderRelation) {
                             // the type is the name of the relation
-                            if(segName.equals(rel.getType())) {
+                            if (segName.equals(rel.getType())) {
                                 startNodes.add(n);
                                 break;
                             }
@@ -316,8 +320,10 @@ public class CommonHelper {
      * Finds the {@link STextualDS} for a given node. The node must dominate a token
      * of this text.
      *
-     * @param node Salt node to find the textual data source for
-     * @param graph document graph
+     * @param node
+     *                  Salt node to find the textual data source for
+     * @param graph
+     *                  document graph
      * @return textual datasource or null if not connected to one
      */
     public static STextualDS getTextualDSForNode(SNode node, SDocumentGraph graph) {
@@ -339,7 +345,8 @@ public class CommonHelper {
      * Returns a file name that is safe to use and does not have any invalid
      * characters.
      *
-     * @param orig original file name
+     * @param orig
+     *                 original file name
      * @return encoded file name
      */
     public static String getSafeFileName(String orig) {
@@ -353,7 +360,8 @@ public class CommonHelper {
     /**
      * Gets all names of a corpus from a salt project.
      *
-     * @param p Salt project
+     * @param p
+     *              Salt project
      * @return returns an empty list if project is empty or null.
      */
     public static Set<String> getToplevelCorpusNames(SaltProject p) {
@@ -376,8 +384,10 @@ public class CommonHelper {
      * Takes a map of salt node IDs to a value and return a new map that uses the
      * SNodes as keys instead of the IDs.
      *
-     * @param map Map of node IDs
-     * @param graph document graph
+     * @param map
+     *                  Map of node IDs
+     * @param graph
+     *                  document graph
      * @return map with SNodes as key
      */
     public static <V> Map<SNode, V> createSNodeMapFromIDs(Map<String, V> map, SDocumentGraph graph) {
@@ -424,5 +434,43 @@ public class CommonHelper {
         featAnnos.setName(AnnisConstants.FEAT_MATCHEDANNOS);
         featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
         document.addFeature(featAnnos);
+    }
+
+    /**
+     * Parses the fragment.
+     *
+     * Fragments have the form key1=value&key2=test ...
+     *
+     * @param fragment
+     *                     fragment to parse
+     * @return a map with the keys and values of the fragment
+     */
+    public static Map<String, String> parseFragment(String fragment) {
+        Map<String, String> result = new TreeMap<String, String>();
+
+        fragment = StringUtils.removeStart(fragment, "!");
+
+        String[] split = StringUtils.split(fragment, "&");
+        for (String s : split) {
+            String[] parts = s.split("=", 2);
+            String name = parts[0].trim();
+            String value = "";
+            if (parts.length == 2) {
+                try {
+                    // every name that starts with "_" is base64 encoded
+                    if (name.startsWith("_")) {
+                        value = new String(Base64.decodeBase64(parts[1]), "UTF-8");
+                    } else {
+                        value = URLDecoder.decode(parts[1], "UTF-8");
+                    }
+                } catch (UnsupportedEncodingException ex) {
+                    log.error(ex.getMessage(), ex);
+                }
+            }
+            name = StringUtils.removeStart(name, "_");
+
+            result.put(name, value);
+        }
+        return result;
     }
 }

@@ -107,7 +107,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             usage(null);
         } else if ("import".equals(command)) {
             doImport(commandArgs);
-
+        } else if ("migrate-url-shortener".equals(command)) {
+            doMigrateUrlShortener(commandArgs);
         } else if ("export".equals(command)) {
             doExport(commandArgs);
         } else if ("delete".equals(command)) {
@@ -215,6 +216,27 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
         } catch (ParseException ex) {
             HelpFormatter helpFormatter = new HelpFormatter();
             helpFormatter.printHelp("annis-admin.sh import [OPTION] DIR1 DIR2 ...", options);
+        }
+    }
+
+    void doMigrateUrlShortener(List<String> commandArgs) {
+        Options options = new OptionBuilder()
+                .addToggle("i", "ignore-errors", false, "Migrate a short URL even if validation fails.")
+                .createOptions();
+
+        try {
+            CommandLineParser parser = new PosixParser();
+            CommandLine cmdLine = parser.parse(options, commandArgs.toArray(new String[commandArgs.size()]));
+
+            List<String> urlShortenerFiles = cmdLine.getArgList();
+            if(urlShortenerFiles.isEmpty()) {
+                throw new ParseException("Where can I find the url shortener export files you want to migrate?");
+            }
+            corpusAdministration.migrateUrlShortener(urlShortenerFiles);
+
+        } catch (ParseException ex) {
+            HelpFormatter helpFormatter = new HelpFormatter();
+            helpFormatter.printHelp("annis-admin.sh migrate-url-shortener [OPTION] FILE", options);
         }
     }
 

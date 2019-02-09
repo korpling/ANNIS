@@ -47,7 +47,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.declarative.Design;
 
 import annis.gui.beans.CorpusBrowserEntry;
-import annis.gui.objects.Query;
+import annis.model.Query;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Background;
 import annis.libgui.Helper;

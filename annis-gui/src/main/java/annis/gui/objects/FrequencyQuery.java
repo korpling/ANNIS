@@ -16,52 +16,43 @@
  */
 package annis.gui.objects;
 
-import annis.service.objects.FrequencyTableQuery;
 import java.util.Objects;
+
+import annis.model.Query;
+import annis.service.objects.FrequencyTableQuery;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class FrequencyQuery extends Query
-{
-  
+public class FrequencyQuery extends Query {
+
   private FrequencyTableQuery frequencyDefinition;
 
-  public FrequencyTableQuery getFrequencyDefinition()
-  {
+  public FrequencyTableQuery getFrequencyDefinition() {
     return frequencyDefinition;
   }
 
-  public void setFrequencyDefinition(FrequencyTableQuery frequencyDefinition)
-  {
+  public void setFrequencyDefinition(FrequencyTableQuery frequencyDefinition) {
     this.frequencyDefinition = frequencyDefinition;
   }
-  
-  
-  
+
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     return Objects.hash(getCorpora(), getQuery(), getFrequencyDefinition());
   }
 
-  
   @Override
-  public boolean equals(Object obj)
-  {
-    if (obj == null)
-    {
+  public boolean equals(Object obj) {
+    if (obj == null) {
       return false;
     }
-    if (getClass() != obj.getClass())
-    {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     final FrequencyQuery other = (FrequencyQuery) obj;
-    
-    return Objects.equals(this.getQuery(), other.getQuery())
-      && Objects.equals(this.getCorpora(), other.getCorpora())
-      && Objects.equals(this.getFrequencyDefinition(), other.getFrequencyDefinition());
+
+    return Objects.equals(this.getQuery(), other.getQuery()) && Objects.equals(this.getCorpora(), other.getCorpora())
+        && Objects.equals(this.getFrequencyDefinition(), other.getFrequencyDefinition());
   }
 }

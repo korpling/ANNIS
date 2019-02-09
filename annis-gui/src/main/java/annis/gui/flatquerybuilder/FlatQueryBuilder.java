@@ -45,7 +45,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 
 import annis.gui.QueryController;
-import annis.gui.objects.Query;
+import annis.model.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.QueryLanguage;

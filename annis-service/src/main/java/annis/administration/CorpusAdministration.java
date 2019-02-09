@@ -19,12 +19,14 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -52,9 +54,13 @@ import annis.AnnisRunnerException;
 import annis.CommonHelper;
 import annis.ServiceConfig;
 import annis.exceptions.AnnisException;
+import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
+import annis.service.objects.QueryLanguage;
 import annis.utils.ANNISFormatHelper;
+import au.com.bytecode.opencsv.CSVParser;
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  *
@@ -194,6 +200,55 @@ public class CorpusAdministration {
         } // end for each corpus
 
         return importStats;
+    }
+
+
+    private Query queryFromShortenerURL(String url) {
+        if(url.startsWith("/embeddedvis")) {
+            
+        } else if(url.startsWith("/#")) {
+            Map<String, String> args = CommonHelper.parseFragment(url.substring("/#".length()));
+            String corporaRaw = args.get("c");
+            String aql = args.get("q");
+            if(corporaRaw != null && aql != null) {
+                Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
+                Query q = new Query();
+                q.setCorpora(corpora);
+                q.setQuery(aql);
+                q.setQueryLanguage(QueryLanguage.AQL);
+                return q;
+            }
+        }
+        return null;
+    }
+
+
+    public void migrateUrlShortener(List<String> paths) {
+        if (paths == null) {
+            return;
+        }
+        for (String p : paths) {
+            File urlShortenerFile = new File(p);
+            if (urlShortenerFile.isFile()) {
+                try(CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {
+                    String[] line;
+                    while((line = csvReader.readNext()) != null) {
+                        if(line.length == 4) {
+                            // parse URL
+                            Query q = queryFromShortenerURL(line[3]);
+                            if(q != null) {
+                                log.info("Query: {}", q.getQuery());
+                            }
+                        }
+                    }
+
+                } catch (FileNotFoundException ex) {
+                    log.error("File with URL shortener table not found", ex);
+                } catch (IOException ex) {
+                    log.error("Migrating URL shortener table failed", ex);
+                }
+            }
+        }
     }
 
     /**
