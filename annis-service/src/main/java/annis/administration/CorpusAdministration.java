@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -207,25 +208,6 @@ public class CorpusAdministration {
         return importStats;
     }
 
-    private Query queryFromShortenerURL(String url) {
-        if (url.startsWith("/embeddedvis")) {
-            // TODO: parse embedded vis linked query
-        } else if (url.startsWith("/#")) {
-            Map<String, String> args = CommonHelper.parseFragment(url.substring("/#".length()));
-            String corporaRaw = args.get("c");
-            String aql = args.get("q");
-            if (corporaRaw != null && aql != null) {
-                Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
-                Query q = new Query();
-                q.setCorpora(corpora);
-                q.setQuery(aql);
-                q.setQueryLanguage(QueryLanguage.AQL);
-                return q;
-            }
-        }
-        return null;
-    }
-
     public void migrateUrlShortener(List<String> paths, String serviceURL, String username, String password) {
         if (paths == null || serviceURL == null) {
             return;
@@ -236,7 +218,7 @@ public class CorpusAdministration {
             HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basic(username, password);
             client.register(authFeature);
         }
-        WebTarget countTarget = client.target(serviceURL).path("annis").path("query").path("search").path("count");
+        WebTarget searchService = client.target(serviceURL).path("annis").path("query").path("search");
 
         int sucessfull = 0;
         for (String p : paths) {
@@ -247,27 +229,17 @@ public class CorpusAdministration {
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
                             // parse URL
-                            Query q = queryFromShortenerURL(line[3]);
-                            if (q != null) {
-                                log.info("test");
-                                // check the query
-                                try {
-                                    int countGraphANNIS = getAdministrationDao().getQueryDao().count(q.getQuery(),
-                                            QueryLanguage.AQL, new LinkedList<>(q.getCorpora()));
-                                    MatchAndDocumentCount countLegacy = countTarget.queryParam("q", q.getQuery())
-                                            .queryParam("corpora", Joiner.on(",").join(q.getCorpora())).request()
-                                            .get(MatchAndDocumentCount.class);
-                                    if (countGraphANNIS != countLegacy.getMatchCount()) {
-                                        log.error("Count mismatch on corpus {}:\n{}",
-                                                Joiner.on(",").join(q.getCorpora()), q.getQuery());
+                            URLShortenerQuery q = new URLShortenerQuery(line[3]);
+                            // check the query
+                            try {
+                                URLShortenerQuery.Status status = q.test(getAdministrationDao().getQueryDao(),
+                                        searchService);
+                                
 
-                                        // TODO: check the actual match IDs
-                                        // TODO: check in quirks mode and rewrite if necessary
-                                    }
-                                } catch (GraphANNISException ex) {
-                                    log.error("Executing query {} failed", q.getQuery(), ex);
-                                }
+                            } catch (GraphANNISException ex) {
+                                log.error("Executing query {} failed", q.getQuery(), ex);
                             }
+
                         }
                     }
 
