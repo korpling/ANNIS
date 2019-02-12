@@ -136,6 +136,29 @@
 			</plugin>
 
 			<plugin>
+				<groupId>com.amashchenko.maven.plugin</groupId>
+				<artifactId>gitflow-maven-plugin</artifactId>
+				<version>1.11.0</version>
+				<configuration>
+					<pushRemote>true</pushRemote>
+					<preReleaseGoals>license:add-third-party license:download-licenses</preReleaseGoals>
+					<postReleaseGoals>-Prelease,mdbook deploy</postReleaseGoals>
+					<postHotfixGoals>-Prelease,mdbook deploy</postHotfixGoals>
+					<verbose>true</verbose>
+					<gitFlowConfig>
+						<productionBranch>master</productionBranch>
+						<developmentBranch>develop</developmentBranch>
+						<featureBranchPrefix>feature/</featureBranchPrefix>
+						<releaseBranchPrefix>release/</releaseBranchPrefix>
+						<hotfixBranchPrefix>hotfix/</hotfixBranchPrefix>
+						<supportBranchPrefix>support/</supportBranchPrefix>
+						<versionTagPrefix>annis-</versionTagPrefix>
+						<origin>origin</origin>
+					</gitFlowConfig>
+				</configuration>
+			</plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.0.1</version>
