@@ -12,7 +12,7 @@ Otherwise the documentation can't be created.
 
 ### Initialization phase 
 
-1. **Start** the release process by executing `mvn gitflow:release-start`for a regular release (branched from the `develop`) or `mvn gitflow:hotfix-start` for a hotfix that is branched from the `master`. The command will ask you for the new version number, use [semantic versioning](https://semver.org/).
+1. **Start** the release process by executing `mvn gitflow:release-start`for a regular release (branched from the `develop`) or `mvn gitflow:hotfix-start` for a hotfix that is branched from `master`. The command will ask you for the new version number, use [semantic versioning](https://semver.org/).
 2. **Add new changelog entry**, if some important information is missing create an enhancement issue in GitHub and repeat
 	- Get the GitHub Milestone id associated the release (is visible in the URL if you view the issues of the release tracking milestone).
 	- replace the ID in the `Misc/changelog.py` script
