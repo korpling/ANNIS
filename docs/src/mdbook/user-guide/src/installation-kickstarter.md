@@ -31,6 +31,7 @@ or .bat script respectively):
 ```
 (To accelerate searches it is also possible to give the PostgreSQL database
 more memory, see the next section below).
+
 4. Once the program has started, if this is the first time you run Kickstarter, press
 “Init Database” and supply your PostgreSQL administrator password from step 1. If you are upgrading from version 3.0.1 of ANNIS Kickstarter or higher, you will be given the option to reimport your corpora, assuming they can still be found at the paths from which they were originally imported.
 5. Download and unzip the GUM demo corpus from the ANNIS website:
