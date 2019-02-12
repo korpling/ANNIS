@@ -141,8 +141,8 @@
 				<version>1.11.0</version>
 				<configuration>
 					<pushRemote>true</pushRemote>
-					<postReleaseGoals>-Prelease,mdbook deploy</postReleaseGoals>
-					<postHotfixGoals>-Prelease,mdbook deploy</postHotfixGoals>
+					<postReleaseGoals>-Prelease,mdbook install deploy</postReleaseGoals>
+					<postHotfixGoals>-Prelease,mdbook install deploy</postHotfixGoals>
 					<verbose>true</verbose>
 					<gitFlowConfig>
 						<productionBranch>master</productionBranch>
