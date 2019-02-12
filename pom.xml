@@ -141,7 +141,6 @@
 				<version>1.11.0</version>
 				<configuration>
 					<pushRemote>true</pushRemote>
-					<preReleaseGoals>license:add-third-party license:download-licenses</preReleaseGoals>
 					<postReleaseGoals>-Prelease,mdbook deploy</postReleaseGoals>
 					<postHotfixGoals>-Prelease,mdbook deploy</postHotfixGoals>
 					<verbose>true</verbose>
