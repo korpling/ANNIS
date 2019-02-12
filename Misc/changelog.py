@@ -3,6 +3,7 @@
 import json
 import io
 from subprocess import call
+import sys
 
 milestone_id = sys.argv[1]
 
