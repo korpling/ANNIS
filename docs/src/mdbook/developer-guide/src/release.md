@@ -17,6 +17,10 @@ Otherwise the documentation can't be created.
 	- Get the GitHub Milestone id associated the release (is visible in the URL if you view the issues of the release tracking milestone).
 	- execute this script `Misc/changelog.py <milestone-id>`
 	- add the output to the begin of the `CHANGELOG` file
+3. Update and commit  **license information**
+~~~bash
+mvn license:add-third-party license:download-licenses
+~~~
 
 ### Testing cycle
 
