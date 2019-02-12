@@ -8,7 +8,20 @@
 	<packaging>pom</packaging>
 	<name>ANNIS corpus search</name>
 	<version>4.0.0-SNAPSHOT</version>
-	<description>ANNIS is an open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with    diverse types of annotation. ANNIS, which stands for ANNotation of Information Structure, has been designed to provide access to the data of the SFB 632 - "Information Structure: The Linguistic Means for Structuring Utterances, Sentences and Texts". Since information structure interacts with    linguistic phenomena on many levels, ANNIS addresses the SFB's need to concurrently annotate, query and visualize data from such varied areas as    syntax, semantics, morphology, prosody, referentiality, lexis and more. For projects working with spoken language, support for audio / video    annotations is also required.</description>
+	<description>
+    ANNIS is an open source, versatile web browser-based search and
+    visualization architecture for complex multilevel linguistic corpora with
+    diverse types of annotation. ANNIS, which stands for ANNotation of Information
+    Structure, has been designed to provide access to the data of the
+    SFB 632 - "Information Structure: The Linguistic Means for Structuring
+    Utterances, Sentences and Texts". Since information structure interacts with
+    linguistic phenomena on many levels, ANNIS addresses the SFB's need to
+    concurrently annotate, query and visualize data from such varied areas as
+    syntax, semantics, morphology, prosody, referentiality, lexis and more.
+    For projects working with spoken language, support for audio / video
+    annotations is also required.
+  </description>
+
 	<url>http://corpus-tools.org/annis/</url>
 	<developers>
 		<developer>
@@ -81,6 +94,28 @@
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.amashchenko.maven.plugin</groupId>
+				<artifactId>gitflow-maven-plugin</artifactId>
+				<version>1.11.0</version>
+				<configuration>
+					<pushRemote>true</pushRemote>
+					<postReleaseGoals>-Prelease,mdbook install javadoc:jar deploy</postReleaseGoals>
+					<postHotfixGoals>-Prelease,mdbook install javadoc:jar deploy</postHotfixGoals>
+					<verbose>true</verbose>
+					<gitFlowConfig>
+						<productionBranch>master</productionBranch>
+						<developmentBranch>develop</developmentBranch>
+						<featureBranchPrefix>feature/</featureBranchPrefix>
+						<releaseBranchPrefix>release/</releaseBranchPrefix>
+						<hotfixBranchPrefix>hotfix/</hotfixBranchPrefix>
+						<supportBranchPrefix>support/</supportBranchPrefix>
+						<versionTagPrefix>annis-</versionTagPrefix>
+						<origin>origin</origin>
+					</gitFlowConfig>
 				</configuration>
 			</plugin>
 

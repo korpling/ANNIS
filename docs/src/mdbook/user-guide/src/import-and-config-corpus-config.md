@@ -2,7 +2,7 @@
 
 ## Generating Example Queries
 
-User created example queries are stored in the file example_queries.tab within the
+User created example queries are stored in the file `example_queries.annis` within the
 relANNIS corpus folder. The file contains two columns (tab delimited), the first with a
 valid AQL query for your corpus and the second with a human readable description of
 the query. These queries are the then visible in Example Queries tab of the workspace

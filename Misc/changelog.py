@@ -3,8 +3,9 @@
 import json
 import io
 from subprocess import call
+import sys
 
-milestone_id = "61"
+milestone_id = sys.argv[1]
 
 import http.client
 
