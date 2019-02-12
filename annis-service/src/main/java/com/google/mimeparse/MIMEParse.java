@@ -47,8 +47,8 @@ public final class MIMEParse
         {
             StringBuffer s = new StringBuffer("('" + type + "', '" + subType
                     + "', {");
-            for (String k : params.keySet())
-                s.append("'" + k + "':'" + params.get(k) + "',");
+            for (Map.Entry<String, String> e : params.entrySet())
+                s.append("'" + e.getKey() + "':'" + e.getValue() + "',");
             return s.append("})").toString();
         }
     }

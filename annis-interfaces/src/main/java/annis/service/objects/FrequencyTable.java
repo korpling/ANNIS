@@ -110,11 +110,11 @@ public class FrequencyTable implements Serializable
       }
 
       // we want to have greatest elements first
-      int countCmp = ((Long) lhs.getCount()).compareTo(rhs.getCount());
+      int countCmp = Long.compare(lhs.getCount(), rhs.getCount());
       if (countCmp == 0)
       {
         // their are actually equal in count, but we can still use their hash code
-        return ((Integer) lhs.hashCode()).compareTo(rhs.hashCode());
+        return Integer.compare(lhs.hashCode(), rhs.hashCode());
       }
       else if(countCmp < 0)
       {

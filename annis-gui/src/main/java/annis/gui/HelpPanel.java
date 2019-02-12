@@ -15,39 +15,87 @@
  */
 package annis.gui;
 
-import annis.gui.tutorial.TutorialPanel;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Accordion;
+import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.UI;
+
+import annis.gui.components.StatefulBrowserComponent;
+import annis.libgui.InstanceConfig;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class HelpPanel extends Accordion
-{
-  private final TutorialPanel tutorial;
-  private final ExampleQueriesPanel examples;
-  
-  public HelpPanel(AnnisUI ui)
-  {
-    setSizeFull();
-    
-    tutorial = new TutorialPanel();
-    tutorial.setHeight("99%");
-    
-    examples = new ExampleQueriesPanel(ui, this);
-    examples.setHeight("99%");
-    
-    addTab(tutorial, "Tutorial", FontAwesome.BOOK);
-    addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
-    setSelectedTab(examples);
-    addStyleName("help-tab");
-    
-  }
+public class HelpPanel extends Accordion {
 
-  public ExampleQueriesPanel getExamples()
-  {
-    return examples;
-  }
-  
+	private static final Logger log = LoggerFactory.getLogger(HelpPanel.class);
+
+	private StatefulBrowserComponent help;
+	private final ExampleQueriesPanel examples;
+
+	public HelpPanel(AnnisUI ui) {
+		setSizeFull();
+		
+		
+		if (ui != null) {
+			InstanceConfig cfg = ((AnnisUI) ui).getInstanceConfig();
+			
+			URI url = null;
+			if(cfg.getHelpUrl() != null && !cfg.getHelpUrl().isEmpty()) {
+				try {
+					url = new URI(cfg.getHelpUrl());
+				} catch (URISyntaxException ex) {
+					log.error("Invalid help URL {} provided in instance configuration", cfg.getHelpUrl(), ex);
+				}
+			} else {
+				URI appURI = UI.getCurrent().getPage().getLocation();
+				String relativeFile = "/VAADIN/help/index.html";
+		
+				try {
+					String oldPath = VaadinService.getCurrentRequest().getContextPath();
+					if (oldPath == null) {
+						oldPath = "";
+					}
+					if (oldPath.endsWith("/")) {
+						oldPath = oldPath.substring(0, oldPath.length() - 1);
+					}
+					url = new URI(appURI.getScheme(), appURI.getUserInfo(), appURI.getHost(), appURI.getPort(),
+							oldPath + relativeFile, null, null);
+		
+				} catch (URISyntaxException ex) {
+					log.error("Invalid help URI", ex);
+				}	}
+			
+			if(url != null) {
+				help = new StatefulBrowserComponent(url);
+				help.setSizeFull();
+				addComponent(help);
+				help.setHeight("99%");
+				addTab(help, "Help", FontAwesome.BOOK);
+				setSelectedTab(help);
+			}
+		}
+		
+		examples = new ExampleQueriesPanel(ui, this);
+		examples.setHeight("99%");
+		
+		addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
+		addStyleName("help-tab");
+	}
+
+	public ExampleQueriesPanel getExamples() {
+		return examples;
+	}
+
 }

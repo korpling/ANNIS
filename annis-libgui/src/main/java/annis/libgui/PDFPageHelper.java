@@ -15,16 +15,16 @@
  */
 package annis.libgui;
 
-import annis.libgui.visualizers.VisualizerInput;
-import annis.model.AnnisConstants;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-import annis.model.RelannisNodeFeature;
+
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.core.SAnnotation;
@@ -33,6 +33,10 @@ import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import annis.libgui.visualizers.VisualizerInput;
+import annis.model.AnnisConstants;
+import annis.model.RelannisNodeFeature;
 
 /**
  * Helps to extract page number annotations from {@link SSpan} of a salt
@@ -244,11 +248,11 @@ public class PDFPageHelper {
     SSpan rightSpan = null;
     Integer rightIdx = null;
 
-    for (Integer leftIdxKey : sspans.keySet()) {
-      for (Integer rightIdxKey : sspans.get(leftIdxKey).keySet()) {
-        if (rightIdx == null || rightIdx <= rightIdxKey) {
-          rightIdx = rightIdxKey;
-          rightSpan = sspans.get(leftIdxKey).get(rightIdx);
+    for (TreeMap<Integer, SSpan> leftIdxValue : sspans.values()) {
+      for (Map.Entry<Integer, SSpan> rightIdxEntry : leftIdxValue.entrySet()) {
+        if (rightIdx == null || rightIdx <= rightIdxEntry.getKey()) {
+          rightIdx = rightIdxEntry.getKey();
+          rightSpan = rightIdxEntry.getValue();
         }
       }
     }

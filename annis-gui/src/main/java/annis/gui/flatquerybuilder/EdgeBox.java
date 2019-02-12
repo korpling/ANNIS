@@ -15,13 +15,15 @@
  */
 package annis.gui.flatquerybuilder;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.BlurListener;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Panel;
-import java.util.HashMap;
-import java.util.regex.Pattern;
 
 /**
  * @author Martin Klotz (martin.klotz@hu-berlin.de)
@@ -54,10 +56,10 @@ public class EdgeBox extends Panel
     storedValue=".";
     edge = new ComboBox();
     edge.setItemCaptionMode(AbstractSelect.ItemCaptionMode.EXPLICIT);
-    for(String o : EO.keySet())
+    for(Map.Entry<String,String> o : EO.entrySet())
     {
-      edge.addItem(o);
-      edge.setItemCaption(o, EO.get(o));
+      edge.addItem(o.getKey());
+      edge.setItemCaption(o, o.getValue());
     }
     edge.setNewItemsAllowed(true);
     edge.setTextInputAllowed(true);    

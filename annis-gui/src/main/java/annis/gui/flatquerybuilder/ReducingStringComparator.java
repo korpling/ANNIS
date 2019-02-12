@@ -40,7 +40,6 @@ public class ReducingStringComparator
   
   public ReducingStringComparator()
   {
-    initAlphabet();
     readMappings();
   }
   
