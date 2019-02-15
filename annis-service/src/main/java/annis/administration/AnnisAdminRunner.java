@@ -242,56 +242,65 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             if (urlShortenerFiles.isEmpty()) {
                 throw new ParseException("Where can I find the url shortener export files you want to migrate?");
             }
-            
-           Multimap<QueryStatus, URLShortenerQuery> status = corpusAdministration.migrateUrlShortener(urlShortenerFiles, cmdLine.getOptionValue("service-url"),
+
+            Multimap<QueryStatus, URLShortenerQuery> status = corpusAdministration.migrateUrlShortener(
+                    urlShortenerFiles, cmdLine.getOptionValue("service-url"),
                     cmdLine.getOptionValue("service-username"), cmdLine.getOptionValue("service-password"));
-           
-           // output summary and detailed list of failed queries  
-           Collection<URLShortenerQuery> unknownCorpusQueries = status.get(QueryStatus.UnknownCorpus);
-           
-           if(!unknownCorpusQueries.isEmpty()) {
-               Map<String, Integer> unknownCorpusCount = new TreeMap<>();
-               for(URLShortenerQuery q : unknownCorpusQueries) {
-                   for(String c : q.getQuery().getCorpora()) {
-                       int oldCount = unknownCorpusCount.getOrDefault(c, 0);
-                       unknownCorpusCount.put(c, oldCount+1);
-                   }
-               }
-               String unknownCorpusCaption = "Unknown corpus (sum: " + unknownCorpusCount.size() + ")";
-               System.out.println(unknownCorpusCaption);
-               System.out.println(Strings.repeat("=", unknownCorpusCaption.length()));
-               System.out.println();
-               
-               for(Map.Entry<String, Integer> e : unknownCorpusCount.entrySet()) {
-                   System.out.println("Corpus \"" + e.getKey() + "\": " +  e.getValue() + " queries");
-               }
-               System.out.println();
-           }
-           
-           printProblematicQueries("Count different", status.get(QueryStatus.CountDiffers));
-           printProblematicQueries("Match list different", status.get(QueryStatus.MatchesDiffer));
-           //printProblematicQueries("Failed", status.get(QueryStatus.Failed));
-           
-           
-           System.out.println("Successful: " + status.get(QueryStatus.Ok).size() + " from " + status.size());
-           System.out.println();
-         
+
+            // output summary and detailed list of failed queries
+            Collection<URLShortenerQuery> unknownCorpusQueries = status.get(QueryStatus.UnknownCorpus);
+
+            if (!unknownCorpusQueries.isEmpty()) {
+                Map<String, Integer> unknownCorpusCount = new TreeMap<>();
+                for (URLShortenerQuery q : unknownCorpusQueries) {
+                    for (String c : q.getQuery().getCorpora()) {
+                        int oldCount = unknownCorpusCount.getOrDefault(c, 0);
+                        unknownCorpusCount.put(c, oldCount + 1);
+                    }
+                }
+                System.out.println();
+                String unknownCorpusCaption = "Unknown corpus (sum: " + unknownCorpusCount.size() + ")";
+                System.out.println(unknownCorpusCaption);
+                System.out.println(Strings.repeat("=", unknownCorpusCaption.length()));
+                System.out.println();
+
+                for (Map.Entry<String, Integer> e : unknownCorpusCount.entrySet()) {
+                    System.out.println("Corpus \"" + e.getKey() + "\": " + e.getValue() + " queries");
+                }
+                System.out.println();
+            }
+
+            printProblematicQueries("Count different", status.get(QueryStatus.CountDiffers));
+            printProblematicQueries("Match list different", status.get(QueryStatus.MatchesDiffer));
+            // printProblematicQueries("Failed", status.get(QueryStatus.Failed));
+
+            String summaryString = "+ Successful: " + status.get(QueryStatus.Ok).size() + " from " + status.size()
+                    + " +";
+            System.out.println(Strings.repeat("+", summaryString.length()));
+            System.out.println(summaryString);
+            System.out.println(Strings.repeat("+", summaryString.length()));
 
         } catch (ParseException ex) {
             HelpFormatter helpFormatter = new HelpFormatter();
             helpFormatter.printHelp("annis-admin.sh migrate-url-shortener [OPTION] FILE", options);
         }
     }
-    
+
     private void printProblematicQueries(String statusCaption, Collection<URLShortenerQuery> queries) {
-        if(queries != null && !queries.isEmpty()) {
-            String captionWithCount = statusCaption +  " (sum: " + queries.size() + ")";
+        if (queries != null && !queries.isEmpty()) {
+            String captionWithCount = statusCaption + " (sum: " + queries.size() + ")";
             System.out.println(captionWithCount);
             System.out.println(Strings.repeat("=", captionWithCount.length()));
             System.out.println();
-            
-            for(URLShortenerQuery q : queries) {
-                System.out.println("Corpus \"" + q.getQuery().getCorpora() + "\": " +  q.getQuery().getQuery());
+
+            for (URLShortenerQuery q : queries) {
+                if (q.getErrorMsg() != null) {
+                    System.out.println("Error: " + q.getErrorMsg());
+                }
+                System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
+                System.out.println("Query:");
+                System.out.println(q.getQuery().getQuery());
+
                 System.out.println("-------");
             }
             System.out.println();
