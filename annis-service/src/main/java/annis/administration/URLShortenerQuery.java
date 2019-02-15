@@ -1,7 +1,12 @@
 package annis.administration;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 
 import annis.CommonHelper;
 import annis.dao.QueryDao;
@@ -34,27 +40,47 @@ public class URLShortenerQuery {
 
     private String errorMsg;
 
-    public URLShortenerQuery(String url) {
+    protected URLShortenerQuery() {
         this.query = new Query();
-        this.query.setCorpora(new LinkedHashSet<>());
-        this.query.setQuery("");
-        this.query.setQueryLanguage(QueryLanguage.AQL);
         this.errorMsg = null;
+    }
 
-        if (url.startsWith("/embeddedvis")) {
-            // TODO: parse embedded vis linked query
-        } else if (url.startsWith("/#")) {
-            Map<String, String> args = CommonHelper.parseFragment(url.substring("/#".length()));
+    public static URLShortenerQuery parse(String url) throws URISyntaxException, UnsupportedEncodingException {
+
+        URI parsedURI = new URI(url);
+
+        if (parsedURI.getPath().startsWith("/embeddedvis")) {
+            // parse embedded vis linked query
+            Map<String, String> args = new LinkedHashMap<>();
+            for(String argRaw : Splitter.on('&').trimResults().split(parsedURI.getRawQuery())) {
+                List<String> keyValue = Splitter.on('=').limit(2).splitToList(argRaw);
+                if(keyValue.size() == 1) {
+                    args.putIfAbsent(keyValue.get(0), "");
+                } else {
+                    args.putIfAbsent(keyValue.get(0), keyValue.get(1));
+                }
+            }
+            String interfaceURL = URLDecoder.decode(args.get("embedded_interface"), "UTF-8");
+
+            if (interfaceURL != null) {
+                return parse(interfaceURL);
+            }
+
+        } else {
+            Map<String, String> args = CommonHelper.parseFragment(parsedURI.getFragment());
             String corporaRaw = args.get("c");
             String aql = args.get("q");
             if (corporaRaw != null && aql != null) {
+                URLShortenerQuery result = new URLShortenerQuery();
                 Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
-                this.query = new Query();
-                this.query.setCorpora(corpora);
-                this.query.setQuery(aql);
-                this.query.setQueryLanguage(QueryLanguage.AQL);
+                result.getQuery().setCorpora(corpora);
+                result.getQuery().setQuery(aql);
+                result.getQuery().setQueryLanguage(QueryLanguage.AQL);
+                return result;
             }
         }
+
+        return null;
     }
 
     public Query getQuery() {

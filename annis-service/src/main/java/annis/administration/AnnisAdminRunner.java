@@ -272,7 +272,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
             printProblematicQueries("Count different", status.get(QueryStatus.CountDiffers));
             printProblematicQueries("Match list different", status.get(QueryStatus.MatchesDiffer));
-            // printProblematicQueries("Failed", status.get(QueryStatus.Failed));
+            printProblematicQueries("Failed", status.get(QueryStatus.Failed));
 
             String summaryString = "+ Successful: " + status.get(QueryStatus.Ok).size() + " from " + status.size()
                     + " +";

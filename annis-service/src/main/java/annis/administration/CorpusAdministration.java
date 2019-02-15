@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -232,36 +233,36 @@ public class CorpusAdministration {
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
                             // parse URL
-                            URLShortenerQuery q = new URLShortenerQuery(line[3]);
-                            
-                            // check if all corpora exist in the new instance
-                            List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
-                            List<AnnisCorpus> corpora = getAdministrationDao().getQueryDao().listCorpora(corpusNames);
-                            if(corpora.size() != corpusNames.size()) {
-                                queryByStatus.put(QueryStatus.UnknownCorpus, q);
-                            } else if (corpusNames.isEmpty()) {
-                                queryByStatus.put(QueryStatus.Failed, q);
-                            } else {
-                                // check the query
-                                try {
-                                    log.info("Testing query {} on corpus {}", q.getQuery().getQuery(), q.getQuery().getCorpora());
-                                    QueryStatus status = q.test(getAdministrationDao().getQueryDao(),
-                                            searchService);
-                                    
-                                    queryByStatus.put(status, q);
-                                    
-    
-                                } catch (GraphANNISException ex) {
+                            URLShortenerQuery q = URLShortenerQuery.parse(line[3]);
+                            if(q != null) {
+                                // check if all corpora exist in the new instance
+                                List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
+                                List<AnnisCorpus> corpora = getAdministrationDao().getQueryDao().listCorpora(corpusNames);
+                                if(corpora.size() != corpusNames.size()) {
+                                    queryByStatus.put(QueryStatus.UnknownCorpus, q);
+                                } else if (corpusNames.isEmpty()) {
                                     queryByStatus.put(QueryStatus.Failed, q);
+                                } else {
+                                    // check the query
+                                    try {
+                                        log.info("Testing query {} on corpus {}", q.getQuery().getQuery(), q.getQuery().getCorpora());
+                                        QueryStatus status = q.test(getAdministrationDao().getQueryDao(),
+                                                searchService);
+                                        
+                                        queryByStatus.put(status, q);
+                                        
+        
+                                    } catch (GraphANNISException ex) {
+                                        queryByStatus.put(QueryStatus.Failed, q);
+                                    }
                                 }
                             }
-
                         }
                     }
 
                 } catch (FileNotFoundException ex) {
                     log.error("File with URL shortener table not found", ex);
-                } catch (IOException ex) {
+                } catch (URISyntaxException | IOException ex) {
                     log.error("Migrating URL shortener table failed", ex);
                 }
             }
