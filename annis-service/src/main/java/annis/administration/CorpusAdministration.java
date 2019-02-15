@@ -44,6 +44,8 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.io.ByteStreams;
 
 import org.aeonbits.owner.ConfigFactory;
@@ -208,9 +210,9 @@ public class CorpusAdministration {
         return importStats;
     }
 
-    public void migrateUrlShortener(List<String> paths, String serviceURL, String username, String password) {
+    public Multimap<QueryStatus, URLShortenerQuery> migrateUrlShortener(List<String> paths, String serviceURL, String username, String password) {
         if (paths == null || serviceURL == null) {
-            return;
+            return HashMultimap.create();
         }
 
         Client client = ClientBuilder.newClient();
@@ -219,8 +221,9 @@ public class CorpusAdministration {
             client.register(authFeature);
         }
         WebTarget searchService = client.target(serviceURL).path("annis").path("query").path("search");
-
-        int sucessfull = 0;
+        
+        Multimap<QueryStatus, URLShortenerQuery> queryByStatus = HashMultimap.create();
+        
         for (String p : paths) {
             File urlShortenerFile = new File(p);
             if (urlShortenerFile.isFile()) {
@@ -230,14 +233,27 @@ public class CorpusAdministration {
                         if (line.length == 4) {
                             // parse URL
                             URLShortenerQuery q = new URLShortenerQuery(line[3]);
-                            // check the query
-                            try {
-                                URLShortenerQuery.Status status = q.test(getAdministrationDao().getQueryDao(),
-                                        searchService);
-                                
-
-                            } catch (GraphANNISException ex) {
-                                log.error("Executing query {} failed", q.getQuery(), ex);
+                            
+                            // check if all corpora exist in the new instance
+                            List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
+                            List<AnnisCorpus> corpora = getAdministrationDao().getQueryDao().listCorpora(corpusNames);
+                            if(corpora.size() != corpusNames.size()) {
+                                queryByStatus.put(QueryStatus.UnknownCorpus, q);
+                            } else if (corpusNames.isEmpty()) {
+                                queryByStatus.put(QueryStatus.Failed, q);
+                            } else {
+                                // check the query
+                                try {
+                                    log.info("Testing query {} on corpus {}", q.getQuery().getQuery(), q.getQuery().getCorpora());
+                                    QueryStatus status = q.test(getAdministrationDao().getQueryDao(),
+                                            searchService);
+                                    
+                                    queryByStatus.put(status, q);
+                                    
+    
+                                } catch (GraphANNISException ex) {
+                                    queryByStatus.put(QueryStatus.Failed, q);
+                                }
                             }
 
                         }
@@ -250,9 +266,9 @@ public class CorpusAdministration {
                 }
             }
         }
-
-        // TODO: output summary
         // TODO: insert URLs into new database
+        
+        return queryByStatus;
     }
 
     /**

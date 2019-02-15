@@ -8,9 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
 
 import org.corpus_tools.graphannis.errors.GraphANNISException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 
@@ -23,15 +27,17 @@ import annis.service.objects.QueryLanguage;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 
 public class URLShortenerQuery {
-
-    public static enum Status {
-        Ok, UnknownCorpus, CountDiffers, MatchesDiffer
-    }
+    
+    private final static Logger log = LoggerFactory.getLogger(URLShortenerQuery.class);
 
     private Query query;
 
     public URLShortenerQuery(String url) {
-
+        this.query = new Query();
+        this.query.setCorpora(new LinkedHashSet<>());
+        this.query.setQuery("");
+        this.query.setQueryLanguage(QueryLanguage.AQL);
+        
         if (url.startsWith("/embeddedvis")) {
             // TODO: parse embedded vis linked query
         } else if (url.startsWith("/#")) {
@@ -52,17 +58,42 @@ public class URLShortenerQuery {
         return query;
     }
 
-    public Status test(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException {
+    public QueryStatus test(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException {
+        
+        if(this.query.getCorpora().isEmpty()) {
+            return QueryStatus.Failed;
+        }
+
         List<Match> matchesGraphANNIS = queryDao.find(query.getQuery(), QueryLanguage.AQL,
                 new LinkedList<>(query.getCorpora()), new LimitOffsetQueryData(0, Integer.MAX_VALUE));
-        MatchGroup matchesLegacy = annisSearchService.path("find").queryParam("q", query.getQuery())
-                .queryParam("limit", -1).queryParam("corpora", Joiner.on(",").join(query.getCorpora())).request()
-                .get(MatchGroup.class);
-        if (matchesGraphANNIS.size() != matchesLegacy.getMatches().size()) {
-            return Status.CountDiffers;
-        } else {
-            return matchesGraphANNIS.equals(matchesLegacy.getMatches()) ? Status.Ok : Status.MatchesDiffer;
+
+        WebTarget findTarget = annisSearchService.path("find").queryParam("q", query.getQuery()).queryParam("corpora",
+                Joiner.on(",").join(query.getCorpora()));
+       
+        try {
+            MatchGroup matchesLegacy = findTarget.request(MediaType.APPLICATION_XML_TYPE).get(MatchGroup.class);
+
+
+            if (matchesGraphANNIS.size() != matchesLegacy.getMatches().size()) {
+                return QueryStatus.CountDiffers;
+            } else {
+                Iterator<Match> itGraphANNIS = matchesGraphANNIS.iterator();
+                Iterator<Match> itLegacy = matchesLegacy.getMatches().iterator();
+                while(itGraphANNIS.hasNext() && itLegacy.hasNext()) {
+                    String m1 = itGraphANNIS.next().toString();
+                    String m2 = itLegacy.next().toString();
+                    
+                    if(!m1.equals(m2)) {
+                        log.warn("{} != {}", m1, m2);
+                        return QueryStatus.MatchesDiffer;
+                    }
+                }
+                return QueryStatus.Ok;
+            }
+            // TODO: check in quirks mode and rewrite if necessary
+            
+        } catch (ForbiddenException ex) {
+            return QueryStatus.Failed;
         }
-        // TODO: check in quirks mode and rewrite if necessary
     }
 }
