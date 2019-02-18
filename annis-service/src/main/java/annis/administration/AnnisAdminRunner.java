@@ -249,6 +249,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
             // output summary and detailed list of failed queries
             Collection<URLShortenerQuery> unknownCorpusQueries = status.get(QueryStatus.UnknownCorpus);
+            
+            System.out.println();
 
             if (!unknownCorpusQueries.isEmpty()) {
                 Map<String, Integer> unknownCorpusCount = new TreeMap<>();
@@ -258,7 +260,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                         unknownCorpusCount.put(c, oldCount + 1);
                     }
                 }
-                System.out.println();
                 String unknownCorpusCaption = "Unknown corpus (sum: " + unknownCorpusCount.size() + ")";
                 System.out.println(unknownCorpusCaption);
                 System.out.println(Strings.repeat("=", unknownCorpusCaption.length()));

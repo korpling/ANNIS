@@ -16,11 +16,11 @@
 package annis.gui.resultfetch;
 
 import annis.gui.AnnisUI;
-import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.model.AqlParseError;
+import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;

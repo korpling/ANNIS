@@ -16,6 +16,9 @@
 package annis.gui.objects;
 
 import com.google.common.base.Preconditions;
+
+import annis.model.PagedResultQuery;
+
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;

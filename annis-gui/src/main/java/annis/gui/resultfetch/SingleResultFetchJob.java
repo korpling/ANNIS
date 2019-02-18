@@ -23,8 +23,8 @@ import org.corpus_tools.salt.common.SaltProject;
 
 import com.sun.jersey.api.client.WebResource;
 
-import annis.gui.objects.PagedResultQuery;
 import annis.libgui.Helper;
+import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;

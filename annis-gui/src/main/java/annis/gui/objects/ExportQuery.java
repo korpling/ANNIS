@@ -18,6 +18,7 @@ package annis.gui.objects;
 import com.google.common.base.Splitter;
 
 import annis.libgui.exporter.ExporterPlugin;
+import annis.model.ContextualizedQuery;
 
 import java.util.List;
 import java.util.Objects;

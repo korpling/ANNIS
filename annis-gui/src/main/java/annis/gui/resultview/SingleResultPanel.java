@@ -56,12 +56,12 @@ import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
 import annis.gui.ShareSingleMatchGenerator;
 import annis.gui.objects.DisplayedResultQuery;
-import annis.gui.objects.PagedResultQuery;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProvider;
+import annis.model.PagedResultQuery;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 

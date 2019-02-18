@@ -29,8 +29,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
 import annis.gui.beans.CitationProvider;
-import annis.gui.objects.ContextualizedQuery;
 import annis.gui.objects.DisplayedResultQuery;
+import annis.model.ContextualizedQuery;
 import annis.model.Query;
 import annis.gui.objects.QueryGenerator;
 import annis.libgui.Helper;

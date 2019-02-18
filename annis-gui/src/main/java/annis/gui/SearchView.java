@@ -64,7 +64,7 @@ import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.DisplayedResultQuery;
-import annis.gui.objects.PagedResultQuery;
+import annis.model.PagedResultQuery;
 import annis.model.Query;
 import annis.gui.objects.QueryGenerator;
 import annis.gui.querybuilder.AQLOperator;
