@@ -53,7 +53,6 @@ import com.google.common.collect.Multimap;
 
 import annis.AnnisBaseRunner;
 import annis.AnnisRunnerException;
-import annis.TableFormatter;
 import annis.UsageException;
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
@@ -83,7 +82,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
     public static void main(String[] args) {
         // get Runner from Spring
         try {
-            AnnisBaseRunner.setupLogging(true);
+            AnnisBaseRunner.setupLogging(false);
             new AnnisAdminRunner().run(args);
         } catch (AnnisRunnerException ex) {
             log.error(ex.getMessage() + " (error code " + ex.getExitCode() + ")", ex);
