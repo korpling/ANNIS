@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 
@@ -52,9 +53,9 @@ public class URLShortenerQuery {
         if (parsedURI.getPath().startsWith("/embeddedvis")) {
             // parse embedded vis linked query
             Map<String, String> args = new LinkedHashMap<>();
-            for(String argRaw : Splitter.on('&').trimResults().split(parsedURI.getRawQuery())) {
+            for (String argRaw : Splitter.on('&').trimResults().split(parsedURI.getRawQuery())) {
                 List<String> keyValue = Splitter.on('=').limit(2).splitToList(argRaw);
-                if(keyValue.size() == 1) {
+                if (keyValue.size() == 1) {
                     args.putIfAbsent(keyValue.get(0), "");
                 } else {
                     args.putIfAbsent(keyValue.get(0), keyValue.get(1));
@@ -91,6 +92,8 @@ public class URLShortenerQuery {
         return errorMsg;
     }
 
+    public static int MAX_RETRY = 3;
+
     public QueryStatus test(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException {
 
         if (this.query.getCorpora().isEmpty()) {
@@ -105,8 +108,19 @@ public class URLShortenerQuery {
                 Joiner.on(",").join(query.getCorpora()));
 
         try {
-            MatchGroup matchesLegacy = findTarget.request(MediaType.APPLICATION_XML_TYPE).get(MatchGroup.class);
 
+            int tries = 0;
+            MatchGroup matchesLegacy = null;
+            while (matchesLegacy == null) {
+                try {
+                    tries++;
+                    matchesLegacy = findTarget.request(MediaType.APPLICATION_XML_TYPE).get(MatchGroup.class);
+                } catch (ServerErrorException ex) {
+                    if (tries >= MAX_RETRY) {
+                        throw ex;
+                    }
+                }
+            }
             if (matchesGraphANNIS.size() != matchesLegacy.getMatches().size()) {
                 this.errorMsg = "should have been " + matchesLegacy.getMatches().size() + " but was "
                         + matchesGraphANNIS.size();
