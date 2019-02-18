@@ -118,6 +118,8 @@ public class URLShortenerQuery {
                 } catch (ServerErrorException ex) {
                     if (tries >= MAX_RETRY) {
                         throw ex;
+                    } else {
+                        log.warn("Server error when executing query {}", query.getQuery(), ex);
                     }
                 }
             }
