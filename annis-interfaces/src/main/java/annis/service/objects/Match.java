@@ -224,7 +224,7 @@ public class Match implements Serializable
         
         uri = new java.net.URI(id).normalize();
         
-        if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
+        if (!"salt".equals(uri.getScheme()))
         {
           throw new URISyntaxException("not a Salt id", uri.toString());
         }
