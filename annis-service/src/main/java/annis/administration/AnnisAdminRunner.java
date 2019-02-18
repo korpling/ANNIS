@@ -82,7 +82,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
     public static void main(String[] args) {
         // get Runner from Spring
         try {
-            AnnisBaseRunner.setupLogging(false);
+            AnnisBaseRunner.setupLogging(true);
             new AnnisAdminRunner().run(args);
         } catch (AnnisRunnerException ex) {
             log.error(ex.getMessage() + " (error code " + ex.getExitCode() + ")", ex);
