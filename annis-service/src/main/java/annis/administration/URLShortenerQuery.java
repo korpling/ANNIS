@@ -101,7 +101,7 @@ public class URLShortenerQuery {
             return QueryStatus.Failed;
         }
 
-        List<Match> matchesGraphANNIS = queryDao.find(query.getQuery(), QueryLanguage.AQL,
+        List<Match> matchesGraphANNIS = queryDao.find(query.getQuery(), query.getQueryLanguage(),
                 new LinkedList<>(query.getCorpora()), new LimitOffsetQueryData(0, Integer.MAX_VALUE));
 
         WebTarget findTarget = annisSearchService.path("find").queryParam("q", query.getQuery()).queryParam("corpora",
@@ -123,10 +123,12 @@ public class URLShortenerQuery {
                     }
                 }
             }
+
+            QueryStatus status = QueryStatus.Ok;
             if (matchesGraphANNIS.size() != matchesLegacy.getMatches().size()) {
                 this.errorMsg = "should have been " + matchesLegacy.getMatches().size() + " but was "
                         + matchesGraphANNIS.size();
-                return QueryStatus.CountDiffers;
+                status = QueryStatus.CountDiffers;
             } else {
                 Iterator<Match> itGraphANNIS = matchesGraphANNIS.iterator();
                 Iterator<Match> itLegacy = matchesLegacy.getMatches().iterator();
@@ -136,12 +138,31 @@ public class URLShortenerQuery {
 
                     if (!m1.equals(m2)) {
                         this.errorMsg = m1 + " != " + m2;
-                        return QueryStatus.MatchesDiffer;
+                        status = QueryStatus.MatchesDiffer;
+                        break;
                     }
                 }
-                return QueryStatus.Ok;
             }
-            // TODO: check in quirks mode and rewrite if necessary
+
+            if (status != QueryStatus.Ok && this.query.getQueryLanguage() == QueryLanguage.AQL) {
+                // check in quirks mode and rewrite if necessary
+                URLShortenerQuery quirksQuery = new URLShortenerQuery();
+                quirksQuery.query = new Query(this.query.getQuery(), QueryLanguage.AQL_QUIRKS_V3,
+                        this.query.getCorpora());
+                log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery(), this.query.getCorpora());
+                        
+                QueryStatus quirksStatus = quirksQuery.test(queryDao, annisSearchService);
+                if(quirksStatus == QueryStatus.Ok) {
+                    this.query = quirksQuery.query;
+                    this.errorMsg = "Rewrite in quirks mode necessary";
+                    status = QueryStatus.Ok;
+                } else {
+                    this.errorMsg = quirksQuery.getErrorMsg();
+                    log.warn("Quirks not sucessful");
+                }
+            }
+
+            return status;
 
         } catch (ForbiddenException ex) {
             this.errorMsg = ex.toString();
