@@ -16,6 +16,7 @@
 package annis.administration;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -241,10 +242,19 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             if (urlShortenerFiles.isEmpty()) {
                 throw new ParseException("Where can I find the url shortener export files you want to migrate?");
             }
+            
+            String userName = cmdLine.getOptionValue("service-username");
+            String password = cmdLine.getOptionValue("service-password");
+            if(userName != null && password == null && System.console() != null) {
+                // no password given as argument, ask the user interactively
+               char[] providedPassword = System.console().readPassword("Password for user '%s': ", userName);
+               password = new String(providedPassword);
+               Arrays.fill(providedPassword, ' ');
+            }
 
             Multimap<QueryStatus, URLShortenerQuery> status = corpusAdministration.migrateUrlShortener(
-                    urlShortenerFiles, cmdLine.getOptionValue("service-url"),
-                    cmdLine.getOptionValue("service-username"), cmdLine.getOptionValue("service-password"));
+                    urlShortenerFiles, cmdLine.getOptionValue("service-url"), userName, password);
+            password = null;
 
             // output summary and detailed list of failed queries
             Collection<URLShortenerQuery> unknownCorpusQueries = status.get(QueryStatus.UnknownCorpus);
