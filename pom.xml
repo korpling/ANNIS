@@ -87,7 +87,7 @@
 
 	<properties>
 		<servlet.version>3.0.1</servlet.version>
-		<vaadin.version>7.7.15</vaadin.version>
+		<vaadin.version>7.7.16</vaadin.version>
 	</properties>
 
 	<reporting>
