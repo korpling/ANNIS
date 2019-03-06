@@ -237,7 +237,7 @@ public class SaltImport {
       
       // add connection to document node if available
       if(documentNodeName != null) {
-        updateList.addEdge(name, documentNodeName, "annis", "PartOfSubcorpus", "");
+        updateList.addEdge(name, documentNodeName, "annis", "PartOf", "");
       }
     }
   }

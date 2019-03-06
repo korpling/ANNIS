@@ -23,7 +23,6 @@ import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 import annis.administration.CorpusAdministration;
-import annis.dao.QueryDao;
 import annis.service.internal.AnnisServiceRunner;
 import annis.service.objects.AnnisCorpus;
 

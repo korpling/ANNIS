@@ -15,15 +15,16 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.SwingWorker;
+import javax.swing.table.DefaultTableModel;
+
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
 import annis.service.objects.AnnisCorpus;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import javax.swing.SwingWorker;
-import javax.swing.table.DefaultTableModel;
 
 /**
  *
