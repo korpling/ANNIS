@@ -18,6 +18,7 @@ or .bat script respectively):
 ```
 -Xss1024k -Xmx1024m
 ```
+
 3. Download and unzip the GUM demo corpus from the ANNIS website:
 [http://corpus-tools.org/annis/corpora.html](http://corpus-tools.org/annis/corpora.html).
 4. Press “Import Corpus” and navigate to the directory containing the directory
