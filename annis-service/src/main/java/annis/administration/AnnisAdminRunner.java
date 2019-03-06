@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -179,26 +180,34 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                         "Get the paths to import from the ANNIS service accessible by this URL. This helps to migrate "
                                 + "corpora from an older instance. "
                                 + "Make sure that the ANNIS Service and this script run on the same machine (otherwise the paths are not valid.")
-                 .addLongParameter("service-username", "Optional username when using the ANNIS service")
-                 .addLongParameter("service-password", "Optional password when using the ANNIS service")                 
-                .createOptions();
+                .addLongParameter("service-username", "Optional username when using the ANNIS service")
+                .addLongParameter("service-password", "Optional password when using the ANNIS service").createOptions();
 
         try {
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
             CommandLine cmdLine = parser.parse(options, commandArgs.toArray(new String[commandArgs.size()]));
-
 
             List<String> corpusPaths;
             String serviceURL = cmdLine.getOptionValue("service-url");
+            String userName = cmdLine.getOptionValue("service-username");
+            String password = cmdLine.getOptionValue("service-password");
+            if (userName != null && password == null && System.console() != null) {
+                // no password given as argument, ask the user interactively
+                char[] providedPassword = System.console().readPassword("Password for user '%s': ", userName);
+                password = new String(providedPassword);
+                Arrays.fill(providedPassword, ' ');
+            }
+
             if (serviceURL != null) {
-                corpusPaths = getCorpusPathsFromService(serviceURL, cmdLine.getOptionValue("service-username"), cmdLine.getOptionValue("service-password"));
+                corpusPaths = getCorpusPathsFromService(serviceURL, userName, password);
             } else {
                 if (cmdLine.getArgList().isEmpty()) {
                     throw new ParseException("Where can I find the corpus you want to import?");
                 }
                 corpusPaths = cmdLine.getArgList();
             }
-            
+            password = null;
+
             boolean overwrite = cmdLine.hasOption('o');
             corpusAdministration.importCorporaSave(overwrite, cmdLine.getOptionValue("alias"),
                     cmdLine.getOptionValue("mail"), false, corpusPaths);
