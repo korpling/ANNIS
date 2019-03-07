@@ -22,20 +22,18 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -45,11 +43,6 @@ import javax.mail.internet.InternetAddress;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.io.ByteStreams;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.io.FileUtils;
@@ -61,16 +54,18 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.io.ByteStreams;
+
 import annis.AnnisRunnerException;
 import annis.CommonHelper;
 import annis.ServiceConfig;
 import annis.dao.ShortenerDao;
 import annis.exceptions.AnnisException;
-import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
-import annis.service.objects.MatchAndDocumentCount;
-import annis.service.objects.QueryLanguage;
 import annis.utils.ANNISFormatHelper;
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -278,9 +273,9 @@ public class CorpusAdministration {
         Collection<URLShortenerDefinition> okEntries = queryByStatus.get(QueryStatus.Ok);
         if (allowPartialMigration || okEntries.size() == queryByStatus.size()) {
             for (URLShortenerDefinition q : okEntries) {
-                if (getShortenerDao().unshorten(q.getUuid()) == null) {
+                if (getShortenerDao().unshorten(q.getUuid()) == null) {                   
                     getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid(),
-                            q.getCreationTime().toDate());
+                            q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
                 } else {
                     log.warn("UUID {} can't be migrated because it already exists.");
                 }

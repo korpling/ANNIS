@@ -59,6 +59,7 @@ public class URLShortenerDefinition {
         this.uri = uri;
         this.uuid = uuid;
         this.query = query;
+        this.creationTime = creationTime;
         this.errorMsg = null;
     }
 
