@@ -55,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.ByteStreams;
@@ -221,7 +222,13 @@ public class CorpusAdministration {
         if (username != null && password != null) {
             HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basic(username, password);
             client.register(authFeature);
+
+            // test authentication and fail early
+            String result = client.target(serviceURL).path("annis").path("admin").path("is-authenticated").request()
+                    .get(String.class);
+            Preconditions.checkArgument("true".equalsIgnoreCase(result), "Authentication failed");
         }
+
         WebTarget searchService = client.target(serviceURL).path("annis").path("query").path("search");
 
         Multimap<QueryStatus, URLShortenerDefinition> queryByStatus = HashMultimap.create();

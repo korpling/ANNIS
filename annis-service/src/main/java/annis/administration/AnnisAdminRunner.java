@@ -287,7 +287,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             printProblematicQueries("Count different", status.get(QueryStatus.CountDiffers));
             printProblematicQueries("Match list different", status.get(QueryStatus.MatchesDiffer));
             printProblematicQueries("Failed", status.get(QueryStatus.Failed));
-            
 
             String summaryString = "+ Successful: " + status.get(QueryStatus.Ok).size() + " from " + status.size()
                     + " +";
@@ -309,13 +308,13 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             System.out.println();
 
             for (URLShortenerDefinition q : queries) {
-                if (q.getErrorMsg() != null) {
-                    System.out.println("Error: " + q.getErrorMsg());
-                }
                 System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
                 System.out.println("UUID: \"" + q.getUuid() + "\"");
                 System.out.println("Query:");
                 System.out.println(q.getQuery().getQuery());
+                if (q.getErrorMsg() != null) {
+                    System.out.println("Error: " + q.getErrorMsg());
+                }
 
                 System.out.println("-------");
             }

@@ -68,8 +68,7 @@ public class URLShortenerDefinition {
 
         URI parsedURI = new URI(url);
 
-        DateTimeFormatter dateFormatter = DateTimeFormat
-                .forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");
+        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");
 
         URLShortenerDefinition result = new URLShortenerDefinition(parsedURI, UUID.fromString(uuid),
                 dateFormatter.parseDateTime(creationTime));
@@ -187,7 +186,8 @@ public class URLShortenerDefinition {
                     String m2 = itLegacy.next().toString();
 
                     if (!m1.equals(m2)) {
-                        this.errorMsg = m1 + " != " + m2;
+                        this.errorMsg = "(should be)" + System.lineSeparator() + m2 + System.lineSeparator()
+                                + "(but was)" + System.lineSeparator() + m1;
                         status = QueryStatus.MatchesDiffer;
                         break;
                     }
