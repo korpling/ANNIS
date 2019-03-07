@@ -325,52 +325,7 @@ public class Helper {
         return "";
     }
 
-    public static List<String> citationFragment(String aql, QueryLanguage queryLanguage, Set<String> corpora,
-            int contextLeft, int contextRight, String segmentation, String visibleBaseText, long start, int limit,
-            OrderType order, Set<Long> selectedMatches) {
-        List<String> result = new ArrayList<>();
-        try {
-            result.add("_q=" + encodeBase64URL(aql));
-            result.add("ql=" + URLEncoder.encode(queryLanguage.name().toLowerCase(), "UTF-8"));
-            result.add("_c=" + encodeBase64URL(StringUtils.join(corpora, ",")));
-            result.add("cl=" + URLEncoder.encode("" + contextLeft, "UTF-8"));
-            result.add("cr=" + URLEncoder.encode("" + contextRight, "UTF-8"));
-            result.add("s=" + URLEncoder.encode("" + start, "UTF-8"));
-            result.add("l=" + URLEncoder.encode("" + limit, "UTF-8"));
-            if (segmentation != null) {
-                result.add("_seg=" + encodeBase64URL(segmentation));
-            }
-            // only output "bt" if it is not the same as the context segmentation
-            if (!Objects.equals(visibleBaseText, segmentation)) {
-                result.add("_bt=" + (visibleBaseText == null ? "" : encodeBase64URL(visibleBaseText)));
-            }
-            if (order != OrderType.ascending && order != null) {
-                result.add("o=" + order.toString());
-            }
-            if (selectedMatches != null && !selectedMatches.isEmpty()) {
-                result.add("m=" + Joiner.on(',').join(selectedMatches));
-            }
-        } catch (UnsupportedEncodingException ex) {
-            log.warn(ex.getMessage(), ex);
-        }
 
-        return result;
-    }
-
-    public static URI generateCitation(String aql, QueryLanguage queryLanguage, Set<String> corpora, int contextLeft,
-            int contextRight, String segmentation, String visibleBaseText, long start, int limit, OrderType order,
-            Set<Long> selectedMatches) {
-        try {
-            URI appURI = UI.getCurrent().getPage().getLocation();
-
-            return new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), appURI.getPath(), null,
-                    StringUtils.join(citationFragment(aql, queryLanguage, corpora, contextLeft, contextRight, segmentation,
-                            visibleBaseText, start, limit, order, selectedMatches), "&"));
-        } catch (URISyntaxException ex) {
-            log.error(null, ex);
-        }
-        return null;
-    }
 
     public static String generateCorpusLink(Set<String> corpora) {
         try {

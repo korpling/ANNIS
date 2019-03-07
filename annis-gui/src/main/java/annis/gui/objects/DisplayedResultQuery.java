@@ -15,13 +15,23 @@
  */
 package annis.gui.objects;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
+import annis.libgui.Helper;
 import annis.model.PagedResultQuery;
+import annis.service.objects.OrderType;
+import annis.service.objects.QueryLanguage;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * The query state of the actual displayed result query.
@@ -51,6 +61,32 @@ public class DisplayedResultQuery extends PagedResultQuery
   public void setBaseText(String baseText)
   {
     this.baseText = baseText;
+  }
+  
+  public List<String> citationFragment() throws UnsupportedEncodingException {
+      List<String> result = new ArrayList<>();
+      result.add("_q=" + Helper.encodeBase64URL(getQuery()));
+      result.add("ql=" + URLEncoder.encode(getQueryLanguage().name().toLowerCase(), "UTF-8"));
+      result.add("_c=" + Helper.encodeBase64URL(StringUtils.join(getCorpora(), ",")));
+      result.add("cl=" + URLEncoder.encode("" + getLeftContext(), "UTF-8"));
+      result.add("cr=" + URLEncoder.encode("" + getRightContext(), "UTF-8"));
+      result.add("s=" + URLEncoder.encode("" + getOffset(), "UTF-8"));
+      result.add("l=" + URLEncoder.encode("" + getLimit(), "UTF-8"));
+      if (getSegmentation() != null) {
+          result.add("_seg=" + Helper.encodeBase64URL(getSegmentation()));
+      }
+      // only output "bt" if it is not the same as the context segmentation
+      if (!Objects.equals(getBaseText(), getSegmentation())) {
+          result.add("_bt=" + (getBaseText() == null ? "" : Helper.encodeBase64URL(getBaseText())));
+      }
+      if (getOrder() != OrderType.ascending && getOrder() != null) {
+          result.add("o=" + getOrder().toString());
+      }
+      if (getSelectedMatches() != null && !getSelectedMatches().isEmpty()) {
+          result.add("m=" + Joiner.on(',').join(getSelectedMatches()));
+      }
+
+      return result;
   }
   
   @Override

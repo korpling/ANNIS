@@ -60,6 +60,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import annis.CommonHelper;
 import annis.VersionInfo;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -584,16 +585,20 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
      *              The query where the parameters are extracted from.
      */
     public void updateFragment(DisplayedResultQuery q) {
-        List<String> args = Helper.citationFragment(q.getQuery(), q.getQueryLanguage(), q.getCorpora(),
-                q.getLeftContext(), q.getRightContext(), q.getSegmentation(), q.getBaseText(), q.getOffset(),
-                q.getLimit(), q.getOrder(), q.getSelectedMatches());
 
-        // set our fragment
-        lastEvaluatedFragment = StringUtils.join(args, "&");
-        UI.getCurrent().getPage().setUriFragment(lastEvaluatedFragment, false);
+        try {
+            List<String> args = q.citationFragment();
+            // set our fragment
+            lastEvaluatedFragment = StringUtils.join(args, "&");
+            UI.getCurrent().getPage().setUriFragment(lastEvaluatedFragment, false);
 
-        // reset title
-        Page.getCurrent().setTitle(ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
+            // reset title
+            Page.getCurrent().setTitle(ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
+            
+        } catch (UnsupportedEncodingException e) {
+            log.error("Could not generate citation fragment", e);
+            ExceptionDialog.show(e, "Could not generate citation fragment");
+        }
     }
 
     /**
