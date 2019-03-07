@@ -239,7 +239,7 @@ public class CorpusAdministration {
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
                             // parse URL
-                            URLShortenerQuery q = URLShortenerQuery.parse(line[3], UUID.fromString(line[0]));
+                            URLShortenerQuery q = URLShortenerQuery.parse(line[3], line[0], line[2]);
                             if (q != null) {
                                 // check if all corpora exist in the new instance
                                 List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
@@ -279,7 +279,8 @@ public class CorpusAdministration {
         if (allowPartialMigration || okEntries.size() == queryByStatus.size()) {
             for (URLShortenerQuery q : okEntries) {
                 if (getShortenerDao().unshorten(q.getUuid()) == null) {
-                    getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid());
+                    getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid(),
+                            q.getCreationTime().toDate());
                 } else {
                     log.warn("UUID {} can't be migrated because it already exists.");
                 }

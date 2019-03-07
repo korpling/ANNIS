@@ -3,7 +3,6 @@ package annis.administration;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -20,9 +19,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.http.NameValuePair;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,50 +44,58 @@ public class URLShortenerQuery {
     private URI uri;
     private DisplayedResultQuery query;
     private UUID uuid;
-    
+    private DateTime creationTime;
+
     private String errorMsg;
 
-    protected URLShortenerQuery(URI uri, UUID uuid) {
-        this(uri, new DisplayedResultQuery(), uuid);
+    protected URLShortenerQuery(URI uri, UUID uuid, DateTime creationTime) {
+        this(uri, uuid, creationTime, new DisplayedResultQuery());
     }
 
-    protected URLShortenerQuery(URI uri, DisplayedResultQuery query, UUID uuid) {
+    protected URLShortenerQuery(URI uri, UUID uuid, DateTime creationTime, DisplayedResultQuery query) {
         this.uri = uri;
         this.uuid = uuid;
         this.query = query;
         this.errorMsg = null;
     }
 
-    public static URLShortenerQuery parse(String url, UUID uuid) throws URISyntaxException, UnsupportedEncodingException {
+    public static URLShortenerQuery parse(String url, String uuid, String creationTime)
+            throws URISyntaxException, UnsupportedEncodingException {
 
         URI parsedURI = new URI(url);
 
-        URLShortenerQuery result = new URLShortenerQuery(parsedURI, uuid);
+        URLShortenerQuery result = new URLShortenerQuery(parsedURI, UUID.fromString(uuid),
+                DateTime.parse(creationTime));
 
         if (parsedURI.getPath().startsWith("/embeddedvis")) {
 
             for (NameValuePair arg : URLEncodedUtils.parse(parsedURI, "UTF-8")) {
                 if ("embedded_interface".equals(arg.getName())) {
-                    URLShortenerQuery subquery = parse(arg.getValue(), uuid);
-                    result.query = subquery.query;
+                    URI interfaceURI = new URI(arg.getValue());
+                    result.query = parseFragment(interfaceURI.getFragment());
                     break;
                 }
             }
 
         } else {
-            Map<String, String> args = CommonHelper.parseFragment(parsedURI.getFragment());
-            String corporaRaw = args.get("c");
-            if (corporaRaw != null) {
-                Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
-
-                result.query = QueryGenerator.displayed().left(Integer.parseInt(args.get("cl")))
-                        .right(Integer.parseInt(args.get("cr"))).offset(Integer.parseInt(args.get("s")))
-                        .limit(Integer.parseInt(args.get("l"))).segmentation(args.get("seg")).baseText(args.get("bt"))
-                        .query(args.get("q")).corpora(corpora).build();
-            }
+            result.query = parseFragment(parsedURI.getFragment());
         }
 
         return result;
+    }
+    
+    private static DisplayedResultQuery parseFragment(String fragment) {
+        Map<String, String> args = CommonHelper.parseFragment(fragment);
+        String corporaRaw = args.get("c");
+        if (corporaRaw != null) {
+            Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
+
+            return QueryGenerator.displayed().left(Integer.parseInt(args.get("cl")))
+                    .right(Integer.parseInt(args.get("cr"))).offset(Integer.parseInt(args.get("s")))
+                    .limit(Integer.parseInt(args.get("l"))).segmentation(args.get("seg")).baseText(args.get("bt"))
+                    .query(args.get("q")).corpora(corpora).build();
+        }
+        return null;
     }
 
     public URLShortenerQuery rewriteInQuirksMode() {
@@ -105,7 +112,7 @@ public class URLShortenerQuery {
             rewrittenUri.fragment(rewrittenQuery.toCitationFragment());
         }
 
-        return new URLShortenerQuery(rewrittenUri.build(), rewrittenQuery, this.uuid);
+        return new URLShortenerQuery(rewrittenUri.build(), this.uuid, this.creationTime, rewrittenQuery);
     }
 
     public Query getQuery() {
@@ -115,15 +122,19 @@ public class URLShortenerQuery {
     public String getErrorMsg() {
         return errorMsg;
     }
-    
+
     public UUID getUuid() {
         return uuid;
     }
-    
+
     public URI getUri() {
         return uri;
     }
     
+    public DateTime getCreationTime() {
+        return creationTime;
+    }
+
     public static int MAX_RETRY = 3;
 
     public QueryStatus test(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException {

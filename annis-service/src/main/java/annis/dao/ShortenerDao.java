@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.date.DateFormatUtils;
@@ -87,8 +88,8 @@ public class ShortenerDao extends AbstractDao {
         return result;
     }
 
-    public void migrate(String str, String userName, UUID uuid) {
-        
+    public void migrate(String str, String userName, UUID uuid, Date creationTime) {
+
         try (Connection conn = createConnection(DB.SERVICE_DATA)) {
             conn.setAutoCommit(false);
 
@@ -97,12 +98,11 @@ public class ShortenerDao extends AbstractDao {
 
             Preconditions.checkState(existing == 0,
                     "Attempted to migrate UUID {} which already exists in the database.", uuid);
-            
-            getQueryRunner().update(conn,
-                    "INSERT INTO url_shortener(id, \"owner\", created, url) VALUES(?, ?, ?, ?)", uuid, userName,
-                    DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(new Date()), str);
+
+            getQueryRunner().update(conn, "INSERT INTO url_shortener(id, \"owner\", created, url) VALUES(?, ?, ?, ?)",
+                    uuid, userName, DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(creationTime), str);
             conn.commit();
-        
+
         } catch (SQLException ex) {
             log.error("Could not shorten URL {} for user {}", str, userName, ex);
         }
