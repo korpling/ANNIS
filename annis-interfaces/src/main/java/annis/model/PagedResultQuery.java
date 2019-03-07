@@ -19,12 +19,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
 import annis.CommonHelper;
 import annis.service.objects.OrderType;
-import annis.service.objects.QueryLanguage;
 
 /**
  * Parameters for a query that shows the result to the user

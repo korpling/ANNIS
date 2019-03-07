@@ -18,11 +18,6 @@ package annis.model;
 import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.base.Joiner;
-
-import annis.CommonHelper;
-import annis.service.objects.OrderType;
-
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
