@@ -244,6 +244,8 @@ public class CorpusAdministration {
                                     queryByStatus.put(QueryStatus.UnknownCorpus, q);
                                 } else if (corpusNames.isEmpty()) {
                                     queryByStatus.put(QueryStatus.Failed, q);
+                                } else if (getShortenerDao().unshorten(q.getUuid()) != null) {
+                                    queryByStatus.put(QueryStatus.UUIDExists, q);
                                 } else {
                                     // check the query
                                     try {
@@ -269,16 +271,13 @@ public class CorpusAdministration {
                 }
             }
         }
+
         // insert URLs into new database
         Collection<URLShortenerDefinition> okEntries = queryByStatus.get(QueryStatus.Ok);
         if (allowPartialMigration || okEntries.size() == queryByStatus.size()) {
             for (URLShortenerDefinition q : okEntries) {
-                if (getShortenerDao().unshorten(q.getUuid()) == null) {                   
-                    getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid(),
-                            q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
-                } else {
-                    log.warn("UUID {} can't be migrated because it already exists.");
-                }
+                getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid(),
+                        q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
             }
         }
 
