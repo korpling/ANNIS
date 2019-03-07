@@ -89,13 +89,13 @@ public class AnnisServiceRunner extends ResourceConfig {
             this.queryDao = QueryDao.create();
             this.deleteCorpusDao = DeleteCorpusDao.create(this.queryDao);
             this.adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
-            this.shortenerDao = new ShortenerDao();
-            this.corpusAdministration = CorpusAdministration.create(this.adminDao);
+            this.shortenerDao = ShortenerDao.create();
+            this.corpusAdministration = CorpusAdministration.create(this.adminDao, this.shortenerDao);
         } else {
             this.queryDao = corpusAdmin.getAdministrationDao().getQueryDao();
             this.deleteCorpusDao = corpusAdmin.getAdministrationDao().getDeleteCorpusDao();
             this.adminDao = corpusAdmin.getAdministrationDao();
-            this.shortenerDao = new ShortenerDao();
+            this.shortenerDao = corpusAdmin.getShortenerDao();
             this.corpusAdministration = corpusAdmin;
         }
         this.importWorker = new ImportWorker(this.corpusAdministration);

@@ -25,6 +25,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -62,6 +64,7 @@ import org.slf4j.LoggerFactory;
 import annis.AnnisRunnerException;
 import annis.CommonHelper;
 import annis.ServiceConfig;
+import annis.dao.ShortenerDao;
 import annis.exceptions.AnnisException;
 import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
@@ -78,6 +81,7 @@ import au.com.bytecode.opencsv.CSVReader;
 public class CorpusAdministration {
 
     private AdministrationDao administrationDao;
+    private ShortenerDao shortenerDao;
 
     private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
 
@@ -86,9 +90,10 @@ public class CorpusAdministration {
     public CorpusAdministration() {
     }
 
-    public static CorpusAdministration create(AdministrationDao administrationDao) {
+    public static CorpusAdministration create(AdministrationDao administrationDao, ShortenerDao shortenerDao) {
         CorpusAdministration corpusAdmin = new CorpusAdministration();
         corpusAdmin.setAdministrationDao(administrationDao);
+        corpusAdmin.setShortenerDao(shortenerDao);
 
         corpusAdmin.checkDatabaseSchemaVersion();
 
@@ -212,7 +217,7 @@ public class CorpusAdministration {
     }
 
     public Multimap<QueryStatus, URLShortenerQuery> migrateUrlShortener(List<String> paths, String serviceURL,
-            String username, String password) {
+            String username, String password, boolean allowPartialMigration) {
         if (paths == null || serviceURL == null) {
             return HashMultimap.create();
         }
@@ -234,7 +239,7 @@ public class CorpusAdministration {
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
                             // parse URL
-                            URLShortenerQuery q = URLShortenerQuery.parse(line[3]);
+                            URLShortenerQuery q = URLShortenerQuery.parse(line[3], UUID.fromString(line[0]));
                             if (q != null) {
                                 // check if all corpora exist in the new instance
                                 List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
@@ -269,7 +274,17 @@ public class CorpusAdministration {
                 }
             }
         }
-        // TODO: insert URLs into new database
+        // insert URLs into new database
+        Collection<URLShortenerQuery> okEntries = queryByStatus.get(QueryStatus.Ok);
+        if (allowPartialMigration || okEntries.size() == queryByStatus.size()) {
+            for (URLShortenerQuery q : okEntries) {
+                if (getShortenerDao().unshorten(q.getUuid()) == null) {
+                    getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid());
+                } else {
+                    log.warn("UUID {} can't be migrated because it already exists.");
+                }
+            }
+        }
 
         return queryByStatus;
     }
@@ -611,6 +626,14 @@ public class CorpusAdministration {
 
     public DeleteCorpusDao getDeleteCorpusDao() {
         return administrationDao.getDeleteCorpusDao();
+    }
+
+    public ShortenerDao getShortenerDao() {
+        return shortenerDao;
+    }
+
+    public void setShortenerDao(ShortenerDao shortenerDao) {
+        this.shortenerDao = shortenerDao;
     }
 
 }

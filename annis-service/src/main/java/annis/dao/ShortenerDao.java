@@ -31,75 +31,102 @@ import com.google.common.base.Preconditions;
 
 /**
  * A DAO for retrieving and adding URL shortener information from the database.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ShortenerDao extends AbstractDao {
 
-  private static final Logger log = LoggerFactory.getLogger(ShortenerDao.class);
+    private static final Logger log = LoggerFactory.getLogger(ShortenerDao.class);
 
-  /**
-   * 
-   * @param str
-   * @param userName
-   * @return 
-   */
-  public UUID shorten(String str, String userName) {
-    UUID result = null;
+    public static ShortenerDao create() {
+        return new ShortenerDao();
+    }
 
-    try (Connection conn = createConnection(DB.SERVICE_DATA)) {
-      conn.setAutoCommit(false);
+    /**
+     * 
+     * @param str
+     * @param userName
+     * @return
+     */
+    public UUID shorten(String str, String userName) {
+        UUID result = null;
 
-      // check if the string to shorten was already shortened before
-      result = getExistingShortID(conn, str);
-      if (result == null) {
-        // no, this string is new
+        try (Connection conn = createConnection(DB.SERVICE_DATA)) {
+            conn.setAutoCommit(false);
 
-        // find a new random identifier for that string
+            // check if the string to shorten was already shortened before
+            result = getExistingShortID(conn, str);
+            if (result == null) {
+                // no, this string is new
 
-        int numberOfTries = 0;
-        while (result == null) {
-          Preconditions.checkState(numberOfTries < 1000,
-              "Can't find a new random " + "ID that is not already taken even after trying 1000 times. "
-                  + "Will abort since it seems that no new shortener IDs are available.");
+                // find a new random identifier for that string
 
-          UUID randomUUID = UUID.randomUUID();
-          int existing = getQueryRunner().query(conn, "SELECT count(*) FROM url_shortener WHERE id = ?",
-              new ScalarHandler<>(1), randomUUID);
-          if (existing == 0) {
-            result = randomUUID;
-          }
-          numberOfTries++;
+                int numberOfTries = 0;
+                while (result == null) {
+                    Preconditions.checkState(numberOfTries < 1000,
+                            "Can't find a new random " + "ID that is not already taken even after trying 1000 times. "
+                                    + "Will abort since it seems that no new shortener IDs are available.");
+
+                    UUID randomUUID = UUID.randomUUID();
+                    int existing = getQueryRunner().query(conn, "SELECT count(*) FROM url_shortener WHERE id = ?",
+                            new ScalarHandler<>(1), randomUUID);
+                    if (existing == 0) {
+                        result = randomUUID;
+                    }
+                    numberOfTries++;
+                }
+
+                getQueryRunner().update(conn,
+                        "INSERT INTO url_shortener(id, \"owner\", created, url) VALUES(?, ?, ?, ?)", result, userName,
+                        DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(new Date()), str);
+                conn.commit();
+            }
+        } catch (SQLException ex) {
+            log.error("Could not shorten URL {} for user {}", str, userName, ex);
+        }
+        return result;
+    }
+
+    public void migrate(String str, String userName, UUID uuid) {
+        
+        try (Connection conn = createConnection(DB.SERVICE_DATA)) {
+            conn.setAutoCommit(false);
+
+            int existing = getQueryRunner().query(conn, "SELECT count(*) FROM url_shortener WHERE id = ?",
+                    new ScalarHandler<>(1), uuid);
+
+            Preconditions.checkState(existing == 0,
+                    "Attempted to migrate UUID {} which already exists in the database.", uuid);
+            
+            getQueryRunner().update(conn,
+                    "INSERT INTO url_shortener(id, \"owner\", created, url) VALUES(?, ?, ?, ?)", uuid, userName,
+                    DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(new Date()), str);
+            conn.commit();
+        
+        } catch (SQLException ex) {
+            log.error("Could not shorten URL {} for user {}", str, userName, ex);
+        }
+    }
+
+    public String unshorten(UUID id) {
+        try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
+
+            List<String> result = getQueryRunner().query(conn, "SELECT url FROM url_shortener WHERE id=? LIMIT 1",
+                    new ColumnListHandler<>(1), id);
+
+            return result.isEmpty() ? null : result.get(0);
+        } catch (SQLException ex) {
+            log.error("Could not unshorten URL with ID {}", id.toString(), ex);
         }
 
-        getQueryRunner().update(conn, "INSERT INTO url_shortener(id, \"owner\", created, url) VALUES(?, ?, ?, ?)", result,
-            userName, DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(new Date()), str);
-        conn.commit();
-      }
-    } catch (SQLException ex) {
-      log.error("Could not shorten URL {} for user {}", str, userName, ex);
-    }
-    return result;
-  }
-
-  public String unshorten(UUID id) {
-    try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
-      
-      List<String> result = getQueryRunner().query(conn, "SELECT url FROM url_shortener WHERE id=? LIMIT 1",
-          new ColumnListHandler<>(1), id);
-
-      return result.isEmpty() ? null : result.get(0);
-    } catch (SQLException ex) {
-      log.error("Could not unshorten URL with ID {}", id.toString(), ex);
+        return null;
     }
 
-    return null;
-  }
+    private UUID getExistingShortID(Connection conn, String str) throws SQLException {
 
-  private UUID getExistingShortID(Connection conn, String str) throws SQLException {
-
-    List<String> result = getQueryRunner().query(conn, "SELECT id FROM url_shortener WHERE url=? LIMIT 1",
-        new ColumnListHandler<>(1), str);
-    return result.isEmpty() ? null : UUID.fromString(result.get(0));
-  }
+        List<String> result = getQueryRunner().query(conn, "SELECT id FROM url_shortener WHERE url=? LIMIT 1",
+                new ColumnListHandler<>(1), str);
+        return result.isEmpty() ? null : UUID.fromString(result.get(0));
+    }
 
 }

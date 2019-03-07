@@ -50,6 +50,7 @@ import annis.administration.CorpusAdministration;
 import annis.administration.DeleteCorpusDao;
 import annis.administration.ImportStatus;
 import annis.dao.QueryDao;
+import annis.dao.ShortenerDao;
 
 /**
  *
@@ -159,8 +160,9 @@ public class MainFrame extends javax.swing.JFrame {
         // init corpusAdministration
 
         QueryDao queryDao = QueryDao.create();
+        ShortenerDao shortenerDao = ShortenerDao.create();
         this.corpusAdministration = CorpusAdministration
-                .create(AdministrationDao.create(queryDao, DeleteCorpusDao.create(queryDao)));
+                .create(AdministrationDao.create(queryDao, DeleteCorpusDao.create(queryDao)), shortenerDao);
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel() {
                 @Override

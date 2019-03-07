@@ -57,6 +57,7 @@ import annis.AnnisRunnerException;
 import annis.UsageException;
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
+import annis.dao.ShortenerDao;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.service.objects.AnnisCorpus;
 
@@ -77,7 +78,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
         DeleteCorpusDao deleteCorpusDao = DeleteCorpusDao.create(queryDao);
         AdministrationDao adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
 
-        this.corpusAdministration = CorpusAdministration.create(adminDao);
+        this.corpusAdministration = CorpusAdministration.create(adminDao, ShortenerDao.create());
     }
 
     public static void main(String[] args) {
@@ -225,14 +226,15 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
     }
 
     void doMigrateUrlShortener(List<String> commandArgs) {
-        Options options = new OptionBuilder()
-                .addToggle("i", "ignore-errors", false, "Migrate a short URL even if validation fails.")
-                .addLongParameter("service-url",
-                        "Get the paths to import from the ANNIS service accessible by this URL. This helps to migrate "
-                                + "corpora from an older instance. "
-                                + "Make sure that the ANNIS Service and this script run on the same machine (otherwise the paths are not valid.")
+        Options options = new OptionBuilder().addLongParameter("service-url",
+                "Get the paths to import from the ANNIS service accessible by this URL. This helps to migrate "
+                        + "corpora from an older instance. "
+                        + "Make sure that the ANNIS Service and this script run on the same machine (otherwise the paths are not valid.")
                 .addLongParameter("service-username", "Optional username when using the ANNIS service")
-                .addLongParameter("service-password", "Optional password when using the ANNIS service").createOptions();
+                .addLongParameter("service-password", "Optional password when using the ANNIS service")
+                .addToggle("p", "allow-partial", false,
+                        "Allow migrating a subset for successful queries. Normally queries are only migrated if all of them are valid.")
+                .createOptions();
 
         try {
             CommandLineParser parser = new PosixParser();
@@ -242,23 +244,24 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             if (urlShortenerFiles.isEmpty()) {
                 throw new ParseException("Where can I find the url shortener export files you want to migrate?");
             }
-            
+
             String userName = cmdLine.getOptionValue("service-username");
             String password = cmdLine.getOptionValue("service-password");
-            if(userName != null && password == null && System.console() != null) {
+            if (userName != null && password == null && System.console() != null) {
                 // no password given as argument, ask the user interactively
-               char[] providedPassword = System.console().readPassword("Password for user '%s': ", userName);
-               password = new String(providedPassword);
-               Arrays.fill(providedPassword, ' ');
+                char[] providedPassword = System.console().readPassword("Password for user '%s': ", userName);
+                password = new String(providedPassword);
+                Arrays.fill(providedPassword, ' ');
             }
 
             Multimap<QueryStatus, URLShortenerQuery> status = corpusAdministration.migrateUrlShortener(
-                    urlShortenerFiles, cmdLine.getOptionValue("service-url"), userName, password);
+                    urlShortenerFiles, cmdLine.getOptionValue("service-url"), userName, password,
+                    cmdLine.hasOption("allow-partial"));
             password = null;
 
             // output summary and detailed list of failed queries
             Collection<URLShortenerQuery> unknownCorpusQueries = status.get(QueryStatus.UnknownCorpus);
-            
+
             System.out.println();
 
             if (!unknownCorpusQueries.isEmpty()) {

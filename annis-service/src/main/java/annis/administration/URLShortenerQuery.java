@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.ServerErrorException;
@@ -42,34 +43,33 @@ public class URLShortenerQuery {
     private final static Logger log = LoggerFactory.getLogger(URLShortenerQuery.class);
 
     private URI uri;
-
     private DisplayedResultQuery query;
-
+    private UUID uuid;
+    
     private String errorMsg;
 
-    protected URLShortenerQuery(URI uri) {
-        this.uri = uri;
-        this.query = new DisplayedResultQuery();
-        this.errorMsg = null;
+    protected URLShortenerQuery(URI uri, UUID uuid) {
+        this(uri, new DisplayedResultQuery(), uuid);
     }
 
-    protected URLShortenerQuery(URI uri, DisplayedResultQuery query) {
+    protected URLShortenerQuery(URI uri, DisplayedResultQuery query, UUID uuid) {
         this.uri = uri;
+        this.uuid = uuid;
         this.query = query;
         this.errorMsg = null;
     }
 
-    public static URLShortenerQuery parse(String url) throws URISyntaxException, UnsupportedEncodingException {
+    public static URLShortenerQuery parse(String url, UUID uuid) throws URISyntaxException, UnsupportedEncodingException {
 
         URI parsedURI = new URI(url);
 
-        URLShortenerQuery result = new URLShortenerQuery(parsedURI);
+        URLShortenerQuery result = new URLShortenerQuery(parsedURI, uuid);
 
         if (parsedURI.getPath().startsWith("/embeddedvis")) {
 
             for (NameValuePair arg : URLEncodedUtils.parse(parsedURI, "UTF-8")) {
                 if ("embedded_interface".equals(arg.getName())) {
-                    URLShortenerQuery subquery = parse(arg.getValue());
+                    URLShortenerQuery subquery = parse(arg.getValue(), uuid);
                     result.query = subquery.query;
                     break;
                 }
@@ -105,7 +105,7 @@ public class URLShortenerQuery {
             rewrittenUri.fragment(rewrittenQuery.toCitationFragment());
         }
 
-        return new URLShortenerQuery(rewrittenUri.build(), rewrittenQuery);
+        return new URLShortenerQuery(rewrittenUri.build(), rewrittenQuery, this.uuid);
     }
 
     public Query getQuery() {
@@ -115,7 +115,15 @@ public class URLShortenerQuery {
     public String getErrorMsg() {
         return errorMsg;
     }
-
+    
+    public UUID getUuid() {
+        return uuid;
+    }
+    
+    public URI getUri() {
+        return uri;
+    }
+    
     public static int MAX_RETRY = 3;
 
     public QueryStatus test(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException {
