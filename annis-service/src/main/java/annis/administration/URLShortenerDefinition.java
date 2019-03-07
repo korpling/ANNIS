@@ -22,8 +22,11 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sqlite.date.DateFormatUtils;
 
 import com.google.common.base.Joiner;
 
@@ -64,8 +67,11 @@ public class URLShortenerDefinition {
 
         URI parsedURI = new URI(url);
 
+        DateTimeFormatter dateFormatter = DateTimeFormat
+                .forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");
+
         URLShortenerDefinition result = new URLShortenerDefinition(parsedURI, UUID.fromString(uuid),
-                DateTime.parse(creationTime));
+                dateFormatter.parseDateTime(creationTime));
 
         if (parsedURI.getPath().startsWith("/embeddedvis")) {
 
@@ -83,7 +89,7 @@ public class URLShortenerDefinition {
 
         return result;
     }
-    
+
     private static DisplayedResultQuery parseFragment(String fragment) {
         Map<String, String> args = CommonHelper.parseFragment(fragment);
         String corporaRaw = args.get("c");
@@ -130,7 +136,7 @@ public class URLShortenerDefinition {
     public URI getUri() {
         return uri;
     }
-    
+
     public DateTime getCreationTime() {
         return creationTime;
     }
