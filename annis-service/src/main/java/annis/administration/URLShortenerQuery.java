@@ -37,12 +37,15 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
 public class URLShortenerQuery {
 
     private final static Logger log = LoggerFactory.getLogger(URLShortenerQuery.class);
+    
+    private URI uri;
 
-    private Query query;
+    private DisplayedResultQuery query;
 
     private String errorMsg;
 
-    protected URLShortenerQuery() {
+    protected URLShortenerQuery(URI uri) {
+        this.uri = uri;
         this.query = new DisplayedResultQuery();
         this.errorMsg = null;
     }
@@ -50,6 +53,8 @@ public class URLShortenerQuery {
     public static URLShortenerQuery parse(String url) throws URISyntaxException, UnsupportedEncodingException {
 
         URI parsedURI = new URI(url);
+        
+        URLShortenerQuery result = new URLShortenerQuery(parsedURI);
 
         if (parsedURI.getPath().startsWith("/embeddedvis")) {
             // parse embedded vis linked query
@@ -65,7 +70,8 @@ public class URLShortenerQuery {
             String interfaceURL = URLDecoder.decode(args.get("embedded_interface"), "UTF-8");
 
             if (interfaceURL != null) {
-                return parse(interfaceURL);
+                URLShortenerQuery subquery = parse(interfaceURL);
+                result.query = subquery.query;
             }
 
         } else {
@@ -73,12 +79,12 @@ public class URLShortenerQuery {
             String corporaRaw = args.get("c");
             String aql = args.get("q");
             if (corporaRaw != null && aql != null) {
-                URLShortenerQuery result = new URLShortenerQuery();
+             //   URLShortenerQuery result = new URLShortenerQuery();
                 Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
                 result.getQuery().setCorpora(corpora);
                 result.getQuery().setQuery(aql);
                 result.getQuery().setQueryLanguage(QueryLanguage.AQL);
-                return result;
+
             }
         }
 
@@ -146,21 +152,21 @@ public class URLShortenerQuery {
             }
 
             if (status != QueryStatus.Ok && this.query.getQueryLanguage() == QueryLanguage.AQL) {
-                // check in quirks mode and rewrite if necessary
-                URLShortenerQuery quirksQuery = new URLShortenerQuery();
-                quirksQuery.query = new Query(this.query.getQuery(), QueryLanguage.AQL_QUIRKS_V3,
-                        this.query.getCorpora());
-                log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery(), this.query.getCorpora());
-                        
-                QueryStatus quirksStatus = quirksQuery.test(queryDao, annisSearchService);
-                if(quirksStatus == QueryStatus.Ok) {
-                    this.query = quirksQuery.query;
-                    this.errorMsg = "Rewrite in quirks mode necessary";
-                    status = QueryStatus.Ok;
-                } else {
-                    this.errorMsg = quirksQuery.getErrorMsg();
-                    log.warn("Quirks not sucessful");
-                }
+//                // check in quirks mode and rewrite if necessary
+//                URLShortenerQuery quirksQuery = new URLShortenerQuery();
+//                quirksQuery.query = new Query(this.query.getQuery(), QueryLanguage.AQL_QUIRKS_V3,
+//                        this.query.getCorpora());
+//                log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery(), this.query.getCorpora());
+//                        
+//                QueryStatus quirksStatus = quirksQuery.test(queryDao, annisSearchService);
+//                if(quirksStatus == QueryStatus.Ok) {
+//                    this.query = quirksQuery.query;
+//                    this.errorMsg = "Rewrite in quirks mode necessary";
+//                    status = QueryStatus.Ok;
+//                } else {
+//                    this.errorMsg = quirksQuery.getErrorMsg();
+//                    log.warn("Quirks not sucessful");
+//                }
             }
 
             return status;

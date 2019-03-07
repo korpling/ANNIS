@@ -48,6 +48,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 
+import annis.QueryGenerator;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.controller.CountCallback;
 import annis.gui.controller.ExportBackgroundJob;
@@ -57,10 +58,9 @@ import annis.gui.controlpanel.QueryPanel;
 import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
-import annis.gui.objects.ExportQuery;
-import annis.gui.objects.FrequencyQuery;
 import annis.model.Query;
-import annis.gui.objects.QueryGenerator;
+import annis.gui.objects.ExportQuery;
+import annis.gui.objects.ExportQueryGenerator;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultfetch.SingleResultFetchJob;
@@ -75,6 +75,7 @@ import annis.libgui.visualizers.IFrameResourceMap;
 import annis.model.AqlParseError;
 import annis.model.ContextualizedQuery;
 import annis.model.DisplayedResultQuery;
+import annis.model.FrequencyQuery;
 import annis.model.NodeDesc;
 import annis.model.PagedResultQuery;
 import annis.model.QueryNode;
@@ -295,11 +296,12 @@ public class QueryController implements Serializable {
      * @return
      */
     public ExportQuery getExportQuery() {
-        return QueryGenerator.export().query(state.getAql().getValue()).corpora(state.getSelectedCorpora().getValue())
-                .queryLanguage(state.getQueryLanguage().getValue()).left(state.getLeftContext().getValue())
-                .right(state.getRightContext().getValue()).segmentation(state.getVisibleBaseText().getValue())
-                .exporter(state.getExporter().getValue()).annotations(state.getExportAnnotationKeys().getValue())
-                .param(state.getExportParameters().getValue()).alignmc(state.getAlignmc().getValue()).build();
+        return new ExportQueryGenerator().query(state.getAql().getValue())
+                .corpora(state.getSelectedCorpora().getValue()).queryLanguage(state.getQueryLanguage().getValue())
+                .left(state.getLeftContext().getValue()).right(state.getRightContext().getValue())
+                .segmentation(state.getVisibleBaseText().getValue()).exporter(state.getExporter().getValue())
+                .annotations(state.getExportAnnotationKeys().getValue()).param(state.getExportParameters().getValue())
+                .alignmc(state.getAlignmc().getValue()).build();
     }
 
     private void checkQuirksMode(Query query) {
@@ -434,7 +436,7 @@ public class QueryController implements Serializable {
         ExportQuery query = getExportQuery();
 
         checkQuirksMode(query);
-        
+
         addHistoryEntry(query);
 
         ExporterPlugin exporterImpl = ui.getExporter(query.getExporter());
@@ -487,7 +489,7 @@ public class QueryController implements Serializable {
         FrequencyQuery query = QueryGenerator.frequency().query(state.getAql().getValue())
                 .corpora(state.getSelectedCorpora().getValue()).queryLanguage(state.getQueryLanguage().getValue())
                 .def(freqDefinition).build();
-        
+
         checkQuirksMode(query);
 
         addHistoryEntry(query);

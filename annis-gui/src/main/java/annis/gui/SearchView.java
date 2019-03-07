@@ -59,12 +59,12 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import annis.CommonHelper;
+import annis.QueryGenerator;
 import annis.VersionInfo;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.objects.QueryGenerator;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Background;
 import annis.libgui.Helper;

@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.objects;
+package annis.model;
 
 import java.util.Objects;
 
-import annis.model.Query;
 import annis.service.objects.FrequencyTableQuery;
 
 /**

@@ -17,8 +17,8 @@ package annis.gui.controller;
 
 import annis.gui.AnnisUI;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.objects.FrequencyQuery;
 import annis.libgui.Helper;
+import annis.model.FrequencyQuery;
 import annis.service.objects.FrequencyTable;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;

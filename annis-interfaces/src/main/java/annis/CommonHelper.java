@@ -445,8 +445,8 @@ public class CommonHelper {
      *                     fragment to parse
      * @return a map with the keys and values of the fragment
      */
-    public static Map<String, String> parseFragment(String fragment) {
-        Map<String, String> result = new TreeMap<String, String>();
+    public static LinkedHashMap<String, String> parseFragment(String fragment) {
+        LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
 
         fragment = StringUtils.removeStart(fragment, "!");
 

@@ -60,9 +60,9 @@ import com.vaadin.ui.VerticalLayout;
 
 import annis.gui.QueryController;
 import annis.gui.admin.PopupTwinColumnSelect;
-import annis.gui.objects.FrequencyQuery;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
+import annis.model.FrequencyQuery;
 import annis.model.NodeDesc;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;

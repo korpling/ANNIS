@@ -51,8 +51,8 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import annis.gui.components.FrequencyChart;
-import annis.gui.objects.FrequencyQuery;
 import annis.libgui.Helper;
+import annis.model.FrequencyQuery;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import au.com.bytecode.opencsv.CSVWriter;

@@ -28,11 +28,11 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import annis.QueryGenerator;
 import annis.gui.beans.CitationProvider;
 import annis.model.ContextualizedQuery;
 import annis.model.DisplayedResultQuery;
 import annis.model.Query;
-import annis.gui.objects.QueryGenerator;
 import annis.libgui.Helper;
 
 /**
