@@ -66,7 +66,7 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
             URI appURI = UI.getCurrent().getPage().getLocation();
             String fragment;
             try {
-                fragment = StringUtils.join(query.citationFragment(), "&");
+                fragment = StringUtils.join(query.toCitationFragment(), "&");
                 URI url = new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), appURI.getPath(), null,
                         fragment);
 

@@ -17,8 +17,10 @@ package annis.model;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -58,27 +60,37 @@ public class DisplayedResultQuery extends PagedResultQuery {
         this.baseText = baseText;
     }
 
-    public List<String> citationFragment() throws UnsupportedEncodingException {
-        List<String> result = new ArrayList<>();
-        result.add("_q=" + CommonHelper.encodeBase64URL(getQuery()));
-        result.add("ql=" + URLEncoder.encode(getQueryLanguage().name().toLowerCase(), "UTF-8"));
-        result.add("_c=" + CommonHelper.encodeBase64URL(StringUtils.join(getCorpora(), ",")));
-        result.add("cl=" + URLEncoder.encode("" + getLeftContext(), "UTF-8"));
-        result.add("cr=" + URLEncoder.encode("" + getRightContext(), "UTF-8"));
-        result.add("s=" + URLEncoder.encode("" + getOffset(), "UTF-8"));
-        result.add("l=" + URLEncoder.encode("" + getLimit(), "UTF-8"));
+    public String toCitationFragment() throws UnsupportedEncodingException {
+        Map<String, String> result = getCitationFragmentArguments();
+        List<String> fragmentParts = new LinkedList<String>();
+        for(Map.Entry<String, String> e : result.entrySet()) {
+            fragmentParts.add(e.getKey() + "=" + e.getValue());
+        }
+
+        return StringUtils.join(fragmentParts, "&");
+    }
+    
+    public Map<String, String> getCitationFragmentArguments() throws UnsupportedEncodingException {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("_q", CommonHelper.encodeBase64URL(getQuery()));
+        result.put("ql", URLEncoder.encode(getQueryLanguage().name().toLowerCase(), "UTF-8"));
+        result.put("_c", CommonHelper.encodeBase64URL(StringUtils.join(getCorpora(), ",")));
+        result.put("cl", URLEncoder.encode("" + getLeftContext(), "UTF-8"));
+        result.put("cr", URLEncoder.encode("" + getRightContext(), "UTF-8"));
+        result.put("s", URLEncoder.encode("" + getOffset(), "UTF-8"));
+        result.put("l", URLEncoder.encode("" + getLimit(), "UTF-8"));
         if (getSegmentation() != null) {
-            result.add("_seg=" + CommonHelper.encodeBase64URL(getSegmentation()));
+            result.put("_seg", CommonHelper.encodeBase64URL(getSegmentation()));
         }
         // only output "bt" if it is not the same as the context segmentation
         if (!Objects.equals(getBaseText(), getSegmentation())) {
-            result.add("_bt=" + (getBaseText() == null ? "" : CommonHelper.encodeBase64URL(getBaseText())));
+            result.put("_bt", (getBaseText() == null ? "" : CommonHelper.encodeBase64URL(getBaseText())));
         }
         if (getOrder() != OrderType.ascending && getOrder() != null) {
-            result.add("o=" + getOrder().toString());
+            result.put("o", getOrder().toString());
         }
         if (getSelectedMatches() != null && !getSelectedMatches().isEmpty()) {
-            result.add("m=" + Joiner.on(',').join(getSelectedMatches()));
+            result.put("m", Joiner.on(',').join(getSelectedMatches()));
         }
 
         return result;

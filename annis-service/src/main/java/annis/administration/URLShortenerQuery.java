@@ -27,6 +27,7 @@ import com.google.common.base.Splitter;
 
 import annis.CommonHelper;
 import annis.dao.QueryDao;
+import annis.model.DisplayedResultQuery;
 import annis.model.Query;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
@@ -42,7 +43,7 @@ public class URLShortenerQuery {
     private String errorMsg;
 
     protected URLShortenerQuery() {
-        this.query = new Query();
+        this.query = new DisplayedResultQuery();
         this.errorMsg = null;
     }
 

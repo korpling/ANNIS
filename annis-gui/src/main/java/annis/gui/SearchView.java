@@ -64,11 +64,7 @@ import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.model.DisplayedResultQuery;
-import annis.model.PagedResultQuery;
-import annis.model.Query;
 import annis.gui.objects.QueryGenerator;
-import annis.gui.querybuilder.AQLOperator;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Background;
 import annis.libgui.Helper;
@@ -78,6 +74,9 @@ import annis.libgui.media.MediaControllerImpl;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
+import annis.model.DisplayedResultQuery;
+import annis.model.PagedResultQuery;
+import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;
@@ -587,9 +586,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
     public void updateFragment(DisplayedResultQuery q) {
 
         try {
-            List<String> args = q.citationFragment();
             // set our fragment
-            lastEvaluatedFragment = StringUtils.join(args, "&");
+            lastEvaluatedFragment = q.toCitationFragment();
             UI.getCurrent().getPage().setUriFragment(lastEvaluatedFragment, false);
 
             // reset title
