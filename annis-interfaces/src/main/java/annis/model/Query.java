@@ -18,6 +18,7 @@ package annis.model;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -49,6 +50,12 @@ public class Query implements Serializable, Cloneable {
 
     public Query() {
         corpora = new HashSet<>();
+    }
+
+    public Query(Query orig) {
+        this.query = orig.getQuery();
+        this.corpora = orig.getCorpora();
+        this.queryLanguage = orig.getQueryLanguage();
     }
 
     public Query(String query, QueryLanguage queryLanguage, Set<String> corpora) {
@@ -90,16 +97,22 @@ public class Query implements Serializable, Cloneable {
         return result;
     }
 
-    public String toCitationFragment() throws UnsupportedEncodingException {
+    public String toCitationFragment() {
         Map<String, String> result = getCitationFragmentArguments();
         List<String> fragmentParts = new LinkedList<String>();
         for (Map.Entry<String, String> e : result.entrySet()) {
             String value;
             // every name that starts with "_" is base64 encoded
             if (e.getKey().startsWith("_")) {
-                value = new String(Base64.decodeBase64(e.getValue()), "UTF-8");
+                value = new String(Base64.decodeBase64(e.getValue()), StandardCharsets.UTF_8);
             } else {
-                value = URLDecoder.decode(e.getValue(), "UTF-8");
+                try {
+                    value = URLDecoder.decode(e.getValue(), StandardCharsets.UTF_8.name());
+                } catch (UnsupportedEncodingException ex) {
+                    // should not happen, from Java 10 onward we can use
+                    // URLDecoder.decode(e.getValue(), StandardCharsets.UTF_8) directly
+                    value = "";
+                }
             }
             fragmentParts.add(e.getKey() + "=" + value);
         }

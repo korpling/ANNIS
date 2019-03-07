@@ -584,19 +584,12 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
      *              The query where the parameters are extracted from.
      */
     public void updateFragment(DisplayedResultQuery q) {
+        // set our fragment
+        lastEvaluatedFragment = q.toCitationFragment();
+        UI.getCurrent().getPage().setUriFragment(lastEvaluatedFragment, false);
 
-        try {
-            // set our fragment
-            lastEvaluatedFragment = q.toCitationFragment();
-            UI.getCurrent().getPage().setUriFragment(lastEvaluatedFragment, false);
-
-            // reset title
-            Page.getCurrent().setTitle(ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
-            
-        } catch (UnsupportedEncodingException e) {
-            log.error("Could not generate citation fragment", e);
-            ExceptionDialog.show(e, "Could not generate citation fragment");
-        }
+        // reset title
+        Page.getCurrent().setTitle(ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");     
     }
 
     /**

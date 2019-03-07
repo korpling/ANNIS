@@ -33,6 +33,16 @@ import annis.service.objects.OrderType;
 public class DisplayedResultQuery extends PagedResultQuery {
     private Set<Long> selectedMatches = new TreeSet<>();
     private String baseText;
+    
+    public DisplayedResultQuery() {
+        
+    }
+    
+    public DisplayedResultQuery(DisplayedResultQuery orig) {
+        super(orig);
+        this.selectedMatches = orig.getSelectedMatches();
+        this.baseText = orig.getBaseText();
+    }
 
     public Set<Long> getSelectedMatches() {
         return selectedMatches;

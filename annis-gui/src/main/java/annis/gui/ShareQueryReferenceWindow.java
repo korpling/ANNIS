@@ -75,7 +75,7 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
                 } else {
                     shortURL = url.toASCIIString();
                 }
-            } catch (UnsupportedEncodingException | URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 log.error("Could not generate query share link", e);
                 ExceptionDialog.show(e, "Could not generate query share link");
             }

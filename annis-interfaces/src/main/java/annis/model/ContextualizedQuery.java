@@ -30,6 +30,13 @@ public class ContextualizedQuery extends Query {
   public ContextualizedQuery() {
 
   }
+  
+  public ContextualizedQuery(ContextualizedQuery orig) {
+      super(orig);
+      this.leftContext = orig.getLeftContext();
+      this.rightContext = orig.getRightContext();
+      this.segmentation = orig.getSegmentation();
+  }
 
   public int getLeftContext() {
     return leftContext;

@@ -37,6 +37,13 @@ public class PagedResultQuery extends ContextualizedQuery {
     public PagedResultQuery() {
 
     }
+    
+    public PagedResultQuery(PagedResultQuery orig) {
+        super(orig);
+        this.offset = orig.getOffset();
+        this.limit = orig.getLimit();
+        this.order = orig.getOrder();
+    }
 
     public PagedResultQuery(int contextLeft, int contextRight, long offset, int limit, String segmentation,
             String query, Set<String> corpora) {

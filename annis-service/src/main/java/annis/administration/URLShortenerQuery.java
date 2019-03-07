@@ -3,10 +3,9 @@ package annis.administration;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,15 +16,19 @@ import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 
 import annis.CommonHelper;
+import annis.QueryGenerator;
 import annis.dao.QueryDao;
 import annis.model.DisplayedResultQuery;
 import annis.model.Query;
@@ -37,7 +40,7 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
 public class URLShortenerQuery {
 
     private final static Logger log = LoggerFactory.getLogger(URLShortenerQuery.class);
-    
+
     private URI uri;
 
     private DisplayedResultQuery query;
@@ -50,45 +53,59 @@ public class URLShortenerQuery {
         this.errorMsg = null;
     }
 
+    protected URLShortenerQuery(URI uri, DisplayedResultQuery query) {
+        this.uri = uri;
+        this.query = query;
+        this.errorMsg = null;
+    }
+
     public static URLShortenerQuery parse(String url) throws URISyntaxException, UnsupportedEncodingException {
 
         URI parsedURI = new URI(url);
-        
+
         URLShortenerQuery result = new URLShortenerQuery(parsedURI);
 
         if (parsedURI.getPath().startsWith("/embeddedvis")) {
-            // parse embedded vis linked query
-            Map<String, String> args = new LinkedHashMap<>();
-            for (String argRaw : Splitter.on('&').trimResults().split(parsedURI.getRawQuery())) {
-                List<String> keyValue = Splitter.on('=').limit(2).splitToList(argRaw);
-                if (keyValue.size() == 1) {
-                    args.putIfAbsent(keyValue.get(0), "");
-                } else {
-                    args.putIfAbsent(keyValue.get(0), keyValue.get(1));
-                }
-            }
-            String interfaceURL = URLDecoder.decode(args.get("embedded_interface"), "UTF-8");
 
-            if (interfaceURL != null) {
-                URLShortenerQuery subquery = parse(interfaceURL);
-                result.query = subquery.query;
+            for (NameValuePair arg : URLEncodedUtils.parse(parsedURI, "UTF-8")) {
+                if ("embedded_interface".equals(arg.getName())) {
+                    URLShortenerQuery subquery = parse(arg.getValue());
+                    result.query = subquery.query;
+                    break;
+                }
             }
 
         } else {
             Map<String, String> args = CommonHelper.parseFragment(parsedURI.getFragment());
             String corporaRaw = args.get("c");
-            String aql = args.get("q");
-            if (corporaRaw != null && aql != null) {
-             //   URLShortenerQuery result = new URLShortenerQuery();
+            if (corporaRaw != null) {
                 Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
-                result.getQuery().setCorpora(corpora);
-                result.getQuery().setQuery(aql);
-                result.getQuery().setQueryLanguage(QueryLanguage.AQL);
 
+                result.query = QueryGenerator.displayed().left(Integer.parseInt(args.get("cl")))
+                        .right(Integer.parseInt(args.get("cr"))).offset(Integer.parseInt(args.get("s")))
+                        .limit(Integer.parseInt(args.get("l"))).segmentation(args.get("seg")).baseText(args.get("bt"))
+                        .query(args.get("q")).corpora(corpora).build();
             }
         }
 
-        return null;
+        return result;
+    }
+
+    public URLShortenerQuery rewriteInQuirksMode() {
+        DisplayedResultQuery rewrittenQuery = new DisplayedResultQuery(this.query);
+        rewrittenQuery.setQueryLanguage(QueryLanguage.AQL_QUIRKS_V3);
+
+        UriBuilder rewrittenUri = UriBuilder.fromUri(this.uri);
+        if (this.uri.getPath().startsWith("/embeddedvis")) {
+            // we need to keep query parameters arguments, except for the one with the
+            // linked query
+            rewrittenUri.queryParam("embedded_interface", rewrittenQuery.toCitationFragment());
+        } else {
+            // just update the fragment, but leave everything else the same
+            rewrittenUri.fragment(rewrittenQuery.toCitationFragment());
+        }
+
+        return new URLShortenerQuery(rewrittenUri.build(), rewrittenQuery);
     }
 
     public Query getQuery() {
@@ -152,21 +169,21 @@ public class URLShortenerQuery {
             }
 
             if (status != QueryStatus.Ok && this.query.getQueryLanguage() == QueryLanguage.AQL) {
-//                // check in quirks mode and rewrite if necessary
-//                URLShortenerQuery quirksQuery = new URLShortenerQuery();
-//                quirksQuery.query = new Query(this.query.getQuery(), QueryLanguage.AQL_QUIRKS_V3,
-//                        this.query.getCorpora());
-//                log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery(), this.query.getCorpora());
-//                        
-//                QueryStatus quirksStatus = quirksQuery.test(queryDao, annisSearchService);
-//                if(quirksStatus == QueryStatus.Ok) {
-//                    this.query = quirksQuery.query;
-//                    this.errorMsg = "Rewrite in quirks mode necessary";
-//                    status = QueryStatus.Ok;
-//                } else {
-//                    this.errorMsg = quirksQuery.getErrorMsg();
-//                    log.warn("Quirks not sucessful");
-//                }
+                // check in quirks mode and rewrite if necessary
+                log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery(),
+                        this.query.getCorpora());
+
+                URLShortenerQuery quirksQuery = this.rewriteInQuirksMode();
+                QueryStatus quirksStatus = quirksQuery.test(queryDao, annisSearchService);
+                if (quirksStatus == QueryStatus.Ok) {
+                    this.query = quirksQuery.query;
+                    this.uri = quirksQuery.uri;
+                    this.errorMsg = "Rewrite in quirks mode necessary";
+                    status = QueryStatus.Ok;
+                } else {
+                    this.errorMsg = quirksQuery.getErrorMsg();
+                    log.warn("Quirks not sucessful");
+                }
             }
 
             return status;
