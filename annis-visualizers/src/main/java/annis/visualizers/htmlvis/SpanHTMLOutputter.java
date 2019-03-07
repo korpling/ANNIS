@@ -30,6 +30,7 @@ import com.google.common.escape.Escaper;
 import com.google.common.html.HtmlEscapers;
 
 import annis.CommonHelper;
+
 import java.util.LinkedList;
 import java.util.Map;
 import org.corpus_tools.salt.SALT_TYPE;

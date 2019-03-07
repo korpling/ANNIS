@@ -23,6 +23,7 @@ import annis.libgui.PDFPageHelper;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.TimeHelper;
 import annis.libgui.visualizers.VisualizerInput;
+
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;

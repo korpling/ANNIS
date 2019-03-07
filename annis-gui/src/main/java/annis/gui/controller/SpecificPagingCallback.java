@@ -17,12 +17,13 @@ package annis.gui.controller;
 
 import annis.gui.AnnisUI;
 import annis.gui.SearchView;
-import annis.gui.objects.DisplayedResultQuery;
 import annis.gui.objects.QueryUIState;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Background;
+import annis.model.DisplayedResultQuery;
+
 import java.util.concurrent.Future;
 
 /**

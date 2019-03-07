@@ -22,6 +22,7 @@ import java.util.TreeSet;
 
 import annis.libgui.exporter.ExporterPlugin;
 import annis.model.ContextualizedQuery;
+import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.model.Query;
 import annis.service.objects.FrequencyTableQuery;

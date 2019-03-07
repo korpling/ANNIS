@@ -35,8 +35,8 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
 import annis.gui.components.ExceptionDialog;
-import annis.gui.objects.DisplayedResultQuery;
 import annis.libgui.Helper;
+import annis.model.DisplayedResultQuery;
 
 /**
  *

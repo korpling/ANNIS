@@ -64,7 +64,7 @@ import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.objects.DisplayedResultQuery;
+import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.model.Query;
 import annis.gui.objects.QueryGenerator;
@@ -610,7 +610,7 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
      */
     public void updateFragementWithSelectedCorpus(Set<String> corpora) {
         if (corpora != null && !corpora.isEmpty()) {
-            String fragment = "_c=" + Helper.encodeBase64URL(StringUtils.join(corpora, ","));
+            String fragment = "_c=" + CommonHelper.encodeBase64URL(StringUtils.join(corpora, ","));
             UI.getCurrent().getPage().setUriFragment(fragment);
         } else {
             UI.getCurrent().getPage().setUriFragment("");

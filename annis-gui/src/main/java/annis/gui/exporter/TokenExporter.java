@@ -15,9 +15,10 @@
  */
 package annis.gui.exporter;
 
-import annis.CommonHelper;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
+
+import annis.CommonHelper;
 import annis.model.Annotation;
 import annis.service.objects.SubgraphFilter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;

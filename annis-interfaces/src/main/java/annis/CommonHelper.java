@@ -473,4 +473,13 @@ public class CommonHelper {
         }
         return result;
     }
+
+    public static String encodeBase64URL(String val) {
+        try {
+            return Base64.encodeBase64URLSafeString(val.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException ex) {
+            log.error("Java Virtual Maschine can't handle UTF-8: I'm utterly confused", ex);
+        }
+        return "";
+    }
 }

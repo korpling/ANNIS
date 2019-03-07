@@ -18,7 +18,6 @@ package annis.libgui;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -36,7 +35,6 @@ import java.util.TreeMap;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -79,6 +77,7 @@ import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 
+import annis.CommonHelper;
 import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
@@ -316,22 +315,11 @@ public class Helper {
 
     }
 
-    public static String encodeBase64URL(String val) {
-        try {
-            return Base64.encodeBase64URLSafeString(val.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException ex) {
-            log.error("Java Virtual Maschine can't handle UTF-8: I'm utterly confused", ex);
-        }
-        return "";
-    }
-
-
-
     public static String generateCorpusLink(Set<String> corpora) {
         try {
             URI appURI = UI.getCurrent().getPage().getLocation();
 
-            String fragment = "_c=" + encodeBase64URL(StringUtils.join(corpora, ","));
+            String fragment = "_c=" + CommonHelper.encodeBase64URL(StringUtils.join(corpora, ","));
 
             return new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), appURI.getPath(), null,
                     fragment).toASCIIString();
