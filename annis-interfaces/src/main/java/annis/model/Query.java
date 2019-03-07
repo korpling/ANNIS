@@ -16,10 +16,19 @@
 package annis.model;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
 
@@ -28,91 +37,98 @@ import annis.service.objects.QueryLanguage;
 /**
  * A POJO representing a query.
  * 
- * This objects holds all relevant information about the state of the UI
- * related to querying, e.g. the AQL, the search options and the type of the query.
+ * This objects holds all relevant information about the state of the UI related
+ * to querying, e.g. the AQL, the search options and the type of the query.
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class Query implements Serializable, Cloneable
-{
-  private String query;
-  private Set<String> corpora;
-  private QueryLanguage queryLanguage = QueryLanguage.AQL;
-  
+public class Query implements Serializable, Cloneable {
+    private String query;
+    private Set<String> corpora;
+    private QueryLanguage queryLanguage = QueryLanguage.AQL;
 
-  public Query()
-  {
-    corpora = new HashSet<>();
-  }
-
-  public Query(String query, QueryLanguage queryLanguage,
-    Set<String> corpora)
-  {
-    this.query = query == null ? "" : query;
-    this.corpora = corpora == null ?  new LinkedHashSet<String>() : corpora;
-    this.queryLanguage = queryLanguage;
-  }
-
-  
-  public String getQuery()
-  {
-    return query;
-  }
-
-  public void setQuery(String query)
-  {
-    this.query = query == null ? "" : query;
-  }
-
-  public Set<String> getCorpora()
-  {
-    return corpora;
-  }
-
-  public void setCorpora(Set<String> corpora)
-  {
-    this.corpora = corpora == null ? new LinkedHashSet<String>() : corpora;
-  }
-  
-  public QueryLanguage getQueryLanguage() {
-      return queryLanguage;
-  }
-  
-  public void setQueryLanguage(QueryLanguage queryLanguage) {
-      Preconditions.checkNotNull(queryLanguage, "The query language of a paged result query must never be null.");
-      this.queryLanguage = queryLanguage;
-  }
-
-  @Override
-  public int hashCode()
-  {
-    return Objects.hash(corpora, query, queryLanguage);
-  }
-
-  
-  @Override
-  public boolean equals(Object obj)
-  {
-    if (obj == null)
-    {
-      return false;
+    public Query() {
+        corpora = new HashSet<>();
     }
-    if (getClass() != obj.getClass())
-    {
-      return false;
+
+    public Query(String query, QueryLanguage queryLanguage, Set<String> corpora) {
+        this.query = query == null ? "" : query;
+        this.corpora = corpora == null ? new LinkedHashSet<String>() : corpora;
+        this.queryLanguage = queryLanguage;
     }
-    final Query other = (Query) obj;
-    
-    return Objects.equals(this.query, other.query)
-      && Objects.equals(this.corpora, other.corpora)
-      && Objects.equals(this.queryLanguage, other.queryLanguage);
-  }
 
-  @Override
-  public Query clone() throws CloneNotSupportedException
-  {
-    return (Query) super.clone();
-  }
+    public String getQuery() {
+        return query;
+    }
 
-  
+    public void setQuery(String query) {
+        this.query = query == null ? "" : query;
+    }
+
+    public Set<String> getCorpora() {
+        return corpora;
+    }
+
+    public void setCorpora(Set<String> corpora) {
+        this.corpora = corpora == null ? new LinkedHashSet<String>() : corpora;
+    }
+
+    public QueryLanguage getQueryLanguage() {
+        return queryLanguage;
+    }
+
+    public void setQueryLanguage(QueryLanguage queryLanguage) {
+        Preconditions.checkNotNull(queryLanguage, "The query language of a paged result query must never be null.");
+        this.queryLanguage = queryLanguage;
+    }
+
+    public Map<String, String> getCitationFragmentArguments() {
+        Map<String, String> result = new LinkedHashMap<>();
+        result.put("_q", getQuery());
+        result.put("ql", getQueryLanguage().name().toLowerCase());
+        result.put("_c", StringUtils.join(getCorpora(), ","));
+        return result;
+    }
+
+    public String toCitationFragment() throws UnsupportedEncodingException {
+        Map<String, String> result = getCitationFragmentArguments();
+        List<String> fragmentParts = new LinkedList<String>();
+        for (Map.Entry<String, String> e : result.entrySet()) {
+            String value;
+            // every name that starts with "_" is base64 encoded
+            if (e.getKey().startsWith("_")) {
+                value = new String(Base64.decodeBase64(e.getValue()), "UTF-8");
+            } else {
+                value = URLDecoder.decode(e.getValue(), "UTF-8");
+            }
+            fragmentParts.add(e.getKey() + "=" + value);
+        }
+
+        return StringUtils.join(fragmentParts, "&");
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(corpora, query, queryLanguage);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Query other = (Query) obj;
+
+        return Objects.equals(this.query, other.query) && Objects.equals(this.corpora, other.corpora)
+                && Objects.equals(this.queryLanguage, other.queryLanguage);
+    }
+
+    @Override
+    public Query clone() throws CloneNotSupportedException {
+        return (Query) super.clone();
+    }
+
 }

@@ -15,11 +15,14 @@
  */
 package annis.model;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
+import annis.CommonHelper;
 import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;
 
@@ -72,6 +75,18 @@ public class PagedResultQuery extends ContextualizedQuery {
     public void setOrder(OrderType order) {
         Preconditions.checkNotNull(order, "The order of a paged result query must never be null.");
         this.order = order;
+    }
+    
+    @Override
+    public Map<String, String> getCitationFragmentArguments() {
+        Map<String, String> result = super.getCitationFragmentArguments();
+        result.put("s", "" + getOffset());
+        result.put("l", "" + getLimit());
+        if (getSegmentation() != null) {
+            result.put("_seg", CommonHelper.encodeBase64URL(getSegmentation()));
+        }
+
+        return result;
     }
 
 

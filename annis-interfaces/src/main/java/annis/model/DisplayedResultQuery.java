@@ -15,23 +15,14 @@
  */
 package annis.model;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 
-import annis.CommonHelper;
 import annis.service.objects.OrderType;
 
 /**
@@ -61,35 +52,10 @@ public class DisplayedResultQuery extends PagedResultQuery {
         this.baseText = baseText;
     }
 
-    public String toCitationFragment() throws UnsupportedEncodingException {
-        Map<String, String> result = getCitationFragmentArguments();
-        List<String> fragmentParts = new LinkedList<String>();
-        for (Map.Entry<String, String> e : result.entrySet()) {
-            String value;
-            // every name that starts with "_" is base64 encoded
-            if (e.getKey().startsWith("_")) {
-                value = new String(Base64.decodeBase64(e.getValue()), "UTF-8");
-            } else {
-                value = URLDecoder.decode(e.getValue(), "UTF-8");
-            }
-            fragmentParts.add(e.getKey() + "=" + value);
-        }
-
-        return StringUtils.join(fragmentParts, "&");
-    }
 
     public Map<String, String> getCitationFragmentArguments() {
-        Map<String, String> result = new LinkedHashMap<>();
-        result.put("_q", getQuery());
-        result.put("ql", getQueryLanguage().name().toLowerCase());
-        result.put("_c", StringUtils.join(getCorpora(), ","));
-        result.put("cl", "" + getLeftContext());
-        result.put("cr", "" + getRightContext());
-        result.put("s", "" + getOffset());
-        result.put("l", "" + getLimit());
-        if (getSegmentation() != null) {
-            result.put("_seg", CommonHelper.encodeBase64URL(getSegmentation()));
-        }
+        Map<String, String> result = super.getCitationFragmentArguments();
+        
         // only output "bt" if it is not the same as the context segmentation
         if (!Objects.equals(getBaseText(), getSegmentation())) {
             result.put("_bt", (getBaseText() == null ? "" : getBaseText()));

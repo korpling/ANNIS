@@ -15,7 +15,13 @@
  */
 package annis.model;
 
+import java.util.Map;
 import java.util.Objects;
+
+import com.google.common.base.Joiner;
+
+import annis.CommonHelper;
+import annis.service.objects.OrderType;
 
 /**
  *
@@ -53,6 +59,15 @@ public class ContextualizedQuery extends Query {
   public void setSegmentation(String segmentation) {
     this.segmentation = segmentation;
   }
+  
+  @Override
+    public Map<String, String> getCitationFragmentArguments() {
+        Map<String, String> result = super.getCitationFragmentArguments();
+        result.put("cl", "" + getLeftContext());
+        result.put("cr", "" + getRightContext());
+        return result;
+    }
+  
 
   @Override
   public int hashCode() {
