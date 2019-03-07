@@ -18,6 +18,7 @@ package annis.model;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Preconditions;
 
+import annis.CommonHelper;
 import annis.service.objects.QueryLanguage;
 
 /**
@@ -104,10 +106,10 @@ public class Query implements Serializable, Cloneable {
             String value;
             // every name that starts with "_" is base64 encoded
             if (e.getKey().startsWith("_")) {
-                value = new String(Base64.decodeBase64(e.getValue()), StandardCharsets.UTF_8);
+                value = CommonHelper.encodeBase64URL(e.getValue());
             } else {
                 try {
-                    value = URLDecoder.decode(e.getValue(), StandardCharsets.UTF_8.name());
+                    value = URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8.name());
                 } catch (UnsupportedEncodingException ex) {
                     // should not happen, from Java 10 onward we can use
                     // URLDecoder.decode(e.getValue(), StandardCharsets.UTF_8) directly

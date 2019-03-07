@@ -99,7 +99,7 @@ public class URLShortenerQuery {
         if (this.uri.getPath().startsWith("/embeddedvis")) {
             // we need to keep query parameters arguments, except for the one with the
             // linked query
-            rewrittenUri.queryParam("embedded_interface", rewrittenQuery.toCitationFragment());
+            rewrittenUri.replaceQueryParam("embedded_interface", rewrittenQuery.toCitationFragment());
         } else {
             // just update the fragment, but leave everything else the same
             rewrittenUri.fragment(rewrittenQuery.toCitationFragment());
