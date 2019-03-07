@@ -141,7 +141,7 @@ public class URLShortenerDefinition {
         return creationTime;
     }
 
-    public static int MAX_RETRY = 3;
+    public static int MAX_RETRY = 5;
 
     public QueryStatus test(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException {
 
@@ -166,7 +166,8 @@ public class URLShortenerDefinition {
                     matchesLegacy = findTarget.request(MediaType.APPLICATION_XML_TYPE).get(MatchGroup.class);
                 } catch (ServerErrorException ex) {
                     if (tries >= MAX_RETRY) {
-                        throw ex;
+                        this.errorMsg = ex.getMessage();
+                        return QueryStatus.Failed;
                     } else {
                         log.warn("Server error when executing query {}", query.getQuery(), ex);
                     }
