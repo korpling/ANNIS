@@ -37,9 +37,9 @@ import annis.service.objects.MatchGroup;
 import annis.service.objects.QueryLanguage;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 
-public class URLShortenerQuery {
+public class URLShortenerDefinition {
 
-    private final static Logger log = LoggerFactory.getLogger(URLShortenerQuery.class);
+    private final static Logger log = LoggerFactory.getLogger(URLShortenerDefinition.class);
 
     private URI uri;
     private DisplayedResultQuery query;
@@ -48,23 +48,23 @@ public class URLShortenerQuery {
 
     private String errorMsg;
 
-    protected URLShortenerQuery(URI uri, UUID uuid, DateTime creationTime) {
+    protected URLShortenerDefinition(URI uri, UUID uuid, DateTime creationTime) {
         this(uri, uuid, creationTime, new DisplayedResultQuery());
     }
 
-    protected URLShortenerQuery(URI uri, UUID uuid, DateTime creationTime, DisplayedResultQuery query) {
+    protected URLShortenerDefinition(URI uri, UUID uuid, DateTime creationTime, DisplayedResultQuery query) {
         this.uri = uri;
         this.uuid = uuid;
         this.query = query;
         this.errorMsg = null;
     }
 
-    public static URLShortenerQuery parse(String url, String uuid, String creationTime)
+    public static URLShortenerDefinition parse(String url, String uuid, String creationTime)
             throws URISyntaxException, UnsupportedEncodingException {
 
         URI parsedURI = new URI(url);
 
-        URLShortenerQuery result = new URLShortenerQuery(parsedURI, UUID.fromString(uuid),
+        URLShortenerDefinition result = new URLShortenerDefinition(parsedURI, UUID.fromString(uuid),
                 DateTime.parse(creationTime));
 
         if (parsedURI.getPath().startsWith("/embeddedvis")) {
@@ -98,7 +98,7 @@ public class URLShortenerQuery {
         return null;
     }
 
-    public URLShortenerQuery rewriteInQuirksMode() {
+    public URLShortenerDefinition rewriteInQuirksMode() {
         DisplayedResultQuery rewrittenQuery = new DisplayedResultQuery(this.query);
         rewrittenQuery.setQueryLanguage(QueryLanguage.AQL_QUIRKS_V3);
 
@@ -112,7 +112,7 @@ public class URLShortenerQuery {
             rewrittenUri.fragment(rewrittenQuery.toCitationFragment());
         }
 
-        return new URLShortenerQuery(rewrittenUri.build(), this.uuid, this.creationTime, rewrittenQuery);
+        return new URLShortenerDefinition(rewrittenUri.build(), this.uuid, this.creationTime, rewrittenQuery);
     }
 
     public Query getQuery() {
@@ -192,7 +192,7 @@ public class URLShortenerQuery {
                 log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery(),
                         this.query.getCorpora());
 
-                URLShortenerQuery quirksQuery = this.rewriteInQuirksMode();
+                URLShortenerDefinition quirksQuery = this.rewriteInQuirksMode();
                 QueryStatus quirksStatus = quirksQuery.test(queryDao, annisSearchService);
                 if (quirksStatus == QueryStatus.Ok) {
                     this.query = quirksQuery.query;

@@ -254,19 +254,19 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 Arrays.fill(providedPassword, ' ');
             }
 
-            Multimap<QueryStatus, URLShortenerQuery> status = corpusAdministration.migrateUrlShortener(
+            Multimap<QueryStatus, URLShortenerDefinition> status = corpusAdministration.migrateUrlShortener(
                     urlShortenerFiles, cmdLine.getOptionValue("service-url"), userName, password,
                     cmdLine.hasOption("allow-partial"));
             password = null;
 
             // output summary and detailed list of failed queries
-            Collection<URLShortenerQuery> unknownCorpusQueries = status.get(QueryStatus.UnknownCorpus);
+            Collection<URLShortenerDefinition> unknownCorpusQueries = status.get(QueryStatus.UnknownCorpus);
 
             System.out.println();
 
             if (!unknownCorpusQueries.isEmpty()) {
                 Map<String, Integer> unknownCorpusCount = new TreeMap<>();
-                for (URLShortenerQuery q : unknownCorpusQueries) {
+                for (URLShortenerDefinition q : unknownCorpusQueries) {
                     for (String c : q.getQuery().getCorpora()) {
                         int oldCount = unknownCorpusCount.getOrDefault(c, 0);
                         unknownCorpusCount.put(c, oldCount + 1);
@@ -299,14 +299,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
         }
     }
 
-    private void printProblematicQueries(String statusCaption, Collection<URLShortenerQuery> queries) {
+    private void printProblematicQueries(String statusCaption, Collection<URLShortenerDefinition> queries) {
         if (queries != null && !queries.isEmpty()) {
             String captionWithCount = statusCaption + " (sum: " + queries.size() + ")";
             System.out.println(captionWithCount);
             System.out.println(Strings.repeat("=", captionWithCount.length()));
             System.out.println();
 
-            for (URLShortenerQuery q : queries) {
+            for (URLShortenerDefinition q : queries) {
                 if (q.getErrorMsg() != null) {
                     System.out.println("Error: " + q.getErrorMsg());
                 }

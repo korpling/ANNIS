@@ -216,7 +216,7 @@ public class CorpusAdministration {
         return importStats;
     }
 
-    public Multimap<QueryStatus, URLShortenerQuery> migrateUrlShortener(List<String> paths, String serviceURL,
+    public Multimap<QueryStatus, URLShortenerDefinition> migrateUrlShortener(List<String> paths, String serviceURL,
             String username, String password, boolean allowPartialMigration) {
         if (paths == null || serviceURL == null) {
             return HashMultimap.create();
@@ -229,7 +229,7 @@ public class CorpusAdministration {
         }
         WebTarget searchService = client.target(serviceURL).path("annis").path("query").path("search");
 
-        Multimap<QueryStatus, URLShortenerQuery> queryByStatus = HashMultimap.create();
+        Multimap<QueryStatus, URLShortenerDefinition> queryByStatus = HashMultimap.create();
 
         for (String p : paths) {
             File urlShortenerFile = new File(p);
@@ -239,7 +239,7 @@ public class CorpusAdministration {
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
                             // parse URL
-                            URLShortenerQuery q = URLShortenerQuery.parse(line[3], line[0], line[2]);
+                            URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
                             if (q != null) {
                                 // check if all corpora exist in the new instance
                                 List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
@@ -275,9 +275,9 @@ public class CorpusAdministration {
             }
         }
         // insert URLs into new database
-        Collection<URLShortenerQuery> okEntries = queryByStatus.get(QueryStatus.Ok);
+        Collection<URLShortenerDefinition> okEntries = queryByStatus.get(QueryStatus.Ok);
         if (allowPartialMigration || okEntries.size() == queryByStatus.size()) {
-            for (URLShortenerQuery q : okEntries) {
+            for (URLShortenerDefinition q : okEntries) {
                 if (getShortenerDao().unshorten(q.getUuid()) == null) {
                     getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid(),
                             q.getCreationTime().toDate());
