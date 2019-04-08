@@ -36,11 +36,16 @@ effective_cache_size = 1536MB   # estimated size of disk cached used by the OS
                                 # use lower value on a desktop system, where other applications are running
                                 # e.g. 512MB for a desktop with 2 GB RAM
 
-default_statistcs_target = 100      # size of value histogram for each table column
+default_statistics_target = 100     # size of value histogram for each table column
                                     # use maximum value
 
+# The following only applies to versions of PostgreSQL prior to 9.5:
 checkpoint_segments = 20    # affects how quickly buffers are written
                             # to disk inside a transaction
+# For version 9.5 and higher, you can set the parameter max_wal_size to
+# approx. 3 * checkpoint_segments * 16MB, but since the default for
+# max_wal_size is much higher than the default for checkpoint_segments
+# used to be, this may no longer be necessary.
 
 autovacuum = off        # VACUUM is done automatically during corpus import
 ~~~
