@@ -80,7 +80,7 @@ public class SaltExport {
 
 	private static void mapLabels(SAnnotationContainer n, Map<QName, String> labels, boolean isMeta) {
 		for (Map.Entry<QName, String> e : labels.entrySet()) {
-			if ("annis".equals(e.getKey().getNs())) {
+			if ("annis".equals(e.getKey().getNs()) && !"time".equals(e.getKey().getName())) {
 				n.createFeature(e.getKey().getNs(), e.getKey().getName(), e.getValue());
 			} else if (isMeta) {
 				n.createMetaAnnotation(e.getKey().getNs(), e.getKey().getName(), e.getValue());
