@@ -556,7 +556,7 @@ public class EventExtractor {
         // use fixed seed in order to get consistent results (with random properties)
         Random rand = new Random(5711l);
         int tries = 0;
-        // this should be enough to be quite sure we don't miss any optimalization
+        // this should be enough to be quite sure we don't miss any optimization
         // possibility
         final int maxTries = rows.size() * 2;
 
