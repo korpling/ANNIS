@@ -311,17 +311,7 @@ public class GridComponent extends Panel {
 
                 Range<Integer> coveredRange = Helper.getLeftRightSpan(t, graph, token2index);
 
-                String text;
-                if (this.segmentationName == null) {
-                    text = graph.getText(t);
-                } else {
-                    SAnnotation anno = t.getAnnotation(this.segmentationName);
-                    if (anno == null) {
-                        text = "";
-                    } else {
-                        text = anno.getValue_STEXT();
-                    }
-                }
+                String text = extractTextForToken(t, segmentationName);
                 GridEvent event = new GridEvent(t.getId(), coveredRange.lowerEndpoint(), coveredRange.upperEndpoint(),
                         text);
                 event.setTextID(tokenText.getId());
@@ -334,6 +324,20 @@ public class GridComponent extends Panel {
 
         return tokenRow;
     }
+    
+    private static String extractTextForToken(SNode t, String segmentation) {
+        if (t instanceof SToken) {
+            return CommonHelper.getSpannedText((SToken) t);
+        } else if (segmentation != null) {
+            for (SAnnotation anno : t.getAnnotations()) {
+                if (anno.getName().equals(segmentation)) {
+                    return anno.getValue_STEXT();
+                }
+            }
+        }
+        return "";
+    }
+
 
     private LinkedHashMap<String, ArrayList<Row>> computeAnnotationRows(Map<SToken, Integer> token2index) {
         List<String> annos = new LinkedList<>();
