@@ -43,6 +43,7 @@ import org.corpus_tools.salt.common.STextualRelation;
 import org.corpus_tools.salt.common.STimelineRelation;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
+import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SAnnotationContainer;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph;
@@ -317,6 +318,12 @@ public class SaltExport {
 
 						SFeature featTok = currNode.getFeature("annis::tok");
 						if (featTok != null && currNode instanceof SSpan) {
+						    // only add the annotation if not yet existing (e.g. in another namespace)
+						    for(SAnnotation existingAnno : currNode.getAnnotations()) {
+						        if(Objects.equal(name, existingAnno.getName())) {
+						            return;
+						        }
+						    }
 							currNode.createAnnotation(null, name, featTok.getValue().toString());
 						}
 					}
