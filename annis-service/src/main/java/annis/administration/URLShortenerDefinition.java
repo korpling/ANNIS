@@ -228,7 +228,7 @@ public class URLShortenerDefinition {
 
             if (status != QueryStatus.Ok && this.query.getQueryLanguage() == QueryLanguage.AQL) {
                 // check in quirks mode and rewrite if necessary
-                log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery(),
+                log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery().trim(),
                         this.query.getCorpora());
 
                 URLShortenerDefinition quirksQuery = this.rewriteInQuirksMode();
@@ -240,7 +240,6 @@ public class URLShortenerDefinition {
                     status = QueryStatus.Ok;
                 } else {
                     this.errorMsg = quirksQuery.getErrorMsg();
-                    log.warn("Quirks not sucessful");
                 }
             }
 

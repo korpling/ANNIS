@@ -256,12 +256,27 @@ public class CorpusAdministration {
                                 } else {
                                     // check the query
                                     try {
-                                        log.info("Testing query {} on corpus {}", q.getQuery().getQuery(),
+                                        log.info("Testing query {} on corpus {}", q.getQuery().getQuery().trim(),
                                                 q.getQuery().getCorpora());
                                         QueryStatus status = q.test(getAdministrationDao().getQueryDao(),
                                                 searchService);
 
                                         queryByStatus.put(status, q);
+
+                                        if (status != QueryStatus.Ok) {
+                                            
+                                            String lineSeparator = System.getProperty("line.separator");
+                                            
+                                            StringBuilder sb = new StringBuilder();
+                                            sb.append("Query Error: " + status + lineSeparator);
+                                            sb.append("Corpus: \"" + q.getQuery().getCorpora() + "\"" + lineSeparator);
+                                            sb.append("UUID: \"" + q.getUuid() + "\"" + lineSeparator);
+                                            sb.append("Query:" + lineSeparator);
+                                            sb.append(q.getQuery().getQuery().trim() + lineSeparator);
+                                            sb.append("Error Message: " + q.getErrorMsg());
+                                            
+                                            log.warn(sb.toString());
+                                        }
 
                                     } catch (GraphANNISException ex) {
                                         queryByStatus.put(QueryStatus.Failed, q);

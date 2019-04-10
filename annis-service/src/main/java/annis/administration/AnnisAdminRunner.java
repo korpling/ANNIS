@@ -311,7 +311,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
                 System.out.println("UUID: \"" + q.getUuid() + "\"");
                 System.out.println("Query:");
-                System.out.println(q.getQuery().getQuery());
+                System.out.println(q.getQuery().getQuery().trim());
                 if (q.getErrorMsg() != null) {
                     System.out.println("Error: " + q.getErrorMsg());
                 }
