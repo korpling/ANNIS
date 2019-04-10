@@ -237,7 +237,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 .createOptions();
 
         try {
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
             CommandLine cmdLine = parser.parse(options, commandArgs.toArray(new String[commandArgs.size()]));
 
             List<String> urlShortenerFiles = cmdLine.getArgList();

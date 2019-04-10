@@ -20,13 +20,13 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.corpus_tools.graphannis.CorpusStorageManager.CountResult;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sqlite.date.DateFormatUtils;
 
 import com.google.common.base.Joiner;
 
@@ -36,6 +36,7 @@ import annis.dao.QueryDao;
 import annis.model.DisplayedResultQuery;
 import annis.model.Query;
 import annis.service.objects.Match;
+import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.QueryLanguage;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
@@ -143,6 +144,48 @@ public class URLShortenerDefinition {
 
     public static int MAX_RETRY = 5;
 
+    private QueryStatus testFind(QueryDao queryDao, WebTarget annisSearchService, int offset, int limit)
+            throws GraphANNISException {
+
+        WebTarget findTarget = annisSearchService.path("find").queryParam("q", query.getQuery()).queryParam("corpora",
+                Joiner.on(",").join(query.getCorpora()));
+
+        List<Match> matchesGraphANNIS = queryDao.find(query.getQuery(), query.getQueryLanguage(),
+                new LinkedList<>(query.getCorpora()), new LimitOffsetQueryData(offset, limit));
+
+        int tries = 0;
+        MatchGroup matchesLegacy = null;
+        while (matchesLegacy == null) {
+            try {
+                tries++;
+                matchesLegacy = findTarget.queryParam("offset", offset).queryParam("limit", limit)
+                        .request(MediaType.APPLICATION_XML_TYPE).get(MatchGroup.class);
+            } catch (ServerErrorException ex) {
+                if (tries >= MAX_RETRY) {
+                    this.errorMsg = ex.getMessage();
+                    return QueryStatus.Failed;
+                } else {
+                    log.warn("Server error when executing query {}", query.getQuery(), ex);
+                }
+            }
+        }
+
+        Iterator<Match> itGraphANNIS = matchesGraphANNIS.iterator();
+        Iterator<Match> itLegacy = matchesLegacy.getMatches().iterator();
+        while (itGraphANNIS.hasNext() && itLegacy.hasNext()) {
+            String m1 = itGraphANNIS.next().toString();
+            String m2 = itLegacy.next().toString();
+
+            if (!m1.equals(m2)) {
+                this.errorMsg = "(should be)" + System.lineSeparator() + m2 + System.lineSeparator() + "(but was)"
+                        + System.lineSeparator() + m1;
+                return QueryStatus.MatchesDiffer;
+            }
+        }
+
+        return QueryStatus.Ok;
+    }
+
     public QueryStatus test(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException {
 
         if (this.query.getCorpora().isEmpty()) {
@@ -150,46 +193,34 @@ public class URLShortenerDefinition {
             return QueryStatus.Failed;
         }
 
-        List<Match> matchesGraphANNIS = queryDao.find(query.getQuery(), query.getQueryLanguage(),
-                new LinkedList<>(query.getCorpora()), new LimitOffsetQueryData(0, Integer.MAX_VALUE));
-
-        WebTarget findTarget = annisSearchService.path("find").queryParam("q", query.getQuery()).queryParam("corpora",
-                Joiner.on(",").join(query.getCorpora()));
+        // check count first (also warmup for the corpus)
+        int countGraphANNIS = queryDao.count(query.getQuery(), query.getQueryLanguage(),
+                new LinkedList<>(query.getCorpora()));
 
         try {
 
-            int tries = 0;
-            MatchGroup matchesLegacy = null;
-            while (matchesLegacy == null) {
-                try {
-                    tries++;
-                    matchesLegacy = findTarget.request(MediaType.APPLICATION_XML_TYPE).get(MatchGroup.class);
-                } catch (ServerErrorException ex) {
-                    if (tries >= MAX_RETRY) {
-                        this.errorMsg = ex.getMessage();
-                        return QueryStatus.Failed;
-                    } else {
-                        log.warn("Server error when executing query {}", query.getQuery(), ex);
-                    }
-                }
-            }
-
             QueryStatus status = QueryStatus.Ok;
-            if (matchesGraphANNIS.size() != matchesLegacy.getMatches().size()) {
-                this.errorMsg = "should have been " + matchesLegacy.getMatches().size() + " but was "
-                        + matchesGraphANNIS.size();
-                status = QueryStatus.CountDiffers;
-            } else {
-                Iterator<Match> itGraphANNIS = matchesGraphANNIS.iterator();
-                Iterator<Match> itLegacy = matchesLegacy.getMatches().iterator();
-                while (itGraphANNIS.hasNext() && itLegacy.hasNext()) {
-                    String m1 = itGraphANNIS.next().toString();
-                    String m2 = itLegacy.next().toString();
 
-                    if (!m1.equals(m2)) {
-                        this.errorMsg = "(should be)" + System.lineSeparator() + m2 + System.lineSeparator()
-                                + "(but was)" + System.lineSeparator() + m1;
-                        status = QueryStatus.MatchesDiffer;
+            int countLegacy = annisSearchService.path("count").queryParam("q", query.getQuery())
+                    .queryParam("corpora", Joiner.on(",").join(query.getCorpora())).request()
+                    .get(MatchAndDocumentCount.class).getMatchCount();
+
+            if (countGraphANNIS != countLegacy) {
+
+                this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
+                status = QueryStatus.CountDiffers;
+
+            } else {
+
+                // execute find with smaller blocks of matches
+                final int limit = 1000;
+                for (int offset = 0; offset + limit < countGraphANNIS; offset += limit) {
+                    status = testFind(queryDao, annisSearchService, offset, limit);
+                    if (status == QueryStatus.Failed) {
+                        // don't try quirks mode when failed
+                        return status;
+                    } else if (status != QueryStatus.Ok) {
+                        // failed once, don't try the other offset/limit combinations
                         break;
                     }
                 }
