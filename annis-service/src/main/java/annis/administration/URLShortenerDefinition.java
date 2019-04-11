@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.WebTarget;
@@ -194,16 +195,27 @@ public class URLShortenerDefinition {
         }
 
         // check count first (also warmup for the corpus)
-        int countGraphANNIS = queryDao.count(query.getQuery(), query.getQueryLanguage(),
-                new LinkedList<>(query.getCorpora()));
+        int countGraphANNIS;
+
+        try {
+            countGraphANNIS = queryDao.count(query.getQuery(), query.getQueryLanguage(),
+                    new LinkedList<>(query.getCorpora()));
+        } catch (GraphANNISException ex) {
+            countGraphANNIS = 0;
+        }
 
         try {
 
             QueryStatus status = QueryStatus.Ok;
 
-            int countLegacy = annisSearchService.path("count").queryParam("q", query.getQuery())
-                    .queryParam("corpora", Joiner.on(",").join(query.getCorpora())).request()
-                    .get(MatchAndDocumentCount.class).getMatchCount();
+            int countLegacy;
+            try {
+                countLegacy = annisSearchService.path("count").queryParam("q", query.getQuery())
+                        .queryParam("corpora", Joiner.on(",").join(query.getCorpora())).request()
+                        .get(MatchAndDocumentCount.class).getMatchCount();
+            } catch (BadRequestException ex) {
+                countLegacy = 0;
+            }
 
             if (countGraphANNIS != countLegacy) {
 
