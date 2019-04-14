@@ -34,6 +34,7 @@ import com.google.common.base.Joiner;
 import annis.CommonHelper;
 import annis.QueryGenerator;
 import annis.dao.QueryDao;
+import annis.exceptions.AnnisTimeoutException;
 import annis.model.DisplayedResultQuery;
 import annis.model.Query;
 import annis.service.objects.Match;
@@ -257,7 +258,7 @@ public class URLShortenerDefinition {
 
             return status;
 
-        } catch (ForbiddenException ex) {
+        } catch (ForbiddenException | AnnisTimeoutException ex) {
             this.errorMsg = ex.toString();
             return QueryStatus.Failed;
         }
