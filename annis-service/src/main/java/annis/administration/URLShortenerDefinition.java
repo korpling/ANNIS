@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -209,16 +210,29 @@ public class URLShortenerDefinition {
 
             QueryStatus status = QueryStatus.Ok;
 
-            int countLegacy;
+            Optional<Integer> countLegacy = Optional.empty();
             try {
-                countLegacy = annisSearchService.path("count").queryParam("q", query.getQuery())
-                        .queryParam("corpora", Joiner.on(",").join(query.getCorpora())).request()
-                        .get(MatchAndDocumentCount.class).getMatchCount();
+                for(int tries=0; tries < MAX_RETRY; tries++) {
+                    try {
+                        countLegacy = Optional.of(annisSearchService.path("count").queryParam("q", query.getQuery())
+                                .queryParam("corpora", Joiner.on(",").join(query.getCorpora())).request()
+                                .get(MatchAndDocumentCount.class).getMatchCount());
+                        break;
+                    } catch(ServerErrorException ex) {
+                        if (tries >= MAX_RETRY-1) {
+                            this.errorMsg = ex.getMessage();
+                            return QueryStatus.Failed;
+                        } else {
+                            log.warn("Server error when executing query {}", query.getQuery(), ex);
+                        }
+                    }
+                }
             } catch (BadRequestException ex) {
-                countLegacy = 0;
+                countLegacy = Optional.of(0);
             }
+            
 
-            if (countGraphANNIS != countLegacy) {
+            if (countGraphANNIS != countLegacy.get()) {
 
                 this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
                 status = QueryStatus.CountDiffers;
