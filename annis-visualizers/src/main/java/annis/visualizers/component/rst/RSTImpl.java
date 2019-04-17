@@ -233,17 +233,22 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     this.getContent().setSizeUndefined();
   }
 
+  private boolean isSignalNode(SNode sNode) {
+    return sNode.getAnnotation("default_ns", "signal_type") != null;
+  }
+
   private String transformSaltToJSON(VisualizerInput visInput) {
     graph = visInput.getSResult().getDocumentGraph();
     List<SNode> rootSNodes = graph.getRoots();
     List<SNode> rstRoots = new ArrayList<SNode>();
 
-
     for (SNode sNode : rootSNodes) {
-      if (CommonHelper.checkSLayer(namespace, sNode)) {
+      if (CommonHelper.checkSLayer(namespace, sNode)
+              && !isSignalNode(sNode)) {
         rstRoots.add(sNode);
       }
     }
+
 
 
     if (rootSNodes.size() > 0) {
@@ -256,7 +261,8 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
                 String traversalId, SNode currNode, SRelation sRelation,
                 SNode fromNode, long order) {
           if (currNode instanceof SStructure
-                  && isSegment(currNode)) {
+                  && isSegment(currNode)
+                  && !isSignalNode(currNode)) {
             sentences.add((SStructure) currNode);
           }
         }
