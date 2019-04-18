@@ -309,6 +309,22 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     return result.toString();
   }
 
+  private JSONObject jsonizeSignalNode(SNode node) {
+    JSONObject signal = new JSONObject();
+    signal.put("type", node.getAnnotation("default_ns", "signal_type").getValue());
+    signal.put("subtype", node.getAnnotation("default_ns", "signal_subtype").getValue());
+    JSONArray indexes = new JSONArray();
+    SAnnotation indexesAnn = node.getAnnotation("default_ns", "signal_indexes");
+    if (indexesAnn != null) {
+      for (String index : ((String) indexesAnn.getValue()).split(" ")) {
+        indexes.put(index);
+      }
+    }
+    signal.put("indexes", indexes);
+    System.out.println(signal);
+    return signal;
+  }
+
   private JSONObject createJsonEntry(SNode currNode) {
     JSONObject jsonData = new JSONObject();
     StringBuilder sb = new StringBuilder();
@@ -382,6 +398,16 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
         data.put(SENTENCE_LEFT, index);
         data.put(SENTENCE_RIGHT, index);
+
+        JSONArray signals = new JSONArray();
+        for (SRelation<SNode, SNode> relation : currNode.getInRelations()) {
+          if (isSignalNode(relation.getSource())) {
+            signals.put(jsonizeSignalNode(relation.getSource()));
+          }
+        }
+        if (signals.length() > 0) {
+          data.put("signals", signals);
+        }
       }
 
       jsonData.put("data", data);
