@@ -12,7 +12,9 @@
 		 * http://killdream.github.com/blog/2011/10/understanding-javascript-oop
 		 */
 		// Aliases for the rather verbose methods on ES5
-		var descriptor = Object.getOwnPropertyDescriptor, properties = Object.getOwnPropertyNames, define_prop = Object.defineProperty
+		var descriptor = Object.getOwnPropertyDescriptor;
+		var properties = Object.getOwnPropertyNames;
+		var define_prop = Object.defineProperty;
 
 		// (target:Object, source:Object) → Object
 		// Copies properties from `source' to `target'
@@ -289,7 +291,10 @@
 				container.appendChild(elem);
 
 				if (json.data.sentence_left != undefined && json.data.sentence_right != undefined) {
-					elem.innerHTML = "<p style='color :" + conf.nodeLabelColor + ";'>" + (json.data.sentence_left + " - " + json.data.sentence_right) + "</p>";
+					var eduRange = json.data.sentence
+						? json.name
+						: (json.data.sentence_left + " - " + json.data.sentence_right);
+					elem.innerHTML = "<p style='color :" + conf.nodeLabelColor + ";'>" + eduRange + "</p>";
 				}
 
 				elem.innerHTML += (json.data.sentence != undefined) ? json.data.sentence : "";
@@ -509,7 +514,7 @@
 			};
 
 			/**
-			 * Calls the necassary functions to plot edges and to place labels.
+			 * Calls the necessary functions to plot edges and to place labels.
 			 */
 			this.init = function() {
 				layoutTree(this.config);
