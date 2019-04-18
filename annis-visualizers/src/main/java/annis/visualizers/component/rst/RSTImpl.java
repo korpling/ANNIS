@@ -321,7 +321,6 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       }
     }
     signal.put("indexes", indexes);
-    System.out.println(signal);
     return signal;
   }
 
