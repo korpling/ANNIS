@@ -345,18 +345,16 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
       // build strings
       Iterator<SToken> tokIterator = token.iterator();
-      int tokCount = 0;
       while(tokIterator.hasNext())
       {
         SToken tok = tokIterator.next();
         String text = getText(tok);
         String color = getHTMLColor(tok);
-        tokCount++;
 
         if (color != null) {
-          sb.append("<span id=\"tok").append(tokCount).append("\" style=\"color : ").append(color).append(";\">");
+          sb.append("<span class=\"token\" style=\"color : ").append(color).append(";\">");
         } else {
-          sb.append("<span id=\"tok").append(tokCount).append("\">");
+          sb.append("<span class=\"token\">");
         }
 
         if (tokIterator.hasNext()) {
