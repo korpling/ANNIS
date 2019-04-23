@@ -169,6 +169,68 @@
 			conf.containerElement = container;
 		}
 
+
+		/**
+		 * Add a <style> element to the document head for styling elements used
+		 * in the visualization of signals.
+		 *
+		 * @param conf
+		 *            holds the config of the rst-visualization
+		 *
+		 */
+		function injectStyles(conf) {
+			var head = document.head;
+			var style = document.createElement('style');
+
+			var css = ( ".rst-node-id {"
+					  + "  color: " + conf.nodeLabelColor + ";"
+					  + "  position: relative;"
+					  + "  margin: 10px 0;"
+					  + "}"
+
+					  + ".rst-signal-list {"
+					  + "  display: none;"
+					  + "  position: absolute;"
+					  + "  background: white;"
+					  + "  bottom: 10px;"
+					  + "  left: 0;"
+					  + "  width: 120px;"
+					  + "  list-style: none;"
+					  + "  padding: 0;"
+					  + "  box-shadow: 2px 2px 5px 2px #cccccc;"
+					  + "}"
+
+					  + ".rst-signal-list li {"
+					  + "  padding: 2px 0;"
+					  + "  border-bottom: 1px solid #cccccc;"
+					  + "  text-align: left;"
+					  + "  padding-left: 4px;"
+					  + "  color: black;"
+					  + "  background: white;"
+					  + "  transition-duration: 0.5s;"
+					  + "  transition-property: background;"
+					  + "}"
+
+					  + ".rst-signal-list li:last-child {"
+					  + "  border-bottom: none;"
+					  + "}"
+
+					  + ".rst-signal-list li:hover {"
+					  + "  background: #ffffaa;"
+					  + "}"
+
+					  + ".rst-node {}"
+
+					  + ".rst-node:hover .rst-signal-list {"
+					  + "  display: block;"
+					  + "  transition-delay: 0.5s;"
+					  + "}"
+					  );
+			style.innerHTML = css;
+
+			head.appendChild(style);
+		}
+
 		/**
 		 * This layouts the tree. It's based on a Depth-First algorithm and takes
 		 * advantage of that this always reaches the leafs first. Leafs are always
@@ -285,35 +347,73 @@
 			var canvas = conf.canvas;
 			var nodes = conf.nodes;
 
+			// for every node, create a div absolutely positioned over the canvas sketch
+			// that displays its ID and a list of any signals associated with it on hover
 			for (var node in nodes) {
 				var json = nodes[node];
-				var elem = document.createElement("div");
-				container.appendChild(elem);
+				var nodeElt = document.createElement("div");
+				var nodeIdElt = document.createElement("div");
+				nodeElt.classList.add("rst-node");
+				nodeIdElt.classList.add("rst-node-id");
+				nodeElt.appendChild(nodeIdElt);
+				container.appendChild(nodeElt);
 
+				// add <p> with the node's ID (or ID range)
 				if (json.data.sentence_left != undefined && json.data.sentence_right != undefined) {
 					var eduRange = json.data.sentence
 						? json.name
 						: (json.data.sentence_left + " - " + json.data.sentence_right);
-					elem.innerHTML = "<p style='color :" + conf.nodeLabelColor + ";'>" + eduRange + "</p>";
+					nodeIdElt.appendChild(document.createTextNode(eduRange));
 				}
 
-				elem.innerHTML += (json.data.sentence != undefined) ? json.data.sentence : "";
+				// add the sentence, if it exists
+				var sentenceSpan = document.createElement("span");
+				sentenceSpan.innerHTML = (json.data.sentence != undefined) ? json.data.sentence : "";
+				nodeElt.appendChild(sentenceSpan);
 
-				elem.style.position = "absolute";
-				elem.style.top = json.pos.y + "px";
-				elem.style.left = json.pos.x + "px";
-				elem.style.textAlign = "center";
-				elem.style.fontSize = conf.labelSize + "px";
-				elem.style.width = conf.nodeWidth + "px";
+				// set the div's label
+				nodeElt.style.position = "absolute";
+				nodeElt.style.top = json.pos.y + "px";
+				nodeElt.style.left = json.pos.x + "px";
+				nodeElt.style.textAlign = "center";
+				nodeElt.style.fontSize = conf.labelSize + "px";
+				nodeElt.style.width = conf.nodeWidth + "px";
 
-				// get the deepest one, it's hacky
-				var top = elem.clientHeight + elem.offsetTop;
+				// extend the height of the container and canvas
+				// if the node just placed lies beyond it
+				var top = nodeElt.clientHeight + nodeElt.offsetTop;
 				if (top > container.clientHeight) {
 					container.style.height = top + 5 + "px";
 					container.setAttribute("height", top +"px");
 					canvas.setAttribute("height", top + "px");
 				}
+
+				// add signal list, if present
+				var signals = json.data.signals;
+				if (signals && signals.length > 0) {
+					var signalListElt = createSignalList(conf, json, signals);
+					nodeIdElt.appendChild(signalListElt);
+				}
 			}
+		}
+
+		function createSignalList(conf, node, signals) {
+			var list = document.createElement("ul");
+			list.classList.add("rst-signal-list");
+
+			for (signal in signals) {
+				var signalElt = createSignalListItem(conf, node, signals[signal]);
+				list.appendChild(signalElt);
+			}
+
+			return list;
+		}
+
+		function createSignalListItem(conf, node, signal) {
+			var elt = document.createElement("li");
+			elt.innerHTML = signal.type + ", " + signal.subtype;
+
+			return elt;
 		}
 
 		/**
@@ -520,6 +620,7 @@
 				layoutTree(this.config);
 				initWrapper(this.config);
 				initCanvas(this.config);
+				injectStyles(this.config);
 				plotNodes(this.config);
 				plotEdges(this.config);
 			}
