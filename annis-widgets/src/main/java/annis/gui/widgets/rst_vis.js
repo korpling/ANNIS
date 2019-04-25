@@ -189,7 +189,7 @@
 					  + "}"
 
 					  + ".rst-signal-list {"
-					  + "  display: none;"
+					  + "  opacity: 0;"
 					  + "  position: absolute;"
 					  + "  background: white;"
 					  + "  bottom: 10px;"
@@ -198,6 +198,7 @@
 					  + "  list-style: none;"
 					  + "  padding: 0;"
 					  + "  box-shadow: 2px 2px 5px 2px #cccccc;"
+					  + "  z-index: 1337;"
 					  + "}"
 
 					  + ".rst-signal-list li {"
@@ -222,8 +223,40 @@
 					  + ".rst-node {}"
 
 					  + ".rst-node:hover .rst-signal-list {"
-					  + "  display: block;"
+					  + "  opacity: 1;"
+					  + "  transition-duration: 0.3s;"
 					  + "  transition-delay: 0.5s;"
+					  + "  transition-property: opacity;"
+					  + "}"
+
+					  + ".badge {"
+					  + "  width: 11px;"
+					  + "  height: 11px;"
+					  + "  font-size: 9px;"
+					  + "  border: solid 1px;"
+					  + "  border-radius: 8px;"
+					  + "  padding: 0;"
+					  + "  margin: 0 0 0 0.5em;"
+					  + "  background-color: #f7f7f7;"
+					  + "  color: black;"
+					  + "  display: inline-block;"
+					  + "}"
+
+					  + ".rst-node:hover .badge {"
+					  + "  background-color: yellow;"
+					  + "  transition-duration: 0.3s;"
+					  + "  transition-delay: 0.5s;"
+					  + "  transition-property: background-color;"
+					  + "}"
+
+					  + ".rst-token--highlighted {"
+					  + "  background-color: yellow;"
+					  + "}"
+
+					  + "#show-all-tokens {"
+					  + "  position: absolute;
+					  + "  top: 10px;
+					  + "  right: 10px;
 					  + "}"
 					  );
 			style.innerHTML = css;
@@ -388,13 +421,23 @@
 					canvas.setAttribute("height", top + "px");
 				}
 
-				// add signal list, if present
+				// add signal badge and list, if signals are present
 				var signals = json.data.signals;
 				if (signals && signals.length > 0) {
 					var signalListElt = createSignalList(conf, json, signals);
 					nodeIdElt.appendChild(signalListElt);
+
+					var signalBadge = createSignalBadge(signals);
+					nodeIdElt.appendChild(signalBadge);
 				}
 			}
+		}
+
+		function createSignalBadge(signals) {
+			var badge = document.createElement("div");
+			badge.classList.add("badge");
+			badge.innerText = signals.length;
+			return badge;
 		}
 
 		function createSignalList(conf, node, signals) {
@@ -412,6 +455,20 @@
 		function createSignalListItem(conf, node, signal) {
 			var elt = document.createElement("li");
 			elt.innerHTML = signal.type + ", " + signal.subtype;
+			elt.addEventListener("click", function() {
+				var tokens = document.querySelectorAll("span.rst-token");
+				var highlightedTokens = document.querySelectorAll("span.rst-token--highlighted");
+				var indexes = signal.indexes;
+				var i;
+
+				for (i = 0; i < highlightedTokens.length; i++) {
+					highlightedTokens[i].classList.remove("rst-token--highlighted");
+				}
+				for (i = 0; i < indexes.length; i++) {
+					var tokenListIndex = indexes[i] - 1;
+					tokens[tokenListIndex].classList.add("rst-token--highlighted");
+				}
+			});
 
 			return elt;
 		}
