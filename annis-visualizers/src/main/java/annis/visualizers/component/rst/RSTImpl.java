@@ -353,9 +353,9 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
         String color = getHTMLColor(tok);
 
         if (color != null) {
-          sb.append("<span class=\"token\" style=\"color : ").append(color).append(";\">");
+          sb.append("<span class=\"rst-token\" style=\"color : ").append(color).append(";\">");
         } else {
-          sb.append("<span class=\"token\">");
+          sb.append("<span class=\"rst-token\">");
         }
 
         if (tokIterator.hasNext()) {
