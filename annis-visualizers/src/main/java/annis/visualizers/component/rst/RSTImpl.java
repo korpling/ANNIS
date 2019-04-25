@@ -326,6 +326,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
   private JSONObject createJsonEntry(SNode currNode) {
     JSONObject jsonData = new JSONObject();
+    JSONObject data = new JSONObject();
     StringBuilder sb = new StringBuilder();
     // use a hash set so we don't get any duplicate entries
     LinkedHashSet<SToken> token = new LinkedHashSet<>();
@@ -365,6 +366,17 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
         sb.append("</span>");
       }
+
+      // add signals
+      JSONArray signals = new JSONArray();
+      for (SRelation<SNode, SNode> relation : currNode.getInRelations()) {
+        if (isSignalNode(relation.getSource())) {
+          signals.put(jsonizeSignalNode(relation.getSource()));
+        }
+      }
+      if (signals.length() > 0) {
+        data.put("signals", signals);
+      }
     }
 
     try {
@@ -375,7 +387,6 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       /**
        * additional data oject for edge labels and rendering sentences
        */
-      JSONObject data = new JSONObject();
       JSONArray edgesJSON = getOutGoingEdgeTypeAnnotation(currNode);
 
 
@@ -397,16 +408,6 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
         data.put(SENTENCE_LEFT, index);
         data.put(SENTENCE_RIGHT, index);
-
-        JSONArray signals = new JSONArray();
-        for (SRelation<SNode, SNode> relation : currNode.getInRelations()) {
-          if (isSignalNode(relation.getSource())) {
-            signals.put(jsonizeSignalNode(relation.getSource()));
-          }
-        }
-        if (signals.length() > 0) {
-          data.put("signals", signals);
-        }
       }
 
       jsonData.put("data", data);
