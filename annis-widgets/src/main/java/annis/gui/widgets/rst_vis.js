@@ -250,13 +250,17 @@
 					  + "}"
 
 					  + ".rst-token--highlighted {"
-					  + "  background-color: yellow;"
+					  + "  background-color: yellow !important;"
 					  + "}"
 
-					  + "#show-all-tokens {"
-					  + "  position: absolute;
-					  + "  top: 10px;
-					  + "  right: 10px;
+					  + ".rst-token--semi-highlighted {"
+					  + "  background-color: rgba(255, 255, 0, 0.2);"
+					  + "}"
+
+					  + ".show-all-tokens {"
+					  + "  position: absolute;"
+					  + "  top: 10px;"
+					  + "  right: 10px;"
 					  + "}"
 					  );
 			style.innerHTML = css;
@@ -431,6 +435,14 @@
 					nodeIdElt.appendChild(signalBadge);
 				}
 			}
+
+			var showSignalsButton = createShowAllSignalsButton(conf);
+			if (showSignalsButton) {
+				// This is a little evil: we are relying on vaadin implementation facts to
+				// attach this button to a div that will keep it in place during scroll.
+				// If this button ever breaks in the future, look here.
+				container.parentNode.parentNode.parentNode.appendChild(showSignalsButton);
+			}
 		}
 
 		function createSignalBadge(signals) {
@@ -456,8 +468,8 @@
 			var elt = document.createElement("li");
 			elt.innerHTML = signal.type + ", " + signal.subtype;
 			elt.addEventListener("click", function() {
-				var tokens = document.querySelectorAll("span.rst-token");
-				var highlightedTokens = document.querySelectorAll("span.rst-token--highlighted");
+				var tokens = conf.containerElement.querySelectorAll("span.rst-token");
+				var highlightedTokens = conf.containerElement.querySelectorAll("span.rst-token--highlighted");
 				var indexes = signal.indexes;
 				var i;
 
@@ -471,6 +483,61 @@
 			});
 
 			return elt;
+		}
+
+		/**
+		 * recursive helper that finds all signals
+		 */
+		function findAllSignals(json) {
+			var signals = [];
+			if (!json) {
+				return signals;
+			}
+
+			if (json.data && json.data.signals) {
+				signals = signals.concat(json.data.signals);
+			}
+
+			if (json.children) {
+				for (var i = 0; i < json.children.length; i++) {
+				   signals = signals.concat(findAllSignals(json.children[i]));
+				}
+			}
+
+			return signals;
+		}
+
+		function createShowAllSignalsButton(conf) {
+			var signals = findAllSignals(conf.json);
+			if (signals.length === 0) {
+				return null;
+			}
+
+			var button = document.createElement("button");
+			button.classList.add("show-all-tokens");
+			var onText = "Hide Signal Tokens";
+			var offText  = "Show All Signal Tokens";
+			button.innerText = offText;
+
+			var tokens = conf.containerElement.querySelectorAll("span.rst-token");
+			button.addEventListener("click", function() {
+				if (button.innerText === offText) {
+					signals.forEach(function(signal) {
+						signal.indexes.forEach(function(i) {
+							tokens[i - 1].classList.add("rst-token--semi-highlighted");
+						});
+					});
+					button.innerText = onText;
+				} else {
+					var highlightedTokens = conf.containerElement.querySelectorAll("span.rst-token--semi-highlighted");
+					for (i = 0; i < highlightedTokens.length; i++) {
+						highlightedTokens[i].classList.remove("rst-token--semi-highlighted");
+					}
+					button.innerText = offText;
+				}
+			});
+			var tokens = conf.containerElement.querySelectorAll("span.rst-token");
+			return button;
 		}
 
 		/**
