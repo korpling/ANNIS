@@ -201,7 +201,7 @@
 					  + "  z-index: 1337;"
 					  + "}"
 
-					  + ".rst-signal-list li {"
+					  + ".rst-signal-list-item {"
 					  + "  padding: 2px 0;"
 					  + "  border-bottom: 1px solid #cccccc;"
 					  + "  text-align: left;"
@@ -212,12 +212,12 @@
 					  + "  transition-property: background;"
 					  + "}"
 
-					  + ".rst-signal-list li:last-child {"
+					  + ".rst-signal-list-item:last-child {"
 					  + "  border-bottom: none;"
 					  + "}"
 
-					  + ".rst-signal-list li:hover {"
-					  + "  background: #ffffaa;"
+					  + ".rst-signal-list-item--highlighted {"
+					  + "  background-color: yellow;"
 					  + "}"
 
 					  + ".rst-node {}"
@@ -242,8 +242,12 @@
 					  + "  display: inline-block;"
 					  + "}"
 
+					  + ".badge--highlighted {"
+					  + "  background-color: yellow !important;"
+					  + "}"
+
 					  + ".rst-node:hover .badge {"
-					  + "  background-color: yellow;"
+					  + "  background-color: rgba(255, 255, 0, 0.5);"
 					  + "  transition-duration: 0.3s;"
 					  + "  transition-delay: 0.5s;"
 					  + "  transition-property: background-color;"
@@ -383,6 +387,8 @@
 			var container = conf.containerElement;
 			var canvas = conf.canvas;
 			var nodes = conf.nodes;
+			// keeps track of how many currently selected signals are highlighting a certain token
+			var tokenCount = [];
 
 			// for every node, create a div absolutely positioned over the canvas sketch
 			// that displays its ID and a list of any signals associated with it on hover
@@ -428,15 +434,14 @@
 				// add signal badge and list, if signals are present
 				var signals = json.data.signals;
 				if (signals && signals.length > 0) {
-					var signalListElt = createSignalList(conf, json, signals);
-					nodeIdElt.appendChild(signalListElt);
-
 					var signalBadge = createSignalBadge(signals);
+					var signalListElt = createSignalList(conf, json, signals, signalBadge, tokenCount);
+					nodeIdElt.appendChild(signalListElt);
 					nodeIdElt.appendChild(signalBadge);
 				}
 			}
 
-			var showSignalsButton = createShowAllSignalsButton(conf);
+			var showSignalsButton = createShowAllSignalsButton(conf, tokenCount);
 			if (showSignalsButton) {
 				// This is a little evil: we are relying on vaadin implementation facts to
 				// attach this button to a div that will keep it in place during scroll.
@@ -452,33 +457,47 @@
 			return badge;
 		}
 
-		function createSignalList(conf, node, signals) {
+		function createSignalList(conf, node, signals, badgeElt, tokenCount) {
 			var list = document.createElement("ul");
 			list.classList.add("rst-signal-list");
 
 			for (signal in signals) {
-				var signalElt = createSignalListItem(conf, node, signals[signal]);
+				var signalElt = createSignalListItem(conf, node, signals[signal], badgeElt, tokenCount);
 				list.appendChild(signalElt);
 			}
 
 			return list;
 		}
 
-		function createSignalListItem(conf, node, signal) {
+		function createSignalListItem(conf, node, signal, badgeElt, tokenCount) {
 			var elt = document.createElement("li");
+			elt.classList.add("rst-signal-list-item");
 			elt.innerHTML = signal.type + ", " + signal.subtype;
 			elt.addEventListener("click", function() {
 				var tokens = conf.containerElement.querySelectorAll("span.rst-token");
-				var highlightedTokens = conf.containerElement.querySelectorAll("span.rst-token--highlighted");
 				var indexes = signal.indexes;
 				var i;
+				var itemNotPreviouslySelected = elt.classList.toggle("rst-signal-list-item--highlighted");
 
-				for (i = 0; i < highlightedTokens.length; i++) {
-					highlightedTokens[i].classList.remove("rst-token--highlighted");
+				// Ensure that the badge is yellow iff at least one signal item is selected
+				if (itemNotPreviouslySelected) {
+					badgeElt.classList.add("badge--highlighted");
+				} else if (elt.parentNode.querySelectorAll(".rst-signal-list-item--highlighted").length === 0) {
+					badgeElt.classList.remove("badge--highlighted");
 				}
+
 				for (i = 0; i < indexes.length; i++) {
 					var tokenListIndex = indexes[i] - 1;
-					tokens[tokenListIndex].classList.add("rst-token--highlighted");
+					var existingCount = tokenCount[tokenListIndex];
+					if (itemNotPreviouslySelected) {
+						tokenCount[tokenListIndex] = existingCount ? existingCount + 1 : 1;
+						tokens[tokenListIndex].classList.add("rst-token--highlighted");
+					} else {
+						tokenCount[tokenListIndex] -= 1;
+						if (tokenCount[tokenListIndex] === 0) {
+							tokens[tokenListIndex].classList.remove("rst-token--highlighted");
+						}
+					}
 				}
 			});
 
@@ -507,7 +526,7 @@
 			return signals;
 		}
 
-		function createShowAllSignalsButton(conf) {
+		function createShowAllSignalsButton(conf, tokenCount) {
 			var signals = findAllSignals(conf.json);
 			if (signals.length === 0) {
 				return null;
@@ -532,11 +551,23 @@
 					var highlightedTokens = conf.containerElement.querySelectorAll("span.rst-token--semi-highlighted");
 					for (i = 0; i < highlightedTokens.length; i++) {
 						highlightedTokens[i].classList.remove("rst-token--semi-highlighted");
+						highlightedTokens[i].classList.remove("rst-token--highlighted");
 					}
+
+					var highlightedSignals = conf.containerElement.querySelectorAll(".rst-signal-list-item--highlighted");
+					for (i = 0; i < highlightedSignals.length; i++) {
+						highlightedSignals[i].classList.remove("rst-signal-list-item--highlighted");
+					}
+
+					var highlightedBadges = conf.containerElement.querySelectorAll(".badge--highlighted");
+					for (i = 0; i < highlightedSignals.length; i++) {
+						highlightedBadges[i].classList.remove("badge--highlighted");
+					}
+
+					tokenCount = [];
 					button.innerText = offText;
 				}
 			});
-			var tokens = conf.containerElement.querySelectorAll("span.rst-token");
 			return button;
 		}
 
