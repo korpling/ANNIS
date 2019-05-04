@@ -450,6 +450,11 @@
 			}
 		}
 
+		/**
+		 * A small circular icon that indicates how many signals are associated with a particular relation.
+		 * @param {signals}
+		 *            the list of signals associated with this node
+		 */
 		function createSignalBadge(signals) {
 			var badge = document.createElement("div");
 			badge.classList.add("badge");
@@ -457,6 +462,21 @@
 			return badge;
 		}
 
+		/**
+		 * A hovering list that appears when a relation is hovered over. Items represent individual signals and
+		 * can be clicked.
+		 *
+		 * @param {conf}
+		 *            holds the config of rst visualization
+		 * @param {node}
+		 *            the JS object representing the node currently being drawn in plotNodes
+		 * @param {signals}
+		 *            the list of signals associated with this node
+		 * @param {badgeElt}
+		 *            a reference to the badge element
+		 * @param {tokenCount}
+		 *            an array mapping from token index to number of times a signal has highlighted it
+		 */
 		function createSignalList(conf, node, signals, badgeElt, tokenCount) {
 			var list = document.createElement("ul");
 			list.classList.add("rst-signal-list");
@@ -469,10 +489,25 @@
 			return list;
 		}
 
+		/**
+		 * Represents an individual signal.
+		 *
+		 * @param {conf}
+		 *            holds the config of rst visualization
+		 * @param {node}
+		 *            the JS object representing the node currently being drawn in plotNodes
+		 * @param {signal}
+		 *            a JS object representing an individual signal
+		 * @param {badgeElt}
+		 *            a reference to the badge element
+		 * @param {tokenCount}
+		 *            an array mapping from token index to number of times a signal has highlighted it
+		 */
 		function createSignalListItem(conf, node, signal, badgeElt, tokenCount) {
 			var elt = document.createElement("li");
 			elt.classList.add("rst-signal-list-item");
 			elt.innerHTML = signal.type + ", " + signal.subtype;
+
 			elt.addEventListener("click", function() {
 				var tokens = conf.containerElement.querySelectorAll("span.rst-token");
 				var indexes = signal.indexes;
@@ -486,6 +521,11 @@
 					badgeElt.classList.remove("badge--highlighted");
 				}
 
+				// Need to be careful not to de-select a token if another signal was already selected that highlighted
+				// the same token. We keep track of how many times a token has been highlighted by a signal in the
+				// tokenCount array: when a signal highlights a token, the count for that token is increased by 1,
+				// and when a signal "unhighlights" a token, it is only unhighlighted if no other tokens have
+				// highlighted that token, i.e. if tokenCount[index] is 0.
 				for (i = 0; i < indexes.length; i++) {
 					var tokenListIndex = indexes[i] - 1;
 					var existingCount = tokenCount[tokenListIndex];
@@ -506,6 +546,9 @@
 
 		/**
 		 * recursive helper that finds all signals
+		 *
+		 * @param {json}
+		 *            the JS object representing the entire RST data structure
 		 */
 		function findAllSignals(json) {
 			var signals = [];
@@ -526,6 +569,15 @@
 			return signals;
 		}
 
+
+		/**
+		 * Create a button that semi-highlights all tokens associated with a signal when pressed.
+		 *
+		 * @param {conf}
+		 *            holds the config of rst visualization
+		 * @param {tokenCount}
+		 *            an array mapping from token index to number of times a signal has highlighted it
+		 */
 		function createShowAllSignalsButton(conf, tokenCount) {
 			var signals = findAllSignals(conf.json);
 			if (signals.length === 0) {
@@ -539,6 +591,11 @@
 			button.innerText = offText;
 
 			var tokens = conf.containerElement.querySelectorAll("span.rst-token");
+
+			// This button, when activated, adds a slight highlight to all tokens that are associated with at least one
+			// signal in the document. When it is deactivated, not only this slight highlight is removed, but all other
+			// signal-related state is also removed. This includes badge, signal list item, and token selections, as
+			// well as the state of tokenCount (see createSignalListItem).
 			button.addEventListener("click", function() {
 				if (button.innerText === offText) {
 					signals.forEach(function(signal) {
