@@ -211,6 +211,7 @@
 					  + "  background: white;"
 					  + "  transition-duration: 0.5s;"
 					  + "  transition-property: background;"
+					  + "  white-space: normal;"
 					  + "}"
 
 					  + ".rst-signal-list-item:last-child {"
