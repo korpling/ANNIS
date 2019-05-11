@@ -27,6 +27,8 @@ import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.DateTimeFormatterBuilder;
+import org.joda.time.format.DateTimeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,8 +74,13 @@ public class URLShortenerDefinition {
 
         URI parsedURI = new URI(url);
 
-        DateTimeFormatter dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ");
-
+        DateTimeParser[] parsers = {
+                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ").getParser(),
+                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ").getParser(),
+        };
+        
+        DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().append(null, parsers).toFormatter();
+        
         URLShortenerDefinition result = new URLShortenerDefinition(parsedURI, UUID.fromString(uuid),
                 dateFormatter.parseDateTime(creationTime));
 
