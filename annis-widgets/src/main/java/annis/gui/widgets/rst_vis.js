@@ -257,7 +257,7 @@
 					  + "}"
 
 					  + ".rst-relation:hover .badge {"
-					  + "  background-color: rgba(255, 255, 0, 0.5);"
+					  + "  background-color: rgba(255, 255, 0);"
 					  + "  transition-duration: 0.3s;"
 					  + "  transition-delay: 0.5s;"
 					  + "  transition-property: background-color;"
@@ -762,7 +762,7 @@
 
 				var labelPos = {
 					x : child.pos.x,
-					y : source.pos.y + config.subTreeOffset / 2
+					y : child.pos.y - 20
 				}
 
 				label.style.top = labelPos.y + "px";
