@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -241,54 +242,71 @@ public class CorpusAdministration {
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
                             // parse URL
-                            URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
-                            if (q != null) {
-                                // check if all corpora exist in the new instance
-                                List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
-                                List<AnnisCorpus> corpora = getAdministrationDao().getQueryDao()
-                                        .listCorpora(corpusNames);
-                                if (corpora.size() != corpusNames.size()) {
-                                    queryByStatus.put(QueryStatus.UnknownCorpus, q);
-                                } else if (corpusNames.isEmpty()) {
-                                    queryByStatus.put(QueryStatus.Failed, q);
-                                } else if (getShortenerDao().unshorten(q.getUuid()) != null) {
-                                    queryByStatus.put(QueryStatus.UUIDExists, q);
-                                } else {
-                                    // check the query
-                                    try {
-                                        log.info("Testing query {} on corpus {}", q.getQuery().getQuery().trim(),
-                                                q.getQuery().getCorpora());
-                                        QueryStatus status = q.test(getAdministrationDao().getQueryDao(),
-                                                searchService);
-
-                                        queryByStatus.put(status, q);
-
-                                        if (status != QueryStatus.Ok) {
-                                            
-                                            String lineSeparator = System.getProperty("line.separator");
-                                            
-                                            StringBuilder sb = new StringBuilder();
-                                            sb.append("Query Error: " + status + lineSeparator);
-                                            sb.append("Corpus: \"" + q.getQuery().getCorpora() + "\"" + lineSeparator);
-                                            sb.append("UUID: \"" + q.getUuid() + "\"" + lineSeparator);
-                                            sb.append("Query:" + lineSeparator);
-                                            sb.append(q.getQuery().getQuery().trim() + lineSeparator);
-                                            sb.append("Error Message: " + q.getErrorMsg());
-                                            
-                                            log.warn(sb.toString());
-                                        }
-
-                                    } catch (GraphANNISException ex) {
+                            try {
+                                URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
+                                if (q != null) {
+                                    // check if all corpora exist in the new instance
+                                    List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
+                                    List<AnnisCorpus> corpora = getAdministrationDao().getQueryDao()
+                                            .listCorpora(corpusNames);
+                                    if (corpora.size() != corpusNames.size()) {
+                                        queryByStatus.put(QueryStatus.UnknownCorpus, q);
+                                    } else if (corpusNames.isEmpty()) {
                                         queryByStatus.put(QueryStatus.Failed, q);
+                                    } else if (getShortenerDao().unshorten(q.getUuid()) != null) {
+                                        queryByStatus.put(QueryStatus.UUIDExists, q);
+                                    } else {
+                                        // check the query
+                                        try {
+                                            log.info("Testing query {} on corpus {}", q.getQuery().getQuery().trim(),
+                                                    q.getQuery().getCorpora());
+                                            QueryStatus status = q.test(getAdministrationDao().getQueryDao(),
+                                                    searchService);
+
+                                            queryByStatus.put(status, q);
+
+                                            if (status != QueryStatus.Ok) {
+
+                                                String lineSeparator = System.getProperty("line.separator");
+
+                                                StringBuilder sb = new StringBuilder();
+                                                sb.append("Query Error: " + status + lineSeparator);
+                                                sb.append("Corpus: \"" + q.getQuery().getCorpora() + "\""
+                                                        + lineSeparator);
+                                                sb.append("UUID: \"" + q.getUuid() + "\"" + lineSeparator);
+                                                sb.append("Query:" + lineSeparator);
+                                                sb.append(q.getQuery().getQuery().trim() + lineSeparator);
+                                                sb.append("Error Message: " + q.getErrorMsg());
+
+                                                log.warn(sb.toString());
+                                            }
+
+                                        } catch (GraphANNISException ex) {
+                                            queryByStatus.put(QueryStatus.Failed, q);
+                                        }
                                     }
                                 }
+                            } catch (URISyntaxException ex) {
+
+                                String lineSeparator = System.getProperty("line.separator");
+
+                                StringBuilder sb = new StringBuilder();
+                                sb.append("Query Error: " + QueryStatus.Failed);
+                                sb.append("UUID: \"" + line[0] + "\"" + lineSeparator);
+                                sb.append("Error Message: " + ex.getMessage());
+
+                                queryByStatus.put(QueryStatus.Failed,
+                                        new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]),
+                                                URLShortenerDefinition.parseCreationTime(line[2])));
+
+                                log.warn(sb.toString());
                             }
                         }
                     }
 
                 } catch (FileNotFoundException ex) {
                     log.error("File with URL shortener table not found", ex);
-                } catch (URISyntaxException | IOException ex) {
+                } catch (IOException ex) {
                     log.error("Migrating URL shortener table failed", ex);
                 }
             }
@@ -298,8 +316,10 @@ public class CorpusAdministration {
         Collection<URLShortenerDefinition> okEntries = queryByStatus.get(QueryStatus.Ok);
         if (allowPartialMigration || okEntries.size() == queryByStatus.size()) {
             for (URLShortenerDefinition q : okEntries) {
-                getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid(),
-                        q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
+                if (q.getUri() != null && q.getUuid() != null) {
+                    getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid(),
+                            q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
+                }
             }
         }
 

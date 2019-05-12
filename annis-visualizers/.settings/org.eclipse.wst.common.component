@@ -15,10 +15,8 @@
         
         
         <wb-resource deploy-path="/" source-path="/target/generated-sources/antlr4"/>
-                                
-        
-        
         <wb-resource deploy-path="/" source-path="/target/generated-sources/annotations"/>
+        <wb-resource deploy-path="/" source-path="/target/generated-test-sources/test-annotations"/>
                             
     
     

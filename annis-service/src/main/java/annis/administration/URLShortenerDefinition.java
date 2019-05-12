@@ -69,20 +69,26 @@ public class URLShortenerDefinition {
         this.errorMsg = null;
     }
 
+    public static UUID parseUUID(String uuid) {
+        return UUID.fromString(uuid);
+    }
+
+    public static DateTime parseCreationTime(String creationTime) {
+
+        DateTimeParser[] parsers = { DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ").getParser(),
+                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ").getParser(), };
+
+        DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().append(null, parsers).toFormatter();
+        return dateFormatter.parseDateTime(creationTime);
+    }
+
     public static URLShortenerDefinition parse(String url, String uuid, String creationTime)
             throws URISyntaxException, UnsupportedEncodingException {
 
         URI parsedURI = new URI(url);
 
-        DateTimeParser[] parsers = {
-                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ").getParser(),
-                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ").getParser(),
-        };
-        
-        DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().append(null, parsers).toFormatter();
-        
-        URLShortenerDefinition result = new URLShortenerDefinition(parsedURI, UUID.fromString(uuid),
-                dateFormatter.parseDateTime(creationTime));
+        URLShortenerDefinition result = new URLShortenerDefinition(parsedURI, parseUUID(uuid),
+                parseCreationTime(creationTime));
 
         if (parsedURI.getPath().startsWith("/embeddedvis")) {
 
@@ -219,14 +225,14 @@ public class URLShortenerDefinition {
 
             Optional<Integer> countLegacy = Optional.empty();
             try {
-                for(int tries=0; tries < MAX_RETRY; tries++) {
+                for (int tries = 0; tries < MAX_RETRY; tries++) {
                     try {
                         countLegacy = Optional.of(annisSearchService.path("count").queryParam("q", query.getQuery())
                                 .queryParam("corpora", Joiner.on(",").join(query.getCorpora())).request()
                                 .get(MatchAndDocumentCount.class).getMatchCount());
                         break;
-                    } catch(ServerErrorException ex) {
-                        if (tries >= MAX_RETRY-1) {
+                    } catch (ServerErrorException ex) {
+                        if (tries >= MAX_RETRY - 1) {
                             this.errorMsg = ex.getMessage();
                             return QueryStatus.Failed;
                         } else {
@@ -237,11 +243,10 @@ public class URLShortenerDefinition {
             } catch (BadRequestException ex) {
                 countLegacy = Optional.of(0);
             }
-            
 
             if (countGraphANNIS != countLegacy.get()) {
 
-                this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
+                this.errorMsg = "should have been " + countLegacy.get() + " but was " + countGraphANNIS;
                 status = QueryStatus.CountDiffers;
 
             } else {
