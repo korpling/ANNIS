@@ -39,6 +39,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -540,6 +541,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public List<Match> find(String query, QueryLanguage queryLanguage, List<String> corpusList,
             LimitOffsetQueryData limitOffset) throws GraphANNISException {
+    
+        Collections.sort(corpusList);
         List<String> corpora = escapedCorpusNames(corpusList);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
@@ -578,6 +581,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public boolean find(String query, QueryLanguage queryLanguage, List<String> corpusList,
             LimitOffsetQueryData limitOffset, final OutputStream out) throws GraphANNISException {
+
+        Collections.sort(corpusList);
         List<String> corpora = escapedCorpusNames(corpusList);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
@@ -631,6 +636,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public int count(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException {
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
 
+        Collections.sort(corpusList);
         Future<Integer> result = exec.submit(() -> {
             return (int) corpusStorageMgr.count(escapedCorpusNames(corpusList), query, ql);
         });
@@ -656,6 +662,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             List<String> corpusList) throws GraphANNISException {
 
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
+
+        Collections.sort(corpusList);
 
         Future<MatchAndDocumentCount> result = exec.submit(() -> {
             CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(escapedCorpusNames(corpusList), query,
@@ -683,6 +691,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public FrequencyTable frequency(String query, QueryLanguage queryLanguage, List<String> corpusList,
             FrequencyTableQuery freqQuery) throws GraphANNISException {
+
+        Collections.sort(corpusList);
 
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
 
