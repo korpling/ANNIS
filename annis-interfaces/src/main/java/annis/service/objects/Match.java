@@ -175,8 +175,6 @@ public class Match implements Serializable
     {
       URI uri;
       
-      // undo any escaping
-      singleMatch = singleMatch.replace("%20", " ").replace("%25", "%").replace("%2C", ",");
       
       String id = "";
       String anno = null;
@@ -217,6 +215,8 @@ public class Match implements Serializable
         {
           anno = ns + "::" + name;
         }
+        // undo any escaping for the annotation part
+        anno = anno.replace("%20", " ").replace("%25", "%").replace("%2C", ",");
       }
       
       try
