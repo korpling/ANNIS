@@ -181,7 +181,7 @@ public class URLShortenerDefinition {
                     this.errorMsg = ex.getMessage();
                     return QueryStatus.Failed;
                 } else {
-                    log.warn("Server error when executing query {}", query.getQuery(), ex);
+                    log.warn("Server error when executing query: {}. Will retry", query.getQuery(), ex);
                 }
             }
         }
@@ -252,7 +252,7 @@ public class URLShortenerDefinition {
             } else {
 
                 // execute find with smaller blocks of matches
-                final int limit = 1000;
+                final int limit = 100;
                 for (int offset = 0; offset + limit < countGraphANNIS; offset += limit) {
                     status = testFind(queryDao, annisSearchService, offset, limit);
                     if (status == QueryStatus.Failed) {
