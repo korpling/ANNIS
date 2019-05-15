@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
@@ -33,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Stopwatch;
 
 import annis.CommonHelper;
 import annis.QueryGenerator;
@@ -252,9 +254,15 @@ public class URLShortenerDefinition {
             } else {
 
                 // execute find with smaller blocks of matches
-                final int limit = 100;
+                int limit = 100;
+                
                 for (int offset = 0; offset + limit < countGraphANNIS; offset += limit) {
+                    Stopwatch stopwatch = Stopwatch.createStarted();
                     status = testFind(queryDao, annisSearchService, offset, limit);
+                    stopwatch.stop();
+                    if(stopwatch.elapsed(TimeUnit.SECONDS) < 1) {
+                        limit += 100;
+                    }
                     if (status == QueryStatus.Failed) {
                         // don't try quirks mode when failed
                         return status;
