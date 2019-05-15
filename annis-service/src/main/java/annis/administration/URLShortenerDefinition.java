@@ -254,14 +254,14 @@ public class URLShortenerDefinition {
             } else {
 
                 // execute find with smaller blocks of matches
-                int limit = 100;
+                int limit = 500;
                 
                 for (int offset = 0; offset + limit < countGraphANNIS; offset += limit) {
                     Stopwatch stopwatch = Stopwatch.createStarted();
                     status = testFind(queryDao, annisSearchService, offset, limit);
                     stopwatch.stop();
                     if(stopwatch.elapsed(TimeUnit.SECONDS) < 1) {
-                        limit += 100;
+                        limit *= 2;
                     }
                     if (status == QueryStatus.Failed) {
                         // don't try quirks mode when failed
