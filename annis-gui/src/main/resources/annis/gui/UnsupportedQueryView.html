@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+	<vaadin-panel size-full>
+		<vaadin-vertical-layout :center>
+			<vaadin-label :center>
+				<div style="text-align: center">
+					<h1>Unsupported query for citation link</h1>
+					<div>The query referenced by the citation link you followed is not supported properly by
+						this version of ANNIS.
+						We are sorry for the inconvenience and ask you to file a bug report at <a
+							href="https://github.com/korpling/ANNIS/issues">https://github.com/korpling/ANNIS/issues</a>
+						with the original citation link.
+					</div>
+					<div>
+						If you want, you can still execute the query. <strong>This will probably give you
+							different results than the ones originally referenced by this link.</strong>
+					</div>
+				</div>
+			</vaadin-label>
+			<vaadin-button _id="btExecute" :center>I understand, execute the query nevertheless.</vaadin-button>
+		</vaadin-vertical-layout>
+	</vaadin-panel>
+</body>
+
+</html>

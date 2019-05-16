@@ -4,7 +4,6 @@
     // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "type": "java",
             "name": "Debug (Launch) - Current File",
@@ -19,7 +18,9 @@
             "projectName": "annis-service",
             "vmArgs": "-Dannis.home=${workspaceFolder}/annis-service/src/main/distribution -Dannis.nosecurity=true",
             "cwd": "${workspaceFolder}/annis-service/src/main/distribution",
-            "classPaths": ["${workspaceFolder}/annis-service/target/annis-service-4.0.0-SNAPSHOT-distribution/annis-service-4.0.0-SNAPSHOT/lib/*"]
+            "classPaths": [
+                "${workspaceFolder}/annis-service/target/annis-service-4.0.0-SNAPSHOT-distribution/annis-service-4.0.0-SNAPSHOT/lib/*"
+            ]
         }
     ]
 }

@@ -72,6 +72,8 @@ public class AnnisUI extends CommonUI
 
   private AdminView adminView;
 
+  private UnsupportedQueryView unsupportedQueryView;
+
   private Navigator nav;
 
   /**
@@ -104,6 +106,7 @@ public class AnnisUI extends CommonUI
 
     searchView = new SearchView(AnnisUI.this);
     adminView = new AdminView(AnnisUI.this);
+    unsupportedQueryView = new UnsupportedQueryView(AnnisUI.this);
     queryController = new QueryController(searchView, AnnisUI.this);
     
     toolbar = new MainToolbar();
@@ -115,6 +118,7 @@ public class AnnisUI extends CommonUI
     nav = new Navigator(AnnisUI.this, AnnisUI.this);
     nav.addView(SearchView.NAME, searchView);
     nav.addView(AdminView.NAME, adminView);
+    nav.addView(UnsupportedQueryView.NAME, unsupportedQueryView);
     nav.addViewChangeListener(AnnisUI.this);
     
     addExtension(toolbar.getScreenshotExtension());

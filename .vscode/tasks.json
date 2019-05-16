@@ -29,5 +29,6 @@
             "command": "mvn -B test",
             "group": "test"
         }
+    
     ]
 }
