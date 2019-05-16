@@ -50,6 +50,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
+import org.apache.http.client.utils.URIBuilder;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
@@ -315,10 +316,27 @@ public class CorpusAdministration {
         // insert URLs into new database
         Collection<URLShortenerDefinition> okEntries = queryByStatus.get(QueryStatus.Ok);
         if (allowPartialMigration || okEntries.size() == queryByStatus.size()) {
-            for (URLShortenerDefinition q : okEntries) {
+            for (Map.Entry<QueryStatus, URLShortenerDefinition> entry : queryByStatus.entries()) {
+                URLShortenerDefinition q = entry.getValue();
                 if (q.getUri() != null && q.getUuid() != null) {
-                    getShortenerDao().migrate(q.getUri().toASCIIString(), "anonymous", q.getUuid(),
+                    String temporary = null;
+
+                    if (entry.getKey() != QueryStatus.Ok) {
+                        // Link the UUID to an error page temporarily, until the issue is fixed.
+                        // Remember the original URL, so the temporary URL can just be set to null to
+                        // resolve
+                        // to the original URL when the issue is fixed in ANNIS.
+                        try {
+                            URI tempURI = new URIBuilder().setPath("/unsupported-query")
+                                    .addParameter("url", q.getUri().toASCIIString()).build();
+                            temporary = tempURI.toASCIIString();
+                        } catch (URISyntaxException e) {
+                            log.error("Could not create proper URI for unsupported query", e);
+                        }
+                    }
+                    getShortenerDao().migrate(q.getUri().toASCIIString(), temporary, "anonymous", q.getUuid(),
                             q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
+
                 }
             }
         }
