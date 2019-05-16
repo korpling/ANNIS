@@ -163,7 +163,8 @@ public class URLShortenerDefinition {
 
     public static int MAX_RETRY = 5;
 
-    private QueryStatus testFind(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException, IOException {
+    private QueryStatus testFind(QueryDao queryDao, WebTarget annisSearchService)
+            throws GraphANNISException, IOException {
 
         WebTarget findTarget = annisSearchService.path("find").queryParam("q", query.getQuery()).queryParam("corpora",
                 Joiner.on(",").join(query.getCorpora()));
@@ -244,8 +245,9 @@ public class URLShortenerDefinition {
                 this.errorMsg = "should have been " + countLegacy.get() + " but was " + countGraphANNIS;
                 status = QueryStatus.CountDiffers;
 
+            } else if (countGraphANNIS == 0) {
+                status = QueryStatus.Ok;
             } else {
-
                 status = testFind(queryDao, annisSearchService);
                 if (status == QueryStatus.Failed) {
                     // don't try quirks mode when failed
