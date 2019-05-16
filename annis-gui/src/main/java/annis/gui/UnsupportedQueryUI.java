@@ -15,8 +15,7 @@
  */
 package annis.gui;
 
-import java.net.URI;
-
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -36,7 +35,6 @@ public class UnsupportedQueryUI extends CommonUI {
 
     @Override
     protected void init(VaadinRequest request) {
-
         UnsupportedQueryPanel panel = new UnsupportedQueryPanel(request.getParameter("url"));
         setContent(panel);
     }
@@ -48,6 +46,8 @@ public class UnsupportedQueryUI extends CommonUI {
 
         public UnsupportedQueryPanel(String url) {
             this.url = url;
+
+            Page.getCurrent().setTitle("ANNIS: Unsupported query for citation link");
 
             Design.read("UnsupportedQueryPanel.html", this);
 
