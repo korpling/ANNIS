@@ -239,7 +239,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             .c("value");
 
     private final Table urlShortenerTable = new Table("url_shortener").c(new Column("id").primaryKey()).c("owner")
-            .c("created").c("url").index("url");
+            .c("created").c("url").c("temporary_url").index("url");
 
     private final Table exampleQueriesTable = new Table(EXAMPLE_QUERIES_TAB)
             .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c(new Column("example_query").notNull())

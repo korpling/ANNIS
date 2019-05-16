@@ -21,14 +21,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.common.base.Preconditions;
+
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.date.DateFormatUtils;
-
-import com.google.common.base.Preconditions;
 
 /**
  * A DAO for retrieving and adding URL shortener information from the database.
@@ -111,10 +110,12 @@ public class ShortenerDao extends AbstractDao {
     public String unshorten(UUID id) {
         try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
 
-            List<String> result = getQueryRunner().query(conn, "SELECT url FROM url_shortener WHERE id=? LIMIT 1",
+            List<String> url = getQueryRunner().query(conn,
+                    "SELECT COALESCE(temporary_url, url) FROM url_shortener WHERE id=? LIMIT 1",
                     new ColumnListHandler<>(1), id);
 
-            return result.isEmpty() ? null : result.get(0);
+            return url.isEmpty() ? null : url.get(0);
+
         } catch (SQLException ex) {
             log.error("Could not unshorten URL with ID {}", id.toString(), ex);
         }
