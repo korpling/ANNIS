@@ -1,18 +1,23 @@
 package annis.administration;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
@@ -23,7 +28,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.corpus_tools.graphannis.CorpusStorageManager.CountResult;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -34,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Stopwatch;
 
 import annis.CommonHelper;
 import annis.QueryGenerator;
@@ -42,9 +45,7 @@ import annis.dao.QueryDao;
 import annis.exceptions.AnnisTimeoutException;
 import annis.model.DisplayedResultQuery;
 import annis.model.Query;
-import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
-import annis.service.objects.MatchGroup;
 import annis.service.objects.QueryLanguage;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 
@@ -162,42 +163,34 @@ public class URLShortenerDefinition {
 
     public static int MAX_RETRY = 5;
 
-    private QueryStatus testFind(QueryDao queryDao, WebTarget annisSearchService, int offset, int limit)
-            throws GraphANNISException {
+    private QueryStatus testFind(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException, IOException {
 
         WebTarget findTarget = annisSearchService.path("find").queryParam("q", query.getQuery()).queryParam("corpora",
                 Joiner.on(",").join(query.getCorpora()));
 
-        List<Match> matchesGraphANNIS = queryDao.find(query.getQuery(), query.getQueryLanguage(),
-                new LinkedList<>(query.getCorpora()), new LimitOffsetQueryData(offset, limit));
+        File matchesGraphANNISFile = File.createTempFile("annis-migrate-url-shortener-graphannis", ".txt");
+        matchesGraphANNISFile.deleteOnExit();
 
-        int tries = 0;
-        MatchGroup matchesLegacy = null;
-        while (matchesLegacy == null) {
-            try {
-                tries++;
-                matchesLegacy = findTarget.queryParam("offset", offset).queryParam("limit", limit)
-                        .request(MediaType.APPLICATION_XML_TYPE).get(MatchGroup.class);
-            } catch (ServerErrorException ex) {
-                if (tries >= MAX_RETRY) {
-                    this.errorMsg = ex.getMessage();
-                    return QueryStatus.Failed;
-                } else {
-                    log.warn("Server error when executing query: {}. Will retry", query.getQuery(), ex);
-                }
-            }
+        // write all graphANNIS matches to temporary file
+        try (BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(matchesGraphANNISFile))) {
+            queryDao.find(query.getQuery(), query.getQueryLanguage(), new LinkedList<>(query.getCorpora()),
+                    new LimitOffsetQueryData(0, Integer.MAX_VALUE), fileOutput);
         }
 
-        Iterator<Match> itGraphANNIS = matchesGraphANNIS.iterator();
-        Iterator<Match> itLegacy = matchesLegacy.getMatches().iterator();
-        while (itGraphANNIS.hasNext() && itLegacy.hasNext()) {
-            String m1 = itGraphANNIS.next().toString();
-            String m2 = itLegacy.next().toString();
-
-            if (!m1.equals(m2)) {
-                this.errorMsg = "(should be)" + System.lineSeparator() + m2 + System.lineSeparator() + "(but was)"
-                        + System.lineSeparator() + m1;
-                return QueryStatus.MatchesDiffer;
+        // read in the file again line by line and compare it with the legacy ANNIS
+        // version
+        try (BufferedReader matchesGraphANNIS = new BufferedReader(new FileReader(matchesGraphANNISFile));
+                BufferedReader matchesLegacy = new BufferedReader(
+                        new InputStreamReader(findTarget.request(MediaType.TEXT_PLAIN_TYPE).get(InputStream.class)))) {
+            // compare each line
+            String m1;
+            String m2;
+            while ((m1 = matchesGraphANNIS.readLine()) != null && (m2 = matchesLegacy.readLine()) != null) {
+                if (!m1.equals(m2)) {
+                    this.errorMsg = "(should be)" + System.lineSeparator() + m2 + System.lineSeparator() + "(but was)"
+                            + System.lineSeparator() + m1;
+                    return QueryStatus.MatchesDiffer;
+                }
             }
         }
 
@@ -253,24 +246,12 @@ public class URLShortenerDefinition {
 
             } else {
 
-                // execute find with smaller blocks of matches
-                int limit = 500;
-                
-                for (int offset = 0; offset + limit < countGraphANNIS; offset += limit) {
-                    Stopwatch stopwatch = Stopwatch.createStarted();
-                    status = testFind(queryDao, annisSearchService, offset, limit);
-                    stopwatch.stop();
-                    if(stopwatch.elapsed(TimeUnit.SECONDS) < 1) {
-                        limit *= 2;
-                    }
-                    if (status == QueryStatus.Failed) {
-                        // don't try quirks mode when failed
-                        return status;
-                    } else if (status != QueryStatus.Ok) {
-                        // failed once, don't try the other offset/limit combinations
-                        break;
-                    }
+                status = testFind(queryDao, annisSearchService);
+                if (status == QueryStatus.Failed) {
+                    // don't try quirks mode when failed
+                    return status;
                 }
+
             }
 
             if (status != QueryStatus.Ok && this.query.getQueryLanguage() == QueryLanguage.AQL) {
@@ -292,7 +273,7 @@ public class URLShortenerDefinition {
 
             return status;
 
-        } catch (ForbiddenException | AnnisTimeoutException ex) {
+        } catch (ForbiddenException | AnnisTimeoutException | IOException ex) {
             this.errorMsg = ex.toString();
             return QueryStatus.Failed;
         }
