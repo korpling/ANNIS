@@ -180,6 +180,7 @@ public class URLShortenerDefinition {
 
         // read in the file again line by line and compare it with the legacy ANNIS
         // version
+        int matchNr = 0;
         try (BufferedReader matchesGraphANNIS = new BufferedReader(new FileReader(matchesGraphANNISFile));
                 BufferedReader matchesLegacy = new BufferedReader(
                         new InputStreamReader(findTarget.request(MediaType.TEXT_PLAIN_TYPE).get(InputStream.class)))) {
@@ -187,8 +188,10 @@ public class URLShortenerDefinition {
             String m1;
             String m2;
             while ((m1 = matchesGraphANNIS.readLine()) != null && (m2 = matchesLegacy.readLine()) != null) {
+                matchNr++;
+                
                 if (!m1.equals(m2)) {
-                    this.errorMsg = "(should be)" + System.lineSeparator() + m2 + System.lineSeparator() + "(but was)"
+                    this.errorMsg = "Match " + matchNr +  " (should be)" + System.lineSeparator() + m2 + System.lineSeparator() + "(but was)"
                             + System.lineSeparator() + m1;
                     return QueryStatus.MatchesDiffer;
                 }
