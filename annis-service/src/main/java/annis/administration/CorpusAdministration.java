@@ -284,6 +284,19 @@ public class CorpusAdministration {
 
                                         } catch (GraphANNISException ex) {
                                             queryByStatus.put(QueryStatus.Failed, q);
+                                        } catch (Throwable ex) {
+                                            String lineSeparator = System.getProperty("line.separator");
+                                            StringBuilder sb = new StringBuilder();
+                                            sb.append("Query Error: " + QueryStatus.Failed + lineSeparator);
+                                            sb.append("Corpus: \"" + q.getQuery().getCorpora() + "\""
+                                                    + lineSeparator);
+                                            sb.append("UUID: \"" + q.getUuid() + "\"" + lineSeparator);
+                                            sb.append("Query:" + lineSeparator);
+                                            sb.append(q.getQuery().getQuery().trim() + lineSeparator);
+                                            sb.append("Error Message: " + ex.getMessage());
+
+                                            log.warn(sb.toString(), ex);
+                                            queryByStatus.put(QueryStatus.Failed, q);
                                         }
                                     }
                                 }
