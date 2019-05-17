@@ -17,7 +17,7 @@ package annis.gui.converter;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.vaadin.data.util.converter.Converter;
+import com.vaadin.v7.data.util.converter.Converter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;

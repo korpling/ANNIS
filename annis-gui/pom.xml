@@ -1,222 +1,225 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <artifactId>annis-all</artifactId>
-    <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>4.0.0-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
-  </parent>
+	<parent>
+		<artifactId>annis-all</artifactId>
+		<groupId>de.hu-berlin.german.korpling.annis</groupId>
+		<version>4.0.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
-  <artifactId>annis-gui</artifactId>
-  <packaging>war</packaging>
+	<artifactId>annis-gui</artifactId>
+	<packaging>war</packaging>
 
-  <organization>
-    <name>Corpuslinguistic working group Humboldt University Berlin</name>
-    <url>http://www.linguistik.hu-berlin.de/institut/professuren/korpuslinguistik/</url>
-  </organization>
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-    </license>
-  </licenses>
+	<organization>
+		<name>Corpuslinguistic working group Humboldt University Berlin</name>
+		<url>http://www.linguistik.hu-berlin.de/institut/professuren/korpuslinguistik/</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
-  </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
+	</properties>
 
-  <build>
-    <finalName>annis-gui</finalName>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-      <resource>
-        <directory>${basedir}/target/extra-resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
+	<build>
+		<finalName>annis-gui</finalName>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>${basedir}/target/extra-resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 
-    <plugins>
-   
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <webResources>
-            <webResource>
-              <directory>${basedir}/src/main/webapp/WEB-INF</directory>
-              <includes>
-                <include>web.xml</include>
-              </includes>
-              <targetPath>WEB-INF</targetPath>
-              <filtering>true</filtering>
-            </webResource>
-          </webResources>
-        </configuration>
-      </plugin>
-      
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.6</version>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/${project.build.finalName}/</outputDirectory>
-              <resources>          
-                <resource>
-                  <directory>${main.basedir}</directory>
-                  <includes>
-                    <include>NOTICE</include>
-                    <include>CHANGELOG</include>
-                    <include>LICENSE</include>
-                  </includes>
-                  <filtering>true</filtering>
-                </resource>
-                <resource>
-                  <directory>THIRD-PARTY</directory>
-                  <targetPath>THIRD-PARTY</targetPath>
-                  <excludes />
-                </resource>
-              </resources>              
-            </configuration>            
-          </execution>
-        </executions>
-      </plugin>
-   
-      <!-- A simple Jetty test server at http://localhost:8080/annis-gui can 
-      be launched with the Maven goal jetty:run and stopped with jetty:stop -->
-      <plugin>
-        <groupId>org.eclipse.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <version>9.3.7.v20160115</version>
-        <configuration>
-          <webApp>
-            <contextPath>/annis-gui</contextPath>
-            <baseResource implementation="org.eclipse.jetty.util.resource.ResourceCollection">
-              <resourcesAsCSV>target/annis-gui/,src/main/webapp/</resourcesAsCSV>
-            </baseResource>
-          </webApp>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-continuation</artifactId>
-            <version>9.3.7.v20160115</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      
-      <plugin>
-        <groupId>com.vaadin</groupId>
-        <artifactId>vaadin-maven-plugin</artifactId>
-        <version>${vaadin.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>clean</goal>
-              <goal>resources</goal>
-              <goal>update-theme</goal>
-              <goal>compile-theme</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <optimizationLevel>9</optimizationLevel>
-          <style>OBF</style>
-        </configuration>
-      </plugin>
-      
-    </plugins>
-  </build>
+		<plugins>
 
-  <dependencies>
-    
-    <dependency>
-      <groupId>de.hu-berlin.german.korpling.annis</groupId>
-      <artifactId>annis-libgui</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
-      <!-- do not use commons logging -->
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<webResources>
+						<webResource>
+							<directory>${basedir}/src/main/webapp/WEB-INF</directory>
+							<includes>
+								<include>web.xml</include>
+							</includes>
+							<targetPath>WEB-INF</targetPath>
+							<filtering>true</filtering>
+						</webResource>
+					</webResources>
+				</configuration>
+			</plugin>
 
-    <dependency>
-      <groupId>com.github.vaadin4qbanos</groupId>
-      <artifactId>jsclipboard</artifactId>
-      <version>1.0.12</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>de.hu-berlin.german.korpling.annis</groupId>
-      <artifactId>annis-docs</artifactId>
-      <version>${project.version}</version>
-      <type>pom</type>
-    </dependency>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/${project.build.finalName}/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${main.basedir}</directory>
+									<includes>
+										<include>NOTICE</include>
+										<include>CHANGELOG</include>
+										<include>LICENSE</include>
+									</includes>
+									<filtering>true</filtering>
+								</resource>
+								<resource>
+									<directory>THIRD-PARTY</directory>
+									<targetPath>THIRD-PARTY</targetPath>
+									<excludes />
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-    <dependency>
-      <groupId>de.hu-berlin.german.korpling.annis</groupId>
-      <artifactId>annis-visualizers</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
-    </dependency>
-    
-    <dependency>
-      <groupId>net.sf.opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>2.3</version>
-      <type>jar</type>
-    </dependency>
-    
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>${servlet.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>2.49.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-htmlunit-driver</artifactId>
-      <version>2.49.0</version>
-      <scope>test</scope>
-    </dependency>
-    
-     <dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <version>2.6.11</version>
-    </dependency>
-    
- 
-  </dependencies>
-  <name>annis-gui</name>
+			<!-- A simple Jetty test server at http://localhost:8080/annis-gui can 
+				be launched with the Maven goal jetty:run and stopped with jetty:stop -->
+			<plugin>
+				<groupId>org.eclipse.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>9.3.7.v20160115</version>
+				<configuration>
+					<webApp>
+						<contextPath>/annis-gui</contextPath>
+						<baseResource
+							implementation="org.eclipse.jetty.util.resource.ResourceCollection">
+							<resourcesAsCSV>target/annis-gui/,src/main/webapp/</resourcesAsCSV>
+						</baseResource>
+					</webApp>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.eclipse.jetty</groupId>
+						<artifactId>jetty-continuation</artifactId>
+						<version>9.3.7.v20160115</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>clean</goal>
+							<goal>resources</goal>
+							<goal>update-theme</goal>
+							<goal>compile-theme</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<optimizationLevel>9</optimizationLevel>
+					<style>OBF</style>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>de.hu-berlin.german.korpling.annis</groupId>
+			<artifactId>annis-libgui</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+			<!-- do not use commons logging -->
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.github.vaadin4qbanos</groupId>
+			<artifactId>jsclipboard</artifactId>
+			<version>1.0.12</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.hu-berlin.german.korpling.annis</groupId>
+			<artifactId>annis-docs</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
+		</dependency>
+
+		<dependency>
+			<groupId>de.hu-berlin.german.korpling.annis</groupId>
+			<artifactId>annis-visualizers</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.3</version>
+			<type>jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>2.49.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-htmlunit-driver</artifactId>
+			<version>2.49.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+			<version>2.6.11</version>
+		</dependency>
+
+
+	</dependencies>
+	<name>annis-gui</name>
 </project>

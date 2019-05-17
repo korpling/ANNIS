@@ -15,31 +15,34 @@
  */
 package annis.gui;
 
-import annis.VersionInfo;
-import annis.libgui.IDGenerator;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.Version;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
+import com.vaadin.v7.ui.Label;
 import com.vaadin.ui.Link;
-import com.vaadin.ui.TextArea;
+import com.vaadin.v7.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+
+import annis.VersionInfo;
+import annis.libgui.IDGenerator;
 
 /**
  *

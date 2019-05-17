@@ -61,7 +61,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import annis.CommonHelper;
 import annis.QueryGenerator;
 import annis.VersionInfo;
-import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -124,9 +123,6 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
 
         // init a doc browser controller
         this.docBrowserController = new DocBrowserController(ui);
-
-        // always get the resize events directly
-        setImmediate(true);
 
         setSizeFull();
         setMargin(false);

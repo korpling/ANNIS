@@ -45,7 +45,7 @@ import com.google.common.collect.Range;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
 
 import annis.CommonHelper;
 import annis.gui.widgets.grid.AnnotationGrid;

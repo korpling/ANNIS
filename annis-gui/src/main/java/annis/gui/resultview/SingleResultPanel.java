@@ -31,16 +31,11 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
 import org.slf4j.LoggerFactory;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
-import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -49,6 +44,11 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.IndexedContainer;
+import com.vaadin.v7.ui.AbstractSelect;
+import com.vaadin.v7.ui.ComboBox;
 
 import annis.CommonHelper;
 import annis.gui.AnnisUI;

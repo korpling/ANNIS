@@ -15,32 +15,35 @@
  */
 package annis.gui.paging;
 
-import annis.gui.AnnisUI;
-import annis.gui.ShareQueryReferenceWindow;
-import annis.gui.util.ANNISFontIcon;
-import annis.libgui.Helper;
-import com.vaadin.data.Validator;
-import com.vaadin.data.validator.AbstractStringValidator;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.slf4j.LoggerFactory;
+import com.vaadin.v7.data.Validator;
+import com.vaadin.v7.data.validator.AbstractStringValidator;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.TextField;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
+import annis.gui.AnnisUI;
+import annis.gui.ShareQueryReferenceWindow;
+import annis.gui.util.ANNISFontIcon;
+import annis.libgui.Helper;
 
 /**
  *

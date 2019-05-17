@@ -26,9 +26,9 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
 
-import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.data.util.ObjectProperty;
 
 import annis.gui.controlpanel.CorpusSorter;
 import annis.gui.exporter.CSVExporter;

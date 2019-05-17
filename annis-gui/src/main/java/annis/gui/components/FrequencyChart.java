@@ -15,17 +15,19 @@
  */
 package annis.gui.components;
 
+import org.slf4j.LoggerFactory;
+
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.ui.OptionGroup;
+
 import annis.gui.AnnisUI;
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.service.objects.FrequencyTable;
-import com.vaadin.data.Property;
-import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import org.slf4j.LoggerFactory;
 
 /**
  *

@@ -54,7 +54,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
 
 import annis.CommonHelper;
 import annis.libgui.Background;

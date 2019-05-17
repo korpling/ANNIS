@@ -15,44 +15,47 @@
  */
 package annis.gui.admin;
 
-import annis.gui.admin.view.UserListView;
-import annis.gui.converter.CommaSeperatedStringConverterSet;
-import annis.gui.converter.DateTimeStringConverter;
-import annis.security.User;
-import com.vaadin.data.Container;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.GeneratedPropertyContainer;
-import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.data.util.PropertyValueGenerator;
-import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.event.Action;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.event.ShortcutAction;
-import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.Grid.HeaderRow;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.renderers.ButtonRenderer;
-import com.vaadin.ui.renderers.ClickableRenderer;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.joda.time.DateTime;
+
+import com.vaadin.event.Action;
+import com.vaadin.event.ShortcutAction;
+import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.v7.data.Container;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.fieldgroup.FieldGroup;
+import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.v7.data.util.GeneratedPropertyContainer;
+import com.vaadin.v7.data.util.IndexedContainer;
+import com.vaadin.v7.data.util.PropertyValueGenerator;
+import com.vaadin.v7.data.util.filter.SimpleStringFilter;
+import com.vaadin.v7.event.FieldEvents;
+import com.vaadin.v7.ui.CheckBox;
+import com.vaadin.v7.ui.Grid;
+import com.vaadin.v7.ui.Grid.HeaderRow;
+import com.vaadin.v7.ui.TextField;
+import com.vaadin.v7.ui.renderers.ButtonRenderer;
+import com.vaadin.v7.ui.renderers.ClickableRenderer;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
+import annis.gui.admin.view.UserListView;
+import annis.gui.converter.CommaSeperatedStringConverterSet;
+import annis.gui.converter.DateTimeStringConverter;
+import annis.security.User;
 
 /**
  *

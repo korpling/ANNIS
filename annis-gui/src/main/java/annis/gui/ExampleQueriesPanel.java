@@ -15,41 +15,43 @@
  */
 package annis.gui;
 
-import annis.examplequeries.ExampleQuery;
-import annis.gui.controlpanel.ControlPanel;
-import annis.gui.controlpanel.CorpusListPanel;
-import annis.gui.controlpanel.QueryPanel;
-import annis.model.Query;
-import annis.gui.resultview.ResultViewPanel;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.service.objects.QueryLanguage;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.Label;
+import com.vaadin.v7.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.BaseTheme;
-import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Table;
+import com.vaadin.v7.ui.themes.BaseTheme;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
+import annis.examplequeries.ExampleQuery;
+import annis.gui.controlpanel.ControlPanel;
+import annis.gui.controlpanel.CorpusListPanel;
+import annis.gui.controlpanel.QueryPanel;
+import annis.gui.resultview.ResultViewPanel;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.model.Query;
+import annis.service.objects.QueryLanguage;
 
 /**
  * Wraps the auto generated queries.

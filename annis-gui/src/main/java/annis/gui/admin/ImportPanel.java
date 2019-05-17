@@ -15,15 +15,24 @@
  */
 package annis.gui.admin;
 
-import annis.gui.LoginListener;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.service.objects.ImportJob;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.text.DecimalFormat;
+import java.util.List;
+
+import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Splitter;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -34,23 +43,17 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextArea;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.BaseTheme;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
-import java.text.DecimalFormat;
-import java.util.List;
-import javax.ws.rs.core.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.vaadin.v7.data.validator.EmailValidator;
+import com.vaadin.v7.ui.TextField;
+import com.vaadin.v7.ui.Upload;
+import com.vaadin.v7.ui.themes.BaseTheme;
+
+import annis.gui.LoginListener;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.service.objects.ImportJob;
 
 /**
  *

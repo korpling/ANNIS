@@ -15,18 +15,19 @@
  */
 package annis.gui.flatquerybuilder;
 
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.ArrayList;
-import java.util.Collection;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.data.Property.ValueChangeListener;
+import com.vaadin.v7.ui.CheckBox;
 
 /**
  *
@@ -84,16 +85,13 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
     this.vfs = new ArrayList<>();    
     vnframe = new VerticalLayout();
     vnframe.setSpacing(true);
-    vnframe.setImmediate(true);
     this.sb = new VerticalLayout(); //maybe other name? sb is "reserved" by SearchBox
-    sb.setImmediate(true);
     sb.setSpacing(false);     //used to be true
     lbl = new Label(ebene);    
     HorizontalLayout sbtoolbar = new HorizontalLayout();
     sbtoolbar.setSpacing(false);
     // searchbox tickbox for regex
     reBox = new CheckBox(CAPTION_REBOX);
-    reBox.setImmediate(true);
     sbtoolbar.addComponent(reBox);
     reBox.addValueChangeListener(new ValueChangeListener() {
       // TODO make this into a nice subroutine

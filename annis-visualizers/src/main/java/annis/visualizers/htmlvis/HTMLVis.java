@@ -15,28 +15,6 @@
  */
 package annis.visualizers.htmlvis;
 
-import annis.CommonHelper;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import annis.libgui.MatchedNodeColors;
-import annis.libgui.VisualizationToggle;
-import annis.libgui.visualizers.AbstractVisualizer;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.model.Annotation;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -52,12 +30,10 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
@@ -67,6 +43,30 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Label;
+
+import annis.CommonHelper;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.model.Annotation;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *

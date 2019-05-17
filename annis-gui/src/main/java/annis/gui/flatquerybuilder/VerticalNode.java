@@ -15,14 +15,15 @@
  */
 package annis.gui.flatquerybuilder;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
+
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
 
 /**
  * @author Martin

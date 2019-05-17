@@ -27,15 +27,14 @@ import org.slf4j.LoggerFactory;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.ObjectProperty;
-import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.ObjectProperty;
+import com.vaadin.v7.event.FieldEvents;
 
 import annis.model.AqlParseError;
 import annis.model.NodeDesc;
-import annis.model.QueryNode;
 import elemental.json.JsonArray;
 
 /**
@@ -245,12 +244,6 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   }
 
   @Override
-  public void addListener(FieldEvents.TextChangeListener listener)
-  {
-    addTextChangeListener(listener);
-  }
-
-  @Override
   public void removeTextChangeListener(FieldEvents.TextChangeListener listener)
   {
     removeListener(FieldEvents.TextChangeListener.EVENT_ID,
@@ -258,11 +251,6 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
       listener);
   }
 
-  @Override
-  public void removeListener(FieldEvents.TextChangeListener listener)
-  {
-    removeTextChangeListener(listener);
-  }
 
   public String getValue()
   {

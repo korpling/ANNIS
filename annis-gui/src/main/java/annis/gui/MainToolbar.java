@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.eventbus.Subscribe;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
@@ -38,8 +37,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.validator.EmailValidator;
+import com.vaadin.v7.ui.themes.BaseTheme;
 
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.components.SettingsStorage;

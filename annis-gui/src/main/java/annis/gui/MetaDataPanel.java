@@ -15,34 +15,6 @@
  */
 package annis.gui;
 
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.model.Annotation;
-import com.google.common.collect.ComparisonChain;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.ColumnGenerator;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -53,9 +25,37 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.lang3.concurrent.CallableBackgroundInitializer;
-import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ComparisonChain;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.google.common.util.concurrent.FutureCallback;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.ComboBox;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.Table;
+import com.vaadin.v7.ui.Table.ColumnGenerator;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.model.Annotation;
 
 /**
  * Provides all corpus annotations for a corpus or for a specific search result.
