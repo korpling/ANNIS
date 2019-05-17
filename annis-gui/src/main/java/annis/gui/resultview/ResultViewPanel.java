@@ -37,14 +37,15 @@ import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.JavaScript;
 import com.vaadin.ui.Label;
@@ -66,7 +67,6 @@ import annis.libgui.IDGenerator;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProviderImpl;
-import annis.model.AnnisConstants;
 import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.resolver.ResolverEntry;
@@ -110,7 +110,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     private final CssLayout resultLayout;
 
-    private final List<SingleResultPanel> resultPanelList;
+    private final List<AbstractComponent> resultPanelList;
 
     private String segmentationName;
 
@@ -135,7 +135,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
         cacheResolver = Collections.synchronizedMap(new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
-        resultPanelList = Collections.synchronizedList(new LinkedList<SingleResultPanel>());
+        resultPanelList = Collections.synchronizedList(new LinkedList<AbstractComponent>());
 
         resultLayout = new CssLayout();
         resultLayout.addStyleName("result-view-css");
@@ -252,7 +252,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
             return;
         }
 
-        List<SingleResultPanel> newPanels = new LinkedList<>();
+        List<AbstractComponent> newPanels = new LinkedList<>();
         try {
             if (subgraphList == null || subgraphList.isEmpty()) {
                 Notification.show("Could not get subgraphs", Notification.Type.TRAY_NOTIFICATION);
@@ -271,10 +271,13 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
                         resetQueryResultQueue();
                     }
 
-                    for (SingleResultPanel panel : newPanels) {
+                    for (AbstractComponent panel : newPanels) {
                         resultPanelList.add(panel);
                         resultLayout.addComponent(panel);
-                        panel.setSegmentationLayer(sui.getQueryState().getVisibleBaseText().getValue());
+                        if (panel instanceof SingleResultPanel) {
+                            ((SingleResultPanel) panel)
+                                    .setSegmentationLayer(sui.getQueryState().getVisibleBaseText().getValue());
+                        }
                     }
                 }
 
@@ -313,12 +316,12 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
         qp.setStatus(qp.getLastPublicStatus());
     }
 
-    private List<SingleResultPanel> createPanels(SaltProject p, int localMatchIndex, long globalOffset) {
-        List<SingleResultPanel> result = new LinkedList<>();
+    private List<AbstractComponent> createPanels(SaltProject p, int localMatchIndex, long globalOffset) {
+        List<AbstractComponent> resultPanels = new LinkedList<>();
 
         int i = 0;
         for (SCorpusGraph corpusGraph : p.getCorpusGraphs()) {
-            SDocument doc = corpusGraph.getDocuments().get(0);
+            SDocument doc = corpusGraph.getDocuments().isEmpty() ? null : corpusGraph.getDocuments().get(0);
             Match m = new Match();
             if (allMatches != null && localMatchIndex >= 0 && localMatchIndex < allMatches.size()) {
                 m = allMatches.get(localMatchIndex);
@@ -333,9 +336,9 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
             panel.setWidth("100%");
             panel.setHeight("-1px");
 
-            result.add(panel);
+            resultPanels.add(panel);
         }
-        return result;
+        return resultPanels;
     }
 
     private void updateVariables(SaltProject p) {
@@ -377,14 +380,14 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
                     List<SNode> orderRoots = g.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
                     // collect the start nodes of a segmentation chain of length 1
                     if (orderRoots != null) {
-	                    for (SNode n : orderRoots) {
-	                        for (SRelation<?, ?> rel : n.getOutRelations()) {
-	                            if (rel instanceof SOrderRelation) {
-	                                // the type is the name of the relation
-	                                result.add(rel.getType());
-	                            }
-	                        }
-	                    }
+                        for (SNode n : orderRoots) {
+                            for (SRelation<?, ?> rel : n.getOutRelations()) {
+                                if (rel instanceof SOrderRelation) {
+                                    // the type is the name of the relation
+                                    result.add(rel.getType());
+                                }
+                            }
+                        }
                     }
                 } // end if graph not null
             }
@@ -553,14 +556,18 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
     }
 
     private void setVisibleTokenAnnosVisible(SortedSet<String> annos) {
-        for (SingleResultPanel p : resultPanelList) {
-            p.setVisibleTokenAnnosVisible(annos);
+        for (Component p : resultPanelList) {
+            if (p instanceof SingleResultPanel) {
+                ((SingleResultPanel) p).setVisibleTokenAnnosVisible(annos);
+            }
         }
     }
 
     private void setSegmentationLayer(String segmentationLayer) {
-        for (SingleResultPanel p : resultPanelList) {
-            p.setSegmentationLayer(segmentationLayer);
+        for (Component p : resultPanelList) {
+            if (p instanceof SingleResultPanel) {
+                ((SingleResultPanel) p).setSegmentationLayer(segmentationLayer);
+            }
         }
     }
 
