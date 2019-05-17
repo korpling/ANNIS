@@ -43,9 +43,6 @@
         <dependent-module archiveName="annis-interfaces-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-interfaces/annis-interfaces">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="salt-api-3.3.7-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/salt-api/salt-api">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module archiveName="annis-visualizers-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-visualizers/annis-visualizers">
             <dependency-type>uses</dependency-type>
         </dependent-module>
