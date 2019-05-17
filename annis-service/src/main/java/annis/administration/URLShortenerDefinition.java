@@ -189,12 +189,16 @@ public class URLShortenerDefinition {
             String m2;
             while ((m1 = matchesGraphANNIS.readLine()) != null && (m2 = matchesLegacy.readLine()) != null) {
                 matchNr++;
-                
+
                 if (!m1.equals(m2)) {
-                    this.errorMsg = "Match " + matchNr +  " (should be)" + System.lineSeparator() + m2 + System.lineSeparator() + "(but was)"
-                            + System.lineSeparator() + m1;
+                    this.errorMsg = "Match " + matchNr + " (should be)" + System.lineSeparator() + m2
+                            + System.lineSeparator() + "(but was)" + System.lineSeparator() + m1;
                     return QueryStatus.MatchesDiffer;
                 }
+            }
+        } finally {
+            if (!matchesGraphANNISFile.delete()) {
+                log.warn("Could not delete temporary file {}", matchesGraphANNISFile.getAbsolutePath());
             }
         }
 
