@@ -99,7 +99,12 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>, Mess
             // output XMI root element
             writer.writeXMIRootElement(xml);
 
+            // write all documents that belong to these corpus graphs
             for (SCorpusGraph corpusGraph : project.getCorpusGraphs()) {
+                // write the corpus graph
+                writer.writeCorpusGraph(xml, corpusGraph, true);
+
+                // write the all document graphs
                 for (SDocument doc : corpusGraph.getDocuments()) {
                     // make sure that any ANNIS feature on the document is copied to the document
                     // graph
@@ -149,50 +154,23 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>, Mess
             source.setEncoding("UTF-8");
             xmlReader.parse(source);
 
-            for (SDocumentGraph g : handler.getDocGraphs()) {
+            SCorpusGraph corpusGraph = null;
 
-                // create a separate corpus graph for each document
-                SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
-
-                SCorpus parentCorpus = null;
-                SDocument doc = null;
-
-                List<SNode> nodes = g.getNodes();
-                Iterator<String> it = null;
-                if (nodes != null && !nodes.isEmpty()) {
-                    for(SNode n : nodes) {
-                        if(n instanceof SStructuredNode) {
-                            // the path of each node ID is always the document/corpus path
-                            it = n.getPath().segmentsList().iterator();
-                            break;
-                        }
-                    }
-                   
-                }
-                if(it == null) {
-                    // Old salt versions had a separate ID for the document graph
-                    // which was the document name with the suffix "_graph".
-                    // Thus this method of getting the corpus path is only the fallback.
-                    it = g.getPath().segmentsList().iterator();
-                }
-
-                while (it.hasNext()) {
-                    String name = it.next();
-                    if (it.hasNext()) {
-                        // this is a sub-corpus
-                        parentCorpus = corpusGraph.createCorpus(parentCorpus, name);
-                    } else {
-                        // no more path elements left, must be a document
-                        doc = corpusGraph.createDocument(parentCorpus, name);
-                        break;
-                    }
-                }
-                if (doc != null) {
+            for (Object rootObject : handler.getRootObjects()) {
+                if (rootObject instanceof SCorpusGraph) {
+                    corpusGraph = (SCorpusGraph) rootObject;
                     result.addCorpusGraph(corpusGraph);
-                    doc.setDocumentGraph(g);
+                } else if (corpusGraph != null && rootObject instanceof SDocumentGraph) {
+                    
+                    SDocumentGraph g = (SDocumentGraph) rootObject;
+                    
+                    SNode docRaw = corpusGraph.getNode(g.getPath().toString());
+                    if(docRaw instanceof SDocument) {
+                        SDocument doc = (SDocument) docRaw;
+                        doc.setDocumentGraph(g);
+                    }
                 }
             }
-
         } catch (ParserConfigurationException | SAXException ex) {
             log.error("Error when parsing XMI", ex);
         }
