@@ -15,11 +15,13 @@
  */
 package annis.gui.resultview;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,7 @@ import java.util.concurrent.BlockingQueue;
 
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -321,15 +324,33 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
         int i = 0;
         for (SCorpusGraph corpusGraph : p.getCorpusGraphs()) {
-            SDocument doc = corpusGraph.getDocuments().isEmpty() ? null : corpusGraph.getDocuments().get(0);
             Match m = new Match();
             if (allMatches != null && localMatchIndex >= 0 && localMatchIndex < allMatches.size()) {
                 m = allMatches.get(localMatchIndex);
             }
 
-            SingleResultPanel panel = new SingleResultPanel(doc, m, i + globalOffset,
-                    new ResolverProviderImpl(cacheResolver), ps, sui, getVisibleTokenAnnos(), segmentationName,
-                    controller, instanceConfig, initialQuery);
+            AbstractComponent panel;
+            if (corpusGraph.getDocuments().isEmpty()) {
+
+                Set<SCorpus> matchedCorpora = new LinkedHashSet<>();
+                for(URI id : m.getSaltIDs()) {
+                    SNode n = corpusGraph.getNode(id.toASCIIString());
+                    if(n instanceof SCorpus) {
+                        matchedCorpora.add((SCorpus) n);
+                    }
+                }
+
+                panel = new SingleCorpusResultPanel(matchedCorpora, m,
+                        i + globalOffset, ps, sui, initialQuery);
+
+            } else {
+                SDocument doc = corpusGraph.getDocuments().get(0);
+
+                panel = new SingleResultPanel(doc, m, i + globalOffset,
+                        new ResolverProviderImpl(cacheResolver), ps, sui, getVisibleTokenAnnos(), segmentationName,
+                        controller, instanceConfig, initialQuery);
+
+            }
 
             i++;
 

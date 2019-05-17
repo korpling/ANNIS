@@ -145,7 +145,7 @@ public class VisualizerPanel extends CssLayout
     Map<SNode, Long> markedAndCovered,
     String htmlID,
     String resultID,
-    SingleResultPanel parent,
+    VisualizerContextChanger parent,
     String segmentationName,
     PluginSystem ps,
     InstanceConfig instanceConfig) throws IOException
