@@ -80,6 +80,7 @@ import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.corpus_tools.salt.util.internal.persistence.SaltXML10Writer;
 import org.eclipse.emf.common.util.URI;
@@ -151,18 +152,48 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         SaltProject p = SaltFactory.createSaltProject();
 
         SCorpusGraph corpusGraph = p.createCorpusGraph();
-        SCorpus rootCorpus = corpusGraph.createCorpus(null, "root");
 
         if (matchGroup != null && annoExt != null) {
 
-            int i = 0;
-
             for (Match m : matchGroup.getMatches()) {
-                SDocumentGraph docGraph = fetchDocumentWithContext(m, annoExt);
-                SDocument doc = corpusGraph.createDocument(rootCorpus, "match" + i++);
-                doc.setDocumentGraph(docGraph);
 
-                CommonHelper.addMatchToDocumentGraph(m, doc);
+                List<URI> certainDocumentIDs = new LinkedList<>();
+                List<URI> possibleCorpusIDs = new LinkedList<>();
+
+                for (java.net.URI rawID : m.getSaltIDs()) {
+                    URI id = URI.createURI(rawID.toASCIIString());
+                    if (id.fragment() == null) {
+                        possibleCorpusIDs.add(id);
+                    } else {
+                        certainDocumentIDs.add(id.trimFragment());
+                    }
+                }
+                
+                for (URI id : certainDocumentIDs) {
+                    if(corpusGraph.getNode(id.toString()) == null) {
+                        corpusGraph.createDocument(id);
+                    }
+                }
+                for (URI id : possibleCorpusIDs) {
+                    if(corpusGraph.getNode(id.toString()) == null) {
+                        corpusGraph.createCorpus(id);
+                    }
+                }
+
+                // If this match refers only to documents and (sub-) corpus matches, only create
+                // a corpus graph.
+                if (!certainDocumentIDs.isEmpty()) {
+
+                    // Fetch the document graph for the match and add it to the already created
+                    // document node
+                    SNode docRaw = corpusGraph.getNode(certainDocumentIDs.get(0).toString());
+                    if(docRaw instanceof SDocument) {
+                        SDocument doc = (SDocument) docRaw;
+                        SDocumentGraph docGraph = fetchDocumentWithContext(m, annoExt);
+                        doc.setDocumentGraph(docGraph);
+                        CommonHelper.addMatchToDocumentGraph(m, doc);
+                    }
+                }
             }
         }
 
@@ -541,7 +572,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     @Override
     public List<Match> find(String query, QueryLanguage queryLanguage, List<String> corpusList,
             LimitOffsetQueryData limitOffset) throws GraphANNISException {
-    
+
         Collections.sort(corpusList);
         List<String> corpora = escapedCorpusNames(corpusList);
 
@@ -901,13 +932,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         URI docURI = SaltUtil.createSaltURI(toplevelCorpusName).appendSegment(documentName);
 
         Graph rawGraph;
-        
+
         boolean fallbackToAll = false;
-        if(nodeAnnotationFilter == null || nodeAnnotationFilter.isEmpty()) {
+        if (nodeAnnotationFilter == null || nodeAnnotationFilter.isEmpty()) {
             fallbackToAll = true;
         } else {
-            for(String nodeAnno : nodeAnnotationFilter) {
-                if(!validQNamePattern.matcher(nodeAnno).matches() ) {
+            for (String nodeAnno : nodeAnnotationFilter) {
+                if (!validQNamePattern.matcher(nodeAnno).matches()) {
                     // If we can't produce a valid query for this annotation name fallback
                     // to retrieve all annotations.
                     fallbackToAll = true;
@@ -915,12 +946,12 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 }
             }
         }
-        
+
         if (fallbackToAll) {
             rawGraph = corpusStorageMgr.subcorpusGraph(toplevelCorpusName, Arrays.asList(docURI.toString()));
         } else {
             StringBuilder aql = new StringBuilder("(a#tok");
-            for(String nodeAnno : nodeAnnotationFilter) {
+            for (String nodeAnno : nodeAnnotationFilter) {
                 aql.append(" | a#");
                 aql.append(nodeAnno);
             }
@@ -929,7 +960,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             aql.append("/");
             aql.append(documentName);
             aql.append("\" & #a @* #d");
-            
+
             rawGraph = corpusStorageMgr.subGraphForQuery(toplevelCorpusName, aql.toString(),
                     org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage.AQL);
         }
