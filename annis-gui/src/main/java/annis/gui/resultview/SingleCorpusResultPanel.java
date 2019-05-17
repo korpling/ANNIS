@@ -71,8 +71,6 @@ public class SingleCorpusResultPanel extends CssLayout {
 
     private List<ResolverEntry> resolverEntries;
 
-    private final Button btLink;
-
     private final HorizontalLayout infoBar;
 
     private final long resultNumber;
@@ -107,20 +105,6 @@ public class SingleCorpusResultPanel extends CssLayout {
         Label lblNumber = new Label("" + (resultNumber + 1));
         infoBar.addComponent(lblNumber);
         lblNumber.setSizeUndefined();
-
-        btLink = new Button();
-        btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
-        btLink.setIcon(FontAwesome.SHARE_ALT);
-        btLink.setDescription("Share match reference");
-        btLink.setDisableOnClick(true);
-        btLink.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                showShareSingleMatchGenerator();
-            }
-        });
-        infoBar.addComponent(btLink);
 
         VerticalLayout corpusPaths = new VerticalLayout();
         infoBar.addComponent(corpusPaths);
@@ -192,39 +176,12 @@ public class SingleCorpusResultPanel extends CssLayout {
         addComponent(lblEmpty);
     }
 
-    private void showShareSingleMatchGenerator() {
-        // select the current match
-        if (ui != null) {
-            ui.getQueryState().getSelectedMatches().getValue().clear();
-            ui.getQueryState().getSelectedMatches().getValue().add(resultNumber);
-            ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
-        }
 
-        Window window = new ShareSingleMatchGenerator(resolverEntries, match, query, null, ps);
-        window.setWidth(790, Unit.PIXELS);
-        window.setHeight(580, Unit.PIXELS);
-        window.setResizable(true);
-        window.setModal(true);
-
-        window.addCloseListener(new Window.CloseListener() {
-
-            @Override
-            public void windowClose(Window.CloseEvent e) {
-                btLink.setEnabled(true);
-            }
-        });
-        window.setCaption("Match reference link");
-
-        UI.getCurrent().addWindow(window);
-    }
 
     @Override
     public void attach() {
         super.attach();
-        if (Helper.isKickstarter(getSession())) {
-            btLink.setVisible(false);
-        }
-        IDGenerator.assignIDForFields(SingleCorpusResultPanel.this, infoBar, btLink);
+        IDGenerator.assignIDForFields(SingleCorpusResultPanel.this, infoBar);
     }
 
 }
