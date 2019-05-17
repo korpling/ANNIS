@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SCorpus;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.Button;
@@ -35,6 +36,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -96,30 +98,45 @@ public class SingleCorpusResultPanel extends CssLayout {
 
         infoBar = new HorizontalLayout();
         infoBar.addStyleName("info-bar");
+        infoBar.addStyleName("no-document-info-bar");
         infoBar.setWidth("100%");
         infoBar.setHeight("-1px");
+        
 
         Label lblNumber = new Label("" + (resultNumber + 1));
         infoBar.addComponent(lblNumber);
         lblNumber.setSizeUndefined();
+        
+        btLink = new Button();
+        btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+        btLink.setIcon(FontAwesome.SHARE_ALT);
+        btLink.setDescription("Share match reference");
+        btLink.setDisableOnClick(true);
+        btLink.addClickListener(new Button.ClickListener() {
+
+            @Override
+            public void buttonClick(ClickEvent event) {
+                showShareSingleMatchGenerator();
+            }
+        });
+        infoBar.addComponent(btLink);
+        
+        VerticalLayout corpusPaths = new VerticalLayout();
+        infoBar.addComponent(corpusPaths);
+        infoBar.setExpandRatio(corpusPaths, 1.0f);
+
 
         for (SCorpus c : this.result) {
             
             try {
                 List<String> path = CommonHelper.getCorpusPath(new URI(c.getPath().toString()));
-                Collections.reverse(path);
-
+                
+                HorizontalLayout corpusInfoLayout = new HorizontalLayout();
+                corpusPaths.addComponent(corpusInfoLayout);
+                
                 // build label
                 StringBuilder sb = new StringBuilder("Path: ");
                 sb.append(StringUtils.join(path, " > "));
-
-                Label lblPath = new Label(sb.toString());
-                lblPath.addStyleName("path-label");
-
-                lblPath.setWidth("100%");
-                lblPath.setHeight("-1px");
-                infoBar.addComponent(lblPath);
-                infoBar.setExpandRatio(lblPath, 1.0f);
 
                 Button btInfo;
                 btInfo = new Button();
@@ -144,26 +161,20 @@ public class SingleCorpusResultPanel extends CssLayout {
 
                     }
                 });
-                infoBar.addComponent(btInfo);
+                corpusInfoLayout.addComponent(btInfo);
+                
+
+                Label lblPath = new Label(sb.toString());
+                lblPath.addStyleName("path-label");
+                
+                lblPath.setWidth("100%");
+                lblPath.setHeight("-1px");
+                corpusInfoLayout.addComponent(lblPath);                
             } catch (URISyntaxException ex) {
                 log.error("Could not get path for (sub-) corpus", ex);
             }
            
         }
-
-        btLink = new Button();
-        btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
-        btLink.setIcon(FontAwesome.SHARE_ALT);
-        btLink.setDescription("Share match reference");
-        btLink.setDisableOnClick(true);
-        btLink.addClickListener(new Button.ClickListener() {
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                showShareSingleMatchGenerator();
-            }
-        });
-        infoBar.addComponent(btLink);
 
         infoBar.setSpacing(false);
 

@@ -243,12 +243,20 @@ $font-size: 10pt;
     border-width: 1px 0px 0px 0px;
   }
   
+ .no-document-info-bar {
+	.path-label {
+		text-decoration: underline;
+	}
+
+}
+  
   .selected-match .info-bar {
       background-color: rgb(129, 184, 255);
       .path-label {
         font-weight: bold;
       }
    }
+   
 
   $huge-menubar-height: 40px;
 

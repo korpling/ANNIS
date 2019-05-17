@@ -161,15 +161,8 @@ public class SingleResultPanel extends CssLayout implements
 
     Label lblNumber = new Label("" + (resultNumber + 1));
     infoBar.addComponent(lblNumber);
-    lblNumber.setSizeUndefined();
+    lblNumber.setSizeUndefined();    
 
-    btInfo = new Button();
-    btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
-    btInfo.setIcon(ICON_RESOURCE);
-    btInfo.setDescription("Show metadata");
-    btInfo.addClickListener((Button.ClickListener) this);
-    infoBar.addComponent(btInfo);
-    
     btLink = new Button();
     btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
     btLink.setIcon(FontAwesome.SHARE_ALT);
@@ -185,6 +178,14 @@ public class SingleResultPanel extends CssLayout implements
       }
     });
     infoBar.addComponent(btLink);
+
+    btInfo = new Button();
+    btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+    btInfo.setIcon(ICON_RESOURCE);
+    btInfo.setDescription("Show metadata");
+    btInfo.addClickListener((Button.ClickListener) this);
+    infoBar.addComponent(btInfo);
+    
 
     /**
      * Extract the top level corpus name and the document name of this single
