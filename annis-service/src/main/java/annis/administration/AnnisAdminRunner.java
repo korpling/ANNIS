@@ -101,37 +101,38 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
         // print help if no argument is given
         if (args.length == 0) {
-            throw new UsageException("missing command");
-        }
-
-        // first parameter is command
-        String command = args[0];
-
-        // following parameters are arguments for the command
-        List<String> commandArgs = Arrays.asList(args).subList(1, args.length);
-
-        if ("help".equals(command) || "--help".equals(command)) {
             usage(null);
-        } else if ("import".equals(command)) {
-            doImport(commandArgs);
-        } else if ("migrate-url-shortener".equals(command)) {
-            doMigrateUrlShortener(commandArgs);
-        } else if ("export".equals(command)) {
-            doExport(commandArgs);
-        } else if ("delete".equals(command)) {
-            doDelete(commandArgs);
-        } else if ("list".equals(command)) {
-            doList();
-        } else if ("genexamples".equals(command)) {
-            doGenerateExampleQueries(commandArgs);
-        } else if ("delexamples".equals(command)) {
-            doDeleteExampleQueries(commandArgs);
-        } else if ("cleanup-data".equals(command)) {
-            doCleanupData(commandArgs);
-        } else if ("check-db-schema-version".equals(command)) {
-            doCheckDBSchemaVersion();
         } else {
-            throw new UsageException("Unknown command: " + command);
+    
+            // first parameter is command
+            String command = args[0];
+    
+            // following parameters are arguments for the command
+            List<String> commandArgs = Arrays.asList(args).subList(1, args.length);
+    
+            if ("help".equals(command) || "--help".equals(command)) {
+                usage(null);
+            } else if ("import".equals(command)) {
+                doImport(commandArgs);
+            } else if ("migrate-url-shortener".equals(command)) {
+                doMigrateUrlShortener(commandArgs);
+            } else if ("export".equals(command)) {
+                doExport(commandArgs);
+            } else if ("delete".equals(command)) {
+                doDelete(commandArgs);
+            } else if ("list".equals(command)) {
+                doList();
+            } else if ("genexamples".equals(command)) {
+                doGenerateExampleQueries(commandArgs);
+            } else if ("delexamples".equals(command)) {
+                doDeleteExampleQueries(commandArgs);
+            } else if ("cleanup-data".equals(command)) {
+                doCleanupData(commandArgs);
+            } else if ("check-db-schema-version".equals(command)) {
+                doCheckDBSchemaVersion();
+            } else {
+                throw new UsageException("Unknown command: " + command);
+            }
         }
 
         getQueryDao().shutdown();

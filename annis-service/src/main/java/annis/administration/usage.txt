@@ -1,43 +1,25 @@
 ANNIS Administration Utility
 ----------------------------
 
-usage:
-  annis-admin.sh import OPTIONS PATH [PATH ...]
-  annis-admin.sh delete CORPUS_ID [CORPUS_ID ...]
-  annis-admin.sh list
-  annis-admin.sh delexamples [CORPUS_NAME ...]
-  annis-admin.sh genexamples [CORPUS_NAME ...]
+Usage: 
+annis-admin.sh <command> [...]
 
+To get more information about each sub-command,
+and its arguments, execute
 
-* import:  Import a list of corpora.
-    Specify the path to one or more corpora as arguments.
+annis-admin.sh <command> --help
 
-  Option:
-    -o, --overwrite overwrites all corpora which have conflicting top
-                    level corpus names.
+Most of these commands can't be run at the same
+time as the ANNIS service.
 
-* export: Export a corpus as SaltXML
-  Specificy the corpus name and the output directory as arguments.
-  Non-Terminal subcorpora and linked (media) files are not supported yet.
-
-
-* delete:   Delete a list of corpora.
-    Specify the IDs or the names of one or more corpora as arguments.
+Overview of commands
+---------------------
 
 * list:    List all top-level corpora.
-
+* import:  Import a list of corpora.
+* delete:   Delete a list of corpora.
+* migrate-url-shortener:  Migrate reference links
 * genexamples:  Generate example queries for corpora.
-    Specify to one or more corpus names as arguments.
-
-  Options:
-    -o, --overwrite overwrites old example queries, if they exist.
-
-  NOTE: if no corpus is specified, it will generate example queries
-  for all corpora
-
 * delexamples: Delete example queries.
-    Specify a corpus name as an argument, otherwise all example queries
-    will be deleted.
-
 * cleanup-data: Delete files not used by this instance in the data directory.
 
