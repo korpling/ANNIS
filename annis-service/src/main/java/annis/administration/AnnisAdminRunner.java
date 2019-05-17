@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 import annis.AnnisBaseRunner;
@@ -231,10 +232,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                         + "corpora from an older instance. "
                         + "Make sure that the ANNIS Service and this script run on the same machine (otherwise the paths are not valid.")
                 .addLongParameter("service-username", "Optional username when using the ANNIS service")
-                .addLongParameter("service-password", "Optional password when using the ANNIS service")
-                .addToggle("p", "allow-partial", false,
-                        "Allow migrating a subset for successful queries. Normally queries are only migrated if all of them are valid.")
-                .createOptions();
+                .addLongParameter("service-password", "Optional password when using the ANNIS service").createOptions();
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -254,13 +252,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 Arrays.fill(providedPassword, ' ');
             }
 
-            Multimap<QueryStatus, URLShortenerDefinition> status = corpusAdministration.migrateUrlShortener(
-                    urlShortenerFiles, cmdLine.getOptionValue("service-url"), userName, password,
-                    cmdLine.hasOption("allow-partial"));
+            Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
+
+            int totalNumberOfQueriess = corpusAdministration.migrateUrlShortener(urlShortenerFiles,
+                    cmdLine.getOptionValue("service-url"), userName, password, failedQueries);
             password = null;
 
             // output summary and detailed list of failed queries
-            Collection<URLShortenerDefinition> unknownCorpusQueries = status.get(QueryStatus.UnknownCorpus);
+            Collection<URLShortenerDefinition> unknownCorpusQueries = failedQueries.get(QueryStatus.UnknownCorpus);
 
             System.out.println();
 
@@ -283,13 +282,13 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 System.out.println();
             }
 
-            printProblematicQueries("UUID already exists", status.get(QueryStatus.UUIDExists));
-            printProblematicQueries("Count different", status.get(QueryStatus.CountDiffers));
-            printProblematicQueries("Match list different", status.get(QueryStatus.MatchesDiffer));
-            printProblematicQueries("Failed", status.get(QueryStatus.Failed));
+            printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUIDExists));
+            printProblematicQueries("Count different", failedQueries.get(QueryStatus.CountDiffers));
+            printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer));
+            printProblematicQueries("Failed", failedQueries.get(QueryStatus.Failed));
 
-            String summaryString = "+ Successful: " + status.get(QueryStatus.Ok).size() + " from " + status.size()
-                    + " +";
+            String summaryString = "+ Successful: " + (totalNumberOfQueriess - failedQueries.size()) + " from "
+                    + totalNumberOfQueriess + " +";
             System.out.println(Strings.repeat("+", summaryString.length()));
             System.out.println(summaryString);
             System.out.println(Strings.repeat("+", summaryString.length()));

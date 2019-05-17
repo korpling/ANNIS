@@ -214,11 +214,13 @@ public class CorpusAdministration {
         return importStats;
     }
 
-    public Multimap<QueryStatus, URLShortenerDefinition> migrateUrlShortener(List<String> paths, String serviceURL,
-            String username, String password, boolean allowPartialMigration) {
+    public int migrateUrlShortener(List<String> paths, String serviceURL,
+            String username, String password, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
         if (paths == null || serviceURL == null) {
-            return HashMultimap.create();
+            return 0;
         }
+        
+        int totalNumberOfQueries = 0;
 
         Client client = ClientBuilder.newClient();
         if (username != null && password != null) {
@@ -233,8 +235,7 @@ public class CorpusAdministration {
 
         WebTarget searchService = client.target(serviceURL).path("annis").path("query").path("search");
 
-        Multimap<QueryStatus, URLShortenerDefinition> queryByStatus = HashMultimap.create();
-
+        
         for (String p : paths) {
             File urlShortenerFile = new File(p);
             if (urlShortenerFile.isFile()) {
@@ -242,6 +243,8 @@ public class CorpusAdministration {
                     String[] line;
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
+                            totalNumberOfQueries++;
+                            
                             // parse URL
                             try {
                                 URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
@@ -251,11 +254,11 @@ public class CorpusAdministration {
                                     List<AnnisCorpus> corpora = getAdministrationDao().getQueryDao()
                                             .listCorpora(corpusNames);
                                     if (corpora.size() != corpusNames.size()) {
-                                        queryByStatus.put(QueryStatus.UnknownCorpus, q);
+                                        failedQueries.put(QueryStatus.UnknownCorpus, q);
                                     } else if (corpusNames.isEmpty()) {
-                                        queryByStatus.put(QueryStatus.Failed, q);
+                                        failedQueries.put(QueryStatus.Failed, q);
                                     } else if (getShortenerDao().unshorten(q.getUuid()) != null) {
-                                        queryByStatus.put(QueryStatus.UUIDExists, q);
+                                        failedQueries.put(QueryStatus.UUIDExists, q);
                                     } else {
                                         // check the query
                                         try {
@@ -264,7 +267,33 @@ public class CorpusAdministration {
                                             QueryStatus status = q.test(getAdministrationDao().getQueryDao(),
                                                     searchService);
 
-                                            queryByStatus.put(status, q);
+                                            // insert URLs into new database
+                                            String temporary = null;
+
+                                            if (status != QueryStatus.Ok) {
+                                                failedQueries.put(status, q);
+                                                // Link the UUID to an error page temporarily, until the issue is
+                                                // fixed.
+                                                // Remember the original URL, so the temporary URL can just be set
+                                                // to null to
+                                                // resolve
+                                                // to the original URL when the issue is fixed in ANNIS.
+                                                try {
+                                                    URI tempURI = new URIBuilder().setPath("/unsupported-query")
+                                                            .addParameter("url", q.getUri().toASCIIString())
+                                                            .build();
+                                                    temporary = tempURI.toASCIIString();
+                                                } catch (URISyntaxException e) {
+                                                    log.error("Could not create proper URI for unsupported query",
+                                                            e);
+                                                }
+                                            }
+                                            getShortenerDao().migrate(q.getUri().toASCIIString(), temporary,
+                                                    "anonymous", q.getUuid(),
+                                                    q.getCreationTime() == null ? new Date()
+                                                            : q.getCreationTime().toDate());
+
+                                        
 
                                             if (status != QueryStatus.Ok) {
 
@@ -283,20 +312,19 @@ public class CorpusAdministration {
                                             }
 
                                         } catch (GraphANNISException ex) {
-                                            queryByStatus.put(QueryStatus.Failed, q);
+                                            failedQueries.put(QueryStatus.Failed, q);
                                         } catch (Throwable ex) {
                                             String lineSeparator = System.getProperty("line.separator");
                                             StringBuilder sb = new StringBuilder();
                                             sb.append("Query Error: " + QueryStatus.Failed + lineSeparator);
-                                            sb.append("Corpus: \"" + q.getQuery().getCorpora() + "\""
-                                                    + lineSeparator);
+                                            sb.append("Corpus: \"" + q.getQuery().getCorpora() + "\"" + lineSeparator);
                                             sb.append("UUID: \"" + q.getUuid() + "\"" + lineSeparator);
                                             sb.append("Query:" + lineSeparator);
                                             sb.append(q.getQuery().getQuery().trim() + lineSeparator);
                                             sb.append("Error Message: " + ex.getMessage());
 
                                             log.warn(sb.toString(), ex);
-                                            queryByStatus.put(QueryStatus.Failed, q);
+                                            failedQueries.put(QueryStatus.Failed, q);
                                         }
                                     }
                                 }
@@ -309,7 +337,7 @@ public class CorpusAdministration {
                                 sb.append("UUID: \"" + line[0] + "\"" + lineSeparator);
                                 sb.append("Error Message: " + ex.getMessage());
 
-                                queryByStatus.put(QueryStatus.Failed,
+                                failedQueries.put(QueryStatus.Failed,
                                         new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]),
                                                 URLShortenerDefinition.parseCreationTime(line[2])));
 
@@ -326,35 +354,7 @@ public class CorpusAdministration {
             }
         }
 
-        // insert URLs into new database
-        Collection<URLShortenerDefinition> okEntries = queryByStatus.get(QueryStatus.Ok);
-        if (allowPartialMigration || okEntries.size() == queryByStatus.size()) {
-            for (Map.Entry<QueryStatus, URLShortenerDefinition> entry : queryByStatus.entries()) {
-                URLShortenerDefinition q = entry.getValue();
-                if (q.getUri() != null && q.getUuid() != null) {
-                    String temporary = null;
-
-                    if (entry.getKey() != QueryStatus.Ok) {
-                        // Link the UUID to an error page temporarily, until the issue is fixed.
-                        // Remember the original URL, so the temporary URL can just be set to null to
-                        // resolve
-                        // to the original URL when the issue is fixed in ANNIS.
-                        try {
-                            URI tempURI = new URIBuilder().setPath("/unsupported-query")
-                                    .addParameter("url", q.getUri().toASCIIString()).build();
-                            temporary = tempURI.toASCIIString();
-                        } catch (URISyntaxException e) {
-                            log.error("Could not create proper URI for unsupported query", e);
-                        }
-                    }
-                    getShortenerDao().migrate(q.getUri().toASCIIString(), temporary, "anonymous", q.getUuid(),
-                            q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
-
-                }
-            }
-        }
-
-        return queryByStatus;
+        return totalNumberOfQueries;
     }
 
     /**
