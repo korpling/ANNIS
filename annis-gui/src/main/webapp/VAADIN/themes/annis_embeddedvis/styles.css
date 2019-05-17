@@ -14291,6 +14291,10 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis_embeddedvis .no-document-info-bar .path-label {
+	text-decoration: underline;
+}
+
 .annis_embeddedvis .v-menubar-popup .v-menubar-menuitem-huge, .annis_embeddedvis .v-menubar-popup .v-menubar-menuitem-huge-selected {
 	line-height: 40px;
 }

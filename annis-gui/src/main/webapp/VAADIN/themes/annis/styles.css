@@ -13207,6 +13207,10 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis .no-document-info-bar .path-label {
+	text-decoration: underline;
+}
+
 .annis .v-menubar-popup .v-menubar-menuitem-huge, .annis .v-menubar-popup .v-menubar-menuitem-huge-selected {
 	line-height: 40px;
 }

@@ -256,7 +256,10 @@ $font-size: 10pt;
         font-weight: bold;
       }
    }
-   
+ 
+  .no-document-info-bar .path-label {
+  	text-decoration: underline;
+  }  
 
   $huge-menubar-height: 40px;
 

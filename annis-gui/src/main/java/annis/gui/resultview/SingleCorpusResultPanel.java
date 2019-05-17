@@ -18,7 +18,6 @@ package annis.gui.resultview;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SCorpus;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -44,8 +42,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.MetaDataPanel;
-import annis.gui.ShareSingleMatchGenerator;
-import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.PluginSystem;
@@ -151,7 +147,7 @@ public class SingleCorpusResultPanel extends CssLayout {
 
                 Label lblPath = new Label(sb.toString());
                 lblPath.addStyleName("path-label");
-                lblPath.addStyleName(MatchedNodeColors.colorClassByMatch(matchIdx));
+                //lblPath.addStyleName(MatchedNodeColors.colorClassByMatch(matchIdx));
 
                 lblPath.setWidth("100%");
                 lblPath.setHeight("-1px");
