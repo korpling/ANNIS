@@ -19,11 +19,16 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.QueryRunner;
 import org.sqlite.SQLiteConfig;
 import org.sqlite.SQLiteDataSource;
 
+import annis.ServiceConfig;
+
 public class DBProvider {
+    
+    private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
     
     public enum DB {
         CORPUS_REGISTRY("corpus_registry.sqlite3"),
@@ -63,9 +68,12 @@ public class DBProvider {
     }
 
     public File getANNISDir() {
-        // TODO: make the annis folder location configurable
-        // (like the external data dir)
-        return new File(System.getProperty("user.home"), ".annis");
+        String path = cfg.dataPath();
+        if(path == null || path.isEmpty()) {
+            return new File(System.getProperty("user.home"), ".annis");
+        } else {
+            return new File(path);
+        }
     }
 
     public File getGraphANNISDir() {

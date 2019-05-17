@@ -16,8 +16,8 @@ public interface ServiceConfig extends Config {
     @DefaultValue("60000")
     int timeout();
     
-    @Key("annis.external-data-path")
-    String externalDataPath();
+    @Key("annis.data-path")
+    String dataPath();
     
     @Key("annis.mail-sender")
     String mailSender();
