@@ -1262,17 +1262,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         return new LinkedList<>();
     }
 
-    public File getRealDataDir() {
-        File dataDir;
-        if (cfg.externalDataPath() == null || cfg.externalDataPath().isEmpty()) {
-            // use the default directory
-            dataDir = new File(System.getProperty("user.home"), ".annis/data/");
-        } else {
-            dataDir = new File(cfg.externalDataPath());
-        }
-        return dataDir;
-    }
-
     @Override
     public Properties getCorpusConfigurationSave(String corpus) {
         try {

@@ -138,5 +138,5 @@ annis-admin.sh cleanup-data
 ~~~
 \warning This will delete all data files not known to the current instance of ANNIS.
 If you have multiple parallel installations and did not use different values for
-the `annis.external-data-path` variable in the `conf/annis-service.properties`
+the `annis.data-path` variable in the `conf/annis-service.properties`
 the data files of the other installations will be lost.

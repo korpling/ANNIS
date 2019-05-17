@@ -53,8 +53,6 @@ public class DBProvider {
 
     public Connection createConnection(DB db, boolean readonly) throws SQLException {
         // TODO: use a connection pool
-        // TODO: split into two databases, one "corpus_registry" and a
-        // "service_data" file
         File dbFile = getDBFile(db);
         return createConnection(dbFile, readonly);
     }
@@ -78,6 +76,11 @@ public class DBProvider {
 
     public File getGraphANNISDir() {
         return new File(getANNISDir(), "v4");
+    }
+    
+
+    public File getRealDataDir() {
+        return new File(getANNISDir(), "data");
     }
 
     public QueryRunner getQueryRunner() {

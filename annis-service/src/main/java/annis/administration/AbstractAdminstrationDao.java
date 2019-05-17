@@ -38,28 +38,9 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
 
   private final static Logger log = LoggerFactory.getLogger(
     AbstractAdminstrationDao.class);
-
-  private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
-  private String externalFilesPath;
   
   private QueryDao queryDao;
 
-
-  protected File getRealDataDir()
-  {
-    File dataDir;
-    if (cfg.externalDataPath() == null || cfg.externalDataPath().isEmpty())
-    {
-      // use the default directory
-      dataDir = new File(System.getProperty("user.home"), ".annis/data/");
-    }
-    else
-    {
-      dataDir = new File(cfg.externalDataPath());
-    }
-    return dataDir;
-  }
-  
   /**
    * Checks, if there already exists a top level corpus.
    *
