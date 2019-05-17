@@ -168,7 +168,7 @@ public class SingleCorpusResultPanel extends CssLayout {
 
         Label lblEmpty = new Label(
                 "Result matches only (sub-) corpora and their metadata. "
-                + "You might want extend your query  to include a token search. <br/> "
+                + "You might want to extend your query to include a token search. <br/> "
                 + "An example would be: <br/> <code>tok @* my_meta_attribute=\"somevalue\"</code>");
         lblEmpty.setContentMode(ContentMode.HTML);
         lblEmpty.addStyleName("empty_token_hint");
