@@ -43,7 +43,7 @@ public class DBProvider {
     }
 
     public File getDBFile(DB db) {
-        return new File(getANNISDir(), db.filename);
+        return new File(getGraphANNISDir(), db.filename);
     }
 
     public Connection createConnection(DB db, boolean readonly) throws SQLException {
@@ -69,7 +69,7 @@ public class DBProvider {
     }
 
     public File getGraphANNISDir() {
-        return new File(getANNISDir(), "graphannis");
+        return new File(getANNISDir(), "v4");
     }
 
     public QueryRunner getQueryRunner() {
