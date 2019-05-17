@@ -47,6 +47,7 @@ import annis.gui.MetaDataPanel;
 import annis.gui.ShareSingleMatchGenerator;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
+import annis.libgui.MatchedNodeColors;
 import annis.libgui.PluginSystem;
 import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
@@ -125,8 +126,10 @@ public class SingleCorpusResultPanel extends CssLayout {
         infoBar.addComponent(corpusPaths);
         infoBar.setExpandRatio(corpusPaths, 1.0f);
 
+        long matchIdx = 0;
         for (SCorpus c : this.result) {
-
+            matchIdx++;
+            
             try {
                 List<String> path = CommonHelper.getCorpusPath(new URI(c.getPath().toString()));
 
@@ -164,6 +167,7 @@ public class SingleCorpusResultPanel extends CssLayout {
 
                 Label lblPath = new Label(sb.toString());
                 lblPath.addStyleName("path-label");
+                lblPath.addStyleName(MatchedNodeColors.colorClassByMatch(matchIdx));
 
                 lblPath.setWidth("100%");
                 lblPath.setHeight("-1px");
@@ -179,9 +183,9 @@ public class SingleCorpusResultPanel extends CssLayout {
         addComponent(infoBar);
 
         Label lblEmpty = new Label(
-                "Result matches only (sub-) corpora and their meta-data. "
-                + "You might want extend your query  to include a general token search. <br/> "
-                + "E.g. if you could search for <br/> <code>tok @* my_meta_attribute=\"somevalue\"</code>");
+                "Result matches only (sub-) corpora and their metadata. "
+                + "You might want extend your query  to include a token search. <br/> "
+                + "An example would be: <br/> <code>tok @* my_meta_attribute=\"somevalue\"</code>");
         lblEmpty.setContentMode(ContentMode.HTML);
         lblEmpty.addStyleName("empty_token_hint");
 

@@ -12858,6 +12858,11 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis .no-document-info-bar .match_1 {
+	color: red;
+	text-decoration: underline;
+}
+
 .annis .v-table-cell-content-match_2 {
 	color: #c71585;
 }
@@ -12869,6 +12874,11 @@ div.v-layout.v-horizontal.v-widget {
 .annis .aql-code-editor .cm-node_2 {
 	color: #c71585;
 	font-weight: bold;
+}
+
+.annis .no-document-info-bar .match_2 {
+	color: #c71585;
+	text-decoration: underline;
 }
 
 .annis .v-table-cell-content-match_3 {
@@ -12884,6 +12894,11 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis .no-document-info-bar .match_3 {
+	color: #32cd32;
+	text-decoration: underline;
+}
+
 .annis .v-table-cell-content-match_4 {
 	color: #cd853f;
 }
@@ -12895,6 +12910,11 @@ div.v-layout.v-horizontal.v-widget {
 .annis .aql-code-editor .cm-node_4 {
 	color: #cd853f;
 	font-weight: bold;
+}
+
+.annis .no-document-info-bar .match_4 {
+	color: #cd853f;
+	text-decoration: underline;
 }
 
 .annis .v-table-cell-content-match_5 {
@@ -12910,6 +12930,11 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis .no-document-info-bar .match_5 {
+	color: #87ceeb;
+	text-decoration: underline;
+}
+
 .annis .v-table-cell-content-match_6 {
 	color: #cd5c5c;
 }
@@ -12921,6 +12946,11 @@ div.v-layout.v-horizontal.v-widget {
 .annis .aql-code-editor .cm-node_6 {
 	color: #cd5c5c;
 	font-weight: bold;
+}
+
+.annis .no-document-info-bar .match_6 {
+	color: #cd5c5c;
+	text-decoration: underline;
 }
 
 .annis .v-table-cell-content-match_7 {
@@ -12936,6 +12966,11 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis .no-document-info-bar .match_7 {
+	color: #adff2f;
+	text-decoration: underline;
+}
+
 .annis .v-table-cell-content-match_8 {
 	color: #8b0000;
 }
@@ -12947,6 +12982,11 @@ div.v-layout.v-horizontal.v-widget {
 .annis .aql-code-editor .cm-node_8 {
 	color: #8b0000;
 	font-weight: bold;
+}
+
+.annis .no-document-info-bar .match_8 {
+	color: #8b0000;
+	text-decoration: underline;
 }
 
 .annis .v-table-cell-content-match_9 {
@@ -12962,6 +13002,11 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis .no-document-info-bar .match_9 {
+	color: #ff4500;
+	text-decoration: underline;
+}
+
 .annis .v-table-cell-content-match_10 {
 	color: #ffd700;
 }
@@ -12973,6 +13018,11 @@ div.v-layout.v-horizontal.v-widget {
 .annis .aql-code-editor .cm-node_10 {
 	color: #ffd700;
 	font-weight: bold;
+}
+
+.annis .no-document-info-bar .match_10 {
+	color: #ffd700;
+	text-decoration: underline;
 }
 
 .annis .v-table-cell-content-match_11 {
@@ -12988,6 +13038,11 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis .no-document-info-bar .match_11 {
+	color: #d2b48c;
+	text-decoration: underline;
+}
+
 .annis .v-table-cell-content-match_12 {
 	color: navy;
 }
@@ -12999,6 +13054,11 @@ div.v-layout.v-horizontal.v-widget {
 .annis .aql-code-editor .cm-node_12 {
 	color: navy;
 	font-weight: bold;
+}
+
+.annis .no-document-info-bar .match_12 {
+	color: navy;
+	text-decoration: underline;
 }
 
 .annis .v-table-cell-content-match_13 {
@@ -13014,6 +13074,11 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis .no-document-info-bar .match_13 {
+	color: #00fa9a;
+	text-decoration: underline;
+}
+
 .annis .v-table-cell-content-match_14 {
 	color: #1e90ff;
 }
@@ -13025,6 +13090,11 @@ div.v-layout.v-horizontal.v-widget {
 .annis .aql-code-editor .cm-node_14 {
 	color: #1e90ff;
 	font-weight: bold;
+}
+
+.annis .no-document-info-bar .match_14 {
+	color: #1e90ff;
+	text-decoration: underline;
 }
 
 .annis .v-table-cell-content-match_15 {
@@ -13040,6 +13110,11 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+.annis .no-document-info-bar .match_15 {
+	color: #6b8e23;
+	text-decoration: underline;
+}
+
 .annis .v-table-cell-content-match_16 {
 	color: #ffb6c1;
 }
@@ -13051,6 +13126,11 @@ div.v-layout.v-horizontal.v-widget {
 .annis .aql-code-editor .cm-node_16 {
 	color: #ffb6c1;
 	font-weight: bold;
+}
+
+.annis .no-document-info-bar .match_16 {
+	color: #ffb6c1;
+	text-decoration: underline;
 }
 
 .annis .left-button, .annis .right-button {
@@ -13117,10 +13197,6 @@ div.v-layout.v-horizontal.v-widget {
 	border-style: solid;
 	border-color: black;
 	border-width: 1px 0px 0px 0px;
-}
-
-.annis .no-document-info-bar .path-label {
-	text-decoration: underline;
 }
 
 .annis .selected-match .info-bar {
