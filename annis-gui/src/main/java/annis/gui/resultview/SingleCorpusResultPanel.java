@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Joiner;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -101,12 +102,11 @@ public class SingleCorpusResultPanel extends CssLayout {
         infoBar.addStyleName("no-document-info-bar");
         infoBar.setWidth("100%");
         infoBar.setHeight("-1px");
-        
 
         Label lblNumber = new Label("" + (resultNumber + 1));
         infoBar.addComponent(lblNumber);
         lblNumber.setSizeUndefined();
-        
+
         btLink = new Button();
         btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
         btLink.setIcon(FontAwesome.SHARE_ALT);
@@ -120,20 +120,19 @@ public class SingleCorpusResultPanel extends CssLayout {
             }
         });
         infoBar.addComponent(btLink);
-        
+
         VerticalLayout corpusPaths = new VerticalLayout();
         infoBar.addComponent(corpusPaths);
         infoBar.setExpandRatio(corpusPaths, 1.0f);
 
-
         for (SCorpus c : this.result) {
-            
+
             try {
                 List<String> path = CommonHelper.getCorpusPath(new URI(c.getPath().toString()));
-                
+
                 HorizontalLayout corpusInfoLayout = new HorizontalLayout();
                 corpusPaths.addComponent(corpusInfoLayout);
-                
+
                 // build label
                 StringBuilder sb = new StringBuilder("Path: ");
                 sb.append(StringUtils.join(path, " > "));
@@ -162,23 +161,31 @@ public class SingleCorpusResultPanel extends CssLayout {
                     }
                 });
                 corpusInfoLayout.addComponent(btInfo);
-                
 
                 Label lblPath = new Label(sb.toString());
                 lblPath.addStyleName("path-label");
-                
+
                 lblPath.setWidth("100%");
                 lblPath.setHeight("-1px");
-                corpusInfoLayout.addComponent(lblPath);                
+                corpusInfoLayout.addComponent(lblPath);
             } catch (URISyntaxException ex) {
                 log.error("Could not get path for (sub-) corpus", ex);
             }
-           
+
         }
 
         infoBar.setSpacing(false);
 
         addComponent(infoBar);
+
+        Label lblEmpty = new Label(
+                "Result matches only (sub-) corpora and their meta-data. "
+                + "You might want extend your query  to include a general token search. <br/> "
+                + "E.g. if you could search for <br/> <code>tok @* my_meta_attribute=\"somevalue\"</code>");
+        lblEmpty.setContentMode(ContentMode.HTML);
+        lblEmpty.addStyleName("empty_token_hint");
+
+        addComponent(lblEmpty);
     }
 
     private void showShareSingleMatchGenerator() {
