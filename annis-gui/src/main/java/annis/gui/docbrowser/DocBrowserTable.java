@@ -35,6 +35,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.v7.data.Item;
@@ -414,7 +415,7 @@ public class DocBrowserTable extends Table
     if (!docMetaDataCache.containsKey(docBrowserPanel.getCorpus()))
     {
       // get the metadata for the corpus
-      WebResource res = Helper.getAnnisWebResource();
+      WebResource res = Helper.getAnnisWebResource(UI.getCurrent());
       res = res.path("meta/corpus/").path(
         urlPathEscape.escape(docBrowserPanel.getCorpus())).path("closure");
       

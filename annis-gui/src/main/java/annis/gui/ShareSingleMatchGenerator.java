@@ -202,7 +202,7 @@ public class ShareSingleMatchGenerator extends Window implements
     }
     
     UriBuilder serviceURL =
-      UriBuilder.fromUri(Helper.getAnnisWebResource().path(
+      UriBuilder.fromUri(Helper.getAnnisWebResource(UI.getCurrent()).path(
       "query").getURI());
     
     VisualizerPlugin visPlugin = ps.getVisualizer(entry.getVisType());
@@ -228,7 +228,7 @@ public class ShareSingleMatchGenerator extends Window implements
       if(visPlugin instanceof FilteringVisualizerPlugin)
       {
         List<String> visAnnos = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
-          corpusName, documentName, entry.getMappings());
+          corpusName, documentName, entry.getMappings(), UI.getCurrent());
         if(visAnnos != null)
         {
           Set<String> annos = new HashSet<>(visAnnos);
@@ -309,7 +309,7 @@ public class ShareSingleMatchGenerator extends Window implements
       generatedLinks.setVisible(true);
       
       URI url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
-      String shortURL = Helper.shortenURL(url);
+      String shortURL = Helper.shortenURL(url, UI.getCurrent());
       directURL.setValue(shortURL);
       iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + shortURL + "\"></iframe>");
       preview.setSource(new ExternalResource(shortURL));

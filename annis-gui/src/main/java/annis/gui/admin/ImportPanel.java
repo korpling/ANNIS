@@ -251,7 +251,7 @@ public class ImportPanel extends Panel
   private void startImport()
   {
     
-    WebResource res = Helper.getAnnisWebResource().path("admin").path("import");
+    WebResource res = Helper.getAnnisWebResource(UI.getCurrent()).path("admin").path("import");
     String mail = txtMail.getValue();
     if(txtMail.isValid() && mail != null && !mail.isEmpty())
     {
@@ -317,7 +317,7 @@ public class ImportPanel extends Panel
     public void run()
     {
       // check the overall status
-      WebResource res = Helper.getAnnisWebResource()
+      WebResource res = Helper.getAnnisWebResource(ui)
         .path("admin").path("import").path("status");
       
       ImportJob.Status lastStatus = ImportJob.Status.WAITING;

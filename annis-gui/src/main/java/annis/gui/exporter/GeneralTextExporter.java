@@ -49,6 +49,7 @@ import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.UI;
 
 import annis.CommonHelper;
 import annis.exceptions.AnnisCorpusAccessException;
@@ -72,7 +73,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   @Override
   public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc, 
-    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
+    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs, UI ui)
   {
     try
     {
@@ -183,7 +184,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
             }
 
             convertText(p, 
-              keys, args, out, offset-currentMatches.getMatches().size());
+              keys, args, out, offset-currentMatches.getMatches().size(), ui);
 
             currentMatches.getMatches().clear();
 
@@ -219,7 +220,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
           convertText(p,
-            keys, args, out, offset - currentMatches.getMatches().size() - 1);
+            keys, args, out, offset - currentMatches.getMatches().size() - 1, ui);
         }
         offset = 0;
         
@@ -240,7 +241,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   }
 
   public void convertText(SaltProject queryResult, List<String> keys,
-    Map<String, String> args, Writer out, int offset) throws IOException
+    Map<String, String> args, Writer out, int offset, UI ui) throws IOException
   {
     Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
     
@@ -292,7 +293,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
         if(!metaKeys.isEmpty())
         {
           String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
-          appendMetaData(out, metaKeys, path[path.length-1], path[0], metadataCache);
+          appendMetaData(out, metaKeys, path[path.length-1], path[0], metadataCache, ui);
         }
         out.append("\n");
 
@@ -304,7 +305,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   public void appendMetaData(Writer out, 
     List<String> metaKeys,
     String toplevelCorpus, String documentName,
-    Map<String, Map<String, Annotation>> metadataCache)
+    Map<String, Map<String, Annotation>> metadataCache, UI ui)
     throws IOException
   {
     Map<String, Annotation> metaData = new HashMap<>();
@@ -314,7 +315,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
     }
     else
     {
-      List<Annotation> asList = Helper.getMetaData(toplevelCorpus, documentName);
+      List<Annotation> asList = Helper.getMetaData(toplevelCorpus, documentName,  ui);
       for(Annotation anno : asList)
       {
         metaData.put(anno.getQualifiedName(), anno);

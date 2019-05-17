@@ -15,12 +15,6 @@
  */
 package annis.visualizers.component;
 
-import annis.libgui.ImagePanel;
-import annis.libgui.VisualizationToggle;
-import annis.libgui.visualizers.AbstractVisualizer;
-import annis.libgui.visualizers.VisualizerInput;
-import com.vaadin.server.StreamResource;
-import com.vaadin.ui.Embedded;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,9 +22,19 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.Random;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+
+import com.vaadin.server.StreamResource;
+import com.vaadin.ui.Embedded;
+import com.vaadin.ui.UI;
+
+import annis.libgui.ImagePanel;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
 
 /**
  *

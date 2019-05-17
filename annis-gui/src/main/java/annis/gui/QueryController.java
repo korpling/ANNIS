@@ -47,6 +47,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.UI;
 
 import annis.QueryGenerator;
 import annis.gui.components.ExceptionDialog;
@@ -137,7 +138,7 @@ public class QueryController implements Serializable {
         } else {
             // validate query
             try {
-                AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
+                AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource(ui);
                 Future<List<NodeDesc>> future = annisResource.path("query").path("parse/nodes")
                         .queryParam("q", Helper.encodeJersey(query)).get(new GenericType<List<NodeDesc>>() {
                         });
@@ -208,7 +209,7 @@ public class QueryController implements Serializable {
                 qp.setStatus(caption + ": " + description);
                 break;
             case 403:
-                if (Helper.getUser() == null) {
+                if (Helper.getUser(ui) == null) {
                     // not logged in
                     qp.setStatus("You don't have the access rights to query this corpus. "
                             + "You might want to login to access more corpora.");
@@ -373,7 +374,7 @@ public class QueryController implements Serializable {
 
         addHistoryEntry(displayedQuery);
 
-        AsyncWebResource res = Helper.getAnnisAsyncWebResource();
+        AsyncWebResource res = Helper.getAnnisAsyncWebResource(ui);
 
         //
         // begin execute match fetching
@@ -568,7 +569,7 @@ public class QueryController implements Serializable {
 
             newQuery.setOffset(offset);
 
-            Background.runWithCallback(new SingleResultFetchJob(match, newQuery), new FutureCallback<SaltProject>() {
+            Background.runWithCallback(new SingleResultFetchJob(match, newQuery, UI.getCurrent()), new FutureCallback<SaltProject>() {
 
                 @Override
                 public void onSuccess(SaltProject result) {

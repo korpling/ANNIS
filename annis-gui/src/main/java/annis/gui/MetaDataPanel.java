@@ -41,6 +41,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.Property;
 import com.vaadin.v7.data.util.BeanItemContainer;
@@ -123,10 +124,12 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     @Override
     public void attach() {
         super.attach();
+        
+        final UI ui =  UI.getCurrent();
 
         if (documentName == null) {
             Callable<List<Annotation>> backgroundJob = () -> {
-                return getAllSubcorpora(toplevelCorpusName);
+                return getAllSubcorpora(toplevelCorpusName, ui);
             };
             Background.runWithCallback(backgroundJob, new FutureCallback<List<Annotation>>() {
 
@@ -225,7 +228,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
      * Returns empty map if no metadata are available.
      */
     private Map<Integer, List<Annotation>> splitListAnnotations() {
-        List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName, documentName);
+        List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName, documentName, UI.getCurrent());
 
         Map<Integer, List<Annotation>> hashMetaData = new HashMap<>();
 
@@ -264,9 +267,9 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
         return listOfBeanItemCon;
     }
 
-    private List<Annotation> getAllSubcorpora(String toplevelCorpusName) {
+    private List<Annotation> getAllSubcorpora(String toplevelCorpusName, UI ui) {
         List<Annotation> result = new LinkedList<>();
-        WebResource res = Helper.getAnnisWebResource();
+        WebResource res = Helper.getAnnisWebResource(ui);
         try {
             res = res.path("meta").path("docnames").path(urlPathEscape.escape(toplevelCorpusName));
             result = res.get(new Helper.AnnotationListType());
@@ -293,7 +296,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     public void valueChange(Property.ValueChangeEvent event) {
         if (lastSelectedItem == null || !lastSelectedItem.equals(event.getProperty().getValue())) {
             lastSelectedItem = event.getProperty().getValue().toString();
-            List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName, lastSelectedItem);
+            List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName, lastSelectedItem, UI.getCurrent());
 
             if (metaData == null || metaData.isEmpty()) {
                 super.setCaption("No metadata available");

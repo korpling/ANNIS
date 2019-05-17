@@ -56,6 +56,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -371,7 +372,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
         for (String corpusName : corpusNames) {
 
-            CorpusConfig corpusConfig = Helper.getCorpusConfig(corpusName);
+            CorpusConfig corpusConfig = Helper.getCorpusConfig(corpusName, UI.getCurrent());
 
             if (corpusConfig != null && corpusConfig.containsKey(MAPPING_HIDDEN_ANNOS)) {
                 hiddenTokenAnnos = new HashSet<>(

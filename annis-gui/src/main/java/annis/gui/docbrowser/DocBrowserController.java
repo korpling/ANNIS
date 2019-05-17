@@ -169,7 +169,7 @@ public class DocBrowserController implements Serializable
    * whole document.
    */
   public static VisualizerInput createInput(String corpus, String docName,
-    Visualizer config, boolean isUsingRawText, List<String> nodeAnnoFilter)
+    Visualizer config, boolean isUsingRawText, List<String> nodeAnnoFilter, UI ui)
   {
     VisualizerInput input = new VisualizerInput();
 
@@ -181,7 +181,7 @@ public class DocBrowserController implements Serializable
     String encodedDocument = urlPathEscape.escape(docName);
     if (isUsingRawText)
     {
-      WebResource w = Helper.getAnnisWebResource();
+      WebResource w = Helper.getAnnisWebResource(ui);
       w = w.path("query").path("rawtext")
         .path(encodedToplevelCorpus).path(encodedDocument);
       RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
@@ -192,7 +192,7 @@ public class DocBrowserController implements Serializable
       // get the whole document wrapped in a salt project
       SaltProject txt = null;
 
-      WebResource res = Helper.getAnnisWebResource()
+      WebResource res = Helper.getAnnisWebResource(ui)
         .path("query").path("graph").
         path(encodedToplevelCorpus).
         path(encodedDocument);
@@ -287,7 +287,7 @@ public class DocBrowserController implements Serializable
       if(visualizer instanceof FilteringVisualizerPlugin)
       {
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visualizer)
-          .getFilteredNodeAnnotationNames(corpus, doc, parseMappings(config));
+          .getFilteredNodeAnnotationNames(corpus, doc, parseMappings(config), ui);
       }
       
       // check if a visualization is already initiated
@@ -296,7 +296,7 @@ public class DocBrowserController implements Serializable
         {
           // fetch the salt project - so long part
           input = createInput(corpus, doc, config, visualizer.
-            isUsingRawText(), nodeAnnoFilter);
+            isUsingRawText(), nodeAnnoFilter, ui);
 
         }
       }

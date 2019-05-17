@@ -31,6 +31,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.v7.data.Container;
 import com.vaadin.v7.data.Property;
 import com.vaadin.v7.data.util.BeanItemContainer;
@@ -253,9 +254,9 @@ public class SearchOptionsPanel extends FormLayout {
         return null;
     }
 
-    private static List<String> getSegmentationNamesFromService(Set<String> corpora) {
+    private static List<String> getSegmentationNamesFromService(Set<String> corpora, UI ui) {
         List<String> segNames = new ArrayList<>();
-        WebResource service = Helper.getAnnisWebResource();
+        WebResource service = Helper.getAnnisWebResource(ui);
         if (service != null) {
             for (String corpus : corpora) {
                 try {
@@ -532,7 +533,7 @@ public class SearchOptionsPanel extends FormLayout {
 
         @Override
         public void run() {
-            final List<String> segmentations = getSegmentationNamesFromService(corpora);
+            final List<String> segmentations = getSegmentationNamesFromService(corpora, ui);
 
             final Set<String> corporaWithDefault = new TreeSet<>(corpora);
             corporaWithDefault.add(DEFAULT_CONFIG);

@@ -15,17 +15,18 @@
  */
 package annis.libgui.exporter;
 
-import com.google.common.eventbus.EventBus;
-import com.sun.jersey.api.client.WebResource;
-
-import annis.service.objects.CorpusConfig;
-import annis.service.objects.QueryLanguage;
-import net.xeoh.plugins.base.Plugin;
-
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.eventbus.EventBus;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.UI;
+
+import annis.service.objects.CorpusConfig;
+import annis.service.objects.QueryLanguage;
+import net.xeoh.plugins.base.Plugin;
 
 /**
  *
@@ -36,7 +37,7 @@ public interface ExporterPlugin extends Plugin
   public Exception convertText(String query, QueryLanguage queryLanguage, int contextLeft, int contextRight, 
    Set<String> corpora, List<String> keys, String args, boolean alignmc,
    WebResource annisResource, Writer out, EventBus eventBus,
-   Map<String, CorpusConfig> corpusConfigs);
+   Map<String, CorpusConfig> corpusConfigs, UI ui);
   
   public boolean isCancelable();
   

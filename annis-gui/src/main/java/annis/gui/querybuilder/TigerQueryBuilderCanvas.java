@@ -41,6 +41,7 @@ import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 
 import annis.gui.QueryController;
 import annis.gui.widgets.GripDragComponent;
@@ -110,7 +111,7 @@ public class TigerQueryBuilderCanvas extends Panel
   {
     Set<String> result = new TreeSet<>();
 
-    WebResource service = Helper.getAnnisWebResource();
+    WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
 
     // get current corpus selection
     Set<String> corpusSelection = controller.getState().getSelectedCorpora().getValue();

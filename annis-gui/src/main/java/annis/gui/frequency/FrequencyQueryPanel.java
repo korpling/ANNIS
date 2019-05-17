@@ -44,6 +44,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.Container;
 import com.vaadin.v7.data.Property;
@@ -96,11 +97,14 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private final ProgressBar pbQuery = new ProgressBar();
   
   private final QueryUIState state;
+  
+  private final QueryController controller;
 
   
   public FrequencyQueryPanel(final QueryController controller, QueryUIState state)
   {    
     this.state = state;
+    this.controller = controller;
     
     setWidth("99%");
     setHeight("99%");
@@ -202,11 +206,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout.addComponent(metaSelect);
     
     
-    if(controller != null)
-    {
-      createAutomaticEntriesForQuery(state.getAql().getValue());
-      updateQueryInfo(state.getAql().getValue());
-    }
     
     HorizontalLayout layoutButtons = new HorizontalLayout();
     
@@ -430,10 +429,21 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
   }
   
+  @Override
+    public void attach() {
+        super.attach();
+
+        if(controller != null)
+        {
+          createAutomaticEntriesForQuery(state.getAql().getValue());
+          updateQueryInfo(state.getAql().getValue());
+        }
+    }
+  
   public Set<String> getAvailableMetaNames()
   {
     Set<String> result = new TreeSet<>();
-    WebResource service = Helper.getAnnisWebResource();
+    WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
     // get current corpus selection
     Set<String> corpusSelection = state.getSelectedCorpora().getValue();
     if (service != null)
@@ -504,7 +514,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       return new LinkedList<>();
     }
     // let the service parse the query
-    WebResource res = Helper.getAnnisWebResource();
+    WebResource res = Helper.getAnnisWebResource(UI.getCurrent());
     List<NodeDesc> nodes = res.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(query))
       .get(new GenericType<List<NodeDesc>>() {});
     

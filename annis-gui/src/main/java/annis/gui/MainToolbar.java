@@ -334,15 +334,18 @@ public class MainToolbar extends HorizontalLayout
       new LoginCloseCallback());
 
     updateSidebarState();
-    MainToolbar.this.updateUserInformation();
   }
 
   @Override
   public void attach()
   {
     super.attach();
+    
 
     UI ui = UI.getCurrent();
+
+    MainToolbar.this.updateUserInformation();
+    
     if (ui instanceof AnnisBaseUI)
     {
       ((AnnisBaseUI) ui).getLoginDataLostBus().register(this);
@@ -363,7 +366,7 @@ public class MainToolbar extends HorizontalLayout
     super.detach();
   }
 
-  public void setNavigationTarget(NavigationTarget target)
+  public void setNavigationTarget(NavigationTarget target, UI ui)
   {
     if(target == this.navigationTarget)
     {
@@ -376,7 +379,7 @@ public class MainToolbar extends HorizontalLayout
     if (target == NavigationTarget.ADMIN)
     {
       // check in background if display is necessary
-      AnnisUser user = Helper.getUser();
+      AnnisUser user = Helper.getUser(ui);
       if (user != null && user.getUserName() != null)
       {
         Background.run(new CheckIfUserIsAdministratorJob(user.getUserName(), UI.
@@ -490,7 +493,7 @@ public class MainToolbar extends HorizontalLayout
       btNavigate.setVisible(false);
     }
 
-    AnnisUser user = Helper.getUser();
+    AnnisUser user = Helper.getUser(UI.getCurrent());
 
     // always close the window
     if (windowLogin != null)
@@ -644,7 +647,7 @@ public class MainToolbar extends HorizontalLayout
 
   public boolean isLoggedIn()
   {
-    return Helper.getUser() != null;
+    return Helper.getUser(UI.getCurrent()) != null;
   }
 
   private class LoginCloseCallback implements JavaScriptFunction
@@ -727,7 +730,7 @@ public class MainToolbar extends HorizontalLayout
       User user = null;
       try
       {
-        user = Helper.getAnnisWebResource().path("admin/users").path(
+        user = Helper.getAnnisWebResource(ui).path("admin/users").path(
           userName)
           .get(User.class);
       }

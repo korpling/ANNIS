@@ -33,6 +33,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.mail.Session;
 import javax.ws.rs.core.UriBuilder;
 
 import org.apache.commons.lang3.StringUtils;
@@ -165,9 +166,17 @@ public class Helper {
         return createRESTClient(null, null);
     }
 
-    public static AnnisUser getUser() {
+    public static AnnisUser getUser(UI ui) {
 
-        VaadinSession vSession = VaadinSession.getCurrent();
+        if(ui != null) {
+            VaadinSession vSession = ui.getSession();
+            return getUser(vSession);
+        }
+        return null;
+    }
+    
+    public static AnnisUser getUser(VaadinSession vSession) {
+
         WrappedSession wrappedSession = null;
 
         if (vSession != null) {
@@ -181,7 +190,6 @@ public class Helper {
                 return (AnnisUser) o;
             }
         }
-
         return null;
     }
 
@@ -270,9 +278,18 @@ public class Helper {
      *
      * @return A reference to the ANNIS service root resource.
      */
-    public static WebResource getAnnisWebResource() {
+    public static WebResource getAnnisWebResource(UI ui) {
 
-        VaadinSession vSession = VaadinSession.getCurrent();
+        if(ui != null) {
+            VaadinSession vSession = ui.getSession();
+    
+            return getAnnisWebResource(vSession);
+        } else {
+            return null;
+        }
+    }
+    
+    public static WebResource getAnnisWebResource(VaadinSession vSession) {
 
         // get URI used by the application
         String uri = null;
@@ -282,9 +299,10 @@ public class Helper {
         }
 
         // if already authentificated the REST client is set as the "user" property
-        AnnisUser user = getUser();
+        AnnisUser user = getUser(vSession);
 
         return getAnnisWebResource(uri, user);
+    
     }
 
     /**
@@ -296,14 +314,17 @@ public class Helper {
      *
      * @return A reference to the ANNIS service root resource.
      */
-    public static AsyncWebResource getAnnisAsyncWebResource() {
-        // get URI used by the application
-        String uri = (String) VaadinSession.getCurrent().getAttribute(KEY_WEB_SERVICE_URL);
-
-        // if already authentificated the REST client is set as the "user" property
-        AnnisUser user = getUser();
-
-        return getAnnisAsyncWebResource(uri, user);
+    public static AsyncWebResource getAnnisAsyncWebResource(UI ui) {
+        if(ui != null) {
+            // get URI used by the application
+            String uri = (String) ui.getSession().getAttribute(KEY_WEB_SERVICE_URL);
+    
+            // if already authentificated the REST client is set as the "user" property
+            AnnisUser user = getUser(ui);
+    
+            return getAnnisAsyncWebResource(uri, user);
+        }
+        return null;
     }
 
     public static String getContext() {
@@ -337,9 +358,9 @@ public class Helper {
      *                               specifies the document.
      * @return returns only the meta data for a single document.
      */
-    public static List<Annotation> getMetaDataDoc(String toplevelCorpusName, String documentName) {
+    public static List<Annotation> getMetaDataDoc(String toplevelCorpusName, String documentName, UI ui) {
         List<Annotation> result = new ArrayList<Annotation>();
-        WebResource res = Helper.getAnnisWebResource();
+        WebResource res = Helper.getAnnisWebResource(ui);
         try {
             res = res.path("meta").path("doc").path(urlPathEscape.escape(toplevelCorpusName));
             res = res.path(urlPathEscape.escape(documentName));
@@ -366,9 +387,9 @@ public class Helper {
      * @return Returns also the metada of the all parent corpora. There must be at
      *         least one of them.
      */
-    public static List<Annotation> getMetaData(String toplevelCorpusName, String documentName) {
+    public static List<Annotation> getMetaData(String toplevelCorpusName, String documentName, UI ui) {
         List<Annotation> result = new ArrayList<Annotation>();
-        WebResource res = Helper.getAnnisWebResource();
+        WebResource res = Helper.getAnnisWebResource(ui);
         try {
             res = res.path("meta").path("doc").path(urlPathEscape.escape(toplevelCorpusName));
 
@@ -391,9 +412,9 @@ public class Helper {
         return result;
     }
 
-    public static DocumentBrowserConfig getDocBrowserConfig(String corpus) {
+    public static DocumentBrowserConfig getDocBrowserConfig(String corpus, UI ui) {
         try {
-            DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource().path("query").path("corpora")
+            DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource(ui).path("query").path("corpora")
                     .path("doc_browser_config").path(urlPathEscape.escape(corpus)).get(DocumentBrowserConfig.class);
 
             return docBrowserConfig;
@@ -417,7 +438,7 @@ public class Helper {
      *         object. This Properties object stores the corpus configuration as
      *         simple key-value pairs.
      */
-    public static CorpusConfig getCorpusConfig(String corpus) {
+    public static CorpusConfig getCorpusConfig(String corpus, UI ui) {
 
         if (corpus == null || corpus.isEmpty()) {
             Notification.show("no corpus is selected", "please select at leas one corpus and execute query again",
@@ -428,7 +449,7 @@ public class Helper {
         CorpusConfig corpusConfig = new CorpusConfig();
 
         try {
-            corpusConfig = Helper.getAnnisWebResource().path("query").path("corpora").path(urlPathEscape.escape(corpus))
+            corpusConfig = Helper.getAnnisWebResource(ui).path("query").path("corpora").path(urlPathEscape.escape(corpus))
                     .path("config").get(CorpusConfig.class);
         } catch (UniformInterfaceException | ClientHandlerException ex) {
             if (!AnnisBaseUI.handleCommonError(ex, "get corpus configuration")) {
@@ -440,12 +461,12 @@ public class Helper {
         return corpusConfig;
     }
 
-    public static CorpusConfig getDefaultCorpusConfig() {
+    public static CorpusConfig getDefaultCorpusConfig(UI ui) {
 
         CorpusConfig defaultCorpusConfig = new CorpusConfig();
 
         try {
-            defaultCorpusConfig = Helper.getAnnisWebResource().path("query").path("corpora").path(DEFAULT_CONFIG)
+            defaultCorpusConfig = Helper.getAnnisWebResource(ui).path("query").path("corpora").path(DEFAULT_CONFIG)
                     .get(CorpusConfig.class);
         } catch (UniformInterfaceException | ClientHandlerException ex) {
             if (!AnnisBaseUI.handleCommonError(ex, "get default corpus configuration")) {
@@ -467,12 +488,12 @@ public class Helper {
      *         key-value pairs. The Map includes also the default corpus
      *         configuration.
      */
-    public static CorpusConfigMap getCorpusConfigs() {
+    public static CorpusConfigMap getCorpusConfigs(UI ui) {
 
         CorpusConfigMap corpusConfigurations = null;
 
         try {
-            corpusConfigurations = Helper.getAnnisWebResource().path("query").path("corpora").path("config")
+            corpusConfigurations = Helper.getAnnisWebResource(ui).path("query").path("corpora").path("config")
                     .get(CorpusConfigMap.class);
         } catch (UniformInterfaceException | ClientHandlerException ex) {
             UI.getCurrent().access(new Runnable() {
@@ -491,7 +512,7 @@ public class Helper {
             corpusConfigurations = new CorpusConfigMap();
         }
 
-        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
+        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig(ui));
 
         return corpusConfigurations;
     }
@@ -507,15 +528,15 @@ public class Helper {
      *         names. A Properties object stores the corpus configuration as simple
      *         key-value pairs. The map includes the default configuration.
      */
-    public static CorpusConfigMap getCorpusConfigs(Set<String> corpora) {
+    public static CorpusConfigMap getCorpusConfigs(Set<String> corpora, UI ui) {
 
         CorpusConfigMap corpusConfigurations = new CorpusConfigMap();
 
         for (String corpus : corpora) {
-            corpusConfigurations.put(corpus, getCorpusConfig(corpus));
+            corpusConfigurations.put(corpus, getCorpusConfig(corpus, ui));
         }
 
-        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
+        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig(ui));
         return corpusConfigurations;
     }
 
@@ -544,10 +565,10 @@ public class Helper {
         return sb.toString();
     }
 
-    public static RawTextWrapper getRawText(String corpusName, String documentName) {
+    public static RawTextWrapper getRawText(String corpusName, String documentName, UI ui) {
         RawTextWrapper texts = null;
         try {
-            WebResource webResource = getAnnisWebResource();
+            WebResource webResource = getAnnisWebResource(ui);
             webResource = webResource.path("query").path("rawtext").path(corpusName).path(documentName);
             texts = webResource.get(RawTextWrapper.class);
         }
@@ -843,8 +864,8 @@ public class Helper {
         }
     }
 
-    public static String shortenURL(URI original) {
-        WebResource res = Helper.getAnnisWebResource().path("shortener");
+    public static String shortenURL(URI original, UI ui) {
+        WebResource res = Helper.getAnnisWebResource(ui).path("shortener");
         String appContext = Helper.getContext();
 
         String path = original.getRawPath();

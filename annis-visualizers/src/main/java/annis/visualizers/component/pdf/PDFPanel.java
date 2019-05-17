@@ -29,6 +29,7 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
+import com.vaadin.ui.UI;
 
 import annis.CommonHelper;
 import annis.libgui.Helper;
@@ -111,7 +112,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     corpusName = urlPathEscape.escape(corpusName);
     documentName = urlPathEscape.escape(documentName);
 
-    WebResource resMeta = Helper.getAnnisWebResource().path(
+    WebResource resMeta = Helper.getAnnisWebResource(input.getUI()).path(
             "meta/binary").path(corpusName).path(documentName);
     List<AnnisBinaryMetaData> meta = resMeta.get(
             new GenericType<List<AnnisBinaryMetaData>>() {

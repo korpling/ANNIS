@@ -32,25 +32,26 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.DesignRoot;
-import com.vaadin.v7.data.Item;
-import com.vaadin.v7.data.Property.ValueChangeEvent;
-import com.vaadin.v7.data.Property.ValueChangeListener;
-import com.vaadin.v7.data.util.BeanItemContainer;
-import com.vaadin.v7.data.util.DefaultItemSorter;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.declarative.Design;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.data.Property.ValueChangeListener;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.data.util.DefaultItemSorter;
 
 import annis.gui.beans.CorpusBrowserEntry;
-import annis.model.Query;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Background;
 import annis.libgui.Helper;
+import annis.model.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.QueryLanguage;
@@ -165,17 +166,24 @@ public class CorpusBrowserPanel extends Panel {
     public void attach() {
         super.attach();
         
-        Background.run(new AnnotationFetcher());
+        Background.run(new AnnotationFetcher(UI.getCurrent()));
 
     }
 
     private class AnnotationFetcher implements Runnable {
+        
+        private final UI ui;
+        
+        public AnnotationFetcher(UI ui) {
+            this.ui = ui;
+        }
+        
         @Override
         public void run() {
    
 
             final List<AnnisAttribute> attributes = corpus == null ? new LinkedList<AnnisAttribute>()
-                    : fetchAnnos(corpus.getName());
+                    : fetchAnnos(corpus.getName(), ui);
            
             
             ((AnnisUI) getUI()).access(new Runnable() {
@@ -329,10 +337,10 @@ public class CorpusBrowserPanel extends Panel {
           
         }
     }
-    private List<AnnisAttribute> fetchAnnos(String toplevelCorpus) {
+    private List<AnnisAttribute> fetchAnnos(String toplevelCorpus, UI ui) {
         Collection<AnnisAttribute> result = new ArrayList<>();
         try {
-            WebResource service = Helper.getAnnisWebResource();
+            WebResource service = Helper.getAnnisWebResource(ui);
             if (service != null) {
                 WebResource query = service.path("query").path("corpora").path(urlPathEscape.escape(toplevelCorpus))
                         .path("annotations").queryParam("fetchvalues", "true")

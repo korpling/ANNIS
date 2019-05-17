@@ -92,7 +92,7 @@ public class DocBrowserPanel extends Panel
 
   public DocumentBrowserConfig getDocBrowserConfig()
   {
-    return Helper.getDocBrowserConfig(corpus);
+    return Helper.getDocBrowserConfig(corpus, ui);
   }
 
   /**
@@ -120,7 +120,7 @@ public class DocBrowserPanel extends Panel
     public void run()
     {
 
-      WebResource res = Helper.getAnnisWebResource();
+      WebResource res = Helper.getAnnisWebResource(ui);
       final List<Annotation> docs = res.path("meta/docnames/"
         + urlPathEscape.escape(corpus)).
         get(new Helper.AnnotationListType());

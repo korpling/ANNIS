@@ -45,8 +45,16 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
 
     private static final Logger log = LoggerFactory.getLogger(ShareQueryReferenceWindow.class);
 
+    private final DisplayedResultQuery query;
+    private final boolean shorten;
+
+    private TextArea txtCitation;
+
     public ShareQueryReferenceWindow(DisplayedResultQuery query, boolean shorten) {
         super("Query reference link");
+
+        this.query = query;
+        this.shorten = shorten;
 
         VerticalLayout wLayout = new VerticalLayout();
         setContent(wLayout);
@@ -60,34 +68,12 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
         wLayout.addComponent(lblInfo);
         wLayout.setExpandRatio(lblInfo, 0.0f);
 
-        String shortURL = "ERROR";
-        if (query != null) {
-            URI appURI = UI.getCurrent().getPage().getLocation();
-            String fragment;
-            try {
-                fragment = StringUtils.join(query.toCitationFragment(), "&");
-                URI url = new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), appURI.getPath(), null,
-                        fragment);
-
-                if (shorten) {
-                    shortURL = Helper.shortenURL(url);
-                } else {
-                    shortURL = url.toASCIIString();
-                }
-            } catch (URISyntaxException e) {
-                log.error("Could not generate query share link", e);
-                ExceptionDialog.show(e, "Could not generate query share link");
-            }
-
-        }
-
-        TextArea txtCitation = new TextArea();
+        txtCitation = new TextArea();
 
         txtCitation.setWidth("100%");
         txtCitation.setHeight("100%");
         txtCitation.addStyleName(ValoTheme.TEXTFIELD_LARGE);
         txtCitation.addStyleName("shared-text");
-        txtCitation.setValue(shortURL);
         txtCitation.setWordwrap(true);
         txtCitation.setReadOnly(true);
 
@@ -105,6 +91,35 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
         setWidth("400px");
         setHeight("300px");
 
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
+
+        String shortURL = "ERROR";
+        if (query != null) {
+            URI appURI = UI.getCurrent().getPage().getLocation();
+            String fragment;
+            try {
+                fragment = StringUtils.join(query.toCitationFragment(), "&");
+                URI url = new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), appURI.getPath(), null,
+                        fragment);
+
+                if (shorten) {
+                    shortURL = Helper.shortenURL(url, UI.getCurrent());
+                } else {
+                    shortURL = url.toASCIIString();
+                }
+            } catch (URISyntaxException e) {
+                log.error("Could not generate query share link", e);
+                ExceptionDialog.show(e, "Could not generate query share link");
+            }
+
+        }
+        
+        txtCitation.setValue(shortURL);
+        
     }
 
     @Override

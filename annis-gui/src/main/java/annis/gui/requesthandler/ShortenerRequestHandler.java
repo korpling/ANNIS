@@ -45,7 +45,7 @@ public class ShortenerRequestHandler implements RequestHandler
     }
     
     // get the actual URL
-    WebResource res = Helper.getAnnisWebResource();
+    WebResource res = Helper.getAnnisWebResource(session);
     res = res.path("shortener").path(id);
     String longURL = res.get(String.class);
     

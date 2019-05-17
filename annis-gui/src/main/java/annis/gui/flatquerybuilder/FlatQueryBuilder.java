@@ -39,6 +39,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.Property;
 import com.vaadin.v7.ui.NativeSelect;
@@ -659,7 +660,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
   public Set<String> getAvailableAnnotationNames()
   {
     Set<String> result = new TreeSet<>();
-    WebResource service = Helper.getAnnisWebResource();
+    WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
     // get current corpus selection
     Set<String> corpusSelection = cp.getState().getSelectedCorpora().getValue();
     if (service != null)
@@ -699,7 +700,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
   public Collection<String> getAvailableAnnotationLevels(String meta)
   {
     Collection<String> result = new TreeSet<>();
-    WebResource service = Helper.getAnnisWebResource();
+    WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
     // get current corpus selection
     Set<String> corpusSelection = cp.getState().getSelectedCorpora().getValue();
     if (service != null)
@@ -754,7 +755,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
   public Set<String> getAvailableMetaNames()
   {
     Set<String> result = new TreeSet<>();
-    WebResource service = Helper.getAnnisWebResource();
+    WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
     // get current corpus selection
     Set<String> corpusSelection = cp.getState().getSelectedCorpora().getValue();
     if (service != null)
@@ -794,7 +795,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
   public Set<String> getAvailableMetaLevels(String meta)
 {
     Set<String> result = new TreeSet<>();
-    WebResource service = Helper.getAnnisWebResource();
+    WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
     // get current corpus selection
     Set<String> corpusSelection = cp.getState().getSelectedCorpora().getValue();
     if (service != null)

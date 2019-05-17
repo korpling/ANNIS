@@ -32,6 +32,8 @@ import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SNode;
 
+import com.vaadin.ui.UI;
+
 import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
@@ -155,7 +157,7 @@ public class CSVExporter extends SaltBasedExporter
    */
   @Override
   public void outputText(SDocumentGraph graph, boolean alignmc, int matchNumber,
-    Writer out) throws IOException, IllegalArgumentException
+    Writer out, UI ui) throws IOException, IllegalArgumentException
   {
 
     // first match
@@ -216,7 +218,7 @@ public class CSVExporter extends SaltBasedExporter
     if(!metakeys.isEmpty()) {
       // TODO is this the best way to get the corpus name?
       String corpus_name = CommonHelper.getCorpusPath(java.net.URI.create(graph.getDocument().getId())).get(0);
-      List<Annotation> asList = Helper.getMetaData(corpus_name, graph.getDocument().getName());
+      List<Annotation> asList = Helper.getMetaData(corpus_name, graph.getDocument().getName(), ui);
       for(Annotation anno : asList)
       {
         if (metakeys.contains(anno.getName()))

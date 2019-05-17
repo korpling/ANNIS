@@ -297,8 +297,6 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setSortContainerPropertyId("name");
 
     setExpandRatio(tblCorpora, 1.0f);
-
-    updateCorpusSetList(true, true);
     
   }
 
@@ -306,6 +304,8 @@ public class CorpusListPanel extends VerticalLayout implements
   public void attach()
   {
     super.attach();
+
+    updateCorpusSetList(true, true);
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
   }
   
@@ -407,7 +407,7 @@ public class CorpusListPanel extends VerticalLayout implements
     List<AnnisCorpus> result = new LinkedList<>();
     try
     {
-      WebResource rootRes = Helper.getAnnisWebResource();
+      WebResource rootRes = Helper.getAnnisWebResource(ui);
       result = rootRes.path("query").path("corpora")
         .get(new AnnisCorpusListType());
       return result;
@@ -448,7 +448,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private UserConfig getUserConfigFromRemote()
   {
-    WebResource rootRes = Helper.getAnnisWebResource();
+    WebResource rootRes = Helper.getAnnisWebResource(ui);
     // get the current corpus configuration
     return rootRes.path("admin").path("userconfig").
       get(UserConfig.class);
@@ -456,7 +456,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private void storeChangesRemote()
   {
-    WebResource rootRes = Helper.getAnnisWebResource();
+    WebResource rootRes = Helper.getAnnisWebResource(ui);
     // store the config on the server
     rootRes.path("admin").path("userconfig").post(this.userConfig);
   }
@@ -523,7 +523,7 @@ public class CorpusListPanel extends VerticalLayout implements
       return new Action[0];
     }
 
-    if (Helper.getUser() == null)
+    if (Helper.getUser(ui) == null)
     {
       // we can't change anything if we are not logged in so don't even try
       return new Action[0];

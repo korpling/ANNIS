@@ -80,568 +80,461 @@ import annis.visualizers.LoadableVisualizer;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  *
  */
-public class VisualizerPanel extends CssLayout
-  implements Button.ClickListener, VisualizationToggle
-{
-  public static final long serialVersionUID = 2L;
+public class VisualizerPanel extends CssLayout implements Button.ClickListener, VisualizationToggle {
+    public static final long serialVersionUID = 2L;
 
-  private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
+    private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
-  public static final Resource ICON_COLLAPSE = FontAwesome.MINUS_SQUARE_O;
+    public static final Resource ICON_COLLAPSE = FontAwesome.MINUS_SQUARE_O;
 
-  public static final Resource ICON_EXPAND = FontAwesome.PLUS_SQUARE_O;
+    public static final Resource ICON_EXPAND = FontAwesome.PLUS_SQUARE_O;
 
-  private String corpusName;
+    private String corpusName;
 
-  private String documentName;
-  
-  private Match match;
+    private String documentName;
 
-  private Component vis;
+    private Match match;
 
-  private SDocument result;
+    private Component vis;
 
-  private ResolverEntry entry;
+    private SDocument result;
 
-  private Map<SNode, Long> markedAndCovered;
+    private ResolverEntry entry;
 
+    private Map<SNode, Long> markedAndCovered;
 
-  private Button btEntry;
+    private Button btEntry;
 
-  private String htmlID;
+    private String htmlID;
 
-  private String resultID;
+    private String resultID;
 
-  private VisualizerPlugin visPlugin;
+    private VisualizerPlugin visPlugin;
 
-  private Set<String> visibleTokenAnnos;
+    private Set<String> visibleTokenAnnos;
 
-  private String segmentationName;
+    private String segmentationName;
 
-  private final String ISVISIBLE = "visible";
+    private final String ISVISIBLE = "visible";
 
-  private final String HIDDEN = "hidden";
+    private final String HIDDEN = "hidden";
 
-  private final String PRELOADED = "preloaded";
+    private final String PRELOADED = "preloaded";
 
-  private ProgressBar progress;
+    private ProgressBar progress;
 
-  private InstanceConfig instanceConfig;
+    private InstanceConfig instanceConfig;
 
-  private VisualizerContextChanger visCtxChanger;
-  
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+    private VisualizerContextChanger visCtxChanger;
 
-  /**
-   * This Constructor should be used for {@link ComponentVisualizerPlugin}
-   * Visualizer.
-   *
-   */
-  public VisualizerPanel(
-    final ResolverEntry entry,
-    SDocument result,
-    Match match,
-    Set<String> visibleTokenAnnos,
-    Map<SNode, Long> markedAndCovered,
-    String htmlID,
-    String resultID,
-    VisualizerContextChanger parent,
-    String segmentationName,
-    PluginSystem ps,
-    InstanceConfig instanceConfig) throws IOException
-  {
-    this.instanceConfig = instanceConfig;
-    this.entry = entry;
+    private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
-    this.visCtxChanger = parent;
+    private final PluginSystem ps;
+    
+    /**
+     * This Constructor should be used for {@link ComponentVisualizerPlugin}
+     * Visualizer.
+     *
+     */
+    public VisualizerPanel(final ResolverEntry entry, SDocument result, Match match, Set<String> visibleTokenAnnos,
+            Map<SNode, Long> markedAndCovered, String htmlID, String resultID, VisualizerContextChanger parent,
+            String segmentationName, PluginSystem ps, InstanceConfig instanceConfig) throws IOException {
+        this.instanceConfig = instanceConfig;
+        this.entry = entry;
+        this.ps = ps;
 
-    this.result = result;
-    this.match = match;
-    if(!match.getSaltIDs().isEmpty())
-    {
-      List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
-      this.corpusName = corpusPath.get(0);
-      this.documentName = corpusPath.get(corpusPath.size()-1);
-    }
-    this.visibleTokenAnnos = visibleTokenAnnos;
-    this.markedAndCovered = markedAndCovered;
-    this.segmentationName = segmentationName;
-    this.htmlID = htmlID;
-    this.resultID = resultID;
+        this.visCtxChanger = parent;
 
-    this.progress = new ProgressBar();
-    this.progress.setIndeterminate(true);
-    this.progress.setVisible(false);
-    this.progress.setEnabled(false);
-
-    this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    this.setWidth("100%");
-
-    if (entry != null && ps != null)
-    {
-      visPlugin = ps.getVisualizer(entry.getVisType());
-      if (visPlugin == null)
-      {
-        // fallback to default visualizer if original vis type was not found
-        entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
-        visPlugin = ps.getVisualizer(entry.getVisType());
-      }
-
-      if (HIDDEN.equalsIgnoreCase(entry.getVisibility()))
-      {
-        // build button for visualizer
-        btEntry = new Button(entry.getDisplayName());
-        btEntry.setIcon(ICON_EXPAND);
-        btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
-          + ChameleonTheme.BUTTON_SMALL);
-        btEntry.addClickListener((Button.ClickListener) this);
-        btEntry.setDisableOnClick(true);
-        
-        addComponent(btEntry);
-        addComponent(progress);
-      }
-      else
-      {
-
-        if (ISVISIBLE.equalsIgnoreCase(entry.getVisibility())
-          || PRELOADED.equalsIgnoreCase(entry.getVisibility()))
-        {
-          // build button for visualizer
-          btEntry = new Button(entry.getDisplayName());
-          btEntry.setIcon(ICON_COLLAPSE);
-          btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
-            + ChameleonTheme.BUTTON_SMALL);
-          btEntry.addClickListener((Button.ClickListener) this);
-          addComponent(btEntry);
+        this.result = result;
+        this.match = match;
+        if (!match.getSaltIDs().isEmpty()) {
+            List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
+            this.corpusName = corpusPath.get(0);
+            this.documentName = corpusPath.get(corpusPath.size() - 1);
         }
-        
-        addComponent(progress);
+        this.visibleTokenAnnos = visibleTokenAnnos;
+        this.markedAndCovered = markedAndCovered;
+        this.segmentationName = segmentationName;
+        this.htmlID = htmlID;
+        this.resultID = resultID;
 
-        // create the visualizer and calc input
-        try
-        {
-          vis = createComponent();
-          if (vis != null)
-          {
-            vis.setVisible(true);
-            addComponent(vis);
-          }
-        }
-        catch (Exception ex)
-        {
-          Notification.show(
-            "Could not create visualizer " + visPlugin.getShortName(),
-            ex.toString(),
-            Notification.Type.TRAY_NOTIFICATION);
-          log.error("Could not create visualizer " + visPlugin.getShortName(),
-            ex);
-        }
+        this.progress = new ProgressBar();
+        this.progress.setIndeterminate(true);
+        this.progress.setVisible(false);
+        this.progress.setEnabled(false);
 
-        if (btEntry != null && PRELOADED.equalsIgnoreCase(entry.getVisibility()))
-        {
-          btEntry.setIcon(ICON_EXPAND);
-          if (vis != null)
-          {
-            vis.setVisible(false);
-          }
-        }
+        this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+        this.setWidth("100%");
 
-      }
-
-    } // end if entry not null
-
-  }
-  
-  private Component createComponent()
-  {
-    if (visPlugin == null)
-    {
-      return null;
     }
 
-    final VisualizerInput input = createInput();
+    @Override
+    public void attach() {
+        super.attach();
 
-    Component c = visPlugin.createComponent(input, this);
-    if (c == null) {
+        if (entry != null && ps != null) {
+            visPlugin = ps.getVisualizer(entry.getVisType());
+            if (visPlugin == null) {
+                // fallback to default visualizer if original vis type was not found
+                entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
+                visPlugin = ps.getVisualizer(entry.getVisType());
+            }
+
+            if (HIDDEN.equalsIgnoreCase(entry.getVisibility())) {
+                // build button for visualizer
+                btEntry = new Button(entry.getDisplayName());
+                btEntry.setIcon(ICON_EXPAND);
+                btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " " + ChameleonTheme.BUTTON_SMALL);
+                btEntry.addClickListener((Button.ClickListener) this);
+                btEntry.setDisableOnClick(true);
+
+                addComponent(btEntry);
+                addComponent(progress);
+            } else {
+
+                if (ISVISIBLE.equalsIgnoreCase(entry.getVisibility())
+                        || PRELOADED.equalsIgnoreCase(entry.getVisibility())) {
+                    // build button for visualizer
+                    btEntry = new Button(entry.getDisplayName());
+                    btEntry.setIcon(ICON_COLLAPSE);
+                    btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " " + ChameleonTheme.BUTTON_SMALL);
+                    btEntry.addClickListener((Button.ClickListener) this);
+                    addComponent(btEntry);
+                }
+
+                addComponent(progress);
+
+                // create the visualizer and calc input
+                try {
+                    vis = createComponent(UI.getCurrent());
+                    if (vis != null) {
+                        vis.setVisible(true);
+                        addComponent(vis);
+                    }
+                } catch (Exception ex) {
+                    Notification.show("Could not create visualizer " + visPlugin.getShortName(), ex.toString(),
+                            Notification.Type.TRAY_NOTIFICATION);
+                    log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
+                }
+
+                if (btEntry != null && PRELOADED.equalsIgnoreCase(entry.getVisibility())) {
+                    btEntry.setIcon(ICON_EXPAND);
+                    if (vis != null) {
+                        vis.setVisible(false);
+                    }
+                }
+
+            }
+
+        } // end if entry not null
+    }
+
+    private Component createComponent(UI ui) {
+        if (visPlugin == null) {
+            return null;
+        }
+
+        final VisualizerInput input = createInput(ui);
+
+        Component c = visPlugin.createComponent(input, this);
+        if (c == null) {
+            return c;
+        }
+        c.setVisible(false);
+        c.addStyleName(Helper.CORPUS_FONT);
+        c.addStyleName("vis-content");
+
         return c;
     }
-    c.setVisible(false);
-    c.addStyleName(Helper.CORPUS_FONT);
-    c.addStyleName("vis-content");
 
-    return c;
-  }
+    private VisualizerInput createInput(UI ui) {
+        VisualizerInput input = new VisualizerInput();
+        input.setUI(ui);
+        input.setContextPath(Helper.getContext());
+        input.setId(resultID);
 
-  private VisualizerInput createInput()
-  {
-    VisualizerInput input = new VisualizerInput();
-    input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().
-      getAttribute("AnnisWebService.URL"));
-    input.setContextPath(Helper.getContext());
-    input.setId(resultID);
+        input.setMarkedAndCovered(markedAndCovered);
 
-    input.setMarkedAndCovered(markedAndCovered);
-
-    input.setResult(result);
-    input.setVisibleTokenAnnos(visibleTokenAnnos);
-    input.setSegmentationName(segmentationName);
-    if (instanceConfig != null && instanceConfig.getFont() != null)
-    {
-      input.setFont(instanceConfig.getFont());
-    }
-
-    if (entry != null)
-    {
-      input.setMappings(entry.getMappings());
-      input.setNamespace(entry.getNamespace());
-      String template = Helper.getContext()
-        + "/Resource/" + entry.getVisType() + "/%s";
-      input.setResourcePathTemplate(template);
-    }
-
-    // getting the whole document, when plugin is using text
-    if (visPlugin != null
-      && visPlugin.isUsingText()
-      && result != null
-      && result.getDocumentGraph().getNodes().size() > 0)
-    {
-      List<String> nodeAnnoFilter = null;
-      if(visPlugin instanceof FilteringVisualizerPlugin)
-      {
-        nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
-          corpusName, documentName, input.getMappings());
-      }
-      SaltProject p = getDocument(result.getGraph().getRoots().
-        get(0).getName(), result.getName(), nodeAnnoFilter);
-
-      SDocument wholeDocument = p.getCorpusGraphs().get(0).getDocuments()
-        .get(0);
-      
-      CommonHelper.addMatchToDocumentGraph(match, wholeDocument);
-
-      input.setDocument(wholeDocument);
-    }
-    else
-    {
-      input.setDocument(result);
-    }
-
-    // getting the raw text, when the visualizer wants to have it
-    if (visPlugin != null && visPlugin.isUsingRawText())
-    {
-      input.setRawText(Helper.getRawText(corpusName, documentName));
-    }
-
-    return input;
-  }
-
-  public void setVisibleTokenAnnosVisible(SortedSet<String> annos)
-  {
-    this.visibleTokenAnnos = annos;
-    if (visPlugin != null && vis != null)
-    {
-      visPlugin.setVisibleTokenAnnosVisible(vis, annos);
-    }
-  }
-
-  public void setSegmentationLayer(String segmentationName,
-    Map<SNode, Long> markedAndCovered)
-  {
-    this.segmentationName = segmentationName;
-    this.markedAndCovered = markedAndCovered;
-    
-    if (visPlugin != null && vis != null)
-    {
-      visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
-    }
-  }
-
-  private SaltProject getDocument(String toplevelCorpusName, String documentName,
-    List<String> nodeAnnoFilter)
-  {
-    SaltProject txt = null;
-    try
-    {
-      toplevelCorpusName = urlPathEscape.escape(toplevelCorpusName);
-      documentName = urlPathEscape.escape(documentName);
-      WebResource res = Helper.getAnnisWebResource().path("query").path("graph").path(toplevelCorpusName).
-        path(documentName);
-      if(nodeAnnoFilter != null)
-      {
-        res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
-      }
-      txt = res.get(SaltProject.class);
-    }
-    catch (ClientHandlerException | UniformInterfaceException e)
-    {
-      log.error("General remote service exception", e);
-    }
-    return txt;
-  }
-
-  @Override
-  public void buttonClick(ClickEvent event)
-  {
-
-    boolean isVisible = !visualizerIsVisible();
-
-    // register new state by the parent SingleResultPanel, so the state will be
-    // still available, after a reload
-    visCtxChanger.registerVisibilityStatus(entry.getId(), isVisible);
-
-    // start the toogle process.
-    toggleVisualizer(isVisible, null);
-  }
-
-  @Override
-  public boolean visualizerIsVisible()
-  {
-    if (vis == null || !vis.isVisible())
-    {
-      return false;
-    }
-    return true;
-  }
-
-  private void loadVisualizer(final LoadableVisualizer.Callback callback)
-  {
-    if (visPlugin != null)
-    {
-      btEntry.setIcon(ICON_COLLAPSE);
-      progress.setIndeterminate(true);
-      progress.setVisible(true);
-      progress.setEnabled(true);
-      progress.setDescription("Loading visualizer" + visPlugin.getShortName());
-      
-      ExecutorService execService = Executors.newSingleThreadExecutor();
-
-      final Future<Component> future = execService.submit(
-        new LoadComponentTask());
-      
-      // run the actual code to load the visualizer
-      Background.run(new BackgroundJob(future, callback, UI.getCurrent()));
-
-    } // end if create input was needed
-
-  } // end loadVisualizer
-
-  private void updateGUIAfterLoadingVisualizer(
-    LoadableVisualizer.Callback callback)
-  {
-    if (callback != null && vis instanceof LoadableVisualizer)
-    {
-      LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
-      if (loadableVis.isLoaded())
-      {
-        // direct call callback since the visualizer is already ready
-        callback.visualizerLoaded(loadableVis);
-      }
-      else
-      {
-        loadableVis.clearCallbacks();
-        // add listener when player was fully loaded
-        loadableVis.addOnLoadCallBack(callback);
-      }
-    }
-
-    progress.setEnabled(false);
-    progress.setVisible(false);
-
-    if (vis != null)
-    {
-      btEntry.setEnabled(true);
-      vis.setVisible(true);
-      if (vis instanceof PDFViewer)
-      {
-        ((PDFViewer) vis).openPDFPage("-1");
-      }
-      if (vis instanceof MediaPlayer)
-      {
-        // if this is a media player visualizer, close all other media players
-        // since some browsers (e.g. Chrome) have problems if there are multiple
-        // audio/video elements on one page
-        MediaController mediaController = VaadinSession.getCurrent().
-          getAttribute(
-            MediaController.class);
-        mediaController.closeOtherPlayers((MediaPlayer) vis);
-
-      }
-      // add if not already added
-      if (getComponentIndex(vis) < 0)
-      {
-        addComponent(vis);
-      }
-    }
-  }
-
-  @Override
-  public void toggleVisualizer(boolean visible,
-    LoadableVisualizer.Callback callback)
-  {
-    if (visible)
-    {
-      loadVisualizer(callback);
-    }
-    else
-    {
-      // hide
-      btEntry.setEnabled(true);
-
-      if (vis != null)
-      {
-        vis.setVisible(false);
-        if (vis instanceof MediaPlayer)
-        {
-          removeComponent(vis);
+        input.setResult(result);
+        input.setVisibleTokenAnnos(visibleTokenAnnos);
+        input.setSegmentationName(segmentationName);
+        if (instanceConfig != null && instanceConfig.getFont() != null) {
+            input.setFont(instanceConfig.getFont());
         }
 
-      }
+        if (entry != null) {
+            input.setMappings(entry.getMappings());
+            input.setNamespace(entry.getNamespace());
+            String template = Helper.getContext() + "/Resource/" + entry.getVisType() + "/%s";
+            input.setResourcePathTemplate(template);
+        }
 
-      btEntry.setIcon(ICON_EXPAND);
+        // getting the whole document, when plugin is using text
+        if (visPlugin != null && visPlugin.isUsingText() && result != null
+                && result.getDocumentGraph().getNodes().size() > 0) {
+            List<String> nodeAnnoFilter = null;
+            if (visPlugin instanceof FilteringVisualizerPlugin) {
+                nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(corpusName,
+                        documentName, input.getMappings(), ui);
+            }
+            SaltProject p = getDocument(result.getGraph().getRoots().get(0).getName(), result.getName(), nodeAnnoFilter,
+                    ui);
 
+            SDocument wholeDocument = p.getCorpusGraphs().get(0).getDocuments().get(0);
+
+            CommonHelper.addMatchToDocumentGraph(match, wholeDocument);
+
+            input.setDocument(wholeDocument);
+        } else {
+            input.setDocument(result);
+        }
+
+        // getting the raw text, when the visualizer wants to have it
+        if (visPlugin != null && visPlugin.isUsingRawText()) {
+            input.setRawText(Helper.getRawText(corpusName, documentName, ui));
+        }
+
+        return input;
     }
-  }
 
-  public String getHtmlID()
-  {
-    return htmlID;
-  }
-
-
-  private class BackgroundJob implements Runnable
-  {
-
-    private final Future<Component> future;
-    private final LoadableVisualizer.Callback callback;
-    private final UI ui;
-
-    public BackgroundJob(
-      Future<Component> future, LoadableVisualizer.Callback callback, UI ui)
-    {
-      this.future = future;
-      this.callback = callback;
-      this.ui = ui;
+    public void setVisibleTokenAnnosVisible(SortedSet<String> annos) {
+        this.visibleTokenAnnos = annos;
+        if (visPlugin != null && vis != null) {
+            visPlugin.setVisibleTokenAnnosVisible(vis, annos);
+        }
     }
 
-    @Override
-    public void run()
-    {
+    public void setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered) {
+        this.segmentationName = segmentationName;
+        this.markedAndCovered = markedAndCovered;
 
-      Throwable exception = null;
-      try
-      {
-        final Component result = future.get(60, TimeUnit.SECONDS);
-
-        ui.accessSynchronously(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            vis = result;
-            updateGUIAfterLoadingVisualizer(callback);
-          }
-        });
-      }
-      catch (InterruptedException ex)
-      {
-        log.error(null, ex);
-        exception = ex;
-      }
-      catch (ExecutionException ex)
-      {
-        log.error(null, ex);
-        exception = ex;
-      }
-      catch (TimeoutException ex)
-      {
-        future.cancel(true);
-        log.error(
-          "Could create visualizer " + visPlugin.getShortName()
-          + " in 60 seconds: Timeout",
-          ex);
-        exception = ex;
-      }
-
-      if (exception != null)
-      {
-        final Throwable finalException = exception;
-        ui.accessSynchronously(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            Notification.show(
-              "Error when creating visualizer " + visPlugin.getShortName(),
-              finalException.toString(),
-              Notification.Type.WARNING_MESSAGE);
-          }
-        });
-      }
-
+        if (visPlugin != null && vis != null) {
+            visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
+        }
     }
-  }
 
-  public class LoadComponentTask implements Callable<Component>
-  {
-
-    @Override
-    public Component call() throws Exception
-    {
-      // only create component if not already created
-      if (vis == null)
-      {
-        return createComponent();
-      }
-      else
-      {
-        return vis;
-      }
-    }
-  }
-
-  public static class ByteArrayOutputStreamSource implements
-    StreamResource.StreamSource
-  {
-
-    private static final Logger log = LoggerFactory.
-      getLogger(ByteArrayOutputStreamSource.class);
-
-    private transient ByteArrayOutputStream byteStream;
-
-    public ByteArrayOutputStreamSource(ByteArrayOutputStream byteStream)
-    {
-      this.byteStream = byteStream;
+    private SaltProject getDocument(String toplevelCorpusName, String documentName, List<String> nodeAnnoFilter,
+            UI ui) {
+        SaltProject txt = null;
+        try {
+            toplevelCorpusName = urlPathEscape.escape(toplevelCorpusName);
+            documentName = urlPathEscape.escape(documentName);
+            WebResource res = Helper.getAnnisWebResource(ui).path("query").path("graph").path(toplevelCorpusName)
+                    .path(documentName);
+            if (nodeAnnoFilter != null) {
+                res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
+            }
+            txt = res.get(SaltProject.class);
+        } catch (ClientHandlerException | UniformInterfaceException e) {
+            log.error("General remote service exception", e);
+        }
+        return txt;
     }
 
     @Override
-    public InputStream getStream()
-    {
-      if (byteStream == null)
-      {
-        log.error("byte stream was null");
-        return null;
-      }
-      return new ByteArrayInputStream(byteStream.toByteArray());
-    }
-  }
+    public void buttonClick(ClickEvent event) {
 
-  public String getVisualizerShortName()
-  {
-    if (visPlugin != null)
-    {
-      return visPlugin.getShortName();
+        boolean isVisible = !visualizerIsVisible();
+
+        // register new state by the parent SingleResultPanel, so the state will be
+        // still available, after a reload
+        visCtxChanger.registerVisibilityStatus(entry.getId(), isVisible);
+
+        // start the toogle process.
+        toggleVisualizer(isVisible, null);
     }
 
-    else
-    {
-      return null;
+    @Override
+    public boolean visualizerIsVisible() {
+        if (vis == null || !vis.isVisible()) {
+            return false;
+        }
+        return true;
     }
-  }
 
-  protected SDocument getResult()
-  {
-    return result;
-  }
-  
-  
+    private void loadVisualizer(final LoadableVisualizer.Callback callback) {
+        if (visPlugin != null) {
+            btEntry.setIcon(ICON_COLLAPSE);
+            progress.setIndeterminate(true);
+            progress.setVisible(true);
+            progress.setEnabled(true);
+            progress.setDescription("Loading visualizer" + visPlugin.getShortName());
+
+            ExecutorService execService = Executors.newSingleThreadExecutor();
+
+            final Future<Component> future = execService.submit(new LoadComponentTask(UI.getCurrent()));
+
+            // run the actual code to load the visualizer
+            Background.run(new BackgroundJob(future, callback, UI.getCurrent()));
+
+        } // end if create input was needed
+
+    } // end loadVisualizer
+
+    private void updateGUIAfterLoadingVisualizer(LoadableVisualizer.Callback callback) {
+        if (callback != null && vis instanceof LoadableVisualizer) {
+            LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+            if (loadableVis.isLoaded()) {
+                // direct call callback since the visualizer is already ready
+                callback.visualizerLoaded(loadableVis);
+            } else {
+                loadableVis.clearCallbacks();
+                // add listener when player was fully loaded
+                loadableVis.addOnLoadCallBack(callback);
+            }
+        }
+
+        progress.setEnabled(false);
+        progress.setVisible(false);
+
+        if (vis != null) {
+            btEntry.setEnabled(true);
+            vis.setVisible(true);
+            if (vis instanceof PDFViewer) {
+                ((PDFViewer) vis).openPDFPage("-1");
+            }
+            if (vis instanceof MediaPlayer) {
+                // if this is a media player visualizer, close all other media players
+                // since some browsers (e.g. Chrome) have problems if there are multiple
+                // audio/video elements on one page
+                MediaController mediaController = VaadinSession.getCurrent().getAttribute(MediaController.class);
+                mediaController.closeOtherPlayers((MediaPlayer) vis);
+
+            }
+            // add if not already added
+            if (getComponentIndex(vis) < 0) {
+                addComponent(vis);
+            }
+        }
+    }
+
+    @Override
+    public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback) {
+        if (visible) {
+            loadVisualizer(callback);
+        } else {
+            // hide
+            btEntry.setEnabled(true);
+
+            if (vis != null) {
+                vis.setVisible(false);
+                if (vis instanceof MediaPlayer) {
+                    removeComponent(vis);
+                }
+
+            }
+
+            btEntry.setIcon(ICON_EXPAND);
+
+        }
+    }
+
+    public String getHtmlID() {
+        return htmlID;
+    }
+
+    private class BackgroundJob implements Runnable {
+
+        private final Future<Component> future;
+        private final LoadableVisualizer.Callback callback;
+        private final UI ui;
+
+        public BackgroundJob(Future<Component> future, LoadableVisualizer.Callback callback, UI ui) {
+            this.future = future;
+            this.callback = callback;
+            this.ui = ui;
+        }
+
+        @Override
+        public void run() {
+
+            Throwable exception = null;
+            try {
+                final Component result = future.get(60, TimeUnit.SECONDS);
+
+                ui.accessSynchronously(new Runnable() {
+                    @Override
+                    public void run() {
+                        vis = result;
+                        updateGUIAfterLoadingVisualizer(callback);
+                    }
+                });
+            } catch (InterruptedException ex) {
+                log.error(null, ex);
+                exception = ex;
+            } catch (ExecutionException ex) {
+                log.error(null, ex);
+                exception = ex;
+            } catch (TimeoutException ex) {
+                future.cancel(true);
+                log.error("Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout", ex);
+                exception = ex;
+            }
+
+            if (exception != null) {
+                final Throwable finalException = exception;
+                ui.accessSynchronously(new Runnable() {
+                    @Override
+                    public void run() {
+                        Notification.show("Error when creating visualizer " + visPlugin.getShortName(),
+                                finalException.toString(), Notification.Type.WARNING_MESSAGE);
+                    }
+                });
+            }
+
+        }
+    }
+
+    public class LoadComponentTask implements Callable<Component> {
+        private final UI ui;
+
+        public LoadComponentTask(UI ui) {
+            this.ui = ui;
+        }
+
+        @Override
+        public Component call() throws Exception {
+            // only create component if not already created
+            if (vis == null) {
+                return createComponent(ui);
+            } else {
+                return vis;
+            }
+        }
+    }
+
+    public static class ByteArrayOutputStreamSource implements StreamResource.StreamSource {
+
+        private static final Logger log = LoggerFactory.getLogger(ByteArrayOutputStreamSource.class);
+
+        private transient ByteArrayOutputStream byteStream;
+
+        public ByteArrayOutputStreamSource(ByteArrayOutputStream byteStream) {
+            this.byteStream = byteStream;
+        }
+
+        @Override
+        public InputStream getStream() {
+            if (byteStream == null) {
+                log.error("byte stream was null");
+                return null;
+            }
+            return new ByteArrayInputStream(byteStream.toByteArray());
+        }
+    }
+
+    public String getVisualizerShortName() {
+        if (visPlugin != null) {
+            return visPlugin.getShortName();
+        }
+
+        else {
+            return null;
+        }
+    }
+
+    protected SDocument getResult() {
+        return result;
+    }
+
 }

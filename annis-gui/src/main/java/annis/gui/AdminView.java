@@ -29,6 +29,7 @@ import com.vaadin.server.Page;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
@@ -51,293 +52,246 @@ import annis.libgui.Helper;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class AdminView extends VerticalLayout implements View,
-  UIView, LoginListener, TabSheet.SelectedTabChangeListener, WebResourceProvider
-{
+public class AdminView extends VerticalLayout
+        implements View, UIView, LoginListener, TabSheet.SelectedTabChangeListener, WebResourceProvider {
 
-  public static final String NAME = "admin";
+    public static final String NAME = "admin";
 
-  private final List<UIView.Listener> listeners = new LinkedList<>();
+    private final List<UIView.Listener> listeners = new LinkedList<>();
 
-  private final TabSheet tabSheet;
+    private final TabSheet tabSheet;
 
-  private final ImportPanel importPanel;
+    private final ImportPanel importPanel;
 
-  private final CorpusAdminPanel corpusAdminPanel;
+    private final CorpusAdminPanel corpusAdminPanel;
 
-  private final UserManagementPanel userManagementPanel;
+    private final UserManagementPanel userManagementPanel;
 
-  private final GroupManagementPanel groupManagementPanel;
+    private final GroupManagementPanel groupManagementPanel;
 
-  private MainToolbar toolbar;
+    private MainToolbar toolbar;
 
-  private transient WebResource webResource;
+    private transient WebResource webResource;
 
-  private transient AsyncWebResource asyncWebResource;
-  
-  public AdminView(AnnisUI ui)
-  {
-    Page.getCurrent().setTitle("ANNIS Adminstration");
+    private transient AsyncWebResource asyncWebResource;
 
-    UserManagement userManagement = new UserManagement();
-    userManagement.setWebResourceProvider(AdminView.this);
-    GroupManagement groupManagement = new GroupManagement();
-    groupManagement.setWebResourceProvider(AdminView.this);
-    CorpusManagement corpusManagement = new CorpusManagement();
-    corpusManagement.setWebResourceProvider(AdminView.this);
+    private final AnnisUI ui;
 
-    boolean isLoggedIn = Helper.getUser() != null;
+    public AdminView(AnnisUI ui) {
+        this.ui = ui;
+        Page.getCurrent().setTitle("ANNIS Adminstration");
 
-    corpusAdminPanel = new CorpusAdminPanel();
-    new CorpusController(corpusManagement, corpusAdminPanel,
-      this, isLoggedIn);
+        UserManagement userManagement = new UserManagement();
+        userManagement.setWebResourceProvider(AdminView.this);
+        GroupManagement groupManagement = new GroupManagement();
+        groupManagement.setWebResourceProvider(AdminView.this);
+        CorpusManagement corpusManagement = new CorpusManagement();
+        corpusManagement.setWebResourceProvider(AdminView.this);
 
-    userManagementPanel = new UserManagementPanel();
-    new UserController(userManagement,
-      userManagementPanel, this, isLoggedIn);
+        boolean isLoggedIn = Helper.getUser(ui) != null;
 
-    groupManagementPanel = new GroupManagementPanel();
-    new GroupController(groupManagement,
-      corpusManagement,
-      groupManagementPanel, this, userManagementPanel, isLoggedIn);
+        corpusAdminPanel = new CorpusAdminPanel();
+        new CorpusController(corpusManagement, corpusAdminPanel, this, isLoggedIn);
 
-    importPanel = new ImportPanel();
+        userManagementPanel = new UserManagementPanel();
+        new UserController(userManagement, userManagementPanel, this, isLoggedIn);
 
-    tabSheet = new TabSheet();
-    tabSheet.addTab(importPanel, "Import Corpus", FontAwesome.UPLOAD);
-    tabSheet.addTab(corpusAdminPanel, "Corpus management", FontAwesome.LIST_ALT);
-    tabSheet.addTab(userManagementPanel, "User management", FontAwesome.USER);
-    tabSheet.addTab(groupManagementPanel, "Group management",
-      FontAwesome.USERS);
+        groupManagementPanel = new GroupManagementPanel();
+        new GroupController(groupManagement, corpusManagement, groupManagementPanel, this, userManagementPanel,
+                isLoggedIn);
 
-    tabSheet.setSizeFull();
+        importPanel = new ImportPanel();
 
-    tabSheet.addSelectedTabChangeListener(AdminView.this);
+        tabSheet = new TabSheet();
+        tabSheet.addTab(importPanel, "Import Corpus", FontAwesome.UPLOAD);
+        tabSheet.addTab(corpusAdminPanel, "Corpus management", FontAwesome.LIST_ALT);
+        tabSheet.addTab(userManagementPanel, "User management", FontAwesome.USER);
+        tabSheet.addTab(groupManagementPanel, "Group management", FontAwesome.USERS);
 
-    addComponents(tabSheet);
-    setSizeFull();
+        tabSheet.setSizeFull();
 
-    setExpandRatio(tabSheet, 1.0f);
+        tabSheet.addSelectedTabChangeListener(AdminView.this);
 
-    tabSheet.addStyleName(ValoTheme.TABSHEET_FRAMED);
+        addComponents(tabSheet);
+        setSizeFull();
 
-  }
+        setExpandRatio(tabSheet, 1.0f);
 
-  public void setToolbar(MainToolbar newToolbar)
-  {
-    // remove old one if necessary
-    if (this.toolbar != null)
-    {
-      removeComponent(this.toolbar);
-      this.toolbar = null;
+        tabSheet.addStyleName(ValoTheme.TABSHEET_FRAMED);
+
     }
 
-    // add new toolbar
-    if (newToolbar != null)
-    {
-      this.toolbar = newToolbar;
-      addComponent(this.toolbar, 0);
-      setExpandRatio(this.toolbar, 0.0f);
-      this.toolbar.addLoginListener(this);
-    }
-  }
+    public void setToolbar(MainToolbar newToolbar) {
+        // remove old one if necessary
+        if (this.toolbar != null) {
+            removeComponent(this.toolbar);
+            this.toolbar = null;
+        }
 
-  @Override
-  public void enter(ViewChangeListener.ViewChangeEvent event)
-  {
-
-    boolean kickstarter = Helper.isKickstarter(getSession());
-
-    importPanel.updateMode(kickstarter, Helper.getUser() != null);
-
-    // group and user management are not applicable in kickstarter
-    tabSheet.getTab(groupManagementPanel).setVisible(!kickstarter);
-    tabSheet.getTab(userManagementPanel).setVisible(!kickstarter);
-
-    Component selectedTab = getComponentForFragment(event.getParameters());
-    if(selectedTab != null && selectedTab != tabSheet.getSelectedTab())
-    {
-      // Select the component given by the fragment, This will call
-      // the selection change handler and thus we don't have
-      // to call the listeners here. 
-      tabSheet.setSelectedTab(selectedTab);
-    }
-    else
-    {
-      // nothing to change in the tab selection, call the listeners manually
-      selectedTab = tabSheet.getSelectedTab();
-      for (UIView.Listener l : listeners)
-      {
-        l.loadedTab(selectedTab);
-      } 
-      setFragmentParameter(getFragmentForComponent(selectedTab));
+        // add new toolbar
+        if (newToolbar != null) {
+            this.toolbar = newToolbar;
+            addComponent(this.toolbar, 0);
+            setExpandRatio(this.toolbar, 0.0f);
+            this.toolbar.addLoginListener(this);
+        }
     }
 
-  }
+    @Override
+    public void enter(ViewChangeListener.ViewChangeEvent event) {
 
-  @Override
-  public void detach()
-  {
-    // inform the controllers that no tab is active any longer
-    for(UIView.Listener l : listeners)
-    {
-      l.loadedTab(null);
+        boolean kickstarter = Helper.isKickstarter(getSession());
+
+        importPanel.updateMode(kickstarter, Helper.getUser(ui) != null);
+
+        // group and user management are not applicable in kickstarter
+        tabSheet.getTab(groupManagementPanel).setVisible(!kickstarter);
+        tabSheet.getTab(userManagementPanel).setVisible(!kickstarter);
+
+        Component selectedTab = getComponentForFragment(event.getParameters());
+        if (selectedTab != null && selectedTab != tabSheet.getSelectedTab()) {
+            // Select the component given by the fragment, This will call
+            // the selection change handler and thus we don't have
+            // to call the listeners here.
+            tabSheet.setSelectedTab(selectedTab);
+        } else {
+            // nothing to change in the tab selection, call the listeners manually
+            selectedTab = tabSheet.getSelectedTab();
+            for (UIView.Listener l : listeners) {
+                l.loadedTab(selectedTab);
+            }
+            setFragmentParameter(getFragmentForComponent(selectedTab));
+        }
+
     }
-    
-    super.detach();
-  }
-  
-  
 
-  private Component getComponentForFragment(String fragment)
-  {
-    if (fragment != null)
-    {
-      switch (fragment)
-      {
-        case "import":
-          return importPanel;
-        case "corpora":
-          return corpusAdminPanel;
-        case "users":
-          return userManagementPanel;
-        case "groups":
-          return groupManagementPanel;
-        default:
-          break;
-      }
+    @Override
+    public void detach() {
+        // inform the controllers that no tab is active any longer
+        for (UIView.Listener l : listeners) {
+            l.loadedTab(null);
+        }
+
+        super.detach();
     }
-    return null;
-  }
-  
-  private String getFragmentForComponent(Component c)
-  {
-    if (c == importPanel)
-    {
-      return "import";
+
+    private Component getComponentForFragment(String fragment) {
+        if (fragment != null) {
+            switch (fragment) {
+            case "import":
+                return importPanel;
+            case "corpora":
+                return corpusAdminPanel;
+            case "users":
+                return userManagementPanel;
+            case "groups":
+                return groupManagementPanel;
+            default:
+                break;
+            }
+        }
+        return null;
     }
-    else if (c == corpusAdminPanel)
-    {
-      return "corpora";
+
+    private String getFragmentForComponent(Component c) {
+        if (c == importPanel) {
+            return "import";
+        } else if (c == corpusAdminPanel) {
+            return "corpora";
+        } else if (c == userManagementPanel) {
+            return "users";
+        } else if (c == groupManagementPanel) {
+            return "groups";
+        }
+        return "";
     }
-    else if (c == userManagementPanel)
-    {
-      return "users";
+
+    @Override
+    public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
+        Component selected = event.getTabSheet().getSelectedTab();
+
+        for (UIView.Listener l : listeners) {
+            l.loadedTab(selected);
+        }
+        setFragmentParameter(getFragmentForComponent(selected));
     }
-    else if (c == groupManagementPanel)
-    {
-      return  "groups";
+
+    private void setFragmentParameter(String param) {
+        Page.getCurrent().setUriFragment("!" + NAME + "/" + param, false);
     }
-    return "";
-  }
 
-  @Override
-  public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
-  {
-    Component selected = event.getTabSheet().getSelectedTab();
-    
-    for (UIView.Listener l : listeners)
-    {
-      l.loadedTab(selected);
+    @Override
+    public void addListener(UIView.Listener listener) {
+        listeners.add(listener);
     }
-    setFragmentParameter(getFragmentForComponent(selected));
-  }
 
-  private void setFragmentParameter(String param)
-  {
-    Page.getCurrent().setUriFragment("!" + NAME + "/" + param, false);
-  }
-
-  @Override
-  public void addListener(UIView.Listener listener)
-  {
-    listeners.add(listener);
-  }
-
-  @Override
-  public void showInfo(String info, String description)
-  {
-    Notification.show(info, description, Notification.Type.HUMANIZED_MESSAGE);
-  }
-
-  @Override
-  public void showBackgroundInfo(String info, String description)
-  {
-    Notification.show(info, description, Notification.Type.TRAY_NOTIFICATION);
-  }
-
-  @Override
-  public void showWarning(String error, String description)
-  {
-    Notification.show(error, description, Notification.Type.WARNING_MESSAGE);
-  }
-
-  @Override
-  public void showError(String error, String description)
-  {
-    Notification.show(error, description, Notification.Type.ERROR_MESSAGE);
-  }
-
-  @Override
-  public void onLogin()
-  {
-    for (UIView.Listener l : listeners)
-    {
-      l.loginChanged(true);
+    @Override
+    public void showInfo(String info, String description) {
+        Notification.show(info, description, Notification.Type.HUMANIZED_MESSAGE);
     }
-    // TODO: make import panel a normal UI view listener
-    if (importPanel != null)
-    {
-      importPanel.onLogin();
-    }
-  }
 
-  @Override
-  public void onLogout()
-  {
-    for (UIView.Listener l : listeners)
-    {
-      l.loginChanged(false);
+    @Override
+    public void showBackgroundInfo(String info, String description) {
+        Notification.show(info, description, Notification.Type.TRAY_NOTIFICATION);
     }
-    // TODO: make import panel a normal UI view listener
-    if (importPanel != null)
-    {
-      importPanel.onLogout();
+
+    @Override
+    public void showWarning(String error, String description) {
+        Notification.show(error, description, Notification.Type.WARNING_MESSAGE);
     }
-  }
 
-  @Override
-  public <T> void runInBackground(Callable<T> job,
-    final FutureCallback<T> callback)
-  {
-    Background.runWithCallback(job, callback);
-  }
-
-  @Override
-  public WebResource getWebResource()
-  {
-    if (webResource == null)
-    {
-      webResource = Helper.getAnnisWebResource();
+    @Override
+    public void showError(String error, String description) {
+        Notification.show(error, description, Notification.Type.ERROR_MESSAGE);
     }
-    return webResource;
-  }
 
-  @Override
-  public AsyncWebResource getAsyncWebResource()
-  {
-    if (asyncWebResource == null)
-    {
-      asyncWebResource = Helper.getAnnisAsyncWebResource();
+    @Override
+    public void onLogin() {
+        for (UIView.Listener l : listeners) {
+            l.loginChanged(true);
+        }
+        // TODO: make import panel a normal UI view listener
+        if (importPanel != null) {
+            importPanel.onLogin();
+        }
     }
-    return asyncWebResource;
-  }
 
-  @Override
-  public void invalidateWebResource()
-  {
-    asyncWebResource = null;
-    webResource = null;
-  }
+    @Override
+    public void onLogout() {
+        for (UIView.Listener l : listeners) {
+            l.loginChanged(false);
+        }
+        // TODO: make import panel a normal UI view listener
+        if (importPanel != null) {
+            importPanel.onLogout();
+        }
+    }
+
+    @Override
+    public <T> void runInBackground(Callable<T> job, final FutureCallback<T> callback) {
+        Background.runWithCallback(job, callback);
+    }
+
+    @Override
+    public WebResource getWebResource() {
+        if (webResource == null) {
+            webResource = Helper.getAnnisWebResource(ui);
+        }
+        return webResource;
+    }
+
+    @Override
+    public AsyncWebResource getAsyncWebResource() {
+        if (asyncWebResource == null) {
+            asyncWebResource = Helper.getAnnisAsyncWebResource(ui);
+        }
+        return asyncWebResource;
+    }
+
+    @Override
+    public void invalidateWebResource() {
+        asyncWebResource = null;
+        webResource = null;
+    }
 
 }

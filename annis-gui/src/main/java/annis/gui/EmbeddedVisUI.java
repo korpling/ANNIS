@@ -163,7 +163,7 @@ public class EmbeddedVisUI extends CommonUI {
             URI uri = new URI(rawUri);
             // fetch content of the URI
             Client client = null;
-            AnnisUser user = Helper.getUser();
+            AnnisUser user = Helper.getUser(EmbeddedVisUI.this);
             if (user != null) {
                 client = user.getClient();
             }
@@ -341,7 +341,7 @@ public class EmbeddedVisUI extends CommonUI {
 
             // create input
             try {
-                input = DocBrowserController.createInput(corpus, doc, visConfig, false, null);
+                input = DocBrowserController.createInput(corpus, doc, visConfig, false, null, EmbeddedVisUI.this);
                 // create components, put in a panel
                 Panel viszr = visualizer.createComponent(input, null);
 

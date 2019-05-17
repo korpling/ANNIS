@@ -222,9 +222,9 @@ public class ExampleQueriesPanel extends CssLayout {
      *                        If it is null or empty all available example queries
      *                        are fetched.
      */
-    private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames) {
+    private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames, UI ui) {
         List<ExampleQuery> result = new LinkedList<>();
-        WebResource service = Helper.getAnnisWebResource();
+        WebResource service = Helper.getAnnisWebResource(ui);
         try {
             if (corpusNames == null || corpusNames.isEmpty()) {
                 result = service.path("query").path("corpora").path("example-queries")
@@ -273,7 +273,7 @@ public class ExampleQueriesPanel extends CssLayout {
         public void run() {
             final List<ExampleQuery> result = new LinkedList<>();
             try {
-                result.addAll(loadExamplesFromRemote(selectedCorpora));
+                result.addAll(loadExamplesFromRemote(selectedCorpora, ui));
             } finally {
                 ui.access(new Runnable() {
                     @Override

@@ -290,7 +290,6 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.addComponent(ctxLayout);
 
     addComponent(infoBar);
-    initVisualizer();
   }
   
 
@@ -394,7 +393,7 @@ public class SingleResultPanel extends CssLayout implements
     {
       ResolverEntry[] entries 
         = resolverProvider == null ? new ResolverEntry[0] 
-        : resolverProvider.getResolverEntries(result);
+        : resolverProvider.getResolverEntries(result, UI.getCurrent());
       visualizers = new LinkedList<>();
       resolverEntries = new LinkedList<>();
       
@@ -465,6 +464,9 @@ public class SingleResultPanel extends CssLayout implements
   public void attach()
   {
     super.attach();
+
+    initVisualizer();
+    
     if (Helper.isKickstarter(getSession()))
     {
       btLink.setVisible(false);

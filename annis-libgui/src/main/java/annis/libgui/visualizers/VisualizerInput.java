@@ -26,7 +26,8 @@ import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.core.SNode;
 
-import annis.CommonHelper;
+import com.vaadin.ui.UI;
+
 import annis.gui.FontConfig;
 import annis.libgui.MatchedNodeColors;
 import annis.service.objects.RawTextWrapper;
@@ -50,7 +51,7 @@ public class VisualizerInput implements Serializable
 
   private String contextPath;
 
-  private String annisWebServiceURL;
+  private UI ui;
 
   private Properties mappings;
 
@@ -64,9 +65,9 @@ public class VisualizerInput implements Serializable
 
   private RawTextWrapper rawText;
 
-  public String getAnnisWebServiceURL()
+  public UI getUI()
   {
-    return annisWebServiceURL;
+    return ui;
   }
 
   /**
@@ -74,9 +75,9 @@ public class VisualizerInput implements Serializable
    *
    * @param annisRemoteServiceURL
    */
-  public void setAnnisWebServiceURL(String annisRemoteServiceURL)
+  public void setUI(UI ui)
   {
-    this.annisWebServiceURL = annisRemoteServiceURL;
+    this.ui = ui;
   }
 
   /**
