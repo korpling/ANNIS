@@ -1031,7 +1031,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 } else {
                     return getQueryRunner().query(conn,
                             "SELECT * FROM metadata_cache WHERE corpus = ? AND "
-                                    + "((\"type\" = 'DOCUMENT' AND path LIKE ?') OR (\"type\"= 'CORPUS' AND path = ?))",
+                                    + "((\"type\" = 'DOCUMENT' AND path LIKE ?) OR (\"type\"= 'CORPUS' AND path = ?))",
                             new MetadataCacheHelper(), toplevelCorpusName, "%/" + documentName, toplevelCorpusName);
                 }
             }
