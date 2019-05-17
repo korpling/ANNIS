@@ -216,6 +216,9 @@ public class URLShortenerDefinition {
                     new LinkedList<>(query.getCorpora()));
         } catch (GraphANNISException ex) {
             countGraphANNIS = 0;
+        } catch (AnnisTimeoutException ex) {
+            this.errorMsg = "Timeout in graphANNIS";
+            return QueryStatus.Failed;
         }
 
         try {
