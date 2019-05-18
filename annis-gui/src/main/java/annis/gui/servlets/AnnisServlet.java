@@ -43,32 +43,6 @@ import annis.libgui.UIConfig;
  */
 public class AnnisServlet extends VaadinServlet {
     
-    protected void loadApplicationProperties(String configFile, VaadinSession session) {
-        List<File> locations = AnnisBaseUI.getAllConfigLocations(configFile);
-
-        // load properties in the right order
-        for (File f : locations) {
-            loadPropertyFile(f, session);
-        }
-    }
-
-    private void loadPropertyFile(File f, VaadinSession session) {
-        if (f.canRead() && f.isFile()) {
-            try (FileInputStream fis = new FileInputStream(f)) {
-                Properties p = new Properties();
-                p.load(fis);
-
-                // copy all properties to the session
-                for (String name : p.stringPropertyNames()) {
-                    session.setAttribute(name, p.getProperty(name));
-                }
-
-            } catch (IOException ex) {
-
-            }
-        }
-    }
-
     @Override
     protected void servletInitialized() throws ServletException {
         super.servletInitialized();
