@@ -310,8 +310,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             for (URLShortenerDefinition q : queries) {
                 System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
                 System.out.println("UUID: \"" + q.getUuid() + "\"");
-                System.out.println("Query:");
-                System.out.println(q.getQuery().getQuery().trim());
+                if(q.getQuery().getQuery() != null) {
+                    System.out.println("Query:");
+                    System.out.println(q.getQuery().getQuery().trim());
+                }
                 if (q.getErrorMsg() != null) {
                     System.out.println("Error: " + q.getErrorMsg());
                 }
