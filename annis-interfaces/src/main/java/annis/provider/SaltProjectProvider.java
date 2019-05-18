@@ -104,7 +104,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>, Mess
                 // write the corpus graph
                 writer.writeCorpusGraph(xml, corpusGraph, true);
 
-                // write the all document graphs
+                // write the all document graphs of this corpus graph
                 for (SDocument doc : corpusGraph.getDocuments()) {
                     // make sure that any ANNIS feature on the document is copied to the document
                     // graph

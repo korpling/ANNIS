@@ -151,12 +151,13 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt) throws GraphANNISException {
         SaltProject p = SaltFactory.createSaltProject();
 
-        SCorpusGraph corpusGraph = p.createCorpusGraph();
-
         if (matchGroup != null && annoExt != null) {
 
             for (Match m : matchGroup.getMatches()) {
 
+                // create a corpus graph for each match
+                SCorpusGraph corpusGraph = p.createCorpusGraph();
+                
                 List<URI> certainDocumentIDs = new LinkedList<>();
                 List<URI> possibleCorpusIDs = new LinkedList<>();
 

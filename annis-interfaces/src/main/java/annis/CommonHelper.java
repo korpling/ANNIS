@@ -138,7 +138,7 @@ public class CommonHelper {
             Set<SNode> startNodes = new LinkedHashSet<SNode>();
             if (graph != null) {
                 List<SNode> orderRoots = graph.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
-                if(orderRoots != null) {
+                if (orderRoots != null) {
                     // collect the start nodes of a segmentation chain of length 1
                     for (SNode n : orderRoots) {
                         for (SRelation<?, ?> rel : n.getOutRelations()) {
@@ -426,16 +426,23 @@ public class CommonHelper {
             }
             i++;
         }
-        SFeature featIDs = SaltFactory.createSFeature();
-        featIDs.setNamespace(AnnisConstants.ANNIS_NS);
-        featIDs.setName(AnnisConstants.FEAT_MATCHEDIDS);
-        featIDs.setValue(Joiner.on(",").join(allUrisAsString));
-        document.addFeature(featIDs);
-        SFeature featAnnos = SaltFactory.createSFeature();
-        featAnnos.setNamespace(AnnisConstants.ANNIS_NS);
-        featAnnos.setName(AnnisConstants.FEAT_MATCHEDANNOS);
-        featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
-        document.addFeature(featAnnos);
+        SFeature existingFeatIDs = document.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
+        if (existingFeatIDs == null) {
+            SFeature featIDs = SaltFactory.createSFeature();
+            featIDs.setNamespace(AnnisConstants.ANNIS_NS);
+            featIDs.setName(AnnisConstants.FEAT_MATCHEDIDS);
+            featIDs.setValue(Joiner.on(",").join(allUrisAsString));
+            document.addFeature(featIDs);
+        }
+        
+        SFeature existingFeatAnnos = document.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDANNOS);
+        if(existingFeatAnnos == null) {
+            SFeature featAnnos = SaltFactory.createSFeature();
+            featAnnos.setNamespace(AnnisConstants.ANNIS_NS);
+            featAnnos.setName(AnnisConstants.FEAT_MATCHEDANNOS);
+            featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
+             document.addFeature(featAnnos);
+        }
     }
 
     /**
