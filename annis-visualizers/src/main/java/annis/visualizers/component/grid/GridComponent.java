@@ -109,7 +109,7 @@ public class GridComponent extends Panel {
             this.segmentationName = forceToken ? null : input.getSegmentationName();
 
             List<STextualDS> texts = input.getDocument().getDocumentGraph().getTextualDSs();
-            if (texts != null && texts.size() > 0 && !Helper.isRTLDisabled()) {
+            if (texts != null && texts.size() > 0 && !Helper.isRTLDisabled(input.getUI())) {
                 if (CommonHelper.containsRTLText(texts.get(0).getText())) {
                     addStyleName("rtl");
                 }

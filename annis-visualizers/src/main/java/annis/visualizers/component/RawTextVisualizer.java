@@ -130,7 +130,7 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
                     lblText = new Label(s, ContentMode.TEXT);
                 }
                 
-                if(!Helper.isRTLDisabled() && CommonHelper.containsRTLText(s))
+                if(!Helper.isRTLDisabled(visInput.getUI()) && CommonHelper.containsRTLText(s))
                 {
                   lblText.addStyleName("rtl");
                 }
@@ -151,7 +151,7 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
         if (texts.hasTexts() && !hasOnlyWhiteSpace(texts.getFirstText())) {
             lblText = new Label(texts.getFirstText(), ContentMode.TEXT);
             
-            if(!Helper.isRTLDisabled() && CommonHelper.containsRTLText(texts.getFirstText()))
+            if(!Helper.isRTLDisabled(visInput.getUI()) && CommonHelper.containsRTLText(texts.getFirstText()))
             {
               lblText.addStyleName("rtl");
             }

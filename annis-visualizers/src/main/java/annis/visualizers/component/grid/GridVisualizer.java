@@ -75,9 +75,9 @@ public class GridVisualizer extends AbstractVisualizer<GridComponent>
   public GridComponent createComponent(VisualizerInput visInput,
     VisualizationToggle visToggle)
   {
-    MediaController mediaController = VaadinSession.getCurrent().getAttribute(
+    MediaController mediaController = visInput.getUI().getSession().getAttribute(
       MediaController.class);
-    PDFController pdfController = VaadinSession.getCurrent().getAttribute(
+    PDFController pdfController = visInput.getUI().getSession().getAttribute(
       PDFController.class);
     GridComponent component = null;
     try

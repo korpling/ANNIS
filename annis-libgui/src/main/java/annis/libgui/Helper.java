@@ -185,7 +185,7 @@ public class Helper {
 
         if (wrappedSession != null) {
 
-            Object o = VaadinSession.getCurrent().getSession().getAttribute(AnnisBaseUI.USER_KEY);
+            Object o = wrappedSession.getAttribute(AnnisBaseUI.USER_KEY);
             if (o != null && o instanceof AnnisUser) {
                 return (AnnisUser) o;
             }
@@ -295,7 +295,7 @@ public class Helper {
         String uri = null;
 
         if (vSession != null) {
-            uri = (String) VaadinSession.getCurrent().getAttribute(KEY_WEB_SERVICE_URL);
+            uri = (String) vSession.getAttribute(KEY_WEB_SERVICE_URL);
         }
 
         // if already authentificated the REST client is set as the "user" property
@@ -327,11 +327,11 @@ public class Helper {
         return null;
     }
 
-    public static String getContext() {
+    public static String getContext(UI ui) {
         if (VaadinService.getCurrentRequest() != null) {
             return VaadinService.getCurrentRequest().getContextPath();
         } else {
-            return (String) VaadinSession.getCurrent().getAttribute(AnnisBaseUI.CONTEXT_PATH);
+            return (String) ui.getSession().getAttribute(AnnisBaseUI.CONTEXT_PATH);
         }
 
     }
@@ -607,8 +607,8 @@ public class Helper {
      *
      * @return True if RTL is disabled
      */
-    public static boolean isRTLDisabled() {
-        String disableRtl = (String) VaadinSession.getCurrent().getAttribute("disable-rtl");
+    public static boolean isRTLDisabled(UI ui) {
+        String disableRtl = (String) ui.getSession().getAttribute("disable-rtl");
         return "true".equalsIgnoreCase(disableRtl);
     }
 
@@ -866,7 +866,7 @@ public class Helper {
 
     public static String shortenURL(URI original, UI ui) {
         WebResource res = Helper.getAnnisWebResource(ui).path("shortener");
-        String appContext = Helper.getContext();
+        String appContext = Helper.getContext(ui);
 
         String path = original.getRawPath();
         if (path.startsWith(appContext)) {

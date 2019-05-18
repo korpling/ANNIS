@@ -250,7 +250,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
     private VisualizerInput createInput(UI ui) {
         VisualizerInput input = new VisualizerInput();
         input.setUI(ui);
-        input.setContextPath(Helper.getContext());
+        input.setContextPath(Helper.getContext(ui));
         input.setId(resultID);
 
         input.setMarkedAndCovered(markedAndCovered);
@@ -265,7 +265,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
         if (entry != null) {
             input.setMappings(entry.getMappings());
             input.setNamespace(entry.getNamespace());
-            String template = Helper.getContext() + "/Resource/" + entry.getVisType() + "/%s";
+            String template = Helper.getContext(ui) + "/Resource/" + entry.getVisType() + "/%s";
             input.setResourcePathTemplate(template);
         }
 

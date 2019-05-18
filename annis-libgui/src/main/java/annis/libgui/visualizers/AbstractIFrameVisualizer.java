@@ -67,7 +67,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
   public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle)
   { 
     
-    VaadinSession session = VaadinSession.getCurrent();
+    VaadinSession session = vis.getUI().getSession();
     if(session.getAttribute(IFrameResourceMap.class) == null)
     {
       session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
@@ -83,7 +83,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
     UUID uuid = UUID.randomUUID();
     session.getAttribute(IFrameResourceMap.class).put(uuid, res);
   
-    URI base = UI.getCurrent().getPage().getLocation();
+    URI base = vis.getUI().getPage().getLocation();
     AutoHeightIFrame iframe = 
       new AutoHeightIFrame(base.resolve("vis-iframe-res/" + uuid.toString()));
     return iframe;

@@ -178,7 +178,7 @@ public class ShareSingleMatchGenerator extends Window implements
   
   private URI generatorURLForVisualizer(ResolverEntry entry)
   {
-    String appContext = Helper.getContext();
+    String appContext = Helper.getContext(UI.getCurrent());
     URI appURI = UI.getCurrent().getPage().getLocation();
     UriBuilder result = UriBuilder.fromUri(appURI)
       .replacePath(appContext)
