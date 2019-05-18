@@ -62,7 +62,7 @@ service if the user can provide the appropriate credentials.
 **Thus you should always make sure to enforce encrypted SSL (HTTPS) connections for the public accessable service.**
 
 After you made the service available for other servers you have to configure the front-end to use this non-default service URL.
-Change the file `WEB-INF/conf/annis-gui.properties` and set the `AnnisWebService.URL` to the right value:
+Change the file `WEB-INF/classes/annis-gui.properties` and set the `AnnisWebService.URL` to the right value:
 ~~~Ini
 AnnisWebService.URL=https://example.com/annis3-service/annis/
 DotPath=dot

@@ -35,6 +35,8 @@ import java.util.TreeMap;
 
 import javax.ws.rs.core.UriBuilder;
 
+import org.aeonbits.owner.Config;
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -94,7 +96,7 @@ import elemental.json.JsonValue;
  */
 public class Helper {
 
-    public final static String KEY_WEB_SERVICE_URL = "AnnisWebService.URL";
+    private final static UIConfig cfg = ConfigFactory.create(UIConfig.class);
 
     public final static String DEFAULT_CONFIG = "default-config";
 
@@ -261,6 +263,18 @@ public class Helper {
         return anonymousClient.get().asyncResource(uri);
     }
 
+    private static String getServiceURL(VaadinSession session) {
+        if(session != null) {
+            String overriddenByInit = session.getConfiguration().getInitParameters()
+                    .getProperty("AnnisWebService.URL");;
+            if(overriddenByInit != null) {
+                return overriddenByInit;
+            }
+        }
+        return cfg.webserviceURL();
+            
+    }
+
     /**
      * Gets or creates a web resource to the ANNIS service.
      *
@@ -275,11 +289,7 @@ public class Helper {
         VaadinSession vSession = VaadinSession.getCurrent();
 
         // get URI used by the application
-        String uri = null;
-
-        if (vSession != null) {
-            uri = (String) VaadinSession.getCurrent().getAttribute(KEY_WEB_SERVICE_URL);
-        }
+        String uri = getServiceURL(vSession);
 
         // if already authentificated the REST client is set as the "user" property
         AnnisUser user = getUser();
@@ -297,8 +307,10 @@ public class Helper {
      * @return A reference to the ANNIS service root resource.
      */
     public static AsyncWebResource getAnnisAsyncWebResource() {
+        VaadinSession vSession = VaadinSession.getCurrent();
+        
         // get URI used by the application
-        String uri = (String) VaadinSession.getCurrent().getAttribute(KEY_WEB_SERVICE_URL);
+        String uri = getServiceURL(vSession);
 
         // if already authentificated the REST client is set as the "user" property
         AnnisUser user = getUser();
@@ -328,6 +340,7 @@ public class Helper {
         }
         return "ERROR";
     }
+
     /**
      * Retrieve the meta data for a given document of a corpus.
      *
@@ -519,8 +532,6 @@ public class Helper {
         return corpusConfigurations;
     }
 
-   
-
     /**
      * Returns a formatted string containing the type of the exception, the message
      * and the stacktrace.
@@ -651,7 +662,7 @@ public class Helper {
         }
 
         List<SToken> sortedTokens = graph.getSortedTokenByText();
-        if(sortedTokens != null) {
+        if (sortedTokens != null) {
             int i = 0;
             for (SToken t : sortedTokens) {
                 token2index.put(t, i++);

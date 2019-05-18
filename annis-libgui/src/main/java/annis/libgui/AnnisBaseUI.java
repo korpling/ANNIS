@@ -123,11 +123,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     
     initLogging();
     
-    // store the webservice URL property explicitly in the session in order to 
-    // access it from the "external" servlets
-    getSession().getSession().setAttribute(WEBSERVICEURL_KEY,
-      getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
-
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     alreadyAddedCSS.clear();
     
