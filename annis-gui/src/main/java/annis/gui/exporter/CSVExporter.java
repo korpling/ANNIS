@@ -53,13 +53,11 @@ public class CSVExporter extends SaltBasedExporter
   @Override
   public String getHelpMessage()
   {
-    return "The CSV MultiTok Exporter exports only the "
+    return "The CSV Exporter exports only the "
       + "values of the elements searched for by the user, ignoring the context "
-      + "around search results. The values for all annotations of each of the "
+      + "around search results. "
+      + "The values for all annotations of each of the "
       + "found nodes is given in a comma-separated table (CSV). <br/><br/>"
-      + "This exporter will take more time than the normal CSV Exporter "
-      + "but it is able to export the underlying text for spans "
-      + "if the corpus contains multiple tokenizations. <br/><br/>"
       + "Parameters: <br/>"
       + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
       + "<code>metakeys=title,documentname</code>)";
@@ -238,4 +236,9 @@ public class CSVExporter extends SaltBasedExporter
   {
     return false;
   }
+  
+  @Override
+    public boolean needsContext() {
+        return false;
+    }
 }

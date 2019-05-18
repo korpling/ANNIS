@@ -410,6 +410,11 @@ public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
     return true;
   }
   
+  @Override
+  public boolean needsContext() {
+      return true;
+  }
+  
   /**
    * Specifies the ending of export file.
    */
