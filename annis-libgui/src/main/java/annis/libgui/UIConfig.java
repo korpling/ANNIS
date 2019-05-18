@@ -28,5 +28,9 @@ public interface UIConfig extends Config {
 
     @Key("login-window-maximized")
     boolean isLoginWindowMaximized();
+    
+    @Key("shorten-urls")
+    @DefaultValue("false")
+    boolean shortenURLs();
 
 }

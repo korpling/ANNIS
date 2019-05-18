@@ -20,22 +20,18 @@ import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.aeonbits.owner.Config;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
@@ -56,7 +52,6 @@ import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Range;
 import com.google.common.escape.Escaper;
@@ -85,8 +80,6 @@ import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
-import annis.service.objects.OrderType;
-import annis.service.objects.QueryLanguage;
 import annis.service.objects.RawTextWrapper;
 import elemental.json.JsonValue;
 
