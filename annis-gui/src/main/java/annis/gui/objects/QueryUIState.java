@@ -80,8 +80,6 @@ public class QueryUIState implements Serializable {
 
     private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition = new BeanContainer<>(
             UserGeneratedFrequencyEntry.class);
-    private final ObjectProperty<Set<String>> frequencyMetaData = new ObjectProperty<Set<String>>(
-            new TreeSet<String>());
 
     private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
 
@@ -164,10 +162,6 @@ public class QueryUIState implements Serializable {
 
     public BeanContainer<Integer, UserGeneratedFrequencyEntry> getFrequencyTableDefinition() {
         return frequencyTableDefinition;
-    }
-
-    public ObjectProperty<Set<String>> getFrequencyMetaData() {
-        return frequencyMetaData;
     }
 
     public ObjectProperty<OrderType> getOrder() {

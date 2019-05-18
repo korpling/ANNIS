@@ -79,7 +79,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private static final Logger log = LoggerFactory.getLogger(FrequencyQueryPanel.class);
   
   private Table tblFrequencyDefinition;
-  private final IndexedContainer metaNamesContainer;
   private final Button btAdd;
   private final Button btReset;
   private final CheckBox cbAutomaticMode;
@@ -194,14 +193,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.setVisibleColumns("nr", "annotation", "comment");
     
     queryLayout.addComponent(tblFrequencyDefinition);
-    
-    metaNamesContainer = new IndexedContainer();
-    PopupTwinColumnSelect metaSelect = new PopupTwinColumnSelect();
-    metaSelect.setSelectableContainer(metaNamesContainer);
-    metaSelect.setPropertyDataSource(state.getFrequencyMetaData());
-    metaSelect.setCaption("Metadata");
-    
-    queryLayout.addComponent(metaSelect);
     
     
     if(controller != null)
@@ -611,18 +602,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   }
   
   private void updateQueryInfo(String query)
-  {
-    metaNamesContainer.removeAllItems();
-    Set<String> allMetaNames = getAvailableMetaNames();
-    Set<String> oldSelection = new TreeSet<>(state.getFrequencyMetaData().getValue());
-    for(String m : allMetaNames)
-    {
-      metaNamesContainer.addItem(m);
-    }
-    // remove all selections that are no longer present
-    oldSelection.retainAll(allMetaNames);
-    state.getFrequencyMetaData().setValue(oldSelection);
-    
+  {    
     Set<String> selectedCorpora = state.getSelectedCorpora().getValue();
     if(selectedCorpora.isEmpty())
     {

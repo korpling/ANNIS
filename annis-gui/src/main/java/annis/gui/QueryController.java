@@ -478,14 +478,7 @@ public class QueryController implements Serializable {
             UserGeneratedFrequencyEntry userGen = container.getItem(id).getBean();
             freqDefinition.add(userGen.toFrequencyTableEntry());
         }
-        // additionally add meta data columns
-        for (String m : state.getFrequencyMetaData().getValue()) {
-            FrequencyTableEntry entry = new FrequencyTableEntry();
-            entry.setType(FrequencyTableEntryType.meta);
-            entry.setKey(m);
-            freqDefinition.add(entry);
-        }
-
+        
         FrequencyQuery query = QueryGenerator.frequency().query(state.getAql().getValue())
                 .corpora(state.getSelectedCorpora().getValue()).queryLanguage(state.getQueryLanguage().getValue())
                 .def(freqDefinition).build();
