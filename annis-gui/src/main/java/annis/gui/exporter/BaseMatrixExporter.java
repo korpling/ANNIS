@@ -69,16 +69,15 @@ import net.sf.ehcache.Element;
 import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 
 /**
- * An abstract base class for exporters that use Salt subgraphs to produce
- * some kind of textual output.
+ * An abstract base class for exporters that use Salt subgraphs to some kind of matrix output
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 
 @IgnoreSizeOf 
-public abstract class SaltBasedExporter implements ExporterPlugin, Serializable
+public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 {
   
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltBasedExporter.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(BaseMatrixExporter.class);
 
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 

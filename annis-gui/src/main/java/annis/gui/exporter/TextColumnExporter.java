@@ -61,7 +61,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * @author irina
  */
 @PluginImplementation
-public class TextColumnExporter extends SaltBasedExporter {
+public class TextColumnExporter extends BaseMatrixExporter {
 	private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 	private static final String TRAV_PREPROCESSING = "travPreprocessing";
 	public static final String FILTER_PARAMETER_KEYWORD = "filter";
@@ -514,7 +514,7 @@ public class TextColumnExporter extends SaltBasedExporter {
 	}
 
 	/**
-	 * @see annis.gui.exporter.SaltBasedExporter#getFileEnding()
+	 * @see annis.gui.exporter.BaseMatrixExporter#getFileEnding()
 	 * 
 	 * @return a constant String ("csv") for file ending
 	 */

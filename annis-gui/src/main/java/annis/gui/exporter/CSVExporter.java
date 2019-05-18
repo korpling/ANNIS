@@ -48,7 +48,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * @author Fabian Barteld
  */
 @PluginImplementation
-public class CSVExporter extends SaltBasedExporter
+public class CSVExporter extends BaseMatrixExporter
 {
   @Override
   public String getHelpMessage()
