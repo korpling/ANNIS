@@ -214,13 +214,13 @@ public class CorpusAdministration {
         return importStats;
     }
 
-    public int migrateUrlShortener(List<String> paths, String serviceURL,
-            String username, String password, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
+    public int migrateUrlShortener(List<String> paths, String serviceURL, String username, String password,
+            Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
         if (paths == null || serviceURL == null) {
             return 0;
         }
-        
-        int totalNumberOfQueries = 0;
+
+        int successfulQueries = 0;
 
         Client client = ClientBuilder.newClient();
         if (username != null && password != null) {
@@ -235,7 +235,6 @@ public class CorpusAdministration {
 
         WebTarget searchService = client.target(serviceURL).path("annis").path("query").path("search");
 
-        
         for (String p : paths) {
             File urlShortenerFile = new File(p);
             if (urlShortenerFile.isFile()) {
@@ -243,8 +242,6 @@ public class CorpusAdministration {
                     String[] line;
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
-                            totalNumberOfQueries++;
-                            
                             // parse URL
                             try {
                                 URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
@@ -270,7 +267,9 @@ public class CorpusAdministration {
                                             // insert URLs into new database
                                             String temporary = null;
 
-                                            if (status != QueryStatus.Ok) {
+                                            if (status == QueryStatus.Ok) {
+                                                successfulQueries++;
+                                            } else {
                                                 failedQueries.put(status, q);
                                                 // Link the UUID to an error page temporarily, until the issue is
                                                 // fixed.
@@ -280,22 +279,11 @@ public class CorpusAdministration {
                                                 // to the original URL when the issue is fixed in ANNIS.
                                                 try {
                                                     URI tempURI = new URIBuilder().setPath("/unsupported-query")
-                                                            .addParameter("url", q.getUri().toASCIIString())
-                                                            .build();
+                                                            .addParameter("url", q.getUri().toASCIIString()).build();
                                                     temporary = tempURI.toASCIIString();
                                                 } catch (URISyntaxException e) {
-                                                    log.error("Could not create proper URI for unsupported query",
-                                                            e);
+                                                    log.error("Could not create proper URI for unsupported query", e);
                                                 }
-                                            }
-                                            getShortenerDao().migrate(q.getUri().toASCIIString(), temporary,
-                                                    "anonymous", q.getUuid(),
-                                                    q.getCreationTime() == null ? new Date()
-                                                            : q.getCreationTime().toDate());
-
-                                        
-
-                                            if (status != QueryStatus.Ok) {
 
                                                 String lineSeparator = System.getProperty("line.separator");
 
@@ -310,6 +298,9 @@ public class CorpusAdministration {
 
                                                 log.warn(sb.toString());
                                             }
+                                            getShortenerDao().migrate(q.getUri().toASCIIString(), temporary,
+                                                    "anonymous", q.getUuid(), q.getCreationTime() == null ? new Date()
+                                                            : q.getCreationTime().toDate());
 
                                         } catch (GraphANNISException ex) {
                                             failedQueries.put(QueryStatus.Failed, q);
@@ -354,7 +345,7 @@ public class CorpusAdministration {
             }
         }
 
-        return totalNumberOfQueries;
+        return successfulQueries;
     }
 
     /**

@@ -255,7 +255,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
             Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
 
-            int totalNumberOfQueriess = corpusAdministration.migrateUrlShortener(urlShortenerFiles,
+            int successfulQueries = corpusAdministration.migrateUrlShortener(urlShortenerFiles,
                     cmdLine.getOptionValue("service-url"), userName, password, failedQueries);
             password = null;
 
@@ -288,8 +288,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer));
             printProblematicQueries("Failed", failedQueries.get(QueryStatus.Failed));
 
-            String summaryString = "+ Successful: " + (totalNumberOfQueriess - failedQueries.size()) + " from "
-                    + totalNumberOfQueriess + " +";
+            String summaryString = "+ Successful: " + successfulQueries + " from "
+                    + (successfulQueries + failedQueries.size()) + " +";
             System.out.println(Strings.repeat("+", summaryString.length()));
             System.out.println(summaryString);
             System.out.println(Strings.repeat("+", summaryString.length()));
