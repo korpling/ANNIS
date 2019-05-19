@@ -382,6 +382,10 @@ public class SaltExport {
 		// find all chains of SOrderRelations and reconstruct the texts belonging to
 		// them
 		Multimap<String, SNode> orderRoots = docGraph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
+		if(orderRoots.isEmpty() && docGraph.getTokens().size() == 1) {
+		    // if there is only one token, there won't be any order relations
+		    orderRoots.put("", docGraph.getTokens().get(0));
+		}
 		orderRoots.keySet().forEach((name) -> {
 			ArrayList<SNode> roots = new ArrayList<>(orderRoots.get(name));
 			if (SaltUtil.SALT_NULL_VALUE.equals(name)) {
