@@ -103,13 +103,13 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
         if (args.length == 0) {
             usage(null);
         } else {
-    
+
             // first parameter is command
             String command = args[0];
-    
+
             // following parameters are arguments for the command
             List<String> commandArgs = Arrays.asList(args).subList(1, args.length);
-    
+
             if ("help".equals(command) || "--help".equals(command)) {
                 usage(null);
             } else if ("import".equals(command)) {
@@ -170,7 +170,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             return this;
         }
 
-        public OptionBuilder addToggle(String opt, String longOpt, boolean hasArg, String description) {
+        public OptionBuilder addToggle(String opt, String longOpt, String description) {
             options.addOption(opt, longOpt, false, description);
             return this;
         }
@@ -182,7 +182,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
     private void doImport(List<String> commandArgs) {
         Options options = new OptionBuilder()
-                .addToggle("o", "overwrite", false, "Overwrites a corpus, when it is already stored in the database.")
+                .addToggle("o", "overwrite", "Overwrites a corpus, when it is already stored in the database.")
                 .addParameter("m", "mail", "e-mail adress to where status updates should be send")
                 .addParameter("a", "alias", "an alias name for this corpus")
                 .addLongParameter("service-url",
@@ -233,7 +233,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                         + "corpora from an older instance. "
                         + "Make sure that the ANNIS Service and this script run on the same machine (otherwise the paths are not valid.")
                 .addLongParameter("service-username", "Optional username when using the ANNIS service")
-                .addLongParameter("service-password", "Optional password when using the ANNIS service").createOptions();
+                .addLongParameter("service-password", "Optional password when using the ANNIS service")
+                .addToggle("s", "skip-existing",
+                        "Skip all existing UUIDs that already have been migrated to the new instance.")
+                .createOptions();
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -243,6 +246,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             if (urlShortenerFiles.isEmpty()) {
                 throw new ParseException("Where can I find the url shortener export files you want to migrate?");
             }
+            
+            final boolean skipExisting = cmdLine.hasOption('s');
 
             String userName = cmdLine.getOptionValue("service-username");
             String password = cmdLine.getOptionValue("service-password");
@@ -256,7 +261,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
 
             int successfulQueries = corpusAdministration.migrateUrlShortener(urlShortenerFiles,
-                    cmdLine.getOptionValue("service-url"), userName, password, failedQueries);
+                    cmdLine.getOptionValue("service-url"), userName, password, skipExisting, failedQueries);
             password = null;
 
             // output summary and detailed list of failed queries
@@ -283,6 +288,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 System.out.println();
             }
 
+            
             printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUIDExists));
             printProblematicQueries("Count different", failedQueries.get(QueryStatus.CountDiffers));
             printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer));
@@ -310,7 +316,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             for (URLShortenerDefinition q : queries) {
                 System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
                 System.out.println("UUID: \"" + q.getUuid() + "\"");
-                if(q.getQuery().getQuery() != null) {
+                if (q.getQuery().getQuery() != null) {
                     System.out.println("Query:");
                     System.out.println(q.getQuery().getQuery().trim());
                 }

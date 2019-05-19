@@ -34,9 +34,6 @@
         
         
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated-sources/annotations"/>
-        <dependent-module archiveName="annis-libgui-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-libgui/annis-libgui">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <dependent-module archiveName="annis-widgets-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-widgets/annis-widgets">
             <dependency-type>uses</dependency-type>
         </dependent-module>

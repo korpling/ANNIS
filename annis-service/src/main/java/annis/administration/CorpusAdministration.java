@@ -215,7 +215,7 @@ public class CorpusAdministration {
     }
 
     public int migrateUrlShortener(List<String> paths, String serviceURL, String username, String password,
-            Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
+            boolean skipExisting, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
         if (paths == null || serviceURL == null) {
             return 0;
         }
@@ -255,7 +255,11 @@ public class CorpusAdministration {
                                     } else if (corpusNames.isEmpty()) {
                                         failedQueries.put(QueryStatus.Failed, q);
                                     } else if (getShortenerDao().unshorten(q.getUuid()) != null) {
-                                        failedQueries.put(QueryStatus.UUIDExists, q);
+                                        if (skipExisting) {
+                                            continue;
+                                        } else {
+                                            failedQueries.put(QueryStatus.UUIDExists, q);
+                                        }
                                     } else {
                                         // check the query
                                         try {
