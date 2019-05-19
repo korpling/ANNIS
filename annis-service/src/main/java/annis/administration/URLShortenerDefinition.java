@@ -115,6 +115,7 @@ public class URLShortenerDefinition {
         String corporaRaw = args.get("c");
         if (corporaRaw != null) {
             Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
+            corpora.remove("");
 
             return QueryGenerator.displayed().left(Integer.parseInt(args.get("cl")))
                     .right(Integer.parseInt(args.get("cr"))).offset(Integer.parseInt(args.get("s")))
