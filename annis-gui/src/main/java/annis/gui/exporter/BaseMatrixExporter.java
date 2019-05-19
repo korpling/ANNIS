@@ -206,9 +206,9 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
             // dynamically adjust the number of items to fetch if single subgraph
             // export was fast enough
-            if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500 && stepSize < 50)
+            if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500)
             {
-              stepSize += 10;
+              stepSize *= 2;
             }
                 
             
