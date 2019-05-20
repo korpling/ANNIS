@@ -25,15 +25,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -58,7 +59,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.ByteStreams;
 
@@ -248,9 +248,17 @@ public class CorpusAdministration {
                                 if (q != null) {
                                     // check if all corpora exist in the new instance
                                     List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
-                                    List<AnnisCorpus> corpora = getAdministrationDao().getQueryDao()
-                                            .listCorpora(corpusNames);
-                                    if (corpora.size() != corpusNames.size()) {
+                                    Set<String> knownCorpora = getAdministrationDao().getQueryDao()
+                                            .listCorpora(corpusNames).stream().map((c) -> c.getName())
+                                            .collect(Collectors.toSet());
+
+                                    for (String c : corpusNames) {
+                                        if (!knownCorpora.contains(c)) {
+                                            q.addUnknownCorpus(c);
+                                        }
+                                    }
+
+                                    if (!q.getUnknownCorpora().isEmpty()) {
                                         failedQueries.put(QueryStatus.UnknownCorpus, q);
                                     } else if (corpusNames.isEmpty()) {
                                         failedQueries.put(QueryStatus.Failed, q);
@@ -271,9 +279,7 @@ public class CorpusAdministration {
                                             // insert URLs into new database
                                             String temporary = null;
 
-                                            if (status == QueryStatus.Ok) {
-                                                successfulQueries++;
-                                            } else {
+                                            if (status != QueryStatus.Ok) {
                                                 failedQueries.put(status, q);
                                                 // Link the UUID to an error page temporarily, until the issue is
                                                 // fixed.
@@ -305,6 +311,10 @@ public class CorpusAdministration {
                                             getShortenerDao().migrate(q.getUri().toASCIIString(), temporary,
                                                     "anonymous", q.getUuid(), q.getCreationTime() == null ? new Date()
                                                             : q.getCreationTime().toDate());
+
+                                            if (status == QueryStatus.Ok) {
+                                                successfulQueries++;
+                                            }
 
                                         } catch (GraphANNISException ex) {
                                             failedQueries.put(QueryStatus.Failed, q);

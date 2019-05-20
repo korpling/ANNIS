@@ -57,6 +57,7 @@ public class URLShortenerDefinition {
     private DisplayedResultQuery query;
     private UUID uuid;
     private DateTime creationTime;
+    private Set<String> unknownCorpora = new LinkedHashSet<>();
 
     private String errorMsg;
 
@@ -160,6 +161,14 @@ public class URLShortenerDefinition {
 
     public DateTime getCreationTime() {
         return creationTime;
+    }
+    
+    public Set<String> getUnknownCorpora() {
+        return unknownCorpora;
+    }
+    
+    public void addUnknownCorpus(String corpus) {
+        unknownCorpora.add(corpus);
     }
 
     public static int MAX_RETRY = 5;

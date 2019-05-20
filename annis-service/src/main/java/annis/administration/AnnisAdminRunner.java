@@ -272,7 +272,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             if (!unknownCorpusQueries.isEmpty()) {
                 Map<String, Integer> unknownCorpusCount = new TreeMap<>();
                 for (URLShortenerDefinition q : unknownCorpusQueries) {
-                    for (String c : q.getQuery().getCorpora()) {
+                    for (String c : q.getUnknownCorpora()) {
                         int oldCount = unknownCorpusCount.getOrDefault(c, 0);
                         unknownCorpusCount.put(c, oldCount + 1);
                     }
