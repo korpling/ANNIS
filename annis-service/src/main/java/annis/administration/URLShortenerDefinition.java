@@ -45,6 +45,7 @@ import annis.dao.QueryDao;
 import annis.exceptions.AnnisTimeoutException;
 import annis.model.DisplayedResultQuery;
 import annis.model.Query;
+import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.QueryLanguage;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
@@ -199,8 +200,11 @@ public class URLShortenerDefinition {
             String m2;
             while ((m1 = matchesGraphANNIS.readLine()) != null && (m2 = matchesLegacy.readLine()) != null) {
                 matchNr++;
+                
+                Match parsed_m1 = Match.parseFromString(m1);
+                Match parsed_m2 = Match.parseFromString(m2);
 
-                if (!m1.equals(m2)) {
+                if (!parsed_m1.equals(parsed_m2)) {
                     this.errorMsg = "Match " + matchNr + " (should be)" + System.lineSeparator() + m2
                             + System.lineSeparator() + "(but was)" + System.lineSeparator() + m1;
                     return QueryStatus.MatchesDiffer;
