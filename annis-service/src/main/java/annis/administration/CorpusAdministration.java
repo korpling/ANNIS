@@ -271,8 +271,8 @@ public class CorpusAdministration {
                                     } else {
                                         // check the query
                                         try {
-                                            log.info("Testing query {} on corpus {}", q.getQuery().getQuery().trim(),
-                                                    q.getQuery().getCorpora());
+                                            log.info("UUID {}, testing query {} on corpus {}", q.getUuid(),
+                                                    q.getQuery().getQuery().trim(), q.getQuery().getCorpora());
                                             QueryStatus status = q.test(getAdministrationDao().getQueryDao(),
                                                     searchService);
 
