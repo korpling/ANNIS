@@ -460,25 +460,27 @@ public class CommonHelper {
         fragment = StringUtils.removeStart(fragment, "!");
 
         String[] split = StringUtils.split(fragment, "&");
-        for (String s : split) {
-            String[] parts = s.split("=", 2);
-            String name = parts[0].trim();
-            String value = "";
-            if (parts.length == 2) {
-                try {
-                    // every name that starts with "_" is base64 encoded
-                    if (name.startsWith("_")) {
-                        value = new String(Base64.decodeBase64(parts[1]), "UTF-8");
-                    } else {
-                        value = URLDecoder.decode(parts[1], "UTF-8");
+        if(split != null) {
+            for (String s : split) {
+                String[] parts = s.split("=", 2);
+                String name = parts[0].trim();
+                String value = "";
+                if (parts.length == 2) {
+                    try {
+                        // every name that starts with "_" is base64 encoded
+                        if (name.startsWith("_")) {
+                            value = new String(Base64.decodeBase64(parts[1]), "UTF-8");
+                        } else {
+                            value = URLDecoder.decode(parts[1], "UTF-8");
+                        }
+                    } catch (UnsupportedEncodingException ex) {
+                        log.error(ex.getMessage(), ex);
                     }
-                } catch (UnsupportedEncodingException ex) {
-                    log.error(ex.getMessage(), ex);
                 }
+                name = StringUtils.removeStart(name, "_");
+    
+                result.put(name, value);
             }
-            name = StringUtils.removeStart(name, "_");
-
-            result.put(name, value);
         }
         return result;
     }

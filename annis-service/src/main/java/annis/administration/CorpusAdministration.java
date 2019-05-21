@@ -241,13 +241,15 @@ public class CorpusAdministration {
                     String[] line;
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
-                            
+
                             // parse URL
                             try {
                                 URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
                                 if (q != null) {
                                     // check if all corpora exist in the new instance
-                                    List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
+                                    List<String> corpusNames = q.getQuery() == null || q.getQuery().getCorpora() == null
+                                            ? new LinkedList<>()
+                                            : new LinkedList<>(q.getQuery().getCorpora());
                                     Set<String> knownCorpora = getAdministrationDao().getQueryDao()
                                             .listCorpora(corpusNames).stream().map((c) -> c.getName())
                                             .collect(Collectors.toSet());
@@ -329,7 +331,7 @@ public class CorpusAdministration {
                                             sb.append("Query:" + lineSeparator);
                                             sb.append(q.getQuery().getQuery().trim() + lineSeparator);
                                             sb.append("Error Message: " + ex.getMessage());
-                                            
+
                                             q.setErrorMsg(ex.getMessage());
 
                                             log.warn(sb.toString(), ex);
@@ -340,10 +342,12 @@ public class CorpusAdministration {
                             } catch (Throwable ex) {
 
                                 String lineSeparator = System.getProperty("line.separator");
-                                
+
                                 String errorMsg = ex.getMessage();
-                                if(errorMsg == null) {
+                                if (errorMsg == null) {
                                     errorMsg = ex.getClass().toString();
+                                    ex.printStackTrace();
+
                                 }
 
                                 StringBuilder sb = new StringBuilder();
@@ -351,8 +355,8 @@ public class CorpusAdministration {
                                 sb.append("UUID: \"" + line[0] + "\"" + lineSeparator);
                                 sb.append("Error Message: " + errorMsg);
 
-                                URLShortenerDefinition q = new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]),
-                                        null);
+                                URLShortenerDefinition q = new URLShortenerDefinition(null,
+                                        URLShortenerDefinition.parseUUID(line[0]), null);
                                 q.setErrorMsg(errorMsg);
                                 failedQueries.put(QueryStatus.Failed, q);
 

@@ -313,9 +313,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             System.out.println();
 
             for (URLShortenerDefinition q : queries) {
-                System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
+                if(q.getQuery() != null && q.getQuery().getCorpora() != null) {
+                    System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
+                }
                 System.out.println("UUID: \"" + q.getUuid() + "\"");
-                if (q.getQuery().getQuery() != null) {
+                if (q.getQuery() != null && q.getQuery().getQuery() != null) {
                     System.out.println("Query:");
                     System.out.println(q.getQuery().getQuery().trim());
                 }
