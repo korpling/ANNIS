@@ -233,9 +233,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                         + "corpora from an older instance. "
                         + "Make sure that the ANNIS Service and this script run on the same machine (otherwise the paths are not valid.")
                 .addLongParameter("service-username", "Optional username when using the ANNIS service")
-                .addLongParameter("service-password", "Optional password when using the ANNIS service")
-                .addToggle("s", "skip-existing",
-                        "Skip all existing UUIDs that already have been migrated to the new instance.")
+                .addLongParameter("service-password", "Optional password when using the ANNIS service").addToggle("s",
+                        "skip-existing", "Skip all existing UUIDs that already have been migrated to the new instance.")
                 .createOptions();
 
         try {
@@ -246,7 +245,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             if (urlShortenerFiles.isEmpty()) {
                 throw new ParseException("Where can I find the url shortener export files you want to migrate?");
             }
-            
+
             final boolean skipExisting = cmdLine.hasOption('s');
 
             String userName = cmdLine.getOptionValue("service-username");
@@ -277,7 +276,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                         unknownCorpusCount.put(c, oldCount + 1);
                     }
                 }
-                String unknownCorpusCaption = "Unknown corpus (sum: " + unknownCorpusCount.size() + ")";
+                String unknownCorpusCaption = "Unknown corpus (" + unknownCorpusCount.size() + " unknown corpora and "
+                        + unknownCorpusQueries.size() + " queries)";
                 System.out.println(unknownCorpusCaption);
                 System.out.println(Strings.repeat("=", unknownCorpusCaption.length()));
                 System.out.println();
@@ -288,7 +288,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 System.out.println();
             }
 
-            
             printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUIDExists));
             printProblematicQueries("Count different", failedQueries.get(QueryStatus.CountDiffers));
             printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer));
