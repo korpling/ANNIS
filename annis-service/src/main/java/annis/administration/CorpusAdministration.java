@@ -242,6 +242,7 @@ public class CorpusAdministration {
                     String[] line;
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
+                            
                             // parse URL
                             try {
                                 URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
@@ -333,7 +334,7 @@ public class CorpusAdministration {
                                         }
                                     }
                                 }
-                            } catch (URISyntaxException ex) {
+                            } catch (Throwable ex) {
 
                                 String lineSeparator = System.getProperty("line.separator");
 

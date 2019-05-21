@@ -81,7 +81,8 @@ public class URLShortenerDefinition {
     public static DateTime parseCreationTime(String creationTime) {
 
         DateTimeParser[] parsers = { DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ").getParser(),
-                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ").getParser(), };
+                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ").getParser(), 
+                DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").getParser()};
 
         DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().append(null, parsers).toFormatter();
         return dateFormatter.parseDateTime(creationTime);
