@@ -287,10 +287,13 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 }
                 System.out.println();
             }
-
+            
             printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUIDExists));
             printProblematicQueries("Count different", failedQueries.get(QueryStatus.CountDiffers));
             printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer));
+            printProblematicQueries("Timeout", failedQueries.get(QueryStatus.Timeout));
+            printProblematicQueries("Other server error", failedQueries.get(QueryStatus.ServerError)); 
+            printProblematicQueries("Empty corpus list", failedQueries.get(QueryStatus.EmptyCorpusList));
             printProblematicQueries("Failed", failedQueries.get(QueryStatus.Failed));
 
             String summaryString = "+ Successful: " + successfulQueries + " from "

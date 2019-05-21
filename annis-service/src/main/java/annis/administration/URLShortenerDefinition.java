@@ -228,7 +228,7 @@ public class URLShortenerDefinition {
 
         if (this.query.getCorpora().isEmpty()) {
             this.errorMsg = "Empty corpus list";
-            return QueryStatus.Failed;
+            return QueryStatus.EmptyCorpusList;
         }
 
         // check count first (also warmup for the corpus)
@@ -241,7 +241,7 @@ public class URLShortenerDefinition {
             countGraphANNIS = 0;
         } catch (AnnisTimeoutException ex) {
             this.errorMsg = "Timeout in graphANNIS";
-            return QueryStatus.Failed;
+            return QueryStatus.Timeout;
         }
 
         try {
@@ -259,7 +259,7 @@ public class URLShortenerDefinition {
                     } catch (ServerErrorException ex) {
                         if (tries >= MAX_RETRY - 1) {
                             this.errorMsg = ex.getMessage();
-                            return QueryStatus.Failed;
+                            return QueryStatus.ServerError;
                         } else {
                             log.warn("Server error when executing query {}", query.getQuery(), ex);
                         }
@@ -278,11 +278,6 @@ public class URLShortenerDefinition {
                 status = QueryStatus.Ok;
             } else {
                 status = testFind(queryDao, annisSearchService);
-                if (status == QueryStatus.Failed) {
-                    // don't try quirks mode when failed
-                    return status;
-                }
-
             }
 
             if (status != QueryStatus.Ok && this.query.getQueryLanguage() == QueryLanguage.AQL) {
@@ -303,10 +298,12 @@ public class URLShortenerDefinition {
             }
 
             return status;
-
-        } catch (ForbiddenException | AnnisTimeoutException | IOException ex) {
+        } catch (AnnisTimeoutException ex) {
             this.errorMsg = ex.toString();
-            return QueryStatus.Failed;
+            return QueryStatus.Timeout;
+        } catch (ForbiddenException | IOException ex) {
+            this.errorMsg = ex.toString();
+            return QueryStatus.ServerError;
         }
     }
 }
