@@ -345,7 +345,7 @@ public class CorpusAdministration {
 
                                 failedQueries.put(QueryStatus.Failed,
                                         new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]),
-                                                URLShortenerDefinition.parseCreationTime(line[2])));
+                                                null));
 
                                 log.warn(sb.toString());
                             }
