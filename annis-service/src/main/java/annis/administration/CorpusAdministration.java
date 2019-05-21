@@ -262,6 +262,7 @@ public class CorpusAdministration {
                                     if (!q.getUnknownCorpora().isEmpty()) {
                                         failedQueries.put(QueryStatus.UnknownCorpus, q);
                                     } else if (corpusNames.isEmpty()) {
+                                        q.setErrorMsg("Corpus name is empty");
                                         failedQueries.put(QueryStatus.Failed, q);
                                     } else if (getShortenerDao().unshorten(q.getUuid()) != null) {
                                         if (skipExisting) {
@@ -318,6 +319,7 @@ public class CorpusAdministration {
                                             }
 
                                         } catch (GraphANNISException ex) {
+                                            q.setErrorMsg(ex.getMessage());
                                             failedQueries.put(QueryStatus.Failed, q);
                                         } catch (Throwable ex) {
                                             String lineSeparator = System.getProperty("line.separator");
@@ -328,6 +330,8 @@ public class CorpusAdministration {
                                             sb.append("Query:" + lineSeparator);
                                             sb.append(q.getQuery().getQuery().trim() + lineSeparator);
                                             sb.append("Error Message: " + ex.getMessage());
+                                            
+                                            q.setErrorMsg(ex.getMessage());
 
                                             log.warn(sb.toString(), ex);
                                             failedQueries.put(QueryStatus.Failed, q);
