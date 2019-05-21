@@ -343,9 +343,10 @@ public class CorpusAdministration {
                                 sb.append("UUID: \"" + line[0] + "\"" + lineSeparator);
                                 sb.append("Error Message: " + ex.getMessage());
 
-                                failedQueries.put(QueryStatus.Failed,
-                                        new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]),
-                                                null));
+                                URLShortenerDefinition q = new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]),
+                                        null);
+                                q.setErrorMsg(ex.getMessage());
+                                failedQueries.put(QueryStatus.Failed, q);
 
                                 log.warn(sb.toString());
                             }
