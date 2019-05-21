@@ -29,13 +29,12 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -341,15 +340,20 @@ public class CorpusAdministration {
                             } catch (Throwable ex) {
 
                                 String lineSeparator = System.getProperty("line.separator");
+                                
+                                String errorMsg = ex.getMessage();
+                                if(errorMsg == null) {
+                                    errorMsg = ex.getClass().toString();
+                                }
 
                                 StringBuilder sb = new StringBuilder();
-                                sb.append("Query Error: " + QueryStatus.Failed);
+                                sb.append("Query Error: " + QueryStatus.Failed + lineSeparator);
                                 sb.append("UUID: \"" + line[0] + "\"" + lineSeparator);
-                                sb.append("Error Message: " + ex.getMessage());
+                                sb.append("Error Message: " + errorMsg);
 
                                 URLShortenerDefinition q = new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]),
                                         null);
-                                q.setErrorMsg(ex.getMessage());
+                                q.setErrorMsg(errorMsg);
                                 failedQueries.put(QueryStatus.Failed, q);
 
                                 log.warn(sb.toString());
