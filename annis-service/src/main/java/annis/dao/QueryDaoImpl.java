@@ -769,12 +769,16 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 List<org.corpus_tools.graphannis.model.Annotation> annoList = corpusStorageMgr
                         .listNodeAnnotations(corpusName, listValues, onlyMostFrequentValues);
                 for (org.corpus_tools.graphannis.model.Annotation anno : annoList) {
+                    String anno_name = anno.getKey().getName();
+                    if(anno_name == null || anno_name.isEmpty()) {
+                        anno_name = "_";
+                    }
                     if (!"annis".equals(anno.getKey().getNs())) {
                         String qname;
                         if (anno.getKey().getNs() == null || anno.getKey().getNs().isEmpty()) {
-                            qname = anno.getKey().getName();
+                            qname = anno_name;
                         } else {
-                            qname = anno.getKey().getNs() + ":" + anno.getKey().getName();
+                            qname = anno.getKey().getNs() + ":" + anno_name;
                         }
                         if (qname != null) {
                             Set<String> values = nodeAnnos.get(qname);
