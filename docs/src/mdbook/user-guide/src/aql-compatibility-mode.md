@@ -30,9 +30,13 @@ to enforce that these operand are not the same.
 The standard mode will not include a match if `#1` and `#3` reference the same match per default.
 This does not affect the addition of matches if the operator is reflexive.
 
-## Meta-data constraints are applied to all conjunctions of a disjunction
+## `meta::` is still allowed
 
-Meta-data constraints like `meta::doc="mydocumentname"` are applied to all conjunctions of the disjunction.
+Meta data constraints have been replaced with the part-of operator `@*` and will result
+in a syntax error for the normal query mode.
+In the compatibility mode, `meta::` is still allowed.
+
+Be aware that meta data constraints like `meta::doc="mydocumentname"` are applied to all conjunctions of the disjunction, which is seems counter-intuitive.
 E.g the query.
 ```
 (pos="NN" | lemma="be" & meta::age="20")

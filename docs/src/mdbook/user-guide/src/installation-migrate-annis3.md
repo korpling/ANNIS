@@ -74,7 +74,7 @@ annis-admin.sh migrate-url-shortener --service-url <old-service-url> url_shorten
 It will then compare the results.
 If both results are exactly the same, it migrates the reference link to the new system.
 Some queries only work in the same way in [compatibility query mode](./aql-compatibility-mode.md), these will be rewritten automatically.
-The user will be able to execute this query normally, but see a warning that its using deprecated functions of the query language.
+The user will be able to execute this query normally, but sees a warning that its using deprecated functions of the query language.
 For queries where both the normal and the compatibility mode don't return the same results, they are still migrated but a clear warning is shown to the user before execution, that this query is known to give different results compared to the previous version of ANNIS.
 
 The command will give a summary how many reference links have been migrated successfully and which kind of errors occurred on the other ones.
