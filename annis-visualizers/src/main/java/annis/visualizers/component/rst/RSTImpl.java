@@ -19,6 +19,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -55,8 +56,6 @@ import annis.gui.widgets.JITWrapper;
 import annis.gui.widgets.gwt.client.ui.VJITWrapper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
-
-import java.util.HashMap;
 
 /**
  * The Visualizer Plugin for RST-Visualization.
@@ -154,12 +153,13 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
     private final Map<SToken, Integer> token2index = new HashMap<>();
 
+    private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
+
     /**
      * Sorted list of all SStructures which overlapped a sentence. It's used for
      * mapping the sentence to a number by the order of the SStructures in the list.
      */
     private final TreeSet<SStructure> sentences;
-    private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
     public RSTImpl(VisualizerInput visInput) {
 
@@ -236,13 +236,17 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
         this.getContent().setSizeUndefined();
     }
 
+    private boolean isSignalNode(SNode sNode) {
+        return sNode.getAnnotation("default_ns", "signal_type") != null;
+    }
+
     private String transformSaltToJSON(VisualizerInput visInput) {
         graph = visInput.getSResult().getDocumentGraph();
         List<SNode> rootSNodes = graph.getRoots();
         List<SNode> rstRoots = new ArrayList<SNode>();
 
         for (SNode sNode : rootSNodes) {
-            if (CommonHelper.checkSLayer(namespace, sNode)) {
+            if (CommonHelper.checkSLayer(namespace, sNode) && !isSignalNode(sNode)) {
                 rstRoots.add(sNode);
             }
         }
@@ -255,7 +259,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
                         @Override
                         public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
                                 SRelation sRelation, SNode fromNode, long order) {
-                            if (currNode instanceof SStructure && isSegment(currNode)) {
+                            if (currNode instanceof SStructure && isSegment(currNode) && !isSignalNode(currNode)) {
                                 sentences.add((SStructure) currNode);
                             }
                         }
@@ -294,8 +298,24 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
         return result.toString();
     }
 
+    private JSONObject jsonizeSignalNode(SNode node) {
+        JSONObject signal = new JSONObject();
+        signal.put("type", node.getAnnotation("default_ns", "signal_type").getValue());
+        signal.put("subtype", node.getAnnotation("default_ns", "signal_subtype").getValue());
+        JSONArray indexes = new JSONArray();
+        SAnnotation indexesAnn = node.getAnnotation("default_ns", "signal_indexes");
+        if (indexesAnn != null) {
+            for (String index : ((String) indexesAnn.getValue()).split(" ")) {
+                indexes.put(index);
+            }
+        }
+        signal.put("indexes", indexes);
+        return signal;
+    }
+
     private JSONObject createJsonEntry(SNode currNode) {
         JSONObject jsonData = new JSONObject();
+        JSONObject data = new JSONObject();
         StringBuilder sb = new StringBuilder();
         // use a hash set so we don't get any duplicate entries
         LinkedHashSet<SToken> token = new LinkedHashSet<>();
@@ -320,9 +340,9 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
                 String color = getHTMLColor(tok);
 
                 if (color != null) {
-                    sb.append("<span style=\"color : ").append(color).append(";\">");
+                    sb.append("<span class=\"rst-token\" style=\"color : ").append(color).append(";\">");
                 } else {
-                    sb.append("<span>");
+                    sb.append("<span class=\"rst-token\">");
                 }
 
                 if (tokIterator.hasNext()) {
@@ -332,6 +352,17 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
                 }
 
                 sb.append("</span>");
+            }
+
+            // add signals
+            JSONArray signals = new JSONArray();
+            for (SRelation<SNode, SNode> relation : currNode.getInRelations()) {
+                if (isSignalNode(relation.getSource())) {
+                    signals.put(jsonizeSignalNode(relation.getSource()));
+                }
+            }
+            if (signals.length() > 0) {
+                data.put("signals", signals);
             }
         }
 
@@ -343,7 +374,6 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
             /**
              * additional data oject for edge labels and rendering sentences
              */
-            JSONObject data = new JSONObject();
             JSONArray edgesJSON = getOutGoingEdgeTypeAnnotation(currNode);
 
             // since we have found some tokens, it must be a sentence in RST.
