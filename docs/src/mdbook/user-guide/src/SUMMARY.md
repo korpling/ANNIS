@@ -3,7 +3,7 @@
 - [Installation](./installation.md)
     - [Installing a Local Version (ANNIS Kickstarter)](./installation-kickstarter.md)
     - [Installing an ANNIS Server](./installation-server.md)
-    - [Upgrading an ANNIS Server installation](./installation-upgrade-server.md)
+    - [Migrating from ANNIS 3](./installation-migrate-annis3.md)
 - [Using the ANNIS interface](./interface.md)
     - [Search Form](./interface-search-form.md)
     - [Result Window](./interface-result-window.md)
