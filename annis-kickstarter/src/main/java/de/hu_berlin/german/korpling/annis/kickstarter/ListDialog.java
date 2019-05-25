@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 
@@ -74,6 +75,7 @@ public class ListDialog extends javax.swing.JDialog
 
             }
         ));
+        tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(tableList);
 
         btClose.setMnemonic('c');
@@ -182,6 +184,7 @@ public class ListDialog extends javax.swing.JDialog
           "name", "id", "text", "tokens", "source_path"
         }, 0);
       tableList.setModel(tableModel);
+      
 
       List<AnnisCorpus> corpora = corpusAdmin.getAdministrationDao().getQueryDao().listCorpora();
 
