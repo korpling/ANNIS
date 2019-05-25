@@ -49,6 +49,7 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -130,6 +131,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 doCleanupData(commandArgs);
             } else if ("check-db-schema-version".equals(command)) {
                 doCheckDBSchemaVersion();
+            } else if ("dump".equals(command)) {
+                doDumpTable(commandArgs);
+            } else if ("restore".equals(command)) {
+                doRestoreTable(commandArgs);
             } else {
                 throw new UsageException("Unknown command: " + command);
             }
@@ -287,12 +292,12 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 }
                 System.out.println();
             }
-            
+
             printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUIDExists));
             printProblematicQueries("Count different", failedQueries.get(QueryStatus.CountDiffers));
             printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer));
             printProblematicQueries("Timeout", failedQueries.get(QueryStatus.Timeout));
-            printProblematicQueries("Other server error", failedQueries.get(QueryStatus.ServerError)); 
+            printProblematicQueries("Other server error", failedQueries.get(QueryStatus.ServerError));
             printProblematicQueries("Empty corpus list", failedQueries.get(QueryStatus.EmptyCorpusList));
             printProblematicQueries("Failed", failedQueries.get(QueryStatus.Failed));
 
@@ -316,7 +321,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             System.out.println();
 
             for (URLShortenerDefinition q : queries) {
-                if(q.getQuery() != null && q.getQuery().getCorpora() != null) {
+                if (q.getQuery() != null && q.getQuery().getCorpora() != null) {
                     System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
                 }
                 System.out.println("UUID: \"" + q.getUuid() + "\"");
@@ -359,7 +364,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
         try {
 
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
             CommandLine cmdLine = parser.parse(options, commandArgs.toArray(new String[commandArgs.size()]));
 
             if (cmdLine.getArgs().length < 2) {
@@ -447,6 +452,16 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             System.exit(1);
         }
 
+    }
+
+    public void doDumpTable(List<String> commandArgs) {
+        Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the output file as argument: annis-admin.sh dump <table> <file>");
+        corpusAdministration.dumpTable(commandArgs.get(0), new File(commandArgs.get(1)));
+    }
+
+    public void doRestoreTable(List<String> commandArgs) {
+        Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the input file as argument: annis-admin.sh restore <table> <file>");
+        corpusAdministration.restoreTable(commandArgs.get(0), new File(commandArgs.get(1)));
     }
 
     private void usage(String error) {

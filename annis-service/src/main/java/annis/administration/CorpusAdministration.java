@@ -68,6 +68,7 @@ import annis.dao.ShortenerDao;
 import annis.exceptions.AnnisException;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
+import annis.tabledefs.Table;
 import annis.utils.ANNISFormatHelper;
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -678,6 +679,44 @@ public class CorpusAdministration {
     public ImportStatus importCorporaSave(boolean overwrite, String aliasName, String statusEmailAdress,
             boolean waitForOtherTasks, String... paths) {
         return importCorporaSave(overwrite, aliasName, statusEmailAdress, waitForOtherTasks, Arrays.asList(paths));
+    }
+
+    public void dumpTable(String tableName, File outputFile) {
+        Table table = null;
+        switch (tableName) {
+        case "url_shortener":
+            table = AdministrationDao.urlShortenerTable;
+            break;
+        case "user_config":
+            table = AdministrationDao.userConfigTable;
+            break;
+        }
+        if (table == null) {
+            log.info("Can't dump unknown table with name {}", tableName);
+            return;
+        } else {
+            log.info("Dumping table {} to file {}", tableName, outputFile);
+            administrationDao.dumpServiceDataTable(table, outputFile);
+        }
+    }
+
+    public void restoreTable(String tableName, File inputFile) {
+        Table table = null;
+        switch (tableName) {
+        case "url_shortener":
+            table = AdministrationDao.urlShortenerTable;
+            break;
+        case "user_config":
+            table = AdministrationDao.userConfigTable;
+            break;
+        }
+        if (table == null) {
+            log.info("Can't restore unknown table with name {}", tableName);
+            return;
+        } else {
+            log.info("Restoring table {} from file {}", tableName, inputFile);
+            administrationDao.restoreServiceDataTable(table, inputFile);
+        }
     }
 
     ///// Helper
