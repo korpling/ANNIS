@@ -186,8 +186,8 @@ public class Match implements Serializable {
             }
 
             try {
-
-                uri = new java.net.URI(id).normalize();
+                
+                uri = new URI(id).normalize();
 
                 if (!"salt".equals(uri.getScheme())) {
                     throw new URISyntaxException("not a Salt id", uri.toString());
@@ -197,8 +197,9 @@ public class Match implements Serializable {
                 String path = uri.getPath();
                 if (path.endsWith("/")) {
                     path = path.substring(0, path.length() - 1);
-                    uri = new URI(uri.getScheme(), uri.getHost(), path, uri.getFragment());
                 }
+                // recreate the URI with the decoded path (returned by getPath())
+                uri  = new URI(uri.getScheme(), uri.getHost(), path, uri.getFragment());
 
             } catch (URISyntaxException ex) {
                 log.error("Invalid syntax for ID " + singleMatch, ex);

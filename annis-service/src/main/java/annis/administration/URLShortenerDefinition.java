@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -209,7 +210,7 @@ public class URLShortenerDefinition {
                 Match parsed_m1 = Match.parseFromString(m1);
                 Match parsed_m2 = Match.parseFromString(m2);
 
-                if (!parsed_m1.equals(parsed_m2)) {
+                if (!Objects.equals(parsed_m1, parsed_m2)) {
                     this.errorMsg = "Match " + matchNr + " (should be)" + System.lineSeparator() + m2
                             + System.lineSeparator() + "(but was)" + System.lineSeparator() + m1;
                     return QueryStatus.MatchesDiffer;
