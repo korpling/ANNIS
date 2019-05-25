@@ -143,8 +143,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     private final ExecutorService exec = Executors.newCachedThreadPool();
 
-    private final Escaper corpusNameEscaper = UrlEscapers.urlPathSegmentEscaper();
-
     private final Pattern validQNamePattern = Pattern.compile("[a-zA-Z_%][a-zA-Z0-9_\\-%:]*");
 
     @Override
@@ -536,14 +534,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         }
     }
 
-    protected List<String> escapedCorpusNames(List<String> originalCorpusList) {
-        List<String> corpusList = new LinkedList<>();
-        for (String c : originalCorpusList) {
-            corpusList.add(corpusNameEscaper.escape(c));
-        }
-        return corpusList;
-    }
-
     public ResultOrder convertOrder(OrderType type) {
         switch (type) {
         case ascending:
@@ -571,11 +561,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public List<Match> find(String query, QueryLanguage queryLanguage, List<String> corpusList,
+    public List<Match> find(String query, QueryLanguage queryLanguage, List<String> corpora,
             LimitOffsetQueryData limitOffset) throws GraphANNISException {
 
-        Collections.sort(corpusList);
-        List<String> corpora = escapedCorpusNames(corpusList);
+        Collections.sort(corpora);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
 
@@ -611,11 +600,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public boolean find(String query, QueryLanguage queryLanguage, List<String> corpusList,
+    public boolean find(String query, QueryLanguage queryLanguage, List<String> corpora,
             LimitOffsetQueryData limitOffset, final OutputStream out) throws GraphANNISException {
 
-        Collections.sort(corpusList);
-        List<String> corpora = escapedCorpusNames(corpusList);
+        Collections.sort(corpora);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
 
@@ -670,7 +658,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         Collections.sort(corpusList);
         Future<Integer> result = exec.submit(() -> {
-            return (int) corpusStorageMgr.count(escapedCorpusNames(corpusList), query, ql);
+            return (int) corpusStorageMgr.count(corpusList, query, ql);
         });
 
         try {
@@ -698,7 +686,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         Collections.sort(corpusList);
 
         Future<MatchAndDocumentCount> result = exec.submit(() -> {
-            CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(escapedCorpusNames(corpusList), query,
+            CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(corpusList, query,
                     ql);
 
             return new MatchAndDocumentCount((int) data.matchCount, (int) data.documentCount);
@@ -733,7 +721,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             return result;
         }
 
-        for (String corpus : escapedCorpusNames(corpusList)) {
+        for (String corpus : corpusList) {
             List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, query,
                     freqQuery.toString(), ql);
             if (freqTableForCorpus != null) {
