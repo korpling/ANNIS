@@ -17,8 +17,7 @@ tok . tok
 
 ![](images/freq.png)
 
-You may also add metadata to the frequency breakdown from the metadata
-selection link. Clicking on “Perform frequency analysis” will produce a
+Clicking on “Perform frequency analysis” will produce a
 breakdown of all consecutive token bigrams in the corpus. The frequency
 graph will only show the first 500 elements, but the table below it will
 give the entire list of values, which can also be **exported as a CSV
