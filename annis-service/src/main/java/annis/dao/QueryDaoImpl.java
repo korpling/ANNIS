@@ -553,7 +553,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         }
     }
 
-    public CorpusStorageManager.QueryLanguage convertQueryLanguage(QueryLanguage ql) {
+    public static CorpusStorageManager.QueryLanguage convertQueryLanguage(QueryLanguage ql) {
         switch (ql) {
         case AQL:
             return CorpusStorageManager.QueryLanguage.AQL;

@@ -73,6 +73,7 @@ import com.google.mimeparse.MIMEParse;
 import annis.CommonHelper;
 import annis.ServiceConfig;
 import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
 import annis.examplequeries.ExampleQuery;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
@@ -204,8 +205,8 @@ public class QueryService {
 
     }
 
-    private List<Match> findXml(final String rawCorpusNames, final String query, final QueryLanguage queryLanguage, final LimitOffsetQueryData limitOffset)
-            throws IOException, GraphANNISException {
+    private List<Match> findXml(final String rawCorpusNames, final String query, final QueryLanguage queryLanguage,
+            final LimitOffsetQueryData limitOffset) throws IOException, GraphANNISException {
         List<String> corpora = findCorporaFromQuery(rawCorpusNames);
         long start = new Date().getTime();
         List<Match> result = getQueryDao().find(query, queryLanguage, corpora, limitOffset);
@@ -556,8 +557,9 @@ public class QueryService {
     @GET
     @Produces("text/plain")
     @Path("check")
-    public String check(@QueryParam("q") String query, @DefaultValue("") @QueryParam("corpora") String rawCorpusNames)
-            throws GraphANNISException {
+    public String check(@QueryParam("q") String query,
+            @QueryParam("query-language") @DefaultValue("AQL") QueryLanguage queryLanguage,
+            @DefaultValue("") @QueryParam("corpora") String rawCorpusNames) throws GraphANNISException {
         Subject user = SecurityUtils.getSubject();
         List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
         for (String c : corpusNames) {
@@ -565,7 +567,7 @@ public class QueryService {
         }
         Collections.sort(corpusNames);
         if (getQueryDao().getCorpusStorageManager().validateQuery(corpusNames, query,
-                CorpusStorageManager.QueryLanguage.AQL)) {
+                QueryDaoImpl.convertQueryLanguage(queryLanguage))) {
             return "ok";
         } else {
             return "error";
@@ -586,6 +588,7 @@ public class QueryService {
     @Path("parse/nodes")
     @Produces("application/xml")
     public Response parseNodes(@QueryParam("q") String query,
+            @QueryParam("query-language") @DefaultValue("AQL") QueryLanguage queryLanguage,
             @DefaultValue("") @QueryParam("corpora") String rawCorpusNames) throws GraphANNISException {
         Subject user = SecurityUtils.getSubject();
         List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
@@ -595,7 +598,7 @@ public class QueryService {
         Collections.sort(corpusNames);
 
         List<NodeDesc> nodes = getQueryDao().getCorpusStorageManager().getNodeDescriptions(query,
-                CorpusStorageManager.QueryLanguage.AQL);
+                QueryDaoImpl.convertQueryLanguage(queryLanguage));
 
         return Response.ok(new GenericEntity<List<NodeDesc>>(nodes) {
         }).build();
