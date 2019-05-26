@@ -6,8 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 This release is a complete overhaul of the ANNIS service backend.
-Instead of PostgreSQL, [graphANNIS](https://github.com/korpling/graphANNIS) is used.
-GraphANNIS is custom AQL implementation based graphs.
+Instead of using the relational database PostgreSQL, a custom AQL implementation based on graph called [graphANNIS](https://github.com/korpling/graphANNIS) is used.
 
 ## Version 3.6.0
 
