@@ -204,11 +204,11 @@ public class QueryService {
 
     }
 
-    private List<Match> findXml(final String rawCorpusNames, final String query, final LimitOffsetQueryData limitOffset)
+    private List<Match> findXml(final String rawCorpusNames, final String query, final QueryLanguage queryLanguage, final LimitOffsetQueryData limitOffset)
             throws IOException, GraphANNISException {
         List<String> corpora = findCorporaFromQuery(rawCorpusNames);
         long start = new Date().getTime();
-        List<Match> result = getQueryDao().find(query, QueryLanguage.AQL, corpora, limitOffset);
+        List<Match> result = getQueryDao().find(query, queryLanguage, corpora, limitOffset);
         long end = new Date().getTime();
         logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
         return result;
@@ -259,7 +259,7 @@ public class QueryService {
         if ("text/plain".equals(bestMediaTypeMatch)) {
             return Response.ok(findRaw(rawCorpusNames, query, queryLanguage, limitOffset), "text/plain").build();
         } else {
-            List<Match> result = findXml(rawCorpusNames, query, limitOffset);
+            List<Match> result = findXml(rawCorpusNames, query, queryLanguage, limitOffset);
             return Response.ok().type("application/xml").entity(new GenericEntity<MatchGroup>(new MatchGroup(result)) {
             }).build();
         }
