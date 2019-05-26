@@ -187,8 +187,7 @@ public class URLShortenerDefinition {
                 Joiner.on(",").join(query.getCorpora()));
 
         File matchesGraphANNISFile = File.createTempFile("annis-migrate-url-shortener-graphannis", ".txt");
-        matchesGraphANNISFile.deleteOnExit();
-
+        
         // write all graphANNIS matches to temporary file
         try (BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(matchesGraphANNISFile))) {
             queryDao.find(query.getQuery(), query.getQueryLanguage(), new LinkedList<>(query.getCorpora()),
