@@ -428,20 +428,22 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             new Thread(() -> {
                 while (graphannisLogfileWatcher != null) {
                     try {
-                        WatchKey wk = graphannisLogfileWatcher.take();
-                        for (WatchEvent<?> event : wk.pollEvents()) {
-                            if (event.context() instanceof Path) {
-                                Path changed = (Path) event.context();
-                                if (changed.toString().equals("graphannis.log")) {
-                                    // read the last line of the logfile and log it
-                                    try (ReversedLinesFileReader reader = new ReversedLinesFileReader(logfile, 4096,
-                                            StandardCharsets.UTF_8)) {
-                                        parseAndReportGraphANNISLogEntry(reader);
+                        WatchKey wk = graphannisLogfileWatcher.poll(5, TimeUnit.SECONDS);
+                        if(wk != null) {
+                            for (WatchEvent<?> event : wk.pollEvents()) {
+                                if (event.context() instanceof Path) {
+                                    Path changed = (Path) event.context();
+                                    if (changed.toString().equals("graphannis.log")) {
+                                        // read the last line of the logfile and log it
+                                        try (ReversedLinesFileReader reader = new ReversedLinesFileReader(logfile, 4096,
+                                                StandardCharsets.UTF_8)) {
+                                            parseAndReportGraphANNISLogEntry(reader);
+                                        }
                                     }
                                 }
                             }
+                            wk.reset();
                         }
-                        wk.reset();
                     } catch (ClosedWatchServiceException ex) {
                         break;
                     } catch (InterruptedException | IOException ex) {
