@@ -445,10 +445,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                             wk.reset();
                         }
                     } catch (ClosedWatchServiceException ex) {
-                        break;
+                        return;
                     } catch (InterruptedException | IOException ex) {
                         log.error("Error when reading graphANNIS logfile", ex);
-                        break;
+                        return;
                     }
                 }
             }).start();
