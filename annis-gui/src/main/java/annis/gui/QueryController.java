@@ -40,6 +40,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
@@ -114,6 +115,14 @@ public class QueryController implements Serializable {
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
                 validateQuery();
+            }
+        });
+        
+        this.state.getQueryLanguage().addValueChangeListener(new Property.ValueChangeListener() {
+            
+            @Override
+            public void valueChange(ValueChangeEvent event) {
+                validateQuery();                
             }
         });
 
