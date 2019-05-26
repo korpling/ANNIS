@@ -16,64 +16,30 @@
 package annis.administration;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
+import org.aeonbits.owner.ConfigFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
 
+import annis.ServiceConfig;
 import annis.dao.AbstractDao;
 import annis.dao.QueryDao;
+import annis.service.objects.AnnisCorpus;
 
 /**
  * Contains common functions used in the different adminstration DAOs
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public abstract class AbstractAdminstrationDao extends AbstractDao
 {
 
   private final static Logger log = LoggerFactory.getLogger(
     AbstractAdminstrationDao.class);
-
-  private String externalFilesPath;
   
   private QueryDao queryDao;
-
-  protected boolean lockRepositoryMetadataTable(boolean waitForOtherTasks)
-  {
-    try
-    {
-      log.info("Locking repository_metadata table to ensure no other import is running");
-      getJdbcTemplate().execute(
-        "LOCK TABLE repository_metadata IN EXCLUSIVE MODE" + (waitForOtherTasks ? ""
-          : " NOWAIT"));
-      return true;
-    }
-    catch (DataAccessException ex)
-    {
-      return false;
-    }
-  }
-
-  protected File getRealDataDir()
-  {
-    File dataDir;
-    if (getExternalFilesPath() == null || getExternalFilesPath().isEmpty())
-    {
-      // use the default directory
-      dataDir = new File(System.getProperty("user.home"), ".annis/data/");
-    }
-    else
-    {
-      dataDir = new File(getExternalFilesPath());
-    }
-    return dataDir;
-  }
 
   /**
    * Checks, if there already exists a top level corpus.
@@ -83,27 +49,8 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
    */
   protected boolean existConflictingTopLevelCorpus(String topLevelCorpusName)
   {
-    String sql = "SELECT count(name) as amount FROM corpus WHERE top_level=true AND name='"
-      + topLevelCorpusName + "'";
-    Integer numberOfCorpora = getJdbcTemplate().query(sql,
-      new ResultSetExtractor<Integer>()
-      {
-        @Override
-        public Integer extractData(ResultSet rs) throws SQLException,
-        DataAccessException
-        {
-          if (rs.next())
-          {
-            return rs.getInt("amount");
-          }
-          else
-          {
-            return 0;
-          }
-        }
-      });
-
-    return numberOfCorpora > 0;
+    List<AnnisCorpus> existing = queryDao.listCorpora(Arrays.asList(topLevelCorpusName));
+    return !existing.isEmpty();
   }
   
   // tables in the staging area have their names prefixed with "_"
@@ -112,55 +59,7 @@ public abstract class AbstractAdminstrationDao extends AbstractDao
     return "_" + table;
   }
 
-  public String getExternalFilesPath()
-  {
-    return externalFilesPath;
-  }
-
-  public void setExternalFilesPath(String externalFilesPath)
-  {
-    this.externalFilesPath = externalFilesPath;
-  }
-
   
-  /**
-   * Closes all open idle connections. The current data source
-   * must have superuser rights.
-   * 
-   * This can be used if a another database action needs full access to a database,
-   * e.g. when deleting and then creating it
-   * @param databasename
-   */
-  protected void closeAllConnections(String databasename)
-  {
-    String sql
-      = "SELECT pg_terminate_backend(pg_stat_activity.pid)\n"
-      + "FROM pg_stat_activity\n"
-      + "WHERE pg_stat_activity.datname = ?\n"
-      + "  AND pid <> pg_backend_pid();";
-    try(Connection conn = getDataSource().getConnection())
-    {
-      DatabaseMetaData meta = conn.getMetaData();
-      
-      if(meta.getDatabaseMajorVersion() == 9 
-        && meta.getDatabaseMinorVersion() <= 1)
-      {
-        sql
-          = "SELECT pg_terminate_backend(pg_stat_activity.procpid)\n"
-          + "FROM pg_stat_activity\n"
-          + "WHERE pg_stat_activity.datname = ?\n"
-          + "  AND procpid <> pg_backend_pid();";
-      }
-    }
-    catch(SQLException ex)
-    {
-      log.warn("Could not get the PostgreSQL version", ex);
-    }
-    
-    getJdbcTemplate().queryForRowSet(sql, databasename);
-
-  }
-
   public QueryDao getQueryDao()
   {
     return queryDao;

@@ -56,7 +56,7 @@ import elemental.json.JsonArray;
  * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists),
  * the screenshot making and some information windows.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class MainToolbar extends HorizontalLayout
   implements LoginListener, ScreenshotMaker.ScreenshotCallback,

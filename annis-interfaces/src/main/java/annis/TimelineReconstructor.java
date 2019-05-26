@@ -39,7 +39,7 @@ import java.util.Arrays;
  * Allows to reconstruct a proper {@link SDocumentGraph} with an {@link STimeline} and
  * several {@link SToken} connected by {@link SOrderRelation} from of a virtual tokenization.
  * 
- * @author Thomas Krause <thomaskrause@posteo.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  *
  */
 public class TimelineReconstructor 
@@ -419,8 +419,8 @@ public class TimelineReconstructor
    * {@link STimeline} and multiple {@link STextualDS}.
    * 
    * This alters the original graph.
-   * @param orig
-   * @return
+   * @param graph original document graph
+   * @param spanAnno2order A map from all span annotation names to the named order relation they belong to.
    */
   public static void removeVirtualTokenization(SDocumentGraph graph, Map<String, String> spanAnno2order)
   {
@@ -443,8 +443,7 @@ public class TimelineReconstructor
    * {@link STimeline} and multiple {@link STextualDS}.
    * 
    * This alters the original graph.
-   * @param orig
-   * @return
+   * @param graph original document graph
    */
   public static void removeVirtualTokenizationUsingNamespace(SDocumentGraph graph)
   {

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.mock;
 /**
  * Utility code for unit tests.
  * 
- * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
+ * @author Viktor Rosenfeld {@literal <rosenfel@informatik.hu-berlin.de>}
  */
 public class TestUtils {
 

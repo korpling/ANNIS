@@ -32,7 +32,7 @@ import org.apache.shiro.web.env.IniWebEnvironment;
  * are set and has no way of fallbacking to any default locations.
  * </p>
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class MultipleIniWebEnvironment extends IniWebEnvironment 
   implements Initializable

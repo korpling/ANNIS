@@ -71,13 +71,12 @@ Greater distances (e.g. `.1,100` for 'within 100 tokens') should always
 be specified explicitly.
 
 Finally, we can add metadata restrictions to the query, which filter out
-documents not matching our definitions. Metadata attributes must be
-preceded by the prefix meta:: and may not be bound (i.e. they are not
-referred to as \#1 etc. and the numbering of other elements ignores
-their existence):
+documents not matching our definitions. Metadata attributes must be connected to
+other non-meta attributes with the `@*` (part-of) operator:
 
 ```
-"want" & "to" & #1 .1,5 #2 & meta::type="interview" 
+"want" & "to" & #1 .1,5 #2
+& type="interview" & #1 @* #2 
 ```
 
 To view metadata for a search result or for a corpus, press the "i" icon

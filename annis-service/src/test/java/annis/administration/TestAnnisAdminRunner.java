@@ -17,6 +17,8 @@ package annis.administration;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,37 +32,23 @@ public class TestAnnisAdminRunner {
 	private AnnisAdminRunner main;
 
 	@Before
-	public void setup() {
+	public void setup() throws GraphANNISException {
 		initMocks(this);
 
 		main = new AnnisAdminRunner();
-      main.setCorpusAdministration(null);
+		main.setCorpusAdministration(null);
 		main.setCorpusAdministration(administration);
 	}
 
 	@Test
-	public void importManyCorpora() {
+	public void importManyCorpora() throws InterruptedException {
 		run("import data/corpus1 data/corpus2 data/corpus3");
 
 		List<String> expected = Arrays.asList("data/corpus1 data/corpus2 data/corpus3".split(" "));
 		verify(administration).importCorporaSave(false, null, null, false, expected);
 	}
-
-	@Test
-	public void initializeDatabase() {
-		run("init -h host --port 5432 -d database -u user -p password");
-		verify(administration).initializeDatabase("host", "5432", "database", "user", 
-      "password", "postgres", "postgres", null, false, "public");
-	}
-
-	@Test
-	public void indexes() {
-		run("indexes");
-		verify(administration).listUsedIndexes();
-		verify(administration).listUnusedIndexes();
-	}
-
-	private void run(String cmdline) {
+	
+	private void run(String cmdline) throws InterruptedException {
 		main.run(cmdline.split(" "));
 	}
 

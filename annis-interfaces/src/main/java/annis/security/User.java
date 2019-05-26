@@ -31,7 +31,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * Represents a user.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @XmlRootElement
 public class User implements Serializable

@@ -33,7 +33,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  * Wrapper for selecting and showing the desired query builder.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class QueryBuilderChooser extends Panel implements Property.ValueChangeListener
 {

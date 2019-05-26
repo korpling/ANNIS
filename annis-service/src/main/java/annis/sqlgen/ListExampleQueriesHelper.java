@@ -17,57 +17,29 @@ package annis.sqlgen;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.core.RowMapper;
+import org.apache.commons.dbutils.handlers.AbstractListHandler;
 
 import annis.examplequeries.ExampleQuery;
 
 /**
  * Generates SQL query for example queries
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public class ListExampleQueriesHelper implements
-RowMapper<ExampleQuery>
-{
+public class ListExampleQueriesHelper extends AbstractListHandler<ExampleQuery> {
 
+    public final static String SQL = "SELECT example_query, description, corpus\n"
+            + "FROM example_queries WHERE corpus=?";
 
-  public String createSQLQuery(List<Long> corpusIDs)
-  {
-    if (corpusIDs == null || corpusIDs.isEmpty())
-    {
-      return "SELECT example_query, example_queries.\"type\", used_ops, "
-        + "description, c.name as corpus_name "
-        + "\nFROM example_queries, corpus c"
-        + "\nWHERE corpus_ref = c.id";
+    @Override
+    protected ExampleQuery handleRow(ResultSet rs) throws SQLException {
+        ExampleQuery exampleQuery = new ExampleQuery();
+
+        exampleQuery.setExampleQuery(rs.getString("example_query"));
+        exampleQuery.setDescription(rs.getString("description"));
+        exampleQuery.setCorpusName(rs.getString("corpus"));
+
+        return exampleQuery;
     }
-    else
-    {
-      String sql = "SELECT example_query, example_queries.\"type\", used_ops, "
-        + "description, c.name as corpus_name  "
-        + "\nFROM example_queries, ("
-        + "\nSELECT * FROM corpus "
-        + "\nWHERE corpus.id in (" + StringUtils.join(corpusIDs, ",") + ")) as c"
-        + "\nWHERE	corpus_ref = c.id"
-        + "\nORDER BY (nodes, used_ops)";
-
-      return sql;
-    }
-  }
-
-  @Override
-  public ExampleQuery mapRow(ResultSet rs, int i) throws SQLException
-  {
-    ExampleQuery exampleQuery = new ExampleQuery();
-
-    exampleQuery.setType(rs.getString("type"));
-    exampleQuery.setUsedOperators(rs.getString("used_ops"));
-    exampleQuery.setExampleQuery(rs.getString("example_query"));
-    exampleQuery.setDescription(rs.getString("description"));
-    exampleQuery.setCorpusName(rs.getString("corpus_name"));
-
-    return exampleQuery;
-  }
 }

@@ -15,254 +15,173 @@
  */
 package annis.libgui;
 
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
-
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SSpan;
+import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
-import org.corpus_tools.salt.util.SaltUtil;
+import org.corpus_tools.salt.util.DataSourceSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
-import annis.model.RelannisNodeFeature;
 
 /**
  * Helps to extract page number annotations from {@link SSpan} of a salt
  * document.
  *
- * <p>It uses the following algorithm:</p>
+ * <p>
+ * It uses the following algorithm:
+ * </p>
  * <ul>
  * <li>Get all spans which are annoteted with a page number.</li>
  * <li>Create intervalls left and right token index of the annis model with the
  * help of SFeatures and {@link AnnisConstants} and build a mapping from these
  * intervalls to the sspan.</li>
  * <li>Get the best fitting intervall for a specific span.</li>
- * <ul>
+ * </ul>
  *
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class PDFPageHelper {
 
-  private static final Logger log = LoggerFactory.getLogger(PDFPageHelper.class);
+    private static final Logger log = LoggerFactory.getLogger(PDFPageHelper.class);
 
-  public static final String MAPPING_PAGE_KEY = "pdf_page_key";
-  public static final String DEFAULT_PAGE_NUMBER_ANNOTATION_NAME = "page";
+    public static final String MAPPING_PAGE_KEY = "pdf_page_key";
+    public static final String DEFAULT_PAGE_NUMBER_ANNOTATION_NAME = "page";
 
-  public static final String PAGE_NUMBER_SEPERATOR = "-";
+    public static final String PAGE_NUMBER_SEPERATOR = "-";
 
-  public static final String PAGE_NO_VALID_NUMBER = "-1";
+    public static final String PAGE_NO_VALID_NUMBER = "-1";
 
-  private SortedMap<Integer, TreeMap<Integer, SSpan>> sspans = new TreeMap<Integer, TreeMap<Integer, SSpan>>();
+    private VisualizerInput input;
 
-  private VisualizerInput input;
-
-  public PDFPageHelper(VisualizerInput visInput) {
-    this.input = visInput;
-    getAllSSpanWithPageNumber(visInput.getDocument().getDocumentGraph());
-  }
-
-  /**
-   * Returns a page annotation for a span, if the span is overlapped by a page
-   * annotation.
-   */
-  public String getPageAnnoForGridEvent(SSpan span) {
-    int left = getLeftIndexFromSNode(span);
-    int right = getRightIndexFromSNode(span);
-
-    if (sspans == null) {
-      log.warn("no page annos found");
-      return null;
+    public PDFPageHelper(VisualizerInput visInput) {
+        this.input = visInput;
     }
+    
 
-    // lookup left index
-    int leftIdx = -1;
-    for (Integer i : sspans.keySet()) {
-      if (i <= left) {
-        leftIdx = i;
-      }
-    }
+    /**
+     * Returns the value of page annotation for a node. It takes the visualizer
+     * mappings into account. If no mapping is defined, this default definition is used:
+     * {@link #DEFAULT_PAGE_NUMBER_ANNOTATION_NAME}
+     *
+     */
+    public String getPageFromAnnotation(SNode node) {
+        if (node != null && node.getAnnotations() != null) {
 
-    if (leftIdx == -1) {
-      log.debug("no left index found");
-      return null;
-    }
+            Set<SLayer> layers = node.getLayers();
+            String nodeNamespace = null;
 
-    // lookup right key
-    int rightIdx = -1;
-    for (Integer i : sspans.get(leftIdx).keySet()) {
-      if (i >= right) {
-        rightIdx = i;
-      }
-    }
-
-    if (rightIdx == -1) {
-      log.debug("no right index found");
-      return null;
-    }
-
-    return getPageFromAnnotation(span);
-  }
-
-  /**
-   * Returns the value of page annotiation for a node. It takes the visualizer
-   * mappings into account. If no mapping is used, this definition is used: {@link
-   * #PAGE_NUMBER_ANNOATATION_NAME}
-   *
-   */
-  public String getPageFromAnnotation(SNode node) {
-    if (node != null && node.getAnnotations() != null) {
-
-      Set<SLayer> layers = node.getLayers();
-      String nodeNamespace = null;
-
-      if(layers != null)
-      {
-        for (SLayer l : layers) {
-          nodeNamespace = l.getName();
-        }
-
-        for (SAnnotation anno : node.getAnnotations()) {
-
-          if ((nodeNamespace == null || input.getNamespace() == null)
-                  && getPDFPageAnnotationName().equals(anno.getName())) {
-            return anno.getValue_STEXT();
-          } else if (nodeNamespace.equals(input.getNamespace())
-                  && getPDFPageAnnotationName().equals(anno.getName())) {
-            return anno.getValue_STEXT();
-          }
-        }
-      }
-    }
-
-    return null;
-  }
-
-  private void getAllSSpanWithPageNumber(
-          SDocumentGraph graph) {
-    if (graph == null) {
-      log.error("could not get page annos from empty graph");
-      return;
-    }
-
-    List<SSpan> sSpans = graph.getSpans();
-
-    if (sSpans != null) {
-      for (SSpan s : sSpans) {
-        Set<SAnnotation> sAnnotations = s.getAnnotations();
-        if (sAnnotations != null) {
-          for (SAnnotation anno : sAnnotations) {
-            // TODO support mappings of resolver vis map
-            if (getPDFPageAnnotationName().equals(anno.getName())) {
-              int leftIdx = getLeftIndexFromSNode(s);
-              int rightIdx = getRightIndexFromSNode(s);
-
-              if (sspans.containsKey(leftIdx)) {
-                if (sspans.get(leftIdx).containsKey(rightIdx)) {
-                  log.warn("an intervall {}-{} is overrided by: {}", s);
+            if (layers != null) {
+                for (SLayer l : layers) {
+                    nodeNamespace = l.getName();
                 }
-                sspans.get(leftIdx).put(rightIdx, s);
-              } else {
-                sspans.put(leftIdx, new TreeMap<Integer, SSpan>());
-                sspans.get(leftIdx).put(rightIdx, s);
-              }
+
+                for (SAnnotation anno : node.getAnnotations()) {
+
+                    if ((nodeNamespace == null || input.getNamespace() == null)
+                            && getPDFPageAnnotationName().equals(anno.getName())) {
+                        return anno.getValue_STEXT();
+                    } else if (nodeNamespace.equals(input.getNamespace())
+                            && getPDFPageAnnotationName().equals(anno.getName())) {
+                        return anno.getValue_STEXT();
+                    }
+                }
             }
-          }
         }
-      }
-    }
-  }
 
-  /**
-   * Get the most left token index of a SSpan.
-   *
-   */
-  public int getLeftIndexFromSNode(SSpan s) 
-  {
-    
-    RelannisNodeFeature feat = 
-      (RelannisNodeFeature) s.getFeature(SaltUtil.createQName(ANNIS_NS, FEAT_RELANNIS_NODE)).getValue();
-    return (int) feat.getLeftToken();
-  }
-
-  /**
-   * Get the most right token index of a SSpan.
-   *
-   */
-  public int getRightIndexFromSNode(SSpan s) 
-  {
-    
-    RelannisNodeFeature feat =
-      (RelannisNodeFeature) s.getFeature(SaltUtil.createQName(ANNIS_NS,
-          FEAT_RELANNIS_NODE)).getValue_SOBJECT();
-    return (int) feat.getRightToken();
-  }
-
-  /**
-   * Gets the pdf page annotation name. It takes into acount the mappings
-   * defined in {@link VisualizerInput#mappings}.
-   *
-   */
-  public String getPDFPageAnnotationName() {
-
-    Properties mappings = input.getMappings();
-
-    if (mappings != null) {
-      return mappings.getProperty(MAPPING_PAGE_KEY,
-              DEFAULT_PAGE_NUMBER_ANNOTATION_NAME);
+        return null;
     }
 
-    return DEFAULT_PAGE_NUMBER_ANNOTATION_NAME;
-  }
+   
+    /**
+     * Gets the pdf page annotation name. It takes into account the mappings defined
+     * in {@link VisualizerInput#mappings}.
+     *
+     */
+    public String getPDFPageAnnotationName() {
 
-  /**
-   * Creates a String (eg. <b>3-9</b> or <b>3</b>), based on the most left and
-   * most right page annotation.
-   *
-   * <p>The page annotation is detected with
-   * {@link #getPageFromAnnotation(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan)}</p>
-   *
-   * @return A String which represents the start and the end page of a pdf,
-   * seperated by {@link #PAGE_NUMBER_SEPERATOR}. If there is no end page, or
-   * exactly one page annotation, only a String with one number is returned.
-   */
-  public String getMostLeftAndMostRightPageAnno() {
+        Properties mappings = input.getMappings();
 
-    if (sspans == null || sspans.isEmpty()) {
-      return null;
-    }
-    TreeMap<Integer, SSpan> rightTokIdxToSSpan = sspans.get(sspans.firstKey());
-    SSpan leftSpan = rightTokIdxToSSpan.get(rightTokIdxToSSpan.firstKey());
-    SSpan rightSpan = null;
-    Integer rightIdx = null;
-
-    for (TreeMap<Integer, SSpan> leftIdxValue : sspans.values()) {
-      for (Map.Entry<Integer, SSpan> rightIdxEntry : leftIdxValue.entrySet()) {
-        if (rightIdx == null || rightIdx <= rightIdxEntry.getKey()) {
-          rightIdx = rightIdxEntry.getKey();
-          rightSpan = rightIdxEntry.getValue();
+        if (mappings != null) {
+            return mappings.getProperty(MAPPING_PAGE_KEY, DEFAULT_PAGE_NUMBER_ANNOTATION_NAME);
         }
-      }
+
+        return DEFAULT_PAGE_NUMBER_ANNOTATION_NAME;
+    }
+    
+    private static Number getCharacterIndex(SSpan span) {
+        
+        if(span != null && span.getGraph() != null) {
+            List<DataSourceSequence> allDS = span.getGraph().getOverlappedDataSourceSequence(span,
+                    SALT_TYPE.STEXT_OVERLAPPING_RELATION);
+            if(allDS != null) {
+                for(DataSourceSequence<?> seq : allDS) {
+                    if(seq.getDataSource() instanceof STextualDS) {
+                        return seq.getStart();
+                       
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
 
-    if (rightIdx != null) {
-      return getPageFromAnnotation(leftSpan)
-              + PAGE_NUMBER_SEPERATOR
-              + getPageFromAnnotation(rightSpan);
-    }
+    /**
+     * Creates a String (eg. <b>3-9</b> or <b>3</b>), based on the most left and
+     * most right page annotation.
+     *
+     * <p>
+     * The page annotation is detected with
+     * {@link #getPageFromAnnotation(SNode)}
+     * </p>
+     *
+     * @return A String which represents the start and the end page of a pdf,
+     *         Separated by {@link #PAGE_NUMBER_SEPERATOR}. If there is no end page,
+     *         or exactly one page annotation, only a String with one number is
+     *         returned.
+     */
+    public String getMostLeftAndMostRightPageAnno() {
 
-    return getPageFromAnnotation(leftSpan);
-  }
+        if (this.input == null || this.input.getDocument() == null
+                || this.input.getDocument().getDocumentGraph() == null) {
+            return null;
+        }
+
+        List<SSpan> sspans = this.input.getDocument().getDocumentGraph().getSpans();
+        if (sspans == null || sspans.isEmpty()) {
+            return null;
+        }
+
+        // iterate over all spans at get their page numbers, store them in ordered map
+        // with their character position as key
+        TreeMap<Integer, String> pageNumbers = new TreeMap<>();
+        for (SSpan span : sspans) {
+            String page = getPageFromAnnotation(span);
+            if (page != null) {
+                Number charIdx = getCharacterIndex(span);
+                if(charIdx != null) {
+                    pageNumbers.put(charIdx.intValue(), page);
+                }
+            }
+        }
+        
+        if(pageNumbers.size() == 1) {
+            return pageNumbers.firstEntry().getValue();
+        } else if(pageNumbers.size() > 1) {
+            return pageNumbers.firstEntry().getValue() + PAGE_NUMBER_SEPERATOR + pageNumbers.lastEntry().getValue();
+        } else {
+            return null;
+        }
+    }
 }

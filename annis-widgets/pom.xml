@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.6.1-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -21,31 +21,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <excludes>
-            <exclude>VAADIN/widgetsets/WEB-INF/**</exclude>
-            <exclude>VAADIN/gwt-unitCache/**</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-
-      <!-- As we are doing "inplace" GWT compilation, ensure the widgetset -->
-      <!-- directory is cleaned properly -->
-      <plugin>
-        <artifactId>maven-clean-plugin</artifactId>
-        <version>2.4.1</version>
-        <configuration>
-          <filesets>
-            <fileset>
-              <directory>src/main/webapp/VAADIN/widgetsets</directory>
-            </fileset>
-          </filesets>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-maven-plugin</artifactId>
         <version>${vaadin.version}</version>
@@ -54,10 +29,6 @@
           <!-- <runTarget>mobilemail</runTarget> -->
           <!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This 
           way compatible with Vaadin eclipse plugin. -->
-          <webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets
-          </webappDirectory>
-          <hostedWebapp>${project.build.outputDirectory}/VAADIN/widgetsets
-          </hostedWebapp>
           <noServer>true</noServer>
           <!-- Remove draftCompile when project is ready -->
           <draftCompile>false</draftCompile>
@@ -92,6 +63,9 @@
       </resource>
       <resource>
         <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/webapp</directory>
       </resource>
     </resources>
   </build>

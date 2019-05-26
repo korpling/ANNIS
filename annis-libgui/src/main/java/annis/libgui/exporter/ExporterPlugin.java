@@ -19,6 +19,7 @@ import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.WebResource;
 
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.QueryLanguage;
 import net.xeoh.plugins.base.Plugin;
 
 import java.io.Writer;
@@ -28,11 +29,11 @@ import java.util.Set;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface ExporterPlugin extends Plugin
 {
-  public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight, 
+  public Exception convertText(String query, QueryLanguage queryLanguage, int contextLeft, int contextRight, 
    Set<String> corpora, List<String> keys, String args, boolean alignmc,
    WebResource annisResource, Writer out, EventBus eventBus,
    Map<String, CorpusConfig> corpusConfigs);
@@ -44,5 +45,7 @@ public interface ExporterPlugin extends Plugin
   public String getHelpMessage();
   
   public String getFileEnding();
+  
+  public boolean needsContext();
   
 }

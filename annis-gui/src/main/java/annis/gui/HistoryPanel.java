@@ -29,12 +29,12 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.declarative.Design;
 
-import annis.gui.objects.Query;
+import annis.model.Query;
 import annis.libgui.Helper;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @DesignRoot
 public class HistoryPanel extends Panel

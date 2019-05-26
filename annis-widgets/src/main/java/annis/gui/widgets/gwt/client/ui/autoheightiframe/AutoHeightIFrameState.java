@@ -19,7 +19,7 @@ import com.vaadin.shared.AbstractComponentState;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class AutoHeightIFrameState extends AbstractComponentState
 {

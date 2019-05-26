@@ -25,7 +25,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * for a complete document.
  *
  * @see RST
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @PluginImplementation
 public class RSTFull extends AbstractVisualizer<RSTPanel>

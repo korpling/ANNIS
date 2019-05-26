@@ -15,242 +15,212 @@
  */
 package annis.dao;
 
-import annis.administration.FileAccessException;
-import annis.administration.StatementController;
-import annis.utils.DynamicDataSource;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Function;
+
+import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCallback;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
+import annis.DevelopConfig;
+import annis.administration.StatementController;
+import annis.tabledefs.Column;
+import annis.tabledefs.Table;
+import au.com.bytecode.opencsv.CSVReader;
+import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  * Common functions used by all data access objects.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * 
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public abstract class AbstractDao
-{
-  private final static Logger log = LoggerFactory.getLogger(
-    AbstractDao.class);
-  
-  private JdbcTemplate jdbcTemplate;
-  private DynamicDataSource dataSource;
-  private StatementController statementController;
-  private String scriptPath;
+public abstract class AbstractDao extends DBProvider {
+    private final static Logger log = LoggerFactory.getLogger(AbstractDao.class);
 
-  /**
-   * executes an SQL string, substituting the
-   * parameters found in args
-   *
-   * @param sql
-   * @param args
-   * @return
-   */
-  protected PreparedStatement executeSql(String sql,
-    MapSqlParameterSource args)
-  {
-    // XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
-    Map<String, Object> parameters = args != null ? args.getValues()
-      : new HashMap<String, Object>();
+    protected final DevelopConfig devCfg = ConfigFactory.create(DevelopConfig.class, System.getProperties(),
+            System.getenv());
 
-    for (Map.Entry<String, Object> placeHolderEntry : parameters.entrySet())
-    {
-      String key = placeHolderEntry.getKey();
-      String value = placeHolderEntry.getValue().toString();
-      log.debug("substitution for parameter '" + key + "' in SQL script: "
-        + value);
-      sql = sql.replaceAll(key, Matcher.quoteReplacement(value));
-    }
-    
-    log.debug("Executing SQL\n{}", sql);
-    
-    CancelableStatements cancelableStats
-      = new CancelableStatements(
-        sql, statementController);
+    private StatementController statementController;
 
-    // register the statement, so we could try to interrupt it in the gui.
-    if (statementController != null)
-    {
-      statementController.registerStatement(cancelableStats.statement);
-    }
-    else
-    {
-      log.debug("statement controller is not initialized");
-    }
-    getJdbcTemplate().execute(cancelableStats, cancelableStats);
-    return cancelableStats.statement;
-
-  }
-  
-  /**
-   * executes an SQL script from $ANNIS_HOME/scripts, substituting the
-   * parameters found in args
-   *
-   * @param script
-   * @param args
-   * @return
-   */
-  protected PreparedStatement executeSqlFromScript(String script,
-    MapSqlParameterSource args)
-  {
-    File fScript = new File(scriptPath, script);
-    if (fScript.canRead() && fScript.isFile())
-    {
-      Resource resource = new FileSystemResource(fScript);
-      log.debug("executing SQL script: " + resource.getFilename());
-      String sql = readSqlFromResource(resource);
-      return executeSql(sql, args);
-    }
-    else
-    {
-      log.debug("SQL script " + fScript.getName() + " does not exist");
-      return null;
-    }
-  }
-  
-  /**
-   * Reads the content from a resource into a string.
-   * @param resource
-   * @return 
-   */
-  private String readSqlFromResource(Resource resource)
-  {
-
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-      new FileInputStream(
-        resource.
-        getFile()), "UTF-8"));)
-    {
-      StringBuilder sqlBuf = new StringBuilder();
-
-      for (String line = reader.readLine(); line != null; line
-        = reader.readLine())
-      {
-        sqlBuf.append(line).append("\n");
-      }
-      return sqlBuf.toString();
-      }
-      catch (IOException e)
-      {
-        log.error("Couldn't read SQL script from resource file.", e);
-        throw new FileAccessException(
-          "Couldn't read SQL script from resource file.", e);
-      }
-  }
-  
-  protected MapSqlParameterSource makeArgs()
-  {
-    return new MapSqlParameterSource();
-  }
-  
-  public void registerGUICancelThread(StatementController statementCon)
-  {
-    this.statementController = statementCon;
-  }
-  
-  public JdbcTemplate getJdbcTemplate()
-  {
-    return jdbcTemplate;
-  }
-
-  public void setJdbcTemplate(JdbcTemplate jdbcTemplate)
-  {
-    this.jdbcTemplate = jdbcTemplate;
-    DataSource dsArg = jdbcTemplate.getDataSource();
-    if(dsArg instanceof DynamicDataSource)
-    {
-      this.dataSource = (DynamicDataSource) dsArg;
-    }
-    else
-    {
-      this.dataSource = new DynamicDataSource();
-      this.dataSource.setInnerDataSource(dsArg);
-    }
-  }
-  
-  
-  
-  public DynamicDataSource getDataSource()
-  {
-    return dataSource;
-  }
-
-  
-  public void setDataSource(DynamicDataSource dataSource)
-  {
-    this.dataSource = dataSource;
-    jdbcTemplate = new JdbcTemplate(dataSource);
-  }
-  
-  public String getScriptPath()
-  {
-    return scriptPath;
-  }
-
-  public void setScriptPath(String scriptPath)
-  {
-    this.scriptPath = scriptPath;
-  }
-  
-  /**
-   * Registers a {@link PreparedStatement} to the {@link StatementController}.
-   */
-  private static class CancelableStatements implements PreparedStatementCreator,
-    PreparedStatementCallback<Void>
-  {
-
-    private final String sqlQuery;
-
-    private PreparedStatement statement;
-    private final StatementController statementController;
-
-    public CancelableStatements(String sql,
-      StatementController statementController)
-    {
-      this.sqlQuery = sql;
-      this.statementController = statementController;
+    public void registerGUICancelThread(StatementController statementCon) {
+        this.statementController = statementCon;
     }
 
-    @Override
-    public PreparedStatement createPreparedStatement(Connection con) throws
-      SQLException
-    {
-      if (statementController != null && statementController.isCancelled())
-      {
-        throw new SQLException("process was cancelled");
-      }
+    public void createTableIfNotExists(DB db, Table table, File initialValuesCSV,
+            Function<String[], String[]> lineModifier) throws SQLException {
 
-      statement = con.prepareCall(sqlQuery);
-      if (statementController != null)
-      {
-        statementController.registerStatement(statement);
-      }
-      return statement;
+        if (table == null) {
+            return;
+        }
+
+        try (Connection conn = createConnection(db)) {
+            conn.setAutoCommit(false);
+
+            // check if table exists
+            int num_existing = getQueryRunner().query(conn,
+                    "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?", new ScalarHandler<>(1),
+                    table.getName());
+
+            if (num_existing == 0) {
+
+                getQueryRunner().update(conn,
+                        "CREATE TABLE " + table.getName() + " (" + Joiner.on(", ").join(table.getColumns()) + ")");
+
+                if (initialValuesCSV != null) {
+                    importCSVIntoTable(conn, table, false, false, initialValuesCSV, lineModifier);
+                }
+
+                // create combined indexes for the columns
+                int index_nr = 1;
+                for (ArrayList<Column> idx_columns : table.getIndexes()) {
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i < idx_columns.size(); i++) {
+                        if (i > 0) {
+                            sb.append(", ");
+                        }
+                        sb.append(idx_columns.get(i).getName());
+                    }
+                    getQueryRunner().update(conn, "CREATE INDEX " + "idx_" + table.getName() + "_" + (index_nr++)
+                            + " ON " + table.getName() + " (" + sb.toString() + ")");
+                }
+
+                conn.commit();
+            }
+        }
     }
 
-    @Override
-    public Void doInPreparedStatement(PreparedStatement ps) throws SQLException,
-      DataAccessException
-    {
-      ps.execute();
-      return null;
+    public void importCSVIntoTable(Connection conn, Table table, boolean importKeys, boolean deleteOld, File csvFile,
+            Function<String[], String[]> lineModifier) throws SQLException {
+
+        try (CSVReader csvReader = new CSVReader(
+                new InputStreamReader(new FileInputStream(csvFile), StandardCharsets.UTF_8), '\t', (char) 0)) {
+
+            String[] firstLine = csvReader.readNext();
+            if (lineModifier != null) {
+                firstLine = lineModifier.apply(firstLine);
+            }
+
+            if (firstLine != null && firstLine.length >= 1) {
+                List<Column> columns = importKeys ? table.getColumns() : table.getNonKeyColumns();
+                Preconditions.checkArgument(columns.size() == firstLine.length,
+                        "Import of table %s failed. " + "File '%s' should have %s columns but has %s.", table.getName(),
+                        csvFile.getAbsolutePath(), columns.size(), firstLine.length);
+                
+                if(deleteOld) {
+                	getQueryRunner().update(conn, "DELETE FROM \"" + table.getName() + "\"");
+                }
+
+                List<String> columnNames = new LinkedList<>();
+                for (Column c : columns) {
+                    columnNames.add("\"" + c.getName() + "\"");
+                }
+
+                String[] line = firstLine;
+                try (PreparedStatement insertStmt = conn.prepareStatement(
+                        "INSERT INTO " + "\"" + table.getName() + "\"" + "(" + Joiner.on(", ").join(columnNames) + ") "
+                                + " VALUES(" + Strings.repeat("?, ", firstLine.length - 1) + "?)")) {
+                    while (line != null) {
+                        for (int i = 0; i < line.length; i++) {
+                            if (line[i] == null || line[i].equals("NULL")) {
+                                insertStmt.setString(i + 1, null);
+                            } else {
+                                insertStmt.setString(i + 1, line[i]);
+                            }
+                        }
+                        insertStmt.execute();
+                        line = csvReader.readNext();
+                        if (lineModifier != null) {
+                            line = lineModifier.apply(line);
+                        }
+                    }
+                }
+            }
+
+        } catch (FileNotFoundException ex) {
+            log.error("Could not find file", ex);
+        } catch (IOException ex) {
+            log.error("Could not write SQLite table", ex);
+        }
     }
-  }
-  
+
+    public void importSQLiteTable(DB db, Table table, File csvFile, Function<String[], String[]> lineModifier)
+            throws SQLException {
+
+        try (Connection conn = createConnection(db)) {
+            conn.setAutoCommit(false);
+            importCSVIntoTable(conn, table, false, false, csvFile, lineModifier);
+            conn.commit();
+        }
+    }
+
+    public void exportTableIntoCSV(Connection conn, Table table, boolean exportKeys, File csvFile,
+            Function<String[], String[]> lineModifier) throws SQLException {
+
+        try (CSVWriter csvWriter = new CSVWriter(
+                new OutputStreamWriter(new FileOutputStream(csvFile), StandardCharsets.UTF_8), '\t', (char) 0)) {
+
+            List<Column> columns = exportKeys ? table.getColumns() : table.getNonKeyColumns();
+            List<String> columnNames = new LinkedList<>();
+            for (Column c : columns) {
+                columnNames.add("\"" + c.getName() + "\"");
+            }
+            
+            String sqlTemplate = "SELECT " + Joiner.on(", ").join(columnNames) + " FROM " + "\"" + table.getName() + "\"";
+            
+            getQueryRunner().query(conn, sqlTemplate,
+                    new ResultSetHandler<Boolean>() {
+                        public Boolean handle(ResultSet rs) throws SQLException {
+                            while (rs.next()) {
+                                String[] line = new String[columnNames.size()];
+                                
+                                for (int i = 0; i < line.length; i++) {
+                                	Object o = rs.getObject(i+1);
+                                	if(o != null) {
+                                	    line[i] = o.toString();
+                                	}
+                                }
+
+                                if (lineModifier != null) {
+                                    line = lineModifier.apply(line);
+                                }
+
+                                csvWriter.writeNext(line);
+                            }
+
+                            return true;
+
+                        }
+                    });
+
+        } catch (FileNotFoundException ex) {
+            log.error("Could not find file", ex);
+        } catch (IOException ex) {
+            log.error("Could not read SQLite table", ex);
+        }
+    }
+
+    public String getScriptPath() {
+        return devCfg.scriptPath();
+    }
+
 }

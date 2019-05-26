@@ -15,10 +15,26 @@
  */
 package annis;
 
-import annis.dao.QueryDao;
-import annis.dao.QueryDaoImpl;
-import annis.provider.SaltProjectProvider;
-import annis.test.TestHelper;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assume.assumeTrue;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.ws.rs.core.MediaType;
+
+import org.corpus_tools.graphannis.errors.GraphANNISException;
+import org.corpus_tools.salt.common.SaltProject;
+import org.glassfish.jersey.internal.util.collection.StringKeyIgnoreCaseMultivaluedMap;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
+
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
@@ -26,148 +42,93 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.carrotsearch.junitbenchmarks.annotation.LabelType;
 import com.google.common.io.ByteStreams;
-import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.List;
-import javax.annotation.Resource;
-import javax.ws.rs.core.MediaType;
-import org.corpus_tools.salt.common.SaltProject;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeNotNull;
-import static org.junit.Assume.assumeTrue;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-import org.springframework.dao.DataAccessException;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import annis.dao.QueryDao;
+import annis.dao.QueryDaoImpl;
+import annis.provider.SaltProjectProvider;
+import annis.service.objects.AnnisCorpus;
+import annis.test.TestHelper;
 
 ;
 
 /**
  * This will execute tests on a real database and check if the counts are OK.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-// TODO: do not test context only for annopool
-@ContextConfiguration(locations =
-{
-  "file:src/main/distribution/conf/spring/Common.xml",
-  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
-  "file:src/main/distribution/conf/spring/Dao.xml"
-  
-}, loader = AnnisXmlContextLoader.class)
 @BenchmarkOptions(callgc = false, benchmarkRounds = 5, warmupRounds = 5)
 @BenchmarkMethodChart(filePrefix = "annis-benchmark")
 @BenchmarkHistoryChart(labelWith = LabelType.RUN_ID, maxRuns = 20)
 @AxisRange(min = 0.0)
 @Ignore
-public class BenchmarkTest
-{
+public class BenchmarkTest {
 
-  @Rule
-  public TestRule benchmarkRun = new BenchmarkRule();
+    @Rule
+    public TestRule benchmarkRun = new BenchmarkRule();
 
-  @Resource(name = "queryDao")
-  QueryDao annisDao;
+    QueryDao annisDao;
 
-  private List<Long> pcc2CorpusID;
+    private List<AnnisCorpus> pcc2Corpus;
 
-  private List<Long> ridgesCorpusID;
+    private List<AnnisCorpus> ridgesCorpus;
 
-  private final SaltProjectProvider provider = new SaltProjectProvider();
+    private final SaltProjectProvider provider = new SaltProjectProvider();
 
-  private final OutputStream nullStream = ByteStreams.nullOutputStream();
-  private final MediaType typeXMI = new MediaType("application", "xmi+xml");
+    private final OutputStream nullStream = ByteStreams.nullOutputStream();
+    private final MediaType typeXMI = new MediaType("application", "xmi+xml");
 
-  @Before
-  public void setup()
-  {
-    QueryDaoImpl springAnnisDao = (QueryDaoImpl) TestHelper.proxyTarget(
-      annisDao);
+    @Before
+    public void setup() throws GraphANNISException {
+        annisDao = QueryDaoImpl.create();
 
-    try
-    {
-      assumeNotNull(springAnnisDao.getJdbcTemplate());
+        // get the id of the "pcc2" corpus
+        pcc2Corpus = getExistingCorpora("pcc2");
 
-      springAnnisDao.getJdbcTemplate().queryForObject("SELECT 1", Integer.class);
+        // get the id of the "Ridges_Herbology_Version_2.0" corpus
+        ridgesCorpus = getExistingCorpora("Ridges_Herbology_Version_2.0");
 
     }
-    catch (DataAccessException ex)
-    {
-      assumeNoException(ex);
+
+    private List<AnnisCorpus> getExistingCorpora(String corpus) {
+        // (and check if it's there, otherwise ignore these tests)
+        List<AnnisCorpus> corpusIDs = annisDao.listCorpora(Arrays.asList(corpus));
+        return corpusIDs;
     }
 
-    // get the id of the "pcc2" corpus
-    pcc2CorpusID = getCorpusIDs("pcc2");
+    @Test
+    public void mapSalt_Pcc4282() throws GraphANNISException {
+        assumeTrue(pcc2Corpus.size() > 0);
 
-    // get the id of the "Ridges_Herbology_Version_2.0" corpus
-    ridgesCorpusID = getCorpusIDs("Ridges_Herbology_Version_2.0");
+        SaltProject p = annisDao.retrieveAnnotationGraph("pcc2", "4282", null);
 
+        assertEquals(1, p.getCorpusGraphs().size());
+    }
 
-  }
+    @Test
+    public void mapSaltAndSaveXMI_Pcc4282() throws IOException, GraphANNISException {
+        assumeTrue(ridgesCorpus.size() > 0);
 
-  private List<Long> getCorpusIDs(String corpus)
-  {
-    // (and check if it's there, otherwise ignore these tests)
-    List<String> corpusNames = new LinkedList<>();
-    corpusNames.add(corpus);
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
-    return corpusIDs;
-  }
+        SaltProject p = annisDao.retrieveAnnotationGraph("pcc2", "4282", null);
+        provider.writeTo(p, SaltProject.class, null, null, typeXMI, new StringKeyIgnoreCaseMultivaluedMap<>(),
+                nullStream);
+    }
 
-  @Test
-  public void mapSalt_Pcc4282()
-  {
-    assumeTrue(pcc2CorpusID.size() > 0);
+    @Test
+    public void mapSalt_SonderbaresKraeuterBuch() throws GraphANNISException {
+        assumeTrue(ridgesCorpus.size() > 0);
 
-    SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282", null);
+        SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
+                "sonderbares.kraeuterbuch.16175.11-21", null);
 
-    assertEquals(1, p.getCorpusGraphs().size());
-  }
+        assertEquals(1, p.getCorpusGraphs().size());
+    }
 
-  @Test
-  public void mapSaltAndSaveXMI_Pcc4282() throws IOException
-  {
-    assumeTrue(ridgesCorpusID.size() > 0);
+    @Test
+    public void mapSaltAndSaveXMI_SonderbaresKraeuterBuch() throws IOException, GraphANNISException {
+        assumeTrue(ridgesCorpus.size() > 0);
 
-    SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282", null);
-    provider.writeTo(p, SaltProject.class, null, null,
-      typeXMI, new StringKeyIgnoreCaseMultivaluedMap<>(),
-      nullStream);
-  }
-
-
-  @Test
-  public void mapSalt_SonderbaresKraeuterBuch()
-  {
-    assumeTrue(ridgesCorpusID.size() > 0);
-
-    SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21", null);
-
-    assertEquals(1, p.getCorpusGraphs().size());
-  }
-
-  @Test
-  public void mapSaltAndSaveXMI_SonderbaresKraeuterBuch() throws IOException
-  {
-    assumeTrue(ridgesCorpusID.size() > 0);
-
-    SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21", null);
-    provider.writeTo(p, 
-      SaltProject.class, null, null,
-      typeXMI, null,
-      nullStream);
-  }
+        SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
+                "sonderbares.kraeuterbuch.16175.11-21", null);
+        provider.writeTo(p, SaltProject.class, null, null, typeXMI, null, nullStream);
+    }
 }

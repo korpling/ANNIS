@@ -35,12 +35,10 @@ import com.vaadin.shared.ui.ui.Transport;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.GridExporter;
-import annis.gui.exporter.CSVMultiTokExporter;
+import annis.gui.exporter.SimpleTextExporter;
 //import annis.gui.exporter.MatchWithContextExporter;
 import annis.gui.exporter.TextColumnExporter;
-import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TokenExporter;
-import annis.gui.exporter.WekaExporter;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
@@ -53,7 +51,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
 /**
  * GUI for searching in corpora.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Theme("annis")
 @Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
@@ -203,11 +201,10 @@ public class AnnisUI extends CommonUI
     super.addCustomUIPlugins(pluginManager);
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).
       toURI());
-    pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
-      toURI());
+    // TODO: enable flat query builder when problems with fetching all annotation values are resolved
+    // pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
+    //   toURI());
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVMultiTokExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(WekaExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(GridExporter.class));

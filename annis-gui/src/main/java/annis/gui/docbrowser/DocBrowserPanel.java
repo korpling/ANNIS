@@ -39,7 +39,7 @@ import annis.service.objects.Visualizer;
 
 /**
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class DocBrowserPanel extends Panel
 {

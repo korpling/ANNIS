@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SSpanningRelation;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;

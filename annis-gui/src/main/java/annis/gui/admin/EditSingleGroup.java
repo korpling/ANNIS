@@ -29,7 +29,7 @@ import com.vaadin.ui.declarative.Design;
 /**
  * UI to edit the properties of a single user.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @DesignRoot
 public class EditSingleGroup extends Panel

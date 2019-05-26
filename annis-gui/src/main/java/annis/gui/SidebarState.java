@@ -21,7 +21,7 @@ import com.vaadin.server.Resource;
 
 /**
  * The current behavior state of the side bar.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public enum SidebarState
 {

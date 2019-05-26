@@ -29,7 +29,7 @@ import com.vaadin.client.ValueMap;
 
 /**
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class VJITWrapper extends Widget implements Paintable
 {

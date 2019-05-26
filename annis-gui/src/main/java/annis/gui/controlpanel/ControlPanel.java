@@ -26,7 +26,7 @@ import annis.libgui.InstanceConfig;
 /**
  * This panel allows the user to control and execute queries.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ControlPanel extends VerticalLayout
 {

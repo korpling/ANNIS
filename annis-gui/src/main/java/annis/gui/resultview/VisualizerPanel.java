@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +33,7 @@ import java.util.concurrent.TimeoutException;
 
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,8 +76,8 @@ import annis.visualizers.LoadableVisualizer;
  * Controls the visibility of visualizer plugins and provides some control
  * methods for the media visualizers.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  *
  */
 public class VisualizerPanel extends CssLayout
@@ -103,11 +103,8 @@ public class VisualizerPanel extends CssLayout
 
   private ResolverEntry entry;
 
-  private Map<String, Long> markedAndCovered;
+  private Map<SNode, Long> markedAndCovered;
 
-  private Map<String, String> markersExact;
-
-  private Map<String, String> markersCovered;
 
   private Button btEntry;
 
@@ -145,20 +142,16 @@ public class VisualizerPanel extends CssLayout
     SDocument result,
     Match match,
     Set<String> visibleTokenAnnos,
-    Map<String, Long> markedAndCovered,
-    @Deprecated Map<String, String> markedAndCoveredMap,
-    @Deprecated Map<String, String> markedExactMap,
+    Map<SNode, Long> markedAndCovered,
     String htmlID,
     String resultID,
-    SingleResultPanel parent,
+    VisualizerContextChanger parent,
     String segmentationName,
     PluginSystem ps,
     InstanceConfig instanceConfig) throws IOException
   {
     this.instanceConfig = instanceConfig;
     this.entry = entry;
-    this.markersExact = markedExactMap;
-    this.markersCovered = markedAndCoveredMap;
 
     this.visCtxChanger = parent;
 
@@ -269,6 +262,9 @@ public class VisualizerPanel extends CssLayout
     final VisualizerInput input = createInput();
 
     Component c = visPlugin.createComponent(input, this);
+    if (c == null) {
+        return c;
+    }
     c.setVisible(false);
     c.addStyleName(Helper.CORPUS_FONT);
     c.addStyleName("vis-content");
@@ -282,13 +278,8 @@ public class VisualizerPanel extends CssLayout
     input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().
       getAttribute("AnnisWebService.URL"));
     input.setContextPath(Helper.getContext());
-    input.
-      setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
-
     input.setId(resultID);
 
-    input.setMarkableExactMap(markersExact);
-    input.setMarkableMap(markersCovered);
     input.setMarkedAndCovered(markedAndCovered);
 
     input.setResult(result);
@@ -326,7 +317,7 @@ public class VisualizerPanel extends CssLayout
       SDocument wholeDocument = p.getCorpusGraphs().get(0).getDocuments()
         .get(0);
       
-      Helper.addMatchToDocumentGraph(match, wholeDocument);
+      CommonHelper.addMatchToDocumentGraph(match, wholeDocument);
 
       input.setDocument(wholeDocument);
     }
@@ -354,7 +345,7 @@ public class VisualizerPanel extends CssLayout
   }
 
   public void setSegmentationLayer(String segmentationName,
-    Map<String, Long> markedAndCovered)
+    Map<SNode, Long> markedAndCovered)
   {
     this.segmentationName = segmentationName;
     this.markedAndCovered = markedAndCovered;

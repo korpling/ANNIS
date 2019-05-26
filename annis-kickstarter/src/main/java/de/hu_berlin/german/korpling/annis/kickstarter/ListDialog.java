@@ -15,13 +15,17 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.administration.CorpusAdministration;
-import annis.administration.ImportStatus;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
+
+import annis.administration.CorpusAdministration;
+import annis.administration.ImportStatus;
+import annis.service.objects.AnnisCorpus;
 
 /**
  *
@@ -71,6 +75,7 @@ public class ListDialog extends javax.swing.JDialog
 
             }
         ));
+        tableList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(tableList);
 
         btClose.setMnemonic('c');
@@ -132,15 +137,13 @@ public class ListDialog extends javax.swing.JDialog
     {//GEN-HEADEREND:event_btDeleteActionPerformed
 
       int row = tableList.getSelectedRow();
-      int col = tableModel.findColumn("id");
+      int col = tableModel.findColumn("name");
 
       if(row > -1 && col > -1)
       {
         Object value = tableModel.getValueAt(row, col);
-        final LinkedList<Long> corpusListToDelete = new LinkedList<Long>();
-        long l = Long.parseLong(value.toString());
-        corpusListToDelete.add(l);
-
+        String corpusToDelete = value.toString();
+        
         pbDelete.setIndeterminate(true);
         btClose.setEnabled(false);
         btDelete.setEnabled(false);
@@ -151,7 +154,7 @@ public class ListDialog extends javax.swing.JDialog
           @Override
           protected String doInBackground() throws Exception
           {
-            corpusAdmin.deleteCorpora(corpusListToDelete);
+            corpusAdmin.deleteCorpora(Arrays.asList(corpusToDelete));
             updateTable();
             return "";
           }
@@ -181,15 +184,17 @@ public class ListDialog extends javax.swing.JDialog
           "name", "id", "text", "tokens", "source_path"
         }, 0);
       tableList.setModel(tableModel);
+      
 
-      List<Map<String, Object>> stats = corpusAdmin.listCorpusStats();
+      List<AnnisCorpus> corpora = corpusAdmin.getAdministrationDao().getQueryDao().listCorpora();
 
-      for(Map<String, Object> map : stats)
+      for(AnnisCorpus c : corpora)
       {
         String[] rowData = new String[tableModel.getColumnCount()];
         for(int j = 0; j < rowData.length; j++)
         {
           String cName = tableList.getColumnName(j);
+          Map<String, Object> map = c.asTableRow();
           if(map.containsKey(cName))
           {
             rowData[j] = map.get(cName).toString();

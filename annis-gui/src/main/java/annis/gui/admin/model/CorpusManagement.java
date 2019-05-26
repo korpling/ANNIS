@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A model that handles the corpus list
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CorpusManagement implements Serializable
 {

@@ -92,13 +92,15 @@
   <logger name="annis.benchmarking" level="DEBUG"/>
   <logger name="org.springframework" level="WARN"/>
   <logger name="org.apache.shiro" level="WARN"/>
-  <logger name="com.sun.jersey" level="WARN" />
   <logger name="net.sf.ehcache" level="WARN" />
   <!-- for debugging the Spring transaction management set this to DEBUG" -->
   <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="WARN"/>
 
   <logger name="QueryLog" level="INFO">
     <appender-ref ref="QUERYLOG"/>
+  </logger>
+  
+  <logger name="org.glassfish.jersey" level="CONFIG">
   </logger>
 
   <root level="INFO">

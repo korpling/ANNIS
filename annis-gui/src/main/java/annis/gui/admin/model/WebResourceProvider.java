@@ -26,7 +26,7 @@ import java.io.Serializable;
  * other serializable classes (the {@link WebResource} itself is not 
  * serializable).
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface WebResourceProvider extends Serializable
 {

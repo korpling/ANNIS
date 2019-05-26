@@ -25,7 +25,7 @@ import net.xeoh.plugins.base.Plugin;
  * Every query builder must implement this interface. It' s also necessary to to
  * load this plugin by hand in {@link AnnisBaseUI#initPlugins()}
  *
- * @author Thomas Krause <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <b.pixeldrama@gmail.com>}
  */
 public interface QueryBuilderPlugin<I extends Component> extends Plugin, Serializable
 {

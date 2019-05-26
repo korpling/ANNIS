@@ -25,35 +25,24 @@ public class AnnisConstants
   public static final String ANNIS_NS = "annis";
 
   /**
-   * Comma-sperated list of matched node Salt-IDs. Feature is applied to
-   * {@link SDocument}.
+   * Comma-separated list of matched node Salt-IDs. Feature is applied to
+   * instances of the SDocument class.
    */
   public static final String FEAT_MATCHEDIDS = "matchedids";
   
   /**
-   * Comma-sperated list of matched annotations. 
+   * Comma-separated list of matched annotations. 
    * If the node itself and not an annotation was matched the string is empty.
    * 
-   * Feature is applied to {@link SDocument}.
+   * Feature is applied to instances of the SDocument class
    */
   public static final String FEAT_MATCHEDANNOS = "matchedannos";
 
   /**
    * The number of the query node if matched. Feature is applied to
-   * {@link SNode} and {@link SAnnotation}.
+   * {instances of the SNode and SAnnotation classes.
    */
   public static final String FEAT_MATCHEDNODE = "matchednode";
-  
-
-  /**
-   * A number of relANNIS specific node values encoded as {@link RelannisNodeFeature}.   * 
-   */
-  public static final String FEAT_RELANNIS_NODE = "relannis_node";
-  
-  /**
-   * A number of relANNIS specific edge values encoded as {@link RelannisEdgeFeature}.   * 
-   */
-  public static final String FEAT_RELANNIS_EDGE = "relannis_edge";
   
   /**
    * A marker feature for the first node of a segmentation chain. The value is the name of the segmentation. 

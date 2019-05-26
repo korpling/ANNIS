@@ -15,13 +15,11 @@
  */
 package annis.test;
 
-import java.lang.reflect.Proxy;
-import org.apache.commons.lang3.Validate;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+
+import org.apache.commons.lang3.Validate;
 import org.junit.Test;
-import org.springframework.aop.target.SingletonTargetSource;
 
 // XXX: is this really necessary?
 public class TestHelper {
@@ -89,21 +87,5 @@ public class TestHelper {
 		assertThat(springFiles(this, "context1.xml", "context2.xml"), is(expected));
 	}
 
-	// retrieve the underlying SpringAnnisDao class of the proxy that is returned by Spring
-	public static Object proxyTarget(Object proxy) {
-		if ( ! (proxy instanceof Proxy) )
-			fail("Not a proxy: " + proxy);
-		
-		SingletonTargetSource targetSource = null;
-		try {
-			targetSource = (SingletonTargetSource) proxy.getClass().getMethod("getTargetSource").invoke(proxy);
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	
-		if (targetSource == null)
-			fail("Couldn't get target of annisDao proxy");
-		
-		return targetSource.getTarget();
-	}
+
 }
