@@ -503,6 +503,24 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     @Override
     public void shutdown() throws InterruptedException {
+        
+        // force all running jobs to stop
+        exec.awaitTermination(5, TimeUnit.SECONDS);
+        exec.shutdownNow();
+        
+        
+        // manually unload all corpora from cache
+        if(corpusStorageMgr != null) {
+            try {
+                for(String corpus : corpusStorageMgr.list()) {
+                    corpusStorageMgr.unloadCorpus(corpus);
+                }
+            } catch (GraphANNISException e) {
+               log.warn("Error when unloading corpora from cache", e);
+            }
+        }
+        
+        // stop watching the graphANNIS logfile
         try {
             if (graphannisLogfileWatcher != null) {
                 graphannisLogfileWatcher.close();
@@ -510,11 +528,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         } catch (IOException ex) {
             log.error("Could not close file system watch", ex);
         }
-        
-        exec.awaitTermination(5, TimeUnit.SECONDS);
-        exec.shutdownNow();
-        
-        
+
     }
 
     @Override
