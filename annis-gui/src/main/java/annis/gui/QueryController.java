@@ -17,7 +17,6 @@ package annis.gui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,7 +57,6 @@ import annis.gui.controlpanel.QueryPanel;
 import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
-import annis.model.Query;
 import annis.gui.objects.ExportQuery;
 import annis.gui.objects.ExportQueryGenerator;
 import annis.gui.objects.QueryUIState;
@@ -78,10 +76,8 @@ import annis.model.DisplayedResultQuery;
 import annis.model.FrequencyQuery;
 import annis.model.NodeDesc;
 import annis.model.PagedResultQuery;
-import annis.model.QueryNode;
+import annis.model.Query;
 import annis.service.objects.CorpusConfig;
-import annis.service.objects.FrequencyTableEntry;
-import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
@@ -139,7 +135,9 @@ public class QueryController implements Serializable {
             try {
                 AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
                 Future<List<NodeDesc>> future = annisResource.path("query").path("parse/nodes")
-                        .queryParam("q", Helper.encodeJersey(query)).get(new GenericType<List<NodeDesc>>() {
+                        .queryParam("q", Helper.encodeJersey(query))
+                        .queryParam("query-language", state.getQueryLanguage().getValue().name())
+                        .get(new GenericType<List<NodeDesc>>() {
                         });
 
                 // wait for maximal one seconds
