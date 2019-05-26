@@ -155,6 +155,11 @@
       <artifactId>jetty-webapp</artifactId>
       <version>${jetty.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-util</artifactId>
+      <version>${jetty.version}</version>
+    </dependency>
     
     <dependency>
       <groupId>javax.servlet.jsp</groupId>
