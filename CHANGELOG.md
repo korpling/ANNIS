@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0-beta.1] - 2019-05-26
+
 This **beta** pre-release is a complete overhaul of the ANNIS service backend.
 Instead of using the relational database PostgreSQL, a custom AQL implementation based on graph called [graphANNIS](https://github.com/korpling/graphANNIS) is used.
 
@@ -827,3 +829,4 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.1...HEAD
