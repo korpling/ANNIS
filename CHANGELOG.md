@@ -1,3 +1,14 @@
+# ANNIS changelog
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+This release is a complete overhaul of the ANNIS service backend.
+Instead of PostgreSQL, [graphANNIS](https://github.com/korpling/graphANNIS) is used.
+GraphANNIS is custom AQL implementation based graphs.
+
 ## Version 3.6.0
 
 Changelog is also available on GitHub:
@@ -807,3 +818,5 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#48](https://github.com/korpling/ANNIS/issues/48) Improving the speed of the subgraph query
 - [#44](https://github.com/korpling/ANNIS/issues/44) Move authentification and authorization from frontend to service
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-SNAPSHOT...HEAD
+[4.0.0-SNAPSHOT]: https://github.com/korpling/ANNIS/compare/v4.0.0-SNAPSHOT...v4.0.0-SNAPSHOT
