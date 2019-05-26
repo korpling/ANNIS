@@ -69,7 +69,7 @@ public abstract class AnnisBaseRunner
   private String prompt;
 
 
-  public void run(String[] args) throws IOException
+  public void run(String[] args) throws IOException, InterruptedException
   {
   
     // run interactive if no argument is given

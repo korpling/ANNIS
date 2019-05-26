@@ -41,14 +41,14 @@ public class TestAnnisAdminRunner {
 	}
 
 	@Test
-	public void importManyCorpora() {
+	public void importManyCorpora() throws InterruptedException {
 		run("import data/corpus1 data/corpus2 data/corpus3");
 
 		List<String> expected = Arrays.asList("data/corpus1 data/corpus2 data/corpus3".split(" "));
 		verify(administration).importCorporaSave(false, null, null, false, expected);
 	}
 	
-	private void run(String cmdline) {
+	private void run(String cmdline) throws InterruptedException {
 		main.run(cmdline.split(" "));
 	}
 

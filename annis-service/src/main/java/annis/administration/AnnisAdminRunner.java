@@ -98,7 +98,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
     }
 
     @Override
-    public void run(String[] args) {
+    public void run(String[] args) throws InterruptedException {
 
         // print help if no argument is given
         if (args.length == 0) {
@@ -137,9 +137,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 doRestoreTable(commandArgs);
             } else {
                 throw new UsageException("Unknown command: " + command);
+       
             }
         }
-
+        
         getQueryDao().shutdown();
     }
 

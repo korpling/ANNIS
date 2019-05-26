@@ -323,7 +323,7 @@ public interface QueryDao {
 
     public void exportCorpus(String toplevelCorpus, File outputDirectory) throws GraphANNISException;
 
-    public void shutdown();
+    public void shutdown() throws InterruptedException;
 
     public static QueryDao create() throws GraphANNISException {
         return QueryDaoImpl.create();

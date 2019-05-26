@@ -500,8 +500,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public void shutdown() {
-        exec.shutdownNow();
+    public void shutdown() throws InterruptedException {
         try {
             if (graphannisLogfileWatcher != null) {
                 graphannisLogfileWatcher.close();
@@ -509,6 +508,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         } catch (IOException ex) {
             log.error("Could not close file system watch", ex);
         }
+        
+        exec.awaitTermination(5, TimeUnit.SECONDS);
+        exec.shutdownNow();
+        
+        
     }
 
     @Override
