@@ -294,6 +294,7 @@ public class URLShortenerDefinition {
                     this.errorMsg = "Rewrite in quirks mode necessary";
                     status = QueryStatus.Ok;
                 } else {
+                    status = quirksStatus;
                     this.errorMsg = quirksQuery.getErrorMsg();
                 }
             }
