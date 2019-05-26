@@ -13,10 +13,12 @@ Otherwise the documentation can't be created.
 ### Initialization phase 
 
 1. **Start** the release process by executing `mvn gitflow:release-start`for a regular release (branched from the `develop`) or `mvn gitflow:hotfix-start` for a hotfix that is branched from `master`. The command will ask you for the new version number, use [semantic versioning](https://semver.org/).
-2. **Add new changelog entry**, if some important information is missing create an enhancement or bugfix issue in GitHub and repeat
-	- Get the GitHub Milestone id associated the release (is visible in the URL if you view the issues of the release tracking milestone).
-	- execute this script `Misc/changelog.py <milestone-id>`
-	- add the output to the begin of the `CHANGELOG` file
+2. **Add new changelog entries**, if some important information is missing add an entry to the changelog.
+When the changelog is up-to-date, execute
+~~~bash
+mvn -N keepachangelog:release
+~~~
+and commit your changes.
 3. Update and commit  **license information**
 ~~~bash
 mvn license:add-third-party license:download-licenses

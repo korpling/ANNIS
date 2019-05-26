@@ -103,8 +103,6 @@
 				<version>1.11.0</version>
 				<configuration>
 					<pushRemote>true</pushRemote>
-					<preReleaseGoals>-N keepachangelog:release</preReleaseGoals>
-					<preHotfixGoals>-N keepachangelog:release</preHotfixGoals>
 					<postReleaseGoals>-Prelease,mdbook install javadoc:jar deploy</postReleaseGoals>
 					<postHotfixGoals>-Prelease,mdbook install javadoc:jar deploy</postHotfixGoals>
 					<verbose>true</verbose>
