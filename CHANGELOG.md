@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 This release is a complete overhaul of the ANNIS service backend.
 Instead of using the relational database PostgreSQL, a custom AQL implementation based on graph called [graphANNIS](https://github.com/korpling/graphANNIS) is used.
 
+ANNIS 4 currently only supports a sub-set of the ANNIS Query Langugage (AQL) compared to ANNIS 3.
+Full support is planned, but some backward-compatible features of AQL will only be available in a compatibility mode.
+See the chapter `Differences in Compatibility Mode` for more information.
+For adminstrators, there are instructions on how to migrate from ANNIS 3 to 4 in the User Guide.
+
+
 ## Version 3.6.0
 
 Changelog is also available on GitHub:
