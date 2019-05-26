@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  * ancestors as well. Additionally it is checked that the siblings of a
  * component don't have the same ID when it is assigned.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class IDGenerator
 {

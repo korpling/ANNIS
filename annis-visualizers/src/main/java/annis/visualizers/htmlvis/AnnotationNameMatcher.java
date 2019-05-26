@@ -26,7 +26,7 @@ import org.corpus_tools.salt.core.SNode;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class AnnotationNameMatcher implements SpanMatcher
 {

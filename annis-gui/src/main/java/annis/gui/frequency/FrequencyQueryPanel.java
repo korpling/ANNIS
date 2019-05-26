@@ -60,9 +60,10 @@ import com.vaadin.ui.VerticalLayout;
 
 import annis.gui.QueryController;
 import annis.gui.admin.PopupTwinColumnSelect;
-import annis.gui.objects.FrequencyQuery;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
+import annis.model.FrequencyQuery;
+import annis.model.NodeDesc;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.service.objects.AnnisAttribute;
@@ -70,7 +71,7 @@ import annis.service.objects.FrequencyTable;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener
 {
@@ -78,7 +79,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private static final Logger log = LoggerFactory.getLogger(FrequencyQueryPanel.class);
   
   private Table tblFrequencyDefinition;
-  private final IndexedContainer metaNamesContainer;
   private final Button btAdd;
   private final Button btReset;
   private final CheckBox cbAutomaticMode;
@@ -194,14 +194,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     queryLayout.addComponent(tblFrequencyDefinition);
     
-    metaNamesContainer = new IndexedContainer();
-    PopupTwinColumnSelect metaSelect = new PopupTwinColumnSelect();
-    metaSelect.setSelectableContainer(metaNamesContainer);
-    metaSelect.setPropertyDataSource(state.getFrequencyMetaData());
-    metaSelect.setCaption("Metadata");
-    
-    queryLayout.addComponent(metaSelect);
-    
     
     if(controller != null)
     {
@@ -236,7 +228,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         }
         if(controller != null)
         {
-          List<QueryNode> nodes = parseQuery(FrequencyQueryPanel.this.state.getAql().getValue());
+          List<NodeDesc> nodes = parseQuery(FrequencyQueryPanel.this.state.getAql().getValue());
           nr = Math.min(nr, nodes.size()-1);
           int id = counter++;
           UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
@@ -498,7 +490,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     resultPanel.setVisible(false);
   }
   
-  private List<QueryNode> parseQuery(String query)
+  private List<NodeDesc> parseQuery(String query)
   {
     if(query == null || query.isEmpty())
     {
@@ -506,8 +498,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     // let the service parse the query
     WebResource res = Helper.getAnnisWebResource();
-    List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(query))
-      .get(new GenericType<List<QueryNode>>() {});
+    List<NodeDesc> nodes = res.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(query))
+      .get(new GenericType<List<NodeDesc>>() {});
     
     return nodes;
   }
@@ -526,12 +518,12 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       lblErrorOrMsg.setVisible(false);
       
       counter = 0;
-      List<QueryNode> nodes = parseQuery(query);
-      Collections.sort(nodes, new Comparator<QueryNode>()
+      List<NodeDesc> nodes = parseQuery(query);
+      Collections.sort(nodes, new Comparator<NodeDesc>()
       {
 
         @Override
-        public int compare(QueryNode o1, QueryNode o2)
+        public int compare(NodeDesc o1, NodeDesc o2)
         {
           if(o1.getVariable() == null)
           {
@@ -542,18 +534,15 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       });
       
       // calculate the nodes that are part of every alternative
-      Multimap<String, Integer> alternativesOfVariable = LinkedHashMultimap.create();
-      int maxAlternative = 0;
-      for(QueryNode n : nodes)
+      Multimap<String, Long> alternativesOfVariable = LinkedHashMultimap.create();
+      long maxAlternative = 0;
+      for(NodeDesc n : nodes)
       {
-        if(n.getAlternativeNumber() != null)
-        {
-          maxAlternative = Math.max(n.getAlternativeNumber(), maxAlternative);
-          alternativesOfVariable.put(n.getVariable(), n.getAlternativeNumber());
-        }
+          maxAlternative = Math.max(n.getComponentNr(), maxAlternative);
+          alternativesOfVariable.put(n.getVariable(), n.getComponentNr()); 
       }
       Set<String> allowedVariables = new LinkedHashSet<>();
-      for(QueryNode n : nodes)
+      for(NodeDesc n : nodes)
       {
         // we assume that the alternative numbering is continuous and without gaps
         if(alternativesOfVariable.get(n.getVariable()).size() == (maxAlternative+1))
@@ -569,15 +558,15 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       
       Set<UserGeneratedFrequencyEntry> generatedEntries = new HashSet<>();
       
-      for(QueryNode n : nodes)
+      for(NodeDesc n : nodes)
       {
-        if(!n.isArtificial() && allowedVariables.contains(n.getVariable()))
+        if(allowedVariables.contains(n.getVariable()))
         {
-          if(n.getNodeAnnotations().isEmpty())
+          if(n.getAnnoName() == null)
           {
             UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
             entry.setAnnotation("tok");
-            entry.setComment("automatically created from " + n.toAQLNodeFragment());
+            entry.setComment("automatically created from " + n.getAqlFragment());
             entry.setNr(n.getVariable());
             
             if(!generatedEntries.contains(entry))
@@ -589,11 +578,10 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           }
           else
           {
-            QueryAnnotation firstAnno = n.getNodeAnnotations().iterator().next();
             
             UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
-            entry.setAnnotation(firstAnno.getName());
-            entry.setComment("automatically created from " + n.toAQLNodeFragment());
+            entry.setAnnotation(n.getAnnoName());
+            entry.setComment("automatically created from " + n.getAqlFragment());
             entry.setNr(n.getVariable());
             
             if(!generatedEntries.contains(entry))
@@ -614,18 +602,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   }
   
   private void updateQueryInfo(String query)
-  {
-    metaNamesContainer.removeAllItems();
-    Set<String> allMetaNames = getAvailableMetaNames();
-    Set<String> oldSelection = new TreeSet<>(state.getFrequencyMetaData().getValue());
-    for(String m : allMetaNames)
-    {
-      metaNamesContainer.addItem(m);
-    }
-    // remove all selections that are no longer present
-    oldSelection.retainAll(allMetaNames);
-    state.getFrequencyMetaData().setValue(oldSelection);
-    
+  {    
     Set<String> selectedCorpora = state.getSelectedCorpora().getValue();
     if(selectedCorpora.isEmpty())
     {

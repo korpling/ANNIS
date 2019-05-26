@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
 /**
  * An general interface for different toplevel ANNIS views.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface UIView extends Serializable
 {

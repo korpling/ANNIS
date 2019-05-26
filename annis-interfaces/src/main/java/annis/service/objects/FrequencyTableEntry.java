@@ -21,7 +21,7 @@ import java.util.List;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class FrequencyTableEntry implements Serializable
 {
@@ -41,8 +41,8 @@ public class FrequencyTableEntry implements Serializable
    * 
    * A definition consists of two parts: the referenced node and the annotation 
    * name or "tok" separated by ":" 
-   * @param definition 
-   * @return 
+   * @param definition the definition
+   * @return  the parsed entry
    */
   public static FrequencyTableEntry parse(String definition)
   {

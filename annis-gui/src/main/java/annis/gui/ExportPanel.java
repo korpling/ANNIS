@@ -58,7 +58,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ExportPanel extends GridLayout
 {
@@ -169,7 +169,7 @@ public class ExportPanel extends GridLayout
 
     cbLeftContext.setValue(5);
     cbRightContext.setValue(5);
-
+    
     formLayout.addComponent(cbLeftContext);
     formLayout.addComponent(cbRightContext);
 
@@ -290,11 +290,16 @@ public class ExportPanel extends GridLayout
         {
           lblHelp.setValue("No help available for this exporter");
         }
+        
+        cbLeftContext.setVisible(exporter.needsContext());
+        cbRightContext.setVisible(exporter.needsContext());
       }
       else
       {
         btCancel.setVisible(false);
         cbAlignmc.setVisible(false);
+        cbLeftContext.setVisible(false);
+        cbRightContext.setVisible(false);
         lblHelp.setValue("No valid exporter selected");
       }
     }

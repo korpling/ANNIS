@@ -30,8 +30,8 @@ import annis.libgui.VisualizationToggle;
 /**
  * Base class for all iframe visualizer plugins
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements ResourcePlugin
 {

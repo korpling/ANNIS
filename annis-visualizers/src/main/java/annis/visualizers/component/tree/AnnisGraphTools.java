@@ -18,10 +18,6 @@ package annis.visualizers.component.tree;
 import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.model.AnnotationGraph;
-import annis.model.Edge;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import java.io.Serializable;
@@ -31,6 +27,14 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
 
 public class AnnisGraphTools implements Serializable
 {
@@ -44,9 +48,9 @@ public class AnnisGraphTools implements Serializable
       this.input = input;
   }
 
-  public List<DirectedGraph<AnnisNode, Edge>> getSyntaxGraphs()
+  public List<DirectedGraph<SNode, SRelation>> getSyntaxGraphs()
   {
-    AnnotationGraph ag = input.getResult().getGraph();
+    final SDocumentGraph docGraph = input.getDocument().getDocumentGraph();
     String namespace = input.getMappings().getProperty("node_ns", input.
       getNamespace());
     String terminalName =  input.getMappings().getProperty(
@@ -54,65 +58,69 @@ public class AnnisGraphTools implements Serializable
     String terminalNamespace =  input.getMappings().getProperty(
       TigerTreeVisualizer.TERMINAL_NS_KEY);
     
-    List<DirectedGraph<AnnisNode, Edge>> resultGraphs = new ArrayList<>();
+    List<DirectedGraph<SNode, SRelation>> resultGraphs = new ArrayList<>();
 
-    List<AnnisNode> rootNodes = new LinkedList<>();
-    
-    for (AnnisNode n : ag.getNodes())
+    List<SNode> rootNodes = new LinkedList<>();
+    for(SNode n : docGraph.getRootsByRelation(SALT_TYPE.SDOMINANCE_RELATION))
     {
-      if (isRootNode(n, namespace))
+      if(CommonHelper.checkSLayer(namespace, n))
       {
         rootNodes.add(n);
       }
     }
     
     //sort root nodes according to their left-most covered token
-    HorizontalOrientation orientation = detectLayoutDirection(ag);
+    HorizontalOrientation orientation = detectLayoutDirection(docGraph);
     if (orientation == HorizontalOrientation.LEFT_TO_RIGHT)
     {
-      Collections.sort(rootNodes, new Comparator<AnnisNode>()
+      Collections.sort(rootNodes, new Comparator<SNode>()
       {
         @Override
-        public int compare(AnnisNode o1, AnnisNode o2)
+        public int compare(SNode o1, SNode o2)
         {
-          return Long.compare(o1.getLeftToken(), o2.getLeftToken());
+          DataSourceSequence seq1 =  docGraph.getOverlappedDataSourceSequence(o1, SALT_TYPE.STEXT_OVERLAPPING_RELATION).get(0);
+          DataSourceSequence seq2 =  docGraph.getOverlappedDataSourceSequence(o2, SALT_TYPE.STEXT_OVERLAPPING_RELATION).get(0);
+          return Long.compare(seq1.getStart().longValue(), seq2.getStart().longValue());
         }
       }
       );
     }
     else if (orientation == HorizontalOrientation.RIGHT_TO_LEFT)
     {
-      Collections.sort(rootNodes, new Comparator<AnnisNode>()
+      Collections.sort(rootNodes, new Comparator<SNode>()
       {
         @Override
-        public int compare(AnnisNode o1, AnnisNode o2)
+        public int compare(SNode o1, SNode o2)
         {
-          return Long.compare(o2.getLeftToken(), o1.getLeftToken());
+          DataSourceSequence seq1 =  docGraph.getOverlappedDataSourceSequence(o1, SALT_TYPE.STEXT_OVERLAPPING_RELATION).get(0);
+          DataSourceSequence seq2 =  docGraph.getOverlappedDataSourceSequence(o2, SALT_TYPE.STEXT_OVERLAPPING_RELATION).get(0);
+          
+          return Long.compare(seq2.getStart().longValue(), seq1.getStart().longValue());
         }
       }
       );
     }
-    for(AnnisNode r : rootNodes)
+    for(SNode r : rootNodes)
     {
-      resultGraphs.add(extractGraph(ag, r, terminalNamespace, terminalName));
+      resultGraphs.add(extractGraph(docGraph, r, terminalNamespace, terminalName));
     }
     
     return resultGraphs;
   }
 
-  private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n,
+  private boolean copyNode(DirectedGraph<SNode, SRelation> graph, SNode n,
      String terminalNamespace, String terminalName)
   {
     boolean addToGraph = AnnisGraphTools.isTerminal(n, input);
     
     if(!addToGraph)
     {
-      for (Edge e : n.getOutgoingEdges())
+      for (SRelation<? extends SNode, ? extends SNode> rel : n.getOutRelations())
       {
-        if (includeEdge(e) && copyNode(graph, e.getDestination(), terminalNamespace, terminalName))
+        if (includeEdge(rel) && copyNode(graph, rel.getTarget(), terminalNamespace, terminalName))
         {
           addToGraph |= true;
-          graph.addEdge(e, n, e.getDestination());
+          graph.addEdge(rel, n, rel.getTarget());
         }
       }
     }
@@ -124,71 +132,53 @@ public class AnnisGraphTools implements Serializable
     return addToGraph;
   }
 
-  private boolean isRootNode(AnnisNode n, String namespace)
-  {
-    if (!n.getNamespace().equals(namespace))
-    {
-      return false;
-    }
-    for (Edge e : n.getIncomingEdges())
-    {
-      if (hasEdgeSubtype(e, getPrimEdgeSubType()) && e.getSource()
-        != null)
-      {
-        return false;
-      }
-    }
-    return true;
-  }
   
-  public static boolean isTerminal(AnnisNode n, VisualizerInput input)
+  public static boolean isTerminal(SNode n, VisualizerInput input)
   {
     String terminalName = (input == null ? null : input.getMappings().getProperty(
       TigerTreeVisualizer.TERMINAL_NAME_KEY));
     
     if(terminalName == null)
     {
-      return n.isToken();
+      return n instanceof SToken;
     }
     else
     {
       String terminalNamespace = (input == null ? null : input.getMappings().getProperty(
         TigerTreeVisualizer.TERMINAL_NS_KEY));
 
-      String annoValue = extractAnnotation(n.getNodeAnnotations(),
-        terminalNamespace,
-        terminalName);
+      SAnnotation anno = n.getAnnotation(terminalNamespace, terminalName);
       
-      return annoValue != null;
+      return anno != null;
     }
   }
-  private DirectedGraph<AnnisNode, Edge> extractGraph(AnnotationGraph ag,
-    AnnisNode n, String terminalNamespace, String terminalName)
+  private DirectedGraph<SNode, SRelation> extractGraph(SDocumentGraph docGraph,
+    SNode n, String terminalNamespace, String terminalName)
   {
-    DirectedGraph<AnnisNode, Edge> graph
-      = new DirectedSparseGraph<AnnisNode, Edge>();
+    DirectedGraph<SNode, SRelation> graph
+      = new DirectedSparseGraph<>();
     copyNode(graph, n, terminalNamespace, terminalName);
-    for (Edge e : ag.getEdges())
+    for (SDominanceRelation rel : docGraph.getDominanceRelations())
     {
-      if (hasEdgeSubtype(e, getSecEdgeSubType()) && graph.
-        containsVertex(e.getDestination())
-        && graph.containsVertex(e.getSource()))
+      if (hasEdgeSubtype(rel, getSecEdgeSubType()) && graph.
+        containsVertex(rel.getTarget())
+        && graph.containsVertex(rel.getSource()))
       {
-        graph.addEdge(e, e.getSource(), e.getDestination());
+        graph.addEdge(rel, rel.getSource(), rel.getTarget());
       }
     }
     return graph;
   }
 
-  private boolean includeEdge(Edge e)
+  private boolean includeEdge(SRelation e)
   {
     boolean result = hasEdgeSubtype(e, getPrimEdgeSubType());
     return result;
   }
 
-  public boolean hasEdgeSubtype(Edge e, String edgeSubtype)
+  public boolean hasEdgeSubtype(SRelation rel, String edgeSubtype)
   {
-    String name = e.getName();
+    String type = rel.getType();
 
     if (getPrimEdgeSubType().equals(edgeSubtype))
     {
@@ -203,15 +193,15 @@ public class AnnisGraphTools implements Serializable
     }
     
     boolean result = 
-      e.getEdgeType() == Edge.EdgeType.DOMINANCE && 
+      rel instanceof SDominanceRelation &&
       (
-        (name == null && "null".equals(edgeSubtype)) 
-        || (name != null && name.equals(edgeSubtype))
+        (type == null && "null".equals(edgeSubtype)) 
+        || (type != null && type.equals(edgeSubtype))
       );
     return result; 
   }
 
-  public static HorizontalOrientation detectLayoutDirection(AnnotationGraph ag)
+  public static HorizontalOrientation detectLayoutDirection(SDocumentGraph docGraph)
   {
     if(Helper.isRTLDisabled())
     {
@@ -219,14 +209,14 @@ public class AnnisGraphTools implements Serializable
     }
     
     int withhRTL = 0;
-    for (AnnisNode token : ag.getTokens())
+    for (SToken token : docGraph.getTokens())
     {
-      if (CommonHelper.containsRTLText(token.getSpannedText()))
+      if (CommonHelper.containsRTLText(docGraph.getText(token)))
       {
         withhRTL += 1;
       }
     }
-    return (withhRTL > ag.getTokens().size() / 3)
+    return (withhRTL > docGraph.getTokens().size() / 3)
       ? HorizontalOrientation.RIGHT_TO_LEFT
       : HorizontalOrientation.LEFT_TO_RIGHT;
   }
@@ -251,25 +241,25 @@ public class AnnisGraphTools implements Serializable
     return input.getMappings().getProperty("secedge_type", SECEDGE_SUBTYPE);
   }
   
-  public static String extractAnnotation(Set<Annotation> annotations,
+  public static String extractAnnotation(Set<SAnnotation> annotations,
     String namespace, String featureName)
   {
     if(annotations != null)
     {
-      for (Annotation a : annotations)
+      for (SAnnotation a : annotations)
       {
         if(namespace == null)
         {
           if (a.getName().equals(featureName))
           {
-            return a.getValue();
+            return a.getValue_STEXT();
           }
         }
         else
         {
           if (a.getNamespace().equals(namespace) && a.getName().equals(featureName))
           {
-            return a.getValue();
+            return a.getValue_STEXT();
           }
         }
       }

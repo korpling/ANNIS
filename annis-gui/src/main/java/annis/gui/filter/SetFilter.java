@@ -23,7 +23,7 @@ import java.util.Set;
 /**
  * A filter for containers to include only items available in a specific
  * set.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @param <T>
  */
 public class SetFilter<T> implements Container.Filter

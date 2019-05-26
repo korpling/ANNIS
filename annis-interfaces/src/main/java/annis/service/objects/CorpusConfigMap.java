@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Maps corpus names to corpus configurations.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @XmlRootElement
 public class CorpusConfigMap implements Serializable
@@ -62,6 +62,7 @@ public class CorpusConfigMap implements Serializable
    * Checks if a corpus configuration is defined for a specific corpus name.
    *
    * @param corpusName The corpus name, for which the config is lookup.
+   * @return True if corpus configuration is defined for this corpus.
    */
   public boolean containsConfig(String corpusName)
   {

@@ -14,3 +14,4 @@
     - [Exporting Results](./aql-export.md)
     - [Frequency Analysis](./aql-frequency.md)
     - [Complete List of Operators](./aql-operators.md)
+    - [Differences in Compatibility Mode](./aql-compatibility-mode.md)

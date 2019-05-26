@@ -28,7 +28,7 @@ import java.util.UUID;
  * implementation of RST. {@link RSTImpl} compute the json out of the Salt
  * document. The whole rendering stuff is done in {@link JITWrapper}.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class RSTPanel extends Panel
 {

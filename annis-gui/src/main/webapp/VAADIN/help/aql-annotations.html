@@ -75,7 +75,7 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="interface.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html" class="active"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">3.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">3.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">3.8.</strong> Complete List of Operators</a></li></ol></li></ol>
+            <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="interface.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html" class="active"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">3.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">3.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">3.8.</strong> Complete List of Operators</a></li><li><a href="aql-compatibility-mode.html"><strong aria-hidden="true">3.9.</strong> Differences in Compatibility Mode</a></li></ol></li></ol>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -149,15 +149,15 @@ example, to search for all forms of the verb <em>be</em> in the GUM corpus,
 simply select the GUM corpus and enter:</p>
 <pre><code>lemma=&quot;be&quot;
 </code></pre>
-<p>Negative searches are also possible using != instead of =. For negated
+<p>Negative searches are also possible using <code>!=</code> instead of <code>=</code>. For negated
 tokens (word forms) use the reserved attribute tok. For example:</p>
 <pre><code>lemma!=&quot;be&quot;
 </code></pre>
 <p>or:</p>
 <pre><code>tok!=&quot;be&quot; 
 </code></pre>
-<p>Metadata can also be negated similarly:</p>
-<pre><code>lemma=&quot;be&quot; &amp; meta::type!=&quot;interview&quot;
+<p>Metadata attributes can also be negated:</p>
+<pre><code>lemma=&quot;be&quot; @* type!=&quot;interview&quot;
 </code></pre>
 <p>To only find finite forms of a verb in GUM, use the part-of-speech (pos)
 annotation concurrently with lemma, and specify that both the lemma and

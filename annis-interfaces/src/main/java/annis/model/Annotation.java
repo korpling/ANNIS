@@ -67,6 +67,12 @@ public class Annotation implements Comparable<Annotation>, Serializable
 
   /**
    * With the constructor we could determine the order of the pre parameter
+   * @param namespace the namespace
+   * @param name the name
+   * @param value the value
+   * @param type the type
+   * @param corpusName the name of the corpus
+   * @param pre the pre-order value
    */
   public Annotation(String namespace, String name, String value, String type,
     String corpusName, int pre)
@@ -77,6 +83,13 @@ public class Annotation implements Comparable<Annotation>, Serializable
 
   /**
    * With the constructor we could determine the order of the pre parameter
+   * @param namespace the namespace
+   * @param name the name
+   * @param value the value
+   * @param type the type
+   * @param corpusName the name of the corpus
+   * @param pre the pre-order value
+   * @param path of the annotation as list of path elements
    */
   public Annotation(String namespace, String name, String value, String type,
     String corpusName, int pre, List<String> annotationPath)
@@ -89,13 +102,24 @@ public class Annotation implements Comparable<Annotation>, Serializable
   public String toString()
   {
     StringBuilder sb = new StringBuilder();
-    sb.append(AnnisNode.qName(namespace, name));
+    sb.append(qName(namespace, name));
     if (value != null)
     {
       sb.append("=");
       sb.append(value);
     }
     return sb.toString();
+  }
+  
+  public static String qName(String namespace, String name)
+  {
+    return qName(namespace, name, ":");
+  }
+  
+  public static String qName(String namespace, String name, String seperator)
+  {
+    return name == null ? null : (namespace == null ? name : namespace
+      + seperator + name);
   }
 
   @Override
@@ -160,7 +184,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
 
   public String getQualifiedName()
   {
-    return AnnisNode.qName(namespace, name);
+    return qName(namespace, name);
   }
 
   public String getType()

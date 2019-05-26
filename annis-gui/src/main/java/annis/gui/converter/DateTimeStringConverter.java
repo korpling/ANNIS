@@ -23,7 +23,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class DateTimeStringConverter implements Converter<String, DateTime>
 {

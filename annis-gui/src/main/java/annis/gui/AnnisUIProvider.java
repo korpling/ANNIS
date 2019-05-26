@@ -21,23 +21,20 @@ import com.vaadin.ui.UI;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class AnnisUIProvider extends UIProvider
-{
+public class AnnisUIProvider extends UIProvider {
 
   @Override
-  public Class<? extends UI> getUIClass(UIClassSelectionEvent event)
-  {
+  public Class<? extends UI> getUIClass(UIClassSelectionEvent event) {
     String path = event.getRequest().getPathInfo();
-    if(path != null && path.startsWith(EmbeddedVisUI.URL_PREFIX))
-    {
+    if (path != null && path.startsWith(EmbeddedVisUI.URL_PREFIX)) {
       return EmbeddedVisUI.class;
-    }
-    else
-    {
+    } else if (path != null && path.startsWith(UnsupportedQueryUI.URL_PREFIX)) {
+      return UnsupportedQueryUI.class;
+    } else {
       return AnnisUI.class;
     }
   }
-  
+
 }

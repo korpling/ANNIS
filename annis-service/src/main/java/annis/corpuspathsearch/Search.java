@@ -16,8 +16,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Searches for ANNIS corpora in file system locations.
- * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class Search {
 

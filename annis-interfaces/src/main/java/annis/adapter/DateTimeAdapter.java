@@ -22,7 +22,7 @@ import org.joda.time.DateTime;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Provider
 public class DateTimeAdapter extends XmlAdapter<String, DateTime>

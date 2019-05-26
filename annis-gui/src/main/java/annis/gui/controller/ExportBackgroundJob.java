@@ -34,71 +34,63 @@ import java.util.concurrent.Callable;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ExportBackgroundJob implements Callable<File>
-{
-  private final EventBus eventBus;
+public class ExportBackgroundJob implements Callable<File> {
+    private final EventBus eventBus;
 
-  private final ExportPanel panel;
+    private final ExportPanel panel;
 
-  private final ExportQuery query;
+    private final ExportQuery query;
 
-  private final AnnisUI ui;
+    private final AnnisUI ui;
 
-  private final ExporterPlugin exporter;
-  
-  private Exception exportError;
+    private final ExporterPlugin exporter;
 
-  public ExportBackgroundJob(ExportQuery query, ExporterPlugin exporter, AnnisUI ui,
-    EventBus eventBus, ExportPanel panel)
-  {
-    this.query = query;
-    this.eventBus = eventBus;
-    this.panel = panel;
-    this.ui = ui;
-    this.exporter = exporter;
-  }
+    private Exception exportError;
 
-  @Override
-  public File call() throws Exception
-  {
-    final File currentTmpFile = File.createTempFile("annis-export", "." + exporter.getFileEnding());
-    currentTmpFile.deleteOnExit();
-    
-    final Map<String, CorpusConfig> corpusConfigs = new LinkedHashMap<>();
-    for(String c : query.getCorpora())
-    {
-      corpusConfigs.put(c, ui.getCorpusConfigWithCache(c));
+    public ExportBackgroundJob(ExportQuery query, ExporterPlugin exporter, AnnisUI ui, EventBus eventBus,
+            ExportPanel panel) {
+        this.query = query;
+        this.eventBus = eventBus;
+        this.panel = panel;
+        this.ui = ui;
+        this.exporter = exporter;
     }
-    
-    try (final OutputStreamWriter outWriter = new OutputStreamWriter(new FileOutputStream(currentTmpFile),
-      "UTF-8"))
-    {
-      exportError = exporter.convertText(query.getQuery(), query.getLeftContext(),
-        query.getRightContext(), query.getCorpora(), query.getAnnotationKeys(),
-        query.getParameters(), query.getAlignmc(), Helper.getAnnisWebResource().path("query"),
-        outWriter, eventBus, corpusConfigs);
-    }
-    finally
-    {
-      ui.access(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          if (panel != null)
-          {
-            panel.showResult(currentTmpFile,  exportError);
-          }
-          if(exportError instanceof UniformInterfaceException)
-          {
-            ui.getQueryController().reportServiceException((UniformInterfaceException) exportError, true);
-          }
+
+    @Override
+    public File call() throws Exception {
+        final File currentTmpFile = File.createTempFile("annis-export", "." + exporter.getFileEnding());
+        currentTmpFile.deleteOnExit();
+
+        final Map<String, CorpusConfig> corpusConfigs = new LinkedHashMap<>();
+        for (String c : query.getCorpora()) {
+            corpusConfigs.put(c, ui.getCorpusConfigWithCache(c));
         }
-      });
+
+        try (final OutputStreamWriter outWriter = new OutputStreamWriter(new FileOutputStream(currentTmpFile),
+                "UTF-8")) {
+            
+            int leftCtx = exporter.needsContext() ? query.getLeftContext() : 0;
+            int rightCtx = exporter.needsContext() ? query.getRightContext() : 0;
+            
+            exportError = exporter.convertText(query.getQuery(), query.getQueryLanguage(), leftCtx,
+                    rightCtx, query.getCorpora(), query.getAnnotationKeys(), query.getParameters(),
+                    query.getAlignmc(), Helper.getAnnisWebResource().path("query"), outWriter, eventBus, corpusConfigs);
+        } finally {
+            ui.access(new Runnable() {
+                @Override
+                public void run() {
+                    if (panel != null) {
+                        panel.showResult(currentTmpFile, exportError);
+                    }
+                    if (exportError instanceof UniformInterfaceException) {
+                        ui.getQueryController().reportServiceException((UniformInterfaceException) exportError, true);
+                    }
+                }
+            });
+        }
+        return currentTmpFile;
     }
-    return currentTmpFile;
-  }
-  
+
 }

@@ -21,7 +21,7 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
   var regexLeftRightChild = />([a-zA-Z_%][a-zA-Z0-9_\-%]*)?(@(l|r)?)/;
   var regexPrecedenceNearPointingDom = /((\.)|(\^)|(->)|(>))([a-zA-Z_%][a-zA-Z0-9_\-%]*)?(\s*(\*)|([ \t,0-9]+))?/;
   
-  var regexSimpleOperators = /(==)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(_ol_)|(_or_)/;
+  var regexSimpleOperators = /(==)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(_ol_)|(_or_)|(_ident_)|(@\*?)/;
   
   function getNodeClassForString(state)
   {

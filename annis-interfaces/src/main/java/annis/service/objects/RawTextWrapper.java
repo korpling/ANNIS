@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Wrapper for the rest api call for extracting the raw text.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @XmlRootElement
 public class RawTextWrapper implements Serializable
@@ -52,6 +52,7 @@ public class RawTextWrapper implements Serializable
 
   /**
    * Checks, whether at least one text exists
+   * @return True if there is at least one text.
    */
   public boolean hasTexts()
   {

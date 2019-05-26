@@ -10,7 +10,7 @@ simply select the GUM corpus and enter:
 lemma="be"
 ```
 
-Negative searches are also possible using \!= instead of =. For negated
+Negative searches are also possible using `!=` instead of `=`. For negated
 tokens (word forms) use the reserved attribute tok. For example:
 ```
 lemma!="be"
@@ -21,10 +21,10 @@ or:
 tok!="be" 
 ```
 
-Metadata can also be negated similarly:
+Metadata attributes can also be negated:
 
 ```
-lemma="be" & meta::type!="interview"
+lemma="be" @* type!="interview"
 ```
 
 To only find finite forms of a verb in GUM, use the part-of-speech (pos)

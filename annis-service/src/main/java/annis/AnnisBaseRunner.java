@@ -15,6 +15,25 @@
  */
 package annis;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+
 import annis.exceptions.AnnisQLSyntaxException;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.filter.ThresholdFilter;
@@ -26,26 +45,9 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.LayoutBase;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.spi.FilterReply;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 import jline.console.ConsoleReader;
 import jline.console.completer.StringsCompleter;
 import jline.console.history.FileHistory;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.springframework.context.support.GenericXmlApplicationContext;
 
 public abstract class AnnisBaseRunner
 {
@@ -66,35 +68,8 @@ public abstract class AnnisBaseRunner
 
   private String prompt;
 
-  public static AnnisBaseRunner getInstance(String beanName,
-    String... contextLocations)
-  {
-    return getInstance(beanName, true, contextLocations);
-  }
 
-  public static AnnisBaseRunner getInstance(String beanName,
-    boolean logToConsole, String... contextLocations)
-  {
-    return (AnnisBaseRunner) getBean(beanName, logToConsole, contextLocations);
-  }
-
-  public static Object getBean(String beanName,
-    boolean logToConsole, String... contextLocations)
-  {
-    checkForAnnisHome();
-    setupLogging(logToConsole);
-
-    GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
-    ctx.setValidating(false);
-   
-    AnnisXmlContextHelper.prepareContext(ctx);
-
-    ctx.load(contextLocations);
-    ctx.refresh();
-    return ctx.getBean(beanName);
-  }
-
-  public void run(String[] args) throws IOException
+  public void run(String[] args) throws IOException, InterruptedException
   {
   
     // run interactive if no argument is given
@@ -341,7 +316,7 @@ public abstract class AnnisBaseRunner
 
     ThresholdFilter consoleFilter = new ConsoleFilter();
 
-    consoleFilter.setLevel(console ? "DEBUG" : "WARN");
+    consoleFilter.setLevel(console ? "INFO" : "WARN");
     consoleFilter.start();
 
     consoleAppender.addFilter(consoleFilter);

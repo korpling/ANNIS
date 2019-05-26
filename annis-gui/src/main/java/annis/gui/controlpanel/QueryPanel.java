@@ -50,13 +50,13 @@ import annis.gui.HistoryPanel;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.objects.Query;
+import annis.model.Query;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import annis.model.AqlParseError;
-import annis.model.QueryNode;
+import annis.model.NodeDesc;
 
 /**
  *
@@ -389,7 +389,7 @@ public class QueryPanel extends GridLayout implements
     return "";
   }
   
-  public void setNodes(List<QueryNode> nodes)
+  public void setNodes(List<NodeDesc> nodes)
   {
     txtQuery.setNodes(nodes);
   }

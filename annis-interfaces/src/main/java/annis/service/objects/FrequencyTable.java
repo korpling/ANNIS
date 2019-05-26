@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlTransient;
 /**
  * A frequency table holds the result of a frequency analysis on a specific result.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @XmlRootElement
 public class FrequencyTable implements Serializable
@@ -46,7 +46,7 @@ public class FrequencyTable implements Serializable
   
   /**
    * Gets the sum of the counts of all entries.
-   * @return 
+   * @return the sum
    */
   public long getSum()
   {
@@ -60,7 +60,7 @@ public class FrequencyTable implements Serializable
   
   /**
    * Adds an entry.
-   * @param e 
+   * @param e entry to add
    */
   public void addEntry(Entry e)
   {

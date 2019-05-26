@@ -82,7 +82,7 @@ public class AnnisUser implements Serializable
 
   /**
    * True if the user a remote user, thus cannot e.g. logout by itself
-   * @return 
+   * @return whether user is remote
    */
   public boolean isRemote()
   {

@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @JavaScript({"js.cookie-2.0.3.min.js", "settingsstorage.js"})
 public class SettingsStorage extends AbstractJavaScriptExtension

@@ -23,10 +23,10 @@ set of matches.
 
 ![ANNIS search options](images/searchoptions.png)
 
-In order to get more control over the search you can click on \"Search
-Options\" to unfold more detailed search options. The context
+In order to get more control over the search you can click on "Search
+Options" to unfold more detailed search options. The context
 surrounding the matching expressions in the result list ist determined
-by the \"Left Context\" and \"Right Context\" options and can be changed
+by the "Left Context" and "Right Context" options and can be changed
 on each side (by default up to 20 tokens). You can also configure how
 many results are shown per page, what order results are shown in
 (ascending, descending or random) and for some corpora, you can select
@@ -34,3 +34,7 @@ alternative segmentation layers to visualize data (relevant for
 languages with multiple tokens per word form, etc., such as Arabic).
 Entire texts can also be viewed using special document visualizations or
 by clicking on the document icon next to each corpus name, if available.
+
+The "Query Language" option allows to switch between the default AQL dialect 
+and an [compatibility mode](aql-compatibility-mode.md) emulating the behavior of the older ANNIS3.
+Make sure to use the latest version for all new queries.

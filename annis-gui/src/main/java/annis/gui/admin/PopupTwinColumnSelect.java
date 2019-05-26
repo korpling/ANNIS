@@ -38,7 +38,7 @@ import annis.gui.converter.TreeSetConverter;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class PopupTwinColumnSelect extends CustomField<Set>
 {

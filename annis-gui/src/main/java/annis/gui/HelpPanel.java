@@ -35,7 +35,7 @@ import annis.libgui.InstanceConfig;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class HelpPanel extends Accordion {
 

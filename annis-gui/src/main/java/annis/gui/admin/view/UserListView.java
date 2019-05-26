@@ -23,7 +23,7 @@ import java.util.Set;
 
 /**
  * Definition of interactions for a view displaying the user list.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface UserListView extends Serializable
 {

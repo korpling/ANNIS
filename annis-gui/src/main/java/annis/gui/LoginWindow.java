@@ -28,7 +28,7 @@ import com.vaadin.ui.Window;
 /**
  * A window for logging in.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class LoginWindow extends Window
 {

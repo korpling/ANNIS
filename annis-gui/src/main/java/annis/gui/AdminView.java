@@ -49,7 +49,7 @@ import annis.libgui.Helper;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class AdminView extends VerticalLayout implements View,
   UIView, LoginListener, TabSheet.SelectedTabChangeListener, WebResourceProvider

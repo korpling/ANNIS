@@ -16,10 +16,10 @@
 package annis.visualizers.component.tree;
 
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.AnnisNode;
-import annis.model.Edge;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
 
 public interface TreeElementLabeler {
-	String getLabel(AnnisNode n, VisualizerInput input);
-	String getLabel(Edge e, VisualizerInput input);
+	String getLabel(SNode n, VisualizerInput input);
+	String getLabel(SRelation e, VisualizerInput input);
 }

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class Background
 {
@@ -45,11 +45,11 @@ public class Background
    * Execute the job in the background and provide a callback which is called
    * when the job is finished.
    * 
-   * It is guarantied that the callback is executed inside of the UI thread.
+   * It is guaranteed that the callback is executed inside of the UI thread.
    * 
-   * @param <T>
-   * @param job
-   * @param callback 
+   * @param <T> the type if the value the callback shall return
+   * @param job The job to execute
+   * @param callback Callback which is executed when the job is finished
    */
   public static <T> void runWithCallback(Callable<T> job, final FutureCallback<T> callback)
   {

@@ -44,7 +44,7 @@ import annis.service.objects.AnnisBinaryMetaData;
  * canvas to.</li>
  * </ul>
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @JavaScript({"pdf.js", "pdf_connector.js"})
 public class PDFPanel extends AbstractJavaScriptComponent {

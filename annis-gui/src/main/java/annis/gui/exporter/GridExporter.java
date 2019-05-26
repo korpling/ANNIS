@@ -15,10 +15,8 @@
  */
 package annis.gui.exporter;
 
-import annis.model.AnnisNode;
+import annis.CommonHelper;
 import annis.model.Annotation;
-import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.SubgraphFilter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
@@ -30,13 +28,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SNode;
 
 @PluginImplementation
 public class GridExporter extends GeneralTextExporter
 {
 
   @Override
-  public void convertText(AnnisResultSet queryResult, List<String> keys, 
+  public void convertText(SaltProject queryResult, List<String> keys, 
     Map<String,String> args, Writer out, int offset) throws IOException
   {
     
@@ -67,76 +72,97 @@ public class GridExporter extends GeneralTextExporter
     }
 
     int counter = 0;
-    for (AnnisResult annisResult : queryResult)
+    for (SCorpusGraph corpusGraph : queryResult.getCorpusGraphs())
     {
-      HashMap<String, TreeMap<Long, Span>> annos =
-        new HashMap<>();
-
-      counter++;
-      out.append((counter + offset) + ".");
-
-      long tokenOffset = annisResult.getGraph().getTokens().get(0).getTokenIndex() - 1;
-      for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
+      for (SDocument doc : corpusGraph.getDocuments())
       {
+        SDocumentGraph graph = doc.getDocumentGraph();
+        HashMap<String, TreeMap<Long, Span>> annos =
+          new HashMap<>();
 
-        for (Annotation resolveAnnotation : resolveNode.getNodeAnnotations())
+        counter++;
+        out.append((counter + offset) + ".");
+        List<SToken> tokens = graph.getSortedTokenByText();
+        Map<SToken, Long> token2index = new HashMap<>();
         {
-          String k = resolveAnnotation.getName();
-          if (annos.get(k) == null)
+          long i = 0;
+          for(SToken t : tokens) 
           {
-            annos.put(k, new TreeMap<Long, Span>());
+            token2index.put(t, i++);
           }
-
-          // create a separate span for every annotation
-          annos.get(k).put(resolveNode.getLeftToken(), new Span(resolveNode.getLeftToken(), resolveNode.getRightToken(),
-            resolveAnnotation.getValue()));
-          
         }
-      }
+        
+        for (SNode resolveNode : graph.getNodes())
+        {          
 
-      for (String k : keys)
-      {
+          List<SToken> coveredTokens = graph.getOverlappedTokens(resolveNode);
+          if(coveredTokens == null || coveredTokens.isEmpty()) {
+            break;
+          }
+          coveredTokens = graph.getSortedTokenByText(coveredTokens);
 
-        if ("tok".equals(k))
-        {
-          out.append("\t" + k + "\t ");
-          for (AnnisNode annisNode : annisResult.getGraph().getTokens())
+          for (SAnnotation resolveAnnotation : resolveNode.getAnnotations())
           {
-            out.append(annisNode.getSpannedText() + " ");
+            String k = resolveAnnotation.getName();
+            if (annos.get(k) == null)
+            {
+              annos.put(k, new TreeMap<>());
+            }
+            
+
+            // create a separate span for every annotation
+            long left_token_idx = token2index.get(coveredTokens.get(0));
+            long right_token_idx = token2index.get(coveredTokens.get(coveredTokens.size()-1));
+            annos.get(k).put(left_token_idx, new Span(left_token_idx, right_token_idx,
+              resolveAnnotation.getValue().toString()));
+
           }
-          out.append("\n");
         }
-        else
+
+        for (String k : keys)
         {
-          if(annos.get(k) != null)
+
+          if ("tok".equals(k))
           {
             out.append("\t" + k + "\t ");
-            for(Span s : annos.get(k).values())
+            for (SToken annisNode : tokens)
             {
-
-              out.append(s.getValue());
-
-              if (showNumbers)
-              {
-                long leftIndex = Math.max(1, s.getStart() - tokenOffset);
-                long rightIndex = s.getEnd() - tokenOffset;
-                out.append("[" + leftIndex
-                  + "-" + rightIndex + "]");
-              }
-              out.append(" ");
-
+              out.append(graph.getText(annisNode) +  " ");
             }
             out.append("\n");
           }
+          else
+          {
+            if(annos.get(k) != null)
+            {
+              out.append("\t" + k + "\t ");
+              for(Span s : annos.get(k).values())
+              {
+
+                out.append(s.getValue());
+
+                if (showNumbers)
+                {
+                  long leftIndex = Math.max(1, s.getStart());
+                  long rightIndex = s.getEnd();
+                  out.append("[" + leftIndex
+                    + "-" + rightIndex + "]");
+                }
+                out.append(" ");
+
+              }
+              out.append("\n");
+            }
+          }
         }
+
+        if(!metaKeys.isEmpty())
+        {
+          String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
+          super.appendMetaData(out, metaKeys, path[path.length-1], path[0], metadataCache);
+        }
+        out.append("\n\n");
       }
-      
-      if(!metaKeys.isEmpty())
-      {
-        String[] path = annisResult.getPath();
-        super.appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
-      }
-      out.append("\n\n");
     }
   }
   

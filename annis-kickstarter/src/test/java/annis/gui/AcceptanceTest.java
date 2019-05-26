@@ -67,7 +67,7 @@ public class AcceptanceTest {
 	@BeforeClass
 	public static void runKickstarter() {
 		try {
-			runner = new KickstartRunner(WEB_PORT, SERVICE_PORT);
+			runner = new KickstartRunner(WEB_PORT, SERVICE_PORT, null);
 
 			runner.startService();
 			runner.startJetty();

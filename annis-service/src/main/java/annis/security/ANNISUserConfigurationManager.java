@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * It has a global lock to ensure that read/write operations are not interfering
  * which each other.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ANNISUserConfigurationManager {
 

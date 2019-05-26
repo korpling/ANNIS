@@ -47,17 +47,17 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 
-import annis.gui.objects.PagedResultQuery;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
 import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
+import annis.model.PagedResultQuery;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ShareSingleMatchGenerator extends Window implements
   SelectionEvent.SelectionListener
