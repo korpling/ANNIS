@@ -164,8 +164,11 @@ You would need to change the query to</p>
 <p>to enforce that these operand are not the same.
 The standard mode will not include a match if <code>#1</code> and <code>#3</code> reference the same match per default.
 This does not affect the addition of matches if the operator is reflexive.</p>
-<a class="header" href="#meta-data-constraints-are-applied-to-all-conjunctions-of-a-disjunction" id="meta-data-constraints-are-applied-to-all-conjunctions-of-a-disjunction"><h2>Meta-data constraints are applied to all conjunctions of a disjunction</h2></a>
-<p>Meta-data constraints like <code>meta::doc=&quot;mydocumentname&quot;</code> are applied to all conjunctions of the disjunction.
+<a class="header" href="#meta-is-still-allowed" id="meta-is-still-allowed"><h2><code>meta::</code> is still allowed</h2></a>
+<p>Meta data constraints have been replaced with the part-of operator <code>@*</code> and will result
+in a syntax error for the normal query mode.
+In the compatibility mode, <code>meta::</code> is still allowed.</p>
+<p>Be aware that meta data constraints like <code>meta::doc=&quot;mydocumentname&quot;</code> are applied to all conjunctions of the disjunction, which is seems counter-intuitive.
 E.g the query.</p>
 <pre><code>(pos=&quot;NN&quot; | lemma=&quot;be&quot; &amp; meta::age=&quot;20&quot;)
 </code></pre>

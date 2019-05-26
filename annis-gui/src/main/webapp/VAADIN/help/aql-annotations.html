@@ -149,15 +149,15 @@ example, to search for all forms of the verb <em>be</em> in the GUM corpus,
 simply select the GUM corpus and enter:</p>
 <pre><code>lemma=&quot;be&quot;
 </code></pre>
-<p>Negative searches are also possible using != instead of =. For negated
+<p>Negative searches are also possible using <code>!=</code> instead of <code>=</code>. For negated
 tokens (word forms) use the reserved attribute tok. For example:</p>
 <pre><code>lemma!=&quot;be&quot;
 </code></pre>
 <p>or:</p>
 <pre><code>tok!=&quot;be&quot; 
 </code></pre>
-<p>Metadata can also be negated similarly:</p>
-<pre><code>lemma=&quot;be&quot; &amp; meta::type!=&quot;interview&quot;
+<p>Metadata attributes can also be negated:</p>
+<pre><code>lemma=&quot;be&quot; @* type!=&quot;interview&quot;
 </code></pre>
 <p>To only find finite forms of a verb in GUM, use the part-of-speech (pos)
 annotation concurrently with lemma, and specify that both the lemma and

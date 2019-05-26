@@ -190,11 +190,10 @@ default, so searching with <code>.1,50</code> is the same as using <code>.*</cod
 Greater distances (e.g. <code>.1,100</code> for 'within 100 tokens') should always
 be specified explicitly.</p>
 <p>Finally, we can add metadata restrictions to the query, which filter out
-documents not matching our definitions. Metadata attributes must be
-preceded by the prefix meta:: and may not be bound (i.e. they are not
-referred to as #1 etc. and the numbering of other elements ignores
-their existence):</p>
-<pre><code>&quot;want&quot; &amp; &quot;to&quot; &amp; #1 .1,5 #2 &amp; meta::type=&quot;interview&quot; 
+documents not matching our definitions. Metadata attributes must be connected to
+other non-meta attributes with the <code>@*</code> (part-of) operator:</p>
+<pre><code>&quot;want&quot; &amp; &quot;to&quot; &amp; #1 .1,5 #2
+&amp; type=&quot;interview&quot; &amp; #1 @* #2 
 </code></pre>
 <p>To view metadata for a search result or for a corpus, press the &quot;i&quot; icon
 next to it in the result window or in the search form respectively.</p>
