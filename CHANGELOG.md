@@ -817,5 +817,5 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#48](https://github.com/korpling/ANNIS/issues/48) Improving the speed of the subgraph query
 - [#44](https://github.com/korpling/ANNIS/issues/44) Move authentification and authorization from frontend to service
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-SNAPSHOT...HEAD
-[4.0.0-SNAPSHOT]: https://github.com/korpling/ANNIS/compare/v4.0.0-SNAPSHOT...v4.0.0-SNAPSHOT
+
+
