@@ -999,11 +999,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             if (listRootCorpus) {
                 return getQueryRunner().query(conn,
-                        "SELECT * FROM metadata_cache WHERE corpus = ? AND (\"type\" = DOCUMENT OR path=?)",
+                        "SELECT * FROM metadata_cache WHERE corpus = ? AND (\"type\" = 'DOCUMENT' OR path=?)",
                         new MetadataCacheHelper(), toplevelCorpusName, toplevelCorpusName);
             } else {
                 return getQueryRunner().query(conn,
-                        "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = DOCUMENT",
+                        "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'DOCUMENT'",
                         new MetadataCacheHelper(), toplevelCorpusName);
             }
         } catch (SQLException ex) {
@@ -1016,7 +1016,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) throws GraphANNISException {
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             return getQueryRunner().query(conn,
-                    "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = CORPUS AND path=?",
+                    "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'CORPUS' AND path=?",
                     new MetadataCacheHelper(), toplevelCorpusName, toplevelCorpusName);
 
         } catch (SQLException ex) {
