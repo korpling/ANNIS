@@ -4,6 +4,8 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Architecture - ANNIS Developer Guide</title>
+        
+
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -56,7 +58,7 @@
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script type="text/javascript">
             var theme;
-            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             document.body.className = theme;
             document.querySelector('html').className = theme + ' js';
@@ -75,7 +77,10 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="architecture.html" class="active"><strong aria-hidden="true">1.</strong> Architecture</a></li><li><a href="building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li><a href="release.html"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li><a href="annisimportformat.html"><strong aria-hidden="true">4.</strong> ANNIS import format version 3.3</a></li><li><a href="querybuilder.html"><strong aria-hidden="true">5.</strong> Create new query builder</a></li><li><a href="rest-api/index.html"><strong aria-hidden="true">6.</strong> Public REST API</a></li><li><ol class="section"><li><a href="rest-api/query.html"><strong aria-hidden="true">6.1.</strong> Corpus queries</a></li><li><a href="rest-api/admin.html"><strong aria-hidden="true">6.2.</strong> Administrative tasks</a></li></ol></li></ol>
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li><a href="architecture.html" class="active"><strong aria-hidden="true">1.</strong> Architecture</a></li><li><a href="building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li><a href="release.html"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li><a href="annisimportformat.html"><strong aria-hidden="true">4.</strong> ANNIS import format version 3.3</a></li><li><a href="querybuilder.html"><strong aria-hidden="true">5.</strong> Create new query builder</a></li><li><a href="rest-api/index.html"><strong aria-hidden="true">6.</strong> Public REST API</a></li><li><ol class="section"><li><a href="rest-api/query.html"><strong aria-hidden="true">6.1.</strong> Corpus queries</a></li><li><a href="rest-api/admin.html"><strong aria-hidden="true">6.2.</strong> Administrative tasks</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -105,7 +110,7 @@
                             
                         </div>
 
-                        <h1 class="menu-title">ANNIS Developer Guide</h1> 
+                        <h1 class="menu-title">ANNIS Developer Guide</h1>
 
                         <div class="right-buttons">
                             <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -140,22 +145,22 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#architecture" id="architecture"><h1>Architecture</h1></a>
+                        <h1><a class="header" href="#architecture" id="architecture">Architecture</a></h1>
 <p>ANNIS is a web-based search and visualization architecture for
 multi-layer corpora. ANNIS consists of two major components: a backend
 service and a web front-end. There is also a local version, ANNIS
 Kickstarter, which is a simple starting point for new users who want
 to try out the system without installing a full server.</p>
-<a class="header" href="#backend-service" id="backend-service"><h2>Backend Service</h2></a>
+<h2><a class="header" href="#backend-service" id="backend-service">Backend Service</a></h2>
 <p>The service runs on a web server such as Tomcat or Jetty and
 communicates with a relational database, using the open source DB
 PostgreSQL. PostgreSQL (Version 9.4 or larger) must be installed for ANNIS to work. For
 more information on installing and managing the backend service, see
 the Administration Guide in the documentation.</p>
-<a class="header" href="#web-front-end" id="web-front-end"><h2>Web Front-end</h2></a>
-<p>The ANNIS front-end is a web application implemented in Java and the <a href="https://vaadin.com/">Vaadin</a> framework and runs in a normal browser (we recommend Mozilla Firefox).
+<h2><a class="header" href="#web-front-end" id="web-front-end">Web Front-end</a></h2>
+<p>The ANNIS front-end is a web application implemented in Java and the <a href="https://vaadin.com/">Vaadin</a> framework and runs in a normal browser (we recommend Mozilla Firefox). 
 The server running the web-application communicates with the backend service via a REST interface.</p>
-<a class="header" href="#annis-kickstarter" id="annis-kickstarter"><h2>ANNIS Kickstarter</h2></a>
+<h2><a class="header" href="#annis-kickstarter" id="annis-kickstarter">ANNIS Kickstarter</a></h2>
 <p>ANNIS Kickstarter is a cross-platform local version which requires
 nothing but a PostgreSQL installation to run. It will run under LINUX,
 Windows and Mac. For a quick tutorial to get started with Kickstarter,

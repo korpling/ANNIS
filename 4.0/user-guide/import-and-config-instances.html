@@ -4,6 +4,8 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Multiple Instances of the Interface - ANNIS User Guide</title>
+        
+
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -56,7 +58,7 @@
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script type="text/javascript">
             var theme;
-            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             document.body.className = theme;
             document.querySelector('html').className = theme + ' js';
@@ -75,7 +77,10 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li><a href="installation-kickstarter.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li><a href="installation-server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li><a href="installation-migrate-annis3.html"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li><a href="interface.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li><li><a href="aql-compatibility-mode.html"><strong aria-hidden="true">4.9.</strong> Differences in Compatibility Mode</a></li></ol></li><li><a href="visualizations.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li><a href="visualizations-list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li><a href="visualizations-context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li><a href="visualizations-documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li><a href="visualizations-rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li><a href="import-and-config.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li><a href="import-and-config-convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li><a href="import-and-config-import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li><a href="import-and-config-corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li><a href="import-and-config-instances.html" class="active"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li><a href="import-and-config-user.html"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li><a href="import-and-config-admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li><a href="advanced.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li><a href="advanced-errorcodes.html"><strong aria-hidden="true">7.1.</strong> Error Codes of the administration tools</a></li><li><a href="advanced-custom-login.html"><strong aria-hidden="true">7.2.</strong> Provide your own login-system</a></li><li><a href="advanced-links-to-queries.html"><strong aria-hidden="true">7.3.</strong> Links to queries</a></li><li><a href="advanced-embed-vis.html"><strong aria-hidden="true">7.4.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li><a href="installation-kickstarter.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li><a href="installation-server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li><a href="installation-migrate-annis3.html"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li><a href="interface.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li><li><a href="aql-compatibility-mode.html"><strong aria-hidden="true">4.9.</strong> Differences in Compatibility Mode</a></li></ol></li><li><a href="visualizations.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li><a href="visualizations-list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li><a href="visualizations-context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li><a href="visualizations-documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li><a href="visualizations-rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li><a href="import-and-config.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li><a href="import-and-config-convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li><a href="import-and-config-import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li><a href="import-and-config-corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li><a href="import-and-config-instances.html" class="active"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li><a href="import-and-config-user.html"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li><a href="import-and-config-admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li><a href="advanced.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li><a href="advanced-errorcodes.html"><strong aria-hidden="true">7.1.</strong> Error Codes of the administration tools</a></li><li><a href="advanced-custom-login.html"><strong aria-hidden="true">7.2.</strong> Provide your own login-system</a></li><li><a href="advanced-links-to-queries.html"><strong aria-hidden="true">7.3.</strong> Links to queries</a></li><li><a href="advanced-embed-vis.html"><strong aria-hidden="true">7.4.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -105,7 +110,7 @@
                             
                         </div>
 
-                        <h1 class="menu-title">ANNIS User Guide</h1> 
+                        <h1 class="menu-title">ANNIS User Guide</h1>
 
                         <div class="right-buttons">
                             <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -140,8 +145,8 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#multiple-instances-of-the-interface" id="multiple-instances-of-the-interface"><h1>Multiple Instances of the Interface</h1></a>
-<a class="header" href="#creating-instances" id="creating-instances"><h2>Creating instances</h2></a>
+                        <h1><a class="header" href="#multiple-instances-of-the-interface" id="multiple-instances-of-the-interface">Multiple Instances of the Interface</a></h1>
+<h2><a class="header" href="#creating-instances" id="creating-instances">Creating instances</a></h2>
 <p>When multiple corpora from different sources are hosted on one server it is often
 still desired to group the corpora by their origin and present them differently.
 You should not be forced to have an ANNIS frontend and service installation for
@@ -162,28 +167,28 @@ by adding something like the following to the shell script starting ANNIS</p>
 The name of the file also defines the instance name.
 Thus the file <code>instances/falko.json</code> defines the instance named &quot;falko&quot;.</p>
 <pre><code class="language-json">{
-    &quot;display-name&quot;: &quot;Falko&quot;,
-    &quot;default-querybuilder&quot;: &quot;tigersearch&quot;,
-    &quot;default-corpusset&quot;: &quot;falko-essays&quot;,
-    &quot;corpus-sets&quot;: [
-    {
-        &quot;name&quot;: &quot;falko-essays&quot;,
-        &quot;corpus&quot;: [
-        &quot;falko-essay-l1&quot;,
-        &quot;falko-essay-l2&quot;
-        ]
-    },
-    {
-        &quot;name&quot;: &quot;falko-summaries&quot;,
-        &quot;corpus&quot;: [
-        &quot;falko-summary-l1&quot;,
-        &quot;falko-summary-l2&quot;
-        ]
-    }
-    ],
-    &quot;keyboard-layout&quot; : &quot;de&quot;,
-    &quot;login-on-start&quot;: &quot;true&quot;,
-    &quot;help-url&quot;: &quot;https://example.com/annis-help&quot;
+	&quot;display-name&quot;: &quot;Falko&quot;,
+	&quot;default-querybuilder&quot;: &quot;tigersearch&quot;,
+	&quot;default-corpusset&quot;: &quot;falko-essays&quot;,
+	&quot;corpus-sets&quot;: [
+	{
+		&quot;name&quot;: &quot;falko-essays&quot;,
+		&quot;corpus&quot;: [
+		&quot;falko-essay-l1&quot;,
+		&quot;falko-essay-l2&quot;
+		]
+	},
+	{
+		&quot;name&quot;: &quot;falko-summaries&quot;,
+		&quot;corpus&quot;: [
+		&quot;falko-summary-l1&quot;,
+		&quot;falko-summary-l2&quot;
+		]
+	}
+	],
+	&quot;keyboard-layout&quot; : &quot;de&quot;,
+	&quot;login-on-start&quot;: &quot;true&quot;,
+	&quot;help-url&quot;: &quot;https://example.com/annis-help&quot;
 }
 </code></pre>
 <p>Each instance configuration can have a verbose display-name which is
@@ -202,13 +207,13 @@ name and a list of corpora that belong to the corpus set.</p>
 additionally accessible by not specifying any instance name in the URL. You can
 configure your web server (e.g. Apache) to rewrite the URLs if you need a more
 project specific and less &quot;technical&quot; URL (e.g. <code>http://&lt;server&gt;/falko</code>).</p>
-<a class="header" href="#embedding-web-fonts" id="embedding-web-fonts"><h2>Embedding Web Fonts</h2></a>
+<h2><a class="header" href="#embedding-web-fonts" id="embedding-web-fonts">Embedding Web Fonts</a></h2>
 <p>It is also possible to set an embedded font for query result display in your instance,
 using the same JSON instance file file described in the previous section.
-Thus a web font is applied to a specific instance.
+Thus a web font is applied to a specific instance. 
 If you not want to define an extra instance, it is possible to add the font configuration to the
 <code>default.json</code> file in the <em>instance</em> directory. If no <em>instance</em>
-directory or <code>default.json</code> file exists, create it.
+directory or <code>default.json</code> file exists, create it. 
 Add a property <strong>font</strong> to the config with the following parameters:</p>
 <pre><code class="language-json">{
  ...
@@ -229,14 +234,15 @@ und is reachable under the defined link in the instance config:</p>
   font-weight: normal;
   font-size: larger;
   src:
-    local('bar'),
-    url(bar.woff) format('woff');
+	local('bar'),
+	url(bar.woff) format('woff');
 }
 </code></pre>
-<p>Further explantation about the <code>@font-face</code> rule is available on the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face">MDN web docs</a>.</p>
+<p>Further explantation about the <code>@font-face</code> rule is available on the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face">MDN web docs
+</a>.</p>
 <p>If you need to have a different font configuration for the frequency chart
 just add a <code>frequency-font</code> entry. It has the same structure as <code>font</code>.</p>
-<a class="header" href="#using-corpus-groups" id="using-corpus-groups"><h2>Using Corpus Groups</h2></a>
+<h2><a class="header" href="#using-corpus-groups" id="using-corpus-groups">Using Corpus Groups</a></h2>
 <p>It is possible to group corpora into groups, which are selected above the corpus list in
 the search form:</p>
 <p><img src="images/corpus-group.png" alt="corpus group selection" /></p>

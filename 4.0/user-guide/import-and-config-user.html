@@ -4,6 +4,8 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>User Configuration - ANNIS User Guide</title>
+        
+
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -56,7 +58,7 @@
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script type="text/javascript">
             var theme;
-            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             document.body.className = theme;
             document.querySelector('html').className = theme + ' js';
@@ -75,7 +77,10 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li><a href="installation-kickstarter.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li><a href="installation-server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li><a href="installation-migrate-annis3.html"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li><a href="interface.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li><li><a href="aql-compatibility-mode.html"><strong aria-hidden="true">4.9.</strong> Differences in Compatibility Mode</a></li></ol></li><li><a href="visualizations.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li><a href="visualizations-list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li><a href="visualizations-context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li><a href="visualizations-documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li><a href="visualizations-rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li><a href="import-and-config.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li><a href="import-and-config-convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li><a href="import-and-config-import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li><a href="import-and-config-corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li><a href="import-and-config-instances.html"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li><a href="import-and-config-user.html" class="active"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li><a href="import-and-config-admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li><a href="advanced.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li><a href="advanced-errorcodes.html"><strong aria-hidden="true">7.1.</strong> Error Codes of the administration tools</a></li><li><a href="advanced-custom-login.html"><strong aria-hidden="true">7.2.</strong> Provide your own login-system</a></li><li><a href="advanced-links-to-queries.html"><strong aria-hidden="true">7.3.</strong> Links to queries</a></li><li><a href="advanced-embed-vis.html"><strong aria-hidden="true">7.4.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li><a href="installation-kickstarter.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li><a href="installation-server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li><a href="installation-migrate-annis3.html"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li><a href="interface.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li><li><a href="aql-compatibility-mode.html"><strong aria-hidden="true">4.9.</strong> Differences in Compatibility Mode</a></li></ol></li><li><a href="visualizations.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li><a href="visualizations-list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li><a href="visualizations-context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li><a href="visualizations-documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li><a href="visualizations-rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li><a href="import-and-config.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li><a href="import-and-config-convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li><a href="import-and-config-import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li><a href="import-and-config-corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li><a href="import-and-config-instances.html"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li><a href="import-and-config-user.html" class="active"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li><a href="import-and-config-admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li><a href="advanced.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li><a href="advanced-errorcodes.html"><strong aria-hidden="true">7.1.</strong> Error Codes of the administration tools</a></li><li><a href="advanced-custom-login.html"><strong aria-hidden="true">7.2.</strong> Provide your own login-system</a></li><li><a href="advanced-links-to-queries.html"><strong aria-hidden="true">7.3.</strong> Links to queries</a></li><li><a href="advanced-embed-vis.html"><strong aria-hidden="true">7.4.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -105,7 +110,7 @@
                             
                         </div>
 
-                        <h1 class="menu-title">ANNIS User Guide</h1> 
+                        <h1 class="menu-title">ANNIS User Guide</h1>
 
                         <div class="right-buttons">
                             <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -140,7 +145,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#user-configuration" id="user-configuration"><h1>User Configuration</h1></a>
+                        <h1><a class="header" href="#user-configuration" id="user-configuration">User Configuration</a></h1>
 <p>ANNIS has an authentication system which allows to handle multiple users
 which will see different corpora depending on which groups the user is part
 of. Behind the scenes ANNIS uses the <a href="http://shiro.apache.org/">Apache Shiro</a> security framework. Per default ANNIS uses a file based authentication and
@@ -149,7 +154,7 @@ layout are evaluated. This section will discuss how to manage this configuration
 Additionally, the administrator can also directly adjust the contents of the conf/
 shiro.ini configuration file. This allows a much more individual configuration
 and the usage of external authorization services like LDAP.</p>
-<a class="header" href="#configuration-file-location" id="configuration-file-location"><h2>Configuration file location</h2></a>
+<h2><a class="header" href="#configuration-file-location" id="configuration-file-location">Configuration file location</a></h2>
 <p>There is a central location where the user configuration files are stored.
 Configure the path to this location in the <code>conf/shiro.info</code> configuration file of
 the ANNIS back-end service. The default path is <code>/etc/annis/user_config/</code> and
@@ -158,7 +163,7 @@ can be changed in the back-end configuration file.</p>
 confManager = annis.security.ANNISUserConfigurationManager
 confManager.resourcePath=/etc/annis/user_config/
 </code></pre>
-<a class="header" href="#user-and-group-files" id="user-and-group-files"><h2>User and group files</h2></a>
+<h2><a class="header" href="#user-and-group-files" id="user-and-group-files">User and group files</a></h2>
 <ol>
 <li>Create a file &quot;groups&quot; in the user-configuration directory (e.g. <code>/etc/annis/user_config/groups</code>)</li>
 </ol>
@@ -169,19 +174,17 @@ anonymous=pcc2,falko
 </code></pre>
 <p>This example means that a member of group group1 will have access to
 corpora with the names pcc3,falko, tiger2 (corpus names can be displayed
-with the <code>annis-admin.sh list</code> command).</p>
-<ol start="2">
-<li>Create a subdirectory <code>users</code></li>
-<li>You have to create a file for each user inside the users subdirectory where
-the user's name is <em>exactly</em> the file name (no file endings).</li>
-</ol>
+with the <code>annis-admin.sh list</code> command).
+2. Create a subdirectory <code>users</code>
+3. You have to create a file for each user inside the users subdirectory where
+the user's name is <em>exactly</em> the file name (no file endings).</p>
 <pre><code class="language-ini">groups=group1,group3
 password=$shiro1$SHA-256$1$tQNwUIxEQhrDn6FKcY1yNg==$Xq8ZCb3RFBwn3GfQ7pav3G3vHg4TKRGD1ItpfdW+JvI=
 # these are optional entries
 permissions=adm:*,query:*
 expires=2015-04-25
 </code></pre>
-<p><strong><em>Notes:</em></strong></p>
+<p><em><strong>Notes:</strong></em></p>
 <ul>
 <li>A superuser who has access to every corpus can be created with <code>groups=*</code></li>
 <li>The password must be hashed with SHA256 (one iteration and using a Salt) and formatted in the <a href="http://shiro.apache.org/static/1.3.2/apidocs/org/apache/shiro/crypto/hash/format/Shiro1CryptFormat.html">Shiro1CryptFormat</a>.</li>
@@ -189,7 +192,7 @@ expires=2015-04-25
 <li>With <code>expires</code> you can define when an account will expire. The format must be in encoded according to the <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO-8601 standard</a>.</li>
 </ul>
 <p>The easiest way to generate the passwort hash is to use the
-<a href="http://shiro.apache.org/command-line-hasher.html">Apache Shiro command line hasher</a> which can be downloaded from
+<a href="http://shiro.apache.org/command-line-hasher.html">Apache Shiro command line hasher</a> which can be downloaded from 
 <a href="http://shiro.apache.org/download.html#Download-1.2.1.BinaryDistribution">here</a>.</p>
 <ol>
 <li>Execute <code>java -jar shiro-tools-hasher-1.2.1-cli.jar -i 1 -p</code> from the
@@ -204,38 +207,38 @@ Password to hash (confirm):
 $shiro1$SHA-256$1$kRMX+Et6w7XJgwSEAgq9nw==$sQOgObXsQdO76wnNxvN0aesvTSPoBsd/2bjxasydB+I=
 </code></pre>
 <p>The last line is what you have to insert into the password field.</p>
-<a class="header" href="#anonymous-and-user-group" id="anonymous-and-user-group"><h3>&quot;anonymous&quot; and &quot;user&quot; group</h3></a>
+<h3><a class="header" href="#anonymous-and-user-group" id="anonymous-and-user-group">&quot;anonymous&quot; and &quot;user&quot; group</a></h3>
 <p>The special group <code>anonymous</code> is used for non logged-in users. Thus every corpus listed here is available for everyone without (and with) login. In addition the group &quot;user&quot; is added to
 every user that is logged in.</p>
-<a class="header" href="#advanced-permissions" id="advanced-permissions"><h3>Advanced permissions</h3></a>
+<h3><a class="header" href="#advanced-permissions" id="advanced-permissions">Advanced permissions</a></h3>
 <p>The following permissions can be granted to individual users. Wildcards (&quot;*&quot;) can be used
 as described in the <a href="https://shiro.apache.org/permissions.html">Apache Shiro documentation</a>.</p>
-<a class="header" href="#administration" id="administration"><h4>Administration</h4></a>
+<h4><a class="header" href="#administration" id="administration">Administration</a></h4>
 <p>If you want to have an administrator user just add</p>
 <pre><code>admin:*
 </code></pre>
 <p>to it's permissions. For more fine-grained control (e.g. for the web service users) you can specify the actual action. You can always use &quot;*&quot; wildcard instead of the corpus name to allow the specific action for any corpus.</p>
-<table><thead><tr><th> permission                    </th><th> description                                                                                                                        </th></tr></thead><tbody>
-<tr><td> admin:import:<strong>{corpusname}</strong> </td><td> Allow to import and overwrite a corpus with a specific name.                                                                       </td></tr>
-<tr><td> admin:query-import:finished   </td><td> Allow to check if an import has finished.                                                                                          </td></tr>
-<tr><td> admin:query-import:running    </td><td> Allow to list the currently running imports.                                                                                       </td></tr>
-<tr><td> admin:write:user              </td><td> Allow to the update or create users.                                                                                               </td></tr>
-<tr><td> admin:read:user               </td><td> Allow get the information about a user (like groups or additionally permissions).                                                  </td></tr>
-<tr><td> admin:write:adminuser         </td><td> Additional permission to update or create users with adminstration rights (thus having an extra permission thats starts &quot;admin:&quot;). </td></tr>
+<table><thead><tr><th>permission</th><th>description</th></tr></thead><tbody>
+<tr><td>admin:import:<strong>{corpusname}</strong></td><td>Allow to import and overwrite a corpus with a specific name.</td></tr>
+<tr><td>admin:query-import:finished</td><td>Allow to check if an import has finished.</td></tr>
+<tr><td>admin:query-import:running</td><td>Allow to list the currently running imports.</td></tr>
+<tr><td>admin:write:user</td><td>Allow to the update or create users.</td></tr>
+<tr><td>admin:read:user</td><td>Allow get the information about a user (like groups or additionally permissions).</td></tr>
+<tr><td>admin:write:adminuser</td><td>Additional permission to update or create users with adminstration rights (thus having an extra permission thats starts &quot;admin:&quot;).</td></tr>
 </tbody></table>
-<a class="header" href="#querying" id="querying"><h4>Querying</h4></a>
-<p>Every user that is part of a group that contains a corpus always get these permissions for a corpus automatically. If you want to allow a user to access only a certain functionality
+<h4><a class="header" href="#querying" id="querying">Querying</a></h4>
+<p>Every user that is part of a group that contains a corpus always get these permissions for a corpus automatically. If you want to allow a user to access only a certain functionality 
 you can add more fine grained permissions. E.g.
 \verbatim
 query:count:*
 \endverbatim
 allows a user to count on all corpora but won't allow him to fetch the annotation graphs. For users that use the graphical user interface and not the service directly you should always grant a user all query permissions for a corpus. Otherwise he the user interface might not function as expected.</p>
-<table><thead><tr><th> permission                      </th><th> description                                                                            </th></tr></thead><tbody>
-<tr><td> query:show:<strong>{corpusname}</strong>     </td><td> Allow to show information about a specific corpus.                                     </td></tr>
-<tr><td> query:count:<strong>{corpusname}</strong>    </td><td> Allow to count on a specific corpus.                                                   </td></tr>
-<tr><td> query:find:<strong>{corpusname}</strong>     </td><td> Allow to find matches on a specific corpus.                                            </td></tr>
-<tr><td> query:subgraph:<strong>{corpusname}</strong> </td><td> Allow to query annotated subgraphs and complete annotated graphs on a specific corpus. </td></tr>
-<tr><td> query:binary:<strong>{corpusname}</strong>   </td><td> Allow to get the  binary files of a specific corpus.                                   </td></tr>
+<table><thead><tr><th>permission</th><th>description</th></tr></thead><tbody>
+<tr><td>query:show:<strong>{corpusname}</strong></td><td>Allow to show information about a specific corpus.</td></tr>
+<tr><td>query:count:<strong>{corpusname}</strong></td><td>Allow to count on a specific corpus.</td></tr>
+<tr><td>query:find:<strong>{corpusname}</strong></td><td>Allow to find matches on a specific corpus.</td></tr>
+<tr><td>query:subgraph:<strong>{corpusname}</strong></td><td>Allow to query annotated subgraphs and complete annotated graphs on a specific corpus.</td></tr>
+<tr><td>query:binary:<strong>{corpusname}</strong></td><td>Allow to get the  binary files of a specific corpus.</td></tr>
 </tbody></table>
 
                     </main>

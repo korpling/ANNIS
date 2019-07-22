@@ -4,6 +4,8 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Corpus queries - ANNIS Developer Guide</title>
+        
+
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -56,7 +58,7 @@
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script type="text/javascript">
             var theme;
-            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             document.body.className = theme;
             document.querySelector('html').className = theme + ' js';
@@ -75,7 +77,10 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="../architecture.html"><strong aria-hidden="true">1.</strong> Architecture</a></li><li><a href="../building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li><a href="../release.html"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li><a href="../annisimportformat.html"><strong aria-hidden="true">4.</strong> ANNIS import format version 3.3</a></li><li><a href="../querybuilder.html"><strong aria-hidden="true">5.</strong> Create new query builder</a></li><li><a href="../rest-api/index.html"><strong aria-hidden="true">6.</strong> Public REST API</a></li><li><ol class="section"><li><a href="../rest-api/query.html" class="active"><strong aria-hidden="true">6.1.</strong> Corpus queries</a></li><li><a href="../rest-api/admin.html"><strong aria-hidden="true">6.2.</strong> Administrative tasks</a></li></ol></li></ol>
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li><a href="../architecture.html"><strong aria-hidden="true">1.</strong> Architecture</a></li><li><a href="../building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li><a href="../release.html"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li><a href="../annisimportformat.html"><strong aria-hidden="true">4.</strong> ANNIS import format version 3.3</a></li><li><a href="../querybuilder.html"><strong aria-hidden="true">5.</strong> Create new query builder</a></li><li><a href="../rest-api/index.html"><strong aria-hidden="true">6.</strong> Public REST API</a></li><li><ol class="section"><li><a href="../rest-api/query.html" class="active"><strong aria-hidden="true">6.1.</strong> Corpus queries</a></li><li><a href="../rest-api/admin.html"><strong aria-hidden="true">6.2.</strong> Administrative tasks</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -105,7 +110,7 @@
                             
                         </div>
 
-                        <h1 class="menu-title">ANNIS Developer Guide</h1> 
+                        <h1 class="menu-title">ANNIS Developer Guide</h1>
 
                         <div class="right-buttons">
                             <a href="../print.html" title="Print this book" aria-label="Print this book">
@@ -140,22 +145,22 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#corpus-queries" id="corpus-queries"><h1>Corpus queries</h1></a>
-<p>Interface defining the REST API calls that ANNIS provides for querying the data.</p>
+                        <h1><a class="header" href="#corpus-queries" id="corpus-queries">Corpus queries</a></h1>
+<p>Interface defining the REST API calls that ANNIS provides for querying the data. </p>
 <p>All paths for this part of the service start with the &quot;annis/query/&quot; prefix.</p>
-<a class="header" href="#count-matches-of-a-query" id="count-matches-of-a-query"><h2><em>Count</em> matches of a query</h2></a>
-<a class="header" href="#paths" id="paths"><h3>Path(s)</h3></a>
+<h2><a class="header" href="#count-matches-of-a-query" id="count-matches-of-a-query"><em>Count</em> matches of a query</a></h2>
+<h3><a class="header" href="#paths" id="paths">Path(s)</a></h3>
 <ol>
 <li><code>GET</code> annis/query/search/count</li>
 </ol>
-<a class="header" href="#parameters" id="parameters"><h3>Parameters</h3></a>
+<h3><a class="header" href="#parameters" id="parameters">Parameters</a></h3>
 <ul>
 <li><code>q</code> - The query in the ANNIS Query Language (AQL)</li>
 <li><code>query-language</code> - Query language to use. Currently &quot;AQL&quot; and &quot;AQL_QUIRKS_V3&quot; are supported as value. The latter one emulates the behavior of the ANNIS 3 version of AQL. Default is &quot;AQL&quot;.</li>
-<li><code>corpora</code> - A comma separated list of corpus names</li>
+<li><code>corpora</code> - A comma separated list of corpus names </li>
 </ul>
-<a class="header" href="#responses" id="responses"><h3>Responses</h3></a>
-<a class="header" href="#code-200" id="code-200"><h4>Code 200</h4></a>
+<h3><a class="header" href="#responses" id="responses">Responses</a></h3>
+<h4><a class="header" href="#code-200" id="code-200">Code 200</a></h4>
 <p>Produces an XML representation of the total matches and the number of documents that contain matches (<code>application/xml</code>):</p>
 <pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
 &lt;matchAndDocumentCount&gt;
@@ -165,22 +170,22 @@
   &lt;matchCount&gt;399&lt;/matchCount&gt;
 &lt;/matchAndDocumentCount&gt;
 </code></pre>
-<a class="header" href="#find-matches-for-a-given-query" id="find-matches-for-a-given-query"><h2><em>Find</em> matches for a given query</h2></a>
-<a class="header" href="#paths-1" id="paths-1"><h3>Path(s)</h3></a>
+<h2><a class="header" href="#find-matches-for-a-given-query" id="find-matches-for-a-given-query"><em>Find</em> matches for a given query</a></h2>
+<h3><a class="header" href="#paths-1" id="paths-1">Path(s)</a></h3>
 <ol>
-<li><code>GET</code> annis/query/search/find</li>
+<li><code>GET</code> annis/query/search/find </li>
 </ol>
-<a class="header" href="#parameters-1" id="parameters-1"><h3>Parameters</h3></a>
+<h3><a class="header" href="#parameters-1" id="parameters-1">Parameters</a></h3>
 <ul>
 <li><code>q</code> - The query in the ANNIS Query Language (AQL)</li>
 <li><code>query-language</code> - Query language to use. Currently &quot;AQL&quot; and &quot;AQL_QUIRKS_V3&quot; are supported as value. The latter one emulates the behavior of the ANNIS 3 version of AQL. Default is &quot;AQL&quot;.</li>
-<li><code>corpora</code> - A comma separated list of corpus names</li>
-<li><code>offset</code> - Optional offset from where to start the matches. Default is 0.</li>
-<li><code>limit</code> - Optional limit of the number of returned matches. Set to -1 if unlimited. Default is -1.</li>
-<li><code>order</code> - Optional order how the results should be sorted. Can be either &quot;normal&quot;, &quot;random&quot; or &quot;inverted&quot; &quot;normal&quot; is the default ordering, &quot;inverted&quot; inverses the default ordering and &quot;random&quot; is a non-stable (thus you will get different results for the same offset and limit) random ordering.</li>
+<li><code>corpora</code> - A comma separated list of corpus names </li>
+<li><code>offset</code> - Optional offset from where to start the matches. Default is 0. </li>
+<li><code>limit</code> - Optional limit of the number of returned matches. Set to -1 if unlimited. Default is -1. </li>
+<li><code>order</code> - Optional order how the results should be sorted. Can be either &quot;normal&quot;, &quot;random&quot; or &quot;inverted&quot; &quot;normal&quot; is the default ordering, &quot;inverted&quot; inverses the default ordering and &quot;random&quot; is a non-stable (thus you will get different results for the same offset and limit) random ordering. </li>
 </ul>
-<a class="header" href="#responses-1" id="responses-1"><h3>Responses</h3></a>
-<a class="header" href="#code-200-1" id="code-200-1"><h4>Code 200</h4></a>
+<h3><a class="header" href="#responses-1" id="responses-1">Responses</a></h3>
+<h4><a class="header" href="#code-200-1" id="code-200-1">Code 200</a></h4>
 <p>A list of the match identifiers for the query.</p>
 <p>Can produce the MIME type <code>application/xml</code> in the following format</p>
 <pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
@@ -214,12 +219,12 @@ salt:/pcc2/11299/#tok_3 tiger::pos::salt:/pcc2/11299/#tok_4
 </code></pre>
 <p>In this format, there is one line per match and each ID is separated by space.
 An ID can be prefixed by the fully qualified annotation name (which is separated with '::' from the ID).</p>
-<a class="header" href="#get-a-subgraph-from-a-set-of-matched-salt-ids" id="get-a-subgraph-from-a-set-of-matched-salt-ids"><h2>Get a <em>subgraph</em> from a set of (matched) Salt IDs</h2></a>
-<a class="header" href="#paths-2" id="paths-2"><h3>Path(s)</h3></a>
+<h2><a class="header" href="#get-a-subgraph-from-a-set-of-matched-salt-ids" id="get-a-subgraph-from-a-set-of-matched-salt-ids">Get a <em>subgraph</em> from a set of (matched) Salt IDs</a></h2>
+<h3><a class="header" href="#paths-2" id="paths-2">Path(s)</a></h3>
 <ol>
 <li><code>POST</code> annis/query/search/subgraph</li>
 </ol>
-<a class="header" href="#request-body" id="request-body"><h3>Request body</h3></a>
+<h3><a class="header" href="#request-body" id="request-body">Request body</a></h3>
 <p>Consumes <code>application/xml</code>:</p>
 <pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
 &lt;match-group&gt;
@@ -251,54 +256,54 @@ salt:/pcc2/11299/#tok_2 tiger::pos::salt:/pcc2/11299/#tok_3
 salt:/pcc2/11299/#tok_3 tiger::pos::salt:/pcc2/11299/#tok_4
 </code></pre>
 <p>One line per match, each ID is separated by space. An ID can be prepended by the fully qualified annotation name (which is separated with '::' from the ID).</p>
-<a class="header" href="#parameters-2" id="parameters-2"><h3>Parameters</h3></a>
+<h3><a class="header" href="#parameters-2" id="parameters-2">Parameters</a></h3>
 <ul>
 <li><code>segmentation</code> - Optional parameter for segmentation layer on which the context is applied. Leave empty for token layer (which is default).</li>
 <li><code>left</code> - Optional parameter for the left context size, default is 0.</li>
 <li><code>right</code> - Optional parameter for the right context size, default is 0.</li>
-<li><code>filter</code> - Optional parameter with value &quot;all&quot; or &quot;token&quot;. If &quot;token&quot; only token will be fetched. Default is &quot;all&quot;.</li>
+<li><code>filter</code> - Optional parameter with value &quot;all&quot; or &quot;token&quot;. If &quot;token&quot; only token will be fetched. Default is &quot;all&quot;. </li>
 </ul>
-<a class="header" href="#responses-2" id="responses-2"><h3>Responses</h3></a>
-<a class="header" href="#code-200-2" id="code-200-2"><h4>Code 200</h4></a>
-<p>Returns a representation of the <a href="http://corpus-tools.org/salt/">Salt</a> annotation graph in the EMF XMI format and with MIME type <code>application/xml</code> or <code>application/xmi+xml</code>.</p>
-<a class="header" href="#get-the-annotation-graph-of-a-complete-document" id="get-the-annotation-graph-of-a-complete-document"><h2>Get the annotation <em>graph</em> of a complete document</h2></a>
-<a class="header" href="#paths-3" id="paths-3"><h3>Path(s)</h3></a>
+<h3><a class="header" href="#responses-2" id="responses-2">Responses</a></h3>
+<h4><a class="header" href="#code-200-2" id="code-200-2">Code 200</a></h4>
+<p>Returns a representation of the <a href="http://corpus-tools.org/salt/">Salt</a> annotation graph in the EMF XMI format and with MIME type <code>application/xml</code> or <code>application/xmi+xml</code>. </p>
+<h2><a class="header" href="#get-the-annotation-graph-of-a-complete-document" id="get-the-annotation-graph-of-a-complete-document">Get the annotation <em>graph</em> of a complete document</a></h2>
+<h3><a class="header" href="#paths-3" id="paths-3">Path(s)</a></h3>
 <ol>
 <li><code>GET</code> annis/query/graph/<strong>{top}</strong>/<strong>{doc}</strong></li>
 </ol>
-<p><strong>{top}</strong> is the toplevel corpus name of the document and <strong>{doc}</strong> the document name.</p>
-<a class="header" href="#parameters-3" id="parameters-3"><h3>Parameters</h3></a>
+<p><strong>{top}</strong> is the toplevel corpus name of the document and <strong>{doc}</strong> the document name. </p>
+<h3><a class="header" href="#parameters-3" id="parameters-3">Parameters</a></h3>
 <ul>
-<li><code>filternodeanno</code> -    A comma seperated list of node annotations which are used as a filter for the graph. Only nodes having one of the annotations are included in the result.</li>
+<li><code>filternodeanno</code> - 	A comma seperated list of node annotations which are used as a filter for the graph. Only nodes having one of the annotations are included in the result. </li>
 </ul>
-<a class="header" href="#responses-3" id="responses-3"><h3>Responses</h3></a>
-<a class="header" href="#code-200-3" id="code-200-3"><h4>Code 200</h4></a>
-<p>Returns a representation of the <a href="http://corpus-tools.org/salt/">Salt</a> annotation graph in the EMF XMI format and with MIME type <code>application/xml</code> or <code>application/xmi+xml</code>.</p>
-<a class="header" href="#get-the-content-a-binary-object-for-a-specific-document" id="get-the-content-a-binary-object-for-a-specific-document"><h2>Get the content a <em>binary</em> object for a specific document</h2></a>
-<a class="header" href="#paths-4" id="paths-4"><h3>Path(s)</h3></a>
+<h3><a class="header" href="#responses-3" id="responses-3">Responses</a></h3>
+<h4><a class="header" href="#code-200-3" id="code-200-3">Code 200</a></h4>
+<p>Returns a representation of the <a href="http://corpus-tools.org/salt/">Salt</a> annotation graph in the EMF XMI format and with MIME type <code>application/xml</code> or <code>application/xmi+xml</code>. </p>
+<h2><a class="header" href="#get-the-content-a-binary-object-for-a-specific-document" id="get-the-content-a-binary-object-for-a-specific-document">Get the content a <em>binary</em> object for a specific document</a></h2>
+<h3><a class="header" href="#paths-4" id="paths-4">Path(s)</a></h3>
 <ol>
-<li><code>GET</code> annis/query/corpora/<strong>{top}</strong>/<strong>{document}</strong>/binary</li>
+<li><code>GET</code> annis/query/corpora/<strong>{top}</strong>/<strong>{document}</strong>/binary </li>
 <li><code>GET</code> annis/query/corpora/<strong>{top}</strong>/<strong>{document}</strong>/binary/<strong>{offset}</strong>/<strong>{length}</strong></li>
 <li><code>GET</code> annis/query/corpora/<strong>{top}</strong>/<strong>{document}</strong>/binary/<strong>{file}</strong></li>
 <li><code>GET</code> annis/query/corpora/<strong>{top}</strong>/<strong>{document}</strong>/binary/<strong>{file}</strong>/<strong>{offset}</strong>/<strong>{length}</strong></li>
 </ol>
-<p>Accepts any MIME type. The MIME type is used as implicit argument to filter the files that match a given query.</p>
-<p>There are several ways of selecting the binary data you want to receive.
-You can choose to select the file only by giving a document name given by the <strong>{top}</strong> and <strong>{document}</strong> arguments (paths 1 and 2).
-This will return the first file that also matches the requested accepted mime types.
+<p>Accepts any MIME type. The MIME type is used as implicit argument to filter the files that match a given query. </p>
+<p>There are several ways of selecting the binary data you want to receive. 
+You can choose to select the file only by giving a document name given by the <strong>{top}</strong> and <strong>{document}</strong> arguments (paths 1 and 2). 
+This will return the first file that also matches the requested accepted mime types. 
 Alternatively the name of the file itself can be given as path argument <strong>{file}</strong> (paths 3 and 4).
-You can also choose to either get the complete file (paths 1 and 3) or chunks containing only a subset of the binary data (paths 2 and 4).
+You can also choose to either get the complete file (paths 1 and 3) or chunks containing only a subset of the binary data (paths 2 and 4). 
 In the latter case, you can specify the <strong>{offset}</strong> and the <strong>{length}</strong> of the chunk (both in bytes).</p>
 <ul>
-<li><strong>{top}</strong> - The toplevel corpus name.</li>
-<li><strong>{document}</strong> - The name of the document that has the file. If you want the files for the toplevel corpus itself, use the name of the toplevel corpus as document name.</li>
+<li><strong>{top}</strong> - The toplevel corpus name. </li>
+<li><strong>{document}</strong> - The name of the document that has the file. If you want the files for the toplevel corpus itself, use the name of the toplevel corpus as document name. </li>
 <li><strong>{file}</strong> - File name/title to select.</li>
 <li><strong>{offset}</strong> - Defines the offset from the the binary chunk starts (in bytes).</li>
 <li><strong>{length}</strong> - Defines the length of the binary chunk (in bytes).</li>
 </ul>
-<a class="header" href="#responses-4" id="responses-4"><h3>Responses</h3></a>
-<a class="header" href="#code-200-4" id="code-200-4"><h4>Code 200</h4></a>
-<p>A binary stream that contains the file content. If path variant 2 and 4 is used only a subset of the file is returned.
+<h3><a class="header" href="#responses-4" id="responses-4">Responses</a></h3>
+<h4><a class="header" href="#code-200-4" id="code-200-4">Code 200</a></h4>
+<p>A binary stream that contains the file content. If path variant 2 and 4 is used only a subset of the file is returned. 
 Path variant 1 and 3 always return the complete file.</p>
 
                     </main>
