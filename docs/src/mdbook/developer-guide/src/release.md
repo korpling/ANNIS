@@ -12,7 +12,7 @@ Otherwise the documentation can't be created.
 
 ### Initialization phase 
 
-1. **Start** the release process by executing `mvn gitflow:release-start`for a regular release (branched from the `develop`) or `mvn gitflow:hotfix-start` for a hotfix that is branched from `master`. The command will ask you for the new version number, use [semantic versioning](https://semver.org/).
+1. **Start** the release process by executing `mvn gitflow:release-start` for a regular release (branched from the `develop`) or `mvn gitflow:hotfix-start` for a hotfix that is branched from `master`. The command will ask you for the new version number, use [semantic versioning](https://semver.org/).
 2. **Add new changelog entries**, if some important information is missing add an entry to the changelog.
 When the changelog is up-to-date, execute
 ~~~bash
