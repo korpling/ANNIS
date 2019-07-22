@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Document explorer does not show metadata specified in document_browser.json (#610)
+- Document explorer does not show metadata specified in `document_browser.json` (#610)
 
 ## [4.0.0-beta.1] - 2019-05-26
 
