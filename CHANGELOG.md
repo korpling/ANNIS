@@ -5,10 +5,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0-beta.2] - 2019-07-22
+
+### Fixed
+
+- Document explorer does not show metadata specified in `document_browser.json` [#610](https://github.com/korpling/ANNIS/issues/610)
+
+### Changed
+
+- Update graphANNIS to version 0.22.0 to fix issues with Kickstarter on Windows and MacOS
+
 ## [4.0.0-beta.1] - 2019-05-26
 
 This **beta** pre-release is a complete overhaul of the ANNIS service backend.
-Instead of using the relational database PostgreSQL, a custom AQL implementation based on graph called [graphANNIS](https://github.com/korpling/graphANNIS) is used.
+Instead of using the relational database PostgreSQL, a custom AQL implementation based on graphs called [graphANNIS](https://github.com/korpling/graphANNIS) is used.
 
 ANNIS 4 currently only supports a sub-set of the ANNIS Query Langugage (AQL) compared to ANNIS 3.
 Full support is planned, but some backward-compatible features of AQL will only be available in a compatibility mode.
@@ -829,4 +839,5 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.1...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.2...HEAD
+[4.0.0-beta.2]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.1...v4.0.0-beta.2

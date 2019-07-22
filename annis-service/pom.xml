@@ -8,13 +8,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<annis.userconfig>/etc/annis/user_config/</annis.userconfig>
-		<graphannis.version>0.21.0</graphannis.version>
+		<graphannis.version>0.22.0</graphannis.version>
 	</properties>
 
 	<parent>
 		<artifactId>annis-all</artifactId>
 		<groupId>de.hu-berlin.german.korpling.annis</groupId>
-		<version>4.0.0-beta.1</version>
+		<version>4.0.0-beta.2</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
