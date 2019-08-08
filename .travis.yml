@@ -15,9 +15,9 @@ before_script:
 script:
   - mvn test -B
    # generate the documentation for possible deploy
-  - mdbook build --dest-dir book/${SHORT_VERSION} docs/user-guide/
-  - mdbook build --dest-dir book/${SHORT_VERSION} docs/developer-guide/
-  - mdbook build --dest-dir book/${SHORT_VERSION} docs/online-help/
+  - mdbook build docs/user-guide/
+  - mdbook build docs/developer-guide/
+  - mdbook build docs/online-help/
   
 deploy:
   - provider: script
