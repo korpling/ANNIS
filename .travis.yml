@@ -1,1 +1,34 @@
 language: java
+jdk:
+  - openjdk8
+  
+before_script:
+  - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
+  - misc/download-mdbook.sh 0.3.1
+  
+script:
+  - mvn test -B
+  # test that the documentation is generated without error
+  - mdbook test docs/src/mdbook/user-guide/
+  - mdbook test docs/src/mdbook/developer-guide/
+  - mdbook test docs/src/mdbook/online-help/
+   # generate the documentation for possible deploy
+  - mdbook build --dest-dir book/${SHORT_VERSION} docs/src/mdbook/user-guide/
+  - mdbook build --dest-dir book/${SHORT_VERSION} docs/src/mdbook/developer-guide/
+  
+deploy:
+  - provider: script
+    script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
+    on:
+      repo: korpling/graphANNIS
+      branch: master
+      tags: true
+      condition: $TRAVIS_OS_NAME = linux
+    skip-cleanup: true
+  - provider: script
+    script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
+    on:
+      repo: korpling/graphANNIS
+      branch: feature/travis-deploy-docs
+      condition: $TRAVIS_OS_NAME = linux
+    skip-cleanup: true
