@@ -175,7 +175,7 @@
 										<argument>build</argument>
 										<argument>-d</argument>
 										<argument>${project.basedir}/src/main/webapp/VAADIN/help/</argument>
-										<argument>${project.basedir}/../docs/src/mdbook/online-help/</argument>
+										<argument>${project.basedir}/../docs/online-help/</argument>
 									</arguments>
 								</configuration>
 							</execution>
