@@ -6,7 +6,8 @@ if [ -n "$GITHUB_API_KEY" ]; then
     cd "$TRAVIS_BUILD_DIR"
 
     echo "cloning gh-pages"
-    git clone -q  -b gh-pages https://$GITHUB_API_KEY@github.com/{TRAVIS_REPO_SLUG} gh-pages &>/dev/null
+    rm -rf gh-pages
+    git clone -q -b gh-pages https://$GITHUB_API_KEY@github.com/{TRAVIS_REPO_SLUG} gh-pages &>/dev/null
     cd gh-pages
    	cp -R ${TRAVIS_BUILD_DIR}/docs/*/book/* .
     git add .
