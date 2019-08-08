@@ -23,7 +23,7 @@ deploy:
   - provider: script
     script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
     on:
-      repo: korpling/graphANNIS
+      repo: korpling/ANNIS
       branch: master
       tags: true
       condition: $TRAVIS_OS_NAME = linux
@@ -31,7 +31,7 @@ deploy:
   - provider: script
     script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
     on:
-      repo: korpling/graphANNIS
+      repo: korpling/ANNIS
       branch: feature/travis-deploy-docs
       condition: $TRAVIS_OS_NAME = linux
     skip-cleanup: true
