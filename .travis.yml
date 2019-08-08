@@ -9,12 +9,12 @@ before_script:
 script:
   - mvn test -B
   # test that the documentation is generated without error
-  - mdbook test docs/src/mdbook/user-guide/
-  - mdbook test docs/src/mdbook/developer-guide/
-  - mdbook test docs/src/mdbook/online-help/
+  - mdbook test docs/user-guide/
+  - mdbook test docs/developer-guide/
+  - mdbook test docs/online-help/
    # generate the documentation for possible deploy
-  - mdbook build --dest-dir book/${SHORT_VERSION} docs/src/mdbook/user-guide/
-  - mdbook build --dest-dir book/${SHORT_VERSION} docs/src/mdbook/developer-guide/
+  - mdbook build --dest-dir book/${SHORT_VERSION} docs/user-guide/
+  - mdbook build --dest-dir book/${SHORT_VERSION} docs/developer-guide/
   
 deploy:
   - provider: script
