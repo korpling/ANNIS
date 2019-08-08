@@ -2,6 +2,10 @@ language: java
 jdk:
   - openjdk8
   
+cache:
+  directories:
+  - $HOME/.m2
+  
 before_script:
   - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
   - mkdir -p $HOME/.cargo/bin
