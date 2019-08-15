@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -178,16 +179,6 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
         this.sentences = new TreeSet<SStructure>(new Comparator<SStructure>() {
             private int getStartPosition(SStructure s) {
-                List<SRelation<SNode, SNode>> out = s.getGraph().getOutRelations(s.getId());
-
-                for (SRelation e : out) {
-                    if (e != null && e.getTarget() instanceof SToken) {
-                        SToken tok = ((SToken) ((SRelation) e).getTarget());
-
-                        return token2index.get(tok);
-                    }
-                }
-
                 int pos = Integer.MAX_VALUE;
                 for (SToken tok : s.getGraph().getOverlappedTokens(s)) {
                     pos = Math.min(pos, token2index.get(tok));
@@ -323,14 +314,16 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
         if (currNode instanceof SStructure) {
 
+        	SDocumentGraph dgraph = ((SStructure) currNode).getGraph();
             edges = currNode.getGraph().getOutRelations(currNode.getId());
-
+            List<SToken> overlappedToken = new LinkedList<>();
             // get all tokens directly dominated tokens and build a string
             for (SRelation<SNode, SNode> sedge : edges) {
                 if (sedge.getTarget() instanceof SToken) {
-                    token.add((SToken) sedge.getTarget());
+                    overlappedToken.add((SToken) sedge.getTarget());
                 }
             }
+            token.addAll(dgraph.getSortedTokenByText(overlappedToken));
 
             // build strings
             Iterator<SToken> tokIterator = token.iterator();
