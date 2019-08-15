@@ -1,82 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-                            
-    
-    
-    
-    
-    
     <wb-module deploy-name="annis-gui">
-                                                        
-        
-        
-        
-        
-        
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
-                                                        
-        
-        
-        
-        
-        
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
-                                                        
-        
-        
-        
-        
-        
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-                                                        
-        
-        
-        
-        
-        
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
-                                                
-        
-        
-        
-        
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/target/generated-sources/annotations"/>
-        <dependent-module archiveName="annis-libgui-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-libgui/annis-libgui">
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/.apt_generated"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/.apt_generated_tests"/>
+        <dependent-module archiveName="annis-libgui-4.0.1-beta.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-libgui/annis-libgui">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="annis-widgets-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-widgets/annis-widgets">
+        <dependent-module archiveName="annis-widgets-4.0.1-beta.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-widgets/annis-widgets">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="annis-interfaces-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-interfaces/annis-interfaces">
+        <dependent-module archiveName="annis-interfaces-4.0.1-beta.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-interfaces/annis-interfaces">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="annis-visualizers-4.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-visualizers/annis-visualizers">
+        <dependent-module archiveName="annis-visualizers-4.0.1-beta.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-visualizers/annis-visualizers">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-                                                        
-        
-        
-        
-        
-        
         <property name="context-root" value="annis-gui"/>
-                                                        
-        
-        
-        
-        
-        
         <property name="java-output-path" value="/annis-gui/target/classes"/>
-                                                    
-    
-    
-    
-    
-    
     </wb-module>
-                        
-
-
-
-
-
 </project-modules>
