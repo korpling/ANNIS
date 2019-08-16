@@ -566,8 +566,14 @@ public class QueryService {
             user.checkPermission("query:parse:" + c);
         }
         Collections.sort(corpusNames);
-        if (getQueryDao().getCorpusStorageManager().validateQuery(corpusNames, query,
-                QueryDaoImpl.convertQueryLanguage(queryLanguage))) {
+        boolean result = true;
+        for(String corpus : corpusNames) {
+            if (getQueryDao().getCorpusStorageManager().validateQuery(corpus, query,
+                    QueryDaoImpl.convertQueryLanguage(queryLanguage)) == false) {
+                result = false;
+            }
+        }
+        if (result) {
             return "ok";
         } else {
             return "error";
