@@ -591,12 +591,16 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         ResultOrder ordering = convertOrder(limitOffset.getOrder());
 
         Future<List<Match>> result = exec.submit(() -> {
-            String[] matchesRaw = corpusStorageMgr.find(corpora, query, limitOffset.getOffset(), limitOffset.getLimit(),
-                    ordering, ql);
 
-            ArrayList<Match> data = new ArrayList<>((int) matchesRaw.length);
-            for (int i = 0; i < matchesRaw.length; i++) {
-                data.add(Match.parseFromString(matchesRaw[i]));
+            ArrayList<Match> data = new ArrayList<>();
+
+            for (String corpusName : corpora) {
+                String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, limitOffset.getOffset(),
+                        limitOffset.getLimit(), ordering);
+
+                for (int i = 0; i < matchesRaw.length; i++) {
+                    data.add(Match.parseFromString(matchesRaw[i]));
+                }
             }
             return data;
         });
@@ -630,19 +634,22 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         ResultOrder ordering = convertOrder(limitOffset.getOrder());
 
         Future<Boolean> result = exec.submit(() -> {
-            String[] matchesRaw = corpusStorageMgr.find(corpora, query, limitOffset.getOffset(), limitOffset.getLimit(),
-                    ordering, ql);
 
             try {
                 PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
 
-                for (int i = 0; i < matchesRaw.length; i++) {
-                    w.print(matchesRaw[i]);
-                    w.print("\n");
+                for (String corpusName : corpora) {
+                    String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, limitOffset.getOffset(),
+                            limitOffset.getLimit(), ordering);
 
-                    // flush after every 10th item
-                    if (i % 10 == 0) {
-                        w.flush();
+                    for (int i = 0; i < matchesRaw.length; i++) {
+                        w.print(matchesRaw[i]);
+                        w.print("\n");
+
+                        // flush after every 10th item
+                        if (i % 10 == 0) {
+                            w.flush();
+                        }
                     }
                 }
 

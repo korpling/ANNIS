@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.corpus_tools.graphannis.CorpusStorageManager;
+import org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage;
 import org.corpus_tools.graphannis.CorpusStorageManager.ResultOrder;
 import org.corpus_tools.graphannis.GraphUpdate;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
@@ -204,7 +205,7 @@ public class SaltImportTest {
 
         Set<String> matches = new HashSet<>();
 
-        String[] result = storage.find(Arrays.asList("root"), "tok", 0, Long.MAX_VALUE,
+        String[] result = storage.find("root", "tok", QueryLanguage.AQL, 0, Long.MAX_VALUE,
                 ResultOrder.Normal);
         assertEquals(2, result.length);
         for (int i = 0; i < 2; i++) {
