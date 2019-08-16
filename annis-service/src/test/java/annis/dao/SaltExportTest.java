@@ -27,6 +27,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamException;
 
 import org.corpus_tools.graphannis.CorpusStorageManager;
+import org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage;
 import org.corpus_tools.graphannis.GraphUpdate;
 import org.corpus_tools.graphannis.LogLevel;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
@@ -99,7 +100,7 @@ public class SaltExportTest {
 
 		storage.applyUpdate("testCorpus", result);
 
-		assertEquals(26, storage.count(Arrays.asList("testCorpus"), "node"));
+		assertEquals(26, storage.count("testCorpus", "node", QueryLanguage.AQL));
 
 		SToken sampleTok = doc.getDocumentGraph().getTokens().get(2);
 
@@ -160,7 +161,7 @@ public class SaltExportTest {
 
 		storage.applyUpdate("testCorpus", result);
 
-		assertEquals(26, storage.count(Arrays.asList("testCorpus"), "node"));
+		assertEquals(26, storage.count("testCorpus", "node", QueryLanguage.AQL));
 
 		// get a subgraph for the complete document
 		SDocumentGraph exportedGraph = SaltExport.map(storage.subcorpusGraph("testCorpus", Arrays.asList(doc.getId())));
