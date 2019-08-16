@@ -54,147 +54,147 @@ import com.google.common.io.Files;
  * @author thomas
  */
 public class SaltExportTest {
-	private CorpusStorageManager storage;
+    private CorpusStorageManager storage;
 
-	public SaltExportTest() {
-	}
+    public SaltExportTest() {
+    }
 
-	@BeforeClass
-	public static void setUpClass() {
-	}
+    @BeforeClass
+    public static void setUpClass() {
+    }
 
-	@AfterClass
-	public static void tearDownClass() {
-	}
+    @AfterClass
+    public static void tearDownClass() {
+    }
 
-	@Before
-	public void setUp() throws GraphANNISException {
-		File tmpDir = Files.createTempDir();
+    @Before
+    public void setUp() throws GraphANNISException {
+        File tmpDir = Files.createTempDir();
 
-		File logfile = new File(tmpDir, "graphannis.log");
-		System.out.println("logging to " + logfile.getAbsolutePath());
-		storage = new CorpusStorageManager(tmpDir.getAbsolutePath(), logfile.getAbsolutePath(), false, LogLevel.Trace);
-	}
+        File logfile = new File(tmpDir, "graphannis.log");
+        System.out.println("logging to " + logfile.getAbsolutePath());
+        storage = new CorpusStorageManager(tmpDir.getAbsolutePath(), logfile.getAbsolutePath(), LogLevel.Trace, false);
+    }
 
-	@After
-	public void tearDown() {
-	}
+    @After
+    public void tearDown() {
+    }
 
-	@Test
-	public void testMapComplexExample() throws IOException, XMLStreamException, GraphANNISException {
+    @Test
+    public void testMapComplexExample() throws IOException, XMLStreamException, GraphANNISException {
 
-		SDocument doc = SaltFactory.createSDocument();
+        SDocument doc = SaltFactory.createSDocument();
 
-		SampleGenerator.createTokens(doc);
-		SampleGenerator.createMorphologyAnnotations(doc);
-		SampleGenerator.createInformationStructureSpan(doc);
-		SampleGenerator.createInformationStructureAnnotations(doc);
-		SampleGenerator.createSyntaxStructure(doc);
-		SampleGenerator.createSyntaxAnnotations(doc);
-		SampleGenerator.createAnaphoricAnnotations(doc);
-		SampleGenerator.createDependencies(doc);
+        SampleGenerator.createTokens(doc);
+        SampleGenerator.createMorphologyAnnotations(doc);
+        SampleGenerator.createInformationStructureSpan(doc);
+        SampleGenerator.createInformationStructureAnnotations(doc);
+        SampleGenerator.createSyntaxStructure(doc);
+        SampleGenerator.createSyntaxAnnotations(doc);
+        SampleGenerator.createAnaphoricAnnotations(doc);
+        SampleGenerator.createDependencies(doc);
 
-		assertEquals(27, doc.getDocumentGraph().getNodes().size());
+        assertEquals(27, doc.getDocumentGraph().getNodes().size());
 
-		GraphUpdate result = new SaltImport().map(doc.getDocumentGraph()).finish();
+        GraphUpdate result = new SaltImport().map(doc.getDocumentGraph()).finish();
 
-		storage.applyUpdate("testCorpus", result);
+        storage.applyUpdate("testCorpus", result);
 
-		assertEquals(26, storage.count("testCorpus", "node", QueryLanguage.AQL));
+        assertEquals(26, storage.count("testCorpus", "node", QueryLanguage.AQL));
 
-		SToken sampleTok = doc.getDocumentGraph().getTokens().get(2);
+        SToken sampleTok = doc.getDocumentGraph().getTokens().get(2);
 
-		// get a subgraph for the complete document
-		SDocumentGraph exportedGraph = SaltExport
-				.map(storage.subgraph("testCorpus", Arrays.asList(sampleTok.getId()), 100, 100));
+        // get a subgraph for the complete document
+        SDocumentGraph exportedGraph = SaltExport
+                .map(storage.subgraph("testCorpus", Arrays.asList(sampleTok.getId()), 100, 100));
 
-		ValidationResult validResult = SaltUtil.validate(exportedGraph).andFindInvalidities();
-		assertTrue("Invalid graph detected:\n" + validResult.toString(), validResult.isValid());
+        ValidationResult validResult = SaltUtil.validate(exportedGraph).andFindInvalidities();
+        assertTrue("Invalid graph detected:\n" + validResult.toString(), validResult.isValid());
 
-		assertEquals(doc.getDocumentGraph().getNodes().size(), exportedGraph.getNodes().size());
-		assertEquals(doc.getDocumentGraph().getTokens().size(), exportedGraph.getTokens().size());
+        assertEquals(doc.getDocumentGraph().getNodes().size(), exportedGraph.getNodes().size());
+        assertEquals(doc.getDocumentGraph().getTokens().size(), exportedGraph.getTokens().size());
 
-		List<SToken> sortedTokenOrig = doc.getDocumentGraph().getSortedTokenByText();
-		List<SToken> sortedTokenSubgraph = exportedGraph.getSortedTokenByText();
+        List<SToken> sortedTokenOrig = doc.getDocumentGraph().getSortedTokenByText();
+        List<SToken> sortedTokenSubgraph = exportedGraph.getSortedTokenByText();
 
-		for (int i = 0; i < sortedTokenOrig.size(); i++) {
-			assertEquals(doc.getDocumentGraph().getText(sortedTokenOrig.get(i)),
-					exportedGraph.getText(sortedTokenSubgraph.get(i)));
-		}
+        for (int i = 0; i < sortedTokenOrig.size(); i++) {
+            assertEquals(doc.getDocumentGraph().getText(sortedTokenOrig.get(i)),
+                    exportedGraph.getText(sortedTokenSubgraph.get(i)));
+        }
 
-		assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SSPANNING_RELATION).size(),
-				exportedGraph.getRelations(SALT_TYPE.SSPANNING_RELATION).size());
-		assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SPOINTING_RELATION).size(),
-				exportedGraph.getRelations(SALT_TYPE.SPOINTING_RELATION).size());
-		assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SDOMINANCE_RELATION).size(),
-				exportedGraph.getRelations(SALT_TYPE.SDOMINANCE_RELATION).size());
+        assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SSPANNING_RELATION).size(),
+                exportedGraph.getRelations(SALT_TYPE.SSPANNING_RELATION).size());
+        assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SPOINTING_RELATION).size(),
+                exportedGraph.getRelations(SALT_TYPE.SPOINTING_RELATION).size());
+        assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SDOMINANCE_RELATION).size(),
+                exportedGraph.getRelations(SALT_TYPE.SDOMINANCE_RELATION).size());
 
-		int numOfOrderRels = exportedGraph.getRelations(SALT_TYPE.SORDER_RELATION).size();
+        int numOfOrderRels = exportedGraph.getRelations(SALT_TYPE.SORDER_RELATION).size();
 
-		assertEquals(doc.getDocumentGraph().getRelations().size(),
-				exportedGraph.getRelations().size() - numOfOrderRels);
+        assertEquals(doc.getDocumentGraph().getRelations().size(),
+                exportedGraph.getRelations().size() - numOfOrderRels);
 
-		// TODO: actual diff
-	}
+        // TODO: actual diff
+    }
 
-	@Test
-	public void testMapComplexExampleDoc() throws IOException, XMLStreamException, GraphANNISException {
+    @Test
+    public void testMapComplexExampleDoc() throws IOException, XMLStreamException, GraphANNISException {
 
-		SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
+        SCorpusGraph corpusGraph = SaltFactory.createSCorpusGraph();
 
-		SCorpus topCorpus = corpusGraph.createCorpus(null, "testMapComplexExampleDoc");
-		SCorpus subCorpus = corpusGraph.createCorpus(topCorpus, "subcorpus");
-		SDocument doc = corpusGraph.createDocument(subCorpus, "TestDoc");
+        SCorpus topCorpus = corpusGraph.createCorpus(null, "testMapComplexExampleDoc");
+        SCorpus subCorpus = corpusGraph.createCorpus(topCorpus, "subcorpus");
+        SDocument doc = corpusGraph.createDocument(subCorpus, "TestDoc");
 
-		SampleGenerator.createTokens(doc);
-		SampleGenerator.createMorphologyAnnotations(doc);
-		SampleGenerator.createInformationStructureSpan(doc);
-		SampleGenerator.createInformationStructureAnnotations(doc);
-		SampleGenerator.createSyntaxStructure(doc);
-		SampleGenerator.createSyntaxAnnotations(doc);
-		SampleGenerator.createAnaphoricAnnotations(doc);
-		SampleGenerator.createDependencies(doc);
+        SampleGenerator.createTokens(doc);
+        SampleGenerator.createMorphologyAnnotations(doc);
+        SampleGenerator.createInformationStructureSpan(doc);
+        SampleGenerator.createInformationStructureAnnotations(doc);
+        SampleGenerator.createSyntaxStructure(doc);
+        SampleGenerator.createSyntaxAnnotations(doc);
+        SampleGenerator.createAnaphoricAnnotations(doc);
+        SampleGenerator.createDependencies(doc);
 
-		assertEquals(27, doc.getDocumentGraph().getNodes().size());
+        assertEquals(27, doc.getDocumentGraph().getNodes().size());
 
-		GraphUpdate result = new SaltImport().map(doc.getDocumentGraph()).finish();
+        GraphUpdate result = new SaltImport().map(doc.getDocumentGraph()).finish();
 
-		storage.applyUpdate("testCorpus", result);
+        storage.applyUpdate("testCorpus", result);
 
-		assertEquals(26, storage.count("testCorpus", "node", QueryLanguage.AQL));
+        assertEquals(26, storage.count("testCorpus", "node", QueryLanguage.AQL));
 
-		// get a subgraph for the complete document
-		SDocumentGraph exportedGraph = SaltExport.map(storage.subcorpusGraph("testCorpus", Arrays.asList(doc.getId())));
+        // get a subgraph for the complete document
+        SDocumentGraph exportedGraph = SaltExport.map(storage.subcorpusGraph("testCorpus", Arrays.asList(doc.getId())));
 
-		assertNotNull(exportedGraph);
+        assertNotNull(exportedGraph);
 
-		ValidationResult validResult = SaltUtil.validate(exportedGraph).andFindInvalidities();
-		assertTrue("Invalid graph detected:\n" + validResult.toString(), validResult.isValid());
+        ValidationResult validResult = SaltUtil.validate(exportedGraph).andFindInvalidities();
+        assertTrue("Invalid graph detected:\n" + validResult.toString(), validResult.isValid());
 
-		assertEquals(doc.getDocumentGraph().getNodes().size(), exportedGraph.getNodes().size());
-		assertEquals(doc.getDocumentGraph().getTokens().size(), exportedGraph.getTokens().size());
+        assertEquals(doc.getDocumentGraph().getNodes().size(), exportedGraph.getNodes().size());
+        assertEquals(doc.getDocumentGraph().getTokens().size(), exportedGraph.getTokens().size());
 
-		List<SToken> sortedTokenOrig = doc.getDocumentGraph().getSortedTokenByText();
-		List<SToken> sortedTokenSubgraph = exportedGraph.getSortedTokenByText();
+        List<SToken> sortedTokenOrig = doc.getDocumentGraph().getSortedTokenByText();
+        List<SToken> sortedTokenSubgraph = exportedGraph.getSortedTokenByText();
 
-		for (int i = 0; i < sortedTokenOrig.size(); i++) {
-			assertEquals(doc.getDocumentGraph().getText(sortedTokenOrig.get(i)),
-					exportedGraph.getText(sortedTokenSubgraph.get(i)));
-		}
+        for (int i = 0; i < sortedTokenOrig.size(); i++) {
+            assertEquals(doc.getDocumentGraph().getText(sortedTokenOrig.get(i)),
+                    exportedGraph.getText(sortedTokenSubgraph.get(i)));
+        }
 
-		assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SSPANNING_RELATION).size(),
-				exportedGraph.getRelations(SALT_TYPE.SSPANNING_RELATION).size());
-		assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SPOINTING_RELATION).size(),
-				exportedGraph.getRelations(SALT_TYPE.SPOINTING_RELATION).size());
-		assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SDOMINANCE_RELATION).size(),
-				exportedGraph.getRelations(SALT_TYPE.SDOMINANCE_RELATION).size());
+        assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SSPANNING_RELATION).size(),
+                exportedGraph.getRelations(SALT_TYPE.SSPANNING_RELATION).size());
+        assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SPOINTING_RELATION).size(),
+                exportedGraph.getRelations(SALT_TYPE.SPOINTING_RELATION).size());
+        assertEquals(doc.getDocumentGraph().getRelations(SALT_TYPE.SDOMINANCE_RELATION).size(),
+                exportedGraph.getRelations(SALT_TYPE.SDOMINANCE_RELATION).size());
 
-		int numOfOrderRels = exportedGraph.getRelations(SALT_TYPE.SORDER_RELATION).size();
+        int numOfOrderRels = exportedGraph.getRelations(SALT_TYPE.SORDER_RELATION).size();
 
-		assertEquals(doc.getDocumentGraph().getRelations().size(),
-				exportedGraph.getRelations().size() - numOfOrderRels);
+        assertEquals(doc.getDocumentGraph().getRelations().size(),
+                exportedGraph.getRelations().size() - numOfOrderRels);
 
-		// TODO: actual diff
-	}
+        // TODO: actual diff
+    }
 
 }
