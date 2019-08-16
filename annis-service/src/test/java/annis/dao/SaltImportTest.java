@@ -95,63 +95,64 @@ public class SaltImportTest {
 
         storage.applyUpdate("testCorpus", result);
 
-        List<String> corpus = Arrays.asList("testCorpus");
+        String corpus = "testCorpus";
+        CorpusStorageManager.QueryLanguage ql = CorpusStorageManager.QueryLanguage.AQL;
 
-        assertEquals(26, storage.count(corpus, "node"));
+        assertEquals(26, storage.count(corpus, "node", ql));
 
         // test that the token are present and have the correct span values
-        assertEquals(11, storage.count(corpus, "tok"));
-        assertEquals(1, storage.count(corpus, "tok=\"Is\""));
-        assertEquals(1, storage.count(corpus, "tok=\"this\""));
-        assertEquals(1, storage.count(corpus, "tok=\"example\""));
-        assertEquals(1, storage.count(corpus, "tok=\"more\""));
-        assertEquals(1, storage.count(corpus, "tok=\"complicated\""));
-        assertEquals(1, storage.count(corpus, "tok=\"than\""));
-        assertEquals(1, storage.count(corpus, "tok=\"it\""));
-        assertEquals(1, storage.count(corpus, "tok=\"appears\""));
-        assertEquals(1, storage.count(corpus, "tok=\"to\""));
-        assertEquals(1, storage.count(corpus, "tok=\"be\""));
-        assertEquals(1, storage.count(corpus, "tok=\"?\""));
+        assertEquals(11, storage.count(corpus, "tok", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"Is\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"this\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"example\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"more\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"complicated\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"than\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"it\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"appears\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"to\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"be\"", ql));
+        assertEquals(1, storage.count(corpus, "tok=\"?\"", ql));
 
         // test that the token annotations have been added
-        assertEquals(1, storage.count(corpus, "pos=\"VBZ\" _=_ \"Is\""));
-        assertEquals(1, storage.count(corpus, "pos=\"DT\" _=_ \"this\""));
-        assertEquals(1, storage.count(corpus, "pos=\"NN\" _=_ \"example\""));
-        assertEquals(1, storage.count(corpus, "pos=\"RBR\" _=_ \"more\""));
-        assertEquals(1, storage.count(corpus, "pos=\"JJ\" _=_ \"complicated\""));
-        assertEquals(1, storage.count(corpus, "pos=\"IN\" _=_ \"than\""));
-        assertEquals(1, storage.count(corpus, "pos=\"PRP\" _=_ \"it\""));
-        assertEquals(1, storage.count(corpus, "pos=\"VBZ\" _=_ \"appears\""));
-        assertEquals(1, storage.count(corpus, "pos=\"TO\" _=_ \"to\""));
-        assertEquals(1, storage.count(corpus, "pos=\"VB\" _=_ \"be\""));
-        assertEquals(1, storage.count(corpus, "pos=\".\" _=_ \"?\""));
+        assertEquals(1, storage.count(corpus, "pos=\"VBZ\" _=_ \"Is\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\"DT\" _=_ \"this\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\"NN\" _=_ \"example\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\"RBR\" _=_ \"more\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\"JJ\" _=_ \"complicated\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\"IN\" _=_ \"than\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\"PRP\" _=_ \"it\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\"VBZ\" _=_ \"appears\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\"TO\" _=_ \"to\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\"VB\" _=_ \"be\"", ql));
+        assertEquals(1, storage.count(corpus, "pos=\".\" _=_ \"?\"", ql));
 
         // test that the precedence works for the token
         assertEquals(1, storage.count(corpus, 
                 "\"Is\" . \"this\" . \"example\" . \"more\" . \"complicated\" . \"than\" . \"it\" . \"appears\" . "
-                        + "\"to\" . \"be\" . \"?\""));
+                        + "\"to\" . \"be\" . \"?\"", ql));
 
         // test that coverage works
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"contrast-focus\" _o_ \"Is\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"this\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"example\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"more\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"complicated\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"than\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"it\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"appears\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"to\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"be\""));
-        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"?\""));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"contrast-focus\" _o_ \"Is\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"this\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"example\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"more\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"complicated\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"than\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"it\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"appears\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"to\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"be\"", ql));
+        assertEquals(1, storage.count(corpus, "Inf-Struct=\"topic\" _o_ \"?\"", ql));
 
         // test some of the dominance edges
-        assertEquals(1, storage.count(corpus, "const=\"ROOT\" > const=\"SQ\" > \"Is\""));
-        assertEquals(1, storage.count(corpus, "const=\"SQ\" >* \"this\""));
+        assertEquals(1, storage.count(corpus, "const=\"ROOT\" > const=\"SQ\" > \"Is\"", ql));
+        assertEquals(1, storage.count(corpus, "const=\"SQ\" >* \"this\"", ql));
 
         // test some of the pointing relations
-        assertEquals(1, storage.count(corpus, "\"it\" ->anaphoric node _o_ \"example\""));
-        assertEquals(9, storage.count(corpus, "tok ->null tok"));
-        assertEquals(1, storage.count(corpus, "\"complicated\" ->null[dependency=\"cop\"] \"Is\""));
+        assertEquals(1, storage.count(corpus, "\"it\" ->anaphoric node _o_ \"example\"", ql));
+        assertEquals(9, storage.count(corpus, "tok ->null tok", ql));
+        assertEquals(1, storage.count(corpus, "\"complicated\" ->null[dependency=\"cop\"] \"Is\"", ql));
     }
 
     @Test
