@@ -870,7 +870,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                     AnnisAttribute att = new AnnisAttribute();
                     att.setType(Type.edge);
                     att.setEdgeName(c.getName());
-                    att.setSubtype(SubType.d);
+                    att.setSubtype(ctype == ComponentType.Dominance ? SubType.d : SubType.p);
 
                     result.add(att);
 
