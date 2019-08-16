@@ -759,8 +759,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         }
 
         for (String corpus : corpusList) {
-            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, query,
-                    freqQuery.toString(), ql);
+            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, query, ql,
+                    freqQuery.toString());
             if (freqTableForCorpus != null) {
                 for (FrequencyTableEntry<String> e : freqTableForCorpus) {
                     result.addEntry(new FrequencyTable.Entry(e.getTuple(), e.getCount()));
