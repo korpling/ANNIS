@@ -410,7 +410,7 @@
 
 				// add <p> with the node's ID (or ID range)
 				if (json.data.sentence_left != undefined && json.data.sentence_right != undefined) {
-					var eduRange = json.data.sentence
+					var eduRange = json.data.sentence && json.data.sentence_left == json.data.sentence_right
 						? json.data.sentence_left
 						: (json.data.sentence_left + " - " + json.data.sentence_right);
 					nodeIdElt.appendChild(document.createTextNode(eduRange));
