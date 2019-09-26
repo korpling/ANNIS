@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - RST document visualizer did not order token properly [#615](https://github.com/korpling/ANNIS/issues/615)
 - Actually retrieve `edge_name` attribute from database when fetching the corpus annotations  [#616](https://github.com/korpling/ANNIS/issues/616)
 - On import, assign correct sub-type `p` for pointing relations entries without annotation: **You need to re-import the corpora to get a correct example query in the corpus browser**.
+- Use context instead of whole location URI to resolve the iframe vis URL [#581](https://github.com/korpling/ANNIS/issues/581)
 
 ## [4.0.0-beta.2] - 2019-07-22
 
