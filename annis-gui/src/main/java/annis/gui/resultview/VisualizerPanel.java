@@ -275,8 +275,7 @@ public class VisualizerPanel extends CssLayout
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().
-      getAttribute("AnnisWebService.URL"));
+    input.setAnnisWebServiceURL(Helper.getServiceURL(VaadinSession.getCurrent()));
     input.setContextPath(Helper.getContext());
     input.setId(resultID);
 
