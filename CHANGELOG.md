@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - On import, assign correct sub-type `p` for pointing relations entries without annotation: **You need to re-import the corpora to get a correct example query in the corpus browser**.
 - Use context instead of whole location URI to resolve the iframe vis URL [#581](https://github.com/korpling/ANNIS/issues/581)
 - Login was failing since web service URL was not properly used in login request handler
+- ZIP-Import might fail because of large directory names
 
 ## [4.0.0-beta.2] - 2019-07-22
 
