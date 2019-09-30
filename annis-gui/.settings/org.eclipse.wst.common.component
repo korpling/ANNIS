@@ -5,17 +5,16 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/.apt_generated"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/.apt_generated_tests"/>
-        <dependent-module archiveName="annis-libgui-4.0.1-beta.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-libgui/annis-libgui">
+        <dependent-module archiveName="annis-libgui-4.0.0-beta.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-libgui/annis-libgui">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="annis-widgets-4.0.1-beta.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-widgets/annis-widgets">
+        <dependent-module archiveName="annis-widgets-4.0.0-beta.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-widgets/annis-widgets">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="annis-interfaces-4.0.1-beta.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-interfaces/annis-interfaces">
+        <dependent-module archiveName="annis-interfaces-4.0.0-beta.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-interfaces/annis-interfaces">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="annis-visualizers-4.0.1-beta.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-visualizers/annis-visualizers">
+        <dependent-module archiveName="annis-visualizers-4.0.0-beta.3-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/annis-visualizers/annis-visualizers">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="annis-gui"/>
