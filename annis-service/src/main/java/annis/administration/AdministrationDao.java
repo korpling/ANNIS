@@ -391,7 +391,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version)
             throws GraphANNISException {
 
-        log.info("importing corpus into graphANNIS");
+        log.info("importing corpus {} into graphANNIS", corpusName);
         getQueryDao().getCorpusStorageManager().importFromFileSystem(path, ImportFormat.RelANNIS, corpusName);
 
     }
