@@ -20,12 +20,15 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -118,7 +121,7 @@ public class CSVExporter extends BaseMatrixExporter
     if (matchNumber == 0)
     {
       // get list of metakeys to export
-      metakeys = new HashSet<>();
+      metakeys = new LinkedHashSet<>();
       if (args.containsKey("metakeys"))
       {
         metakeys.addAll(Arrays.asList(args.get("metakeys").split(",")));
@@ -214,13 +217,16 @@ public class CSVExporter extends BaseMatrixExporter
     if(!metakeys.isEmpty()) {
       // TODO is this the best way to get the corpus name?
       String corpus_name = CommonHelper.getCorpusPath(java.net.URI.create(graph.getDocument().getId())).get(0);
-      List<Annotation> asList = Helper.getMetaData(corpus_name, graph.getDocument().getName());
-      for(Annotation anno : asList)
-      {
-        if (metakeys.contains(anno.getName()))
+      Map<String, Annotation> allMetaAnnos = Helper.getMetaData(corpus_name, graph.getDocument().getName()).stream().collect(Collectors.toMap(Annotation::getName, Function.identity()));
+      
+      for(String metaName : metakeys) {
+      Annotation anno = allMetaAnnos.get(metaName);
+      if(anno == null) {
+          out.append("\t");
+      } else
           out.append("\t" + anno.getValue());
-      }
-    }
+          }
+      }   
 
     out.append("\n");
   }
