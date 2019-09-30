@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use context instead of whole location URI to resolve the iframe vis URL [#581](https://github.com/korpling/ANNIS/issues/581)
 - Login was failing since web service URL was not properly used in login request handler
 - ZIP-Import might fail because of large directory names
+- CSV export was had a mismatch between the order of the metadata keys in the header and in the column
 
 ## [4.0.0-beta.2] - 2019-07-22
 
