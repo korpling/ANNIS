@@ -256,7 +256,7 @@ public class Helper {
         return anonymousClient.get().asyncResource(uri);
     }
 
-    private static String getServiceURL(VaadinSession session) {
+    public static String getServiceURL(VaadinSession session) {
         if(session != null) {
             String overriddenByInit = session.getConfiguration().getInitParameters()
                     .getProperty("AnnisWebService.URL");;
