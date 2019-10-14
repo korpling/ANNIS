@@ -48,6 +48,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -210,9 +211,12 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             }
             matchedIDs.add(id.toASCIIString());
         }
-
+        Optional<String> segmentation = Optional.empty();
+        if(annoExt.getSegmentationLayer() != null && !annoExt.getSegmentationLayer().isEmpty()) {
+            segmentation = Optional.of(annoExt.getSegmentationLayer());
+        }
         SDocumentGraph result = SaltExport
-                .map(corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight()));
+                .map(corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight(), segmentation));
 
         return result;
     }
