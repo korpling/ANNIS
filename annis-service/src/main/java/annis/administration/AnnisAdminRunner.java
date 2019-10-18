@@ -49,6 +49,7 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -97,19 +98,19 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
     }
 
     @Override
-    public void run(String[] args) {
+    public void run(String[] args) throws InterruptedException {
 
         // print help if no argument is given
         if (args.length == 0) {
             usage(null);
         } else {
-    
+
             // first parameter is command
             String command = args[0];
-    
+
             // following parameters are arguments for the command
             List<String> commandArgs = Arrays.asList(args).subList(1, args.length);
-    
+
             if ("help".equals(command) || "--help".equals(command)) {
                 usage(null);
             } else if ("import".equals(command)) {
@@ -130,11 +131,16 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                 doCleanupData(commandArgs);
             } else if ("check-db-schema-version".equals(command)) {
                 doCheckDBSchemaVersion();
+            } else if ("dump".equals(command)) {
+                doDumpTable(commandArgs);
+            } else if ("restore".equals(command)) {
+                doRestoreTable(commandArgs);
             } else {
                 throw new UsageException("Unknown command: " + command);
+       
             }
         }
-
+        
         getQueryDao().shutdown();
     }
 
@@ -170,7 +176,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             return this;
         }
 
-        public OptionBuilder addToggle(String opt, String longOpt, boolean hasArg, String description) {
+        public OptionBuilder addToggle(String opt, String longOpt, String description) {
             options.addOption(opt, longOpt, false, description);
             return this;
         }
@@ -182,7 +188,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
     private void doImport(List<String> commandArgs) {
         Options options = new OptionBuilder()
-                .addToggle("o", "overwrite", false, "Overwrites a corpus, when it is already stored in the database.")
+                .addToggle("o", "overwrite", "Overwrites a corpus, when it is already stored in the database.")
                 .addParameter("m", "mail", "e-mail adress to where status updates should be send")
                 .addParameter("a", "alias", "an alias name for this corpus")
                 .addLongParameter("service-url",
@@ -233,7 +239,9 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
                         + "corpora from an older instance. "
                         + "Make sure that the ANNIS Service and this script run on the same machine (otherwise the paths are not valid.")
                 .addLongParameter("service-username", "Optional username when using the ANNIS service")
-                .addLongParameter("service-password", "Optional password when using the ANNIS service").createOptions();
+                .addLongParameter("service-password", "Optional password when using the ANNIS service").addToggle("s",
+                        "skip-existing", "Skip all existing UUIDs that already have been migrated to the new instance.")
+                .createOptions();
 
         try {
             CommandLineParser parser = new DefaultParser();
@@ -243,6 +251,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             if (urlShortenerFiles.isEmpty()) {
                 throw new ParseException("Where can I find the url shortener export files you want to migrate?");
             }
+
+            final boolean skipExisting = cmdLine.hasOption('s');
 
             String userName = cmdLine.getOptionValue("service-username");
             String password = cmdLine.getOptionValue("service-password");
@@ -255,8 +265,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
             Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
 
-            int totalNumberOfQueriess = corpusAdministration.migrateUrlShortener(urlShortenerFiles,
-                    cmdLine.getOptionValue("service-url"), userName, password, failedQueries);
+            int successfulQueries = corpusAdministration.migrateUrlShortener(urlShortenerFiles,
+                    cmdLine.getOptionValue("service-url"), userName, password, skipExisting, failedQueries);
             password = null;
 
             // output summary and detailed list of failed queries
@@ -267,12 +277,13 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             if (!unknownCorpusQueries.isEmpty()) {
                 Map<String, Integer> unknownCorpusCount = new TreeMap<>();
                 for (URLShortenerDefinition q : unknownCorpusQueries) {
-                    for (String c : q.getQuery().getCorpora()) {
+                    for (String c : q.getUnknownCorpora()) {
                         int oldCount = unknownCorpusCount.getOrDefault(c, 0);
                         unknownCorpusCount.put(c, oldCount + 1);
                     }
                 }
-                String unknownCorpusCaption = "Unknown corpus (sum: " + unknownCorpusCount.size() + ")";
+                String unknownCorpusCaption = "Unknown corpus (" + unknownCorpusCount.size() + " unknown corpora and "
+                        + unknownCorpusQueries.size() + " queries)";
                 System.out.println(unknownCorpusCaption);
                 System.out.println(Strings.repeat("=", unknownCorpusCaption.length()));
                 System.out.println();
@@ -286,10 +297,13 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUIDExists));
             printProblematicQueries("Count different", failedQueries.get(QueryStatus.CountDiffers));
             printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer));
+            printProblematicQueries("Timeout", failedQueries.get(QueryStatus.Timeout));
+            printProblematicQueries("Other server error", failedQueries.get(QueryStatus.ServerError));
+            printProblematicQueries("Empty corpus list", failedQueries.get(QueryStatus.EmptyCorpusList));
             printProblematicQueries("Failed", failedQueries.get(QueryStatus.Failed));
 
-            String summaryString = "+ Successful: " + (totalNumberOfQueriess - failedQueries.size()) + " from "
-                    + totalNumberOfQueriess + " +";
+            String summaryString = "+ Successful: " + successfulQueries + " from "
+                    + (successfulQueries + failedQueries.size()) + " +";
             System.out.println(Strings.repeat("+", summaryString.length()));
             System.out.println(summaryString);
             System.out.println(Strings.repeat("+", summaryString.length()));
@@ -308,10 +322,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             System.out.println();
 
             for (URLShortenerDefinition q : queries) {
-                System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
+                if (q.getQuery() != null && q.getQuery().getCorpora() != null) {
+                    System.out.println("Corpus: \"" + q.getQuery().getCorpora() + "\"");
+                }
                 System.out.println("UUID: \"" + q.getUuid() + "\"");
-                System.out.println("Query:");
-                System.out.println(q.getQuery().getQuery().trim());
+                if (q.getQuery() != null && q.getQuery().getQuery() != null) {
+                    System.out.println("Query:");
+                    System.out.println(q.getQuery().getQuery().trim());
+                }
                 if (q.getErrorMsg() != null) {
                     System.out.println("Error: " + q.getErrorMsg());
                 }
@@ -347,7 +365,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
 
         try {
 
-            CommandLineParser parser = new PosixParser();
+            CommandLineParser parser = new DefaultParser();
             CommandLine cmdLine = parser.parse(options, commandArgs.toArray(new String[commandArgs.size()]));
 
             if (cmdLine.getArgs().length < 2) {
@@ -435,6 +453,16 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             System.exit(1);
         }
 
+    }
+
+    public void doDumpTable(List<String> commandArgs) {
+        Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the output file as argument: annis-admin.sh dump <table> <file>");
+        corpusAdministration.dumpTable(commandArgs.get(0), new File(commandArgs.get(1)));
+    }
+
+    public void doRestoreTable(List<String> commandArgs) {
+        Preconditions.checkArgument(commandArgs.size() >= 2, "Need the table name and the input file as argument: annis-admin.sh restore <table> <file>");
+        corpusAdministration.restoreTable(commandArgs.get(0), new File(commandArgs.get(1)));
     }
 
     private void usage(String error) {

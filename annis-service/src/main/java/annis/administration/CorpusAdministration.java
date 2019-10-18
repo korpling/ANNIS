@@ -25,7 +25,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -35,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.ByteStreams;
 
@@ -69,6 +68,7 @@ import annis.dao.ShortenerDao;
 import annis.exceptions.AnnisException;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.ImportJob;
+import annis.tabledefs.Table;
 import annis.utils.ANNISFormatHelper;
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -162,7 +162,12 @@ public class CorpusAdministration {
 
                     // unzip and add all resulting corpora to import list
                     log.info("Unzipping " + f.getPath());
-                    File outDir = createZIPOutputDir(Joiner.on(", ").join(corpora.keySet()));
+                    String corpusNames = Joiner.on(", ").join(corpora.keySet());
+                    if(corpusNames.length() > 200) {
+                        // some systems don't handle large file names well
+                        corpusNames = corpusNames.substring(0, 200);
+                    }
+                    File outDir = createZIPOutputDir(corpusNames);
                     roots.addAll(unzipCorpus(outDir, zip));
 
                 } catch (ZipException ex) {
@@ -214,13 +219,13 @@ public class CorpusAdministration {
         return importStats;
     }
 
-    public int migrateUrlShortener(List<String> paths, String serviceURL,
-            String username, String password, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
+    public int migrateUrlShortener(List<String> paths, String serviceURL, String username, String password,
+            boolean skipExisting, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
         if (paths == null || serviceURL == null) {
             return 0;
         }
-        
-        int totalNumberOfQueries = 0;
+
+        int successfulQueries = 0;
 
         Client client = ClientBuilder.newClient();
         if (username != null && password != null) {
@@ -235,7 +240,6 @@ public class CorpusAdministration {
 
         WebTarget searchService = client.target(serviceURL).path("annis").path("query").path("search");
 
-        
         for (String p : paths) {
             File urlShortenerFile = new File(p);
             if (urlShortenerFile.isFile()) {
@@ -243,27 +247,41 @@ public class CorpusAdministration {
                     String[] line;
                     while ((line = csvReader.readNext()) != null) {
                         if (line.length == 4) {
-                            totalNumberOfQueries++;
-                            
+
                             // parse URL
                             try {
                                 URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
                                 if (q != null) {
                                     // check if all corpora exist in the new instance
-                                    List<String> corpusNames = new LinkedList<>(q.getQuery().getCorpora());
-                                    List<AnnisCorpus> corpora = getAdministrationDao().getQueryDao()
-                                            .listCorpora(corpusNames);
-                                    if (corpora.size() != corpusNames.size()) {
+                                    List<String> corpusNames = q.getQuery() == null || q.getQuery().getCorpora() == null
+                                            ? new LinkedList<>()
+                                            : new LinkedList<>(q.getQuery().getCorpora());
+                                    Set<String> knownCorpora = getAdministrationDao().getQueryDao()
+                                            .listCorpora(corpusNames).stream().map((c) -> c.getName())
+                                            .collect(Collectors.toSet());
+
+                                    for (String c : corpusNames) {
+                                        if (!knownCorpora.contains(c)) {
+                                            q.addUnknownCorpus(c);
+                                        }
+                                    }
+
+                                    if (!q.getUnknownCorpora().isEmpty()) {
                                         failedQueries.put(QueryStatus.UnknownCorpus, q);
                                     } else if (corpusNames.isEmpty()) {
+                                        q.setErrorMsg("Corpus name is empty");
                                         failedQueries.put(QueryStatus.Failed, q);
                                     } else if (getShortenerDao().unshorten(q.getUuid()) != null) {
-                                        failedQueries.put(QueryStatus.UUIDExists, q);
+                                        if (skipExisting) {
+                                            continue;
+                                        } else {
+                                            failedQueries.put(QueryStatus.UUIDExists, q);
+                                        }
                                     } else {
                                         // check the query
                                         try {
-                                            log.info("Testing query {} on corpus {}", q.getQuery().getQuery().trim(),
-                                                    q.getQuery().getCorpora());
+                                            log.info("UUID {}, testing query {} on corpus {}", q.getUuid(),
+                                                    q.getQuery().getQuery().trim(), q.getQuery().getCorpora());
                                             QueryStatus status = q.test(getAdministrationDao().getQueryDao(),
                                                     searchService);
 
@@ -280,22 +298,11 @@ public class CorpusAdministration {
                                                 // to the original URL when the issue is fixed in ANNIS.
                                                 try {
                                                     URI tempURI = new URIBuilder().setPath("/unsupported-query")
-                                                            .addParameter("url", q.getUri().toASCIIString())
-                                                            .build();
+                                                            .addParameter("url", q.getUri().toASCIIString()).build();
                                                     temporary = tempURI.toASCIIString();
                                                 } catch (URISyntaxException e) {
-                                                    log.error("Could not create proper URI for unsupported query",
-                                                            e);
+                                                    log.error("Could not create proper URI for unsupported query", e);
                                                 }
-                                            }
-                                            getShortenerDao().migrate(q.getUri().toASCIIString(), temporary,
-                                                    "anonymous", q.getUuid(),
-                                                    q.getCreationTime() == null ? new Date()
-                                                            : q.getCreationTime().toDate());
-
-                                        
-
-                                            if (status != QueryStatus.Ok) {
 
                                                 String lineSeparator = System.getProperty("line.separator");
 
@@ -310,8 +317,16 @@ public class CorpusAdministration {
 
                                                 log.warn(sb.toString());
                                             }
+                                            getShortenerDao().migrate(q.getUri().toASCIIString(), temporary,
+                                                    "anonymous", q.getUuid(), q.getCreationTime() == null ? new Date()
+                                                            : q.getCreationTime().toDate());
+
+                                            if (status == QueryStatus.Ok) {
+                                                successfulQueries++;
+                                            }
 
                                         } catch (GraphANNISException ex) {
+                                            q.setErrorMsg(ex.getMessage());
                                             failedQueries.put(QueryStatus.Failed, q);
                                         } catch (Throwable ex) {
                                             String lineSeparator = System.getProperty("line.separator");
@@ -323,23 +338,33 @@ public class CorpusAdministration {
                                             sb.append(q.getQuery().getQuery().trim() + lineSeparator);
                                             sb.append("Error Message: " + ex.getMessage());
 
+                                            q.setErrorMsg(ex.getMessage());
+
                                             log.warn(sb.toString(), ex);
                                             failedQueries.put(QueryStatus.Failed, q);
                                         }
                                     }
                                 }
-                            } catch (URISyntaxException ex) {
+                            } catch (Throwable ex) {
 
                                 String lineSeparator = System.getProperty("line.separator");
 
-                                StringBuilder sb = new StringBuilder();
-                                sb.append("Query Error: " + QueryStatus.Failed);
-                                sb.append("UUID: \"" + line[0] + "\"" + lineSeparator);
-                                sb.append("Error Message: " + ex.getMessage());
+                                String errorMsg = ex.getMessage();
+                                if (errorMsg == null) {
+                                    errorMsg = ex.getClass().toString();
+                                    ex.printStackTrace();
 
-                                failedQueries.put(QueryStatus.Failed,
-                                        new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]),
-                                                URLShortenerDefinition.parseCreationTime(line[2])));
+                                }
+
+                                StringBuilder sb = new StringBuilder();
+                                sb.append("Query Error: " + QueryStatus.Failed + lineSeparator);
+                                sb.append("UUID: \"" + line[0] + "\"" + lineSeparator);
+                                sb.append("Error Message: " + errorMsg);
+
+                                URLShortenerDefinition q = new URLShortenerDefinition(null,
+                                        URLShortenerDefinition.parseUUID(line[0]), null);
+                                q.setErrorMsg(errorMsg);
+                                failedQueries.put(QueryStatus.Failed, q);
 
                                 log.warn(sb.toString());
                             }
@@ -354,7 +379,7 @@ public class CorpusAdministration {
             }
         }
 
-        return totalNumberOfQueries;
+        return successfulQueries;
     }
 
     /**
@@ -659,6 +684,44 @@ public class CorpusAdministration {
     public ImportStatus importCorporaSave(boolean overwrite, String aliasName, String statusEmailAdress,
             boolean waitForOtherTasks, String... paths) {
         return importCorporaSave(overwrite, aliasName, statusEmailAdress, waitForOtherTasks, Arrays.asList(paths));
+    }
+
+    public void dumpTable(String tableName, File outputFile) {
+        Table table = null;
+        switch (tableName) {
+        case "url_shortener":
+            table = AdministrationDao.urlShortenerTable;
+            break;
+        case "user_config":
+            table = AdministrationDao.userConfigTable;
+            break;
+        }
+        if (table == null) {
+            log.info("Can't dump unknown table with name {}", tableName);
+            return;
+        } else {
+            log.info("Dumping table {} to file {}", tableName, outputFile);
+            administrationDao.dumpServiceDataTable(table, outputFile);
+        }
+    }
+
+    public void restoreTable(String tableName, File inputFile) {
+        Table table = null;
+        switch (tableName) {
+        case "url_shortener":
+            table = AdministrationDao.urlShortenerTable;
+            break;
+        case "user_config":
+            table = AdministrationDao.userConfigTable;
+            break;
+        }
+        if (table == null) {
+            log.info("Can't restore unknown table with name {}", tableName);
+            return;
+        } else {
+            log.info("Restoring table {} from file {}", tableName, inputFile);
+            administrationDao.restoreServiceDataTable(table, inputFile);
+        }
     }
 
     ///// Helper

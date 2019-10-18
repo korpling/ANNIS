@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -45,6 +46,7 @@ import annis.dao.QueryDao;
 import annis.exceptions.AnnisTimeoutException;
 import annis.model.DisplayedResultQuery;
 import annis.model.Query;
+import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.QueryLanguage;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
@@ -57,6 +59,7 @@ public class URLShortenerDefinition {
     private DisplayedResultQuery query;
     private UUID uuid;
     private DateTime creationTime;
+    private Set<String> unknownCorpora = new LinkedHashSet<>();
 
     private String errorMsg;
 
@@ -79,7 +82,8 @@ public class URLShortenerDefinition {
     public static DateTime parseCreationTime(String creationTime) {
 
         DateTimeParser[] parsers = { DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ").getParser(),
-                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ").getParser(), };
+                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ").getParser(), 
+                DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").getParser()};
 
         DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().append(null, parsers).toFormatter();
         return dateFormatter.parseDateTime(creationTime);
@@ -115,6 +119,7 @@ public class URLShortenerDefinition {
         String corporaRaw = args.get("c");
         if (corporaRaw != null) {
             Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
+            corpora.remove("");
 
             return QueryGenerator.displayed().left(Integer.parseInt(args.get("cl")))
                     .right(Integer.parseInt(args.get("cr"))).offset(Integer.parseInt(args.get("s")))
@@ -148,6 +153,10 @@ public class URLShortenerDefinition {
     public String getErrorMsg() {
         return errorMsg;
     }
+    
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
 
     public UUID getUuid() {
         return uuid;
@@ -160,6 +169,14 @@ public class URLShortenerDefinition {
     public DateTime getCreationTime() {
         return creationTime;
     }
+    
+    public Set<String> getUnknownCorpora() {
+        return unknownCorpora;
+    }
+    
+    public void addUnknownCorpus(String corpus) {
+        unknownCorpora.add(corpus);
+    }
 
     public static int MAX_RETRY = 5;
 
@@ -170,8 +187,7 @@ public class URLShortenerDefinition {
                 Joiner.on(",").join(query.getCorpora()));
 
         File matchesGraphANNISFile = File.createTempFile("annis-migrate-url-shortener-graphannis", ".txt");
-        matchesGraphANNISFile.deleteOnExit();
-
+        
         // write all graphANNIS matches to temporary file
         try (BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(matchesGraphANNISFile))) {
             queryDao.find(query.getQuery(), query.getQueryLanguage(), new LinkedList<>(query.getCorpora()),
@@ -189,8 +205,11 @@ public class URLShortenerDefinition {
             String m2;
             while ((m1 = matchesGraphANNIS.readLine()) != null && (m2 = matchesLegacy.readLine()) != null) {
                 matchNr++;
+                
+                Match parsed_m1 = Match.parseFromString(m1);
+                Match parsed_m2 = Match.parseFromString(m2);
 
-                if (!m1.equals(m2)) {
+                if (!Objects.equals(parsed_m1, parsed_m2)) {
                     this.errorMsg = "Match " + matchNr + " (should be)" + System.lineSeparator() + m2
                             + System.lineSeparator() + "(but was)" + System.lineSeparator() + m1;
                     return QueryStatus.MatchesDiffer;
@@ -209,7 +228,7 @@ public class URLShortenerDefinition {
 
         if (this.query.getCorpora().isEmpty()) {
             this.errorMsg = "Empty corpus list";
-            return QueryStatus.Failed;
+            return QueryStatus.EmptyCorpusList;
         }
 
         // check count first (also warmup for the corpus)
@@ -222,7 +241,7 @@ public class URLShortenerDefinition {
             countGraphANNIS = 0;
         } catch (AnnisTimeoutException ex) {
             this.errorMsg = "Timeout in graphANNIS";
-            return QueryStatus.Failed;
+            return QueryStatus.Timeout;
         }
 
         try {
@@ -240,7 +259,7 @@ public class URLShortenerDefinition {
                     } catch (ServerErrorException ex) {
                         if (tries >= MAX_RETRY - 1) {
                             this.errorMsg = ex.getMessage();
-                            return QueryStatus.Failed;
+                            return QueryStatus.ServerError;
                         } else {
                             log.warn("Server error when executing query {}", query.getQuery(), ex);
                         }
@@ -259,11 +278,6 @@ public class URLShortenerDefinition {
                 status = QueryStatus.Ok;
             } else {
                 status = testFind(queryDao, annisSearchService);
-                if (status == QueryStatus.Failed) {
-                    // don't try quirks mode when failed
-                    return status;
-                }
-
             }
 
             if (status != QueryStatus.Ok && this.query.getQueryLanguage() == QueryLanguage.AQL) {
@@ -279,15 +293,18 @@ public class URLShortenerDefinition {
                     this.errorMsg = "Rewrite in quirks mode necessary";
                     status = QueryStatus.Ok;
                 } else {
+                    status = quirksStatus;
                     this.errorMsg = quirksQuery.getErrorMsg();
                 }
             }
 
             return status;
-
-        } catch (ForbiddenException | AnnisTimeoutException | IOException ex) {
+        } catch (AnnisTimeoutException ex) {
             this.errorMsg = ex.toString();
-            return QueryStatus.Failed;
+            return QueryStatus.Timeout;
+        } catch (ForbiddenException | IOException ex) {
+            this.errorMsg = ex.toString();
+            return QueryStatus.ServerError;
         }
     }
 }

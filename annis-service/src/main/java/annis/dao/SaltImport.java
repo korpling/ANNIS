@@ -43,7 +43,7 @@ import com.google.common.base.Joiner;
 /**
  * A class which helps to import salt documents into graphANNIS.
  *
- * @author Thomas Krause <thomaskrause@posteo.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class SaltImport {
 

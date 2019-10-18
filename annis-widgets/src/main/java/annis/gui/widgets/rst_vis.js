@@ -12,7 +12,9 @@
 		 * http://killdream.github.com/blog/2011/10/understanding-javascript-oop
 		 */
 		// Aliases for the rather verbose methods on ES5
-		var descriptor = Object.getOwnPropertyDescriptor, properties = Object.getOwnPropertyNames, define_prop = Object.defineProperty
+		var descriptor = Object.getOwnPropertyDescriptor;
+		var properties = Object.getOwnPropertyNames;
+		var define_prop = Object.defineProperty;
 
 		// (target:Object, source:Object) → Object
 		// Copies properties from `source' to `target'
@@ -167,6 +169,119 @@
 			conf.containerElement = container;
 		}
 
+
+		/**
+		 * Add a <style> element to the document head for styling elements used
+		 * in the visualization of signals.
+		 *
+		 * @param conf
+		 *            holds the config of the rst-visualization
+		 *
+		 */
+		function injectStyles(conf) {
+			var head = document.head;
+			var style = document.createElement('style');
+
+			var css = ( ".rst-node-id {"
+					  + "  color: " + conf.nodeLabelColor + ";"
+					  + "  position: relative;"
+					  + "  margin: 10px 0;"
+					  + "}"
+
+					  + ".rst-signal-list {"
+					  + "  opacity: 0;"
+					  + "  position: absolute;"
+					  + "  background: white;"
+					  + "  bottom: 4px;"
+					  + "  left: 0;"
+					  + "  width: 120px;"
+					  + "  list-style: none;"
+					  + "  padding: 0;"
+					  + "  box-shadow: 2px 2px 5px 2px #cccccc;"
+					  + "  font-style: normal;"
+					  + "  z-index: 1337;"
+					  + "}"
+
+					  + ".rst-signal-list-item {"
+					  + "  padding: 2px 0;"
+					  + "  border-bottom: 1px solid #cccccc;"
+					  + "  text-align: left;"
+					  + "  padding-left: 4px;"
+					  + "  color: black;"
+					  + "  background: white;"
+					  + "  transition-duration: 0.5s;"
+					  + "  transition-property: background;"
+					  + "  white-space: normal;"
+					  + "}"
+
+					  + ".rst-signal-list-item:last-child {"
+					  + "  border-bottom: none;"
+					  + "}"
+
+					  + ".rst-signal-list-item--highlighted {"
+					  + "  background-color: yellow;"
+					  + "}"
+
+					  + ".rst-relation {"
+					  + "  font-style: italic;"
+					  + "  text-align: center;"
+					  + "  position: absolute;"
+					  + "  display: block;"
+					  + "  white-space: nowrap;"
+					  + "}"
+
+					  + ".rst-relation:hover .rst-signal-list {"
+					  + "  opacity: 1;"
+					  + "  transition-duration: 0.3s;"
+					  + "  transition-delay: 0.5s;"
+					  + "  transition-property: opacity;"
+					  + "}"
+
+					  + ".badge {"
+					  + "  width: 11px;"
+					  + "  height: 11px;"
+					  + "  font-size: 9px;"
+					  + "  border: solid 1px;"
+					  + "  border-radius: 8px;"
+					  + "  padding: 0;"
+					  + "  margin: 0 0 0 0.5em;"
+					  + "  background-color: #f7f7f7;"
+					  + "  color: black;"
+					  + "  display: inline-block;"
+					  + "  font-style: normal;"
+					  + "  text-align: center;"
+					  + "}"
+
+					  + ".badge--highlighted {"
+					  + "  background-color: yellow !important;"
+					  + "}"
+
+					  + ".rst-relation:hover .badge {"
+					  + "  background-color: rgba(255, 255, 0);"
+					  + "  transition-duration: 0.3s;"
+					  + "  transition-delay: 0.5s;"
+					  + "  transition-property: background-color;"
+					  + "}"
+
+					  + ".rst-token--highlighted {"
+					  + "  background-color: yellow !important;"
+					  + "}"
+
+					  + ".rst-token--semi-highlighted {"
+					  + "  background-color: rgba(255, 255, 0, 0.2);"
+					  + "}"
+
+					  + ".show-all-tokens {"
+					  + "  position: absolute;"
+					  + "  top: 10px;"
+					  + "  right: 10px;"
+					  + "}"
+					  );
+			style.innerHTML = css;
+
+			head.appendChild(style);
+		}
+
 		/**
 		 * This layouts the tree. It's based on a Depth-First algorithm and takes
 		 * advantage of that this always reaches the leafs first. Leafs are always
@@ -283,26 +398,40 @@
 			var canvas = conf.canvas;
 			var nodes = conf.nodes;
 
+			// for every node, create a div absolutely positioned over the canvas sketch
+			// that displays its ID and a list of any signals associated with it on hover
 			for (var node in nodes) {
 				var json = nodes[node];
-				var elem = document.createElement("div");
-				container.appendChild(elem);
+				var nodeElt = document.createElement("div");
+				var nodeIdElt = document.createElement("div");
+				nodeIdElt.classList.add("rst-node-id");
+				nodeElt.appendChild(nodeIdElt);
+				container.appendChild(nodeElt);
 
+				// add <p> with the node's ID (or ID range)
 				if (json.data.sentence_left != undefined && json.data.sentence_right != undefined) {
-					elem.innerHTML = "<p style='color :" + conf.nodeLabelColor + ";'>" + (json.data.sentence_left + " - " + json.data.sentence_right) + "</p>";
+					var eduRange = json.data.sentence && json.data.sentence_left == json.data.sentence_right
+						? json.data.sentence_left
+						: (json.data.sentence_left + " - " + json.data.sentence_right);
+					nodeIdElt.appendChild(document.createTextNode(eduRange));
 				}
 
-				elem.innerHTML += (json.data.sentence != undefined) ? json.data.sentence : "";
+				// add the sentence, if it exists
+				var sentenceSpan = document.createElement("span");
+				sentenceSpan.innerHTML = (json.data.sentence != undefined) ? json.data.sentence : "";
+				nodeElt.appendChild(sentenceSpan);
 
-				elem.style.position = "absolute";
-				elem.style.top = json.pos.y + "px";
-				elem.style.left = json.pos.x + "px";
-				elem.style.textAlign = "center";
-				elem.style.fontSize = conf.labelSize + "px";
-				elem.style.width = conf.nodeWidth + "px";
+				// set the div's label
+				nodeElt.style.position = "absolute";
+				nodeElt.style.top = json.pos.y + "px";
+				nodeElt.style.left = json.pos.x + "px";
+				nodeElt.style.textAlign = "center";
+				nodeElt.style.fontSize = conf.labelSize + "px";
+				nodeElt.style.width = conf.nodeWidth + "px";
 
-				// get the deepest one, it's hacky
-				var top = elem.clientHeight + elem.offsetTop;
+				// extend the height of the container and canvas
+				// if the node just placed lies beyond it
+				var top = nodeElt.clientHeight + nodeElt.offsetTop;
 				if (top > container.clientHeight) {
 					container.style.height = top + 5 + "px";
 					container.setAttribute("height", top +"px");
@@ -312,14 +441,195 @@
 		}
 
 		/**
+		 * A small circular icon that indicates how many signals are associated with a particular relation.
+		 * @param {signals}
+		 *            the list of signals associated with this node
+		 */
+		function createSignalBadge(signals) {
+			var badge = document.createElement("div");
+			badge.classList.add("badge");
+			badge.innerText = signals.length;
+			return badge;
+		}
+
+		/**
+		 * A hovering list that appears when a relation is hovered over. Items represent individual signals and
+		 * can be clicked.
+		 *
+		 * @param {conf}
+		 *            holds the config of rst visualization
+		 * @param {node}
+		 *            the JS object representing the node currently being drawn in plotNodes
+		 * @param {signals}
+		 *            the list of signals associated with this node
+		 * @param {badgeElt}
+		 *            a reference to the badge element
+		 * @param {tokenCount}
+		 *            an array mapping from token index to number of times a signal has highlighted it
+		 */
+		function createSignalList(conf, node, signals, badgeElt, tokenCount) {
+			var list = document.createElement("ul");
+			list.classList.add("rst-signal-list");
+
+			for (signal in signals) {
+				var signalElt = createSignalListItem(conf, node, signals[signal], badgeElt, tokenCount);
+				list.appendChild(signalElt);
+			}
+
+			return list;
+		}
+
+		/**
+		 * Represents an individual signal.
+		 *
+		 * @param {conf}
+		 *            holds the config of rst visualization
+		 * @param {node}
+		 *            the JS object representing the node currently being drawn in plotNodes
+		 * @param {signal}
+		 *            a JS object representing an individual signal
+		 * @param {badgeElt}
+		 *            a reference to the badge element
+		 * @param {tokenCount}
+		 *            an array mapping from token index to number of times a signal has highlighted it
+		 */
+		function createSignalListItem(conf, node, signal, badgeElt, tokenCount) {
+			var elt = document.createElement("li");
+			elt.classList.add("rst-signal-list-item");
+			elt.innerHTML = signal.type + ", " + signal.subtype;
+
+			elt.addEventListener("click", function() {
+				var tokens = conf.containerElement.querySelectorAll("span.rst-token");
+				var indexes = signal.indexes;
+				var i;
+				var itemNotPreviouslySelected = elt.classList.toggle("rst-signal-list-item--highlighted");
+
+				// Ensure that the badge is yellow iff at least one signal item is selected
+				if (itemNotPreviouslySelected) {
+					badgeElt.classList.add("badge--highlighted");
+				} else if (elt.parentNode.querySelectorAll(".rst-signal-list-item--highlighted").length === 0) {
+					badgeElt.classList.remove("badge--highlighted");
+				}
+
+				// Need to be careful not to de-select a token if another signal was already selected that highlighted
+				// the same token. We keep track of how many times a token has been highlighted by a signal in the
+				// tokenCount array: when a signal highlights a token, the count for that token is increased by 1,
+				// and when a signal "unhighlights" a token, it is only unhighlighted if no other tokens have
+				// highlighted that token, i.e. if tokenCount[index] is 0.
+				for (i = 0; i < indexes.length; i++) {
+					var tokenListIndex = indexes[i] - 1;
+					var existingCount = tokenCount[tokenListIndex];
+					if (itemNotPreviouslySelected) {
+						tokenCount[tokenListIndex] = existingCount ? existingCount + 1 : 1;
+						tokens[tokenListIndex].classList.add("rst-token--highlighted");
+					} else {
+						tokenCount[tokenListIndex] -= 1;
+						if (tokenCount[tokenListIndex] === 0) {
+							tokens[tokenListIndex].classList.remove("rst-token--highlighted");
+						}
+					}
+				}
+			});
+
+			return elt;
+		}
+
+		/**
+		 * recursive helper that finds all signals
+		 *
+		 * @param {json}
+		 *            the JS object representing the entire RST data structure
+		 */
+		function findAllSignals(json) {
+			var signals = [];
+			if (!json) {
+				return signals;
+			}
+
+			if (json.data && json.data.signals) {
+				signals = signals.concat(json.data.signals);
+			}
+
+			if (json.children) {
+				for (var i = 0; i < json.children.length; i++) {
+				   signals = signals.concat(findAllSignals(json.children[i]));
+				}
+			}
+
+			return signals;
+		}
+
+
+		/**
+		 * Create a button that semi-highlights all tokens associated with a signal when pressed.
+		 *
+		 * @param {conf}
+		 *            holds the config of rst visualization
+		 * @param {tokenCount}
+		 *            an array mapping from token index to number of times a signal has highlighted it
+		 */
+		function createShowAllSignalsButton(conf, tokenCount) {
+			var signals = findAllSignals(conf.json);
+			if (signals.length === 0) {
+				return null;
+			}
+
+			var button = document.createElement("button");
+			button.classList.add("show-all-tokens");
+			var onText = "Hide Signal Tokens";
+			var offText  = "Show All Signal Tokens";
+			button.innerText = offText;
+
+			var tokens = conf.containerElement.querySelectorAll("span.rst-token");
+
+			// This button, when activated, adds a slight highlight to all tokens that are associated with at least one
+			// signal in the document. When it is deactivated, not only this slight highlight is removed, but all other
+			// signal-related state is also removed. This includes badge, signal list item, and token selections, as
+			// well as the state of tokenCount (see createSignalListItem).
+			button.addEventListener("click", function() {
+				if (button.innerText === offText) {
+					signals.forEach(function(signal) {
+						signal.indexes.forEach(function(i) {
+							tokens[i - 1].classList.add("rst-token--semi-highlighted");
+						});
+					});
+					button.innerText = onText;
+				} else {
+					var highlightedTokens = conf.containerElement.querySelectorAll("span.rst-token--semi-highlighted");
+					for (i = 0; i < highlightedTokens.length; i++) {
+						highlightedTokens[i].classList.remove("rst-token--semi-highlighted");
+						highlightedTokens[i].classList.remove("rst-token--highlighted");
+					}
+
+					var highlightedSignals = conf.containerElement.querySelectorAll(".rst-signal-list-item--highlighted");
+					for (i = 0; i < highlightedSignals.length; i++) {
+						highlightedSignals[i].classList.remove("rst-signal-list-item--highlighted");
+					}
+
+					var highlightedBadges = conf.containerElement.querySelectorAll(".badge--highlighted");
+					for (i = 0; i < highlightedSignals.length; i++) {
+						highlightedBadges[i].classList.remove("badge--highlighted");
+					}
+
+					tokenCount = [];
+					button.innerText = offText;
+				}
+			});
+			return button;
+		}
+
+		/**
 		 * Draws the edges.
 		 */
 		function plotEdges(config) {
 			buildAdjazenzArray(config.json, config.adj);
-			var nodes = config.nodes, adj = config.adj;
+			var nodes = config.nodes;
+			var adj = config.adj;
+			// keeps track of how many currently selected signals are highlighting a certain token
+			var tokenCount = [];
 
 			/**
-			 * This function draws all edges. It takes into account the blurr effect
+			 * This function draws all edges. It takes into account the blur effect
 			 * of canvas.
 			 */
 			config.context.translate(0.5, 0.5);
@@ -332,22 +642,33 @@
 
 				for (var e in adj[i]) {
 
-					var from = nodes[adj[i][e].from], to = nodes[adj[i][e].to], edgeType = adj[i][e].sType, annotation = adj[i][e].annotation;
+					var from = nodes[adj[i][e].from];
+					var to = nodes[adj[i][e].to];
+					var edgeType = adj[i][e].sType;
+					var annotation = adj[i][e].annotation;
 
 					if (edgeType === RST) {
 						drawBezierCurve(from, to, config);
-						plotRSTLabel(from, to, annotation, config);
+						plotRSTLabel(from, to, annotation, config, tokenCount);
 					}
 
 					if (edgeType === MULTINUC) {
 						drawVerticalLine(from, to, config);
-						plotMultinucLabel(from, annotation, config);
+						plotMultinucLabels(from, annotation, config, tokenCount);
 					}
 
 					if (edgeType === DOMINANCE) {
 						drawSpan(from, to, config);
 					}
 				}
+			}
+
+			var showSignalsButton = createShowAllSignalsButton(config, tokenCount);
+			if (showSignalsButton) {
+				// This is a little evil: we are relying on vaadin implementation facts to
+				// attach this button to a div that will keep it in place during scroll.
+				// If this button ever breaks in the future, look here.
+				document.getElementById(config.container).parentNode.parentNode.parentNode.appendChild(showSignalsButton);
 			}
 		}
 
@@ -421,7 +742,7 @@
 			config.context.stroke();
 		}
 
-		function plotMultinucLabel(source, annotation, config) {
+		function plotMultinucLabels(source, annotation, config, tokenCount) {
 			var key = source.id + "::" + annotation, multinucLabels = config.multinucLabels;
 
 			// check if this Label is already plotted
@@ -429,50 +750,66 @@
 				return;
 			}
 
-			var label = document.createElement("label");
-			multinucLabels[key] = label;
+			source.children.forEach(function (child) {
+				var label = document.createElement("label");
+				label.classList.add("rst-relation");
+				multinucLabels[key] = label;
+				config.containerElement.appendChild(label);
 
-			var firstChild = source.children[0], lastChild = source.children[source.children.length - 1];
+				label.innerHTML = annotation;
+				label.style.fontSize = config.labelSize + "px";
+				label.style.color = config.edgeLabelColor;
 
-			var fromX = firstChild.pos.x;
-			toX = lastChild.pos.x, config.containerElement.appendChild(label);
-			label.style.position = "absolute";
-			label.innerHTML = annotation;
-			label.style.fontSize = config.labelSize + "px";
-			label.style.fontStyle = "italic";
-			label.style.color = config.edgeLabelColor;
+				var labelPos = {
+					x : child.pos.x,
+					y : child.pos.y - 20
+				}
 
-			labelPos = {
-				x : ((fromX + toX) / 2) + config.nodeWidth / source.children.length - (label.offsetWidth / 2),
-				y : source.pos.y + config.subTreeOffset / 2
-			}
+				label.style.top = labelPos.y + "px";
+				label.style.left = labelPos.x + "px";
 
-			label.style.top = labelPos.y + "px";
-			label.style.left = labelPos.x + "px";
+				// add signal badge and list, if signals are present
+				var signals = child.data.signals;
+				if (signals && signals.length > 0) {
+					var signalBadge = createSignalBadge(signals);
+					var signalListElt = createSignalList(config, child, signals, signalBadge, tokenCount);
+					label.appendChild(signalListElt);
+					label.appendChild(signalBadge);
+				}
+			});
 		}
 
 		/**
 		 *
 		 */
-		function plotRSTLabel(source, target, annotation, config) {
-			var fromX = getTopCenter(config, source), toX = getTopCenter(config, target), from = source.pos, label = document.createElement("label");
+		function plotRSTLabel(source, target, annotation, config, tokenCount) {
+			var fromX = getTopCenter(config, source);
+			var toX = getTopCenter(config, target);
+			var from = source.pos;
+			var label = document.createElement("label");
+			label.classList.add("rst-relation");
 
 			config.containerElement.appendChild(label);
-			label.style.position = "absolute";
 			label.innerHTML = annotation;
 
-			controllPoint = {};
-			controllPoint.x = (source.pos.x + target.pos.x) / 2;
-			controllPoint.y = from.y - 2 * config.dim;
+			controlPoint = {};
+			controlPoint.x = (source.pos.x + target.pos.x) / 2;
+			controlPoint.y = from.y - 2 * config.dim;
 
-			label.style.top = controllPoint.y + "px";
-			label.style.left = controllPoint.x + "px";
-			label.style.fontStyle = "italic";
+			label.style.top = controlPoint.y + "px";
+			label.style.left = controlPoint.x + "px";
 			label.style.fontSize = config.labelSize + "px";
-			label.style.textAlign = "center";
 			label.style.width = label.clientWidth + "px";
-			label.style.display = "block";
 			label.style.color = config.edgeLabelColor;
+
+			// add signal badge and list, if signals are present
+			var signals = source.data.signals;
+			if (signals && signals.length > 0) {
+				var signalBadge = createSignalBadge(signals);
+				var signalListElt = createSignalList(config, target, signals, signalBadge, tokenCount);
+				label.appendChild(signalListElt);
+				label.appendChild(signalBadge);
+			}
 		}
 
 		var DOMINANCE = "edge";
@@ -509,12 +846,13 @@
 			};
 
 			/**
-			 * Calls the necassary functions to plot edges and to place labels.
+			 * Calls the necessary functions to plot edges and to place labels.
 			 */
 			this.init = function() {
 				layoutTree(this.config);
 				initWrapper(this.config);
 				initCanvas(this.config);
+				injectStyles(this.config);
 				plotNodes(this.config);
 				plotEdges(this.config);
 			}

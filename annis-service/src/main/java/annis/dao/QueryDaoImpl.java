@@ -48,6 +48,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -67,6 +68,7 @@ import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReversedLinesFileReader;
 import org.corpus_tools.graphannis.CorpusStorageManager;
+import org.corpus_tools.graphannis.CorpusStorageManager.CountResult;
 import org.corpus_tools.graphannis.CorpusStorageManager.ResultOrder;
 import org.corpus_tools.graphannis.LogLevel;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
@@ -92,9 +94,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.escape.Escaper;
 import com.google.common.io.ByteStreams;
-import com.google.common.net.UrlEscapers;
 
 import annis.CommonHelper;
 import annis.ServiceConfig;
@@ -143,19 +143,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     private final ExecutorService exec = Executors.newCachedThreadPool();
 
-    private final Escaper corpusNameEscaper = UrlEscapers.urlPathSegmentEscaper();
-
     private final Pattern validQNamePattern = Pattern.compile("[a-zA-Z_%][a-zA-Z0-9_\\-%:]*");
 
     @Override
     public SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt) throws GraphANNISException {
         SaltProject p = SaltFactory.createSaltProject();
 
-        SCorpusGraph corpusGraph = p.createCorpusGraph();
-
         if (matchGroup != null && annoExt != null) {
 
             for (Match m : matchGroup.getMatches()) {
+
+                // create a corpus graph for each match
+                SCorpusGraph corpusGraph = p.createCorpusGraph();
 
                 List<URI> certainDocumentIDs = new LinkedList<>();
                 List<URI> possibleCorpusIDs = new LinkedList<>();
@@ -168,14 +167,14 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                         certainDocumentIDs.add(id.trimFragment());
                     }
                 }
-                
+
                 for (URI id : certainDocumentIDs) {
-                    if(corpusGraph.getNode(id.toString()) == null) {
+                    if (corpusGraph.getNode(id.toString()) == null) {
                         corpusGraph.createDocument(id);
                     }
                 }
                 for (URI id : possibleCorpusIDs) {
-                    if(corpusGraph.getNode(id.toString()) == null) {
+                    if (corpusGraph.getNode(id.toString()) == null) {
                         corpusGraph.createCorpus(id);
                     }
                 }
@@ -187,7 +186,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                     // Fetch the document graph for the match and add it to the already created
                     // document node
                     SNode docRaw = corpusGraph.getNode(certainDocumentIDs.get(0).toString());
-                    if(docRaw instanceof SDocument) {
+                    if (docRaw instanceof SDocument) {
                         SDocument doc = (SDocument) docRaw;
                         SDocumentGraph docGraph = fetchDocumentWithContext(m, annoExt);
                         doc.setDocumentGraph(docGraph);
@@ -212,9 +211,12 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             }
             matchedIDs.add(id.toASCIIString());
         }
-
+        Optional<String> segmentation = Optional.empty();
+        if(annoExt.getSegmentationLayer() != null && !annoExt.getSegmentationLayer().isEmpty()) {
+            segmentation = Optional.of(annoExt.getSegmentationLayer());
+        }
         SDocumentGraph result = SaltExport
-                .map(corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight()));
+                .map(corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight(), segmentation));
 
         return result;
     }
@@ -406,14 +408,14 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         final File logfile = new File(this.getGraphANNISDir(), "graphannis.log");
 
         if (cfg.maxCorpusCacheSize() >= 0) {
-            // use the specific maximum size, convert frim MB into Bytes
+            // use the specific maximum size, convert from MB into Bytes
             long maxSize = cfg.maxCorpusCacheSize() * 1024 * 1024;
             this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
-                    logfile.getAbsolutePath(), maxSize, cfg.parallelQueryExecution(), LogLevel.Info);
+                    logfile.getAbsolutePath(), LogLevel.Info, cfg.parallelQueryExecution(), maxSize);
         } else {
             // use automatic mode
             this.corpusStorageMgr = new CorpusStorageManager(QueryDaoImpl.this.getGraphANNISDir().getAbsolutePath(),
-                    logfile.getAbsolutePath(), cfg.parallelQueryExecution(), LogLevel.Info);
+                    logfile.getAbsolutePath(), LogLevel.Info, cfg.parallelQueryExecution());
         }
         // initialize timeout with value from config (can be overwritten by API)
         this.timeout = cfg.timeout();
@@ -429,25 +431,27 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             new Thread(() -> {
                 while (graphannisLogfileWatcher != null) {
                     try {
-                        WatchKey wk = graphannisLogfileWatcher.take();
-                        for (WatchEvent<?> event : wk.pollEvents()) {
-                            if (event.context() instanceof Path) {
-                                Path changed = (Path) event.context();
-                                if (changed.toString().equals("graphannis.log")) {
-                                    // read the last line of the logfile and log it
-                                    try (ReversedLinesFileReader reader = new ReversedLinesFileReader(logfile, 4096,
-                                            StandardCharsets.UTF_8)) {
-                                        parseAndReportGraphANNISLogEntry(reader);
+                        WatchKey wk = graphannisLogfileWatcher.poll(5, TimeUnit.SECONDS);
+                        if (wk != null) {
+                            for (WatchEvent<?> event : wk.pollEvents()) {
+                                if (event.context() instanceof Path) {
+                                    Path changed = (Path) event.context();
+                                    if (changed.toString().equals("graphannis.log")) {
+                                        // read the last line of the logfile and log it
+                                        try (ReversedLinesFileReader reader = new ReversedLinesFileReader(logfile, 4096,
+                                                StandardCharsets.UTF_8)) {
+                                            parseAndReportGraphANNISLogEntry(reader);
+                                        }
                                     }
                                 }
                             }
+                            wk.reset();
                         }
-                        wk.reset();
                     } catch (ClosedWatchServiceException ex) {
-                        break;
+                        return;
                     } catch (InterruptedException | IOException ex) {
                         log.error("Error when reading graphANNIS logfile", ex);
-                        break;
+                        return;
                     }
                 }
             }).start();
@@ -501,8 +505,24 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public void shutdown() {
+    public void shutdown() throws InterruptedException {
+
+        // force all running jobs to stop
+        exec.awaitTermination(5, TimeUnit.SECONDS);
         exec.shutdownNow();
+
+        // manually unload all corpora from cache
+        if (corpusStorageMgr != null) {
+            try {
+                for (String corpus : corpusStorageMgr.list()) {
+                    corpusStorageMgr.unloadCorpus(corpus);
+                }
+            } catch (GraphANNISException e) {
+                log.warn("Error when unloading corpora from cache", e);
+            }
+        }
+
+        // stop watching the graphANNIS logfile
         try {
             if (graphannisLogfileWatcher != null) {
                 graphannisLogfileWatcher.close();
@@ -510,6 +530,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         } catch (IOException ex) {
             log.error("Could not close file system watch", ex);
         }
+
     }
 
     @Override
@@ -535,14 +556,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         }
     }
 
-    protected List<String> escapedCorpusNames(List<String> originalCorpusList) {
-        List<String> corpusList = new LinkedList<>();
-        for (String c : originalCorpusList) {
-            corpusList.add(corpusNameEscaper.escape(c));
-        }
-        return corpusList;
-    }
-
     public ResultOrder convertOrder(OrderType type) {
         switch (type) {
         case ascending:
@@ -558,7 +571,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         }
     }
 
-    public CorpusStorageManager.QueryLanguage convertQueryLanguage(QueryLanguage ql) {
+    public static CorpusStorageManager.QueryLanguage convertQueryLanguage(QueryLanguage ql) {
         switch (ql) {
         case AQL:
             return CorpusStorageManager.QueryLanguage.AQL;
@@ -570,11 +583,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public List<Match> find(String query, QueryLanguage queryLanguage, List<String> corpusList,
+    public List<Match> find(String query, QueryLanguage queryLanguage, List<String> corpora,
             LimitOffsetQueryData limitOffset) throws GraphANNISException {
 
-        Collections.sort(corpusList);
-        List<String> corpora = escapedCorpusNames(corpusList);
+        Collections.sort(corpora);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
 
@@ -583,12 +595,16 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         ResultOrder ordering = convertOrder(limitOffset.getOrder());
 
         Future<List<Match>> result = exec.submit(() -> {
-            String[] matchesRaw = corpusStorageMgr.find(corpora, query, limitOffset.getOffset(), limitOffset.getLimit(),
-                    ordering, ql);
 
-            ArrayList<Match> data = new ArrayList<>((int) matchesRaw.length);
-            for (int i = 0; i < matchesRaw.length; i++) {
-                data.add(Match.parseFromString(matchesRaw[i]));
+            ArrayList<Match> data = new ArrayList<>();
+
+            for (String corpusName : corpora) {
+                String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, limitOffset.getOffset(),
+                        limitOffset.getLimit(), ordering);
+
+                for (int i = 0; i < matchesRaw.length; i++) {
+                    data.add(Match.parseFromString(matchesRaw[i]));
+                }
             }
             return data;
         });
@@ -610,11 +626,10 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public boolean find(String query, QueryLanguage queryLanguage, List<String> corpusList,
+    public boolean find(String query, QueryLanguage queryLanguage, List<String> corpora,
             LimitOffsetQueryData limitOffset, final OutputStream out) throws GraphANNISException {
 
-        Collections.sort(corpusList);
-        List<String> corpora = escapedCorpusNames(corpusList);
+        Collections.sort(corpora);
 
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
 
@@ -623,19 +638,22 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         ResultOrder ordering = convertOrder(limitOffset.getOrder());
 
         Future<Boolean> result = exec.submit(() -> {
-            String[] matchesRaw = corpusStorageMgr.find(corpora, query, limitOffset.getOffset(), limitOffset.getLimit(),
-                    ordering, ql);
 
             try {
                 PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
 
-                for (int i = 0; i < matchesRaw.length; i++) {
-                    w.print(matchesRaw[i]);
-                    w.print("\n");
+                for (String corpusName : corpora) {
+                    String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, limitOffset.getOffset(),
+                            limitOffset.getLimit(), ordering);
 
-                    // flush after every 10th item
-                    if (i % 10 == 0) {
-                        w.flush();
+                    for (int i = 0; i < matchesRaw.length; i++) {
+                        w.print(matchesRaw[i]);
+                        w.print("\n");
+
+                        // flush after every 10th item
+                        if (i % 10 == 0) {
+                            w.flush();
+                        }
                     }
                 }
 
@@ -669,7 +687,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         Collections.sort(corpusList);
         Future<Integer> result = exec.submit(() -> {
-            return (int) corpusStorageMgr.count(escapedCorpusNames(corpusList), query, ql);
+            long total = 0l;
+            for (String corpusName : corpusList) {
+                total += corpusStorageMgr.count(corpusName, query, ql);
+            }
+            return (int) total;
         });
 
         try {
@@ -697,10 +719,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         Collections.sort(corpusList);
 
         Future<MatchAndDocumentCount> result = exec.submit(() -> {
-            CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(escapedCorpusNames(corpusList), query,
-                    ql);
 
-            return new MatchAndDocumentCount((int) data.matchCount, (int) data.documentCount);
+            CountResult total = new CountResult();
+            total.documentCount = 0;
+            total.matchCount = 0;
+
+            for (String corpusName : corpusList) {
+                CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(corpusName, query, ql);
+                total.documentCount += data.documentCount;
+                total.matchCount += data.matchCount;
+            }
+
+            return new MatchAndDocumentCount((int) total.matchCount, (int) total.documentCount);
         });
 
         try {
@@ -732,9 +762,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             return result;
         }
 
-        for (String corpus : escapedCorpusNames(corpusList)) {
-            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, query,
-                    freqQuery.toString(), ql);
+        for (String corpus : corpusList) {
+            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, query, ql,
+                    freqQuery.toString());
             if (freqTableForCorpus != null) {
                 for (FrequencyTableEntry<String> e : freqTableForCorpus) {
                     result.addEntry(new FrequencyTable.Entry(e.getTuple(), e.getCount()));
@@ -780,12 +810,16 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 List<org.corpus_tools.graphannis.model.Annotation> annoList = corpusStorageMgr
                         .listNodeAnnotations(corpusName, listValues, onlyMostFrequentValues);
                 for (org.corpus_tools.graphannis.model.Annotation anno : annoList) {
+                    String anno_name = anno.getKey().getName();
+                    if (anno_name == null || anno_name.isEmpty()) {
+                        anno_name = "_";
+                    }
                     if (!"annis".equals(anno.getKey().getNs())) {
                         String qname;
                         if (anno.getKey().getNs() == null || anno.getKey().getNs().isEmpty()) {
-                            qname = anno.getKey().getName();
+                            qname = anno_name;
                         } else {
-                            qname = anno.getKey().getNs() + ":" + anno.getKey().getName();
+                            qname = anno.getKey().getNs() + ":" + anno_name;
                         }
                         if (qname != null) {
                             Set<String> values = nodeAnnos.get(qname);
@@ -812,7 +846,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                         String query = e.getKey() + " _ident_ annis:node_type=\"corpus\"";
                         // check if the sub-type is a "normal" node or a meta-data annotation
                         try {
-                            if (corpusStorageMgr.count(Arrays.asList(corpusName), query) > 0) {
+                            if (corpusStorageMgr.count(corpusName, query, CorpusStorageManager.QueryLanguage.AQL) > 0) {
                                 isMeta = true;
                             }
                         } catch (GraphANNISException ex) {
@@ -840,7 +874,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                     AnnisAttribute att = new AnnisAttribute();
                     att.setType(Type.edge);
                     att.setEdgeName(c.getName());
-                    att.setSubtype(SubType.d);
+                    att.setSubtype(ctype == ComponentType.Dominance ? SubType.d : SubType.p);
 
                     result.add(att);
 
@@ -986,11 +1020,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             if (listRootCorpus) {
                 return getQueryRunner().query(conn,
-                        "SELECT * FROM metadata_cache WHERE corpus = ? AND (\"type\" = DOCUMENT OR path=?)",
+                        "SELECT * FROM metadata_cache WHERE corpus = ? AND (\"type\" = 'DOCUMENT' OR path=?)",
                         new MetadataCacheHelper(), toplevelCorpusName, toplevelCorpusName);
             } else {
                 return getQueryRunner().query(conn,
-                        "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = DOCUMENT",
+                        "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'DOCUMENT'",
                         new MetadataCacheHelper(), toplevelCorpusName);
             }
         } catch (SQLException ex) {
@@ -1003,7 +1037,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public List<Annotation> listCorpusAnnotations(String toplevelCorpusName) throws GraphANNISException {
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY, true)) {
             return getQueryRunner().query(conn,
-                    "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = CORPUS AND path=?",
+                    "SELECT * FROM metadata_cache WHERE corpus = ? AND \"type\" = 'CORPUS' AND path=?",
                     new MetadataCacheHelper(), toplevelCorpusName, toplevelCorpusName);
 
         } catch (SQLException ex) {

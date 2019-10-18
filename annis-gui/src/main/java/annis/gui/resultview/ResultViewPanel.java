@@ -83,7 +83,7 @@ import annis.service.objects.Match;
  * @author thomas
  */
 public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExtension.Callback {
-
+  
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
 
     public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";

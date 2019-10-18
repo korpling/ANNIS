@@ -20,12 +20,15 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -42,47 +45,39 @@ import annis.service.objects.SubgraphFilter;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- * A csv-exporter that will export the text of the underlying token
- * instead of the base text.
- * This is useful for getting text spans where the normal csv-exporter
- * doesn't work since there are multiple speakers or normalizations.
+ * A csv-exporter that will export the text of the underlying token instead of
+ * the base text. This is useful for getting text spans where the normal
+ * csv-exporter doesn't work since there are multiple speakers or
+ * normalizations.
  *
  * @author Fabian Barteld
  */
 @PluginImplementation
-public class CSVExporter extends SaltBasedExporter
-{
+public class CSVExporter extends BaseMatrixExporter {
   @Override
-  public String getHelpMessage()
-  {
-    return "The CSV MultiTok Exporter exports only the "
-      + "values of the elements searched for by the user, ignoring the context "
-      + "around search results. The values for all annotations of each of the "
-      + "found nodes is given in a comma-separated table (CSV). <br/><br/>"
-      + "This exporter will take more time than the normal CSV Exporter "
-      + "but it is able to export the underlying text for spans "
-      + "if the corpus contains multiple tokenizations. <br/><br/>"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>)";
+  public String getHelpMessage() {
+    return "The CSV Exporter exports only the "
+        + "values of the elements searched for by the user, ignoring the context " + "around search results. "
+        + "The values for all annotations of each of the "
+        + "found nodes is given in a comma-separated table (CSV). <br/><br/>" + "Parameters: <br/>"
+        + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+        + "<code>metakeys=title,documentname</code>)";
   }
 
   @Override
-  public SubgraphFilter getSubgraphFilter()
-  {
+  public SubgraphFilter getSubgraphFilter() {
     return SubgraphFilter.all;
   }
 
   @Override
-  public String getFileEnding()
-  {
+  public String getFileEnding() {
     return "csv";
   }
 
   private Set<String> metakeys;
-  private SortedMap<Integer,TreeSet<String>> annotationsForMatchedNodes;
+  private SortedMap<Integer, TreeSet<String>> annotationsForMatchedNodes;
 
-    /**
+  /**
    * Takes a match and returns the matched nodes.
    *
    * @param graph
@@ -94,9 +89,9 @@ public class CSVExporter extends SaltBasedExporter
 
     Set<SNode> matchedNodes = new HashSet<>();
 
-    for (SNode node: graph.getNodes()) {
-       if (node.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE) != null)
-         matchedNodes.add(node);
+    for (SNode node : graph.getNodes()) {
+      if (node.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE) != null)
+        matchedNodes.add(node);
     }
 
     return matchedNodes;
@@ -115,30 +110,26 @@ public class CSVExporter extends SaltBasedExporter
    *
    */
   @Override
-  public void createAdjacencyMatrix(SDocumentGraph graph,
-    Map<String, String> args, int matchNumber, int nodeCount) throws IOException, IllegalArgumentException
-  {
+  public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args, int matchNumber, int nodeCount)
+      throws IOException, IllegalArgumentException {
     // first match
-    if (matchNumber == 0)
-    {
+    if (matchNumber == 0) {
       // get list of metakeys to export
-      metakeys = new HashSet<>();
-      if (args.containsKey("metakeys"))
-      {
+      metakeys = new LinkedHashSet<>();
+      if (args.containsKey("metakeys")) {
         metakeys.addAll(Arrays.asList(args.get("metakeys").split(",")));
       }
       // initialize list of annotations for the matched nodes
       annotationsForMatchedNodes = new TreeMap<>();
     }
-    for (SNode node: this.getMatchedNodes(graph)) {
-      int node_id = node
-          .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE)
-          .getValue_SNUMERIC().intValue();
-      if(!annotationsForMatchedNodes.containsKey(node_id))
+    for (SNode node : this.getMatchedNodes(graph)) {
+      int node_id = node.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE).getValue_SNUMERIC()
+          .intValue();
+      if (!annotationsForMatchedNodes.containsKey(node_id))
         annotationsForMatchedNodes.put(node_id, new TreeSet<String>());
       List<SAnnotation> annots = new ArrayList<>(node.getAnnotations());
       Set<String> annoNames = annotationsForMatchedNodes.get(node_id);
-      for (SAnnotation annot: annots) {
+      for (SAnnotation annot : annots) {
         annoNames.add(annot.getNamespace() + "::" + annot.getName());
       }
     }
@@ -156,26 +147,22 @@ public class CSVExporter extends SaltBasedExporter
    *
    */
   @Override
-  public void outputText(SDocumentGraph graph, boolean alignmc, int matchNumber,
-    Writer out, UI ui) throws IOException, IllegalArgumentException
-  {
+  public void outputText(SDocumentGraph graph, boolean alignmc, int matchNumber, Writer out, UI ui)
+      throws IOException, IllegalArgumentException {
 
     // first match
-    if (matchNumber == 0)
-    {
+    if (matchNumber == 0) {
       // output header
       List<String> headerLine = new ArrayList<>();
-      for(Map.Entry<Integer, TreeSet<String>> match: annotationsForMatchedNodes.entrySet())
-      {
+      for (Map.Entry<Integer, TreeSet<String>> match : annotationsForMatchedNodes.entrySet()) {
         int node_id = match.getKey();
         headerLine.add(String.valueOf(node_id) + "_id");
         headerLine.add(String.valueOf(node_id) + "_span");
-        for (String annoName: match.getValue())
-        {
+        for (String annoName : match.getValue()) {
           headerLine.add(String.valueOf(node_id) + "_anno_" + annoName);
         }
       }
-      for (String key: metakeys) {
+      for (String key : metakeys) {
         headerLine.add("meta_" + key);
       }
       out.append(StringUtils.join(headerLine, "\t"));
@@ -184,7 +171,7 @@ public class CSVExporter extends SaltBasedExporter
 
     // output nodes in the order of the matches
     SortedMap<Integer, String> contentLine = new TreeMap<>();
-    for (SNode node: this.getMatchedNodes(graph)) {
+    for (SNode node : this.getMatchedNodes(graph)) {
       List<String> nodeLine = new ArrayList<>();
       nodeLine.add(node.getId());
       // export spanned text
@@ -194,17 +181,13 @@ public class CSVExporter extends SaltBasedExporter
       else
         nodeLine.add("");
       // export annotations
-      int node_id = node
-        .getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE)
-        .getValue_SNUMERIC().intValue();
-      for (String annoName: annotationsForMatchedNodes.get(node_id))
-      {
+      int node_id = node.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE).getValue_SNUMERIC()
+          .intValue();
+      for (String annoName : annotationsForMatchedNodes.get(node_id)) {
         SAnnotation anno = node.getAnnotation(annoName);
-        if (anno != null)
-        {
+        if (anno != null) {
           nodeLine.add(anno.getValue_STEXT());
-        }
-        else
+        } else
           nodeLine.add("'NULL'");
       }
       // add everything to line
@@ -215,13 +198,17 @@ public class CSVExporter extends SaltBasedExporter
 
     // export Metadata
     // TODO cache the metadata
-    if(!metakeys.isEmpty()) {
+    if (!metakeys.isEmpty()) {
       // TODO is this the best way to get the corpus name?
       String corpus_name = CommonHelper.getCorpusPath(java.net.URI.create(graph.getDocument().getId())).get(0);
-      List<Annotation> asList = Helper.getMetaData(corpus_name, graph.getDocument().getName(), ui);
-      for(Annotation anno : asList)
-      {
-        if (metakeys.contains(anno.getName()))
+      Map<String, Annotation> allMetaAnnos = Helper.getMetaData(corpus_name, graph.getDocument().getName(), ui).stream()
+          .collect(Collectors.toMap(Annotation::getName, Function.identity()));
+
+      for (String metaName : metakeys) {
+        Annotation anno = allMetaAnnos.get(metaName);
+        if (anno == null) {
+          out.append("\t");
+        } else
           out.append("\t" + anno.getValue());
       }
     }
@@ -230,14 +217,17 @@ public class CSVExporter extends SaltBasedExporter
   }
 
   @Override
-  public void getOrderedMatchNumbers()
-  {
+  public void getOrderedMatchNumbers() {
     // TODO
   }
 
   @Override
-  public boolean isAlignable()
-  {
+  public boolean isAlignable() {
+    return false;
+  }
+
+  @Override
+  public boolean needsContext() {
     return false;
   }
 }

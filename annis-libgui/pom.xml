@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>annis-all</artifactId>
 		<groupId>de.hu-berlin.german.korpling.annis</groupId>
-		<version>4.0.0-SNAPSHOT</version>
+		<version>4.0.0-beta.4-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -93,6 +93,12 @@
 			<artifactId>commons-email</artifactId>
 			<version>1.3.2</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aeonbits.owner</groupId>
+			<artifactId>owner</artifactId>
+			<version>1.0.10</version>
 		</dependency>
 
 		<dependency>

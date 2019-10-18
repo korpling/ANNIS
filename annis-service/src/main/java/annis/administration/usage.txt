@@ -22,4 +22,6 @@ Overview of commands
 * genexamples:  Generate example queries for corpora.
 * delexamples: Delete example queries.
 * cleanup-data: Delete files not used by this instance in the data directory.
+* dump: Output an internal table to a tab-separated file.
+* restore: Restore an internal table from a tab-separated file.
 

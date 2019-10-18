@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>annis-all</artifactId>
 		<groupId>de.hu-berlin.german.korpling.annis</groupId>
-		<version>4.0.0-SNAPSHOT</version>
+		<version>4.0.0-beta.4-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -28,6 +28,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
+		<annis.service-url>http://localhost:5711/annis/</annis.service-url>
 	</properties>
 
 	<build>
@@ -101,7 +102,7 @@
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>9.3.7.v20160115</version>
+				<version>9.3.27.v20190418</version>
 				<configuration>
 					<webApp>
 						<contextPath>/annis-gui</contextPath>
@@ -143,6 +144,60 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>mdbook</id>
+			<activation>
+				<file>
+					<exists>${user.home}/.cargo/bin/mdbook</exists>
+				</file>
+			</activation>
+
+			<build>
+				<plugins>
+					<!-- Compile the online help with mdBook -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.6.0</version>
+						<executions>
+							<execution>
+								<id>compile-online-help</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>mdbook</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+									<arguments>
+										<argument>build</argument>
+										<argument>-d</argument>
+										<argument>${project.basedir}/src/main/webapp/VAADIN/help/</argument>
+										<argument>${project.basedir}/../docs/online-help/</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- the online help directory should be cleaned as well -->
+					<plugin>
+						<artifactId>maven-clean-plugin</artifactId>
+						<version>3.1.0</version>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>${project.basedir}/src/main/webapp/VAADIN/help/</directory>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+							</filesets>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 	<dependencies>
 
 		<dependency>
@@ -169,13 +224,6 @@
 					<artifactId>vaadin-server</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>de.hu-berlin.german.korpling.annis</groupId>
-			<artifactId>annis-docs</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type>
 		</dependency>
 
 		<dependency>
@@ -225,6 +273,11 @@
 			<version>2.6.11</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.aeonbits.owner</groupId>
+			<artifactId>owner</artifactId>
+			<version>1.0.10</version>
+		</dependency>
 
 	</dependencies>
 	<name>annis-gui</name>

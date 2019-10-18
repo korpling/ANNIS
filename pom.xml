@@ -7,7 +7,7 @@
 	<artifactId>annis-all</artifactId>
 	<packaging>pom</packaging>
 	<name>ANNIS corpus search</name>
-	<version>4.0.0-SNAPSHOT</version>
+	<version>4.0.0-beta.4-SNAPSHOT</version>
 	<description>
     ANNIS is an open source, versatile web browser-based search and
     visualization architecture for complex multilevel linguistic corpora with
@@ -81,7 +81,7 @@
 	<properties>
 		<servlet.version>3.0.1</servlet.version>
 		<vaadin.version>8.8.1</vaadin.version>
-		<jetty.version>9.4.7.v20170914</jetty.version>
+		<jetty.version>9.4.18.v20190429</jetty.version>
         <jersey.version>2.27</jersey.version>
 		<main.basedir>${project.basedir}</main.basedir>
 	</properties>
@@ -117,6 +117,13 @@
 						<origin>origin</origin>
 					</gitFlowConfig>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>co.enear.maven.plugins</groupId>
+				<artifactId>keepachangelog-maven-plugin</artifactId>
+				<version>1.2.2</version>
+				<inherited>false</inherited>
 			</plugin>
 
 			<plugin>
@@ -262,6 +269,5 @@
 		<module>annis-widgets</module>
 		<module>annis-visualizers</module>
 		<module>annis-libgui</module>
-		<module>docs</module>
 	</modules>
 </project>

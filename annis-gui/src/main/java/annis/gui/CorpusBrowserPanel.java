@@ -252,7 +252,7 @@ public class CorpusBrowserPanel extends Panel {
                         containerEdgeType.addBean(cbe);
                     }
 
-                    // secound round, fill the actual containers
+                    // second round, fill the actual containers
                     Set<String> metaAnnosKey = new HashSet<>();
                     for (AnnisAttribute a : attributes) {
                         // if the annotation name is already in the example skip this.

@@ -23,7 +23,8 @@ public class AnnisAttributeHelper extends AbstractListHandler<AnnisAttribute> {
         if(subTypeRaw != null) {
             result.setSubtype(SubType.valueOf(subTypeRaw));
         }
-        result.setEdgeName(result.getEdgeName());
+        String edgeName = rs.getString("edge_name");
+        result.setEdgeName(edgeName);
         String value = rs.getString("value");
         if(value != null) {
             result.getValueSet().add(value);

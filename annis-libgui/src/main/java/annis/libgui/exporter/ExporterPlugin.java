@@ -47,4 +47,6 @@ public interface ExporterPlugin extends Plugin
   
   public String getFileEnding();
   
+  public boolean needsContext();
+  
 }

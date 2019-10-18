@@ -346,6 +346,11 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
     return "txt";
   }
   
+  @Override
+    public boolean needsContext() {
+        return true;
+    }
+  
   
   public abstract SubgraphFilter getSubgraphFilter();
 

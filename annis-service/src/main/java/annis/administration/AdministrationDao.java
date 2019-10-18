@@ -209,9 +209,6 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * The name of the file and the relation containing the resolver information.
      */
     private static final String FILE_RESOLVER_VIS_MAP = "resolver_vis_map";
-    // tables imported from bulk files
-    // DO NOT CHANGE THE ORDER OF THIS LIST! Doing so may cause foreign key
-    // failures during import.
 
     private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -238,14 +235,14 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     private final Table repositoryMetaDataTable = new Table("repository_metadata").c(new Column("name").unique())
             .c("value");
 
-    private final Table urlShortenerTable = new Table("url_shortener").c(new Column("id").primaryKey()).c("owner")
+    public static final Table urlShortenerTable = new Table("url_shortener").c(new Column("id").primaryKey()).c("owner")
             .c("created").c("url").c("temporary_url").index("url");
 
     private final Table exampleQueriesTable = new Table(EXAMPLE_QUERIES_TAB)
             .c(new Column("id").type(Column.Type.INTEGER).primaryKey()).c(new Column("example_query").notNull())
             .c(new Column("description").notNull()).c(new Column("corpus").notNull());
 
-    private final Table userConfigTable = new Table("user_config").c(new Column("id").primaryKey()).c("config");
+    public static final Table userConfigTable = new Table("user_config").c(new Column("id").primaryKey()).c("config");
 
     private final Table corpusAliasTable = new Table("corpus_alias").c(new Column("alias").primaryKey()).c("corpus")
             .index("corpus");
@@ -394,7 +391,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
     protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version)
             throws GraphANNISException {
 
-        log.info("importing corpus into graphANNIS");
+        log.info("importing corpus {} into graphANNIS", corpusName);
         getQueryDao().getCorpusStorageManager().importFromFileSystem(path, ImportFormat.RelANNIS, corpusName);
 
     }
@@ -1019,6 +1016,28 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         } catch (AddressException | EmailException ex) {
             log.warn("Could not send mail: " + ex.getMessage());
         }
+    }
+
+    public void restoreServiceDataTable(Table table, File csvFile) {
+
+        try (Connection conn = createConnection(DB.SERVICE_DATA)) {
+            conn.setAutoCommit(false);
+            importCSVIntoTable(conn, table, true, true, csvFile, null);
+            conn.commit();
+
+        } catch (SQLException ex) {
+            log.error("Could not restore table from file", ex);
+        }
+    }
+
+    public void dumpServiceDataTable(Table table, File csvFile) {
+        try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
+            
+            exportTableIntoCSV(conn, table, true, csvFile, null);
+
+         } catch (SQLException ex) {
+             log.error("Could not save table to file", ex);
+         }
     }
 
     ///// Getter / Setter

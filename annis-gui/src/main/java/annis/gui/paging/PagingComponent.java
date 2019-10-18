@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,7 @@ import annis.gui.AnnisUI;
 import annis.gui.ShareQueryReferenceWindow;
 import annis.gui.util.ANNISFontIcon;
 import annis.libgui.Helper;
+import annis.libgui.UIConfig;
 
 /**
  *
@@ -55,6 +57,8 @@ public class PagingComponent extends Panel implements
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     PagingComponent.class);
+  
+  private final UIConfig cfg = ConfigFactory.create(UIConfig.class);
 
   public static final Resource LEFT_ARROW = ANNISFontIcon.LEFT_ARROW;
 
@@ -362,7 +366,7 @@ public class PagingComponent extends Panel implements
     {
       ShareQueryReferenceWindow w = new ShareQueryReferenceWindow(
         ui.getQueryController().getSearchQuery(),
-        !Helper.isKickstarter(getSession())
+        cfg.shortenURLs() && !Helper.isKickstarter(getSession())
       );
       getUI().addWindow(w);
       w.center();

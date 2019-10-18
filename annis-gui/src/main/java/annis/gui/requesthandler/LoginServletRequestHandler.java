@@ -142,15 +142,7 @@ public class LoginServletRequestHandler implements RequestHandler
       session.getSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
 
       // get the URL for the REST service
-      Object annisServiceURLObject = session.getSession().getAttribute(
-        AnnisBaseUI.WEBSERVICEURL_KEY);
-
-      if (annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
-      {
-        log.warn("AnnisWebService.URL was not set as init parameter in web.xml");
-      }
-
-      String webserviceURL = (String) annisServiceURLObject;
+      String webserviceURL = Helper.getServiceURL(VaadinSession.getCurrent());
 
       try
       {
