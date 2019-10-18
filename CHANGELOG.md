@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0-beta.3] - 2019-10-18
+
 ### Fixed
 
 - RST document visualizer did not order token properly [#615](https://github.com/korpling/ANNIS/issues/615)
@@ -851,5 +853,6 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.2...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.3...HEAD
+[4.0.0-beta.3]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.2...v4.0.0-beta.3
 [4.0.0-beta.2]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.1...v4.0.0-beta.2
