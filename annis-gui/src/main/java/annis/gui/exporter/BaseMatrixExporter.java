@@ -160,7 +160,9 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
       
       //get node count for the query
       WebResource resource = Helper.getAnnisWebResource();
-      List<NodeDesc> nodes = resource.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(queryAnnisQL))
+      List<NodeDesc> nodes = resource.path("query/parse/nodes")
+              .queryParam("q", Helper.encodeJersey(queryAnnisQL))
+              .queryParam("query-language", queryLanguage.name())
       	      .get(new GenericType<List<NodeDesc>>() {});
       Integer nodeCount = nodes.size();
                 
