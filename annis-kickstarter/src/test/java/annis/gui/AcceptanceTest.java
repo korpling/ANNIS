@@ -92,8 +92,8 @@ public class AcceptanceTest {
 	@Before
 	public void setup() {
 		Assume.assumeNotNull(driver);
-		driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-		wait = new WebDriverWait(driver, 30);
+		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+		wait = new WebDriverWait(driver, 60);
 
 		driver.get("http://localhost:" + WEB_PORT + "/annis-gui/");
 

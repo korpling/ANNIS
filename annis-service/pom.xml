@@ -8,13 +8,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<annis.userconfig>/etc/annis/user_config/</annis.userconfig>
-		<graphannis.version>0.22.0</graphannis.version>
+		<graphannis.version>0.24.0</graphannis.version>
 	</properties>
 
 	<parent>
 		<artifactId>annis-all</artifactId>
 		<groupId>de.hu-berlin.german.korpling.annis</groupId>
-		<version>4.0.0-beta.2</version>
+		<version>4.0.0-beta.3</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -25,15 +25,9 @@
 
 		<dependency>
 			<groupId>org.corpus-tools</groupId>
-			<artifactId>graphannis-api</artifactId>
+			<artifactId>graphannis</artifactId>
 			<version>${graphannis.version}</version>
 			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.corpus-tools</groupId>
-					<artifactId>annis-interfaces</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>

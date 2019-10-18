@@ -68,6 +68,7 @@ import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.FrequencyTable;
+import annis.service.objects.QueryLanguage;
 
 /**
  *
@@ -197,7 +198,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     if(controller != null)
     {
-      createAutomaticEntriesForQuery(state.getAql().getValue());
+      createAutomaticEntriesForQuery(state.getAql().getValue(), state.getQueryLanguage().getValue());
       updateQueryInfo(state.getAql().getValue());
     }
     
@@ -228,7 +229,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         }
         if(controller != null)
         {
-          List<NodeDesc> nodes = parseQuery(FrequencyQueryPanel.this.state.getAql().getValue());
+          List<NodeDesc> nodes = parseQuery(FrequencyQueryPanel.this.state.getAql().getValue(), 
+              FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
           nr = Math.min(nr, nodes.size()-1);
           int id = counter++;
           UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
@@ -278,7 +280,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           if(controller != null)
           {
             createAutomaticEntriesForQuery(
-              FrequencyQueryPanel.this.state.getAql().getValue());
+              FrequencyQueryPanel.this.state.getAql().getValue(), 
+              FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
           }
         }
       }
@@ -297,7 +300,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         if(controller != null)
         {
           createAutomaticEntriesForQuery(
-            FrequencyQueryPanel.this.state.getAql().getValue());
+            FrequencyQueryPanel.this.state.getAql().getValue(),
+            FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
         }
       }
     });
@@ -415,7 +419,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           if (cbAutomaticMode.getValue())
           {
-            createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue());
+            createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
+              FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
           }
           updateQueryInfo(FrequencyQueryPanel.this.state.getAql().getValue());
         }
@@ -465,7 +470,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   {
     if(cbAutomaticMode.getValue())
     {
-      createAutomaticEntriesForQuery(event.getText());
+      createAutomaticEntriesForQuery(event.getText(), state.getQueryLanguage().getValue());
     }
     updateQueryInfo(event.getText());
   }
@@ -490,7 +495,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     resultPanel.setVisible(false);
   }
   
-  private List<NodeDesc> parseQuery(String query)
+  private List<NodeDesc> parseQuery(String query, QueryLanguage queryLanguage)
   {
     if(query == null || query.isEmpty())
     {
@@ -498,13 +503,15 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     // let the service parse the query
     WebResource res = Helper.getAnnisWebResource();
-    List<NodeDesc> nodes = res.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(query))
+    List<NodeDesc> nodes = res.path("query/parse/nodes")
+      .queryParam("q", Helper.encodeJersey(query))
+      .queryParam("query-language", queryLanguage.name())
       .get(new GenericType<List<NodeDesc>>() {});
     
     return nodes;
   }
   
-  private void createAutomaticEntriesForQuery(String query)
+  private void createAutomaticEntriesForQuery(String query, QueryLanguage queryLanguage)
   {
     if(query == null || query.isEmpty())
     {
@@ -518,7 +525,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       lblErrorOrMsg.setVisible(false);
       
       counter = 0;
-      List<NodeDesc> nodes = parseQuery(query);
+      List<NodeDesc> nodes = parseQuery(query, queryLanguage);
       Collections.sort(nodes, new Comparator<NodeDesc>()
       {
 

@@ -5,6 +5,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0-beta.3] - 2019-10-18
+
+### Fixed
+
+- RST document visualizer did not order token properly [#615](https://github.com/korpling/ANNIS/issues/615)
+- Actually retrieve `edge_name` attribute from database when fetching the corpus annotations  [#616](https://github.com/korpling/ANNIS/issues/616)
+- On import, assign correct sub-type `p` for pointing relations entries without annotation: **You need to re-import the corpora to get a correct example query in the corpus browser**.
+- Use context instead of whole location URI to resolve the iframe vis URL [#581](https://github.com/korpling/ANNIS/issues/581)
+- Login was failing since web service URL was not properly used in login request handler
+- ZIP-Import might fail because of large directory names
+- CSV export was had a mismatch between the order of the metadata keys in the header and in the column
+- Using a segmentation for the context definition did not work [#624](https://github.com/korpling/ANNIS/issues/624)
+- Frequency analysis and export where not possible with AQL quirks mode and queries that are invalid in the newest AQL version (e.g `meta::`)
+
 ## [4.0.0-beta.2] - 2019-07-22
 
 ### Fixed
@@ -839,5 +853,6 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.2...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.3...HEAD
+[4.0.0-beta.3]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.2...v4.0.0-beta.3
 [4.0.0-beta.2]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.1...v4.0.0-beta.2

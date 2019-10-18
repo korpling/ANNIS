@@ -17,10 +17,7 @@
             "mainClass": "annis.service.internal.AnnisServiceRunner",
             "projectName": "annis-service",
             "vmArgs": "-Dannis.home=${workspaceFolder}/annis-service/src/main/distribution -Dannis.nosecurity=true",
-            "cwd": "${workspaceFolder}/annis-service/src/main/distribution",
-            "classPaths": [
-                "${workspaceFolder}/annis-service/target/annis-service-4.0.0-SNAPSHOT-distribution/annis-service-4.0.0-SNAPSHOT/lib/*"
-            ]
+            "cwd": "${workspaceFolder}/annis-service/src/main/distribution"
         }
     ]
 }

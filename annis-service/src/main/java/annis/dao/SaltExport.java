@@ -63,7 +63,7 @@ import com.google.common.collect.Range;
 /**
  * Allows to extract a Salt-Graph from a database subgraph.
  * 
- * @author Thomas Krause <thomaskrause@posteo.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class SaltExport {
 

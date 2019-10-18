@@ -162,7 +162,12 @@ public class CorpusAdministration {
 
                     // unzip and add all resulting corpora to import list
                     log.info("Unzipping " + f.getPath());
-                    File outDir = createZIPOutputDir(Joiner.on(", ").join(corpora.keySet()));
+                    String corpusNames = Joiner.on(", ").join(corpora.keySet());
+                    if(corpusNames.length() > 200) {
+                        // some systems don't handle large file names well
+                        corpusNames = corpusNames.substring(0, 200);
+                    }
+                    File outDir = createZIPOutputDir(corpusNames);
                     roots.addAll(unzipCorpus(outDir, zip));
 
                 } catch (ZipException ex) {

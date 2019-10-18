@@ -4,6 +4,10 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>ANNIS Help</title>
+        
+        <meta name="robots" content="noindex" />
+        
+
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -56,7 +60,7 @@
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script type="text/javascript">
             var theme;
-            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             document.body.className = theme;
             document.querySelector('html').className = theme + ' js';
@@ -75,7 +79,10 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="interface.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">3.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">3.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">3.8.</strong> Complete List of Operators</a></li><li><a href="aql-compatibility-mode.html"><strong aria-hidden="true">3.9.</strong> Differences in Compatibility Mode</a></li></ol></li></ol>
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="interface.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">3.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">3.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">3.8.</strong> Complete List of Operators</a></li><li><a href="aql-compatibility-mode.html"><strong aria-hidden="true">3.9.</strong> Differences in Compatibility Mode</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
         <div id="page-wrapper" class="page-wrapper">
@@ -105,7 +112,7 @@
                             
                         </div>
 
-                        <h1 class="menu-title">ANNIS Help</h1> 
+                        <h1 class="menu-title">ANNIS Help</h1>
 
                         <div class="right-buttons">
                             <a href="print.html" title="Print this book" aria-label="Print this book">
@@ -140,16 +147,16 @@
 
                 <div id="content" class="content">
                     <main>
-                        <a class="header" href="#introduction" id="introduction"><h1>Introduction</h1></a>
+                        <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
 <p>ANNIS is an open source, browser-based search and visualization architecture for multi-layer corpora.
 It can be used to search for complex graph structures of annotated nodes and edges forming a variety of linguistic structures, such as constituent or dependency syntax trees, coreference, rhetorical structure and parallel alignment edges, span annotations and associated multi-modal data (audio/video).</p>
 <p>In this online help, you can learn more about <a href="interface.html">how to use the ANNIS interface</a> and the <a href="aql.html">query language AQL</a>.
 Additional documentation is available from the homepage at <a href="http://corpus-tools.org/annis/documentation.html" target="_blank">http://corpus-tools.org/annis/documentation.html</a>.</p>
-<a class="header" href="#using-the-annis-interface" id="using-the-annis-interface"><h1>Using the ANNIS interface</h1></a>
+<h1><a class="header" href="#using-the-annis-interface" id="using-the-annis-interface">Using the ANNIS interface</a></h1>
 <p>The ANNIS interface is comprised of several areas, the most important of
 which are the search form on the left side and the results tab on the right side.</p>
 <p><img src="images/annis3_interface.png" alt="Screenshot of the ANNIS user interface" /></p>
-<a class="header" href="#search-form" id="search-form"><h1>Search Form</h1></a>
+<h1><a class="header" href="#search-form" id="search-form">Search Form</a></h1>
 <p><img src="images/searchform.png" alt="ANNIS search form" /></p>
 <p>The Search Form can be found on the left of the interface window. It's
 bottom part shows the list of currently available corpora. By clicking
@@ -179,10 +186,10 @@ alternative segmentation layers to visualize data (relevant for
 languages with multiple tokens per word form, etc., such as Arabic).
 Entire texts can also be viewed using special document visualizations or
 by clicking on the document icon next to each corpus name, if available.</p>
-<p>The &quot;Query Language&quot; option allows to switch between the default AQL dialect
+<p>The &quot;Query Language&quot; option allows to switch between the default AQL dialect 
 and an <a href="aql-compatibility-mode.html">compatibility mode</a> emulating the behavior of the older ANNIS3.
 Make sure to use the latest version for all new queries.</p>
-<a class="header" href="#result-window" id="result-window"><h1>Result Window</h1></a>
+<h1><a class="header" href="#result-window" id="result-window">Result Window</a></h1>
 <p><img src="images/search_bar.png" alt="ANNIS result window toolbar" /></p>
 <p>The result window shows search results in pages of 10 hits each by
 default (this can be changed in the Search Form). The toolbar at the top
@@ -209,7 +216,7 @@ expanded, if available, by clicking on the plus icon next to the
 level's name, e.g. dependencies and referent information for the
 annotations in the dependency tree and grid views in the picture below.</p>
 <p><img src="images/annotation_levels.png" alt="visualization of different annotation levels" /></p>
-<a class="header" href="#query-builder" id="query-builder"><h1>Query Builder</h1></a>
+<h1><a class="header" href="#query-builder" id="query-builder">Query Builder</a></h1>
 <p>To open the graphical query builder, click on the <strong>Query Builder</strong>
 button. On the left-hand side of the toolbar at the top of the query
 builder canvans, you will see the <strong>Add Node</strong> button. Use this button
@@ -219,7 +226,7 @@ immediately update the AQL field in the Search Form with your query,
 though updating the query on the Search Form will not create a new graph
 in the Query Builder.</p>
 <p><img src="images/query_builder_empty.png" alt="The Query Builder tab and the Create Node button" /></p>
-<p>In each node you create you may click on <img src="images/list-add.png" alt="The Add Node button" /> to specify an
+<p>In each node you create you may click on <img src="images/list-add.png" alt="The Add Node button" /> to specify an 
 annotation value. The annotation name can be typed in or selected from a drop down list once a corpus is
 selected. The operator field in the middle allows you to choose between
 an exact match (the '=' symbol) or wildcard search using Regular
@@ -246,10 +253,10 @@ if this is the first node it will dominate the second node (<code>#1 &gt; #2</co
 and not the other way around, as also represented by the arrows along
 the edge.</p>
 <p><img src="images/edge.png" alt="Connecting nodes with an edge" /></p>
-<a class="header" href="#annis-query-language-aql" id="annis-query-language-aql"><h1>ANNIS Query Language (AQL)</h1></a>
+<h1><a class="header" href="#annis-query-language-aql" id="annis-query-language-aql">ANNIS Query Language (AQL)</a></h1>
 <p>ANNIS comes with its own query language called ANNIS Query Language (AQL).
 AQL is based on the concept of searching for annotation attributes and relations between them.</p>
-<a class="header" href="#searching-for-word-forms" id="searching-for-word-forms"><h1>Searching for Word Forms</h1></a>
+<h1><a class="header" href="#searching-for-word-forms" id="searching-for-word-forms">Searching for Word Forms</a></h1>
 <p>To search for word forms in ANNIS, simply select a corpus (in this
 example the freely available <a href="https://corpling.uis.georgetown.edu/gum/">GUM corpus</a>) and enter a search string
 between double quotation marks, e.g.:</p>
@@ -306,7 +313,7 @@ other non-meta attributes with the <code>@*</code> (part-of) operator:</p>
 </code></pre>
 <p>To view metadata for a search result or for a corpus, press the &quot;i&quot; icon
 next to it in the result window or in the search form respectively.</p>
-<a class="header" href="#searching-for-annotations" id="searching-for-annotations"><h1>Searching for Annotations</h1></a>
+<h1><a class="header" href="#searching-for-annotations" id="searching-for-annotations">Searching for Annotations</a></h1>
 <p>Annotations may be searched for using an annotation name and value. The
 names of the annotations vary from corpus to corpus, though many corpora
 contain part-of-speech and lemma annotations with the names <code>pos</code> and
@@ -372,7 +379,7 @@ annotation (the <em>i</em> stands for 'includes'):</p>
 </code></pre>
 <p>This query finds information structurally new discourse referents
 (<code>infstat=&quot;new&quot;</code>) contained within headings (<code>head</code>).</p>
-<a class="header" href="#searching-using-regular-expressions" id="searching-using-regular-expressions"><h1>Searching using Regular Expressions</h1></a>
+<h1><a class="header" href="#searching-using-regular-expressions" id="searching-using-regular-expressions">Searching using Regular Expressions</a></h1>
 <p>When searching for word forms and annotation values, it is possible to
 employ wildcards as placeholders for a variety of characters, using
 Regular Expression syntax (see e.g.
@@ -431,7 +438,7 @@ all non-object dependants of lexical verbs:</p>
 <p>OR (using a shortcut):</p>
 <pre><code>pos=/VV.*/ -&gt;dep[func!=/.*obj.*/] tok
 </code></pre>
-<a class="header" href="#searching-for-trees" id="searching-for-trees"><h1>Searching for Trees</h1></a>
+<h1><a class="header" href="#searching-for-trees" id="searching-for-trees">Searching for Trees</a></h1>
 <p>In corpora containing hierarchical structures, annotations such as
 syntax trees can be searched for by defining terminal or none-terminal
 node annotations, functional dependencies and their values (for
@@ -484,7 +491,7 @@ of the dominance edge as in the following query:</p>
 </code></pre>
 <p>which finds all syntactic categories (value unspecified) dominating
 another syntactic category with a label other than &quot;TMP&quot;.</p>
-<a class="header" href="#searching-for-pointing-relations" id="searching-for-pointing-relations"><h1>Searching for Pointing Relations</h1></a>
+<h1><a class="header" href="#searching-for-pointing-relations" id="searching-for-pointing-relations">Searching for Pointing Relations</a></h1>
 <p>Pointing relations are used to express an arbitrary directed
 relationship between two elements (terminals or non-terminals) without
 implying dominance or coverage inheritance. For instance, in the GUM
@@ -540,7 +547,7 @@ type 'dep' (for dependency) between the two, annotated with
 with the arch dependency visualizer, which shows the verb 'shows' and
 its object 'location'.</p>
 <p><img src="images/dep_vis.png" alt="" /></p>
-<a class="header" href="#exporting-results" id="exporting-results"><h1>Exporting Results</h1></a>
+<h1><a class="header" href="#exporting-results" id="exporting-results">Exporting Results</a></h1>
 <p>To export search results, open the menu &quot;More&quot; between the Search and
 History buttons and select &quot;Export&quot;:</p>
 <p><img src="images/export.png" alt="" /></p>
@@ -620,7 +627,7 @@ metakeys=genre in the parameters box.</p>
 header specifying the content of the columns is not used (useful for
 importing into spreadsheet programs such as Excel or Calc).</p>
 <p>Note that exporting may be slow if the result set is large.</p>
-<a class="header" href="#frequency-analysis" id="frequency-analysis"><h1>Frequency Analysis</h1></a>
+<h1><a class="header" href="#frequency-analysis" id="frequency-analysis">Frequency Analysis</a></h1>
 <p>To perform a frequency analysis, enter the query whose results you want
 to analyze as usual in the AQL box. Note that you <strong>do not need to carry
 out the query first</strong>. Next, open the menu “More” between the Search and
@@ -653,48 +660,48 @@ annotation name we are interested in:</p>
 <p>As a result, we will get a count for each combination of values grouped
 by the first and second tokens' parts-of-speech, as well as the first
 token's lemma.</p>
-<a class="header" href="#complete-list-of-operators" id="complete-list-of-operators"><h1>Complete List of Operators</h1></a>
+<h1><a class="header" href="#complete-list-of-operators" id="complete-list-of-operators">Complete List of Operators</a></h1>
 <p>AQL currently includes the following operators:</p>
-<table><thead><tr><th align="center"> Operator     </th><th align="left"> Description                </th><th align="center"> Illustration                                                 </th><th align="left"> Notes                                                                                                                                                                                                                                       </th><th> </th></tr></thead><tbody>
-<tr><td align="center"> <code>.</code>          </td><td align="left"> direct precedence          </td><td align="center"> <img src="images/A-pred-B.svg" alt="" />                                     </td><td align="left"> For non-terminal nodes, precedence is determined by the right-most and left-most terminal children. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>.layer</code>                            </td><td> </td></tr>
-<tr><td align="center"> <code>.*</code>         </td><td align="left"> indirect precedence        </td><td align="center"> <img src="images/A-pred-ind-B.svg" alt="" />                                 </td><td align="left"> For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>.*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>.layer,3,4</code>             </td><td> </td></tr>
-<tr><td align="center"> <code>^</code>          </td><td align="left"> directly near              </td><td align="center"> <img src="images/A-pred-B.svg" alt="" /> or <img src="images/B-pred-A.svg" alt="" />         </td><td align="left"> Same as precedence, but in either order. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>^layer</code>                                                                                       </td><td> </td></tr>
-<tr><td align="center"> <code>^*</code>         </td><td align="left"> indirectly near            </td><td align="center"> <img src="images/A-pred-ind-B.svg" alt="" /> or <img src="images/B-pred-ind-A.svg" alt="" /> </td><td align="left"> Like indirect precedence in either order. The form <code>^n,m</code> can be used, e.g. <code>^3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>^*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>^layer,3,4</code>  </td><td> </td></tr>
-<tr><td align="center"> <code>&gt;</code>          </td><td align="left"> direct dominance           </td><td align="center"> <img src="images/A-dom-B.svg" alt="" />                                      </td><td align="left"> A specific edge type may be specified, e.g. <code>&gt;secedge</code> to find secondary edges. Edge labels are specified in brackets, e.g. <code>&gt;[func=&quot;OA&quot;]</code> for an edge with the function 'object, accusative'                                               </td><td> </td></tr>
-<tr><td align="center"> <code>&gt;*</code>         </td><td align="left"> indirect dominance         </td><td align="center"> <img src="images/A-dom-ind-B.svg" alt="" />                                  </td><td align="left"> For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance                                                                                                                                  </td><td> </td></tr>
-<tr><td align="center"> <code>@*</code>         </td><td align="left"> part of sub-corpus         </td><td align="center">                             </td><td align="left"> Left attribute is part of a sub-corpus having the attribute of the right-hand side. For specific distance range in the sub-corpus hierarchy, <code>@n,m</code> can be used.                                                                                                                                  </td><td> </td></tr>
-<tr><td align="center"> <code>_=_</code>        </td><td align="left"> identical coverage         </td><td align="center"> <img src="images/A-cov-ident-B.svg" alt="" />                                </td><td align="left"> Applies when two annotations cover the exact same span of tokens                                                                                                                                                                            </td><td> </td></tr>
-<tr><td align="center"> <code>_i_</code>        </td><td align="left"> inclusion                  </td><td align="center"> <img src="images/A-cov-incl-B.svg" alt="" />                                 </td><td align="left"> Applies when one annotation covers a span identical to or larger than  another                                                                                                                                                              </td><td> </td></tr>
-<tr><td align="center"> <code>_o_</code>        </td><td align="left"> overlap                    </td><td align="center"> <img src="images/A-cov-over-B.svg" alt="" />                                 </td><td align="left">                                                                                                                                                               </td><td> </td></tr>
-<tr><td align="center"> <code>_l_</code>        </td><td align="left"> left aligned               </td><td align="center"> <img src="images/A-cov-left-B.svg" alt="" />                                 </td><td align="left"> Both elements span an area beginning with the same token                                                                                                                                                                                    </td><td> </td></tr>
-<tr><td align="center"> <code>_r_</code>        </td><td align="left"> right aligned              </td><td align="center"> <img src="images/A-cov-right-B.svg" alt="" />                                </td><td align="left"> Both elements span an area ending with the same token                                                                                                                                                                                       </td><td> </td></tr>
-<tr><td align="center"> <code>==</code>         </td><td align="left"> value identity             </td><td align="center"> <strong>A = B</strong>                                                    </td><td align="left"> The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)                                                                                 </td><td> </td></tr>
-<tr><td align="center"> <code>!=</code>         </td><td align="left"> value difference           </td><td align="center"> <strong>A ≠ B</strong>                                                    </td><td align="left"> The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)                                                                                       </td><td> </td></tr>
-<tr><td align="center"> <code>-&gt;LABEL</code>    </td><td align="left"> labeled pointing relation  </td><td align="center"> <img src="images/A-point-direct-B.svg" alt="" />                            </td><td align="left"> A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation=&quot;VALUE&quot;]</code>                                                                                                                      </td><td> </td></tr>
-<tr><td align="center"> <code>-&gt;LABEL *</code>  </td><td align="left"> indirect pointing relation </td><td align="center"> <img src="images/A-point-ind-B.svg" alt="" />                               </td><td align="left"> An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length n to m                                                                                     </td><td> </td></tr>
-<tr><td align="center"> <code>#x:arity=n</code> </td><td align="left"> arity                      </td><td align="center"> <img src="images/A-arity.svg" alt="" />                                     </td><td align="left"> Specifies the amount of directly dominated children that the searched node has                                                                                                                                                              </td><td> </td></tr>
-<tr><td align="center"> <code>_ident_</code>    </td><td align="left"> node identity       </td><td align="center">                                                                         </td><td align="left">       True for two attributes that belong to the same node                                                                                                                                                                        </td><td> </td></tr>
+<table><thead><tr><th align="center">Operator</th><th align="left">Description</th><th align="center">Illustration</th><th align="left">Notes</th><th></th></tr></thead><tbody>
+<tr><td align="center"><code>.</code></td><td align="left">direct precedence</td><td align="center"><img src="images/A-pred-B.svg" alt="" /></td><td align="left">For non-terminal nodes, precedence is determined by the right-most and left-most terminal children. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>.layer</code></td><td></td></tr>
+<tr><td align="center"><code>.*</code></td><td align="left">indirect precedence</td><td align="center"><img src="images/A-pred-ind-B.svg" alt="" /></td><td align="left">For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>.*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>.layer,3,4</code></td><td></td></tr>
+<tr><td align="center"><code>^</code></td><td align="left">directly near</td><td align="center"><img src="images/A-pred-B.svg" alt="" /> or <img src="images/B-pred-A.svg" alt="" /></td><td align="left">Same as precedence, but in either order. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>^layer</code></td><td></td></tr>
+<tr><td align="center"><code>^*</code></td><td align="left">indirectly near</td><td align="center"><img src="images/A-pred-ind-B.svg" alt="" /> or <img src="images/B-pred-ind-A.svg" alt="" /></td><td align="left">Like indirect precedence in either order. The form <code>^n,m</code> can be used, e.g. <code>^3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>^*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>^layer,3,4</code></td><td></td></tr>
+<tr><td align="center"><code>&gt;</code></td><td align="left">direct dominance</td><td align="center"><img src="images/A-dom-B.svg" alt="" /></td><td align="left">A specific edge type may be specified, e.g. <code>&gt;secedge</code> to find secondary edges. Edge labels are specified in brackets, e.g. <code>&gt;[func=&quot;OA&quot;]</code> for an edge with the function 'object, accusative'</td><td></td></tr>
+<tr><td align="center"><code>&gt;*</code></td><td align="left">indirect dominance</td><td align="center"><img src="images/A-dom-ind-B.svg" alt="" /></td><td align="left">For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance</td><td></td></tr>
+<tr><td align="center"><code>@*</code></td><td align="left">part of sub-corpus</td><td align="center"></td><td align="left">Left attribute is part of a sub-corpus having the attribute of the right-hand side. For specific distance range in the sub-corpus hierarchy, <code>@n,m</code> can be used.</td><td></td></tr>
+<tr><td align="center"><code>_=_</code></td><td align="left">identical coverage</td><td align="center"><img src="images/A-cov-ident-B.svg" alt="" /></td><td align="left">Applies when two annotations cover the exact same span of tokens</td><td></td></tr>
+<tr><td align="center"><code>_i_</code></td><td align="left">inclusion</td><td align="center"><img src="images/A-cov-incl-B.svg" alt="" /></td><td align="left">Applies when one annotation covers a span identical to or larger than  another</td><td></td></tr>
+<tr><td align="center"><code>_o_</code></td><td align="left">overlap</td><td align="center"><img src="images/A-cov-over-B.svg" alt="" /></td><td align="left"></td><td></td></tr>
+<tr><td align="center"><code>_l_</code></td><td align="left">left aligned</td><td align="center"><img src="images/A-cov-left-B.svg" alt="" /></td><td align="left">Both elements span an area beginning with the same token</td><td></td></tr>
+<tr><td align="center"><code>_r_</code></td><td align="left">right aligned</td><td align="center"><img src="images/A-cov-right-B.svg" alt="" /></td><td align="left">Both elements span an area ending with the same token</td><td></td></tr>
+<tr><td align="center"><code>==</code></td><td align="left">value identity</td><td align="center"><strong>A = B</strong></td><td align="left">The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
+<tr><td align="center"><code>!=</code></td><td align="left">value difference</td><td align="center"><strong>A ≠ B</strong></td><td align="left">The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
+<tr><td align="center"><code>-&gt;LABEL</code></td><td align="left">labeled pointing relation</td><td align="center"><img src="images/A-point-direct-B.svg" alt="" /></td><td align="left">A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation=&quot;VALUE&quot;]</code></td><td></td></tr>
+<tr><td align="center"><code>-&gt;LABEL *</code></td><td align="left">indirect pointing relation</td><td align="center"><img src="images/A-point-ind-B.svg" alt="" /></td><td align="left">An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length n to m</td><td></td></tr>
+<tr><td align="center"><code>#x:arity=n</code></td><td align="left">arity</td><td align="center"><img src="images/A-arity.svg" alt="" /></td><td align="left">Specifies the amount of directly dominated children that the searched node has</td><td></td></tr>
+<tr><td align="center"><code>_ident_</code></td><td align="left">node identity</td><td align="center"></td><td align="left">True for two attributes that belong to the same node</td><td></td></tr>
 </tbody></table>
-<a class="header" href="#unsupported-operators" id="unsupported-operators"><h2>Unsupported operators</h2></a>
+<h2><a class="header" href="#unsupported-operators" id="unsupported-operators">Unsupported operators</a></h2>
 <p>The following operators have been available in the legacy version ANNIS3, but are not yet implemented in the newest ANNIS version.</p>
-<table><thead><tr><th> Operator          </th><th> Description          </th><th> Illustration                                    </th><th> Notes                                                                                                                                                                                                                                       </th></tr></thead><tbody>
-<tr><td align="center"> <code>_ol_</code> and <code>_or_</code></td><td align="left"> Overlap, but only on the left or right side </td><td align="center"> </td><td align="left"> </td></tr>
-<tr><td align="center"> <code>&gt;@l</code>             </td><td align="left"> left-most child      </td><td align="center"> <img src="images/A-left-B.svg" alt="" />                        </td><td align="left">                                                                                                                                                                                                                                             </td></tr>
-<tr><td align="center"> <code>&gt;@r</code>             </td><td align="left"> right-most child     </td><td align="center"> <img src="images/A-right-B.svg" alt="" />                       </td><td align="left">                                                                                                                                                                                                                                             </td></tr>
-<tr><td align="center"> <code>$</code>               </td><td align="left"> common parent node   </td><td align="center"> <img src="images/A-parent-B.svg" alt="" />                      </td><td align="left">                                                                                                                                                                                                                                             </td></tr>
-<tr><td align="center"> <code>$*</code>              </td><td align="left"> common ancestor node </td><td align="center"> <img src="images/A-ancestor-B.svg" alt="" />                    </td><td align="left">                                                                                                                                                                                                                                             </td></tr>
-<tr><td align="center"> <code>#x:tokenarity=n</code> </td><td align="left"> tokenarity           </td><td align="center"> <img src="images/A-tokenarity.svg" alt="" />                    </td><td align="left"> Specifies the length of the span of tokens covered by the node                                                                                                                                                                              </td></tr>
-<tr><td align="center"> <code>#x:root</code>         </td><td align="left"> root                 </td><td align="center"> <img src="images/A-root.svg" alt="" />                          </td><td align="left"> Specifies that the node is not dominated by any other node within its namespace       <strong>s</strong>                                                                                                                                                 </td></tr>
+<table><thead><tr><th align="center">Operator</th><th align="left">Description</th><th align="center">Illustration</th><th align="left">Notes</th></tr></thead><tbody>
+<tr><td align="center"><code>_ol_</code> and <code>_or_</code></td><td align="left">Overlap, but only on the left or right side</td><td align="center"></td><td align="left"></td></tr>
+<tr><td align="center"><code>&gt;@l</code></td><td align="left">left-most child</td><td align="center"><img src="images/A-left-B.svg" alt="" /></td><td align="left"></td></tr>
+<tr><td align="center"><code>&gt;@r</code></td><td align="left">right-most child</td><td align="center"><img src="images/A-right-B.svg" alt="" /></td><td align="left"></td></tr>
+<tr><td align="center"><code>$</code></td><td align="left">common parent node</td><td align="center"><img src="images/A-parent-B.svg" alt="" /></td><td align="left"></td></tr>
+<tr><td align="center"><code>$*</code></td><td align="left">common ancestor node</td><td align="center"><img src="images/A-ancestor-B.svg" alt="" /></td><td align="left"></td></tr>
+<tr><td align="center"><code>#x:tokenarity=n</code></td><td align="left">tokenarity</td><td align="center"><img src="images/A-tokenarity.svg" alt="" /></td><td align="left">Specifies the length of the span of tokens covered by the node</td></tr>
+<tr><td align="center"><code>#x:root</code></td><td align="left">root</td><td align="center"><img src="images/A-root.svg" alt="" /></td><td align="left">Specifies that the node is not dominated by any other node within its namespace       <strong>s</strong></td></tr>
 </tbody></table>
-<a class="header" href="#differences-in-compatibility-mode" id="differences-in-compatibility-mode"><h1>Differences in Compatibility Mode</h1></a>
+<h1><a class="header" href="#differences-in-compatibility-mode" id="differences-in-compatibility-mode">Differences in Compatibility Mode</a></h1>
 <p>Previous versions of ANNIS might have a slightly different interpretation of the semantics of AQL.
 By choosing the compatibility mode in the search options, you can emulate the old behavior.
 The compatibility mode (also called &quot;quirks mode&quot;) has the following differences to the standard AQL semantics.</p>
-<a class="header" href="#indirect-precedence-is-limited-to-a-maximum-distance-of-50" id="indirect-precedence-is-limited-to-a-maximum-distance-of-50"><h2>Indirect Precedence is limited to a maximum distance of 50</h2></a>
+<h2><a class="header" href="#indirect-precedence-is-limited-to-a-maximum-distance-of-50" id="indirect-precedence-is-limited-to-a-maximum-distance-of-50">Indirect Precedence is limited to a maximum distance of 50</a></h2>
 <p>Indirect precedence (<code>.*</code>) was limited to a maximum distance of 50 in older versions for performance reasons.
 E.g. the query <code>tok .* tok</code> is effectively <code>tok .1,50 tok</code>.
 Depending on the text length of the documents, the compatibility mode might return fewer matches than the normal mode.</p>
-<a class="header" href="#non-reflexive-operator-is-only-applied-locally" id="non-reflexive-operator-is-only-applied-locally"><h2>Non-reflexive operator is only applied locally</h2></a>
+<h2><a class="header" href="#non-reflexive-operator-is-only-applied-locally" id="non-reflexive-operator-is-only-applied-locally">Non-reflexive operator is only applied locally</a></h2>
 <p>The operands of non-reflexive operators must be different.
 In standard AQL, a new match can be only included if the new match is different to all other matches.
 In contrast, the compatibility mode only enforces direct non-reflexivity.
@@ -702,7 +709,7 @@ E.g. in the query</p>
 <pre><code>node  &amp; node &amp; node &amp; #1 _o_ #2 &amp; #2 _o_ #3
 </code></pre>
 <p>the first node must be different from the second node and the second node must be different from the third.
-In compatibility mode, it is allowed that <code>#1</code> and <code>#3</code> reference the same match because there is no
+In compatibility mode, it is allowed that <code>#1</code> and <code>#3</code> reference the same match because there is no 
 non-reflexive operator directly between them.
 You would need to change the query to</p>
 <pre><code>node  &amp; node &amp; node &amp; #1 _o_ #2 &amp; #2 _o_ #3 &amp; #1 _o_ #3
@@ -710,7 +717,7 @@ You would need to change the query to</p>
 <p>to enforce that these operand are not the same.
 The standard mode will not include a match if <code>#1</code> and <code>#3</code> reference the same match per default.
 This does not affect the addition of matches if the operator is reflexive.</p>
-<a class="header" href="#meta-is-still-allowed" id="meta-is-still-allowed"><h2><code>meta::</code> is still allowed</h2></a>
+<h2><a class="header" href="#meta-is-still-allowed" id="meta-is-still-allowed"><code>meta::</code> is still allowed</a></h2>
 <p>Meta data constraints have been replaced with the part-of operator <code>@*</code> and will result
 in a syntax error for the normal query mode.
 In the compatibility mode, <code>meta::</code> is still allowed.</p>

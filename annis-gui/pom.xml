@@ -7,7 +7,7 @@
 	<parent>
 		<artifactId>annis-all</artifactId>
 		<groupId>de.hu-berlin.german.korpling.annis</groupId>
-		<version>4.0.0-beta.2</version>
+		<version>4.0.0-beta.3</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -97,12 +97,13 @@
 				</executions>
 			</plugin>
 
+
 			<!-- A simple Jetty test server at http://localhost:8080/annis-gui can 
 				be launched with the Maven goal jetty:run and stopped with jetty:stop -->
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>9.3.7.v20160115</version>
+				<version>9.3.27.v20190418</version>
 				<configuration>
 					<webApp>
 						<contextPath>/annis-gui</contextPath>
@@ -144,6 +145,60 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>mdbook</id>
+			<activation>
+				<file>
+					<exists>${user.home}/.cargo/bin/mdbook</exists>
+				</file>
+			</activation>
+
+			<build>
+				<plugins>
+					<!-- Compile the online help with mdBook -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.6.0</version>
+						<executions>
+							<execution>
+								<id>compile-online-help</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>mdbook</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+									<arguments>
+										<argument>build</argument>
+										<argument>-d</argument>
+										<argument>${project.basedir}/src/main/webapp/VAADIN/help/</argument>
+										<argument>${project.basedir}/../docs/online-help/</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- the online help directory should be cleaned as well -->
+					<plugin>
+						<artifactId>maven-clean-plugin</artifactId>
+						<version>3.1.0</version>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>${project.basedir}/src/main/webapp/VAADIN/help/</directory>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+							</filesets>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
 	<dependencies>
 
 		<dependency>
@@ -164,13 +219,6 @@
 			<groupId>com.github.vaadin4qbanos</groupId>
 			<artifactId>jsclipboard</artifactId>
 			<version>1.0.12</version>
-		</dependency>
-
-		<dependency>
-			<groupId>de.hu-berlin.german.korpling.annis</groupId>
-			<artifactId>annis-docs</artifactId>
-			<version>${project.version}</version>
-			<type>pom</type>
 		</dependency>
 
 		<dependency>
