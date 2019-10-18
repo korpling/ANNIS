@@ -21,11 +21,6 @@ mvn -N keepachangelog:release
 ~~~
 and commit your changes.
 
-3. Update and commit  **license information**
-
-~~~bash
-mvn license:add-third-party license:download-licenses
-~~~
 
 ### Testing cycle
 
@@ -40,9 +35,14 @@ If no known bugs are left to fix go to the next section.
 
 ### Finish phase
 
-1. **Finish** the release by executing either `mvn gitflow:release-finish` for regular releases or `mvn gitflow:hotfix-finish` for hotfixes.
-2. **Release** the staging repository to Maven Central with the Nexus interface: [https://oss.sonatype.org/](https://oss.sonatype.org/)
-3. Create a new **release on GitHub** including the changelog. Upload the binaries from Maven repository to GitHub release as well.
+1. Update and commit  **license information**
+
+~~~bash
+mvn license:add-third-party license:download-licenses
+~~~
+2. **Finish** the release by executing either `mvn gitflow:release-finish` for regular releases or `mvn gitflow:hotfix-finish` for hotfixes.
+3. **Release** the staging repository to Maven Central with the Nexus interface: [https://oss.sonatype.org/](https://oss.sonatype.org/)
+4. Create a new **release on GitHub** including the changelog. Upload the binaries from Maven repository to GitHub release as well.
 
 A new version of the User and Developer Guide will be deployed by Travis CI.
 
