@@ -1,0 +1,1647 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>ANNIS User Guide</title>
+        
+        <meta name="robots" content="noindex" />
+        
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li><a href="installation-kickstarter.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li><a href="installation-server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li><a href="installation-migrate-annis3.html"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li><a href="interface.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li><li><a href="aql-compatibility-mode.html"><strong aria-hidden="true">4.9.</strong> Differences in Compatibility Mode</a></li></ol></li><li><a href="visualizations.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li><a href="visualizations-list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li><a href="visualizations-context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li><a href="visualizations-documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li><a href="visualizations-rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li><a href="import-and-config.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li><a href="import-and-config-convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li><a href="import-and-config-import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li><a href="import-and-config-corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li><a href="import-and-config-instances.html"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li><a href="import-and-config-user.html"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li><a href="import-and-config-admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li><a href="advanced.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li><a href="advanced-errorcodes.html"><strong aria-hidden="true">7.1.</strong> Error Codes of the administration tools</a></li><li><a href="advanced-custom-login.html"><strong aria-hidden="true">7.2.</strong> Provide your own login-system</a></li><li><a href="advanced-links-to-queries.html"><strong aria-hidden="true">7.3.</strong> Links to queries</a></li><li><a href="advanced-embed-vis.html"><strong aria-hidden="true">7.4.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">ANNIS User Guide</h1>
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
+<p>ANNIS is an open source, browser-based search and visualization architecture for
+multi-layer corpora, developed at Humboldt-Universität zu Berlin, Georgetown
+University and Potsdam University. It can be used to search for complex graph
+structures of annotated nodes and edges forming a variety of linguistic structures, such as constituent or dependency syntax trees, coreference, rhetorical structure and parallel alignment edges, span annotations and associated multi-modal data (audio/video). </p>
+<p><img src="images/annis3_full.png" alt="ANNIS user interface" /></p>
+<p>This user guide provides an overview of the current ANNIS system, first steps for installing either a local instance or an ANNIS server with a demo corpus, as well as tutorials for converting data for ANNIS and running queries with AQL (ANNIS Query Language).</p>
+<h1><a class="header" href="#installation" id="installation">Installation</a></h1>
+<p>There are two editions of ANNIS, one for the local use on a standard computer (ANNIS Kickstarter) and one which is only needed when running a web-server. 
+Both versions require the Installation of Java OpenJDK 8.
+If your operating system does already include Java. we recommend the installation of the open-source and free of charge installers provided at <a href="https://adoptopenjdk.net/">https://adoptopenjdk.net/</a>.</p>
+<h1><a class="header" href="#installing-a-local-version-annis-kickstarter" id="installing-a-local-version-annis-kickstarter">Installing a Local Version (ANNIS Kickstarter)</a></h1>
+<p>Local users who do not wish to make their corpora available online can install ANNIS 
+Kickstarter under  most   versions   of  Linux,   Windows and  MacOS. 
+To install Kickstarter follow these steps:</p>
+<ol>
+<li>Download and unzip the ANNIS Kickstarter ZIP-file from the ANNIS website.</li>
+<li>Start AnnisKickstarter.bat if you’re using Windows, AnnisKickstarter.cmd on
+Mac or run the bash script AnnisKickstarter.sh otherwise (this may take a few
+seconds the first time you run Kickstarter). At this point your Firewall may try
+to block Kickstarter and offer you to unblock it – do so and Kickstarter should
+start up.</li>
+</ol>
+<p><em><strong>Note:</strong></em> For most users it is a good idea to give Java more memory (if this is not
+already the default). You can do this by editing the script AnnisKickstarter and
+typing the following after the call to start java (after java or javaw in the .sh
+or .bat script respectively):</p>
+<pre><code>-Xss1024k -Xmx1024m
+</code></pre>
+<ol start="3">
+<li>Download and unzip the GUM demo corpus from the ANNIS website:
+<a href="http://corpus-tools.org/annis/corpora.html">http://corpus-tools.org/annis/corpora.html</a>.</li>
+<li>Press “Import Corpus” and navigate to the directory containing the directory
+<code>GUM_annis/</code>. Select this directory (but do not go into it) and press OK.</li>
+<li>Once import is complete, press “Launch Annis frontend” test the corpus (click
+on one of the example queries displayed on the screen, or try selecting the
+GUM corpus, typing <code>pos=&quot;NN&quot;</code> in the AnnisQL box at the top left and clicking
+“Show Result”. See the sections <a href="interface.html">“Using the ANNIS interface”</a>and <a href="aql.html">“ANNIS Query Language (AQL)”</a> in this guide for some more example queries, or press the Tutorial button in the
+Help/Examples tab of the interface for more information).</li>
+</ol>
+<h1><a class="header" href="#installing-an-annis-server" id="installing-an-annis-server">Installing an ANNIS Server</a></h1>
+<p>The ANNIS server version can be installed on UNIX based servers, or else under
+Windows using <a href="http://www.cygwin.com/">Cygwin</a>, the freely available UNIX emulator. To install the ANNIS server:</p>
+<ol>
+<li>Install a Java Servlet Container (&quot;Java web server&quot;) such as Tomcat or Jetty</li>
+<li>Download the ANNIS service distribution file <code>annis-service-&lt;version&gt;- distribution.tar.gz</code> from the website and then unzip the downloaded file:</li>
+</ol>
+<pre><code class="language-bash">tar xzvf annis-service-&lt;version&gt;-distribution.tar.gz -C &lt;installation directory&gt;
+</code></pre>
+<ol start="3">
+<li>Set the environment variables (each time when starting up)</li>
+</ol>
+<pre><code class="language-bash">export ANNIS_HOME=&lt;installation directory&gt;
+
+export PATH=$PATH:$ANNIS_HOME/bin
+</code></pre>
+<ol start="4">
+<li>Now you can import some corpora:</li>
+</ol>
+<pre><code class="language-bash">annis-admin.sh import path/to/corpus1 path/to/corpus2 ...
+</code></pre>
+<ol start="6">
+<li>Then start the ANNIS service:</li>
+</ol>
+<pre><code class="language-bash">annis-service.sh start
+</code></pre>
+<ol start="7">
+<li>To get the ANNIS front-end running, first download <code>annis-gui-&lt;version&gt;.war</code>
+from our website and deploy it to your Java servlet container (this depends on
+the servlet container you use).</li>
+</ol>
+<h2><a class="header" href="#tomcat-utf8-encoding-in-serverxml" id="tomcat-utf8-encoding-in-serverxml">Tomcat: UTF8 encoding in server.xml</a></h2>
+<p>If using Tomcat make sure the UTF-8 encoding is used for URLs. Some
+installations of Tomcat don't use UTF-8 for the encoding of the URLs and that will
+cause problems when searching for non-ASCII characters. In order to avoid this
+the Connector-configuration needs the property &quot;URIEncoding&quot; set to &quot;UTF-8&quot;
+like in this example (<code>$CATALINA_HOME/server.xml</code>):</p>
+<pre><code class="language-xml">&lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;
+connectionTimeout=&quot;20000&quot;
+URIEncoding=&quot;UTF-8&quot;
+redirectPort=&quot;8443&quot;
+executor=&quot;tomcatThreadPool&quot; /&gt;
+</code></pre>
+<h2><a class="header" href="#install-annis-service-and-web-front-end-on-different-servers" id="install-annis-service-and-web-front-end-on-different-servers">Install ANNIS Service and Web front-end on different servers</a></h2>
+<p>It is possible to install the service and the front-end on different servers.
+Per-default the ANNIS service is only listening to connections from localhost for security reasons.
+You should use a proxy server if you want to enable access from outside.
+E.g. the Apache configuration could look like this:</p>
+<pre><code class="language-Apache">ProxyPass /annis3-service http://localhost:5711
+&lt;location /annis3-service&gt;
+ SSLRequireSSL
+&lt;/location&gt;
+</code></pre>
+<p>If you your server is <code>example.com</code> this configuration would result in the service URL <code>https://example.com/annis3-service/annis/</code></p>
+<p>The service is responsible for the authentication and authorization (see <a href="import-and-config-user.html">the user configuration</a> for more information), thus the corpora are only accessible by the 
+service if the user can provide the appropriate credentials.
+<a href="http://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Authentication</a> is used for transporting the user name and password as clear text over the network.
+<strong>Thus you should always make sure to enforce encrypted SSL (HTTPS) connections for the public accessable service.</strong></p>
+<p>After you made the service available for other servers you have to configure the front-end to use this non-default service URL.
+Change the file <code>WEB-INF/classes/annis-gui.properties</code> and set the <code>AnnisWebService.URL</code> to the right value:</p>
+<pre><code class="language-Ini">AnnisWebService.URL=https://example.com/annis3-service/annis/
+DotPath=dot
+# set to an valid e-mail adress in order to enable the &quot;Report a bug&quot; button
+bug-e-mail=
+</code></pre>
+<p>If you want to secure your service even further you might want to setup a firewall in a way that only the server running the front-end is allowed to access the HTTP(S) port on the server running the backend service.</p>
+<h1><a class="header" href="#migrating-from-annis-3" id="migrating-from-annis-3">Migrating from ANNIS 3</a></h1>
+<p>These instructions are a guideline for upgrading the installation of ANNIS on a UNIX-like server. 
+If you use the <a href="installation-kickstarter.html">ANNIS Kickstarter version</a> 
+just download the new version and (re-) import the corpora you need.
+Please read <a href="installation-server.html">the installation instructions</a> first if you
+haven't done so yet.</p>
+<h2><a class="header" href="#manual-upgrade" id="manual-upgrade">Manual upgrade</a></h2>
+<h4><a class="header" href="#1-save-old-user-configuration-and-reference-links" id="1-save-old-user-configuration-and-reference-links">1. Save old user configuration and reference links</a></h4>
+<p>The user configuration folder can be re-used from the existing ANNIS service and does not need to be copied.
+However, users can store custom settings which are stored in a database table with the name <code>user_config</code>.
+You can export the old version of the table as a CSV file by executing</p>
+<pre><code class="language-.sh">annis-admin.sh dump user_config user_config.csv
+</code></pre>
+<p>using the old ANNIS service.
+You can select any output file in a location of your choice.
+If you want to migrate the reference links, you can export them as well:</p>
+<pre><code class="language-.sh">annis-admin.sh dump url_shortener url_shortener.csv
+</code></pre>
+<h4><a class="header" href="#2-download" id="2-download">2. Download</a></h4>
+<p>Download both the <code>annis-service-&lt;VERSION&gt;.tar.gz</code> and the <code>annis-gui-&lt;VERSION&gt;.war</code>
+to a folder of your choice, e.g. <code>/tmp/</code>.</p>
+<h4><a class="header" href="#3-install-the-new-service" id="3-install-the-new-service">3. Install the new service</a></h4>
+<p>Unzip the annis service to a new  directory (don't delete or stop the old service)
+and install it. 
+These steps are similiar to how to <a href="./installation-server.html">install a new ANNIS service</a>.</p>
+<pre><code class="language-.sh">tar xvzf /tmp/annis-service-&lt;VERSION&gt;.tar.gz -C &lt;new installation directory&gt;
+export ANNIS_HOME=&lt;new installation directory&gt;&gt;
+export PATH=$PATH:$ANNIS_HOME/bin
+</code></pre>
+<p>If you made any manual changes to the <code>conf/annis-service.properties</code> file copy the relevant changes to the new installation.
+Make sure the changed configuration values also exist in the new version ANNIS.</p>
+<h4><a class="header" href="#4-copy-old-corpora" id="4-copy-old-corpora">4. Copy old corpora</a></h4>
+<p>The <code>import</code> command of the <code>annis-admin.sh</code> now supports an additional parameter <code>--service-url</code>, which tells the command to import all corpora available from the running service.</p>
+<p>You can execute the command</p>
+<pre><code class="language-.sh">annis-admin.sh import --service-url &lt;old-service-url&gt;
+</code></pre>
+<p>to import all the public available corpora from the old service.
+<strong>For this command to work correctly, the new service needs access to same files from where the old service imported the corpora</strong>.
+It is therefore best to run both services on the same server or to copy the directories which contain the corpora from the old server to the new one.
+If corpora are not available without login, you can add the <code>--service-username</code> parameter to specify a user name with access to all corpora.
+The import command will ask you for the password interactively.</p>
+<p>This can take a long time, so if you use SSH you might want use a program like e.g. <a href="http://byobu.org/">Byobu</a> to start a terminal that continues to run process in the background even if the connection is interrupted.</p>
+<h4><a class="header" href="#5-migrate-user-configuration-and-reference-links" id="5-migrate-user-configuration-and-reference-links">5. Migrate user configuration and reference links</a></h4>
+<p>You can restore the user settings, execute</p>
+<pre><code class="language-.sh">annis-admin.sh restore user_config user_config.csv
+</code></pre>
+<p>ANNIS aims to be as backward-compatible as possible, but we need to make sure the reference links actually point not only to the same queries and corpora, but show exactly the same result <sup class="footnote-reference"><a href="#sameresult">1</a></sup>.
+The special <code>migrate-url-shortener</code> sub-command of the <code>annis-admin.sh</code> program will execute each query in the given CSV file both on the old ANNIS service and on the new one.</p>
+<pre><code class="language-.sh">annis-admin.sh migrate-url-shortener --service-url &lt;old-service-url&gt; url_shortener.csv
+</code></pre>
+<p>It will then compare the results.
+If both results are exactly the same, it migrates the reference link to the new system.
+Some queries only work in the same way in <a href="./aql-compatibility-mode.html">compatibility query mode</a>, these will be rewritten automatically.
+The user will be able to execute this query normally, but sees a warning that its using deprecated functions of the query language.
+For queries where both the normal and the compatibility mode don't return the same results, they are still migrated but a clear warning is shown to the user before execution, that this query is known to give different results compared to the previous version of ANNIS.</p>
+<p>The command will give a summary how many reference links have been migrated successfully and which kind of errors occurred on the other ones.
+If you think a specific query triggers a bug in the new version of ANNIS, please check if there is already a bug report on <a href="https://github.com/korpling/ANNIS/issues">https://github.com/korpling/ANNIS/issues</a> or open a new one.</p>
+<h4><a class="header" href="#6-switch-service" id="6-switch-service">6. Switch service</a></h4>
+<p>Stop the old service and start the
+new service. Remember to set the <code>ANNIS_HOME</code> variable to the right value in
+both cases before you call <code>annis-service.sh start/stop</code> command.</p>
+<h4><a class="header" href="#7-upgrade-front-end" id="7-upgrade-front-end">7. Upgrade front-end</a></h4>
+<p>Undeploy the old WAR file and deploy the new WAR file.</p>
+<h4><a class="header" href="#8-cleanup" id="8-cleanup">8. Cleanup</a></h4>
+<p>If everything works as expected you can delete the old installation files. 
+To delete all unused external data files execute</p>
+<pre><code class="language-bash">annis-admin.sh cleanup-data
+</code></pre>
+<p><em><strong>Warning!</strong></em> This will delete all data files not known to the current instance of ANNIS.
+If you have multiple parallel installations and did not use different values for
+the <code>annis.data-path</code> variable in the <code>conf/annis-service.properties</code>
+the data files of the other installations will be lost.</p>
+<p><sup class="footnote-reference"><a href="#sameresult:">2</a></sup> Same result means, that the overall count is correct, that the matches have the same Salt IDs and that they are presented in the same order.</p>
+<h1><a class="header" href="#using-the-annis-interface" id="using-the-annis-interface">Using the ANNIS interface</a></h1>
+<p>The ANNIS interface is comprised of several areas, the most important of
+which are the search form on the left side and the results tab on the right side.</p>
+<p><img src="images/annis3_interface.png" alt="Screenshot of the ANNIS user interface" /></p>
+<h1><a class="header" href="#search-form" id="search-form">Search Form</a></h1>
+<p><img src="images/searchform.png" alt="ANNIS search form" /></p>
+<p>The Search Form can be found on the left of the interface window. It's
+bottom part shows the list of currently available corpora. By clicking
+on the line with the corpus name, it is possible to select which corpora
+should be searched in (hold down 'ctrl' to select multiple corpora
+simultaneously). You may also configure groups of corpora or type in the
+filter box to view subsets of the corpora.</p>
+<p>The &quot;AQL&quot; field at the top of the form is used for inputting queries
+manually (see the tutorials on the ANNIS Query Language from the ANNIS
+website). As soon as one or several corpora are selected and a query is
+entered or modified, the query will be validated automatically and
+possible errors in the query syntax will be commented on in the
+&quot;Status&quot; box below (which says &quot;valid query&quot; in the image above).</p>
+<p>Once a valid query has been entered, pressing the &quot;Search&quot; button will
+retrieve the number of matching positions and documents in the selected
+corpora in the Status box and open the Result tab to display the first
+set of matches.</p>
+<p><img src="images/searchoptions.png" alt="ANNIS search options" /></p>
+<p>In order to get more control over the search you can click on &quot;Search
+Options&quot; to unfold more detailed search options. The context
+surrounding the matching expressions in the result list ist determined
+by the &quot;Left Context&quot; and &quot;Right Context&quot; options and can be changed
+on each side (by default up to 20 tokens). You can also configure how
+many results are shown per page, what order results are shown in
+(ascending, descending or random) and for some corpora, you can select
+alternative segmentation layers to visualize data (relevant for
+languages with multiple tokens per word form, etc., such as Arabic).
+Entire texts can also be viewed using special document visualizations or
+by clicking on the document icon next to each corpus name, if available.</p>
+<p>The &quot;Query Language&quot; option allows to switch between the default AQL dialect 
+and an <a href="aql-compatibility-mode.html">compatibility mode</a> emulating the behavior of the older ANNIS3.
+Make sure to use the latest version for all new queries.</p>
+<h1><a class="header" href="#result-window" id="result-window">Result Window</a></h1>
+<p><img src="images/search_bar.png" alt="ANNIS result window toolbar" /></p>
+<p>The result window shows search results in pages of 10 hits each by
+default (this can be changed in the Search Form). The toolbar at the top
+of the window allows you to navigate between these pages. The &quot;Token
+Annotations&quot; button on the toolbar allows you to toggle the token based
+annotations, such as lemmas and parts-of-speech, on or off for you
+convenience. You can use hyperlinks to your queries by copying the
+current browser URL for e-mail or citation purposes, allowing others to
+reproduce your query.</p>
+<p>If your corpus contains multiple alternative text layers or
+segmentations (e.g. normalized and un-normalized text), you may switch
+between these on the fly by using the &quot;base text&quot; menu.</p>
+<p><img src="images/KWIC_narrow.png" alt="KWIC concordance in ANNIS" /></p>
+<p>The result list itself initially shows a KWIC (key word in context)
+concordance of matching positions in the selected corpora, with the
+matching regions marked in color and the context in black on either
+side. Colors in the result match the colors of search expressions in the
+search box (red for the search item #1, purple for #2, etc.).</p>
+<p>Context can be adjusted for individual search results up to the maximum
+allowed for the current corpus. Token annotations are displayed in gray
+under each token, and hovering over them with the mouse will show the
+annotation name and namespace. More complex annotation levels can be
+expanded, if available, by clicking on the plus icon next to the
+level's name, e.g. dependencies and referent information for the
+annotations in the dependency tree and grid views in the picture below.</p>
+<p><img src="images/annotation_levels.png" alt="visualization of different annotation levels" /></p>
+<h1><a class="header" href="#query-builder" id="query-builder">Query Builder</a></h1>
+<p>To open the graphical query builder, click on the <strong>Query Builder</strong>
+button. On the left-hand side of the toolbar at the top of the query
+builder canvans, you will see the <strong>Add Node</strong> button. Use this button
+to define nodes to be searched for (tokens, non-terminal nodes or
+annotations). Creating nodes and modifying them on the canvas will
+immediately update the AQL field in the Search Form with your query,
+though updating the query on the Search Form will not create a new graph
+in the Query Builder.</p>
+<p><img src="images/query_builder_empty.png" alt="The Query Builder tab and the Create Node button" /></p>
+<p>In each node you create you may click on <img src="images/list-add.png" alt="The Add Node button" /> to specify an 
+annotation value. The annotation name can be typed in or selected from a drop down list once a corpus is
+selected. The operator field in the middle allows you to choose between
+an exact match (the '=' symbol) or wildcard search using Regular
+Expressions (the '~' symbol). The annotation value is given on the
+right, and should <strong>NOT</strong> be surrounded by quotations (see the example
+below). It is also possible to specify multiple annotations applying to
+the same position by clicking on <img src="images/list-add.png" alt="The Add Node button" />
+multiple times. Clicking on <img src="images/edit-clear.png" alt="The Clear all nodes button" />
+will delete the values in the node. To search
+for word forms, simply choose &quot;tok&quot; as the field name on the left. A
+node with no data entered will match any node, that is an underspecified
+token or non-terminal node or annotation.</p>
+<p><img src="images/node.png" alt="Query Builder node" /></p>
+<p>To specify the relationship between nodes, first click on the &quot;Edge&quot;
+link at the top left of one node, and then click the &quot;Dock&quot; link which
+becomes available on the other nodes. An edge will connect the nodes
+with an extra box from which operators may be selected (see below). For
+operators allowing additional labels (e.g. the dominance operator <code>&gt;</code>
+allows edge labels to be specified), you may type directly into the
+edge's operator box, as in the example with a &quot;func&quot; label in the
+image below. Note that the node clicked on first (where the &quot;Edge&quot;
+button was clicked) will be the first node in the resulting quey, i.e.
+if this is the first node it will dominate the second node (<code>#1 &gt; #2</code>)
+and not the other way around, as also represented by the arrows along
+the edge.</p>
+<p><img src="images/edge.png" alt="Connecting nodes with an edge" /></p>
+<h1><a class="header" href="#annis-query-language-aql" id="annis-query-language-aql">ANNIS Query Language (AQL)</a></h1>
+<p>ANNIS comes with its own query language called ANNIS Query Language (AQL).
+AQL is based on the concept of searching for annotation attributes and relations between them.</p>
+<h1><a class="header" href="#searching-for-word-forms" id="searching-for-word-forms">Searching for Word Forms</a></h1>
+<p>To search for word forms in ANNIS, simply select a corpus (in this
+example the freely available <a href="https://corpling.uis.georgetown.edu/gum/">GUM corpus</a>) and enter a search string
+between double quotation marks, e.g.:</p>
+<pre><code>&quot;do&quot;
+</code></pre>
+<p>Note that the search is <strong>case sensitive</strong>, so it will not find cases of
+capitalized 'Do', for example at the beginning of a sentence. In order
+to find both options, you can either look for one form OR the other
+using the pipe sign ( <code>|</code> ):</p>
+<pre><code>&quot;do&quot; | &quot;Do&quot;
+</code></pre>
+<p>or else you can use <a href="aql-regex.html">regular expressions</a>, which must
+be surrounded by slashes ( <code>/</code> ) instead of quotation marks:</p>
+<pre><code>/[Dd]o/
+</code></pre>
+<p>To look for a sequence of multiple word forms, enter your search terms
+separated by <code>&amp;</code> and then specify that the relation between the elements
+is one of <strong>precedence</strong>, as signified by the period ( <strong><code>.</code></strong> )
+operator:</p>
+<pre><code>&quot;do&quot; &amp; &quot;n't&quot; &amp; #1 . #2
+</code></pre>
+<p>The expression <code>#1 . #2</code> signifies that the first element (&quot;do&quot;)
+precedes the second element (&quot;n't&quot;). Alternatively, you can also place
+the operator directly between the search elements as a <strong>shortcut</strong>. The
+following shortcut query is equivalent to the one above:</p>
+<pre><code>&quot;do&quot; . &quot;n't&quot;`
+</code></pre>
+<p>For <strong>indirect precedence</strong> (where other tokens may stand between the
+search terms), use the <strong><code>.*</code></strong> operator:</p>
+<pre><code>/[Dd]o/ &amp; &quot;n't&quot; &amp; &quot;any&quot; &amp; #1 . #2 &amp; #2 .* #3 
+</code></pre>
+<p><strong>OR using shortcuts:</strong></p>
+<pre><code>/[Dd]o/ . &quot;n't&quot; .* &quot;any&quot;
+</code></pre>
+<p>The queries above find sequences beginning with the token &quot;Do&quot; or &quot;do&quot;,
+followed directly by &quot;n't&quot;, which must be followed either directly or
+indirectly (.*) by &quot;any&quot;. A range of allowed distances can also be
+specified numerically as follows:</p>
+<pre><code>/[Nn]ot/ &amp; &quot;all&quot; &amp; #1 .1,5 #2
+</code></pre>
+<p><strong>OR:</strong></p>
+<pre><code>/[Nn]ot/ .1,5 &quot;all&quot;
+</code></pre>
+<p>Meaning the two words &quot;not&quot; and &quot;all&quot; may appear at a distance of 1 to 5
+tokens. The operator <code>.*</code> allows a distance of up to 50 tokens by
+default, so searching with <code>.1,50</code> is the same as using <code>.*</code> instead.
+Greater distances (e.g. <code>.1,100</code> for 'within 100 tokens') should always
+be specified explicitly.</p>
+<p>Finally, we can add metadata restrictions to the query, which filter out
+documents not matching our definitions. Metadata attributes must be connected to
+other non-meta attributes with the <code>@*</code> (part-of) operator:</p>
+<pre><code>&quot;want&quot; &amp; &quot;to&quot; &amp; #1 .1,5 #2
+&amp; type=&quot;interview&quot; &amp; #1 @* #2 
+</code></pre>
+<p>To view metadata for a search result or for a corpus, press the &quot;i&quot; icon
+next to it in the result window or in the search form respectively.</p>
+<h1><a class="header" href="#searching-for-annotations" id="searching-for-annotations">Searching for Annotations</a></h1>
+<p>Annotations may be searched for using an annotation name and value. The
+names of the annotations vary from corpus to corpus, though many corpora
+contain part-of-speech and lemma annotations with the names <code>pos</code> and
+<code>lemma</code> respectively (annotation names are <strong>case sensitive</strong>). For
+example, to search for all forms of the verb <em>be</em> in the GUM corpus,
+simply select the GUM corpus and enter:</p>
+<pre><code>lemma=&quot;be&quot;
+</code></pre>
+<p>Negative searches are also possible using <code>!=</code> instead of <code>=</code>. For negated
+tokens (word forms) use the reserved attribute tok. For example:</p>
+<pre><code>lemma!=&quot;be&quot;
+</code></pre>
+<p>or:</p>
+<pre><code>tok!=&quot;be&quot; 
+</code></pre>
+<p>Metadata attributes can also be negated:</p>
+<pre><code>lemma=&quot;be&quot; @* type!=&quot;interview&quot;
+</code></pre>
+<p>To only find finite forms of a verb in GUM, use the part-of-speech (pos)
+annotation concurrently with lemma, and specify that both the lemma and
+pos should apply to the same element. For example for inflected forms of
+the verb <em>give</em>:</p>
+<pre><code>lemma=&quot;give&quot; &amp; pos=/VV.+/ &amp; #1 _=_ #2
+</code></pre>
+<p>OR (using a shortcut):</p>
+<pre><code>lemma=&quot;give&quot; _=_ pos=/VV.+/
+</code></pre>
+<p>The regular expression <code>/VV.+/</code> means a part of speach that begins with
+VV (verb), but has additional characters (.+), such as for past tense
+(VVD) or gerund (VVG). The expression <code>#1 _=_ #2</code> uses the span identity
+operator to specify that the first annotation and the second annotation
+apply to exactly the same position in the corpus.</p>
+<p>Annotations can also apply to longer spans than a single token: for
+example, in GUM, the annotation <code>entity</code> signifies the entity type of a
+discourse referent. This annotation can also apply to phrases longer
+than one token. The following query finds spans containing a discourse
+referent who is a person:</p>
+<pre><code>entity=&quot;person&quot;
+</code></pre>
+<p>If the corpus contains more than one annotation type named <code>entity</code>, a
+namespace may be added to disambiguate these annotations (for example,
+the entity annotation in the GUM corpus has the namespace <code>ref:</code>, so we
+can search for <code>ref:entity=&quot;person&quot;</code>). The namespace may always be
+dropped, but if there are multiple annotations with the same name but
+different namespaces, dropping the namespace will find all of those
+annotations. If you drop the value of the annotation, you can also
+search for any corpus positions that have that annotation, without
+constraining the value. For example, the following query finds all
+annotated entities in the GUM corpus, whether or not they are a person:</p>
+<pre><code>entity
+</code></pre>
+<p>In order to view the span of tokens to which the entity annotation
+applies, enter the query and click on &quot;Search&quot;, then open the
+<em>referents</em> layer to view the grid containing the span.</p>
+<p>Further operators can test the relationships between potentially
+overlapping annotations in spans. For example, the operator <code>_i_</code>
+examines whether one annotation fully contains the span of another
+annotation (the <em>i</em> stands for 'includes'):</p>
+<pre><code>head &amp; infstat=&quot;new&quot; &amp; #1 _i_ #2
+</code></pre>
+<p>OR (using a shortcut):</p>
+<pre><code>head _i_ infstat=&quot;new&quot;
+</code></pre>
+<p>This query finds information structurally new discourse referents
+(<code>infstat=&quot;new&quot;</code>) contained within headings (<code>head</code>).</p>
+<h1><a class="header" href="#searching-using-regular-expressions" id="searching-using-regular-expressions">Searching using Regular Expressions</a></h1>
+<p>When searching for word forms and annotation values, it is possible to
+employ wildcards as placeholders for a variety of characters, using
+Regular Expression syntax (see e.g.
+<a href="http://www.regular-expressions.info/">http://www.regular-expressions.info/</a> for detailed information).
+To search for wildcards use slashes instead of quotation marks to
+surround your search term. For example, you can use the <strong>period (<code>.</code>)</strong>
+to replace any single character:</p>
+<pre><code>tok=/ca./
+</code></pre>
+<p>This finds word forms such as &quot;cat&quot;, &quot;can&quot;, &quot;car&quot;, &quot;cap&quot; etc. It is also
+possible to make characters optional by following them with a <strong>question
+mark (<code>?</code>)</strong>. The following example finds cases of &quot;car&quot; and &quot;cart&quot;,
+since the &quot;t&quot; is optional:</p>
+<pre><code>tok=/cart?/
+</code></pre>
+<p>It is also possible to specify an arbitrary number of repetitions, with
+an <strong>asterisk (<code>*</code>)</strong> signifying zero or more occurrences and a <strong>plus
+(<code>+</code>)</strong> signifying at least one occurrence. For example, the first query
+below finds &quot;o&quot;, &quot;of&quot;, and &quot;off&quot; (since the asterisk means zero or more
+times the preceding &quot;f&quot;), while the second finds &quot;of&quot; and &quot;off&quot;, since
+at least one &quot;f&quot; must be found:</p>
+<pre><code>tok=/of*/
+</code></pre>
+<pre><code>tok=/of+/
+</code></pre>
+<p>It is possible to combine these operators with the period operator to
+mean any number of occurrences of an arbitrary character. For example,
+the query below searches for pos (part-of-speech) annotations that begin
+with &quot;VV&quot;, corresponding to all forms of lexical verbs (the auxiliaries
+&quot;be&quot; and &quot;have&quot; are tagged VB... and VH... respectively). The string
+&quot;VV&quot; means that the result must begin with &quot;VV&quot;, the period stands for
+any character, and the asterisk means that 'any character' can be
+repeated zero or more time, as above.</p>
+<pre><code>pos=/VV.*/
+</code></pre>
+<p>This finds both finite verbs (&quot;VVZ&quot;, &quot;VVP&quot;, &quot;VVD&quot;) and non-finite ones
+(&quot;VV&quot;) or gerunds (&quot;VVG&quot;). It is also possible to search for explicit
+alternatives by either specifying characters in <strong>square brackets</strong> or
+longer strings in <strong>round brackets separated by pipe symbols</strong>. The
+first example below finds either &quot;of&quot; or &quot;on&quot; (i.e. &quot;o&quot; followed by
+either &quot;f&quot; or &quot;n&quot;) while the second example finds lemma annotations that
+are either &quot;be&quot; or &quot;have&quot;.</p>
+<pre><code>tok=/o[nf]/
+</code></pre>
+<pre><code>lemma=/(be|have)/
+</code></pre>
+<p>Finally, negative searches can be used as usual with the exclamation
+point, and regular expressions can generally be used also in edge
+annotations. For example, if we search for trees (see also <a href="aql-trees.html">Searching
+for Trees</a>) where a lexical verb dominates another
+token with a dependency edge not containing 'obj', we can use a wildcard
+to rule out all edges labels containing those letters. This will give us
+all non-object dependants of lexical verbs:</p>
+<pre><code>pos=/VV.*/ &amp; tok &amp; #1 -&gt;dep[func!=/.*obj.*/] #2
+</code></pre>
+<p>OR (using a shortcut):</p>
+<pre><code>pos=/VV.*/ -&gt;dep[func!=/.*obj.*/] tok
+</code></pre>
+<h1><a class="header" href="#searching-for-trees" id="searching-for-trees">Searching for Trees</a></h1>
+<p>In corpora containing hierarchical structures, annotations such as
+syntax trees can be searched for by defining terminal or none-terminal
+node annotations, functional dependencies and their values (for
+dependencies see see <a href="aql-pointing.html">Searching for Pointing
+Relations</a>). A simple search for
+prepostional phrases in the GUM corpus looks like this:</p>
+<pre><code>const:cat=&quot;PP&quot;
+</code></pre>
+<p>If the corpus contains no more than one annotation called <code>cat</code>, the
+optional namespace, in this case <code>const:</code>, may be dropped. This finds
+all PP nodes in the corpus. You can also search for the NP being
+dominated by the PP like this:</p>
+<pre><code>cat=&quot;PP&quot; &amp; cat=&quot;NP&quot; &amp; #1 &gt; #2
+</code></pre>
+<p>OR (using a shortcut):</p>
+<pre><code>cat=&quot;PP&quot; &gt; cat=&quot;NP&quot;
+</code></pre>
+<p>To find all PP nodes directly dominating an adverb, you can combine a
+search for syntactic category and part-of-speech (pos) values (in this
+case &quot;RB&quot; for adverb). The query below gives the shortcut form:</p>
+<pre><code>cat=&quot;PP&quot; &gt; pos=&quot;RB&quot;
+</code></pre>
+<p>The operator <strong>&gt;</strong> signifies <strong>direct dominance</strong>, which must hold
+between the first and the second element. Once the Query Result tab is
+shown you may open the &quot;constituents&quot; annotation layer to see the
+corresponding tree.</p>
+<p><img src="images/tree_expanded.png" alt="" /></p>
+<p>Note that since the context is set to a number of tokens left and right
+of the search term, the tree for the whole sentence may not be
+retrieved, though you can change the amount of tokens at the top of each
+search result, or for all search results in the Search Options tab. To
+make sure that the whole clause is always included, you may want to
+specifically search for the clause or sentence dominating the PP. To do
+so, specify the sentence in another element and use the <strong>indirect
+dominance</strong> ( <strong>&gt;*</strong> ) operator:</p>
+<pre><code>cat=&quot;ROOT&quot; &gt;* cat=&quot;PP&quot; &gt; pos=&quot;RB&quot;
+</code></pre>
+<p>If the annotations in the corpus support it, you may also look for edge
+labels. Using the following query will find all adverbial modifier NPs,
+dominated by some node through an edge labeled ADV. Since we do not know
+anything about the modified node, we simply use the <code>node</code> element as a
+place holder. This element can match any node or annotation in the
+graph:</p>
+<pre><code>node &gt;[const:func=&quot;ADV&quot;] cat=&quot;NP&quot;
+</code></pre>
+<p>Again, the namespace <code>const:</code> is optional and only important if there
+are multiple 'func' annotations. It is also possible to negate the label
+of the dominance edge as in the following query:</p>
+<pre><code>cat &gt;[func!=&quot;TMP&quot;] cat
+</code></pre>
+<p>which finds all syntactic categories (value unspecified) dominating
+another syntactic category with a label other than &quot;TMP&quot;.</p>
+<h1><a class="header" href="#searching-for-pointing-relations" id="searching-for-pointing-relations">Searching for Pointing Relations</a></h1>
+<p>Pointing relations are used to express an arbitrary directed
+relationship between two elements (terminals or non-terminals) without
+implying dominance or coverage inheritance. For instance, in the GUM
+corpus, elements in the <code>ref:</code> namespace may point to each other to
+express coreference or anaphoric relations. The following query searches
+for two <code>entity</code> annotations, which specify whether a discourse referent
+is a person, or an animal, a location, an object, an abstract etc.</p>
+<pre><code>entity=&quot;person&quot; &amp; entity!=&quot;person&quot; &amp; #1 -&gt;coref #2
+</code></pre>
+<p>Using the pointing relation operator <code>-&gt;</code> with the type <code>coref</code>, the
+first <code>entity</code>, which should be a person, is said to be coreferent with
+its antecedent, the second entity, which is not a person. In practice,
+this will usually occur due to &quot;bridging&quot;, where something like a whole
+(e.g. an organization such as a 'research team') implies the existence
+of its part (e.g. persons, such as 'the scientists'). To see a
+visualization of the coreference relations, open the coreference
+annotation layer in the GUM corpus. In the image below, one of the
+matches for the above query is highlighted in red (die Seeburger und
+einige Groß-Glienicker ... sie 'the Seeburgers and some
+Groß-Glienickers... they'). Other discourse referents in the text
+(marked with an underline) may be clicked on, causing coreferential
+chains containing them to be highlighted as well. Note that discourse
+referents may overlap, leading to multiple underlines: Die Seeburger
+'the Seeburgers' is a shorter discourse referent overlapping with the
+larger one ('the Seeburgers and some Groß-Glienickers'), and each
+referent has its own underline. Annotations of the coreference edges of
+each relation can be viewed by hovering of the appropriate underline.</p>
+<p><img src="images/coref.png" alt="" /></p>
+<p>The pointing relation operator can also search for longer chains of
+coreference, using the asterisk extension shown below:</p>
+<pre><code>entity=&quot;organization&quot; -&gt;coref* entity=&quot;person&quot;
+</code></pre>
+<p>This finds all organizations that point back to a person at any point
+along the preceding coreference chain. It is also possible to specify
+annotations of pointing relations, which for coreference in the GUM
+corpus mark what kind of coreference is used: anaphoric, cataphoric,
+lexical coreference, apposition, or bridging. To find appositions of
+place entities, use the following query:</p>
+<pre><code>entity=&quot;place&quot; -&gt;coref[type=&quot;appos&quot;] entity=&quot;place&quot;
+</code></pre>
+<p>Another way to use pointing relations is found in syntactic dependency
+trees. The queries in this case can use both pointing relation types and
+annotations too, as in the following query:</p>
+<pre><code>pos=/VV[PZ]/ &amp; tok &amp; #1 -&gt;dep[func=&quot;dobj&quot;] #2
+</code></pre>
+<p>OR (using a shortcut):</p>
+<pre><code>pos=/VV[PZ]/ -&gt;dep[func=&quot;dobj&quot;] tok
+</code></pre>
+<p>This query searches for a present tense lexical verb (with the
+part-of-speech VVZ or VVP) and a token, with a pointing relation of the
+type 'dep' (for dependency) between the two, annotated with
+<code>func=&quot;dobj&quot;</code> (the function 'direct object'). The result can be viewed
+with the arch dependency visualizer, which shows the verb 'shows' and
+its object 'location'.</p>
+<p><img src="images/dep_vis.png" alt="" /></p>
+<h1><a class="header" href="#exporting-results" id="exporting-results">Exporting Results</a></h1>
+<p>To export search results, open the menu &quot;More&quot; between the Search and
+History buttons and select &quot;Export&quot;:</p>
+<p><img src="images/export.png" alt="" /></p>
+<p>Enter the query whose results you want to export as usual in the AQL
+box. Note that you <strong>do not need to carry out the query first</strong>. You can
+enter the query and export without pressing Search before. Several
+exporter modules can be selected from the Export tab shown below.</p>
+<p><img src="images/export2.png" alt="" /></p>
+<p>The SimpleTextExporter simply gives the text for all tokens in each
+search result, including context, in a one-row-per-hit format. The
+tokens covered by the match area are marked with square brackets and the
+results are numbered, as in the following
+example:</p>
+<pre><code>    0. of the International Brotherhood of [Magicians] Wednesday , October 9 , 
+    1. Magic Month in the United [States] . Wikinews spoke with William 
+    2. of the International Brotherhood of [Magicians] , about the current state 
+    3. - &quot; Scarne on Card [Tricks] &quot; and &quot; Scarne on 
+    4. and &quot; Scarne on Magic [Tricks] &quot; . That started me 
+</code></pre>
+<p>The TextExporter adds all annotations of each token separated by slashes
+(e.g. dogs/NNS/dog for a token dogs annotated with a part-of-speech NNS
+and a lemma dog).</p>
+<p>The GridExporter adds all annotations available for the span of
+retrieved tokens, with each annotation layer in a separate line.
+Annotations are separated by spaces and the hierarchical order of
+annotations is lost, though the span of tokens covered by each
+annotation may optionally be given in square brackets (to turn this off
+use the optional parameter <code>numbers=false</code> in the ‘Parameters’ box). The
+user can specify annotation layers to be exported in the additional
+‘Annotation Keys’ box, and annotation names should be separated by
+comas, as in the image above. Metadata annotations can also be exported
+by entering “metakeys=” and a list of comma separated metadata names in
+the Parameters box. If nothing is specified, all available annotations
+and no metadata will be exported. Multiple options are separated by a
+semicolon, e.g. the Parameters <code>metakeys=type,docname;numbers=false</code>. An
+example output with token numbers and the part of speech (pos) and
+syntactic category annotations looks as follows.</p>
+<pre><code>0.   tok  of the International Brotherhood of Magicians Wednesday 
+    pos  IN[1-1] DT[2-2] NP[3-3] NP[4-4] IN[5-5] NPS[6-6] NP[7-7] 
+    cat  S[1-6] VP[1-6] NP[1-6] PP[1-6] NP[2-4] PP[5-6] NP[6-6] NP[7-12] 
+</code></pre>
+<p>Meaning that the annotation cat=&quot;NP&quot; applies to tokens 1-6 in the search
+result, and so on. Note that when specifying annotation layers, if the
+reserved name 'tok' is not specified, the tokens themselves will not be
+exported (annotations only).</p>
+<p>The WekaExporter outputs the format used by the <a href="http://www.cs.waikato.ac.nz/ml/weka/">WEKA machine learning
+tool</a>. Only the attributes of the
+search elements (#1, #2 etc. in AQL) are outputted, and are separated
+by commas. The order and name of the attributes is declared in the
+beginning of the export text, as in this example:</p>
+<pre><code>@relation name
+
+@attribute #1_id string
+@attribute #1_span string
+@attribute #1_anno_const:cat string
+@attribute #2_id string
+@attribute #2_span string
+@attribute #2_anno_GUM:claws5 string
+@attribute #2_anno_GUM:lemma string
+@attribute #2_anno_GUM:pos string
+
+@data
+
+'11318611','the current state','NP','11318616','current','AJ0','current','JJ'
+'11318686','magic','NP','11318688','magic','AJ0','magic','JJ'
+'11318757','some basic tricks','NP','11318760','basic','AJ0','basic','JJ'
+</code></pre>
+<p>The export shows the properties of an NP node dominating a token with
+the part-of-speech JJ. Since the token also has other attributes, such
+as the lemma and part of speech tags, these are also retrieved.</p>
+<p>It is also possible to output metadata annotations per hit using the
+WekaExporter. To do so, use the parameter metakeys=meta1,meta2 etc. For
+example, if your documents have a metadata annotation called 'genre',
+you may export it for each search result as a further column using
+metakeys=genre in the parameters box.</p>
+<p>The CSVExporter behaves much like the WekaExporter, except that the Weka
+header specifying the content of the columns is not used (useful for
+importing into spreadsheet programs such as Excel or Calc).</p>
+<p>Note that exporting may be slow if the result set is large.</p>
+<h1><a class="header" href="#frequency-analysis" id="frequency-analysis">Frequency Analysis</a></h1>
+<p>To perform a frequency analysis, enter the query whose results you want
+to analyze as usual in the AQL box. Note that you <strong>do not need to carry
+out the query first</strong>. Next, open the menu “More” between the Search and
+History buttons and select “Frequency Analysis”:</p>
+<p><img src="images/export.png" alt="" /></p>
+<p>The interface will open the frequency analysis tab shown below.
+Initially, rows will be generated for the nodes present in the query.
+For example, two rows are automatically generated for the following
+query, which finds any pair of consecutive tokens:</p>
+<pre><code>tok . tok
+</code></pre>
+<p><img src="images/freq.png" alt="" /></p>
+<p>Clicking on “Perform frequency analysis” will produce a
+breakdown of all consecutive token bigrams in the corpus. The frequency
+graph will only show the first 500 elements, but the table below it will
+give the entire list of values, which can also be <strong>exported as a CSV
+file</strong>.</p>
+<p><img src="images/freq2.png" alt="" /></p>
+<p>To edit the analysis or analyze a new query, click the <strong>New Analysis</strong>
+button. It is also possible to <strong>add annotations</strong> to the analysis that
+were not in the original query, provided that these are expected to
+belong to some other node in the query. For example, the tokens in the
+GUM corpus also have part-of-speech and lemma information. We can
+replace the lines in the analysis specifying that tok values should be
+counted with pos values, which gives us part-of-speech bigrams. We can
+also add a lemma annotation belonging to the first search element, by
+clicking the Add button and entering the node definition number and
+annotation name we are interested in:</p>
+<p><img src="images/freq3.png" alt="" /></p>
+<p>As a result, we will get a count for each combination of values grouped
+by the first and second tokens' parts-of-speech, as well as the first
+token's lemma.</p>
+<h1><a class="header" href="#complete-list-of-operators" id="complete-list-of-operators">Complete List of Operators</a></h1>
+<p>AQL currently includes the following operators:</p>
+<table><thead><tr><th align="center">Operator</th><th align="left">Description</th><th align="center">Illustration</th><th align="left">Notes</th><th></th></tr></thead><tbody>
+<tr><td align="center"><code>.</code></td><td align="left">direct precedence</td><td align="center"><img src="images/A-pred-B.svg" alt="" /></td><td align="left">For non-terminal nodes, precedence is determined by the right-most and left-most terminal children. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>.layer</code></td><td></td></tr>
+<tr><td align="center"><code>.*</code></td><td align="left">indirect precedence</td><td align="center"><img src="images/A-pred-ind-B.svg" alt="" /></td><td align="left">For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>.*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>.layer,3,4</code></td><td></td></tr>
+<tr><td align="center"><code>^</code></td><td align="left">directly near</td><td align="center"><img src="images/A-pred-B.svg" alt="" /> or <img src="images/B-pred-A.svg" alt="" /></td><td align="left">Same as precedence, but in either order. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>^layer</code></td><td></td></tr>
+<tr><td align="center"><code>^*</code></td><td align="left">indirectly near</td><td align="center"><img src="images/A-pred-ind-B.svg" alt="" /> or <img src="images/B-pred-ind-A.svg" alt="" /></td><td align="left">Like indirect precedence in either order. The form <code>^n,m</code> can be used, e.g. <code>^3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>^*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>^layer,3,4</code></td><td></td></tr>
+<tr><td align="center"><code>&gt;</code></td><td align="left">direct dominance</td><td align="center"><img src="images/A-dom-B.svg" alt="" /></td><td align="left">A specific edge type may be specified, e.g. <code>&gt;secedge</code> to find secondary edges. Edge labels are specified in brackets, e.g. <code>&gt;[func=&quot;OA&quot;]</code> for an edge with the function 'object, accusative'</td><td></td></tr>
+<tr><td align="center"><code>&gt;*</code></td><td align="left">indirect dominance</td><td align="center"><img src="images/A-dom-ind-B.svg" alt="" /></td><td align="left">For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance</td><td></td></tr>
+<tr><td align="center"><code>@*</code></td><td align="left">part of sub-corpus</td><td align="center"></td><td align="left">Left attribute is part of a sub-corpus having the attribute of the right-hand side. For specific distance range in the sub-corpus hierarchy, <code>@n,m</code> can be used.</td><td></td></tr>
+<tr><td align="center"><code>_=_</code></td><td align="left">identical coverage</td><td align="center"><img src="images/A-cov-ident-B.svg" alt="" /></td><td align="left">Applies when two annotations cover the exact same span of tokens</td><td></td></tr>
+<tr><td align="center"><code>_i_</code></td><td align="left">inclusion</td><td align="center"><img src="images/A-cov-incl-B.svg" alt="" /></td><td align="left">Applies when one annotation covers a span identical to or larger than  another</td><td></td></tr>
+<tr><td align="center"><code>_o_</code></td><td align="left">overlap</td><td align="center"><img src="images/A-cov-over-B.svg" alt="" /></td><td align="left"></td><td></td></tr>
+<tr><td align="center"><code>_l_</code></td><td align="left">left aligned</td><td align="center"><img src="images/A-cov-left-B.svg" alt="" /></td><td align="left">Both elements span an area beginning with the same token</td><td></td></tr>
+<tr><td align="center"><code>_r_</code></td><td align="left">right aligned</td><td align="center"><img src="images/A-cov-right-B.svg" alt="" /></td><td align="left">Both elements span an area ending with the same token</td><td></td></tr>
+<tr><td align="center"><code>==</code></td><td align="left">value identity</td><td align="center"><strong>A = B</strong></td><td align="left">The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
+<tr><td align="center"><code>!=</code></td><td align="left">value difference</td><td align="center"><strong>A ≠ B</strong></td><td align="left">The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
+<tr><td align="center"><code>-&gt;LABEL</code></td><td align="left">labeled pointing relation</td><td align="center"><img src="images/A-point-direct-B.svg" alt="" /></td><td align="left">A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation=&quot;VALUE&quot;]</code></td><td></td></tr>
+<tr><td align="center"><code>-&gt;LABEL *</code></td><td align="left">indirect pointing relation</td><td align="center"><img src="images/A-point-ind-B.svg" alt="" /></td><td align="left">An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length n to m</td><td></td></tr>
+<tr><td align="center"><code>#x:arity=n</code></td><td align="left">arity</td><td align="center"><img src="images/A-arity.svg" alt="" /></td><td align="left">Specifies the amount of directly dominated children that the searched node has</td><td></td></tr>
+<tr><td align="center"><code>_ident_</code></td><td align="left">node identity</td><td align="center"></td><td align="left">True for two attributes that belong to the same node</td><td></td></tr>
+</tbody></table>
+<h2><a class="header" href="#unsupported-operators" id="unsupported-operators">Unsupported operators</a></h2>
+<p>The following operators have been available in the legacy version ANNIS3, but are not yet implemented in the newest ANNIS version.</p>
+<table><thead><tr><th align="center">Operator</th><th align="left">Description</th><th align="center">Illustration</th><th align="left">Notes</th></tr></thead><tbody>
+<tr><td align="center"><code>_ol_</code> and <code>_or_</code></td><td align="left">Overlap, but only on the left or right side</td><td align="center"></td><td align="left"></td></tr>
+<tr><td align="center"><code>&gt;@l</code></td><td align="left">left-most child</td><td align="center"><img src="images/A-left-B.svg" alt="" /></td><td align="left"></td></tr>
+<tr><td align="center"><code>&gt;@r</code></td><td align="left">right-most child</td><td align="center"><img src="images/A-right-B.svg" alt="" /></td><td align="left"></td></tr>
+<tr><td align="center"><code>$</code></td><td align="left">common parent node</td><td align="center"><img src="images/A-parent-B.svg" alt="" /></td><td align="left"></td></tr>
+<tr><td align="center"><code>$*</code></td><td align="left">common ancestor node</td><td align="center"><img src="images/A-ancestor-B.svg" alt="" /></td><td align="left"></td></tr>
+<tr><td align="center"><code>#x:tokenarity=n</code></td><td align="left">tokenarity</td><td align="center"><img src="images/A-tokenarity.svg" alt="" /></td><td align="left">Specifies the length of the span of tokens covered by the node</td></tr>
+<tr><td align="center"><code>#x:root</code></td><td align="left">root</td><td align="center"><img src="images/A-root.svg" alt="" /></td><td align="left">Specifies that the node is not dominated by any other node within its namespace       <strong>s</strong></td></tr>
+</tbody></table>
+<h1><a class="header" href="#differences-in-compatibility-mode" id="differences-in-compatibility-mode">Differences in Compatibility Mode</a></h1>
+<p>Previous versions of ANNIS might have a slightly different interpretation of the semantics of AQL.
+By choosing the compatibility mode in the search options, you can emulate the old behavior.
+The compatibility mode (also called &quot;quirks mode&quot;) has the following differences to the standard AQL semantics.</p>
+<h2><a class="header" href="#indirect-precedence-is-limited-to-a-maximum-distance-of-50" id="indirect-precedence-is-limited-to-a-maximum-distance-of-50">Indirect Precedence is limited to a maximum distance of 50</a></h2>
+<p>Indirect precedence (<code>.*</code>) was limited to a maximum distance of 50 in older versions for performance reasons.
+E.g. the query <code>tok .* tok</code> is effectively <code>tok .1,50 tok</code>.
+Depending on the text length of the documents, the compatibility mode might return fewer matches than the normal mode.</p>
+<h2><a class="header" href="#non-reflexive-operator-is-only-applied-locally" id="non-reflexive-operator-is-only-applied-locally">Non-reflexive operator is only applied locally</a></h2>
+<p>The operands of non-reflexive operators must be different.
+In standard AQL, a new match can be only included if the new match is different to all other matches.
+In contrast, the compatibility mode only enforces direct non-reflexivity.
+E.g. in the query</p>
+<pre><code>node  &amp; node &amp; node &amp; #1 _o_ #2 &amp; #2 _o_ #3
+</code></pre>
+<p>the first node must be different from the second node and the second node must be different from the third.
+In compatibility mode, it is allowed that <code>#1</code> and <code>#3</code> reference the same match because there is no 
+non-reflexive operator directly between them.
+You would need to change the query to</p>
+<pre><code>node  &amp; node &amp; node &amp; #1 _o_ #2 &amp; #2 _o_ #3 &amp; #1 _o_ #3
+</code></pre>
+<p>to enforce that these operand are not the same.
+The standard mode will not include a match if <code>#1</code> and <code>#3</code> reference the same match per default.
+This does not affect the addition of matches if the operator is reflexive.</p>
+<h2><a class="header" href="#meta-is-still-allowed" id="meta-is-still-allowed"><code>meta::</code> is still allowed</a></h2>
+<p>Meta data constraints have been replaced with the part-of operator <code>@*</code> and will result
+in a syntax error for the normal query mode.
+In the compatibility mode, <code>meta::</code> is still allowed.</p>
+<p>Be aware that meta data constraints like <code>meta::doc=&quot;mydocumentname&quot;</code> are applied to all conjunctions of the disjunction, which is seems counter-intuitive.
+E.g the query.</p>
+<pre><code>(pos=&quot;NN&quot; | lemma=&quot;be&quot; &amp; meta::age=&quot;20&quot;)
+</code></pre>
+<p>effectively becomes</p>
+<pre><code>(pos=&quot;NN&quot; &amp; meta::age=&quot;20&quot; | lemma=&quot;be&quot; &amp; meta::age=&quot;20&quot;)
+</code></pre>
+<h1><a class="header" href="#configuring-visualizations" id="configuring-visualizations">Configuring Visualizations</a></h1>
+<p>By default, ANNIS displays all search results in the Key Word in Context (KWIC)
+view in the &quot;Query Result&quot; tab, though in some cases you may wish to turn off this
+visualization (specifically dialog corpora, see below). Further visualizations, such as
+syntax trees or grid views, are displayed by default based on the following namespaces 
+(both nodes an edges can have namespaces):</p>
+<table><thead><tr><th>Element</th><th>Namespace</th><th>Visualizer</th></tr></thead><tbody>
+<tr><td>node</td><td>tiger</td><td>tree visualizer</td></tr>
+<tr><td>node</td><td>exmaralda</td><td>grid visualizer</td></tr>
+<tr><td>node</td><td>mmax</td><td>grid visualizer</td></tr>
+<tr><td>edge</td><td>mmax</td><td>discourse view</td></tr>
+</tbody></table>
+<p>In these cases the namespaces are usually taken from the source format in which the
+corpus was generated, and carried over into relANNIS during the conversion. It is also
+possible to use other namespaces, most easily when working with PAULA XML. In
+PAULA XML, the namespace is determined by the string prefix before the first period
+in the file name / paula_id of each annotation layer (for more information, see the
+<a href="http://www.sfb632.uni-potsdam.de/en/paula.html">PAULA XML documentation</a>).
+Data converted from EXMARaLDA can also optionally use speaker names as
+namespaces. For other formats and namespaces, see the SaltNPepper documentation of
+the appropriate format module (details in Chapter 6).
+FIXME: link to Chapter 6</p>
+<p>In order to manually determine the visualizer and the display name for each namespace
+in each corpus, the resolver table in the database must be edited. This can either be
+done by editing the relANNIS file <code>resolver_vis_map.annis</code> in the corpus directory
+before import, or within the database after import. To edit the table in the database
+after import, open PGAdmin (or if you did not install PGAdmin with ANNIS then via
+PSQL), and access the table resolver_vis_map (it can be found in PGAdmin under
+<em>PostgreSQL 9.[X] &gt; Databases &gt; anniskickstart &gt; Schemas &gt; public &gt; Tables</em> (for
+ANNIS servers replace “anniskickstart” with your database name, determined as
+<dbname> in the installation instructions). You may need to give your
+PostgreSQL password to gain access. Right click on the table and select <em>View Data &gt;
+View All Rows</em>. The table should look like this:</p>
+<p><img src="images/pgadmin-resolver.png" alt="pgAdmin resolver table" /></p>
+<p>The columns in the table (or the file <code>resolver_vis_map.annis</code> before import) can be
+filled out as follows:</p>
+<ul>
+<li><em>corpus</em> determines the corpora for which the instruction is valid (null values
+apply to all corpora, otherwise the name of the relevant corpus)</li>
+<li><em>version</em> is currently unused and reserved for future development</li>
+<li><em>namespace</em> specifies the relevant node or edge namespace which triggers the
+visualization</li>
+<li><em>element</em> determines if a node or an edge should carry the relevant annotation
+for triggering the visualization</li>
+<li><em>vis_type</em> determines the visualizer module used, see the <a href="visualizations-list.html">list of visualizations</a> for possible values</li>
+<li><em>display_name</em> determines the heading that is shown for each visualizer in the interface</li>
+<li><em>order</em> determines the order in which visualizers are rendered in the interface
+(low to high)</li>
+<li><em>mappings</em> provides additional parameters for some visualizations: (separate
+multiple values using a semicolon), see the <a href="visualizations-list.html">list of visualizations</a> for parameters for a specific visualizer</li>
+<li><em>visibility</em> is optional and can be set to:
+<ul>
+<li><em>hidden</em> - the default setting: the visualizer is not shown, but can be
+expanded by clicking on its plus symbol.</li>
+<li><em>permanent</em> - always shown, not closable</li>
+<li><em>visible</em> - shown initially, but closable by clicking on its minus symbol.</li>
+<li><em>removed</em> - not shown; this can be used to hide the KWIC visualization in
+corpora which require a grid by default (e.g. dialogue corpora)</li>
+<li><em>preloaded</em> - like hidden, but actually rendered in the background even
+before its plus symbol is clicked. This is useful for multimedia player
+visualizations, as the player can be invoked and a file may be loaded
+before the user prompts the playing action.</li>
+</ul>
+</li>
+</ul>
+<h1><a class="header" href="#list-of-visualizations" id="list-of-visualizations">List of Visualizations</a></h1>
+<h2><a class="header" href="#kwic" id="kwic"><code>kwic</code></a></h2>
+<p>Default key-word in context view.</p>
+<p><img src="images/vis-kwic.png" alt="kwic visualizer" /></p>
+<h2><a class="header" href="#tree" id="tree"><code>tree</code></a></h2>
+<p>Constituent syntax tree.</p>
+<p><img src="images/vis-tree.png" alt="tree visualizer" /></p>
+<h3><a class="header" href="#mappings" id="mappings">Mappings</a></h3>
+<p>The annotation names to be displayed in non terminal nodes can
+be set e.g. using <code>node_key:cat</code> for an annotation called <em>cat</em> (the default),
+and similarly the edge labels using <code>edge_key:func</code> for an edge label
+called <em>func</em> (the default). 
+It is also possible to use a different annotation
+layer for the leaves of the tree instead of the default tokens by
+specifying <code>terminal_name</code> for the annotation name and <code>terminal_ns</code> for
+the namespace. Multiple instructions are separated using semicolons.</p>
+<h2><a class="header" href="#grid" id="grid"><code>grid</code></a></h2>
+<p>Annotation grid, with annotations spanning multiple tokens.</p>
+<p><img src="images/vis-grid.png" alt="grid visualizer" /></p>
+<h3><a class="header" href="#mappings-1" id="mappings-1">Mappings</a></h3>
+<p>It is possible to specify the order of annotation layers in each grid.
+Use <code>annos: anno_name1, anno_name2, anno_name3</code> to specify the
+order or annotation layers. If <code>annos:</code> is used, additional annotation layers
+not present in the list will not be visualized. If mappings is left empty,
+layers will be ordered alphabetically. It is also possible to add
+annotations applying to the tokens to the visualization, rather than only
+span element annotations, by using <code>tok_anno:true</code>. Finally, you may
+hide the tokens that normally appear at the bottom of the grid using
+<code>hide_tok:true</code>.</p>
+<h2><a class="header" href="#grid_tree" id="grid_tree"><code>grid_tree</code></a></h2>
+<p>A grid visualizing hierarchical tree annotations as ordered grid layers.</p>
+<p><img src="images/vis-grid_tree.png" alt="grid_tree visualizer" /></p>
+<p><em><strong>Note:</strong></em>  all layers represent the same annotation name at different hierarchical depths, marked level: 0,1,2,... etc. on the left</p>
+<h3><a class="header" href="#mappings-2" id="mappings-2">Mappings</a></h3>
+<p>Specify the name of the annotation to be visualized in the
+grid with <code>node_key:name</code>. Note that all grid levels visualize the same
+annotation name at different hierarchical depths.</p>
+<h2><a class="header" href="#sentstructurejs" id="sentstructurejs"><code>sentstructurejs</code></a></h2>
+<p>Visualization for token-token alignments between parallel
+texts using <a href="https://gitlab.cl.uzh.ch/sparcling/SentStructure.js">SentStructure.js</a></p>
+<p><img src="images/vis-sentstructurejs.png" alt="sentstructurejs visualizer for parallel corpus alignment" /></p>
+<h3><a class="header" href="#mappings-3" id="mappings-3">Mappings</a></h3>
+<p>Use <code>alignment_label</code> to specify the edge annotation name that should be displayed.</p>
+<h2><a class="header" href="#discourse" id="discourse"><code>discourse</code></a></h2>
+<p>A view of the entire text of a document, possibly with interactive coreference links.</p>
+<p><img src="images/vis-discourse.png" alt="discourse visualizer" /></p>
+<p>It is possible to use this visualization to view entire texts even if you do not have coreference annotations)</p>
+<h2><a class="header" href="#arch_dependency" id="arch_dependency"><code>arch_dependency</code></a></h2>
+<p>Dependency tree with labeled arches between tokens;
+requires SVG enabled browser.</p>
+<p><img src="images/vis-arch_dependency.png" alt="arch_dependency visualizer" /></p>
+<h3><a class="header" href="#mappings-4" id="mappings-4">Mappings</a></h3>
+<p>To use a different annotation layer (e.g. <em>my_annotation</em>) for the leaves of the tree instead of the default tokens,
+enter <code>node_key:my_annotation</code>.</p>
+<h2><a class="header" href="#audio" id="audio"><code>audio</code></a></h2>
+<p>A linked audio file.</p>
+<p><img src="images/vis-audio.png" alt="audio visualizer" /></p>
+<h2><a class="header" href="#video" id="video"><code>video</code></a></h2>
+<p>A linked video file.</p>
+<p><img src="images/vis-video.png" alt="video visualizer" /></p>
+<h2><a class="header" href="#pdf-or-pdfdoc" id="pdf-or-pdfdoc"><code>pdf</code> or <code>pdfdoc</code></a></h2>
+<p>A linked pdf file, showing either a specific page aligned
+with an annotation or an entire pdf document respectively.</p>
+<p><img src="images/vis-pdf.png" alt="pdf visualizer" /></p>
+<h3><a class="header" href="#mappings-5" id="mappings-5">Mappings</a></h3>
+<p>It is possible to configure the height of the pdf window
+using the <code>height</code> instruction (in pixels), as well as the name (<code>node_key</code>)
+of the node annotation to be used to give individual page numbers
+aligned with a span of tokens (relevant for <code>pdf</code> only, <code>pdfdoc</code> always
+shows all pages). The instructions can be combined as follows:
+<code>node_key:pp;height:400</code></p>
+<h2><a class="header" href="#rst-or-rstdoc" id="rst-or-rstdoc"><code>rst</code> or <code>rstdoc</code></a></h2>
+<p>A visualization for rhetorical structure theory annotations,
+of either just the search result with context or the entire document
+respectively.</p>
+<p><img src="images/vis-rst.png" alt="rst visualizer" /></p>
+<h3><a class="header" href="#mappings-6" id="mappings-6">Mappings</a></h3>
+<p>The names of rst edges can be configured with the setting
+<code>edge</code>. Additionally, some graphical parameters can be modified:
+<code>siblingOffet</code> defines the distance between sibling nodes; <code>subTreeOffset</code>
+defines the distance between node and parent node; <code>nodeWidth</code> defines
+the width of a node; <code>labelSize</code> defines the font size of a node label;
+<code>edgeLabelColor</code> specifies an HTML Color for the font color of an edge
+label; <code>nodeLabelColor</code> specifies an HTML Color for the font color of a
+node label.</p>
+<h2><a class="header" href="#html-or-htmldoc" id="html-or-htmldoc"><code>html</code> or <code>htmldoc</code></a></h2>
+<p>A versatile annotation-triggered css-based visualization
+of either the immediate search result context or the entire document
+respectively; see the ANNIS HTML Visualization Guide for more
+details and some example stylesheets.</p>
+<p><img src="images/vis-html.png" alt="html visualizer" /></p>
+<h3><a class="header" href="#mappings-7" id="mappings-7">Mappings</a></h3>
+<p>You must specify the name of the css stylesheet (<em>.css)
+and configuration file (</em>.config) for the visualization, which are place in
+the ExtData folder of the relANNIS corpus (see HTML Visualization
+Guide for details). To configure the stylesheet name, use the value
+<code>config:filename</code>, where filename is the common name of both
+the .config and the .css files, without the extension.</p>
+<h1><a class="header" href="#maximal-context-size-context-steps-and-result-page-sizes" id="maximal-context-size-context-steps-and-result-page-sizes">Maximal Context Size, Context Steps and Result Page Sizes</a></h1>
+<p>The maximal context size of ±n tokens from each search result (for the KWIC view,
+but also for other visualizations) can be set for the ANNIS service in the file</p>
+<pre><code>&lt;service-home&gt;/conf/annis-service.properties
+</code></pre>
+<p>Using the syntax, e.g. for a maximum context of 10 tokens:</p>
+<pre><code class="language-ini">annis.max-context=10
+</code></pre>
+<p>To configure which steps are actually shown in the front-end (up to the maximum
+allowed by the service above) and the default context selected on login, edit the setting
+<code>annis.max-context</code> in the <code>annis-service.properties</code>. 
+By default, the context steps 1, 2, 5 or 10 tokens are available. 
+To change the default step and step increment, edit the parameters <code>default-context=5</code> and <code>context-steps=5</code> respectively.</p>
+<p>It is also possible to set context sizes individually per corpus. This is done by editing or
+adding the file <code>corpus.properties</code> to the folder <code>ExtData</code> within the relANNIS corpus
+folder before import. 
+The names of the parameters are the same, i.e. <code>default-context=5</code> and <code>context-steps</code> and their values override the 
+default values in <code>annis-service.properties</code>.</p>
+<p>To change the available setting for the amount of hits per result page, edit the setting
+<code>results-per-page</code> in <code>annis-service.properties</code> as explained above for all
+corpora, or for specific corpora in <code>corpus.properties</code> within the relevant corpus.</p>
+<p>Note that for all these setting, if multiple corpora with conflicting instructions are
+selected, the interface will revert to system defaults <strong>up to</strong> the most restrictive settings
+imposed by one of the selected corpora (i.e. if one of the selected corpora limits
+context to ±5 tokens, the search will obey this limit even if other corpora and the
+default setting allow more context).</p>
+<h1><a class="header" href="#document-browser" id="document-browser">Document Browser</a></h1>
+<p>Starting in ANNIS3.1.X, it is possible to view a list of documents for each corpus and
+visualize documents independently of any queries posed by the user. To open the
+document browser for a corpus, click on the document icon in the corpus list next to
+each corpus. By default, a list as shown below is generated with a link to a plain text
+representation of each document.</p>
+<p><img src="images/document-browser.png" alt="document browser" /></p>
+<p>The default configuration for the document browser is stored in the
+<code>conf/document_browser.json</code> file in the <em>back-end configuration</em>. 
+It can be overwritten by a custom the <code>document_browser.json</code> file 
+placed in the <code>ExtData</code> directory of a corpus.</p>
+<p>Available keys are:</p>
+<pre><code class="language-ini">browse-documents=true|false
+browse-document-visualizers= {...}
+</code></pre>
+<p>Note that the browse-documents configuration has only an effect when it is set
+within <code>corpus.properties</code>.</p>
+<h2><a class="header" href="#automatic-switch-onoff" id="automatic-switch-onoff">Automatic switch on/off</a></h2>
+<p>The ANNIS importer tries to detect corpora containing no underlying token text. This
+is usually case if some higher annotation layer is used to represent the base text, e.g. in
+dialogue corpora, where the token layer is used as an alignment base for annotations
+representing different speakers.
+If the <code>text.annis</code> import file contains 
+only artificial token (which means there are only white spaces) the 
+document browser is disabled. 
+In the case there exists a <code>document_browser.json</code> file
+which configures the document browser it will never be disabled by
+ANNIS. Also if in the <code>corpus.properties</code> the <code>browse-documents</code>
+properties is set to true, the document browser will stay active.</p>
+<h2><a class="header" href="#custom-visualizer-and-sorting" id="custom-visualizer-and-sorting">Custom visualizer and sorting</a></h2>
+<p>It is also possible to use a custom visualizer for browsing a whole
+document. The configuration is in JSON-Syntax file named
+document_browser.json, which can be add to the ExtData directory of
+each corpus.</p>
+<pre><code class="language-json">{
+  &quot;visualizers&quot;: [
+    {
+      &quot;type&quot;: &quot;htmldoc&quot;,
+      &quot;displayName&quot;: &quot;diplomatic text&quot;,
+      &quot;mappings&quot;: &quot;config:dipl&quot;
+    },
+    {
+      &quot;type&quot;: &quot;rstdoc&quot;,
+      &quot;displayName&quot;: &quot;rhetorical structure&quot;
+    }
+  ],
+  &quot;metaDataColumns&quot;: [
+    {
+      &quot;namespace&quot;: &quot;annis&quot;,
+      &quot;name&quot;: &quot;title&quot;
+    },
+    {
+      &quot;namespace&quot;: &quot;annis&quot;,
+      &quot;name&quot;: &quot;genre&quot;
+    }
+  ],
+  &quot;orderBy&quot;: [
+    {
+      &quot;namespace&quot;: &quot;annis&quot;,
+      &quot;name&quot;: &quot;title&quot;,
+      &quot;ascending&quot;: &quot;false&quot;
+    }
+  ]
+}
+</code></pre>
+<p>Explanation in detail:</p>
+<ul>
+<li><em>visualizers - type</em>: Defines which document visualizers are available for a
+corpus. All visualizer from the list above with the suffix &quot;doc&quot; in
+their name are suitable for using as doc visualizer.</li>
+<li><em>metaDataColumns</em> (optional): For every defined metadata field an additional
+column is generated in the corpus browser table with the metadata key as a
+column header and the metadata value as the table cell value. This is useful for
+viewing, and sorting by, different metadata available to the documents. The line
+“namespace” can be left out if the namespace is null.</li>
+<li><em>orderBy</em> (optional): In the default state the table is sorted by document name.
+Alternatively it is possible to define a custom sort by the metadata fields, even
+if the column is not visible. &quot;namespace&quot; and &quot;ascending&quot; are optional (if
+namespace is not specified, null is assumed). &quot;ascending&quot; is &quot;true&quot; by default.</li>
+</ul>
+<h1><a class="header" href="#right-to-left-visualizations" id="right-to-left-visualizations">Right-to-Left Visualizations</a></h1>
+<p>The KWIC, grid and tree visualizers support right to left layouting of Arabic and
+Hebrew characters. As soon as such a character is recognized in a search result, the
+visualization is switched into right-to-left mode for these visualizers. If this behavior is
+not desired (e.g. a left-to-right corpus with only a few incidental uses of such
+characters), this behavior can be switched off for the entire ANNIS instance by setting:</p>
+<pre><code>disable-rtl=true
+</code></pre>
+<p>in the file <code>annis-gui.properties</code> in one of the front-end configuration locations.</p>
+<h1><a class="header" href="#importing-and-configuring-corpora" id="importing-and-configuring-corpora">Importing and Configuring Corpora</a></h1>
+<p>Before a corpus can be used in ANNIS, it has to be imported once.
+This section describes how you can create corpora for ANNIS from existing
+corpora in different formats, how you import it and various corpus-related configuration options.</p>
+<p>ANNIS consists of a front-end web-application and a back-end service.
+In the Kickstarter version, both components are combined into one application.
+The behavior of these components can be customized changing their configuration.</p>
+<h2><a class="header" href="#back-end-service" id="back-end-service">Back-end service</a></h2>
+<p>There is a configuration folder <code>conf/</code> in the installation directory with the main configuration file <code>annis-service.properties</code>.
+In addition, there is the <code>shiro.info</code> file to change the location of the <a href="import-and-config-user.html">user configuration</a>.
+You should not need to change any of the other files in this directory.</p>
+<h2><a class="header" href="#front-end-web-application" id="front-end-web-application">Front-end web-application</a></h2>
+<p>The ANNIS front-end will search in different folders for it's configuration.</p>
+<table><thead><tr><th>Folder</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>&lt;Installation&gt;/WEB-INF/conf/</code></td><td>Default configuration inside the deployed web application folder. Should not be changed.</td></tr>
+<tr><td><code>$ANNIS_CFG</code> or <code>/etc/annis/</code></td><td>The global configuration folder defined by the environment variable <code>ANNIS_CFG</code> or a default path if not set.</td></tr>
+<tr><td><code>~/.annis/</code></td><td>User specific configuration inside the <code>.annis</code> sub-folder inside the home folder of the user who is running the frontend.</td></tr>
+</tbody></table>
+<p>Configuration files can be either in the <a href="http://en.wikipedia.org/w/index.php?title=.properties&amp;oldid=521500688">Java Properties</a>
+or <a href="http://www.json.org/">JSON</a> format. Configuration files from the user directory can
+overwrite the global configuration and the global configuration overwrites the
+default configuration.</p>
+<h1><a class="header" href="#converting-corpora-for-annis-using-pepper" id="converting-corpora-for-annis-using-pepper">Converting Corpora for ANNIS using Pepper</a></h1>
+<p>ANNIS uses a relational database format called relANNIS. 
+Before a corpus can be imported into ANNIS, it has to be converted into this format.
+The Pepper converter framework allows users to convert data from various formats including PAULA XML,
+EXMARaLDA XML, TigerXML, CoNLL, RSTTool, generic XML and TreeTagger
+directly into relANNIS. 
+Further formats (including Tiger XML with secondary edges,
+mmax2) can be converted first into PAULA XML and then into relANNIS using the
+converters found on the ANNIS downloads page.</p>
+<p>For complete information on converting corpora with Pepper see:
+<a href="http://corpus-tools.org/pepper/">http://corpus-tools.org/pepper/</a></p>
+<h1><a class="header" href="#importing-corpora-in-the-relannis-format" id="importing-corpora-in-the-relannis-format">Importing Corpora in the relANNIS format</a></h1>
+<p>Corpora in the relANNIS format can be imported into the ANNIS database. For
+information on converting corpora from other formats into relANNIS, see the
+<a href="http://corpus-tools.org/pepper/userGuide.html">Pepper documentation</a>.</p>
+<h2><a class="header" href="#importing-a-relannis-corpus-in-annis-kickstarter" id="importing-a-relannis-corpus-in-annis-kickstarter">Importing a relANNIS Corpus in ANNIS Kickstarter</a></h2>
+<p>To import a corpus to your local Kickstarter, press the “Import Corpus” button on the
+Kickstarter program window and navigate to the directory containing the relANNIS
+directory of your corpus. Select this directory (but do not go into it) and press OK.
+Note that you cannot import a second corpus with the same name into the system: the
+first corpus must be deleted before a new one with the same name is imported.</p>
+<h2><a class="header" href="#importing-a-relannis-corpus-into-an-annis-server" id="importing-a-relannis-corpus-into-an-annis-server">Importing a relANNIS Corpus into an ANNIS Server</a></h2>
+<p>Follow the steps described in the <a href="installation-server.html">installation section</a> for importing the demo corpus GUM 
+(can be downloaded from <a href="http://corpus-tools.org/annis/corpora.html">http://corpus-tools.org/annis/corpora.html</a>).</p>
+<p>Multiple corpora can be imported with <code>annis-admin.sh</code> by supplying a space-separated
+list of paths to relANNIS folders after the import command:</p>
+<pre><code class="language-bash">bin/annis-admin.sh import path1 path2 ...
+</code></pre>
+<p>You can also use the <code>-o</code> flag to overwrite existing corpora:</p>
+<pre><code class="language-bash">bin/annis-admin.sh import -o path1 ...
+</code></pre>
+<h1><a class="header" href="#configuring-settings-for-a-corpus" id="configuring-settings-for-a-corpus">Configuring Settings for a Corpus</a></h1>
+<h2><a class="header" href="#generating-example-queries" id="generating-example-queries">Generating Example Queries</a></h2>
+<p>User created example queries are stored in the file <code>example_queries.annis</code> within the
+relANNIS corpus folder. The file contains two columns (tab delimited), the first with a
+valid AQL query for your corpus and the second with a human readable description of
+the query. These queries are the then visible in Example Queries tab of the workspace
+on the right side of the ANNIS interface.</p>
+<p>It is also possible to have ANNIS automatically generate queries for a corpus (instead
+of, or in addition to user created examples). ANNIS will then create some randomized,
+typical queries, such as searches for a word form appearing in the corpus or a regular
+expression. To determine whether or not example queries are generated by default,
+change the following setting in <code>annis-service.properties</code>:</p>
+<pre><code class="language-inis">annis.import.example-queries=false
+</code></pre>
+<p>On an ANNIS server console it is also possible to generate new example queries on
+demand, replacing or adding to existing queries, and to delete queries for individual
+corpora. For more information on the exact commands and options see the help under:</p>
+<pre><code class="language-bash">bin/annis-admin.sh --help
+</code></pre>
+<h2><a class="header" href="#setting-default-context-and-segmentations" id="setting-default-context-and-segmentations">Setting Default Context and Segmentations</a></h2>
+<p>In corpora with multiple segmentations, such as historical corpora with conflicting
+diplomatic and normalized word form layers, it is possible to choose the default
+segmentation for both search context and the KWIC visualization. To set the relevant
+segmentations, use the following settings in the <code>corpus.properties</code> file in the folder
+<code>ExtData</code> within the relANNIS corpus:</p>
+<pre><code class="language-ini">default-context-segmentation=SEGNAME
+default-base-text-segmentation=SEGNAME
+</code></pre>
+<p>For more details on segmentations, see the ANNIS Multiple Segmentation Corpora
+Guide.</p>
+<h1><a class="header" href="#multiple-instances-of-the-interface" id="multiple-instances-of-the-interface">Multiple Instances of the Interface</a></h1>
+<h2><a class="header" href="#creating-instances" id="creating-instances">Creating instances</a></h2>
+<p>When multiple corpora from different sources are hosted on one server it is often
+still desired to group the corpora by their origin and present them differently.
+You should not be forced to have an ANNIS frontend and service installation for
+each of this groups. Instead the administrator can define so called instances.</p>
+<p>An instance is defined by a JSON file inside the instances sub-folder in one of
+the <em>front-end configuration locations</em>, e.g. the home folder of the user running the ANNIS front-end
+(on a server often the Tomcat user, or under Windows Kickstarter, in
+<code>C:\Users\username\.annis</code> , or under Mac OSX under <code>/Users/username/.annis/</code>,
+which is a hidden folder; to view hidden folders you may need to reconfigure your
+Finder application).
+In ANNIS server scenarios where it is not possible to deploy the
+home directory of the user running the front-end (e.g. no home folder for Tomcat), you
+may prefer to manually set the configuration path parameter <code>ANNIS_CFG</code> for ANNIS,
+by adding something like the following to the shell script starting ANNIS</p>
+<pre><code class="language-bash">export ANNIS_CFG=/etc/my_annis_cfg_path/
+</code></pre>
+<p>Instances can then be specified under this folder.
+The name of the file also defines the instance name.
+Thus the file <code>instances/falko.json</code> defines the instance named &quot;falko&quot;.</p>
+<pre><code class="language-json">{
+	&quot;display-name&quot;: &quot;Falko&quot;,
+	&quot;default-querybuilder&quot;: &quot;tigersearch&quot;,
+	&quot;default-corpusset&quot;: &quot;falko-essays&quot;,
+	&quot;corpus-sets&quot;: [
+	{
+		&quot;name&quot;: &quot;falko-essays&quot;,
+		&quot;corpus&quot;: [
+		&quot;falko-essay-l1&quot;,
+		&quot;falko-essay-l2&quot;
+		]
+	},
+	{
+		&quot;name&quot;: &quot;falko-summaries&quot;,
+		&quot;corpus&quot;: [
+		&quot;falko-summary-l1&quot;,
+		&quot;falko-summary-l2&quot;
+		]
+	}
+	],
+	&quot;keyboard-layout&quot; : &quot;de&quot;,
+	&quot;login-on-start&quot;: &quot;true&quot;,
+	&quot;help-url&quot;: &quot;https://example.com/annis-help&quot;
+}
+</code></pre>
+<p>Each instance configuration can have a verbose display-name which is
+displayed in the title of the browser window. <code>default-querybuilder</code> defines the
+short name of the query builder you want to use. Currently only &quot;tigersearch&quot; and &quot;flatquerybuilder&quot; are
+available in the default installation.
+The <code>keyboard-layout</code> variable is used as the default value for the virtual keyboard of the AQL query box.
+If <code>login-on-start</code> is set to <code>true</code> a login window is shown at each startup of the ANNIS search UI if the user is not logged in yet.
+<code>help-url</code> allows to set your own help page which is displayed in the &quot;Help&quot; tab.
+<em>This URL must point to the same domain as the ANNIS user interface is located on</em>, because of the same-origin policies of the browsers.</p>
+<p>While any user can group corpora into corpus sets for their own, you can define
+corpus sets for the whole instance. Each corpus set is an JSON-object with a
+name and a list of corpora that belong to the corpus set.</p>
+<p>Any defined instance is assigned a special URL at which it can be accessed:
+<code>http://&lt;server&gt;/annis-gui/&lt;instance-name&gt;</code>. The default instance is
+additionally accessible by not specifying any instance name in the URL. You can
+configure your web server (e.g. Apache) to rewrite the URLs if you need a more
+project specific and less &quot;technical&quot; URL (e.g. <code>http://&lt;server&gt;/falko</code>).</p>
+<h2><a class="header" href="#embedding-web-fonts" id="embedding-web-fonts">Embedding Web Fonts</a></h2>
+<p>It is also possible to set an embedded font for query result display in your instance,
+using the same JSON instance file file described in the previous section.
+Thus a web font is applied to a specific instance. 
+If you not want to define an extra instance, it is possible to add the font configuration to the
+<code>default.json</code> file in the <em>instance</em> directory. If no <em>instance</em>
+directory or <code>default.json</code> file exists, create it. 
+Add a property <strong>font</strong> to the config with the following parameters:</p>
+<pre><code class="language-json">{
+ ...
+
+ &quot;font&quot; :
+ {
+   &quot;name&quot; : &quot;foo&quot;,
+   &quot;url&quot;: &quot;https://example.com/foo.css&quot;,
+   &quot;size&quot;: &quot;12pt&quot; // optional
+ }
+}
+</code></pre>
+<p>You must also provide a css file, which contains the <code>@font-face</code> rule
+und is reachable under the defined link in the instance config:</p>
+<pre><code class="language-css">@font-face {
+  font-family: 'bar';
+  font-style: normal;
+  font-weight: normal;
+  font-size: larger;
+  src:
+	local('bar'),
+	url(bar.woff) format('woff');
+}
+</code></pre>
+<p>Further explantation about the <code>@font-face</code> rule is available on the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face">MDN web docs
+</a>.</p>
+<p>If you need to have a different font configuration for the frequency chart
+just add a <code>frequency-font</code> entry. It has the same structure as <code>font</code>.</p>
+<h2><a class="header" href="#using-corpus-groups" id="using-corpus-groups">Using Corpus Groups</a></h2>
+<p>It is possible to group corpora into groups, which are selected above the corpus list in
+the search form:</p>
+<p><img src="images/corpus-group.png" alt="corpus group selection" /></p>
+<p>While any user can group corpora into corpus sets for their own use, you can define
+corpus sets for the whole instance using the &quot;corpus-sets&quot; in the JSON file described
+above. Each corpus set is itself a JSON-object with a name and a list of corpora that
+belong to the corpus set.</p>
+<h1><a class="header" href="#user-configuration" id="user-configuration">User Configuration</a></h1>
+<p>ANNIS has an authentication system which allows to handle multiple users
+which will see different corpora depending on which groups the user is part
+of. Behind the scenes ANNIS uses the <a href="http://shiro.apache.org/">Apache Shiro</a> security framework. Per default ANNIS uses a file based authentication and
+authorization approach where some configuration files with an ANNIS specific
+layout are evaluated. This section will discuss how to manage this configuration.
+Additionally, the administrator can also directly adjust the contents of the conf/
+shiro.ini configuration file. This allows a much more individual configuration
+and the usage of external authorization services like LDAP.</p>
+<h2><a class="header" href="#configuration-file-location" id="configuration-file-location">Configuration file location</a></h2>
+<p>There is a central location where the user configuration files are stored.
+Configure the path to this location in the <code>conf/shiro.info</code> configuration file of
+the ANNIS back-end service. The default path is <code>/etc/annis/user_config/</code> and
+can be changed in the back-end configuration file.</p>
+<pre><code class="language-ini">[main]
+confManager = annis.security.ANNISUserConfigurationManager
+confManager.resourcePath=/etc/annis/user_config/
+</code></pre>
+<h2><a class="header" href="#user-and-group-files" id="user-and-group-files">User and group files</a></h2>
+<ol>
+<li>Create a file &quot;groups&quot; in the user-configuration directory (e.g. <code>/etc/annis/user_config/groups</code>)</li>
+</ol>
+<pre><code class="language-ini">group1=pcc3,falko,tiger2
+group2=pcc3
+group3=tiger1
+anonymous=pcc2,falko
+</code></pre>
+<p>This example means that a member of group group1 will have access to
+corpora with the names pcc3,falko, tiger2 (corpus names can be displayed
+with the <code>annis-admin.sh list</code> command).
+2. Create a subdirectory <code>users</code>
+3. You have to create a file for each user inside the users subdirectory where
+the user's name is <em>exactly</em> the file name (no file endings).</p>
+<pre><code class="language-ini">groups=group1,group3
+password=$shiro1$SHA-256$1$tQNwUIxEQhrDn6FKcY1yNg==$Xq8ZCb3RFBwn3GfQ7pav3G3vHg4TKRGD1ItpfdW+JvI=
+# these are optional entries
+permissions=adm:*,query:*
+expires=2015-04-25
+</code></pre>
+<p><em><strong>Notes:</strong></em></p>
+<ul>
+<li>A superuser who has access to every corpus can be created with <code>groups=*</code></li>
+<li>The password must be hashed with SHA256 (one iteration and using a Salt) and formatted in the <a href="http://shiro.apache.org/static/1.3.2/apidocs/org/apache/shiro/crypto/hash/format/Shiro1CryptFormat.html">Shiro1CryptFormat</a>.</li>
+<li>Additional permissions for the user are given as comma seperated list in the <code>permissions</code> field.</li>
+<li>With <code>expires</code> you can define when an account will expire. The format must be in encoded according to the <a href="http://en.wikipedia.org/wiki/ISO_8601">ISO-8601 standard</a>.</li>
+</ul>
+<p>The easiest way to generate the passwort hash is to use the
+<a href="http://shiro.apache.org/command-line-hasher.html">Apache Shiro command line hasher</a> which can be downloaded from 
+<a href="http://shiro.apache.org/download.html#Download-1.2.1.BinaryDistribution">here</a>.</p>
+<ol>
+<li>Execute <code>java -jar shiro-tools-hasher-1.2.1-cli.jar -i 1 -p</code> from the
+command line (the jar-file must be in the working directory)</li>
+<li>Type the password</li>
+<li>Retype the password</li>
+<li>It will produce the following output:</li>
+</ol>
+<pre><code class="language-bash">$ java -jar shiro-tools-hasher-1.2.1-cli.jar -i 1 -p
+Password to hash: 
+Password to hash (confirm): 
+$shiro1$SHA-256$1$kRMX+Et6w7XJgwSEAgq9nw==$sQOgObXsQdO76wnNxvN0aesvTSPoBsd/2bjxasydB+I=
+</code></pre>
+<p>The last line is what you have to insert into the password field.</p>
+<h3><a class="header" href="#anonymous-and-user-group" id="anonymous-and-user-group">&quot;anonymous&quot; and &quot;user&quot; group</a></h3>
+<p>The special group <code>anonymous</code> is used for non logged-in users. Thus every corpus listed here is available for everyone without (and with) login. In addition the group &quot;user&quot; is added to
+every user that is logged in.</p>
+<h3><a class="header" href="#advanced-permissions" id="advanced-permissions">Advanced permissions</a></h3>
+<p>The following permissions can be granted to individual users. Wildcards (&quot;*&quot;) can be used
+as described in the <a href="https://shiro.apache.org/permissions.html">Apache Shiro documentation</a>.</p>
+<h4><a class="header" href="#administration" id="administration">Administration</a></h4>
+<p>If you want to have an administrator user just add</p>
+<pre><code>admin:*
+</code></pre>
+<p>to it's permissions. For more fine-grained control (e.g. for the web service users) you can specify the actual action. You can always use &quot;*&quot; wildcard instead of the corpus name to allow the specific action for any corpus.</p>
+<table><thead><tr><th>permission</th><th>description</th></tr></thead><tbody>
+<tr><td>admin:import:<strong>{corpusname}</strong></td><td>Allow to import and overwrite a corpus with a specific name.</td></tr>
+<tr><td>admin:query-import:finished</td><td>Allow to check if an import has finished.</td></tr>
+<tr><td>admin:query-import:running</td><td>Allow to list the currently running imports.</td></tr>
+<tr><td>admin:write:user</td><td>Allow to the update or create users.</td></tr>
+<tr><td>admin:read:user</td><td>Allow get the information about a user (like groups or additionally permissions).</td></tr>
+<tr><td>admin:write:adminuser</td><td>Additional permission to update or create users with adminstration rights (thus having an extra permission thats starts &quot;admin:&quot;).</td></tr>
+</tbody></table>
+<h4><a class="header" href="#querying" id="querying">Querying</a></h4>
+<p>Every user that is part of a group that contains a corpus always get these permissions for a corpus automatically. If you want to allow a user to access only a certain functionality 
+you can add more fine grained permissions. E.g.
+\verbatim
+query:count:*
+\endverbatim
+allows a user to count on all corpora but won't allow him to fetch the annotation graphs. For users that use the graphical user interface and not the service directly you should always grant a user all query permissions for a corpus. Otherwise he the user interface might not function as expected.</p>
+<table><thead><tr><th>permission</th><th>description</th></tr></thead><tbody>
+<tr><td>query:show:<strong>{corpusname}</strong></td><td>Allow to show information about a specific corpus.</td></tr>
+<tr><td>query:count:<strong>{corpusname}</strong></td><td>Allow to count on a specific corpus.</td></tr>
+<tr><td>query:find:<strong>{corpusname}</strong></td><td>Allow to find matches on a specific corpus.</td></tr>
+<tr><td>query:subgraph:<strong>{corpusname}</strong></td><td>Allow to query annotated subgraphs and complete annotated graphs on a specific corpus.</td></tr>
+<tr><td>query:binary:<strong>{corpusname}</strong></td><td>Allow to get the  binary files of a specific corpus.</td></tr>
+</tbody></table>
+<h1><a class="header" href="#the-administration-web-interface" id="the-administration-web-interface">The administration web interface</a></h1>
+<p>The administration web interface allows you to import and delete corpora, as well as to
+define users from the ANNIS web application directly. To log into the administration
+interface, use the URL of you ANNIS webapp and add /admin or from ANNIS 3.4.X
+and above, press the Administration button next to ‘About ANNIS’ (this button is only
+shown if you are a logged in administrator). You should see the screen below:</p>
+<p><img src="images/web-admin-import.png" alt="import in web-adminstration interface" /></p>
+<p>Here you can upload a zipped relANNIS corpus for import and set the e-mail address
+in the configuration file. The corpus management tab allows you to select corpora for
+deletion:</p>
+<p><img src="images/web-admin-corpus-select.png" alt="select corpora for deletion" /></p>
+<p>And finally the user and group management tabs allow you to add or remove users,
+give them special permissions, and determine which groups can see which corpora.</p>
+<p><img src="images/web-admin-groups.png" alt="group management" /></p>
+<p><img src="images/web-admin-users.png" alt="user management" /></p>
+<p>These functions edit the files described in the <a href="import-and-config-user.html">User Configuration section</a>. Note that the user management
+function treats any file in the users/ directory from the <a href="import-and-config-user.html">User Configuration section</a> as a user entry, and no
+files except for user files may exist in that directory (otherwise the administration
+functions will not load correctly).</p>
+<h1><a class="header" href="#advanced-topics" id="advanced-topics">Advanced Topics</a></h1>
+<p>This section provides guides for advanced configuration and administration topics.</p>
+<h1><a class="header" href="#error-codes-of-the-administration-tools" id="error-codes-of-the-administration-tools">Error Codes of the administration tools</a></h1>
+<p>Additional to textual output the administration tools will return an error code when exiting in an error condition.
+On Linux you can query the exit code of the last command with</p>
+<pre><code class="language-bash">echo $?
+</code></pre>
+<p>An exit code of &quot;0&quot; means normal exit, everything else is an error indication.</p>
+<table><thead><tr><th>exit code</th><th>description</th></tr></thead><tbody>
+<tr><td>1</td><td>General error, no specific information.</td></tr>
+<tr><td>2</td><td>The <code>annis.home</code> property was not set. This means the <code>ANNIS_HOME</code> environment variable was not set when the startup script was called.</td></tr>
+<tr><td>3</td><td>The location where the <code>annis.home</code>/<code>ANNIS_HOME</code> variable points to is not an existing directory.</td></tr>
+<tr><td>4</td><td>Wrong use of command line arguments.</td></tr>
+<tr><td>5</td><td>Could not access the database.</td></tr>
+<tr><td>6</td><td>Could not access a file.</td></tr>
+<tr><td>50</td><td>Copying corpora from old installation failed.</td></tr>
+<tr><td>51</td><td>Deleting a corpus failed because it does not exist.</td></tr>
+<tr><td>100</td><td>Could not start the internal REST-server used for the ANNIS service (e.g. because the port was already taken).</td></tr>
+<tr><td>101</td><td>There was an internal exception when trying to start the internal REST-server used for the ANNIS service.</td></tr>
+</tbody></table>
+<h1><a class="header" href="#provide-your-own-login-system" id="provide-your-own-login-system">Provide your own login-system</a></h1>
+<p>Per default ANNIS can be used with either no logins at all or with a system where there are users which have a password and can belong to certain groups. The configuration for the default login is system is described <a href="import-and-config-user.html">here</a>.</p>
+<p>This documentation provides the proposed way of using external authentication systems like <a href="http://shibboleth.net/">Shibboleth</a> or <a href="http://openid.net/">OpenID</a> with ANNIS. ANNIS is using a REST webservice internally. 
+This webservice is secured with HTTP user/password authentication. When logging into ANNIS via the web frontend, the credentials are
+only passed through to the webservice. Thus all 3rd party authentication systems that rely on
+browser redirects can't be used directly. The proposed way is to use temporary accounts instead.</p>
+<p>The first step is to configure a custom login page in the <code>annis-gui.properties</code> file, which must be located in one of the <em>front-end configuration folders</em>. Here you can set the <code>login-url</code> parameter to the URL of your custom login page. Optionally set <code>login-window-maximized=true</code> to use the full browser window. Since the login page will be displayed using an iframe, it should be on the same server as the ANNIS web frontend.</p>
+<p>The custom login page should be a web application that does the following things:</p>
+<ul>
+<li>authenticate the user</li>
+<li>use the special REST API function <code>PUT annis/admin/users/{userName}</code> to create a temporary account with a random password (you can use an expiration date to limit the validity). 
+FIXME: add more detailed link to REST API here.</li>
+<li>initiate a <code>POST</code> request to <code>https://&lt;yourdmain&gt;/&lt;annispath&gt;/login</code> containing the parameters <code>annis-login-user</code> and <code>annis-login-password</code> from the users browser.</li>
+<li>if you want to close the login window without changing the login-information execute the <code>window.parent.annis.gui.logincallback()</code> javascript function</li>
+</ul>
+<h1><a class="header" href="#links-to-queries" id="links-to-queries">Links to queries</a></h1>
+<p>If you have an external application that wants to link to a specific corpus or query in ANNIS, you can
+built a special URL that will trigger the query execution. The main part of the URL is the complete host and path to your ANNIS installation e.g. <code>https://korpling.german.hu-berlin.de/annis3/</code>.</p>
+<p>In order to execute a query, you have to append a fragment (separated with a &quot;#&quot;) containing a set of parameters. Each parameter consists of a name, the &quot;=&quot; character and its value. These parameters are again separated by &quot;&amp;&quot;, e.g. <code>https://korpling.german.hu-berlin.de/annis3/#q=tok&amp;c=pcc2</code>. The parameters can be optionally encoded in Base64 in order to avoid any clashes with the special characters used in the fragment. A Base64 encoded parameter always starts with an underscore (&quot;_&quot;). E.g. if you want to specifiy the &quot;q&quot; parameter in Base64 encoding you name this parameter &quot;_q&quot;.</p>
+<h2><a class="header" href="#available-parameters" id="available-parameters">Available parameters</a></h2>
+<table><thead><tr><th>Name</th><th>Explanation</th></tr></thead><tbody>
+<tr><td>c</td><td>A comma seperated list of corpora. If this is the only parameter instead of executing a query, the corpus will be only selected. When you use Base64 encoding the commata must be encoded as well.</td></tr>
+<tr><td>q</td><td>The AQL query to use.</td></tr>
+<tr><td>l</td><td>Limits the query to a number of matches (must be a number). <em>If not specified no limit is applied!</em></td></tr>
+<tr><td>s</td><td>Offset (&quot;start&quot;) for the shown matches (must be a number). Defaults to &quot;0&quot;, so the very first matches are shown.</td></tr>
+<tr><td>cl</td><td>Optional left context (must be a number).</td></tr>
+<tr><td>cr</td><td>Optional right context (must be a number).</td></tr>
+<tr><td>seg</td><td>Optional parameter to specify the segmentation on which the context should be applied.</td></tr>
+</tbody></table>
+<h1><a class="header" href="#embed-annis-visualizations" id="embed-annis-visualizations">Embed ANNIS visualizations</a></h1>
+<p>It is possible to embed visualizations of ANNIS into another website or
+to share links to ANNIS visualizations.
+This is achieved by a special sub website of ANNIS which has the URL</p>
+<pre><code>&lt;annis-base-url&gt;/embeddedvis/&lt;visualizer-short-name&gt;
+</code></pre>
+<p>The possible values for the short name are the same as the ones listed in the <a href="visualizations.html">&quot;Configuring Visualizations&quot; chapter</a> chapter.
+Additional parameters are used to configure how the visualization should be displayed.</p>
+<h2><a class="header" href="#parameters" id="parameters">Parameters</a></h2>
+<p>These are URL query parameters which define the visualizer configuration.
+Any parameter which is not mentioned here will be treated as visualizer mapping.</p>
+<h3><a class="header" href="#embedded_salt" id="embedded_salt">embedded_salt</a></h3>
+<p>An URL from where to fetch to content from.
+The content must be in the Salt XMI intermediate format.
+This can be a dynamic query (like a REST call to the subgraph-function <code>annis.service.QueryService#subgraph(...)</code> of the service) or a link to a static file.</p>
+<h3><a class="header" href="#embedded_interface" id="embedded_interface">embedded_interface</a></h3>
+<p>URL back to the ANNIS instance from which this visualization was generated.
+When given this will trigger a link to appear in the output which links back to this URL.
+The URL should contain all the information (e.g. via fragment parameters) to display
+the query and the selected match.</p>
+<h3><a class="header" href="#embedded_match" id="embedded_match">embedded_match</a></h3>
+<p>A plain text match definition (as produced by the REST find-function <code>annis.service.QueryService#find(...)</code>).
+Example:</p>
+<pre><code>salt:/pcc2/11299/#tok_1 tiger::pos::salt:/pcc2/11299/#tok_2
+</code></pre>
+<h3><a class="header" href="#embedded_instance" id="embedded_instance">embedded_instance</a></h3>
+<p>Name of an ANNIS sub-instance that should be used.
+See the <a href="import-and-config-instances.html">&quot;Multiple Instances of the Interface&quot; chapter</a> for more information.</p>
+<h3><a class="header" href="#embedded_ns" id="embedded_ns">embedded_ns</a></h3>
+<p>Namespace which is &quot;triggering&quot; the visualization (see the <a href="visualizations.html">&quot;Configuring Visualizations&quot; chapter</a>)</p>
+<h3><a class="header" href="#embedded_base" id="embedded_base">embedded_base</a></h3>
+<p>Segmentation base text to use.
+Some visualizers like <code>kwic</code> allow to show only a certain base text,
+this parameter controls which one.</p>
+<h2><a class="header" href="#examples" id="examples">Examples</a></h2>
+<p>In this example https://korpling.german.hu-berlin.de/annis3-snapshot/ is the base URL for the ANNIS user interface.
+When entering the URL</p>
+<pre><code>https://korpling.german.hu-berlin.de/annis3-snapshot/embeddedvis/grid?
+embedded_ns=tei&amp;
+embedded_instance=&amp;
+embedded_salt=http%3A%2F%2Flocalhost%3A5713%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dtei%3A%3Asic%3A%3Asalt%3A%2FGUM%2FGUM_whow_languages%2F%2523sic_487%26left%3D5%26right%3D5&amp;
+embedded_interface=https://korpling.german.hu-berlin.de/annis3-snapshot/%23_q%3Dc2lj%26_c%3DR1VN%26cl%3D5%26cr%3D5%26s%3D10%26l%3D10%26m%3D12
+</code></pre>
+<p>the following web page is <a href="https://korpling.german.hu-berlin.de/annis3-snapshot/embeddedvis/grid?embedded_ns=tei&amp;embedded_instance=&amp;embedded_salt=http%3A%2F%2Flocalhost%3A5713%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dtei%3A%3Asic%3A%3Asalt%3A%2FGUM%2FGUM_whow_languages%2F%2523sic_487%26left%3D5%26right%3D5&amp;embedded_interface=https://korpling.german.hu-berlin.de/annis3-snapshot/%23_q%3Dc2lj%26_c%3DR1VN%26cl%3D5%26cr%3D5%26s%3D10%26l%3D10%26m%3D12">shown</a>:
+<img src="images/embed_example1.png" alt="Embed example 1" /></p>
+<p>The namespace is &quot;tei&quot;, the instance is the default one (empty name).
+There is a dynamic URL to the REST web service running at <code>localhost</code> (the service must be reachable by the web server, not the client)
+and a back-link to the interface is given.
+All parameters must be URL encoded (especially the ones that are URLs by theirself).</p>
+<p>Instead of having only a subgraph with for a single match the following example shows a <a href="https://korpling.german.hu-berlin.de/annis3-snapshot/embeddedvis/htmldoc?embedded_instance=scriptorium2&amp;embedded_match=Abraham::norm::salt:/abraham.our.father/Abraham.XL93-94_merge/%23norm_15&amp;embedded_salt=http%3A%2F%2Flocalhost%3A5713%2Fannis%2Fquery%2Fgraph%2Fabraham.our.father%2FAbraham.XL93-94_merge%3Ffilternodeanno%3Dcb%2CAbraham%3A%3Anorm%2Cpb_xml_id%2Clb%2Chi_rend&amp;embedded_interface=https://korpling.german.hu-berlin.de/annis3-snapshot/scriptorium2%23_q%3Dbm9ybT0i4rKb4rKf4rKp4rKn4rKJIg%26_c%3DYWJyYWhhbS5vdXIuZmF0aGVy%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26_seg%3Dd29yZA%26m%3D0&amp;embedded_base=word&amp;config=dipl">complete document</a>:</p>
+<pre><code>https://korpling.german.hu-berlin.de/annis3-snapshot/embeddedvis/htmldoc?
+embedded_instance=scriptorium2&amp;
+embedded_match=Abraham::norm::salt:/abraham.our.father/Abraham.XL93-94_merge/%23norm_15&amp;
+embedded_salt=http%3A%2F%2Flocalhost%3A5713%2Fannis%2Fquery%2Fgraph%2Fabraham.our.father%2FAbraham.XL93-94_merge%3Ffilternodeanno%3Dcb%2CAbraham%3A%3Anorm%2Cpb_xml_id%2Clb%2Chi_rend&amp;
+embedded_interface=https://korpling.german.hu-berlin.de/annis3-snapshot/scriptorium2%23_q%3Dbm9ybT0i4rKb4rKf4rKp4rKn4rKJIg%26_c%3DYWJyYWhhbS5vdXIuZmF0aGVy%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26_seg%3Dd29yZA%26m%3D0&amp;
+embedded_base=word&amp;
+config=dipl
+</code></pre>
+<p><code>embedded_salt</code> refers to the graph function <code>annis.service.QueryService.graph(...)</code> and this example uses the configuration from the &quot;scriptorium2&quot; instance.
+The additional parameter <code>config</code> is a mapping parameter of the <code>htmldoc</code> visualizer.
+<img src="images/embed_example2.png" alt="Embed example 2" /></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+        
+        
+
+    </body>
+</html>
