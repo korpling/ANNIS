@@ -248,6 +248,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
 
   private VisualizerInput createInput(UI ui) {
     VisualizerInput input = new VisualizerInput();
+    input.setUI(ui);
     input.setContextPath(Helper.getContext(ui));
     input.setId(resultID);
 
