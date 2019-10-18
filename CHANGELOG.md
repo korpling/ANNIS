@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ZIP-Import might fail because of large directory names
 - CSV export was had a mismatch between the order of the metadata keys in the header and in the column
 - Using a segmentation for the context definition did not work [#624](https://github.com/korpling/ANNIS/issues/624)
+- Frequency analysis and export where not possible with AQL quirks mode and queries that are invalid in the newest AQL version (e.g `meta::`)
 
 ## [4.0.0-beta.2] - 2019-07-22
 
