@@ -140,7 +140,9 @@ public class GridComponent extends Panel {
 
         List<SNode> sortedSegmentationNodes = CommonHelper.getSortedSegmentationNodes(this.segmentationName, graph);
 
-        Map<SToken, Integer> token2index = Helper.createToken2IndexMap(graph);
+        CommonHelper.getTextualDSForNode(node, graph)
+
+        Map<SToken, Integer> token2index = Helper.createToken2IndexMap(graph, this.enforcedText);
         Preconditions.checkArgument(!token2index.isEmpty(), "Token list must be non-empty");
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = computeAnnotationRows(token2index);
@@ -290,7 +292,7 @@ public class GridComponent extends Panel {
             }
             /**
              * we want to show all token if no valid text was found and we have only one
-             * text and the first one if there are more than one text.
+             * text and the first one if there is more than one text.
              */
             List<STextualDS> allTexts = graph.getTextualDSs();
             if (validTextIDs.isEmpty() && allTexts != null && (allTexts.size() == 1 || allTexts.size() == 2)) {
