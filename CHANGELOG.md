@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Create multiple textual data sources in Salt document for parallel corpora instead of merging them into one STextualDS
+- When querying multiple corpora at once, getting the next page could fail because of some issues with the offset generation
 
 ## [4.0.0-beta.3] - 2019-10-18
 
