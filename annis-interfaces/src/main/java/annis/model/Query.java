@@ -17,7 +17,6 @@ package annis.model;
 
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -29,10 +28,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-
 import com.google.common.base.Preconditions;
+
+import org.apache.commons.lang3.StringUtils;
 
 import annis.CommonHelper;
 import annis.service.objects.QueryLanguage;

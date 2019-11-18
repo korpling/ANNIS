@@ -34,6 +34,7 @@ import annis.gui.controlpanel.CorpusSorter;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.libgui.exporter.ExporterPlugin;
+import annis.model.DisplayedResultQuery;
 import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.OrderType;
@@ -81,7 +82,7 @@ public class QueryUIState implements Serializable {
     private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition = new BeanContainer<>(
             UserGeneratedFrequencyEntry.class);
 
-    private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
+    private final List<DisplayedResultQuery> history = new ArrayList<>();
 
     private final BeanContainer<String, AnnisCorpus> availableCorpora = new BeanContainer<>(AnnisCorpus.class);;
 
@@ -140,7 +141,7 @@ public class QueryUIState implements Serializable {
         return executedTasks;
     }
 
-    public BeanItemContainer<Query> getHistory() {
+    public List<DisplayedResultQuery> getHistory() {
         return history;
     }
 

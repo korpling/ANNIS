@@ -103,4 +103,9 @@ public class DisplayedResultQuery extends PagedResultQuery {
                 && Objects.equals(getOrder(), other.getOrder()) && Objects.equals(getBaseText(), other.getBaseText())
                 && Objects.equals(getSelectedMatches(), other.getSelectedMatches());
     }
+
+    @Override
+    public DisplayedResultQuery clone() throws CloneNotSupportedException {
+        return (DisplayedResultQuery) super.clone();
+    }
 }

@@ -1,52 +1,47 @@
 package annis.gui;
 
-import com.vaadin.annotations.DesignRoot;
-import com.vaadin.v7.shared.ui.label.ContentMode;
-import com.vaadin.v7.ui.Label;
-import com.vaadin.v7.ui.Table;
-import com.vaadin.v7.ui.Table.ColumnGenerator;
-import com.vaadin.ui.declarative.Design;
+import com.vaadin.data.provider.GridSortOrder;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.themes.ValoTheme;
 
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.libgui.Helper;
 
-@DesignRoot
-public class ExampleTable extends Table
-{
-  
+public class ExampleTable extends Grid<CorpusBrowserEntry> {
 
-  public ExampleTable()
-  {
-    Design.read("ExampleTable.html", this);
+
+  public ExampleTable() {
   }
-  
-  public void setCitationLinkGenerator(CitationLinkGenerator citationGenerator)
-  {
-    addGeneratedColumn("genlink", citationGenerator);
-  }
-  
+
   @Override
-  public void attach()
-  {
+  public void attach() {
     super.attach();
+
+
+    Column<CorpusBrowserEntry, String> colName = addColumn(CorpusBrowserEntry::getName);
+    colName.setCaption("Name");
+    colName.setExpandRatio(1);
+
+    Column<CorpusBrowserEntry, String> colExample = addColumn(CorpusBrowserEntry::getExample);
+    colExample.setCaption("Example (click to use query)");
+    colExample.setExpandRatio(3);
+    colExample.setStyleGenerator(cbe -> Helper.CORPUS_FONT_FORCE);
     
-    addGeneratedColumn("example", new ColumnGenerator()
-    {
-      @Override
-      public Object generateCell(Table source, Object itemId, Object columnId)
-      {
-        CorpusBrowserEntry corpusBrowserEntry = (CorpusBrowserEntry) itemId;
-        Label l = new Label(corpusBrowserEntry.getExample());
-        l.setContentMode(ContentMode.TEXT);
-        l.addStyleName(Helper.CORPUS_FONT_FORCE);
-        return l;
-      }
+    addComponentColumn(cbe -> {
+      Button btLink = new Button();
+      btLink.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+      btLink.setIcon(FontAwesome.SHARE_ALT);
+      btLink.setDescription("Share query reference link");
+      btLink.addClickListener(new LinkClickListener(cbe));
+      return btLink;
     });
 
-    setVisibleColumns("name", "example", "genlink");
-    setColumnHeaders("Name", "Example (click to use query)", "URL");
-    setColumnExpandRatio("name", 0.3f);
-    setColumnExpandRatio("example", 0.7f);
-    setImmediate(true);
+    setSortOrder(GridSortOrder.asc(colName).thenAsc(colExample));
+
+    setSizeFull();
+
   }
+
 }
