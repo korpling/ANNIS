@@ -24,7 +24,7 @@ import org.corpus_tools.salt.core.SNode;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.component.grid.GridComponent;
+import annis.visualizers.component.grid.SingleGridComponent;
 
 /**
  * A component to visualize matched token and their context as "Keyword in
@@ -33,7 +33,7 @@ import annis.visualizers.component.grid.GridComponent;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public class KWICComponent extends GridComponent implements KWICInterface {
+public class KWICComponent extends SingleGridComponent implements KWICInterface {
 
     public KWICComponent(VisualizerInput input, MediaController mediaController, PDFController pdfController,
             STextualDS text) {

@@ -243,9 +243,8 @@ public class SaltExport {
 
             final SNode root = entry.getValue();
             final StringBuilder text = new StringBuilder();
-            final STextualDS ds = docGraph.createTextualDS(entry.getKey());
-
-            ds.setName(name);
+            final STextualDS ds = docGraph.createTextualDS("");
+            ds.setName(entry.getKey());
 
             Map<SToken, Range<Integer>> token2Range = new HashMap<>();
 
