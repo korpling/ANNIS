@@ -128,6 +128,7 @@ public class ShareSingleMatchGenerator extends Window implements
     generatedLinks.setComponentAlignment(txtDirectURL, Alignment.TOP_LEFT);
     generatedLinks.setComponentAlignment(txtIFrameCode, Alignment.TOP_LEFT);
     generatedLinks.setExpandRatio(preview, 1.0f);
+    generatedLinks.setSpacing(false);
     
     visSelector = new Grid(visContainer);
     visSelector.setCaption("Select visualization");
@@ -152,7 +153,7 @@ public class ShareSingleMatchGenerator extends Window implements
     
     HorizontalLayout hLayout = new HorizontalLayout(visSelector, generatedLinks);
     hLayout.setSizeFull();
-    hLayout.setSpacing(true);
+    hLayout.setSpacing(false);
     hLayout.setExpandRatio(generatedLinks, 1.0f);
     
     Button btClose = new Button("Close");
@@ -170,6 +171,7 @@ public class ShareSingleMatchGenerator extends Window implements
     layout = new VerticalLayout(infoText, hLayout, btClose);
     layout.setSizeFull();
     layout.setExpandRatio(hLayout, 1.0f);
+    layout.setSpacing(false);
     layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     
     setContent(layout);

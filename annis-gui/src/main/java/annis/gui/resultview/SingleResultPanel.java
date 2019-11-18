@@ -275,7 +275,7 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
 
         Window window = new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName, ps);
         window.setWidth(790, Unit.PIXELS);
-        window.setHeight(580, Unit.PIXELS);
+        window.setHeight(680, Unit.PIXELS);
         window.setResizable(true);
         window.setModal(true);
 
