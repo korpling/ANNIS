@@ -16,10 +16,13 @@ public class MultipleGridComponent extends CssLayout implements GridComponent {
 
     public MultipleGridComponent(VisualizerInput visInput, MediaController mediaController, PDFController pdfController,
             boolean forceToken) {
-        
+
+        setWidth("100%");
+        setHeight("-1");
+
         if (visInput != null) {
             for (STextualDS text : visInput.getDocument().getDocumentGraph().getTextualDSs()) {
-                
+
                 GridComponent g = new SingleGridComponent(visInput, mediaController, pdfController, forceToken, text);
                 Label label = new Label(text.getName());
                 label.setStyleName("text-name");
