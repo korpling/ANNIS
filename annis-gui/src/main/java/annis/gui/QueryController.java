@@ -39,14 +39,14 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.util.BeanContainer;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.BeanContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.UI;
 
 import annis.QueryGenerator;
 import annis.gui.components.ExceptionDialog;
@@ -121,7 +121,7 @@ public class QueryController implements Serializable {
         this.state.getQueryLanguage().addValueChangeListener(new Property.ValueChangeListener() {
             
             @Override
-            public void valueChange(ValueChangeEvent event) {
+            public void valueChange(Property.ValueChangeEvent event) {
                 validateQuery();                
             }
         });
@@ -142,7 +142,7 @@ public class QueryController implements Serializable {
         } else {
             // validate query
             try {
-                AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
+                AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource(ui);
                 Future<List<NodeDesc>> future = annisResource.path("query").path("parse/nodes")
                         .queryParam("q", Helper.encodeJersey(query))
                         .queryParam("query-language", state.getQueryLanguage().getValue().name())
@@ -171,7 +171,7 @@ public class QueryController implements Serializable {
                         reportServiceException((UniformInterfaceException) ex.getCause(), false);
                     } else {
                         // something unknown, report
-                        ExceptionDialog.show(ex);
+                        ExceptionDialog.show(ex, ui);
                     }
                 } catch (TimeoutException ex) {
                     qp.setStatus("Validation of query took too long.");
@@ -179,7 +179,7 @@ public class QueryController implements Serializable {
 
             } catch (ClientHandlerException ex) {
                 log.error("Could not connect to web service", ex);
-                ExceptionDialog.show(ex, "Could not connect to web service");
+                ExceptionDialog.show(ex, "Could not connect to web service", ui);
             }
         }
     }
@@ -215,7 +215,7 @@ public class QueryController implements Serializable {
                 qp.setStatus(caption + ": " + description);
                 break;
             case 403:
-                if (Helper.getUser() == null) {
+                if (Helper.getUser(ui) == null) {
                     // not logged in
                     qp.setStatus("You don't have the access rights to query this corpus. "
                             + "You might want to login to access more corpora.");
@@ -230,7 +230,7 @@ public class QueryController implements Serializable {
             default:
                 log.error("Exception when communicating with service", ex);
                 qp.setStatus("Unexpected exception:  " + ex.getMessage());
-                ExceptionDialog.show(ex, "Exception when communicating with service.");
+                ExceptionDialog.show(ex, "Exception when communicating with service.", ui);
                 break;
             }
 
@@ -380,7 +380,7 @@ public class QueryController implements Serializable {
 
         addHistoryEntry(displayedQuery);
 
-        AsyncWebResource res = Helper.getAnnisAsyncWebResource();
+        AsyncWebResource res = Helper.getAnnisAsyncWebResource(ui);
 
         //
         // begin execute match fetching
@@ -568,7 +568,7 @@ public class QueryController implements Serializable {
 
             newQuery.setOffset(offset);
 
-            Background.runWithCallback(new SingleResultFetchJob(match, newQuery), new FutureCallback<SaltProject>() {
+            Background.runWithCallback(new SingleResultFetchJob(match, newQuery, UI.getCurrent()), new FutureCallback<SaltProject>() {
 
                 @Override
                 public void onSuccess(SaltProject result) {
@@ -577,7 +577,7 @@ public class QueryController implements Serializable {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    ExceptionDialog.show(t, "Could not extend context.");
+                    ExceptionDialog.show(t, "Could not extend context.", ui);
                 }
             });
         } catch (CloneNotSupportedException ex) {

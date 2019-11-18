@@ -31,13 +31,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -54,7 +49,13 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import annis.CommonHelper;
 import annis.libgui.Background;
@@ -129,6 +130,8 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
 
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
+  private final PluginSystem ps;
+
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
    * Visualizer.
@@ -139,6 +142,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
       String segmentationName, PluginSystem ps, InstanceConfig instanceConfig) throws IOException {
     this.instanceConfig = instanceConfig;
     this.entry = entry;
+    this.ps = ps;
 
     this.visCtxChanger = parent;
 
@@ -162,6 +166,12 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
+
+  }
+
+  @Override
+  public void attach() {
+    super.attach();
 
     if (entry != null && ps != null) {
       visPlugin = ps.getVisualizer(entry.getVisType());
@@ -196,7 +206,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
 
         // create the visualizer and calc input
         try {
-          vis = createComponent();
+          vis = createComponent(UI.getCurrent());
           if (vis != null) {
             vis.setVisible(true);
             addComponent(vis);
@@ -217,15 +227,14 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
       }
 
     } // end if entry not null
-
   }
 
-  private Component createComponent() {
+  private Component createComponent(UI ui) {
     if (visPlugin == null) {
       return null;
     }
 
-    final VisualizerInput input = createInput();
+    final VisualizerInput input = createInput(ui);
 
     Component c = visPlugin.createComponent(input, this);
     if (c == null) {
@@ -238,10 +247,10 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
     return c;
   }
 
-  private VisualizerInput createInput() {
+  private VisualizerInput createInput(UI ui) {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisWebServiceURL(Helper.getServiceURL(VaadinSession.getCurrent()));
-    input.setContextPath(Helper.getContext());
+    input.setUI(ui);
+    input.setContextPath(Helper.getContext(ui));
     input.setId(resultID);
 
     input.setMarkedAndCovered(markedAndCovered);
@@ -256,7 +265,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
     if (entry != null) {
       input.setMappings(entry.getMappings());
       input.setNamespace(entry.getNamespace());
-      String template = Helper.getContext() + "/Resource/" + entry.getVisType() + "/%s";
+      String template = Helper.getContext(ui) + "/Resource/" + entry.getVisType() + "/%s";
       input.setResourcePathTemplate(template);
     }
 
@@ -266,9 +275,9 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
       List<String> nodeAnnoFilter = null;
       if (visPlugin instanceof FilteringVisualizerPlugin) {
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(corpusName,
-            documentName, input.getMappings());
+            documentName, input.getMappings(), ui);
       }
-      SaltProject p = getDocument(result.getGraph().getRoots().get(0).getName(), result.getName(), nodeAnnoFilter);
+      SaltProject p = getDocument(result.getGraph().getRoots().get(0).getName(), result.getName(), nodeAnnoFilter, ui);
 
       SDocument wholeDocument = null;
       if (p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()
@@ -286,7 +295,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
 
     // getting the raw text, when the visualizer wants to have it
     if (visPlugin != null && visPlugin.isUsingRawText()) {
-      input.setRawText(Helper.getRawText(corpusName, documentName));
+      input.setRawText(Helper.getRawText(corpusName, documentName, ui));
     }
 
     return input;
@@ -308,12 +317,12 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
     }
   }
 
-  private SaltProject getDocument(String toplevelCorpusName, String documentName, List<String> nodeAnnoFilter) {
+  private SaltProject getDocument(String toplevelCorpusName, String documentName, List<String> nodeAnnoFilter, UI ui) {
     SaltProject txt = null;
     try {
       toplevelCorpusName = urlPathEscape.escape(toplevelCorpusName);
       documentName = urlPathEscape.escape(documentName);
-      WebResource res = Helper.getAnnisWebResource().path("query").path("graph").path(toplevelCorpusName)
+      WebResource res = Helper.getAnnisWebResource(ui).path("query").path("graph").path(toplevelCorpusName)
           .path(documentName);
       if (nodeAnnoFilter != null) {
         res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
@@ -356,7 +365,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
 
       ExecutorService execService = Executors.newSingleThreadExecutor();
 
-      final Future<Component> future = execService.submit(new LoadComponentTask());
+      final Future<Component> future = execService.submit(new LoadComponentTask(UI.getCurrent()));
 
       // run the actual code to load the visualizer
       Background.run(new BackgroundJob(future, callback, UI.getCurrent()));
@@ -481,11 +490,19 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
 
   public class LoadComponentTask implements Callable<Component> {
 
+    private final UI ui;
+
+    public LoadComponentTask(UI ui) {
+        Preconditions.checkNotNull(ui);
+        this.ui = ui;
+    }
+
+
     @Override
     public Component call() throws Exception {
       // only create component if not already created
       if (vis == null) {
-        return createComponent();
+        return createComponent(ui);
       } else {
         return vis;
       }

@@ -38,6 +38,11 @@ public class KWICComponent extends SingleGridComponent implements KWICInterface 
     public KWICComponent(VisualizerInput input, MediaController mediaController, PDFController pdfController,
             STextualDS text) {
         super(input, mediaController, pdfController, false, text);
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
 
         getGrid().setShowCaption(false);
     }

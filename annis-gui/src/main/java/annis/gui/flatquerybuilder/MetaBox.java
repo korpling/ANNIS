@@ -15,16 +15,17 @@
  */
 package annis.gui.flatquerybuilder;
 
-import annis.libgui.Helper;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.OptionGroup;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
+
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.ui.OptionGroup;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
+import annis.libgui.Helper;
 
 /**
  * @author martin
@@ -42,7 +43,6 @@ public class MetaBox extends Panel implements Button.ClickListener
   {
     this.sq = sq;
     sb = new VerticalLayout();
-    sb.setImmediate(true);
     datum = level;
     // close
     btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);

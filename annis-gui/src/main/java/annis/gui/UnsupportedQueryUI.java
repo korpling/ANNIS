@@ -20,6 +20,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.declarative.Design;
 
 import annis.libgui.Helper;
@@ -56,7 +57,7 @@ public class UnsupportedQueryUI extends CommonUI {
                 @Override
                 public void buttonClick(ClickEvent event) {
                     if(url != null) {
-                        getUI().getPage().setLocation(Helper.getContext() + url);
+                        getUI().getPage().setLocation(Helper.getContext(UI.getCurrent()) + url);
                     }
                 }
             });

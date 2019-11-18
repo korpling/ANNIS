@@ -15,34 +15,6 @@
  */
 package annis.gui;
 
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.model.Annotation;
-import com.google.common.collect.ComparisonChain;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.Table.ColumnGenerator;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -53,9 +25,38 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
 
-import org.apache.commons.lang3.concurrent.CallableBackgroundInitializer;
-import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ComparisonChain;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.google.common.util.concurrent.FutureCallback;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.ComboBox;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.Table;
+import com.vaadin.v7.ui.Table.ColumnGenerator;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.model.Annotation;
 
 /**
  * Provides all corpus annotations for a corpus or for a specific search result.
@@ -123,10 +124,12 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     @Override
     public void attach() {
         super.attach();
+        
+        final UI ui =  UI.getCurrent();
 
         if (documentName == null) {
             Callable<List<Annotation>> backgroundJob = () -> {
-                return getAllSubcorpora(toplevelCorpusName);
+                return getAllSubcorpora(toplevelCorpusName, ui);
             };
             Background.runWithCallback(backgroundJob, new FutureCallback<List<Annotation>>() {
 
@@ -168,7 +171,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
                 @Override
                 public void onFailure(Throwable t) {
-                    ExceptionDialog.show(t, "Could not get meta data.");
+                    ExceptionDialog.show(t, "Could not get meta data.", ui);
                     layout.removeComponent(progress);
 
                 }
@@ -225,7 +228,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
      * Returns empty map if no metadata are available.
      */
     private Map<Integer, List<Annotation>> splitListAnnotations() {
-        List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName, documentName);
+        List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName, documentName, UI.getCurrent());
 
         Map<Integer, List<Annotation>> hashMetaData = new HashMap<>();
 
@@ -264,9 +267,9 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
         return listOfBeanItemCon;
     }
 
-    private List<Annotation> getAllSubcorpora(String toplevelCorpusName) {
+    private List<Annotation> getAllSubcorpora(String toplevelCorpusName, UI ui) {
         List<Annotation> result = new LinkedList<>();
-        WebResource res = Helper.getAnnisWebResource();
+        WebResource res = Helper.getAnnisWebResource(ui);
         try {
             res = res.path("meta").path("docnames").path(urlPathEscape.escape(toplevelCorpusName));
             result = res.get(new Helper.AnnotationListType());
@@ -293,7 +296,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     public void valueChange(Property.ValueChangeEvent event) {
         if (lastSelectedItem == null || !lastSelectedItem.equals(event.getProperty().getValue())) {
             lastSelectedItem = event.getProperty().getValue().toString();
-            List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName, lastSelectedItem);
+            List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName, lastSelectedItem, UI.getCurrent());
 
             if (metaData == null || metaData.isEmpty()) {
                 super.setCaption("No metadata available");

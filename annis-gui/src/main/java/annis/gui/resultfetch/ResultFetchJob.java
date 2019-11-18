@@ -72,7 +72,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
     this.query = query;
     this.ui = ui;
     
-    res = Helper.getAnnisAsyncWebResource();
+    res = Helper.getAnnisAsyncWebResource(ui);
     
     futureMatches = res.path("query").path("search").path("find")
       .queryParam("q", Helper.encodeJersey(query.getQuery()))
@@ -90,7 +90,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
   public void run()
   {
     WebResource subgraphRes
-      = Helper.getAnnisWebResource().path("query/search/subgraph");
+      = Helper.getAnnisWebResource(ui).path("query/search/subgraph");
 
     // holds the ids of the matches.
     MatchGroup result;

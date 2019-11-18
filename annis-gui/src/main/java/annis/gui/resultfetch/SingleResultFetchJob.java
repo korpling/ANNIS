@@ -22,6 +22,7 @@ import java.util.concurrent.Callable;
 import org.corpus_tools.salt.common.SaltProject;
 
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.UI;
 
 import annis.libgui.Helper;
 import annis.model.PagedResultQuery;
@@ -47,18 +48,21 @@ public class SingleResultFetchJob extends AbstractResultFetchJob implements
   private final Match match;
 
   private final PagedResultQuery query;
+  
+  private final UI ui;
 
-  public SingleResultFetchJob(Match match, PagedResultQuery query)
+  public SingleResultFetchJob(Match match, PagedResultQuery query, UI ui)
   {
     this.match = match;
     this.query = query;
+    this.ui = ui;
   }
 
   @Override
   public SaltProject call() throws Exception
   {
     WebResource subgraphRes
-      = Helper.getAnnisWebResource().path("query/search/subgraph");
+      = Helper.getAnnisWebResource(ui).path("query/search/subgraph");
 
     if (Thread.interrupted())
     {

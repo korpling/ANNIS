@@ -28,6 +28,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SSpan;
@@ -38,14 +47,6 @@ import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Range;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 
 import annis.CommonHelper;
 import annis.gui.widgets.grid.AnnotationGrid;
@@ -73,6 +74,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
     private String segmentationName;
     private final transient STextualDS enforcedText;
     private final Label lblEmptyToken;
+    private final boolean forceToken;
 
     public enum ElementType {
 
@@ -85,6 +87,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
         this.mediaController = mediaController;
         this.pdfController = pdfController;
         this.enforcedText = enforcedText;
+        this.forceToken = forceToken;
 
         setWidth("100%");
         setHeight("-1");
@@ -97,12 +100,18 @@ public class SingleGridComponent extends Panel implements GridComponent {
         lblEmptyToken.setVisible(false);
         lblEmptyToken.addStyleName("empty_token_hint");
         layout.addComponent(lblEmptyToken);
+
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
         if (input != null) {
             this.manuallySelectedTokenAnnos = input.getVisibleTokenAnnos();
             this.segmentationName = forceToken ? null : input.getSegmentationName();
 
             List<STextualDS> texts = input.getDocument().getDocumentGraph().getTextualDSs();
-            if (texts != null && texts.size() > 0 && !Helper.isRTLDisabled()) {
+            if (texts != null && texts.size() > 0 && !Helper.isRTLDisabled(UI.getCurrent())) {
                 if (CommonHelper.containsRTLText(texts.get(0).getText())) {
                     addStyleName("rtl");
                 }
@@ -110,7 +119,6 @@ public class SingleGridComponent extends Panel implements GridComponent {
 
             createAnnotationGrid();
         } // end if input not null
-
     }
 
     private boolean createAnnotationGrid() {
@@ -317,7 +325,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
 
         return tokenRow;
     }
-    
+
     private static String extractTextForToken(SNode t, String segmentation) {
         if (t instanceof SToken) {
             return CommonHelper.getSpannedText((SToken) t);
@@ -330,7 +338,6 @@ public class SingleGridComponent extends Panel implements GridComponent {
         }
         return "";
     }
-
 
     private LinkedHashMap<String, ArrayList<Row>> computeAnnotationRows(Map<SToken, Integer> token2index) {
         List<String> annos = new LinkedList<>();
@@ -426,12 +433,10 @@ public class SingleGridComponent extends Panel implements GridComponent {
     /**
      * Checks if a token is covered by a matched node but not a match by it self.
      *
-     * @param markedAndCovered
-     *                             A mapping from node to a matched number. The node
-     *                             must not matched directly, but covered by a
-     *                             matched node.
-     * @param tok
-     *                             the checked token.
+     * @param markedAndCovered A mapping from node to a matched number. The node
+     *                         must not matched directly, but covered by a matched
+     *                         node.
+     * @param tok              the checked token.
      * @return Returns null, if token is not covered neither marked.
      */
     private Long markCoveredTokens(Map<SNode, Long> markedAndCovered, SNode tok) {
@@ -445,8 +450,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
     /**
      * Checks if a token is a marked match
      *
-     * @param tok
-     *                the checked token.
+     * @param tok the checked token.
      * @return Returns null, if token is not marked.
      */
     private Long tokenMatch(SNode tok) {

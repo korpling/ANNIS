@@ -19,9 +19,6 @@ import java.util.List;
 
 import org.vaadin.hene.popupbutton.PopupButton;
 
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
@@ -33,7 +30,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.ListSelect;
+import com.vaadin.v7.ui.ListSelect;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
@@ -43,6 +40,9 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.data.Property.ValueChangeListener;
+import com.vaadin.v7.data.util.BeanItemContainer;
 
 import annis.gui.AnnisUI;
 import annis.gui.ExportPanel;
@@ -50,13 +50,13 @@ import annis.gui.HistoryPanel;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.model.Query;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import annis.model.AqlParseError;
 import annis.model.NodeDesc;
+import annis.model.Query;
 
 /**
  *

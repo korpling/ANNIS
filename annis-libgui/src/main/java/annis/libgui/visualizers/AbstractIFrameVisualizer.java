@@ -68,10 +68,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
 	@Override
 	public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle) {
 
-		VaadinSession session = VaadinSession.getCurrent();
-		if (session.getAttribute(IFrameResourceMap.class) == null) {
-			session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
-		}
+		VaadinSession session = vis.getUI().getSession();
 
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 		writeOutput(vis, outStream);
@@ -85,7 +82,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
 
 		URI base;
 		try {
-			String ctx = Helper.getContext();
+			String ctx = Helper.getContext(vis.getUI());
 			if(!ctx.endsWith("/")) {
 				ctx = ctx + "/";
 			}
@@ -95,7 +92,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implem
 			log.warn(
 					"Getting context failed, falling back to using the complete URL, which will fail if ANNIS used with an instance URL",
 					e);
-			base = UI.getCurrent().getPage().getLocation();
+			base = vis.getUI().getPage().getLocation();
 		}
 		AutoHeightIFrame iframe = new AutoHeightIFrame(base.resolve("vis-iframe-res/" + uuid.toString()));
 		return iframe;

@@ -16,8 +16,8 @@
 
 package annis.gui.admin;
 
-import annis.gui.admin.view.UserListView;
-import com.vaadin.data.Validator;
+import java.util.List;
+
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
 import com.vaadin.ui.Button;
@@ -25,10 +25,12 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
-import java.util.List;
+import com.vaadin.v7.data.Validator;
+import com.vaadin.v7.ui.PasswordField;
+
+import annis.gui.admin.view.UserListView;
 
 /**
  *

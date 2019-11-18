@@ -447,9 +447,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
     if(!alreadyAddedCSS.contains(hashForCssContent))
     {
-//      CSSInject cssInject = new CSSInject(UI.getCurrent());
-//      cssInject.setStyles(cssContent);
-      Page.getCurrent().getStyles().add(cssContent);
+      this.getPage().getStyles().add(cssContent);
       alreadyAddedCSS.add(hashForCssContent);
     }
   }

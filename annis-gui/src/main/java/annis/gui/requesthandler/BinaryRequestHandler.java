@@ -115,12 +115,12 @@ public class BinaryRequestHandler implements RequestHandler
       
       String requestedRangeRaw = request.getHeader("Range");
 
-      WebResource binaryRes = Helper.getAnnisWebResource()
+      WebResource binaryRes = Helper.getAnnisWebResource(session)
         .path("query").path("corpora")
         .path(urlPathEscape.escape(toplevelCorpusName))
         .path(urlPathEscape.escape(documentName)).path("binary");
 
-      WebResource metaBinaryRes = Helper.getAnnisWebResource()
+      WebResource metaBinaryRes = Helper.getAnnisWebResource(session)
         .path("meta").path("binary")
         .path(urlPathEscape.escape(toplevelCorpusName))
         .path(urlPathEscape.escape(documentName));

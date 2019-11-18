@@ -15,28 +15,6 @@
  */
 package annis.visualizers.htmlvis;
 
-import annis.CommonHelper;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import annis.libgui.MatchedNodeColors;
-import annis.libgui.VisualizationToggle;
-import annis.libgui.visualizers.AbstractVisualizer;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.model.Annotation;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -52,12 +30,24 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Label;
+
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
@@ -67,6 +57,16 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import annis.CommonHelper;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.model.Annotation;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
@@ -132,19 +132,19 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     mc = vi.getMarkedAndCovered();
 
     VisualizationDefinition[] definitions = parseDefinitions(corpusName, vi.
-      getMappings());
+      getMappings(), vi.getUI());
 
     if (definitions != null)
     {
 
       lblResult.setValue(createHTML(vi.getSResult().getDocumentGraph(),
-        definitions));
+        definitions, vi.getUI()));
 
       String labelClass = vi.getMappings().getProperty("class", "htmlvis");
       lblResult.addStyleName(labelClass);
 
-      injectWebFonts(visConfigName, corpusName);
-      injectCSS(visConfigName, corpusName, wrapperClassName);
+      injectWebFonts(visConfigName, corpusName, vi.getUI());
+      injectCSS(visConfigName, corpusName, wrapperClassName, vi.getUI());
  
       
     }
@@ -170,12 +170,12 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
   @Override
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
-    String documentName, Properties mappings)
+    String documentName, Properties mappings, UI ui)
   {
     Set<String> result = null;
 
     VisualizationDefinition[] definitions = parseDefinitions(toplevelCorpusName,
-      mappings);
+      mappings, ui);
 
     if (definitions != null)
     {
@@ -210,7 +210,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   }
 
   public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
-    Properties mappings)
+    Properties mappings, UI ui)
   {
     InputStream inStreamConfigRaw = null;
 
@@ -222,7 +222,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     else
     {
-      WebResource resBinary = Helper.getAnnisWebResource().path(
+      WebResource resBinary = Helper.getAnnisWebResource(ui).path(
         "query/corpora/").path(toplevelCorpusName).path(toplevelCorpusName)
         .path("binary").path(visConfigName + ".config");
 
@@ -261,7 +261,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     return null;
   }
   
-  private void injectCSS(String visConfigName, String corpusName, String wrapperClassName)
+  private void injectCSS(String visConfigName, String corpusName, String wrapperClassName, UI ui)
   {
     InputStream inStreamCSSRaw = null;
     if (visConfigName == null)
@@ -270,7 +270,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     else
     {
-      WebResource resBinary = Helper.getAnnisWebResource().path(
+      WebResource resBinary = Helper.getAnnisWebResource(ui).path(
         "query/corpora/").path(corpusName).path(corpusName)
         .path("binary").path(visConfigName + ".css");
 
@@ -285,11 +285,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       try (InputStream inStreamCSS = inStreamCSSRaw)
       {
         String cssContent = IOUtils.toString(inStreamCSS);
-        UI currentUI = UI.getCurrent();
-        if (currentUI instanceof AnnisBaseUI)
+        if (ui instanceof AnnisBaseUI)
         {
           // do not add identical CSS files
-          ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent,
+          ((AnnisBaseUI) ui).injectUniqueCSS(cssContent,
             wrapperClassName);
         }
       }
@@ -305,12 +304,12 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
   }
   
-  private void injectWebFonts(String visConfigName, String corpusName)
+  private void injectWebFonts(String visConfigName, String corpusName, UI ui)
   {
     InputStream inStreamJSONRaw = null;
     if (visConfigName != null)
     {
-      WebResource resBinary = Helper.getAnnisWebResource().path(
+      WebResource resBinary = Helper.getAnnisWebResource(ui).path(
         "query/corpora/").path(corpusName).path(corpusName)
         .path("binary").path(visConfigName + ".fonts.json");
 
@@ -352,11 +351,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
             
             sb.append("}\n");
             
-            UI currentUI = UI.getCurrent();
-            if (currentUI instanceof AnnisBaseUI)
+            if (ui instanceof AnnisBaseUI)
             {
               // do not add identical CSS files
-              ((AnnisBaseUI) currentUI).injectUniqueCSS(sb.toString());
+              ((AnnisBaseUI) ui).injectUniqueCSS(sb.toString());
             }
           }
         }
@@ -388,7 +386,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   }
 
   public String createHTML(SDocumentGraph graph,
-    VisualizationDefinition[] definitions)
+    VisualizationDefinition[] definitions, UI ui)
   {
     HashMap<VisualizationDefinition, Integer> instruction_priorities = new HashMap<>();
 
@@ -449,7 +447,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       strCorpName = corpusPath.get(corpusPath.size() - 1);
 
       //Get metadata and put in hashmap
-      List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName, strDocName);
+      List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName, strDocName, ui);
       for (Annotation metaDatum : metaData)
       {
         meta.put(metaDatum.getName(), metaDatum.getValue());

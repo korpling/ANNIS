@@ -24,6 +24,7 @@ import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
 
 import annis.CommonHelper;
 import annis.gui.components.medialement.MediaElement;
@@ -66,7 +67,7 @@ public class VideoVisualizer extends AbstractVisualizer<MediaElementPlayer>
     corpusName = urlPathEscape.escape(corpusName);
     documentName = urlPathEscape.escape(documentName);
     
-    WebResource resMeta = Helper.getAnnisWebResource().path(
+    WebResource resMeta = Helper.getAnnisWebResource(input.getUI()).path(
       "meta/binary").path(corpusName).path(documentName);
     List<AnnisBinaryMetaData> meta = resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
 

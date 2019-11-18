@@ -15,6 +15,36 @@
  */
 package annis.gui.docbrowser;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.data.util.IndexedContainer;
+import com.vaadin.v7.ui.Table;
+import com.vaadin.v7.ui.themes.BaseTheme;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
 import annis.gui.MetaDataPanel;
 import annis.libgui.Helper;
 import annis.model.Annotation;
@@ -22,32 +52,6 @@ import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MetaDataColumn;
 import annis.service.objects.OrderBy;
 import annis.service.objects.Visualizer;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Item;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Resource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.BaseTheme;
-import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * List documents for a specific corpus.
@@ -411,7 +415,7 @@ public class DocBrowserTable extends Table
     if (!docMetaDataCache.containsKey(docBrowserPanel.getCorpus()))
     {
       // get the metadata for the corpus
-      WebResource res = Helper.getAnnisWebResource();
+      WebResource res = Helper.getAnnisWebResource(UI.getCurrent());
       res = res.path("meta/corpus/").path(
         urlPathEscape.escape(docBrowserPanel.getCorpus())).path("closure");
       

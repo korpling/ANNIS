@@ -97,7 +97,6 @@
 				</executions>
 			</plugin>
 
-
 			<!-- A simple Jetty test server at http://localhost:8080/annis-gui can 
 				be launched with the Maven goal jetty:run and stopped with jetty:stop -->
 			<plugin>
@@ -214,11 +213,17 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>com.github.vaadin4qbanos</groupId>
 			<artifactId>jsclipboard</artifactId>
 			<version>1.0.12</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.vaadin</groupId>
+					<artifactId>vaadin-server</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

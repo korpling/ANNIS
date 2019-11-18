@@ -16,8 +16,6 @@
 package annis.gui.admin;
 
 import com.vaadin.annotations.DesignRoot;
-import com.vaadin.data.fieldgroup.FieldGroup;
-import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HasComponents;
@@ -25,6 +23,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.declarative.Design;
+import com.vaadin.v7.data.fieldgroup.FieldGroup;
+import com.vaadin.v7.data.util.IndexedContainer;
 
 /**
  * UI to edit the properties of a single user.

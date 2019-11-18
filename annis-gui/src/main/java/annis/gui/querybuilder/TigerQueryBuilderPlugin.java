@@ -15,7 +15,6 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.QueryController;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -24,7 +23,9 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
+import annis.gui.QueryController;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**

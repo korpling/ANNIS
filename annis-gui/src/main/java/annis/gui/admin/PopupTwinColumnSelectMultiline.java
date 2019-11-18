@@ -15,8 +15,8 @@
  */
 package annis.gui.admin;
 
-import com.vaadin.ui.AbstractTextField;
-import com.vaadin.ui.TextArea;
+import com.vaadin.v7.ui.AbstractTextField;
+import com.vaadin.v7.ui.TextArea;
 
 /**
  *

@@ -22,6 +22,7 @@ import java.util.Set;
 import org.corpus_tools.salt.core.SNode;
 
 import com.vaadin.ui.Component;
+import com.vaadin.ui.UI;
 
 import annis.libgui.VisualizationToggle;
 import net.xeoh.plugins.base.Plugin;

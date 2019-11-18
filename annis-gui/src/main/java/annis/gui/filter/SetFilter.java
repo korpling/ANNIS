@@ -15,10 +15,11 @@
  */
 package annis.gui.filter;
 
-import com.vaadin.data.Container;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import java.util.Set;
+
+import com.vaadin.v7.data.Container;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.Property;
 
 /**
  * A filter for containers to include only items available in a specific

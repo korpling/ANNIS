@@ -15,29 +15,30 @@
  */
 package annis.gui.querybuilder;
 
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.AbstractSelect.NewItemHandler;
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.data.Property.ValueChangeListener;
+import com.vaadin.v7.ui.AbstractSelect.NewItemHandler;
+import com.vaadin.v7.ui.ComboBox;
+import com.vaadin.v7.ui.TextField;
 
 /**
  *
@@ -123,7 +124,6 @@ public class NodeWindow extends Panel implements Button.ClickListener
       + "Then define a destination node by clicking its \"Dock\" "
       + "button.<br>You can cancel the action by clicking this button "
       + "(\"Cancel\") again.");
-    btEdge.setImmediate(true);
     toolbar.addComponent(btEdge);
     
     btAdd = new Button("Add");
@@ -316,7 +316,6 @@ public class NodeWindow extends Panel implements Button.ClickListener
       cbOperator.addValueChangeListener((ValueChangeListener) this);
       
       txtValue = new TextField();
-      txtValue.setImmediate(true);
       txtValue.addValueChangeListener((ValueChangeListener) this);
       
       cbOperator.setWidth("4em");
