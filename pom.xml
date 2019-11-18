@@ -80,7 +80,7 @@
 	</repositories>
 	<properties>
 		<servlet.version>3.0.1</servlet.version>
-		<vaadin.version>8.8.1</vaadin.version>
+		<vaadin.version>8.9.2</vaadin.version>
 		<jetty.version>9.4.18.v20190429</jetty.version>
         <jersey.version>2.27</jersey.version>
 		<main.basedir>${project.basedir}</main.basedir>

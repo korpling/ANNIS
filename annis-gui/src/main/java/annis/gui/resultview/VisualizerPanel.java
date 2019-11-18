@@ -274,7 +274,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
       List<String> nodeAnnoFilter = null;
       if (visPlugin instanceof FilteringVisualizerPlugin) {
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(corpusName,
-            documentName, input.getMappings());
+            documentName, input.getMappings(), ui);
       }
       SaltProject p = getDocument(result.getGraph().getRoots().get(0).getName(), result.getName(), nodeAnnoFilter, ui);
 

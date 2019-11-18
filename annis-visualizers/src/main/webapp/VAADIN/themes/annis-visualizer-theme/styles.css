@@ -1077,7 +1077,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "8.8.1";
+	content: "8.9.2";
 }
 
 .v-widget {
@@ -6277,7 +6277,12 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis-visualizer-theme .v-datefield-popup td.v-datefield-calendarpanel-month {
 	width: 148px;
+	cursor: default;
 	color: #197de1;
+}
+
+.annis-visualizer-theme .v-datefield-popup td.v-datefield-calendarpanel-month.header-month-year {
+	cursor: pointer;
 }
 
 .annis-visualizer-theme .v-datefield-popup .v-datefield-calendarpanel-year td.v-datefield-calendarpanel-month {
@@ -6462,7 +6467,12 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis-visualizer-theme td.v-datefield-calendarpanel-month {
 	width: 148px;
+	cursor: default;
 	color: #197de1;
+}
+
+.annis-visualizer-theme td.v-datefield-calendarpanel-month.header-month-year {
+	cursor: pointer;
 }
 
 .annis-visualizer-theme .v-datefield-calendarpanel-year td.v-datefield-calendarpanel-month {
@@ -7117,7 +7127,12 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis-visualizer-theme td.v-inline-datefield-calendarpanel-month {
 	width: 148px;
+	cursor: default;
 	color: #197de1;
+}
+
+.annis-visualizer-theme td.v-inline-datefield-calendarpanel-month.header-month-year {
+	cursor: pointer;
 }
 
 .annis-visualizer-theme .v-inline-datefield-calendarpanel-year td.v-inline-datefield-calendarpanel-month {
