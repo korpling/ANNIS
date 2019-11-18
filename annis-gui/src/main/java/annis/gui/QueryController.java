@@ -444,6 +444,8 @@ public class QueryController implements Serializable {
 
         checkQuirksMode(query);
 
+        addHistoryEntry(query);
+
         ExporterPlugin exporterImpl = ui.getExporter(query.getExporter());
 
         exportFuture = Background.call(new ExportBackgroundJob(query, exporterImpl, ui, eventBus, panel));
@@ -489,6 +491,8 @@ public class QueryController implements Serializable {
                 .def(freqDefinition).build();
 
         checkQuirksMode(query);
+
+        addHistoryEntry(query);
 
         FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, query, panel);
 
@@ -539,12 +543,12 @@ public class QueryController implements Serializable {
      *
      * @see HistoryPanel
      */
-    public void addHistoryEntry(DisplayedResultQuery q) {
+    public void addHistoryEntry(Query q) {
         try {
-            DisplayedResultQuery queryCopy = q.clone();
+            Query queryCopy = q.clone();
             // remove it first in order to let it appear on the beginning of the list
-            state.getHistory().remove(queryCopy);
-            state.getHistory().add(0, queryCopy);
+            state.getHistory().removeItem(queryCopy);
+            state.getHistory().addItemAt(0, queryCopy);
             searchView.getControlPanel().getQueryPanel().updateShortHistory();
         } catch (CloneNotSupportedException ex) {
             log.error("Can't clone the query", ex);

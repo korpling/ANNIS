@@ -358,7 +358,7 @@ public class QueryPanel extends GridLayout implements
 
     int counter = 0;
 
-    for(Query q : state.getHistory())
+    for(Query q : state.getHistory().getItemIds())
     {
       if(counter >= MAX_HISTORY_MENU_ITEMS)
       {
