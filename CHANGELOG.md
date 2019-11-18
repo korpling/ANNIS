@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgraded Vaadin from 7 to 8 using the compatibility layer 
+
 ### Fixed
 
 - Create multiple textual data sources in Salt document for parallel corpora instead of merging them into one STextualDS
