@@ -274,12 +274,17 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
       List<String> nodeAnnoFilter = null;
       if (visPlugin instanceof FilteringVisualizerPlugin) {
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(corpusName,
-            documentName, input.getMappings(), ui);
+            documentName, input.getMappings());
       }
       SaltProject p = getDocument(result.getGraph().getRoots().get(0).getName(), result.getName(), nodeAnnoFilter, ui);
 
-      SDocument wholeDocument = p.getCorpusGraphs().get(0).getDocuments().get(0);
+      SDocument wholeDocument = null;
+      if (p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()
+          && p.getCorpusGraphs().get(0).getDocuments() != null
+          && !p.getCorpusGraphs().get(0).getDocuments().isEmpty()) {
+        wholeDocument = p.getCorpusGraphs().get(0).getDocuments().get(0);
 
+      }
       CommonHelper.addMatchToDocumentGraph(match, wholeDocument);
 
       input.setDocument(wholeDocument);

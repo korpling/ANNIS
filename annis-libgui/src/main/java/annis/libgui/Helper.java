@@ -33,26 +33,6 @@ import java.util.TreeMap;
 import javax.mail.Session;
 import javax.ws.rs.core.UriBuilder;
 
-import org.aeonbits.owner.ConfigFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SDominanceRelation;
-import org.corpus_tools.salt.common.SSpanningRelation;
-import org.corpus_tools.salt.common.SToken;
-import org.corpus_tools.salt.core.GraphTraverseHandler;
-import org.corpus_tools.salt.core.SAnnotation;
-import org.corpus_tools.salt.core.SFeature;
-import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
-import org.corpus_tools.salt.core.SNode;
-import org.corpus_tools.salt.core.SRelation;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Range;
 import com.google.common.escape.Escaper;
@@ -74,6 +54,28 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
+
+import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.GraphTraverseHandler;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
+import org.slf4j.LoggerFactory;
 
 import annis.CommonHelper;
 import annis.model.Annotation;
@@ -663,20 +665,33 @@ public class Helper {
         return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).getEncodedValue();
     }
 
-    public static Map<SToken, Integer> createToken2IndexMap(SDocumentGraph graph) {
-        Map<SToken, Integer> token2index = new LinkedHashMap<>();
+    public static Map<SToken, Integer> createToken2IndexMap(final SDocumentGraph graph, final STextualDS textualDS) {
+        final Map<SToken, Integer> token2index = new LinkedHashMap<>();
 
         if (graph == null) {
             return token2index;
         }
 
-        List<SToken> sortedTokens = graph.getSortedTokenByText();
+        List<SToken> sortedTokens;
+        
+        if(textualDS == null) {
+            // get tokens of all texts
+            sortedTokens = graph.getSortedTokenByText();
+        } else {
+            final DataSourceSequence<Number> seq = new DataSourceSequence<>();
+            seq.setDataSource(textualDS);
+            seq.setStart(0);
+            seq.setEnd(textualDS.getText() != null ? textualDS.getText().length() : 0);
+            sortedTokens = graph.getSortedTokenByText(graph.getTokensBySequence(seq));
+        }
+
         if (sortedTokens != null) {
             int i = 0;
-            for (SToken t : sortedTokens) {
+            for (final SToken t : sortedTokens) {
                 token2index.put(t, i++);
             }
         }
+    
         return token2index;
     }
 
@@ -710,7 +725,7 @@ public class Helper {
                 initialCovered.put(n, match);
             }
         }
-        final Map<SToken, Integer> token2index = Helper.createToken2IndexMap(doc.getDocumentGraph());
+        final Map<SToken, Integer> token2index = Helper.createToken2IndexMap(doc.getDocumentGraph(), null);
 
         // calculate covered nodes
         CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(doc.getDocumentGraph(), initialCovered,

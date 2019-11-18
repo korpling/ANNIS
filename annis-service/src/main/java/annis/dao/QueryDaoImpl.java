@@ -61,6 +61,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
@@ -143,7 +144,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     private final ExecutorService exec = Executors.newCachedThreadPool();
 
-    private final Pattern validQNamePattern = Pattern.compile("[a-zA-Z_%][a-zA-Z0-9_\\-%:]*");
+    private final Pattern validQNamePattern = Pattern
+            .compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
 
     @Override
     public SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt) throws GraphANNISException {
@@ -212,11 +214,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             matchedIDs.add(id.toASCIIString());
         }
         Optional<String> segmentation = Optional.empty();
-        if(annoExt.getSegmentationLayer() != null && !annoExt.getSegmentationLayer().isEmpty()) {
+        if (annoExt.getSegmentationLayer() != null && !annoExt.getSegmentationLayer().isEmpty()) {
             segmentation = Optional.of(annoExt.getSegmentationLayer());
         }
-        SDocumentGraph result = SaltExport
-                .map(corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight(), segmentation));
+        SDocumentGraph result = SaltExport.map(
+                corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight(), segmentation));
 
         return result;
     }
@@ -598,14 +600,43 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
             ArrayList<Match> data = new ArrayList<>();
 
-            for (String corpusName : corpora) {
-                String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, limitOffset.getOffset(),
+            if (corpora.size() == 1) {
+                String[] matchesRaw = corpusStorageMgr.find(corpora.get(0), query, ql, limitOffset.getOffset(),
                         limitOffset.getLimit(), ordering);
 
                 for (int i = 0; i < matchesRaw.length; i++) {
                     data.add(Match.parseFromString(matchesRaw[i]));
                 }
+            } else if (corpora.size() > 1) {
+                // initialize the limit/offset values for the first corpus
+                long offset = limitOffset.getOffset();
+                long limit = limitOffset.getLimit();
+                Optional<String> previousCorpus = Optional.empty();
+                for(String currentCorpus : corpora) {
+                    if (previousCorpus.isPresent()) {
+                        // Adjust limit and offset according to the found matches for the next corpus.
+                        // We can't use the match list here since the current corpus can have have
+                        // yielded no matches both because the offset was too high or the limit was
+                        // reached.
+                        // Since we don't know the actual total number of matches we have to query it.
+                        long previousCount = corpusStorageMgr.count(previousCorpus.get(), query, ql);
+                        offset = Math.max(0, offset - previousCount);
+                        limit = Math.max(0, limit - data.size());
+                    }
+                    if (limit > 0) {
+
+                        String[] matchesRaw = corpusStorageMgr.find(currentCorpus, query, ql, offset, limit, ordering);
+
+                        for (int i = 0; i < matchesRaw.length; i++) {
+                            data.add(Match.parseFromString(matchesRaw[i]));
+                        }
+
+                    }
+
+                    previousCorpus = Optional.of(currentCorpus);
+                }
             }
+
             return data;
         });
 
@@ -971,6 +1002,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         if (nodeAnnotationFilter == null || nodeAnnotationFilter.isEmpty()) {
             fallbackToAll = true;
         } else {
+            nodeAnnotationFilter = nodeAnnotationFilter.stream().map((anno_name) -> anno_name.replaceFirst("::", ":"))
+                    .collect(Collectors.toList());
             for (String nodeAnno : nodeAnnotationFilter) {
                 if (!validQNamePattern.matcher(nodeAnno).matches()) {
                     // If we can't produce a valid query for this annotation name fallback

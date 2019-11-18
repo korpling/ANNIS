@@ -106,7 +106,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
      *
      * Contains only token, if mappings does not contain "node_key".
      */
-    Map<SToken, Integer> token2index = Helper.createToken2IndexMap(input.getSResult().getDocumentGraph());
+    Map<SToken, Integer> token2index = Helper.createToken2IndexMap(input.getSResult().getDocumentGraph(), null);
     TreeSet<SNode> selectedNodes = new TreeSet<>(
       new Comparator<SNode>()
       {

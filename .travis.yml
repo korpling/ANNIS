@@ -10,7 +10,7 @@ before_script:
   - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
   - mkdir -p $HOME/.cargo/bin
   - export PATH=$HOME/.cargo/bin:$PATH
-  - misc/download-mdbook.sh 0.3.1
+  - misc/download-mdbook.sh 0.3.5
   
 script:
   - mvn test -B

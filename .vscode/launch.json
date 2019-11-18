@@ -6,6 +6,14 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Debug ANNIS UI (Attach)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 8000,
+            "projectName": "annis-gui",
+        },
+        {
+            "type": "java",
             "name": "Debug (Launch) - Current File",
             "request": "launch",
             "mainClass": "${file}"

@@ -168,7 +168,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>mdbook</executable>
+									<executable>${user.home}/.cargo/bin/mdbook</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>
 									<arguments>
 										<argument>build</argument>

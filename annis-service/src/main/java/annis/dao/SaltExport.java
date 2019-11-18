@@ -58,6 +58,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Range;
 
 /**
@@ -70,6 +71,7 @@ public class SaltExport {
     private final Graph orig;
     private final SDocumentGraph docGraph;
     private final BiMap<Integer, SNode> nodesByID;
+    private final BiMap<SNode, Node> origNodeByMapped;
     private final Map<Integer, Integer> node2timelinePOT;
 
     private final static Logger log = LoggerFactory.getLogger(SaltExport.class);
@@ -79,16 +81,17 @@ public class SaltExport {
 
         this.docGraph = SaltFactory.createSDocumentGraph();
         this.nodesByID = HashBiMap.create();
+        this.origNodeByMapped = HashBiMap.create();
         this.node2timelinePOT = new HashMap<>();
     }
 
     private static void mapLabels(SAnnotationContainer n, Map<QName, String> labels, boolean isMeta) {
         for (Map.Entry<QName, String> e : labels.entrySet()) {
             String name = e.getKey().getName();
-            if(name == null || name.isEmpty()) {
+            if (name == null || name.isEmpty()) {
                 log.warn("Replacing empty label name with '_' ({}:{}={})", e.getKey().getNs(), e.getKey().getName(),
                         e.getValue());
-                
+
                 name = "_";
             }
             if ("annis".equals(e.getKey().getNs()) && !"time".equals(name)) {
@@ -98,7 +101,7 @@ public class SaltExport {
             } else {
                 n.createAnnotation(e.getKey().getNs(), name, e.getValue());
             }
-        
+
         }
 
     }
@@ -220,101 +223,120 @@ public class SaltExport {
     }
 
     private void recreateText(final String name, List<SNode> rootNodes) {
-        final StringBuilder text = new StringBuilder();
-        final STextualDS ds = docGraph.createTextualDS("");
 
-        ds.setName(name);
-
-        Map<SToken, Range<Integer>> token2Range = new HashMap<>();
-
-        // traverse the token chain using the order relations
-        docGraph.traverse(rootNodes, SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "ORDERING_" + name,
-                new GraphTraverseHandler() {
-                    @Override
-                    public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                            SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-                        if (fromNode != null) {
-                            text.append(" ");
-                        }
-
-                        SFeature featTok = currNode.getFeature("annis::tok");
-                        if (featTok != null && currNode instanceof SToken) {
-                            int idxStart = text.length();
-                            text.append(featTok.getValue_STEXT());
-                            token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
-                        }
-                    }
-
-                    @Override
-                    public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
-                            SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-                    }
-
-                    @SuppressWarnings("rawtypes")
-                    @Override
-                    public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                            SRelation relation, SNode currNode, long order) {
-                        if (relation == null) {
-                            // TODO: check if this is ever true
-                            return true;
-                        } else if (relation instanceof SOrderRelation && Objects.equal(name, relation.getType())) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                });
-
-        // update the actual text
-        ds.setText(text.toString());
-
-        // add all relations
-        token2Range.forEach((t, r) -> {
-            STextualRelation rel = SaltFactory.createSTextualRelation();
-            rel.setSource(t);
-            rel.setTarget(ds);
-            rel.setStart(r.lowerEndpoint());
-            rel.setEnd(r.upperEndpoint());
-            docGraph.addRelation(rel);
+        // Separate the roots nodes by their parent text node
+        Multimap<String, SNode> rootsByTextName = Multimaps.index(rootNodes, (n) -> {
+            List<Edge> partEdges = orig.getOutgoingEdges(origNodeByMapped.get(n), ComponentType.PartOf);
+            if (!partEdges.isEmpty()) {
+                Node textNode = partEdges.get(0).getTarget();
+                if (textNode != null) {
+                    // Use the fragment part as text name
+                    List<String> splitted = Splitter.on('#').limit(2).splitToList(textNode.getName());
+                    return splitted.get(splitted.size() - 1);
+                }
+            }
+            return "";
         });
 
-        if (docGraph.getTimeline() != null) {
+        // Create a textual datasource for each text
+        for (Map.Entry<String, SNode> entry : rootsByTextName.entries()) {
 
-            // create the relations to the timeline for the tokens of this text by getting
-            // the original node IDs of the coverage edges and their mapping to a point of
-            // time (POT)
-            for (SToken tok : token2Range.keySet()) {
-                Integer tokID = nodesByID.inverse().get(tok);
-                if (tokID != null) {
-                    Integer tokPOT = this.node2timelinePOT.get(tokID);
-                    if (tokPOT != null) {
-                        // directly map the relation of the token to its POT
-                        STimelineRelation rel = SaltFactory.createSTimelineRelation();
-                        rel.setSource(tok);
-                        rel.setTarget(docGraph.getTimeline());
-                        rel.setStart(tokPOT);
-                        rel.setEnd(tokPOT);
-                        docGraph.addRelation(rel);
-                    } else {
-                        // find the coverage edges from this node to a token which has a POT
-                        Component covCompoment = new Component(ComponentType.Coverage, "annis", "");
-                        List<Edge> edges = orig.getOutgoingEdges(orig.getNodeForID(tokID), covCompoment);
-                        for (Edge e : edges) {
-                            Integer pot = this.node2timelinePOT.get(e.getTargetID());
-                            if (pot != null) {
-                                STimelineRelation rel = SaltFactory.createSTimelineRelation();
-                                rel.setSource(tok);
-                                rel.setTarget(docGraph.getTimeline());
-                                rel.setStart(pot);
-                                rel.setEnd(pot);
-                                docGraph.addRelation(rel);
+            final SNode root = entry.getValue();
+            final StringBuilder text = new StringBuilder();
+            final STextualDS ds = docGraph.createTextualDS("");
+            ds.setName(entry.getKey());
+
+            Map<SToken, Range<Integer>> token2Range = new HashMap<>();
+
+            // traverse the token chain using the order relations
+            docGraph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "ORDERING_" + name,
+                    new GraphTraverseHandler() {
+                        @Override
+                        public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
+                            if (fromNode != null) {
+                                text.append(" ");
                             }
 
+                            SFeature featTok = currNode.getFeature("annis::tok");
+                            if (featTok != null && currNode instanceof SToken) {
+                                int idxStart = text.length();
+                                text.append(featTok.getValue_STEXT());
+                                token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
+                            }
+                        }
+
+                        @Override
+                        public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
+                        }
+
+                        @SuppressWarnings("rawtypes")
+                        @Override
+                        public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                                SRelation relation, SNode currNode, long order) {
+                            if (relation == null) {
+                                // TODO: check if this is ever true
+                                return true;
+                            } else if (relation instanceof SOrderRelation && Objects.equal(name, relation.getType())) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    });
+
+            // update the actual text
+            ds.setText(text.toString());
+
+            // add all relations
+            token2Range.forEach((t, r) -> {
+                STextualRelation rel = SaltFactory.createSTextualRelation();
+                rel.setSource(t);
+                rel.setTarget(ds);
+                rel.setStart(r.lowerEndpoint());
+                rel.setEnd(r.upperEndpoint());
+                docGraph.addRelation(rel);
+            });
+
+            if (docGraph.getTimeline() != null) {
+
+                // create the relations to the timeline for the tokens of this text by getting
+                // the original node IDs of the coverage edges and their mapping to a point of
+                // time (POT)
+                for (SToken tok : token2Range.keySet()) {
+                    Integer tokID = nodesByID.inverse().get(tok);
+                    if (tokID != null) {
+                        Integer tokPOT = this.node2timelinePOT.get(tokID);
+                        if (tokPOT != null) {
+                            // directly map the relation of the token to its POT
+                            STimelineRelation rel = SaltFactory.createSTimelineRelation();
+                            rel.setSource(tok);
+                            rel.setTarget(docGraph.getTimeline());
+                            rel.setStart(tokPOT);
+                            rel.setEnd(tokPOT);
+                            docGraph.addRelation(rel);
+                        } else {
+                            // find the coverage edges from this node to a token which has a POT
+                            Component covCompoment = new Component(ComponentType.Coverage, "annis", "");
+                            List<Edge> edges = orig.getOutgoingEdges(orig.getNodeForID(tokID), covCompoment);
+                            for (Edge e : edges) {
+                                Integer pot = this.node2timelinePOT.get(e.getTargetID());
+                                if (pot != null) {
+                                    STimelineRelation rel = SaltFactory.createSTimelineRelation();
+                                    rel.setSource(tok);
+                                    rel.setTarget(docGraph.getTimeline());
+                                    rel.setStart(pot);
+                                    rel.setEnd(pot);
+                                    docGraph.addRelation(rel);
+                                }
+
+                            }
                         }
                     }
                 }
-            }
 
+            }
         }
     }
 
@@ -376,6 +398,7 @@ public class SaltExport {
         for (Node node : orig.getNodesByType("node")) {
             SNode n = mapNode(node);
             nodesByID.put(node.getId(), n);
+            origNodeByMapped.put(n, node);
             edges.addAll(orig.getOutgoingEdges(node, ComponentType.Dominance));
             edges.addAll(orig.getOutgoingEdges(node, ComponentType.Coverage));
             edges.addAll(orig.getOutgoingEdges(node, ComponentType.Pointing));
