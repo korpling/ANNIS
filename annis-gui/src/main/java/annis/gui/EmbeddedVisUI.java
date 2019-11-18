@@ -262,6 +262,7 @@ public class EmbeddedVisUI extends CommonUI {
                     String template = Helper.getContext(UI.getCurrent()) + "/Resource/" + visName + "/%s";
                     visInput.setResourcePathTemplate(template);
                     visInput.setSegmentationName(baseText);
+                    visInput.setUI(UI.getCurrent());
                     // TODO: which other thing do we have to provide?
 
                     Component c = visPlugin.createComponent(visInput, null);

@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -492,6 +493,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
     private final UI ui;
 
     public LoadComponentTask(UI ui) {
+        Preconditions.checkNotNull(ui);
         this.ui = ui;
     }
 

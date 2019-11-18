@@ -263,7 +263,6 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
         infoBar.addComponent(ctxLayout);
 
         addComponent(infoBar);
-        initVisualizer();
     }
 
     private void showShareSingleMatchGenerator() {
@@ -400,6 +399,9 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
     @Override
     public void attach() {
         super.attach();
+        
+        initVisualizer();
+        
         if (cfg.shortenURLs() && !Helper.isKickstarter(getSession())) {
             btLink.setVisible(true);
         } else {

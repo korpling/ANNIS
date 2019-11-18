@@ -132,19 +132,19 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     mc = vi.getMarkedAndCovered();
 
     VisualizationDefinition[] definitions = parseDefinitions(corpusName, vi.
-      getMappings());
+      getMappings(), vi.getUI());
 
     if (definitions != null)
     {
 
       lblResult.setValue(createHTML(vi.getSResult().getDocumentGraph(),
-        definitions));
+        definitions, vi.getUI()));
 
       String labelClass = vi.getMappings().getProperty("class", "htmlvis");
       lblResult.addStyleName(labelClass);
 
-      injectWebFonts(visConfigName, corpusName);
-      injectCSS(visConfigName, corpusName, wrapperClassName);
+      injectWebFonts(visConfigName, corpusName, vi.getUI());
+      injectCSS(visConfigName, corpusName, wrapperClassName, vi.getUI());
  
       
     }
@@ -175,7 +175,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     Set<String> result = null;
 
     VisualizationDefinition[] definitions = parseDefinitions(toplevelCorpusName,
-      mappings);
+      mappings, ui);
 
     if (definitions != null)
     {
@@ -210,7 +210,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   }
 
   public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
-    Properties mappings)
+    Properties mappings, UI ui)
   {
     InputStream inStreamConfigRaw = null;
 
@@ -222,7 +222,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     else
     {
-      WebResource resBinary = Helper.getAnnisWebResource(UI.getCurrent()).path(
+      WebResource resBinary = Helper.getAnnisWebResource(ui).path(
         "query/corpora/").path(toplevelCorpusName).path(toplevelCorpusName)
         .path("binary").path(visConfigName + ".config");
 
@@ -261,7 +261,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     return null;
   }
   
-  private void injectCSS(String visConfigName, String corpusName, String wrapperClassName)
+  private void injectCSS(String visConfigName, String corpusName, String wrapperClassName, UI ui)
   {
     InputStream inStreamCSSRaw = null;
     if (visConfigName == null)
@@ -270,7 +270,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     else
     {
-      WebResource resBinary = Helper.getAnnisWebResource(UI.getCurrent()).path(
+      WebResource resBinary = Helper.getAnnisWebResource(ui).path(
         "query/corpora/").path(corpusName).path(corpusName)
         .path("binary").path(visConfigName + ".css");
 
@@ -285,11 +285,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       try (InputStream inStreamCSS = inStreamCSSRaw)
       {
         String cssContent = IOUtils.toString(inStreamCSS);
-        UI currentUI = UI.getCurrent();
-        if (currentUI instanceof AnnisBaseUI)
+        if (ui instanceof AnnisBaseUI)
         {
           // do not add identical CSS files
-          ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent,
+          ((AnnisBaseUI) ui).injectUniqueCSS(cssContent,
             wrapperClassName);
         }
       }
@@ -305,12 +304,12 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
   }
   
-  private void injectWebFonts(String visConfigName, String corpusName)
+  private void injectWebFonts(String visConfigName, String corpusName, UI ui)
   {
     InputStream inStreamJSONRaw = null;
     if (visConfigName != null)
     {
-      WebResource resBinary = Helper.getAnnisWebResource(UI.getCurrent()).path(
+      WebResource resBinary = Helper.getAnnisWebResource(ui).path(
         "query/corpora/").path(corpusName).path(corpusName)
         .path("binary").path(visConfigName + ".fonts.json");
 
@@ -352,11 +351,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
             
             sb.append("}\n");
             
-            UI currentUI = UI.getCurrent();
-            if (currentUI instanceof AnnisBaseUI)
+            if (ui instanceof AnnisBaseUI)
             {
               // do not add identical CSS files
-              ((AnnisBaseUI) currentUI).injectUniqueCSS(sb.toString());
+              ((AnnisBaseUI) ui).injectUniqueCSS(sb.toString());
             }
           }
         }
@@ -388,7 +386,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   }
 
   public String createHTML(SDocumentGraph graph,
-    VisualizationDefinition[] definitions)
+    VisualizationDefinition[] definitions, UI ui)
   {
     HashMap<VisualizationDefinition, Integer> instruction_priorities = new HashMap<>();
 
@@ -449,7 +447,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       strCorpName = corpusPath.get(corpusPath.size() - 1);
 
       //Get metadata and put in hashmap
-      List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName, strDocName, UI.getCurrent());
+      List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName, strDocName, ui);
       for (Annotation metaDatum : metaData)
       {
         meta.put(metaDatum.getName(), metaDatum.getValue());
