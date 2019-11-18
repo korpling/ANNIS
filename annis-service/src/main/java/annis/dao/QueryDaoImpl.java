@@ -61,6 +61,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
@@ -143,7 +144,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     private final ExecutorService exec = Executors.newCachedThreadPool();
 
-    private final Pattern validQNamePattern = Pattern.compile("[a-zA-Z_%][a-zA-Z0-9_\\-%:]*");
+    private final Pattern validQNamePattern = Pattern
+            .compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
 
     @Override
     public SaltProject graph(MatchGroup matchGroup, AnnotateQueryData annoExt) throws GraphANNISException {
@@ -212,11 +214,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             matchedIDs.add(id.toASCIIString());
         }
         Optional<String> segmentation = Optional.empty();
-        if(annoExt.getSegmentationLayer() != null && !annoExt.getSegmentationLayer().isEmpty()) {
+        if (annoExt.getSegmentationLayer() != null && !annoExt.getSegmentationLayer().isEmpty()) {
             segmentation = Optional.of(annoExt.getSegmentationLayer());
         }
-        SDocumentGraph result = SaltExport
-                .map(corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight(), segmentation));
+        SDocumentGraph result = SaltExport.map(
+                corpusStorageMgr.subgraph(corpusName, matchedIDs, annoExt.getLeft(), annoExt.getRight(), segmentation));
 
         return result;
     }
@@ -971,6 +973,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         if (nodeAnnotationFilter == null || nodeAnnotationFilter.isEmpty()) {
             fallbackToAll = true;
         } else {
+            nodeAnnotationFilter = nodeAnnotationFilter.stream().map((anno_name) -> anno_name.replaceFirst("::", ":"))
+                    .collect(Collectors.toList());
             for (String nodeAnno : nodeAnnotationFilter) {
                 if (!validQNamePattern.matcher(nodeAnno).matches()) {
                     // If we can't produce a valid query for this annotation name fallback
