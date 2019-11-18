@@ -478,181 +478,183 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
 
     List<SSpan> spans = graph.getSpans();
-    for (VisualizationDefinition vis : definitions)
-    {
-
-      for (SSpan span : spans)
+    if(spans != null && !spans.isEmpty()) {
+      for (VisualizationDefinition vis : definitions)
       {
-        tokenColor = "";
-        if (mc.containsKey(span) && hitMark)
+
+        for (SSpan span : spans)
         {
-          tokenColor = MatchedNodeColors
-            .getHTMLColorByMatch(mc.get(span));
-        }
-        String matched = vis.getMatcher().matchedAnnotation(span);
-        if (matched != null)
-        {
-          vis.getOutputter().outputHTML(span, matched, outputStartTags,
-            outputEndTags, tokenColor, 
-            Objects.firstNonNull(instruction_priorities.get(vis), 0),
-            token2index);
-        }
-      }
-    }
-
-    int minStartTagPos = outputStartTags.firstKey().intValue();
-    int maxEndTagPos = outputEndTags.lastKey().intValue();
-
-    //Find BEGIN and END instructions if available
-    for (VisualizationDefinition vis : definitions)
-    {
-
-      if (vis.getMatcher() instanceof PseudoRegionMatcher)
-      {
-        PseudoRegionMatcher.PseudoRegion psdRegionType = ((PseudoRegionMatcher) vis.
-          getMatcher()).getPsdRegion();
-        int positionStart = 0;
-        int positionEnd = 0;
-
-        if (!outputEndTags.isEmpty() && !outputStartTags.isEmpty() && psdRegionType != null)
-        {
-          switch (psdRegionType)
+          tokenColor = "";
+          if (mc.containsKey(span) && hitMark)
           {
-            case BEGIN:
-              positionStart = positionEnd = Integer.MIN_VALUE;
-
-              // def_priority is now lower than all normal annotation
-              instruction_priorities.put(vis, def_priority);
-              break;
-            case END:
-              positionStart = positionEnd = Integer.MAX_VALUE;
-
-              // def_priority is now lower than all normal annotation
-              instruction_priorities.put(vis, def_priority);
-              break;
-            case ALL:
-              // use same position as last and first key
-              positionStart = minStartTagPos;
-              positionEnd = maxEndTagPos;
-
-              // The ALL pseudo-range must enclose everything, thus it get the
-              // priority which is one lower than the smallest non BEGIN/END
-              // priority.
-              instruction_priorities.put(vis, def_priority);
-              break;
-            default:
-              break;
+            tokenColor = MatchedNodeColors
+              .getHTMLColorByMatch(mc.get(span));
+          }
+          String matched = vis.getMatcher().matchedAnnotation(span);
+          if (matched != null)
+          {
+            vis.getOutputter().outputHTML(span, matched, outputStartTags,
+              outputEndTags, tokenColor, 
+              Objects.firstNonNull(instruction_priorities.get(vis), 0),
+              token2index);
           }
         }
+      }
 
-        switch (vis.getOutputter().getType())
+      int minStartTagPos = outputStartTags.firstKey().intValue();
+      int maxEndTagPos = outputEndTags.lastKey().intValue();
+
+      //Find BEGIN and END instructions if available
+      for (VisualizationDefinition vis : definitions)
+      {
+
+        if (vis.getMatcher() instanceof PseudoRegionMatcher)
         {
-          case META_NAME:
-            String strMetaVal = meta.
-              get(vis.getOutputter().getMetaname().trim());
-            if (strMetaVal == null)
+          PseudoRegionMatcher.PseudoRegion psdRegionType = ((PseudoRegionMatcher) vis.
+            getMatcher()).getPsdRegion();
+          int positionStart = 0;
+          int positionEnd = 0;
+
+          if (!outputEndTags.isEmpty() && !outputStartTags.isEmpty() && psdRegionType != null)
+          {
+            switch (psdRegionType)
             {
-              throw new NullPointerException(
-                "no such metadata name in document: '" + vis.getOutputter().
-                getMetaname().trim() + "'");
+              case BEGIN:
+                positionStart = positionEnd = Integer.MIN_VALUE;
+
+                // def_priority is now lower than all normal annotation
+                instruction_priorities.put(vis, def_priority);
+                break;
+              case END:
+                positionStart = positionEnd = Integer.MAX_VALUE;
+
+                // def_priority is now lower than all normal annotation
+                instruction_priorities.put(vis, def_priority);
+                break;
+              case ALL:
+                // use same position as last and first key
+                positionStart = minStartTagPos;
+                positionEnd = maxEndTagPos;
+
+                // The ALL pseudo-range must enclose everything, thus it get the
+                // priority which is one lower than the smallest non BEGIN/END
+                // priority.
+                instruction_priorities.put(vis, def_priority);
+                break;
+              default:
+                break;
             }
-            else
-            {
+          }
+
+          switch (vis.getOutputter().getType())
+          {
+            case META_NAME:
+              String strMetaVal = meta.
+                get(vis.getOutputter().getMetaname().trim());
+              if (strMetaVal == null)
+              {
+                throw new NullPointerException(
+                  "no such metadata name in document: '" + vis.getOutputter().
+                  getMetaname().trim() + "'");
+              }
+              else
+              {
+                vis.getOutputter().outputAny(positionStart, positionEnd,
+                  ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
+                  strMetaVal, outputStartTags, outputEndTags,
+                  Objects.firstNonNull(instruction_priorities.get(vis), 0));
+              }
+              break;
+            case CONSTANT:
               vis.getOutputter().outputAny(positionStart, positionEnd,
                 ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
-                strMetaVal, outputStartTags, outputEndTags,
+                vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
                 Objects.firstNonNull(instruction_priorities.get(vis), 0));
+              break;
+            case EMPTY:
+              vis.getOutputter().outputAny(positionStart, positionEnd,
+                ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
+                "", outputStartTags, outputEndTags,
+                Objects.firstNonNull(instruction_priorities.get(vis), 0));
+              break;
+            case ANNO_NAME:
+              break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+            case VALUE:
+              break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+            case ESCAPED_VALUE:
+              break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+            default:
+          }
+
+        }
+
+      }
+
+      // get all used indexes
+      Set<Long> indexes = new TreeSet<>();
+      indexes.addAll(outputStartTags.keySet());
+      indexes.addAll(outputEndTags.keySet());
+
+      for (Long i : indexes)
+      {
+        // output all strings belonging to this token position
+        // first the start tags for this position
+
+        // add priorities from instruction_priorities for sorting length ties
+        List<OutputItem> unsortedStart = outputStartTags.get(i);
+        SortedSet<OutputItem> itemsStart = new TreeSet();
+        if (unsortedStart != null)
+        {
+          Iterator<OutputItem> it = unsortedStart.iterator();
+          while (it.hasNext())
+          {
+            OutputItem s = it.next();
+            itemsStart.add(s);
+          }
+        }
+
+        {
+          Iterator<OutputItem> it = itemsStart.iterator();
+          boolean first = true;
+          while (it.hasNext())
+          {
+            OutputItem s = it.next();
+            if (!first)
+            {
+              sb.append("-->");
             }
-            break;
-          case CONSTANT:
-            vis.getOutputter().outputAny(positionStart, positionEnd,
-              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
-              vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
-              Objects.firstNonNull(instruction_priorities.get(vis), 0));
-            break;
-          case EMPTY:
-            vis.getOutputter().outputAny(positionStart, positionEnd,
-              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
-              "", outputStartTags, outputEndTags,
-              Objects.firstNonNull(instruction_priorities.get(vis), 0));
-            break;
-          case ANNO_NAME:
-            break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
-          case VALUE:
-            break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
-          case ESCAPED_VALUE:
-            break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
-          default:
-        }
-
-      }
-
-    }
-
-    // get all used indexes
-    Set<Long> indexes = new TreeSet<>();
-    indexes.addAll(outputStartTags.keySet());
-    indexes.addAll(outputEndTags.keySet());
-
-    for (Long i : indexes)
-    {
-      // output all strings belonging to this token position
-      // first the start tags for this position
-
-      // add priorities from instruction_priorities for sorting length ties
-      List<OutputItem> unsortedStart = outputStartTags.get(i);
-      SortedSet<OutputItem> itemsStart = new TreeSet();
-      if (unsortedStart != null)
-      {
-        Iterator<OutputItem> it = unsortedStart.iterator();
-        while (it.hasNext())
-        {
-          OutputItem s = it.next();
-          itemsStart.add(s);
-        }
-      }
-
-      {
-        Iterator<OutputItem> it = itemsStart.iterator();
-        boolean first = true;
-        while (it.hasNext())
-        {
-          OutputItem s = it.next();
-          if (!first)
-          {
-            sb.append("-->");
-          }
-          first = false;
-          sb.append(s.getOutputString());
-          if (it.hasNext())
-          {
-            sb.append("<!--\n");
+            first = false;
+            sb.append(s.getOutputString());
+            if (it.hasNext())
+            {
+              sb.append("<!--\n");
+            }
           }
         }
-      }
-      // then the end tags for this position, but inverse their order
-      List<OutputItem> unsortedEnd = outputEndTags.get(i);
-      SortedSet<OutputItem> itemsEnd = new TreeSet();
-      if (unsortedEnd != null)
-      {
-        Iterator<OutputItem> it = unsortedEnd.iterator();
-        while (it.hasNext())
+        // then the end tags for this position, but inverse their order
+        List<OutputItem> unsortedEnd = outputEndTags.get(i);
+        SortedSet<OutputItem> itemsEnd = new TreeSet();
+        if (unsortedEnd != null)
         {
-          OutputItem s = it.next();
-          itemsEnd.add(s);
+          Iterator<OutputItem> it = unsortedEnd.iterator();
+          while (it.hasNext())
+          {
+            OutputItem s = it.next();
+            itemsEnd.add(s);
+          }
         }
-      }
 
-      {
-        List<OutputItem> itemsEndReverse = new LinkedList<>(itemsEnd);
-        Collections.reverse(itemsEndReverse);
-        for (OutputItem s : itemsEndReverse)
         {
-          sb.append(s.getOutputString());
+          List<OutputItem> itemsEndReverse = new LinkedList<>(itemsEnd);
+          Collections.reverse(itemsEndReverse);
+          for (OutputItem s : itemsEndReverse)
+          {
+            sb.append(s.getOutputString());
+          }
         }
-      }
 
-    }
+      }
+    } // end if spans not empty
 
     return sb.toString();
   }
