@@ -19,9 +19,6 @@ import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 
 import java.util.LinkedHashSet;
 
-import org.json.JSONException;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.eventbus.Subscribe;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.FontAwesome;
@@ -41,6 +38,10 @@ import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.data.validator.EmailValidator;
 import com.vaadin.v7.ui.themes.BaseTheme;
 
+import org.aeonbits.owner.ConfigFactory;
+import org.json.JSONException;
+import org.slf4j.LoggerFactory;
+
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.components.SettingsStorage;
 import annis.libgui.AnnisBaseUI;
@@ -49,6 +50,7 @@ import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import annis.libgui.LoginDataLostException;
+import annis.libgui.UIConfig;
 import annis.security.User;
 import elemental.json.JsonArray;
 
@@ -127,11 +129,12 @@ public class MainToolbar extends HorizontalLayout
 
   private QueryController queryController;
 
+  private final UIConfig cfg = ConfigFactory.create(UIConfig.class);
+
   public MainToolbar()
   {
 
-    String bugmail = (String) VaadinSession.getCurrent().getAttribute(
-      BUG_MAIL_KEY);
+    String bugmail = cfg.bugEMail();
     if (bugmail != null && !bugmail.isEmpty()
       && !bugmail.startsWith("${")
       && new EmailValidator("").isValid(bugmail))
