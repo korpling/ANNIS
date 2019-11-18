@@ -26,6 +26,7 @@ import com.vaadin.jsclipboard.JSClipboard;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -158,7 +159,7 @@ public class QueryPanel extends GridLayout implements
     btShowResult.setIcon(FontAwesome.SEARCH);
     btShowResult.setWidth("100%");
     btShowResult.addClickListener(new ShowResultClickListener());
-    btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
+    btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter", ContentMode.HTML);
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
     btShowResult.setDisableOnClick(true);
 
@@ -213,7 +214,7 @@ public class QueryPanel extends GridLayout implements
     btHistory.setContent(historyListLayout);
     btHistory.setDescription("<strong>Show History</strong><br />"
       + "Either use the short overview (arrow down) or click on the button "
-      + "for the extended view.");
+      + "for the extended view.", ContentMode.HTML);
 
     Button btShowKeyboard = null;
     if(virtualKeyboard != null)

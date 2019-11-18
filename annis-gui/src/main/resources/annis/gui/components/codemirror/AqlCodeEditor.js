@@ -94,6 +94,11 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       
       cmTextArea.setOption('mode', newMode);
       cmTextArea.setOption("placeholder", connector.getState().inputPrompt);
+      cmTextArea.setOption("extraKeys", {
+        "Ctrl-Enter" : function(cm) {
+          connector.sendTextIfNecessary();
+        }
+      });
       
       // set the text from the server defined state if a new request was made
       if(lastServerRequestCounter < connector.getState().serverRequestCounter)
@@ -259,8 +264,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     cmTextArea.on("blur", function(instance)
     {
       connector.sendTextIfNecessary();
-    });
-    
+    });    
     
 };
 
