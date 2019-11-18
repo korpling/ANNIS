@@ -17,11 +17,23 @@ package annis.dao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
+
+import com.google.common.base.Objects;
+import com.google.common.base.Splitter;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import com.google.common.collect.Range;
 
 import org.corpus_tools.graphannis.model.Component;
 import org.corpus_tools.graphannis.model.ComponentType;
@@ -52,14 +64,6 @@ import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Objects;
-import com.google.common.base.Splitter;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.Range;
 
 /**
  * Allows to extract a Salt-Graph from a database subgraph.
@@ -239,52 +243,60 @@ public class SaltExport {
         });
 
         // Create a textual datasource for each text
-        for (Map.Entry<String, SNode> entry : rootsByTextName.entries()) {
+        for (String textName : rootsByTextName.keySet()) {
 
-            final SNode root = entry.getValue();
+            final Collection<SNode> rootsForText = rootsByTextName.get(textName);
             final StringBuilder text = new StringBuilder();
             final STextualDS ds = docGraph.createTextualDS("");
-            ds.setName(entry.getKey());
+            ds.setName(textName);
 
             Map<SToken, Range<Integer>> token2Range = new HashMap<>();
 
             // traverse the token chain using the order relations
-            docGraph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "ORDERING_" + name,
-                    new GraphTraverseHandler() {
-                        @Override
-                        public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-                            if (fromNode != null) {
-                                text.append(" ");
+            Iterator<SNode> itRoots = rootsForText.iterator();
+            while (itRoots.hasNext()) {
+                SNode root = itRoots.next();
+                docGraph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+                        "ORDERING_" + name, new GraphTraverseHandler() {
+                            @Override
+                            public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                                    SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
+                                if (fromNode != null) {
+                                    text.append(" ");
+                                }
+
+                                SFeature featTok = currNode.getFeature("annis::tok");
+                                if (featTok != null && currNode instanceof SToken) {
+                                    int idxStart = text.length();
+                                    text.append(featTok.getValue_STEXT());
+                                    token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
+                                }
                             }
 
-                            SFeature featTok = currNode.getFeature("annis::tok");
-                            if (featTok != null && currNode instanceof SToken) {
-                                int idxStart = text.length();
-                                text.append(featTok.getValue_STEXT());
-                                token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
+                            @Override
+                            public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                                    SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
                             }
-                        }
 
-                        @Override
-                        public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-                        }
-
-                        @SuppressWarnings("rawtypes")
-                        @Override
-                        public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                                SRelation relation, SNode currNode, long order) {
-                            if (relation == null) {
-                                // TODO: check if this is ever true
-                                return true;
-                            } else if (relation instanceof SOrderRelation && Objects.equal(name, relation.getType())) {
-                                return true;
-                            } else {
-                                return false;
+                            @SuppressWarnings("rawtypes")
+                            @Override
+                            public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                                    SRelation relation, SNode currNode, long order) {
+                                if (relation == null) {
+                                    // TODO: check if this is ever true
+                                    return true;
+                                } else if (relation instanceof SOrderRelation
+                                        && Objects.equal(name, relation.getType())) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
                             }
-                        }
-                    });
+                        });
+                if (itRoots.hasNext()) {
+                    text.append(" ");
+                }
+            }
 
             // update the actual text
             ds.setText(text.toString());
