@@ -600,14 +600,43 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
             ArrayList<Match> data = new ArrayList<>();
 
-            for (String corpusName : corpora) {
-                String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, limitOffset.getOffset(),
+            if (corpora.size() == 1) {
+                String[] matchesRaw = corpusStorageMgr.find(corpora.get(0), query, ql, limitOffset.getOffset(),
                         limitOffset.getLimit(), ordering);
 
                 for (int i = 0; i < matchesRaw.length; i++) {
                     data.add(Match.parseFromString(matchesRaw[i]));
                 }
+            } else if (corpora.size() > 1) {
+                // initialize the limit/offset values for the first corpus
+                long offset = limitOffset.getOffset();
+                long limit = limitOffset.getLimit();
+                Optional<String> previousCorpus = Optional.empty();
+                for(String currentCorpus : corpora) {
+                    if (previousCorpus.isPresent()) {
+                        // Adjust limit and offset according to the found matches for the next corpus.
+                        // We can't use the match list here since the current corpus can have have
+                        // yielded no matches both because the offset was too high or the limit was
+                        // reached.
+                        // Since we don't know the actual total number of matches we have to query it.
+                        long previousCount = corpusStorageMgr.count(previousCorpus.get(), query, ql);
+                        offset = Math.max(0, offset - previousCount);
+                        limit = Math.max(0, limit - data.size());
+                    }
+                    if (limit > 0) {
+
+                        String[] matchesRaw = corpusStorageMgr.find(currentCorpus, query, ql, offset, limit, ordering);
+
+                        for (int i = 0; i < matchesRaw.length; i++) {
+                            data.add(Match.parseFromString(matchesRaw[i]));
+                        }
+
+                    }
+
+                    previousCorpus = Optional.of(currentCorpus);
+                }
             }
+
             return data;
         });
 
