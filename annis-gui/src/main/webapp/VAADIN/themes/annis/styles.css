@@ -12735,6 +12735,11 @@ div.v-layout.v-horizontal.v-widget {
 	cursor: pointer;
 }
 
+.annis .text-name {
+	font-style: italic;
+	margin-bottom: 10px;
+}
+
 .annis .hidden {
 	display: none;
 }

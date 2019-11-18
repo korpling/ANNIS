@@ -13819,6 +13819,11 @@ div.v-layout.v-horizontal.v-widget {
 	cursor: pointer;
 }
 
+.annis_embeddedvis .text-name {
+	font-style: italic;
+	margin-bottom: 10px;
+}
+
 .annis_embeddedvis .hidden {
 	display: none;
 }
