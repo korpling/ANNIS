@@ -118,8 +118,9 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
 
         }
         
+        txtCitation.setReadOnly(false);
         txtCitation.setValue(shortURL);
-        
+        txtCitation.setReadOnly(true);
     }
 
     @Override
