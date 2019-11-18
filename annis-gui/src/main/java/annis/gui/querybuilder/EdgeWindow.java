@@ -64,6 +64,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     VerticalLayout vLayout = new VerticalLayout();
     setContent(vLayout);
     vLayout.setMargin(false);
+    vLayout.setSpacing(false);
     
     HorizontalLayout toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");
