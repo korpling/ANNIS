@@ -189,7 +189,7 @@ public class AnnisUI extends CommonUI
       {
         source = source.getCause();
       }
-      ExceptionDialog.show(source);
+      ExceptionDialog.show(source, this);
     }
   }
 

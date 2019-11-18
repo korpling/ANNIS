@@ -171,7 +171,7 @@ public class QueryController implements Serializable {
                         reportServiceException((UniformInterfaceException) ex.getCause(), false);
                     } else {
                         // something unknown, report
-                        ExceptionDialog.show(ex);
+                        ExceptionDialog.show(ex, ui);
                     }
                 } catch (TimeoutException ex) {
                     qp.setStatus("Validation of query took too long.");
@@ -179,7 +179,7 @@ public class QueryController implements Serializable {
 
             } catch (ClientHandlerException ex) {
                 log.error("Could not connect to web service", ex);
-                ExceptionDialog.show(ex, "Could not connect to web service");
+                ExceptionDialog.show(ex, "Could not connect to web service", ui);
             }
         }
     }
@@ -230,7 +230,7 @@ public class QueryController implements Serializable {
             default:
                 log.error("Exception when communicating with service", ex);
                 qp.setStatus("Unexpected exception:  " + ex.getMessage());
-                ExceptionDialog.show(ex, "Exception when communicating with service.");
+                ExceptionDialog.show(ex, "Exception when communicating with service.", ui);
                 break;
             }
 
@@ -577,7 +577,7 @@ public class QueryController implements Serializable {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    ExceptionDialog.show(t, "Could not extend context.");
+                    ExceptionDialog.show(t, "Could not extend context.", ui);
                 }
             });
         } catch (CloneNotSupportedException ex) {

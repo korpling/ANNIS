@@ -171,7 +171,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
                 @Override
                 public void onFailure(Throwable t) {
-                    ExceptionDialog.show(t, "Could not get meta data.");
+                    ExceptionDialog.show(t, "Could not get meta data.", ui);
                     layout.removeComponent(progress);
 
                 }

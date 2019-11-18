@@ -133,7 +133,7 @@ public class DocBrowserController implements Serializable
     this.visibleVisHolder.put(canonicalTitle, visHolder);
 
     Background.run(new DocVisualizerFetcher(corpus, doc, canonicalTitle,
-        visConfig.getType(), visHolder, visConfig, btn, UI.getCurrent())
+        visConfig.getType(), visHolder, visConfig, btn, ui)
     );
   }
 
@@ -176,6 +176,7 @@ public class DocBrowserController implements Serializable
     // set mappings and namespaces. some visualizer do not survive without   
     input.setMappings(parseMappings(config));
     input.setNamespace(config.getNamespace());
+    input.setUI(ui);
     
     String encodedToplevelCorpus = urlPathEscape.escape(corpus);
     String encodedDocument = urlPathEscape.escape(docName);

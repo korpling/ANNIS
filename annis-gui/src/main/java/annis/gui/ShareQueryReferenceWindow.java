@@ -113,7 +113,7 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
                 }
             } catch (URISyntaxException e) {
                 log.error("Could not generate query share link", e);
-                ExceptionDialog.show(e, "Could not generate query share link");
+                ExceptionDialog.show(e, "Could not generate query share link", UI.getCurrent());
             }
 
         }

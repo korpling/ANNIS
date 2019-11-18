@@ -164,12 +164,12 @@ public class ExceptionDialog extends Window implements Button.ClickListener
   }
   
   
-  public static void show(Throwable ex)
+  public static void show(Throwable ex, UI ui)
   {
-    show(ex, null);
+    show(ex, null, ui);
   }
   
-  public static void show(Throwable ex, String caption)
+  public static void show(Throwable ex, String caption, UI ui)
   {
     ExceptionDialog dlg = new ExceptionDialog(ex);
     dlg.setClosable(true);
@@ -178,7 +178,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     dlg.setWidth("500px");
     dlg.setHeight("-1");
     
-    UI.getCurrent().addWindow(dlg);
+    ui.addWindow(dlg);
     dlg.center();
   }
 }
