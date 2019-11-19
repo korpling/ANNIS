@@ -611,18 +611,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 // initialize the limit/offset values for the first corpus
                 long offset = limitOffset.getOffset();
                 long limit = limitOffset.getLimit();
-                Optional<String> previousCorpus = Optional.empty();
                 for (String currentCorpus : corpora) {
-                    if (previousCorpus.isPresent()) {
-                        // Adjust limit and offset according to the found matches for the next corpus.
-                        // We can't use the match list here since the current corpus can have have
-                        // yielded no matches both because the offset was too high or the limit was
-                        // reached.
-                        // Since we don't know the actual total number of matches we have to query it.
-                        long previousCount = corpusStorageMgr.count(previousCorpus.get(), query, ql);
-                        offset = Math.max(0, offset - previousCount);
-                        limit = Math.max(0, limit - data.size());
-                    }
+
                     if (limit > 0) {
 
                         String[] matchesRaw = corpusStorageMgr.find(currentCorpus, query, ql, offset, limit, ordering);
@@ -631,9 +621,18 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                             data.add(Match.parseFromString(matchesRaw[i]));
                         }
 
+                        // Adjust limit and offset according to the found matches for the next corpus.
+                        limit = Math.max(0, limit - matchesRaw.length);
+                        long countForThisMatch = matchesRaw.length;
+                        if (countForThisMatch == 0) {
+                            // We can't use the match array size here since the current corpus can have have
+                            // yielded no matches both because the offset was too high or the limit was
+                            // reached.
+                            // Since we don't know the actual total number of matches we have to query it.
+                            countForThisMatch = corpusStorageMgr.count(currentCorpus, query, ql);
+                        }
+                        offset = Math.max(0, offset - countForThisMatch);
                     }
-
-                    previousCorpus = Optional.of(currentCorpus);
                 }
             }
 
@@ -687,25 +686,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                         }
                     }
                 } else {
-                    long totalSize = 0;
                     // initialize the limit/offset values for the first corpus
                     long offset = limitOffset.getOffset();
                     long limit = limitOffset.getLimit();
-                    Optional<String> previousCorpus = Optional.empty();
 
                     for (String corpusName : corpora) {
-
-                        if (previousCorpus.isPresent()) {
-                            // Adjust limit and offset according to the found matches for the next corpus.
-                            // We can't use the match list here since the current corpus can have have
-                            // yielded no matches both because the offset was too high or the limit was
-                            // reached.
-                            // Since we don't know the actual total number of matches we have to query it.
-                            long previousCount = corpusStorageMgr.count(previousCorpus.get(), query, ql);
-                            offset = Math.max(0, offset - previousCount);
-                            limit = Math.max(0, limit - totalSize);
-                        }
-
                         if (limit > 0) {
 
                             String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, offset, limit, ordering);
@@ -719,9 +704,19 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                                     w.flush();
                                 }
                             }
-                            totalSize += matchesRaw.length;
+
+                            // Adjust limit and offset according to the found matches for the next corpus.
+                            limit = Math.max(0, limit - matchesRaw.length);
+                            long countForThisMatch = matchesRaw.length;
+                            if (countForThisMatch == 0) {
+                                // We can't use the match array size here since the current corpus can have have
+                                // yielded no matches both because the offset was too high or the limit was
+                                // reached.
+                                // Since we don't know the actual total number of matches we have to query it.
+                                countForThisMatch = corpusStorageMgr.count(corpusName, query, ql);
+                            }
+                            offset = Math.max(0, offset - countForThisMatch);
                         }
-                        previousCorpus = Optional.of(corpusName);
                     }
                 }
 
