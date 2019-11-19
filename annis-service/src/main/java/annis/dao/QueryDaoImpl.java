@@ -612,7 +612,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 long offset = limitOffset.getOffset();
                 long limit = limitOffset.getLimit();
                 Optional<String> previousCorpus = Optional.empty();
-                for(String currentCorpus : corpora) {
+                for (String currentCorpus : corpora) {
                     if (previousCorpus.isPresent()) {
                         // Adjust limit and offset according to the found matches for the next corpus.
                         // We can't use the match list here since the current corpus can have have
@@ -673,8 +673,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             try {
                 PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
 
-                for (String corpusName : corpora) {
-                    String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, limitOffset.getOffset(),
+                if (corpora.size() == 1) {
+                    String[] matchesRaw = corpusStorageMgr.find(corpora.get(0), query, ql, limitOffset.getOffset(),
                             limitOffset.getLimit(), ordering);
 
                     for (int i = 0; i < matchesRaw.length; i++) {
@@ -685,6 +685,43 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                         if (i % 10 == 0) {
                             w.flush();
                         }
+                    }
+                } else {
+                    long totalSize = 0;
+                    // initialize the limit/offset values for the first corpus
+                    long offset = limitOffset.getOffset();
+                    long limit = limitOffset.getLimit();
+                    Optional<String> previousCorpus = Optional.empty();
+
+                    for (String corpusName : corpora) {
+
+                        if (previousCorpus.isPresent()) {
+                            // Adjust limit and offset according to the found matches for the next corpus.
+                            // We can't use the match list here since the current corpus can have have
+                            // yielded no matches both because the offset was too high or the limit was
+                            // reached.
+                            // Since we don't know the actual total number of matches we have to query it.
+                            long previousCount = corpusStorageMgr.count(previousCorpus.get(), query, ql);
+                            offset = Math.max(0, offset - previousCount);
+                            limit = Math.max(0, limit - totalSize);
+                        }
+
+                        if (limit > 0) {
+
+                            String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, offset, limit, ordering);
+
+                            for (int i = 0; i < matchesRaw.length; i++) {
+                                w.print(matchesRaw[i]);
+                                w.print("\n");
+
+                                // flush after every 10th item
+                                if (i % 10 == 0) {
+                                    w.flush();
+                                }
+                            }
+                            totalSize += matchesRaw.length;
+                        }
+                        previousCorpus = Optional.of(corpusName);
                     }
                 }
 
