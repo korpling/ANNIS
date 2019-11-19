@@ -34,6 +34,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.security.cert.PKIXRevocationChecker.Option;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -613,26 +614,29 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 long limit = limitOffset.getLimit();
                 for (String currentCorpus : corpora) {
 
-                    if (limit > 0) {
+                    String[] matchesRaw = corpusStorageMgr.find(currentCorpus, query, ql, offset, limit, ordering);
 
-                        String[] matchesRaw = corpusStorageMgr.find(currentCorpus, query, ql, offset, limit, ordering);
-
-                        for (int i = 0; i < matchesRaw.length; i++) {
-                            data.add(Match.parseFromString(matchesRaw[i]));
-                        }
-
-                        // Adjust limit and offset according to the found matches for the next corpus.
-                        limit = Math.max(0, limit - matchesRaw.length);
-                        long countForThisMatch = matchesRaw.length;
-                        if (countForThisMatch == 0) {
-                            // We can't use the match array size here since the current corpus can have have
-                            // yielded no matches both because the offset was too high or the limit was
-                            // reached.
-                            // Since we don't know the actual total number of matches we have to query it.
-                            countForThisMatch = corpusStorageMgr.count(currentCorpus, query, ql);
-                        }
-                        offset = Math.max(0, offset - countForThisMatch);
+                    for (int i = 0; i < matchesRaw.length; i++) {
+                        data.add(Match.parseFromString(matchesRaw[i]));
                     }
+
+                    // Adjust limit and offset according to the found matches for the next corpus.
+                    if (limit >= 0) {
+                        limit = limit - matchesRaw.length;
+                        if (limit <= 0) {
+                            break;
+                        }
+                    }
+                    long countForThisMatch = matchesRaw.length;
+                    if (countForThisMatch == 0) {
+                        // We can't use the match array size here since the current corpus can have have
+                        // yielded no matches both because the offset was too high or the limit was
+                        // reached.
+                        // Since we don't know the actual total number of matches we have to query it.
+                        countForThisMatch = corpusStorageMgr.count(currentCorpus, query, ql);
+                    }
+                    offset = Math.max(0, offset - countForThisMatch);
+
                 }
             }
 
@@ -691,32 +695,36 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                     long limit = limitOffset.getLimit();
 
                     for (String corpusName : corpora) {
-                        if (limit > 0) {
 
-                            String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, offset, limit, ordering);
+                        String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, offset, limit, ordering);
 
-                            for (int i = 0; i < matchesRaw.length; i++) {
-                                w.print(matchesRaw[i]);
-                                w.print("\n");
+                        for (int i = 0; i < matchesRaw.length; i++) {
+                            w.print(matchesRaw[i]);
+                            w.print("\n");
 
-                                // flush after every 10th item
-                                if (i % 10 == 0) {
-                                    w.flush();
-                                }
+                            // flush after every 10th item
+                            if (i % 10 == 0) {
+                                w.flush();
                             }
-
-                            // Adjust limit and offset according to the found matches for the next corpus.
-                            limit = Math.max(0, limit - matchesRaw.length);
-                            long countForThisMatch = matchesRaw.length;
-                            if (countForThisMatch == 0) {
-                                // We can't use the match array size here since the current corpus can have have
-                                // yielded no matches both because the offset was too high or the limit was
-                                // reached.
-                                // Since we don't know the actual total number of matches we have to query it.
-                                countForThisMatch = corpusStorageMgr.count(corpusName, query, ql);
-                            }
-                            offset = Math.max(0, offset - countForThisMatch);
                         }
+
+                        // Adjust limit and offset according to the found matches for the next corpus.
+                        if (limit >= 0) {
+                            limit = limit - matchesRaw.length;
+                            if (limit <= 0) {
+                                break;
+                            }
+                        }
+                        long countForThisMatch = matchesRaw.length;
+                        if (countForThisMatch == 0) {
+                            // We can't use the match array size here since the current corpus can have have
+                            // yielded no matches both because the offset was too high or the limit was
+                            // reached.
+                            // Since we don't know the actual total number of matches we have to query it.
+                            countForThisMatch = corpusStorageMgr.count(corpusName, query, ql);
+                        }
+                        offset = Math.max(0, offset - countForThisMatch);
+
                     }
                 }
 
