@@ -630,8 +630,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                     long countForThisMatch = matchesRaw.length;
                     if (countForThisMatch == 0) {
                         // We can't use the match array size here since the current corpus can have have
-                        // yielded no matches both because the offset was too high or the limit was
-                        // reached.
+                        // yielded no matches both because the offset was too high.
                         // Since we don't know the actual total number of matches we have to query it.
                         countForThisMatch = corpusStorageMgr.count(currentCorpus, query, ql);
                     }
@@ -718,8 +717,7 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                         long countForThisMatch = matchesRaw.length;
                         if (countForThisMatch == 0) {
                             // We can't use the match array size here since the current corpus can have have
-                            // yielded no matches both because the offset was too high or the limit was
-                            // reached.
+                            // yielded no matches both because the offset was too high.
                             // Since we don't know the actual total number of matches we have to query it.
                             countForThisMatch = corpusStorageMgr.count(corpusName, query, ql);
                         }
