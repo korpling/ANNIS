@@ -102,7 +102,7 @@
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>${jetty-version}</version>
+				<version>9.3.28.v20191105</version>
 				<configuration>
 					<webApp>
 						<contextPath>/annis-gui</contextPath>
