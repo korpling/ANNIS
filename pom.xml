@@ -81,7 +81,7 @@
 	<properties>
 		<servlet.version>3.0.1</servlet.version>
 		<vaadin.version>8.9.2</vaadin.version>
-		<jetty.version>9.4.18.v20190429</jetty.version>
+		<jetty.version>9.3.28.v20191105</jetty.version>
         <jersey.version>2.27</jersey.version>
 		<main.basedir>${project.basedir}</main.basedir>
 	</properties>
