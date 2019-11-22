@@ -18,6 +18,7 @@ package annis.gui.paging;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -86,7 +87,7 @@ public class PagingComponent extends Panel implements
 
   private Set<PagingCallback> callbacks;
 
-  private AtomicInteger count;
+  private AtomicLong count;
 
   private int pageSize;
 
@@ -111,7 +112,7 @@ public class PagingComponent extends Panel implements
       count = 0;
     }
     currentPage = 1;
-    this.count = new AtomicInteger(pageSize);
+    this.count = new AtomicLong(pageSize);
     this.pageSize = pageSize;
 
     setWidth("100%");
@@ -233,7 +234,7 @@ public class PagingComponent extends Panel implements
 
   private void update(boolean informCallbacks)
   {
-    int myCount = count.get();
+    long myCount = count.get();
     txtPage.setValue("" + currentPage);
     lblMaxPages.setValue("/ " + getMaxPage());
 
@@ -266,9 +267,9 @@ public class PagingComponent extends Panel implements
     return callbacks.remove(callback);
   }
 
-  public int getMaxPage()
+  public long getMaxPage()
   {
-    int mycount = Math.max(0, count.get() - 1);
+    long mycount = Math.max(0, count.get() - 1);
     return (1 + (mycount / pageSize));
   }
 
@@ -283,12 +284,12 @@ public class PagingComponent extends Panel implements
     update(false);
   }
 
-  public int getCount()
+  public long getCount()
   {
     return count.get();
   }
 
-  public void setCount(int count, boolean update)
+  public void setCount(long count, boolean update)
   {
     if (count < 0)
     {
