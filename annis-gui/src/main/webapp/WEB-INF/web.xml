@@ -10,8 +10,8 @@
   </session-config>
   <context-param>
     <param-name>heartbeatInterval</param-name>
-    <!-- 30 seconds -->
-    <param-value>30</param-value>
+    <!-- 8 seconds -->
+    <param-value>8</param-value>
   </context-param>
   <context-param>
     <description>Vaadin production mode</description>
