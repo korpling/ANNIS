@@ -55,7 +55,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Theme("annis")
-@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
+@Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 public class AnnisUI extends CommonUI
   implements ErrorHandler, ViewChangeListener
 {
