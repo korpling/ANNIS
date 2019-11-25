@@ -418,7 +418,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
         return result;
     }
 
-    public void setCount(int count) {
+    public void setCount(long count) {
         paging.setCount(count, false);
         paging.setStartNumber(initialQuery.getOffset());
     }

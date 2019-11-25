@@ -776,7 +776,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         log.info("computing statistics for top-level corpus");
 
         // get number of tokens
-        int tokCount = getQueryDao().count("tok", QueryLanguage.AQL, Arrays.asList(toplevelCorpusName));
+        long tokCount = getQueryDao().count("tok", QueryLanguage.AQL, Arrays.asList(toplevelCorpusName));
 
         // get number of documents
         SCorpusGraph corpusGraph = SaltExport

@@ -588,8 +588,6 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     public List<Match> find(String query, QueryLanguage queryLanguage, List<String> corpora,
             LimitOffsetQueryData limitOffset) throws GraphANNISException {
 
-        Collections.sort(corpora);
-
         Preconditions.checkNotNull(limitOffset, "LimitOffsetQueryData must be valid");
 
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
@@ -600,42 +598,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
             ArrayList<Match> data = new ArrayList<>();
 
-            if (corpora.size() == 1) {
-                String[] matchesRaw = corpusStorageMgr.find(corpora.get(0), query, ql, limitOffset.getOffset(),
-                        limitOffset.getLimit(), ordering);
+            String[] matchesRaw = corpusStorageMgr.find(corpora, query, ql, limitOffset.getOffset(),
+                    limitOffset.getLimit(), ordering);
 
-                for (int i = 0; i < matchesRaw.length; i++) {
-                    data.add(Match.parseFromString(matchesRaw[i]));
-                }
-            } else if (corpora.size() > 1) {
-                // initialize the limit/offset values for the first corpus
-                long offset = limitOffset.getOffset();
-                long limit = limitOffset.getLimit();
-                for (String currentCorpus : corpora) {
-
-                    String[] matchesRaw = corpusStorageMgr.find(currentCorpus, query, ql, offset, limit, ordering);
-
-                    for (int i = 0; i < matchesRaw.length; i++) {
-                        data.add(Match.parseFromString(matchesRaw[i]));
-                    }
-
-                    // Adjust limit and offset according to the found matches for the next corpus.
-                    if (limit >= 0) {
-                        limit = limit - matchesRaw.length;
-                        if (limit <= 0) {
-                            break;
-                        }
-                    }
-                    long countForThisMatch = matchesRaw.length;
-                    if (countForThisMatch == 0) {
-                        // We can't use the match array size here since the current corpus can have have
-                        // yielded no matches because the offset was too high.
-                        // Since we don't know the actual total number of matches we have to query it.
-                        countForThisMatch = corpusStorageMgr.count(currentCorpus, query, ql);
-                    }
-                    offset = Math.max(0, offset - countForThisMatch);
-
-                }
+            for (int i = 0; i < matchesRaw.length; i++) {
+                data.add(Match.parseFromString(matchesRaw[i]));
             }
 
             return data;
@@ -674,54 +641,16 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             try {
                 PrintWriter w = new PrintWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
 
-                if (corpora.size() == 1) {
-                    String[] matchesRaw = corpusStorageMgr.find(corpora.get(0), query, ql, limitOffset.getOffset(),
-                            limitOffset.getLimit(), ordering);
+                String[] matchesRaw = corpusStorageMgr.find(corpora, query, ql, limitOffset.getOffset(),
+                        limitOffset.getLimit(), ordering);
 
-                    for (int i = 0; i < matchesRaw.length; i++) {
-                        w.print(matchesRaw[i]);
-                        w.print("\n");
+                for (int i = 0; i < matchesRaw.length; i++) {
+                    w.print(matchesRaw[i]);
+                    w.print("\n");
 
-                        // flush after every 10th item
-                        if (i % 10 == 0) {
-                            w.flush();
-                        }
-                    }
-                } else {
-                    // initialize the limit/offset values for the first corpus
-                    long offset = limitOffset.getOffset();
-                    long limit = limitOffset.getLimit();
-
-                    for (String corpusName : corpora) {
-
-                        String[] matchesRaw = corpusStorageMgr.find(corpusName, query, ql, offset, limit, ordering);
-
-                        for (int i = 0; i < matchesRaw.length; i++) {
-                            w.print(matchesRaw[i]);
-                            w.print("\n");
-
-                            // flush after every 10th item
-                            if (i % 10 == 0) {
-                                w.flush();
-                            }
-                        }
-
-                        // Adjust limit and offset according to the found matches for the next corpus.
-                        if (limit >= 0) {
-                            limit = limit - matchesRaw.length;
-                            if (limit <= 0) {
-                                break;
-                            }
-                        }
-                        long countForThisMatch = matchesRaw.length;
-                        if (countForThisMatch == 0) {
-                            // We can't use the match array size here since the current corpus can have have
-                            // yielded no matches because the offset was too high.
-                            // Since we don't know the actual total number of matches we have to query it.
-                            countForThisMatch = corpusStorageMgr.count(corpusName, query, ql);
-                        }
-                        offset = Math.max(0, offset - countForThisMatch);
-
+                    // flush after every 10th item
+                    if (i % 10 == 0) {
+                        w.flush();
                     }
                 }
 
@@ -733,7 +662,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             return false;
         });
 
-        try {
+        try
+
+        {
             if (getTimeout() > 0) {
                 return result.get(getTimeout(), TimeUnit.MILLISECONDS);
             } else {
@@ -750,16 +681,11 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public int count(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException {
+    public long count(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException {
         final CorpusStorageManager.QueryLanguage ql = convertQueryLanguage(queryLanguage);
 
-        Collections.sort(corpusList);
-        Future<Integer> result = exec.submit(() -> {
-            long total = 0l;
-            for (String corpusName : corpusList) {
-                total += corpusStorageMgr.count(corpusName, query, ql);
-            }
-            return (int) total;
+        Future<Long> result = exec.submit(() -> {
+            return corpusStorageMgr.count(corpusList, query, ql);
         });
 
         try {
@@ -788,17 +714,9 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
         Future<MatchAndDocumentCount> result = exec.submit(() -> {
 
-            CountResult total = new CountResult();
-            total.documentCount = 0;
-            total.matchCount = 0;
+            CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(corpusList, query, ql);
 
-            for (String corpusName : corpusList) {
-                CorpusStorageManager.CountResult data = corpusStorageMgr.countExtra(corpusName, query, ql);
-                total.documentCount += data.documentCount;
-                total.matchCount += data.matchCount;
-            }
-
-            return new MatchAndDocumentCount((int) total.matchCount, (int) total.documentCount);
+            return new MatchAndDocumentCount(data.matchCount, data.documentCount);
         });
 
         try {
@@ -830,15 +748,14 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
             return result;
         }
 
-        for (String corpus : corpusList) {
-            List<FrequencyTableEntry<String>> freqTableForCorpus = corpusStorageMgr.frequency(corpus, query, ql,
-                    freqQuery.toString());
-            if (freqTableForCorpus != null) {
-                for (FrequencyTableEntry<String> e : freqTableForCorpus) {
-                    result.addEntry(new FrequencyTable.Entry(e.getTuple(), e.getCount()));
-                }
+        List<FrequencyTableEntry<String>> freqTable = corpusStorageMgr.frequency(corpusList, query, ql,
+                freqQuery.toString());
+        if (freqTable != null) {
+            for (FrequencyTableEntry<String> e : freqTable) {
+                result.addEntry(new FrequencyTable.Entry(e.getTuple(), e.getCount()));
             }
         }
+
         return result;
     }
 
@@ -914,7 +831,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                         String query = e.getKey() + " _ident_ annis:node_type=\"corpus\"";
                         // check if the sub-type is a "normal" node or a meta-data annotation
                         try {
-                            if (corpusStorageMgr.count(corpusName, query, CorpusStorageManager.QueryLanguage.AQL) > 0) {
+                            if (corpusStorageMgr.count(Arrays.asList(corpusName), query,
+                                    CorpusStorageManager.QueryLanguage.AQL) > 0) {
                                 isMeta = true;
                             }
                         } catch (GraphANNISException ex) {

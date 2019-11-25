@@ -29,37 +29,37 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class MatchAndDocumentCount implements Serializable
 {
-  private int matchCount;
-  private int documentCount;
+  private long matchCount;
+  private long documentCount;
 
   public MatchAndDocumentCount()
   {
     
   }
   
-  public MatchAndDocumentCount(int matchCount, int documentCount)
+  public MatchAndDocumentCount(long matchCount, long documentCount)
   {
     super();
     this.matchCount = matchCount;
     this.documentCount = documentCount;
   }
 
-  public int getMatchCount()
+  public long getMatchCount()
   {
     return matchCount;
   }
 
-  public void setMatchCount(int tupelMatched)
+  public void setMatchCount(long tupelMatched)
   {
     this.matchCount = tupelMatched;
   }
 
-  public int getDocumentCount()
+  public long getDocumentCount()
   {
     return documentCount;
   }
 
-  public void setDocumentCount(int documentsMatched)
+  public void setDocumentCount(long documentsMatched)
   {
     this.documentCount = documentsMatched;
   }

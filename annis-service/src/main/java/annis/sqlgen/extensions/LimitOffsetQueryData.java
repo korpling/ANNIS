@@ -15,53 +15,50 @@
  */
 package annis.sqlgen.extensions;
 
+import java.util.Optional;
+
 import annis.service.objects.OrderType;
 
 /**
  *
  * @author benjamin
  */
-public class LimitOffsetQueryData
-{
+public class LimitOffsetQueryData {
 
-  private final int offset;
-  private final int limit;
+  private final long offset;
+  private final long limit;
   private final OrderType order;
 
-  public LimitOffsetQueryData(int offset, int limit)
-  {
+  public LimitOffsetQueryData(long offset, long limit) {
     this.offset = offset;
     this.limit = limit;
     this.order = OrderType.ascending;
   }
 
-  public LimitOffsetQueryData(int offset, int limit, OrderType order)
-  {
+  public LimitOffsetQueryData(long offset, long limit, OrderType order) {
     this.offset = offset;
     this.limit = limit;
     this.order = order;
   }
-  
-  
 
-  public int getLimit()
-  {
-    return limit;
+  public Optional<Long> getLimit() {
+    if (limit == 0 || limit == Long.MAX_VALUE) {
+      return Optional.empty();
+    } else {
+      return Optional.of(limit);
+    }
   }
 
-  public int getOffset()
-  {
+  public long getOffset() {
     return offset;
   }
-  
-  public boolean isPaged()
-  {
+
+  public boolean isPaged() {
     return offset != 0 || limit != 0;
   }
 
-  public OrderType getOrder()
-  {
+  public OrderType getOrder() {
     return order;
   }
-  
+
 }
