@@ -17,9 +17,12 @@ before_script:
   - mkdir -p $HOME/.cargo/bin
   - export PATH=$HOME/.cargo/bin:$PATH
   - misc/download-mdbook.sh 0.3.5
+  # Install and unzip the Firefox geckodriver
   - wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
   - tar -xzf geckodriver-v0.26.0-linux64.tar.gz
   - cp geckodriver $HOME/bin/
+  - geckodriver --version
+
 
   
 script:
