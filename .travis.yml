@@ -1,6 +1,12 @@
 language: java
 jdk:
   - openjdk8
+
+env:
+  global:
+    - MOZ_HEADLESS=1
+  addons:
+    firefox: latest
   
 cache:
   directories:
