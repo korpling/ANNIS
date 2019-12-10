@@ -22,10 +22,19 @@ before_script:
   - tar -xzf geckodriver-v0.26.0-linux64.tar.gz
   - cp geckodriver $HOME/bin/
   - geckodriver --version
+  # download pcc2 corpus
+  - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
 
 
   
 script:
+  # import corpora needed for tests
+  - mvn package -Dmaven.test.skip=true
+  - cd annis-kickstarter/target/annis-kickstarter-*-distribution/annis-kickstarter-*/
+  - source bin/setup.sh
+  - bin/annis-admin.sh import $HOME/pcc2_relANNIS.zip
+  - cd $TRAVIS_BUILD_DIR
+  # execute Maven Tests
   - mvn test -B
    # generate the documentation for possible deploy
   - mdbook build docs/user-guide/
