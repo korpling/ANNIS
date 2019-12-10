@@ -131,7 +131,7 @@ public class AcceptanceTest {
 
 
 		// only execute this test if pcc2 corpus is imported
-		Assert.assertTrue(corpora.contains("pcc2"));
+		Assume.assumeTrue(corpora.contains("pcc2"));
 
 		// execute a "tok" search on pcc2
 		WebElement codeMirror = driver.findElement(

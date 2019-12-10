@@ -17,11 +17,9 @@ before_script:
   - mkdir -p $HOME/.cargo/bin
   - export PATH=$HOME/.cargo/bin:$PATH
   - misc/download-mdbook.sh 0.3.5
-  # Install and unzip the Firefox geckodriver
-  - wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
-  - tar -xzf geckodriver-v0.26.0-linux64.tar.gz
-  - cp geckodriver $HOME/bin/
-  - geckodriver --version
+  # Install Selenium Runner with geckodriver
+  - npm install selenium-side-runner
+  - npm install geckodriver
   # download pcc2 corpus
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
   - unzip pcc2_relANNIS.zip
@@ -30,18 +28,22 @@ before_script:
 
   
 script:
-  # import corpora needed for tests
-  - mvn package -Dmaven.test.skip=true
-  - cd annis-kickstarter/target/annis-kickstarter-*-distribution/annis-kickstarter-*/
-  - source bin/setup.sh
-  - bin/annis-admin.sh import $HOME/pcc2_v6_relANNIS
-  - cd $TRAVIS_BUILD_DIR
   # execute Maven Tests
   - mvn test -B
    # generate the documentation for possible deploy
   - mdbook build docs/user-guide/
   - mdbook build docs/developer-guide/
   - mdbook build docs/online-help/
+  # import corpora needed for integration tests
+  - cd annis-service/target/annis-service-*-distribution/annis-service-*/
+  - source bin/setup.sh
+  - bin/annis-admin.sh import $HOME/pcc2_v6_relANNIS
+  # start needed (web-) services
+  - bin/annis-service-no-security.sh start
+  - cd $TRAVIS_BUILD_DIR/annis-gui/
+  - mvn jetty:start
+  # execute integration tests
+  - selenium-side-runner -c "browserName=firefox" misc/annis_integration_tests.side
   
 deploy:
   - provider: script

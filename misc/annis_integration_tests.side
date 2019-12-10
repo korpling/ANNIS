@@ -1,0 +1,145 @@
+{
+  "id": "3b30cc20-f4fb-4383-b96f-37d2a9690d2c",
+  "version": "2.0",
+  "name": "ANNIS Acceptance Tests",
+  "url": "http://localhost:8080/annis-gui",
+  "tests": [{
+    "id": "bae08028-13be-4a4e-8383-9b6091d1be6d",
+    "name": "About Window",
+    "commands": [{
+      "id": "e7b6da44-9f9a-411c-ab02-4640f0f5a020",
+      "comment": "",
+      "command": "open",
+      "target": "/annis-gui/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "142aeaee-4ee6-4c96-ba9e-01d5dc016d90",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1024x768",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ea49e764-1b13-427e-b0b5-2c677d602df6",
+      "comment": "",
+      "command": "runScript",
+      "target": "window.scrollTo(0,0)",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "88a0ff8a-a1b1-44fc-bfe9-c8e13ed59c90",
+      "comment": "",
+      "command": "click",
+      "target": "id=SearchView:MainToolbar:btAboutAnnis",
+      "targets": [
+        ["id=SearchView:MainToolbar:btAboutAnnis", "id"],
+        ["css=#SearchView\\3AMainToolbar\\3A btAboutAnnis", "css:finder"],
+        ["xpath=//div[@id='SearchView:MainToolbar:btAboutAnnis']", "xpath:attributes"],
+        ["xpath=//div[@id='SearchView:MainToolbar']/div/div[3]/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "10f63975-aadb-4592-a811-8f5c86a3cc0f",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "id=AboutWindow:VerticalLayout:btClose",
+      "targets": [
+        ["id=AboutWindow:VerticalLayout:btClose", "id"],
+        ["css=#AboutWindow\\3AVerticalLayout\\3A btClose", "css:finder"],
+        ["xpath=//div[@id='AboutWindow:VerticalLayout:btClose']", "xpath:attributes"],
+        ["xpath=//div[@id='AboutWindow:VerticalLayout']/div/div[13]/div", "xpath:idRelative"],
+        ["xpath=//div[13]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c78048fe-6958-4cda-914f-53881ad0287a",
+      "comment": "",
+      "command": "click",
+      "target": "id=AboutWindow:VerticalLayout:btClose",
+      "targets": [
+        ["id=AboutWindow:VerticalLayout:btClose", "id"],
+        ["css=#AboutWindow\\3AVerticalLayout\\3A btClose", "css:finder"],
+        ["xpath=//div[@id='AboutWindow:VerticalLayout:btClose']", "xpath:attributes"],
+        ["xpath=//div[@id='AboutWindow:VerticalLayout']/div/div[13]/div", "xpath:idRelative"],
+        ["xpath=//div[13]/div", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }, {
+    "id": "0b9a1226-5ed1-4417-92c4-172fb823d0ba",
+    "name": "Open Source Window",
+    "commands": [{
+      "id": "32702dc6-615c-4d52-9f4c-6469665006b3",
+      "comment": "",
+      "command": "open",
+      "target": "http://localhost:8080/annis-gui/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "22c81271-4bcf-45e8-917f-34b8f55993af",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1024x768",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f12acd47-ecf4-4b90-a26c-e540a4a5960c",
+      "comment": "",
+      "command": "click",
+      "target": "id=SearchView:MainToolbar:btOpenSource",
+      "targets": [
+        ["id=SearchView:MainToolbar:btOpenSource", "id"],
+        ["css=#SearchView\\3AMainToolbar\\3A btOpenSource", "css:finder"],
+        ["xpath=//div[@id='SearchView:MainToolbar:btOpenSource']", "xpath:attributes"],
+        ["xpath=//div[@id='SearchView:MainToolbar']/div/div[7]/div", "xpath:idRelative"],
+        ["xpath=//div[7]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "cda6e88d-9253-4b60-95fe-7cae6133037e",
+      "comment": "",
+      "command": "runScript",
+      "target": "window.scrollTo(0,0)",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "acd09718-e2a4-440a-b81c-703cfa4d9ef4",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "id=HelpUsWindow:VerticalLayout:btClose",
+      "targets": [
+        ["id=HelpUsWindow:VerticalLayout:btClose", "id"],
+        ["css=#HelpUsWindow\\3AVerticalLayout\\3A btClose", "css:finder"],
+        ["xpath=//div[@id='HelpUsWindow:VerticalLayout:btClose']", "xpath:attributes"],
+        ["xpath=//div[@id='HelpUsWindow:VerticalLayout']/div/div[3]/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div/div/div[3]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "b9a8ce80-f04f-4bdd-b8f8-8d16732f55c4",
+      "comment": "",
+      "command": "click",
+      "target": "id=HelpUsWindow:VerticalLayout:btClose",
+      "targets": [
+        ["id=HelpUsWindow:VerticalLayout:btClose", "id"],
+        ["css=#HelpUsWindow\\3AVerticalLayout\\3A btClose", "css:finder"],
+        ["xpath=//div[@id='HelpUsWindow:VerticalLayout:btClose']", "xpath:attributes"],
+        ["xpath=//div[@id='HelpUsWindow:VerticalLayout']/div/div[3]/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div/div/div[3]/div", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "77771cf3-bcf3-4659-a691-0211e9aad537",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["bae08028-13be-4a4e-8383-9b6091d1be6d", "0b9a1226-5ed1-4417-92c4-172fb823d0ba"]
+  }],
+  "urls": ["http://localhost:8080/", "http://localhost:8080/annis-gui"],
+  "plugins": []
+}
