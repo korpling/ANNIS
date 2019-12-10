@@ -84,7 +84,7 @@ public class AcceptanceTest {
 			driver.manage().window().setSize(new Dimension(1024, 768));
 
 		} catch (Exception ex) {
-			log.error(null, ex);
+			log.error("Could not create Firefox driver", ex);
 			runner = null;
 		}
 	}
@@ -97,7 +97,7 @@ public class AcceptanceTest {
 
 		driver.get("http://localhost:" + WEB_PORT + "/annis-gui/");
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("v-app")));
+		wait.until(driver -> driver.findElement(By.className("v-app")).isDisplayed());
 	}
 
 	protected void takeScreenshot(File outputFile) {
@@ -129,8 +129,9 @@ public class AcceptanceTest {
 	public void testTokenSearchPcc2() throws IOException {
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 
+
 		// only execute this test if pcc2 corpus is imported
-		Assume.assumeTrue(corpora.contains("pcc2"));
+		Assert.assertTrue(corpora.contains("pcc2"));
 
 		// execute a "tok" search on pcc2
 		WebElement codeMirror = driver.findElement(
@@ -150,8 +151,8 @@ public class AcceptanceTest {
 		By pccTrXPath = By.xpath("//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']"
 				+ "//table[contains(@class, 'v-table-table')]//tr//div[contains(text(), 'pcc2')]");
 
-		wait.until(ExpectedConditions.visibilityOfElementLocated(pccTrXPath));
-
+		wait.until(driver -> driver.findElement(pccTrXPath).isDisplayed());
+		
 		driver.findElement(pccTrXPath).click();
 
 		driver.findElement(By.id("SearchView:ControlPanel:QueryPanel:btShowResult")).click();
@@ -159,7 +160,7 @@ public class AcceptanceTest {
 		// wait until the result is loaded
 		By byGridTable = By.xpath(
 				"//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]//table");
-		wait.until(ExpectedConditions.visibilityOfElementLocated(byGridTable));
+		wait.until(driver -> driver.findElement(byGridTable).isDisplayed());
 
 		WebElement gridTable = driver.findElement(byGridTable);
 		List<WebElement> firstRow = gridTable.findElements(By.xpath(".//tr[1]/td"));
@@ -189,9 +190,9 @@ public class AcceptanceTest {
 				+ "%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dsalt%3A%2Fpcc2%2F11299%2F%2523tok_1%26left%3D5%26right%3D5&embedded_interface=http://localhost:8084/annis-gui/%23_q%3DdG9r%26_c%3DcGNjMg%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26m%3D0");
 
 		// wait until page was loaded
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("v-app")));
+		wait.until(driver -> driver.findElement(By.className("v-app")).isDisplayed());
 		// wait until visualization is actually there
-		wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("v-app-loading")));
+		wait.until(driver -> driver.findElements(By.className("v-app-loading")).size() == 0);
 
 		WebElement link = driver.findElement(By.xpath("//div[@id='VerticalLayout:Link']/a/span[2]"));
 		Assert.assertEquals("Show in ANNIS search interface", link.getText());
