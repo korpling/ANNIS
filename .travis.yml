@@ -41,7 +41,7 @@ script:
   # start needed (web-) services
   - bin/annis-service-no-security.sh start
   - cd $TRAVIS_BUILD_DIR/annis-gui/
-  - mvn jetty:start
+  - mvn jetty:start &
   # execute integration tests
   - selenium-side-runner -c "browserName=firefox" misc/annis_integration_tests.side
   
