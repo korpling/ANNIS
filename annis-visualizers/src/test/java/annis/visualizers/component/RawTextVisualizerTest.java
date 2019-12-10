@@ -22,7 +22,7 @@ import org.junit.Test;
 
 /**
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class RawTextVisualizerTest {
 

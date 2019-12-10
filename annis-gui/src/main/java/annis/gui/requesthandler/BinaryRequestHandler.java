@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * This request handler provides binary-files with a stream of partial-content. 
  * The first GET-request is answered with the status-code 206 Partial Content.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @author benjamin
  */
 public class BinaryRequestHandler implements RequestHandler
@@ -115,12 +115,12 @@ public class BinaryRequestHandler implements RequestHandler
       
       String requestedRangeRaw = request.getHeader("Range");
 
-      WebResource binaryRes = Helper.getAnnisWebResource()
+      WebResource binaryRes = Helper.getAnnisWebResource(session)
         .path("query").path("corpora")
         .path(urlPathEscape.escape(toplevelCorpusName))
         .path(urlPathEscape.escape(documentName)).path("binary");
 
-      WebResource metaBinaryRes = Helper.getAnnisWebResource()
+      WebResource metaBinaryRes = Helper.getAnnisWebResource(session)
         .path("meta").path("binary")
         .path(urlPathEscape.escape(toplevelCorpusName))
         .path(urlPathEscape.escape(documentName));

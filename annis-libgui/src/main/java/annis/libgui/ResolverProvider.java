@@ -15,9 +15,13 @@
  */
 package annis.libgui;
 
-import annis.resolver.ResolverEntry;
 import java.io.Serializable;
+
 import org.corpus_tools.salt.common.SDocument;
+
+import com.vaadin.ui.UI;
+
+import annis.resolver.ResolverEntry;
 
 /**
  *
@@ -25,6 +29,6 @@ import org.corpus_tools.salt.common.SDocument;
  */
 public interface ResolverProvider extends Serializable
 {
-  public ResolverEntry[] getResolverEntries(SDocument result);
+  public ResolverEntry[] getResolverEntries(SDocument result, UI ui);
   
 }

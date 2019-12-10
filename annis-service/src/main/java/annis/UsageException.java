@@ -18,7 +18,7 @@ package annis;
 /**
  * Signifies an error by the user, usually a bad command.
  * 
- * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
+ * @author Viktor Rosenfeld {@literal <rosenfel@informatik.hu-berlin.de>}
  */
 @SuppressWarnings("serial")
 public class UsageException extends AnnisRunnerException {

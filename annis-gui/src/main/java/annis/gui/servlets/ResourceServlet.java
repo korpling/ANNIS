@@ -40,7 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * This servlet fetches resources for e.g. visualizers.
 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  *
  */
 @PluginImplementation

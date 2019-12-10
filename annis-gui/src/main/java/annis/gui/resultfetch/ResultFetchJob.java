@@ -16,11 +16,11 @@
 package annis.gui.resultfetch;
 
 import annis.gui.AnnisUI;
-import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.model.AqlParseError;
+import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * A thread that queries for the matches, fetches the the subgraph for the
  * matches and updates the GUI at certain points.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
 {
@@ -72,7 +72,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
     this.query = query;
     this.ui = ui;
     
-    res = Helper.getAnnisAsyncWebResource();
+    res = Helper.getAnnisAsyncWebResource(ui);
     
     futureMatches = res.path("query").path("search").path("find")
       .queryParam("q", Helper.encodeJersey(query.getQuery()))
@@ -80,6 +80,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       .queryParam("limit", "" + query.getLimit())
       .queryParam("corpora", Helper.encodeJersey(StringUtils.join(query.getCorpora(), ",")))
       .queryParam("order", query.getOrder().toString())
+      .queryParam("query-language", query.getQueryLanguage().name())
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(MatchGroup.class);
 
@@ -89,7 +90,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
   public void run()
   {
     WebResource subgraphRes
-      = Helper.getAnnisWebResource().path("query/search/subgraph");
+      = Helper.getAnnisWebResource(ui).path("query/search/subgraph");
 
     // holds the ids of the matches.
     MatchGroup result;

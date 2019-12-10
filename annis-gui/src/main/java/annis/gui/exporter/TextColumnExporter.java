@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -42,13 +43,13 @@ import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 
 import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
 import annis.model.Annotation;
 import annis.service.objects.SubgraphFilter;
-import java.util.Objects;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -57,11 +58,11 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * based text exporter doesn't work since there are multiple speakers or
  * normalizations.
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @author irina
  */
 @PluginImplementation
-public class TextColumnExporter extends SaltBasedExporter {
+public class TextColumnExporter extends BaseMatrixExporter {
 	private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 	private static final String TRAV_PREPROCESSING = "travPreprocessing";
 	public static final String FILTER_PARAMETER_KEYWORD = "filter";
@@ -164,7 +165,7 @@ public class TextColumnExporter extends SaltBasedExporter {
 	 */
 
 	@Override
-	public void outputText(SDocumentGraph graph, boolean alignmc, int recordNumber, Writer out) throws IOException {
+	public void outputText(SDocumentGraph graph, boolean alignmc, int recordNumber, Writer out, UI ui) throws IOException {
 
 		String currSpeakerName = "";
 		String prevSpeakerName = "";
@@ -331,7 +332,7 @@ public class TextColumnExporter extends SaltBasedExporter {
 										graph.getDocument());
 								String corpusName = corpusPath.get(corpusPath.size() - 1);
 								corpusName = urlPathEscape.escape(corpusName);
-								List<Annotation> metadata = Helper.getMetaData(corpusName, docName);
+								List<Annotation> metadata = Helper.getMetaData(corpusName, docName, ui);
 
 								Map<String, String> annosWithoutNamespace = new HashMap<String, String>();
 								Map<String, Map<String, String>> annosWithNamespace = new HashMap<String, Map<String, String>>();
@@ -514,7 +515,7 @@ public class TextColumnExporter extends SaltBasedExporter {
 	}
 
 	/**
-	 * @see annis.gui.exporter.SaltBasedExporter#getFileEnding()
+	 * @see annis.gui.exporter.BaseMatrixExporter#getFileEnding()
 	 * 
 	 * @return a constant String ("csv") for file ending
 	 */

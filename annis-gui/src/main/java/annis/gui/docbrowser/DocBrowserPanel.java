@@ -20,15 +20,15 @@ import java.util.List;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.util.filter.SimpleStringFilter;
-import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.v7.data.util.filter.SimpleStringFilter;
+import com.vaadin.v7.event.FieldEvents;
+import com.vaadin.v7.ui.TextField;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
 
 import annis.gui.AnnisUI;
 import annis.libgui.Background;
@@ -39,7 +39,7 @@ import annis.service.objects.Visualizer;
 
 /**
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class DocBrowserPanel extends Panel
 {
@@ -92,7 +92,7 @@ public class DocBrowserPanel extends Panel
 
   public DocumentBrowserConfig getDocBrowserConfig()
   {
-    return Helper.getDocBrowserConfig(corpus);
+    return Helper.getDocBrowserConfig(corpus, ui);
   }
 
   /**
@@ -120,7 +120,7 @@ public class DocBrowserPanel extends Panel
     public void run()
     {
 
-      WebResource res = Helper.getAnnisWebResource();
+      WebResource res = Helper.getAnnisWebResource(ui);
       final List<Annotation> docs = res.path("meta/docnames/"
         + urlPathEscape.escape(corpus)).
         get(new Helper.AnnotationListType());

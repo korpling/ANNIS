@@ -30,36 +30,36 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Container;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.Container;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.data.Property.ValueChangeListener;
+import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.v7.data.util.filter.SimpleStringFilter;
+import com.vaadin.v7.event.FieldEvents;
+import com.vaadin.v7.event.ItemClickEvent;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.AbstractSelect;
+import com.vaadin.v7.ui.ComboBox;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.Table;
+import com.vaadin.v7.ui.TextField;
 
 import annis.gui.AnnisUI;
 import annis.gui.CorpusBrowserPanel;
@@ -246,15 +246,15 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
     tblCorpora.addGeneratedColumn("docs", new DocLinkGenerator());
 
-    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info",
+    tblCorpora.setVisibleColumns("name", "documentCount", "tokenCount", "info",
       "docs");
-    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "", "");
+    tblCorpora.setColumnHeaders("Name", "Docs", "Tokens", "", "");
     tblCorpora.setHeight("100%");
     tblCorpora.setWidth("100%");
     tblCorpora.setSelectable(true);
     tblCorpora.setNullSelectionAllowed(false);
     tblCorpora.setColumnExpandRatio("name", 0.6f);
-    tblCorpora.setColumnExpandRatio("textCount", 0.15f);
+    tblCorpora.setColumnExpandRatio("documentCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.addStyleName(ValoTheme.TABLE_SMALL);
 
@@ -297,8 +297,6 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setSortContainerPropertyId("name");
 
     setExpandRatio(tblCorpora, 1.0f);
-
-    updateCorpusSetList(true, true);
     
   }
 
@@ -306,6 +304,8 @@ public class CorpusListPanel extends VerticalLayout implements
   public void attach()
   {
     super.attach();
+
+    updateCorpusSetList(true, true);
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
   }
   
@@ -407,7 +407,7 @@ public class CorpusListPanel extends VerticalLayout implements
     List<AnnisCorpus> result = new LinkedList<>();
     try
     {
-      WebResource rootRes = Helper.getAnnisWebResource();
+      WebResource rootRes = Helper.getAnnisWebResource(ui);
       result = rootRes.path("query").path("corpora")
         .get(new AnnisCorpusListType());
       return result;
@@ -448,7 +448,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private UserConfig getUserConfigFromRemote()
   {
-    WebResource rootRes = Helper.getAnnisWebResource();
+    WebResource rootRes = Helper.getAnnisWebResource(ui);
     // get the current corpus configuration
     return rootRes.path("admin").path("userconfig").
       get(UserConfig.class);
@@ -456,7 +456,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private void storeChangesRemote()
   {
-    WebResource rootRes = Helper.getAnnisWebResource();
+    WebResource rootRes = Helper.getAnnisWebResource(ui);
     // store the config on the server
     rootRes.path("admin").path("userconfig").post(this.userConfig);
   }
@@ -523,7 +523,7 @@ public class CorpusListPanel extends VerticalLayout implements
       return new Action[0];
     }
 
-    if (Helper.getUser() == null)
+    if (Helper.getUser(ui) == null)
     {
       // we can't change anything if we are not logged in so don't even try
       return new Action[0];
@@ -776,8 +776,7 @@ public class CorpusListPanel extends VerticalLayout implements
     infoLayout.setColumnExpandRatio(1, 0.5f);
     infoLayout.setComponentAlignment(lblLink, Alignment.MIDDLE_CENTER);
 
-    Window window = new Window("Corpus information for " + c.getName()
-      + " (ID: " + c.getId() + ")", infoLayout);
+    Window window = new Window("Corpus information for " + c.getName(), infoLayout);
     window.setWidth(70, Unit.EM);
     window.setHeight(45, Unit.EM);
     window.setResizable(true);

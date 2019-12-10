@@ -14,20 +14,9 @@ public class AnnisBinaryMetaData implements Serializable
 {
 
   private String localFileName;
-  private String corpusName;
   private String mimeType;
   private String fileName;
   private int length;
-
-  public String getCorpusName()
-  {
-    return corpusName;
-  }
-
-  public void setCorpusName(String corpusName)
-  {
-    this.corpusName = corpusName;
-  }
 
   public String getMimeType()
   {

@@ -15,12 +15,12 @@
  */
 package annis.gui.admin;
 
-import com.vaadin.ui.AbstractTextField;
-import com.vaadin.ui.TextArea;
+import com.vaadin.v7.ui.AbstractTextField;
+import com.vaadin.v7.ui.TextArea;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class PopupTwinColumnSelectMultiline extends PopupTwinColumnSelect
 {

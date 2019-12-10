@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * pairs.</p>
  *
  * @author thomas
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @XmlRootElement
 public class CorpusConfig implements Serializable
@@ -116,6 +116,7 @@ public class CorpusConfig implements Serializable
   /**
    * Checks whether a key exists in the properties.
    *
+   * @param key key to check
    */
   public boolean containsKey(String key)
   {

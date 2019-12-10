@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ShortenerRequestHandler implements RequestHandler
 {
@@ -45,7 +45,7 @@ public class ShortenerRequestHandler implements RequestHandler
     }
     
     // get the actual URL
-    WebResource res = Helper.getAnnisWebResource();
+    WebResource res = Helper.getAnnisWebResource(session);
     res = res.path("shortener").path(id);
     String longURL = res.get(String.class);
     

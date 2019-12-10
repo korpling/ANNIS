@@ -16,12 +16,12 @@
 
 package annis.gui.controlpanel;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.util.DefaultItemSorter;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.util.DefaultItemSorter;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CorpusSorter extends DefaultItemSorter
 {

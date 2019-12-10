@@ -15,16 +15,18 @@
  */
 package annis.gui.converter;
 
-import annis.CaseSensitiveOrder;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.vaadin.data.util.converter.Converter;
 import java.util.Locale;
 import java.util.TreeSet;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.vaadin.v7.data.util.converter.Converter;
+
+import annis.CaseSensitiveOrder;
+
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CommaSeperatedStringConverterSet implements Converter<String, TreeSet>
 {

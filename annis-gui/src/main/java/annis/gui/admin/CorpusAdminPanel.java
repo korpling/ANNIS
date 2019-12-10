@@ -15,24 +15,26 @@
  */
 package annis.gui.admin;
 
-import annis.gui.admin.view.CorpusListView;
-import annis.service.objects.AnnisCorpus;
-import com.vaadin.data.util.BeanContainer;
-import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.v7.ui.Grid;
+
+import annis.gui.admin.view.CorpusListView;
+import annis.service.objects.AnnisCorpus;
+
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CorpusAdminPanel extends Panel
   implements CorpusListView
@@ -50,9 +52,9 @@ public class CorpusAdminPanel extends Panel
     final Grid corporaGrid = new Grid(corpusContainer);
     corporaGrid.setSizeFull();
     corporaGrid.setSelectionMode(Grid.SelectionMode.MULTI);
-    corporaGrid.setColumns("name", "textCount", "tokenCount", "sourcePath");
+    corporaGrid.setColumns("name", "documentCount", "tokenCount", "sourcePath");
 
-    corporaGrid.getColumn("textCount").setHeaderCaption("Texts");
+    corporaGrid.getColumn("documentCount").setHeaderCaption("Documents");
     corporaGrid.getColumn("tokenCount").setHeaderCaption("Tokens");
     corporaGrid.getColumn("sourcePath").setHeaderCaption("Source Path");
 

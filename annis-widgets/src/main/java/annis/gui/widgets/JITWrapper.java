@@ -25,7 +25,7 @@ import java.util.Properties;
 
 /**
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @JavaScript({"vaadin://jquery.js", "rst_vis.js"})
 public class JITWrapper extends AbstractComponent implements LegacyComponent

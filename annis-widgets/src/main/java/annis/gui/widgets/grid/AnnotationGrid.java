@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 {
@@ -44,8 +44,6 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   private transient PDFController pdfController;
 
   private String resultID;
-
-  private int tokenIndexOffset;
 
   private String tokRowKey = "tok";
   
@@ -91,7 +89,6 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     this.mediaController = mediaController;
     this.pdfController = pdfController;
     this.resultID = resultID;
-    this.tokenIndexOffset = 0;
   }
 
   @Override
@@ -166,8 +163,8 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
           {
             target.startTag("event");
             target.addAttribute("id", event.getId());
-            target.addAttribute("left", event.getLeft() - tokenIndexOffset);
-            target.addAttribute("right", event.getRight() - tokenIndexOffset);
+            target.addAttribute("left", event.getLeft());
+            target.addAttribute("right", event.getRight());
             target.addAttribute("value", event.getValue());
 
             if (event.getTooltip() != null)
@@ -268,21 +265,6 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     this.rowsByAnnotation = rowsByAnnotation;
   }
 
-  public int getTokenIndexOffset()
-  {
-    return tokenIndexOffset;
-  }
-
-  /**
-   * Set an offset for the token index. It is assumed that firstNodeLeft -
-   * offset == 0.
-   *
-   * @param tokenIndexOffset
-   */
-  public void setTokenIndexOffset(int tokenIndexOffset)
-  {
-    this.tokenIndexOffset = tokenIndexOffset;
-  }
 
   /**
    * Defines, if the grid visualization render html as text.

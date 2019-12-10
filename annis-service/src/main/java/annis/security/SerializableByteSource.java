@@ -21,7 +21,7 @@ import org.apache.shiro.util.SimpleByteSource;
 
 /**
  * A wrapper around {@link SimpleByteSource} to make it {@link Serializable}
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class SerializableByteSource implements ByteSource, Serializable
 {

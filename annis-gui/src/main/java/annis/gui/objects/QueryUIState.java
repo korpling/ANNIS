@@ -26,177 +26,154 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
 
-import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.data.util.ObjectProperty;
 
 import annis.gui.controlpanel.CorpusSorter;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.libgui.exporter.ExporterPlugin;
+import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.OrderType;
+import annis.service.objects.QueryLanguage;
 
 /**
  * Helper class to bundle all query relevant state information of the UI.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * 
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class QueryUIState implements Serializable
-{
-  
-  public enum QueryType {COUNT, FIND, FREQUENCY, EXPORT}
-  
-  
-  private final ObjectProperty<String> aql = new ObjectProperty<>("");
-  private final ObjectProperty<Set<String>> selectedCorpora 
-    = new ObjectProperty<Set<String>>(new LinkedHashSet<String>());
-  
-  private final ObjectProperty<Integer> leftContext = new ObjectProperty<>(5);
-  private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
-  
-  private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
-  private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
-  private final ObjectProperty<String> visibleBaseText = new ObjectProperty<>(null, String.class);
-  private final ObjectProperty<String> contextSegmentation = new ObjectProperty<>(null, String.class);
-  
-  private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
-  
-  private final ObjectProperty<Set<Long>> selectedMatches = 
-    new ObjectProperty<Set<Long>>(new TreeSet<Long>());
-  
-  private final ObjectProperty<Class<? extends ExporterPlugin>> exporter = new ObjectProperty<Class<? extends ExporterPlugin>>(CSVExporter.class);
-  private final ObjectProperty<List<String>> exportAnnotationKeys 
-    = new ObjectProperty<List<String>>(new ArrayList<String>());
-  private final ObjectProperty<String> exportParameters = 
-    new ObjectProperty<>("");
-  
-  private final ObjectProperty<Boolean> alignmc = new ObjectProperty<Boolean>(false);
-  
-  private transient Map<QueryType, Future<?>> executedTasks;
-  
-  private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition
-    = new BeanContainer<>(UserGeneratedFrequencyEntry.class);
-  private final ObjectProperty<Set<String>> frequencyMetaData = 
-    new ObjectProperty<Set<String>> (new TreeSet<String>());
-  
-  private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
-  
-  private final BeanContainer<String, AnnisCorpus> availableCorpora = new BeanContainer<>(AnnisCorpus.class);;
-  
-  public QueryUIState()
-  {
-    initTransients();
-    availableCorpora.setBeanIdProperty("name");
-    availableCorpora.setItemSorter(new CorpusSorter());
-  }
-  
-  private void initTransients()
-  {
-    executedTasks = new EnumMap<>(QueryType.class);
-  }
-  
-  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
-    initTransients();
-  }
-  
-  public ObjectProperty<String> getAql()
-  {
-    return aql;
-  }
+public class QueryUIState implements Serializable {
 
-  public ObjectProperty<Set<String>> getSelectedCorpora()
-  {
-    return selectedCorpora;
-  }
+    public enum QueryType {
+        COUNT, FIND, FREQUENCY, EXPORT
+    }
 
-  public ObjectProperty<Integer> getLeftContext()
-  {
-    return leftContext;
-  }
+    private final ObjectProperty<String> aql = new ObjectProperty<>("");
+    private final ObjectProperty<Set<String>> selectedCorpora = new ObjectProperty<Set<String>>(
+            new LinkedHashSet<String>());
 
-  public ObjectProperty<Integer> getRightContext()
-  {
-    return rightContext;
-  }
+    private final ObjectProperty<Integer> leftContext = new ObjectProperty<>(5);
+    private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
 
-  public ObjectProperty<Integer> getLimit()
-  {
-    return limit;
-  }
+    private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
+    private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
+    private final ObjectProperty<String> visibleBaseText = new ObjectProperty<>(null, String.class);
+    private final ObjectProperty<String> contextSegmentation = new ObjectProperty<>(null, String.class);
 
-  public ObjectProperty<Long> getOffset()
-  {
-    return offset;
-  }
+    private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
 
-  public ObjectProperty<Set<Long>> getSelectedMatches()
-  {
-    return selectedMatches;
-  }
-  
-  public ObjectProperty<String> getVisibleBaseText()
-  {
-    return visibleBaseText;
-  }
+    private final ObjectProperty<QueryLanguage> queryLanguage = new ObjectProperty<>(QueryLanguage.AQL);
 
-  public ObjectProperty<String> getContextSegmentation()
-  {
-    return contextSegmentation;
-  }
-  
+    private final ObjectProperty<Set<Long>> selectedMatches = new ObjectProperty<Set<Long>>(new TreeSet<Long>());
 
-  public Map<QueryType, Future<?>> getExecutedTasks()
-  {
-    return executedTasks;
-  }
+    private final ObjectProperty<Class<? extends ExporterPlugin>> exporter = new ObjectProperty<Class<? extends ExporterPlugin>>(
+            CSVExporter.class);
+    private final ObjectProperty<List<String>> exportAnnotationKeys = new ObjectProperty<List<String>>(
+            new ArrayList<String>());
+    private final ObjectProperty<String> exportParameters = new ObjectProperty<>("");
 
-  public BeanItemContainer<Query> getHistory()
-  {
-    return history;
-  }  
+    private final ObjectProperty<Boolean> alignmc = new ObjectProperty<Boolean>(false);
 
-  public ObjectProperty<Class<? extends ExporterPlugin>> getExporter()
-  {
-    return exporter;
-  }
+    private transient Map<QueryType, Future<?>> executedTasks;
 
-  public ObjectProperty<List<String>> getExportAnnotationKeys()
-  {
-    return exportAnnotationKeys;
-  }
+    private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition = new BeanContainer<>(
+            UserGeneratedFrequencyEntry.class);
 
-  public ObjectProperty<String> getExportParameters()
-  {
-    return exportParameters;
-  }
-  
-  public ObjectProperty<Boolean> getAlignmc()
-  {
-    return alignmc;
-  }
+    private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
 
-  public BeanContainer<Integer, UserGeneratedFrequencyEntry> getFrequencyTableDefinition()
-  {
-    return frequencyTableDefinition;
-  }
+    private final BeanContainer<String, AnnisCorpus> availableCorpora = new BeanContainer<>(AnnisCorpus.class);;
 
-  public ObjectProperty<Set<String>> getFrequencyMetaData()
-  {
-    return frequencyMetaData;
-  }
+    public QueryUIState() {
+        initTransients();
+        availableCorpora.setBeanIdProperty("name");
+        availableCorpora.setItemSorter(new CorpusSorter());
+    }
 
-  public ObjectProperty<OrderType> getOrder()
-  {
-    return order;
-  }
+    private void initTransients() {
+        executedTasks = new EnumMap<>(QueryType.class);
+    }
 
-  public BeanContainer<String, AnnisCorpus> getAvailableCorpora()
-  {
-    return availableCorpora;
-  }
-  
-  
- 
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        initTransients();
+    }
+
+    public ObjectProperty<String> getAql() {
+        return aql;
+    }
+
+    public ObjectProperty<Set<String>> getSelectedCorpora() {
+        return selectedCorpora;
+    }
+
+    public ObjectProperty<Integer> getLeftContext() {
+        return leftContext;
+    }
+
+    public ObjectProperty<Integer> getRightContext() {
+        return rightContext;
+    }
+
+    public ObjectProperty<Integer> getLimit() {
+        return limit;
+    }
+
+    public ObjectProperty<Long> getOffset() {
+        return offset;
+    }
+
+    public ObjectProperty<Set<Long>> getSelectedMatches() {
+        return selectedMatches;
+    }
+
+    public ObjectProperty<String> getVisibleBaseText() {
+        return visibleBaseText;
+    }
+
+    public ObjectProperty<String> getContextSegmentation() {
+        return contextSegmentation;
+    }
+
+    public Map<QueryType, Future<?>> getExecutedTasks() {
+        return executedTasks;
+    }
+
+    public BeanItemContainer<Query> getHistory() {
+        return history;
+    }
+
+    public ObjectProperty<Class<? extends ExporterPlugin>> getExporter() {
+        return exporter;
+    }
+
+    public ObjectProperty<List<String>> getExportAnnotationKeys() {
+        return exportAnnotationKeys;
+    }
+
+    public ObjectProperty<String> getExportParameters() {
+        return exportParameters;
+    }
+
+    public ObjectProperty<Boolean> getAlignmc() {
+        return alignmc;
+    }
+
+    public BeanContainer<Integer, UserGeneratedFrequencyEntry> getFrequencyTableDefinition() {
+        return frequencyTableDefinition;
+    }
+
+    public ObjectProperty<OrderType> getOrder() {
+        return order;
+    }
+
+    public BeanContainer<String, AnnisCorpus> getAvailableCorpora() {
+        return availableCorpora;
+    }
+
+    public ObjectProperty<QueryLanguage> getQueryLanguage() {
+        return queryLanguage;
+    }
+
 }

@@ -15,17 +15,12 @@
  */
 package annis.model;
 
-import annis.sqlgen.model.RankTableJoin;
-import com.google.common.base.Joiner;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -39,15 +34,9 @@ public class QueryNode implements Serializable
   private String spannedText;
   private Set<QueryAnnotation> nodeAnnotations;
   // node constraints
-  private boolean partOfEdge;
-  private boolean root;
   private boolean token;
   private TextMatching spanTextMatching;
-  private List<Join> ingoingJoins;
-  private List<Join> outgoingJoins;
   private String variable;
-  private Range arity;
-  private Range tokenArity;
   private boolean artificial;
   private Integer alternativeNumber;
   private ParsedEntityLocation parseLocation;
@@ -168,8 +157,6 @@ public class QueryNode implements Serializable
   public QueryNode()
   {
     nodeAnnotations = new TreeSet<>();
-    outgoingJoins = new ArrayList<>();
-    ingoingJoins = new ArrayList<>();
   }
 
   public QueryNode(long id)
@@ -180,46 +167,26 @@ public class QueryNode implements Serializable
   
   /**
    * Copy constructor
-   * @param other 
-   * @param copyOutgoingJoins If true the outgoing join list from the other node
-   *                          is copied to the new node.
+   * @param other other node to copy from
    */
-  public QueryNode(QueryNode other,boolean copyOutgoingJoins)
+  public QueryNode(QueryNode other)
   {
-    this.arity = other.arity;
     this.id = other.id;
-    if(copyOutgoingJoins)
-    {
-      this.outgoingJoins = new ArrayList<>(other.outgoingJoins);
-    }
-    else
-    {
-      this.outgoingJoins = new ArrayList<>();
-    }
-    // do not copy the ingoing join since this is a property of the joins itself
-    // only if they change their target it is allowed to change the state of 
-    // the ingoing joins of the query node
-    this.ingoingJoins = new ArrayList<>();
     this.nodeAnnotations = new TreeSet<>(other.nodeAnnotations);
-    this.partOfEdge = other.partOfEdge;
-    this.root = other.root;
     this.spanTextMatching = other.spanTextMatching;
     this.spannedText = other.spannedText;
     this.token = other.token;
-    this.tokenArity = other.tokenArity;
     this.variable = other.variable;
   }
   
   /**
    * Copy constructor that allows to change the ID.
-   * @param newId
-   * @param other 
-   * @param copyOutgoingJoins If true the outgoing join list from the other node
-   *                          is copied to the new node.
+   * @param newId new ID
+   * @param other other node to copy from 
    */
-  public QueryNode(long newId, QueryNode other, boolean copyOutgoingJoins)
+  public QueryNode(long newId, QueryNode other)
   {
-    this(other, copyOutgoingJoins);
+    this(other);
     this.id = newId;
   }
 
@@ -284,30 +251,11 @@ public class QueryNode implements Serializable
       sb.append(quote);
     }
 
-    if (isRoot())
-    {
-      sb.append("; root node");
-    }
-
     if (!nodeAnnotations.isEmpty())
     {
       sb.append("; node labels: ");
       sb.append(nodeAnnotations);
     }
-
-    Set<QueryAnnotation> edgeAnnotations = getEdgeAnnotations();
-    if (!edgeAnnotations.isEmpty())
-    {
-      sb.append("; edge labes: ");
-      sb.append(edgeAnnotations);
-    }
-
-    for (Join join : outgoingJoins)
-    {
-      sb.append("; ");
-      sb.append(join);
-    }
-
 
     return sb.toString();
   }
@@ -378,63 +326,12 @@ public class QueryNode implements Serializable
     
     return sb.toString();
   }
-  
-  public String toAQLEdgeFragment()
-  {
-    List<String> frags = new LinkedList<>();
-    for (Join join : outgoingJoins)
-    {
-      frags.add(join.toAQLFragment(this));
-    }
-    
-    if(isRoot())
-    {
-      frags.add("#" + getVariable() + ":root");
-    }
-    
-    if(getArity() != null)
-    {
-      frags.add("#" + getVariable() + ":arity=" + getArity().toString());
-    }
-    
-    return Joiner.on(" & ").join(frags);
-  }
 
   public boolean addNodeAnnotation(QueryAnnotation annotation)
   {
     return nodeAnnotations.add(annotation);
   }
   
-  public boolean addOutgoingJoin(Join join)
-  {
-    boolean result = outgoingJoins.add(join);
-    if(join.getTarget() != null)
-    {
-      join.getTarget().ingoingJoins.add(join);
-    }
-    
-    if (join instanceof RankTableJoin)
-    {
-      this.setPartOfEdge(true);
-
-      QueryNode target = join.getTarget();
-      if(target != null)
-      {
-        target.setPartOfEdge(true);
-      }
-    }
-
-    return result;
-  }
-  
-  public void setThisNodeAsTarget(Join j)
-  {
-    
-    j.target.ingoingJoins.remove(j);
-    j.target = this;
-    ingoingJoins.add(j);
-
-  }
   
   @Override
   public boolean equals(Object obj)
@@ -465,15 +362,7 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-
-    if (this.partOfEdge != other.partOfEdge)
-    {
-      return false;
-    }
-    if (this.root != other.root)
-    {
-      return false;
-    }
+    
     if (this.token != other.token)
     {
       return false;
@@ -482,106 +371,23 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    if (this.outgoingJoins != other.outgoingJoins
-      && (this.outgoingJoins == null || !this.outgoingJoins.equals(other.outgoingJoins)))
-    {
-      return false;
-    }
     if ((this.variable == null) ? (other.variable != null) : !this.variable.
       equals(other.variable))
     {
       return false;
     }
-    Set<QueryAnnotation> edgeAnnotations = getEdgeAnnotations();
-    Set<QueryAnnotation> otherEdgeAnnotations = other.getEdgeAnnotations();
-    if (edgeAnnotations != otherEdgeAnnotations
-      && (edgeAnnotations == null || !edgeAnnotations.equals(
-      otherEdgeAnnotations)))
-    {
-      return false;
-    }
-    if ((this.arity == null) ? (other.arity != null) : !this.arity.equals(
-      other.arity))
-    {
-      return false;
-    }
-    if ((this.tokenArity == null) ? (other.tokenArity != null)
-      : !this.tokenArity.equals(other.tokenArity))
-    {
-      return false;
-    }
-
     return true;
   }
 
-  // @Override
-  // public boolean equals(Object obj) {
-  // if (obj == null || !(obj instanceof AnnisNode))
-  // return false;
-  //
-  // AnnisNode other = (AnnisNode) obj;
-  //
-  // return new EqualsBuilder()
-  // .append(this.id, other.id)
-  // .append(this.corpus, other.corpus)
-  // .append(this.textId, other.textId)
-  // .append(this.left, other.left)
-  // .append(this.right, other.right)
-  // .append(this.spannedText, other.spannedText)
-  // .append(this.leftToken, other.leftToken)
-  // .append(this.nodeAnnotations, other.nodeAnnotations)
-  // .append(this.name, other.name)
-  // .append(this.namespace, other.namespace)
-  // .append(this.partOfEdge, other.partOfEdge)
-  // .append(this.root, other.root)
-  // .append(this.token, other.token)
-  // .append(this.spanTextMatching, other.spanTextMatching)
-  // .append(this.outgoingJoins, other.outgoingJoins)
-  // .append(this.variable, other.variable)
-  // .append(this.relationAnnotations, other.relationAnnotations)
-  // .append(this.marker, other.marker)
-  // .isEquals();
-  // }
-  //
+  
   @Override
   public int hashCode()
   {
     return (int) id;
   }
   
-  public boolean removeOutgoingJoin(Join j)
-  {
-    if(j.getTarget() != null)
-    {
-      j.getTarget().ingoingJoins.remove(j);
-    }
-    return outgoingJoins.remove(j);
-  }
-
-  // /// Getter / Setter
-  @XmlTransient
-  public Set<QueryAnnotation> getEdgeAnnotations()
-  {
-    Set<QueryAnnotation> edgeAnnotations = new TreeSet<>();
-    
-    for(Join j : ingoingJoins)
-    {
-      edgeAnnotations.addAll(j.getEdgeAnnotations());
-    }
-    
-    return Collections.unmodifiableSet(edgeAnnotations);
-  }
-
-  public boolean isRoot()
-  {
-    return root;
-  }
-
-  public void setRoot(boolean root)
-  {
-    this.root = root;
-  }
-  
+ 
+  // /// Getter / Setter  
   public String getSpannedText()
   {
     return spannedText;
@@ -621,18 +427,7 @@ public class QueryNode implements Serializable
   {
     this.id = id;
   }
-
-  @XmlTransient // currently not supported, might be added later
-  public List<Join> getOutgoingJoins()
-  {
-    return Collections.unmodifiableList(outgoingJoins);
-  }
   
-  @XmlTransient // currently not supported, might be added later
-  public List<Join> getIngoingJoins()
-  {
-    return Collections.unmodifiableList(ingoingJoins);
-  }
   
   public boolean isToken()
   {
@@ -644,39 +439,10 @@ public class QueryNode implements Serializable
     this.token = token;
   }
 
-  public boolean isPartOfEdge()
-  {
-    return partOfEdge;
-  }
-
-  public void setPartOfEdge(boolean partOfEdge)
-  {
-    this.partOfEdge = partOfEdge;
-  }
-
-  public Range getArity()
-  {
-    return arity;
-  }
-
-  public void setArity(Range arity)
-  {
-    this.arity = arity;
-  }
-
-  public Range getTokenArity()
-  {
-    return tokenArity;
-  }
-
-  public void setTokenArity(Range tokenArity)
-  {
-    this.tokenArity = tokenArity;
-  }
 
   /**
    * Returns if this query node was artificially created by some normalization process.
-   * @return 
+   * @return True if artificially created.
    */
   public boolean isArtificial()
   {
@@ -690,7 +456,7 @@ public class QueryNode implements Serializable
 
   /**
    * If set return the number of the (normalized) alternative this node belongs to.
-   * @return 
+   * @return the number of the alternative
    */
   public Integer getAlternativeNumber()
   {

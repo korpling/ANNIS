@@ -21,7 +21,7 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 
 /**
  * 
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ANNISSecurityManager extends DefaultWebSecurityManager
 {

@@ -23,12 +23,13 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 /**
  * A window for logging in.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class LoginWindow extends Window
 {
@@ -59,7 +60,7 @@ public class LoginWindow extends Window
     if (loginURL == null || loginURL.isEmpty())
     {
       loginRes = new ExternalResource(
-        Helper.getContext() + "/login");
+        Helper.getContext(UI.getCurrent()) + "/login");
     }
     else
     {

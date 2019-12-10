@@ -40,6 +40,13 @@ $font-size: 10pt;
     color: $color;
     font-weight: bold;
   }
+  
+  .no-document-info-bar .match_#{$nr}  {	
+    color: $color;
+    text-decoration: underline;
+  }
+  
+  
 }
 
 @mixin annis {
@@ -249,6 +256,10 @@ $font-size: 10pt;
         font-weight: bold;
       }
    }
+ 
+  .no-document-info-bar .path-label {
+  	text-decoration: underline;
+  }  
 
   $huge-menubar-height: 40px;
 

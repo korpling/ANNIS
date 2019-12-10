@@ -20,7 +20,7 @@ package annis.libgui;
  * 
  * If this exception was thrown the user interface should show
  * to the user that he/she is effectivly logged out.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class LoginDataLostException extends Exception
 {

@@ -15,28 +15,6 @@
  */
 package annis.visualizers.htmlvis;
 
-import annis.CommonHelper;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import annis.libgui.MatchedNodeColors;
-import annis.libgui.VisualizationToggle;
-import annis.libgui.visualizers.AbstractVisualizer;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.model.Annotation;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextArea;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -52,12 +30,24 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Label;
+
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
@@ -67,6 +57,16 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import annis.CommonHelper;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.model.Annotation;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
@@ -79,7 +79,7 @@ import org.slf4j.LoggerFactory;
  * </ul>
  * </p>
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @PluginImplementation
 public class HTMLVis extends AbstractVisualizer<Panel>
@@ -132,19 +132,19 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     mc = vi.getMarkedAndCovered();
 
     VisualizationDefinition[] definitions = parseDefinitions(corpusName, vi.
-      getMappings());
+      getMappings(), vi.getUI());
 
     if (definitions != null)
     {
 
       lblResult.setValue(createHTML(vi.getSResult().getDocumentGraph(),
-        definitions));
+        definitions, vi.getUI()));
 
       String labelClass = vi.getMappings().getProperty("class", "htmlvis");
       lblResult.addStyleName(labelClass);
 
-      injectWebFonts(visConfigName, corpusName);
-      injectCSS(visConfigName, corpusName, wrapperClassName);
+      injectWebFonts(visConfigName, corpusName, vi.getUI());
+      injectCSS(visConfigName, corpusName, wrapperClassName, vi.getUI());
  
       
     }
@@ -170,12 +170,12 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
   @Override
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
-    String documentName, Properties mappings)
+    String documentName, Properties mappings, UI ui)
   {
     Set<String> result = null;
 
     VisualizationDefinition[] definitions = parseDefinitions(toplevelCorpusName,
-      mappings);
+      mappings, ui);
 
     if (definitions != null)
     {
@@ -210,7 +210,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   }
 
   public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
-    Properties mappings)
+    Properties mappings, UI ui)
   {
     InputStream inStreamConfigRaw = null;
 
@@ -222,7 +222,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     else
     {
-      WebResource resBinary = Helper.getAnnisWebResource().path(
+      WebResource resBinary = Helper.getAnnisWebResource(ui).path(
         "query/corpora/").path(toplevelCorpusName).path(toplevelCorpusName)
         .path("binary").path(visConfigName + ".config");
 
@@ -261,7 +261,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     return null;
   }
   
-  private void injectCSS(String visConfigName, String corpusName, String wrapperClassName)
+  private void injectCSS(String visConfigName, String corpusName, String wrapperClassName, UI ui)
   {
     InputStream inStreamCSSRaw = null;
     if (visConfigName == null)
@@ -270,7 +270,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     else
     {
-      WebResource resBinary = Helper.getAnnisWebResource().path(
+      WebResource resBinary = Helper.getAnnisWebResource(ui).path(
         "query/corpora/").path(corpusName).path(corpusName)
         .path("binary").path(visConfigName + ".css");
 
@@ -285,11 +285,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       try (InputStream inStreamCSS = inStreamCSSRaw)
       {
         String cssContent = IOUtils.toString(inStreamCSS);
-        UI currentUI = UI.getCurrent();
-        if (currentUI instanceof AnnisBaseUI)
+        if (ui instanceof AnnisBaseUI)
         {
           // do not add identical CSS files
-          ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent,
+          ((AnnisBaseUI) ui).injectUniqueCSS(cssContent,
             wrapperClassName);
         }
       }
@@ -305,12 +304,12 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
   }
   
-  private void injectWebFonts(String visConfigName, String corpusName)
+  private void injectWebFonts(String visConfigName, String corpusName, UI ui)
   {
     InputStream inStreamJSONRaw = null;
     if (visConfigName != null)
     {
-      WebResource resBinary = Helper.getAnnisWebResource().path(
+      WebResource resBinary = Helper.getAnnisWebResource(ui).path(
         "query/corpora/").path(corpusName).path(corpusName)
         .path("binary").path(visConfigName + ".fonts.json");
 
@@ -352,11 +351,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
             
             sb.append("}\n");
             
-            UI currentUI = UI.getCurrent();
-            if (currentUI instanceof AnnisBaseUI)
+            if (ui instanceof AnnisBaseUI)
             {
               // do not add identical CSS files
-              ((AnnisBaseUI) currentUI).injectUniqueCSS(sb.toString());
+              ((AnnisBaseUI) ui).injectUniqueCSS(sb.toString());
             }
           }
         }
@@ -388,7 +386,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   }
 
   public String createHTML(SDocumentGraph graph,
-    VisualizationDefinition[] definitions)
+    VisualizationDefinition[] definitions, UI ui)
   {
     HashMap<VisualizationDefinition, Integer> instruction_priorities = new HashMap<>();
 
@@ -399,7 +397,14 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     StringBuilder sb = new StringBuilder();
 
     List<SToken> token = graph.getSortedTokenByText();
-
+    Map<SToken, Long> token2index = new HashMap<>();
+    {
+      long i = 0;
+      for(SToken t : token) 
+      {
+        token2index.put(t, i++);
+      }
+    }
     //Get metadata for visualizer if stylesheet requires it
     //First check the stylesheet
     Boolean bolMetaTypeFound = false;
@@ -442,7 +447,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       strCorpName = corpusPath.get(corpusPath.size() - 1);
 
       //Get metadata and put in hashmap
-      List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName, strDocName);
+      List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName, strDocName, ui);
       for (Annotation metaDatum : metaData)
       {
         meta.put(metaDatum.getName(), metaDatum.getValue());
@@ -463,185 +468,191 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if (matched != null)
         {
           vis.getOutputter().outputHTML(t, matched, outputStartTags,
-            outputEndTags, tokenColor, Objects.firstNonNull(instruction_priorities.get(vis), 0));
+            outputEndTags, tokenColor, 
+            Objects.firstNonNull(instruction_priorities.get(vis), 0),
+            token2index);
         }
       }
     }
 
     List<SSpan> spans = graph.getSpans();
-    for (VisualizationDefinition vis : definitions)
-    {
-
-      for (SSpan span : spans)
+    if(spans != null && !spans.isEmpty()) {
+      for (VisualizationDefinition vis : definitions)
       {
-        tokenColor = "";
-        if (mc.containsKey(span) && hitMark)
+
+        for (SSpan span : spans)
         {
-          tokenColor = MatchedNodeColors
-            .getHTMLColorByMatch(mc.get(span));
-        }
-        String matched = vis.getMatcher().matchedAnnotation(span);
-        if (matched != null)
-        {
-          vis.getOutputter().outputHTML(span, matched, outputStartTags,
-            outputEndTags, tokenColor, Objects.firstNonNull(instruction_priorities.get(vis), 0));
-        }
-      }
-    }
-
-    int minStartTagPos = outputStartTags.firstKey().intValue();
-    int maxEndTagPos = outputEndTags.lastKey().intValue();
-
-    //Find BEGIN and END instructions if available
-    for (VisualizationDefinition vis : definitions)
-    {
-
-      if (vis.getMatcher() instanceof PseudoRegionMatcher)
-      {
-        PseudoRegionMatcher.PseudoRegion psdRegionType = ((PseudoRegionMatcher) vis.
-          getMatcher()).getPsdRegion();
-        int positionStart = 0;
-        int positionEnd = 0;
-
-        if (!outputEndTags.isEmpty() && !outputStartTags.isEmpty() && psdRegionType != null)
-        {
-          switch (psdRegionType)
+          tokenColor = "";
+          if (mc.containsKey(span) && hitMark)
           {
-            case BEGIN:
-              positionStart = positionEnd = Integer.MIN_VALUE;
-
-              // def_priority is now lower than all normal annotation
-              instruction_priorities.put(vis, def_priority);
-              break;
-            case END:
-              positionStart = positionEnd = Integer.MAX_VALUE;
-
-              // def_priority is now lower than all normal annotation
-              instruction_priorities.put(vis, def_priority);
-              break;
-            case ALL:
-              // use same position as last and first key
-              positionStart = minStartTagPos;
-              positionEnd = maxEndTagPos;
-
-              // The ALL pseudo-range must enclose everything, thus it get the
-              // priority which is one lower than the smallest non BEGIN/END
-              // priority.
-              instruction_priorities.put(vis, def_priority);
-              break;
-            default:
-              break;
+            tokenColor = MatchedNodeColors
+              .getHTMLColorByMatch(mc.get(span));
+          }
+          String matched = vis.getMatcher().matchedAnnotation(span);
+          if (matched != null)
+          {
+            vis.getOutputter().outputHTML(span, matched, outputStartTags,
+              outputEndTags, tokenColor, 
+              Objects.firstNonNull(instruction_priorities.get(vis), 0),
+              token2index);
           }
         }
+      }
 
-        switch (vis.getOutputter().getType())
+      int minStartTagPos = outputStartTags.firstKey().intValue();
+      int maxEndTagPos = outputEndTags.lastKey().intValue();
+
+      //Find BEGIN and END instructions if available
+      for (VisualizationDefinition vis : definitions)
+      {
+
+        if (vis.getMatcher() instanceof PseudoRegionMatcher)
         {
-          case META_NAME:
-            String strMetaVal = meta.
-              get(vis.getOutputter().getMetaname().trim());
-            if (strMetaVal == null)
+          PseudoRegionMatcher.PseudoRegion psdRegionType = ((PseudoRegionMatcher) vis.
+            getMatcher()).getPsdRegion();
+          int positionStart = 0;
+          int positionEnd = 0;
+
+          if (!outputEndTags.isEmpty() && !outputStartTags.isEmpty() && psdRegionType != null)
+          {
+            switch (psdRegionType)
             {
-              throw new NullPointerException(
-                "no such metadata name in document: '" + vis.getOutputter().
-                getMetaname().trim() + "'");
+              case BEGIN:
+                positionStart = positionEnd = Integer.MIN_VALUE;
+
+                // def_priority is now lower than all normal annotation
+                instruction_priorities.put(vis, def_priority);
+                break;
+              case END:
+                positionStart = positionEnd = Integer.MAX_VALUE;
+
+                // def_priority is now lower than all normal annotation
+                instruction_priorities.put(vis, def_priority);
+                break;
+              case ALL:
+                // use same position as last and first key
+                positionStart = minStartTagPos;
+                positionEnd = maxEndTagPos;
+
+                // The ALL pseudo-range must enclose everything, thus it get the
+                // priority which is one lower than the smallest non BEGIN/END
+                // priority.
+                instruction_priorities.put(vis, def_priority);
+                break;
+              default:
+                break;
             }
-            else
-            {
+          }
+
+          switch (vis.getOutputter().getType())
+          {
+            case META_NAME:
+              String strMetaVal = meta.
+                get(vis.getOutputter().getMetaname().trim());
+              if (strMetaVal == null)
+              {
+                throw new NullPointerException(
+                  "no such metadata name in document: '" + vis.getOutputter().
+                  getMetaname().trim() + "'");
+              }
+              else
+              {
+                vis.getOutputter().outputAny(positionStart, positionEnd,
+                  ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
+                  strMetaVal, outputStartTags, outputEndTags,
+                  Objects.firstNonNull(instruction_priorities.get(vis), 0));
+              }
+              break;
+            case CONSTANT:
               vis.getOutputter().outputAny(positionStart, positionEnd,
                 ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
-                strMetaVal, outputStartTags, outputEndTags,
+                vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
                 Objects.firstNonNull(instruction_priorities.get(vis), 0));
+              break;
+            case EMPTY:
+              vis.getOutputter().outputAny(positionStart, positionEnd,
+                ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
+                "", outputStartTags, outputEndTags,
+                Objects.firstNonNull(instruction_priorities.get(vis), 0));
+              break;
+            case ANNO_NAME:
+              break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+            case VALUE:
+              break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+            case ESCAPED_VALUE:
+              break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+            default:
+          }
+
+        }
+
+      }
+
+      // get all used indexes
+      Set<Long> indexes = new TreeSet<>();
+      indexes.addAll(outputStartTags.keySet());
+      indexes.addAll(outputEndTags.keySet());
+
+      for (Long i : indexes)
+      {
+        // output all strings belonging to this token position
+        // first the start tags for this position
+
+        // add priorities from instruction_priorities for sorting length ties
+        List<OutputItem> unsortedStart = outputStartTags.get(i);
+        SortedSet<OutputItem> itemsStart = new TreeSet();
+        if (unsortedStart != null)
+        {
+          Iterator<OutputItem> it = unsortedStart.iterator();
+          while (it.hasNext())
+          {
+            OutputItem s = it.next();
+            itemsStart.add(s);
+          }
+        }
+
+        {
+          Iterator<OutputItem> it = itemsStart.iterator();
+          boolean first = true;
+          while (it.hasNext())
+          {
+            OutputItem s = it.next();
+            if (!first)
+            {
+              sb.append("-->");
             }
-            break;
-          case CONSTANT:
-            vis.getOutputter().outputAny(positionStart, positionEnd,
-              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
-              vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
-              Objects.firstNonNull(instruction_priorities.get(vis), 0));
-            break;
-          case EMPTY:
-            vis.getOutputter().outputAny(positionStart, positionEnd,
-              ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
-              "", outputStartTags, outputEndTags,
-              Objects.firstNonNull(instruction_priorities.get(vis), 0));
-            break;
-          case ANNO_NAME:
-            break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
-          case VALUE:
-            break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
-          case ESCAPED_VALUE:
-            break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
-          default:
-        }
-
-      }
-
-    }
-
-    // get all used indexes
-    Set<Long> indexes = new TreeSet<>();
-    indexes.addAll(outputStartTags.keySet());
-    indexes.addAll(outputEndTags.keySet());
-
-    for (Long i : indexes)
-    {
-      // output all strings belonging to this token position
-      // first the start tags for this position
-
-      // add priorities from instruction_priorities for sorting length ties
-      List<OutputItem> unsortedStart = outputStartTags.get(i);
-      SortedSet<OutputItem> itemsStart = new TreeSet();
-      if (unsortedStart != null)
-      {
-        Iterator<OutputItem> it = unsortedStart.iterator();
-        while (it.hasNext())
-        {
-          OutputItem s = it.next();
-          itemsStart.add(s);
-        }
-      }
-
-      {
-        Iterator<OutputItem> it = itemsStart.iterator();
-        boolean first = true;
-        while (it.hasNext())
-        {
-          OutputItem s = it.next();
-          if (!first)
-          {
-            sb.append("-->");
-          }
-          first = false;
-          sb.append(s.getOutputString());
-          if (it.hasNext())
-          {
-            sb.append("<!--\n");
+            first = false;
+            sb.append(s.getOutputString());
+            if (it.hasNext())
+            {
+              sb.append("<!--\n");
+            }
           }
         }
-      }
-      // then the end tags for this position, but inverse their order
-      List<OutputItem> unsortedEnd = outputEndTags.get(i);
-      SortedSet<OutputItem> itemsEnd = new TreeSet();
-      if (unsortedEnd != null)
-      {
-        Iterator<OutputItem> it = unsortedEnd.iterator();
-        while (it.hasNext())
+        // then the end tags for this position, but inverse their order
+        List<OutputItem> unsortedEnd = outputEndTags.get(i);
+        SortedSet<OutputItem> itemsEnd = new TreeSet();
+        if (unsortedEnd != null)
         {
-          OutputItem s = it.next();
-          itemsEnd.add(s);
+          Iterator<OutputItem> it = unsortedEnd.iterator();
+          while (it.hasNext())
+          {
+            OutputItem s = it.next();
+            itemsEnd.add(s);
+          }
         }
-      }
 
-      {
-        List<OutputItem> itemsEndReverse = new LinkedList<>(itemsEnd);
-        Collections.reverse(itemsEndReverse);
-        for (OutputItem s : itemsEndReverse)
         {
-          sb.append(s.getOutputString());
+          List<OutputItem> itemsEndReverse = new LinkedList<>(itemsEnd);
+          Collections.reverse(itemsEndReverse);
+          for (OutputItem s : itemsEndReverse)
+          {
+            sb.append(s.getOutputString());
+          }
         }
-      }
 
-    }
+      }
+    } // end if spans not empty
 
     return sb.toString();
   }

@@ -22,6 +22,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.webapp.WebAppContext;
 
+import annis.administration.CorpusAdministration;
 import annis.service.internal.AnnisServiceRunner;
 import annis.service.objects.AnnisCorpus;
 
@@ -38,12 +39,15 @@ public class KickstartRunner
   private final int webServerPort;
   private final Integer servicePort;
   
-  public KickstartRunner()
+  private final CorpusAdministration corpusAdmin;
+  
+  public KickstartRunner(CorpusAdministration corpusAdmin)
   {
-    this(8080, null);
+    this(8080, null, corpusAdmin);
   }
-  public KickstartRunner(int webServerPort, Integer servicePort)
+  public KickstartRunner(int webServerPort, Integer servicePort, CorpusAdministration corpusAdmin)
   {
+    this.corpusAdmin = corpusAdmin;
     this.webServerPort = webServerPort;
     this.servicePort = servicePort;
   }
@@ -56,7 +60,7 @@ public class KickstartRunner
   public void startService() throws Exception
   {
     // starts RMI service at bean creation
-    runner = new AnnisServiceRunner(servicePort);
+    runner = new AnnisServiceRunner(servicePort, corpusAdmin);
     runner.setUseAuthentification(false);
     runner.start(true);
   }
@@ -89,8 +93,8 @@ public class KickstartRunner
     // Whenever we add new dependencies on jersey classes for the service but
     // not for the GUI and "Missing dependency" errors occur, add the classes
     // to the server class list
-    context.addServerClass("com.sun.jersey.json.");
-    context.addServerClass("com.sun.jersey.server.");
+    context.addServerClass("org.glassfish.jersey.json.");
+    context.addServerClass("org.glassfish.jersey.server.");
     jetty.setHandler(context);
     
     // start

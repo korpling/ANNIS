@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CommonUI extends AnnisBaseUI
 {
@@ -81,7 +81,7 @@ public class CommonUI extends AnnisBaseUI
     }
     
     // get the actual URL
-    WebResource res = Helper.getAnnisWebResource();
+    WebResource res = Helper.getAnnisWebResource(CommonUI.this);
     res = res.path("shortener").path(id);
     String longURL = res.get(String.class);
     

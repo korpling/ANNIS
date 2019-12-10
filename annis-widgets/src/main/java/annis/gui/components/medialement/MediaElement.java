@@ -17,7 +17,7 @@ package annis.gui.components.medialement;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public enum MediaElement
 {

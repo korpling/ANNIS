@@ -20,11 +20,11 @@ package annis.libgui;
 import com.vaadin.ui.Embedded;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
 
 /**
  * Panel that displays an image.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ImagePanel extends Panel
 {

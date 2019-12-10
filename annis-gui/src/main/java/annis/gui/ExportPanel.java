@@ -22,28 +22,28 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.data.validator.IntegerRangeValidator;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.AbstractSelect.ItemCaptionMode;
+import com.vaadin.v7.ui.CheckBox;
+import com.vaadin.v7.ui.ComboBox;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.TextField;
 
 import annis.gui.components.HelpButton;
 import annis.gui.controlpanel.QueryPanel;
@@ -58,7 +58,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ExportPanel extends GridLayout
 {
@@ -169,7 +169,7 @@ public class ExportPanel extends GridLayout
 
     cbLeftContext.setValue(5);
     cbRightContext.setValue(5);
-
+    
     formLayout.addComponent(cbLeftContext);
     formLayout.addComponent(cbRightContext);
 
@@ -290,11 +290,16 @@ public class ExportPanel extends GridLayout
         {
           lblHelp.setValue("No help available for this exporter");
         }
+        
+        cbLeftContext.setVisible(exporter.needsContext());
+        cbRightContext.setVisible(exporter.needsContext());
       }
       else
       {
         btCancel.setVisible(false);
         cbAlignmc.setVisible(false);
+        cbLeftContext.setVisible(false);
+        cbRightContext.setVisible(false);
         lblHelp.setValue("No valid exporter selected");
       }
     }

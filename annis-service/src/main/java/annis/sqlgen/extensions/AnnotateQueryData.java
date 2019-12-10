@@ -23,7 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  *  Specifies a segmentation layer.
  *
- * Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class AnnotateQueryData
 {

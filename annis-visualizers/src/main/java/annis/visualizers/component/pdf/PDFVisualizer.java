@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * in the resolver_vis_map.tab file.</p>
  *
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @PluginImplementation
 public class PDFVisualizer extends AbstractVisualizer<Panel> {

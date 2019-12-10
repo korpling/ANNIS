@@ -36,30 +36,30 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
-import com.vaadin.data.Container;
-import com.vaadin.data.util.AbstractBeanContainer;
-import com.vaadin.data.util.DefaultItemSorter;
-import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.data.util.ItemSorter;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.Container;
+import com.vaadin.v7.data.util.AbstractBeanContainer;
+import com.vaadin.v7.data.util.DefaultItemSorter;
+import com.vaadin.v7.data.util.IndexedContainer;
+import com.vaadin.v7.data.util.ItemSorter;
+import com.vaadin.v7.ui.Table;
 
 import annis.gui.components.FrequencyChart;
-import annis.gui.objects.FrequencyQuery;
 import annis.libgui.Helper;
+import annis.model.FrequencyQuery;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import au.com.bytecode.opencsv.CSVWriter;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class FrequencyResultPanel extends VerticalLayout
 {

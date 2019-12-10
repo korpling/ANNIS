@@ -20,7 +20,7 @@ package annis.libgui.media;
  * components of the gui.
  *
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public interface PDFViewer
 {

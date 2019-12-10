@@ -15,8 +15,6 @@
  */
 package annis.visualizers.iframe.dependency;
 
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -28,6 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.SALT_TYPE;
@@ -44,9 +43,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Range;
+
+import annis.libgui.Helper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.RelannisNodeFeature;
 import annis.visualizers.iframe.WriterVisualizer;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
@@ -65,8 +66,8 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * nodes which carry this annotation are searched for pointing relations and
  * instead of the token span the annotation value is used.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels{@literal <b.pixeldrama@gmail.com>}
  * @author Kim Gerdes
  */
 @PluginImplementation
@@ -95,7 +96,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
   public void writeOutput(VisualizerInput input, Writer writer)
   {
     this.mappings = input.getMappings();
-
+    
     /**
      * Try to create a sorted map of nodes. The left annis feature token index
      * is used for sorting the nodes. It is possible the different nodes has the
@@ -105,23 +106,14 @@ public class VakyarthaDependencyTree extends WriterVisualizer
      *
      * Contains only token, if mappings does not contain "node_key".
      */
-    Map<SNode, Integer> selectedNodes = new TreeMap<SNode, Integer>(
+    Map<SToken, Integer> token2index = Helper.createToken2IndexMap(input.getSResult().getDocumentGraph(), null);
+    TreeSet<SNode> selectedNodes = new TreeSet<>(
       new Comparator<SNode>()
       {
         private int getIdx(SNode snode)
         {
-          
-          RelannisNodeFeature feat = 
-            (RelannisNodeFeature) snode.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-          
-          if (snode instanceof SToken)
-          {
-            return feat != null ? (int) feat.getTokenIndex(): -1;
-          }
-          else
-          {
-            return feat != null ? (int) feat.getLeftToken() : -1;
-          }
+          Range<Integer> leftRight = Helper.getLeftRightSpan(snode, input.getSResult().getDocumentGraph(), token2index);
+          return leftRight.lowerEndpoint();
         }
 
         @Override
@@ -150,26 +142,23 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     printHTMLOutput(input, writer, selectedNodes);
   }
 
-  public void printHTMLOutput(VisualizerInput input, Writer writer,
-    Map<SNode, Integer> selectedNodes)
+  public void printHTMLOutput(VisualizerInput input, Writer writer, TreeSet<SNode> selectedNodes)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getDocumentGraph();
+    
 
     for (SNode n : sDocumentGraph.getNodes())
     {
       if (selectNode(n))
       {
-        RelannisNodeFeature feat = 
-          (RelannisNodeFeature) n.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-        
-        int tokenIdx = feat != null ? (int) feat.getTokenIndex() : -1;
-        selectedNodes.put(n, tokenIdx);
+        selectedNodes.add(n);
       }
     }
 
+
     Map<SNode, Integer> node2Int = new HashMap<SNode, Integer>();
     int count = 0;
-    for (SNode tok : selectedNodes.keySet())
+    for (SNode tok : selectedNodes)
     {
       node2Int.put(tok, count++);
     }
@@ -212,7 +201,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       println("tokens=new Object();", writer);
 
       count = 0;
-      for (SNode node : selectedNodes.keySet())
+      for (SNode node : selectedNodes)
       {
         JSONObject vakyarthaObject = new JSONObject();
 

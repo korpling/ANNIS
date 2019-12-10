@@ -18,10 +18,12 @@ package annis.libgui.visualizers;
 import java.util.List;
 import java.util.Properties;
 
+import com.vaadin.ui.UI;
+
 /**
  * A visualizer that defines a filtering for the annotations. This filtering
  * is currently only used when fetching complete documents (if {@link VisualizerPlugin#isUsingText() is true.).
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public interface FilteringVisualizerPlugin
 {
@@ -33,5 +35,5 @@ public interface FilteringVisualizerPlugin
    * @return 
    */
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, 
-    String documentName, Properties mappings);
+    String documentName, Properties mappings, UI ui);
 }

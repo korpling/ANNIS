@@ -20,7 +20,7 @@ import com.google.common.collect.ComparisonChain;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class OutputItem implements Comparable<OutputItem> //Comparator<OutputItem>, 
 {

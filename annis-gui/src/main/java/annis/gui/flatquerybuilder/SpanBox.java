@@ -28,17 +28,17 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.shared.ui.combobox.FilteringMode;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.data.Property.ValueChangeListener;
+import com.vaadin.v7.event.FieldEvents;
+import com.vaadin.v7.shared.ui.combobox.FilteringMode;
+import com.vaadin.v7.ui.CheckBox;
+import com.vaadin.v7.ui.ComboBox;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
 
 import annis.libgui.Helper;
 
@@ -71,7 +71,6 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     this.ebene = ebene;
     this.sq = sq;
     sb = new HorizontalLayout();
-    sb.setImmediate(true);
     sb.setSpacing(true);
     sb.setMargin(true);
     ConcurrentSkipListSet<String> annos = new ConcurrentSkipListSet<>();
@@ -100,7 +99,6 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     sbtoolbar.setSpacing(true);
     // searchbox tickbox for regex
     CheckBox tb = new CheckBox("Regex");
-    tb.setImmediate(true);
     tb.setValue(isRegex);
     sbtoolbar.addComponent(tb);
     tb.addValueChangeListener(new ValueChangeListener() {

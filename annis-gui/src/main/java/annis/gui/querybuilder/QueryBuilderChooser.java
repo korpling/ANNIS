@@ -15,25 +15,27 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.QueryController;
-import annis.libgui.InstanceConfig;
-import annis.libgui.PluginSystem;
-import com.vaadin.data.Property;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.ui.ComboBox;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.ui.ComboBox;
+
+import annis.gui.QueryController;
+import annis.libgui.InstanceConfig;
+import annis.libgui.PluginSystem;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  * Wrapper for selecting and showing the desired query builder.
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class QueryBuilderChooser extends Panel implements Property.ValueChangeListener
 {
@@ -66,7 +68,6 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     cbChooseBuilder = new ComboBox();
     cbChooseBuilder.setNewItemsAllowed(false);
     cbChooseBuilder.setNullSelectionAllowed(false);
-    cbChooseBuilder.setImmediate(true);
     cbChooseBuilder.setInputPrompt("Choose a query builder");
     cbChooseBuilder.setWidth("200px");
     

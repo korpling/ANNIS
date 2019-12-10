@@ -15,109 +15,97 @@
  */
 package annis.visualizers.component.kwic;
 
+import java.util.Map;
+import java.util.Set;
+
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.core.SNode;
+
 import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.component.grid.GridComponent;
-import java.util.Map;
-import java.util.Set;
-import org.corpus_tools.salt.common.STextualDS;
+import annis.visualizers.component.grid.SingleGridComponent;
 
 /**
  * A component to visualize matched token and their context as "Keyword in
  * context"
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public class KWICComponent extends GridComponent implements KWICInterface
-{
+public class KWICComponent extends SingleGridComponent implements KWICInterface {
 
-  public KWICComponent(VisualizerInput input,
-    MediaController mediaController, PDFController pdfController, STextualDS text)
-  {
-    super(input, mediaController, pdfController, false, text);
+    public KWICComponent(VisualizerInput input, MediaController mediaController, PDFController pdfController,
+            STextualDS text) {
+        super(input, mediaController, pdfController, false, text);
+    }
 
-    getGrid().setShowCaption(false);
-  }
+    @Override
+    public void attach() {
+        super.attach();
 
-  @Override
-  public void setSegmentationLayer(String segmentationName,
-    Map<String, Long> markedAndCovered)
-  {
-    super.setSegmentationLayer(segmentationName, markedAndCovered);
-    getGrid().setShowCaption(false);
-  }
-  
-  
+        getGrid().setShowCaption(false);
+    }
 
-  @Override
-  protected boolean isShowingTokenAnnotations()
-  {
-    // always show token annnotations
-    return true;
-  }
+    @Override
+    public boolean setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered) {
+        boolean result = super.setSegmentationLayer(segmentationName, markedAndCovered);
+        getGrid().setShowCaption(false);
+        
+        return result;
+    }
 
-  @Override
-  protected boolean canShowEmptyTokenWarning()
-  {
-    return true;
-  }
-  
-  
+    @Override
+    protected boolean isShowingTokenAnnotations() {
+        // always show token annnotations
+        return true;
+    }
 
-  @Override
-  protected boolean isShowingSpanAnnotations()
-  {
-    // never show span annotations
-    return false;
-  }
+    @Override
+    protected boolean canShowEmptyTokenWarning() {
+        return true;
+    }
 
-  @Override
-  protected boolean isHidingToken()
-  {
-    return false;
-  }
+    @Override
+    protected boolean isShowingSpanAnnotations() {
+        // never show span annotations
+        return false;
+    }
 
-  @Override
-  protected boolean isTokenFirst()
-  {
-    return true;
-  }
+    @Override
+    protected boolean isHidingToken() {
+        return false;
+    }
 
-  @Override
-  protected boolean isFilteringMediaLayer()
-  {
-    return true;
-  }
+    @Override
+    protected boolean isTokenFirst() {
+        return true;
+    }
 
-  @Override
-  protected boolean isAddingPlaybackRow()
-  {
-    return true;
-  }
+    @Override
+    protected boolean isFilteringMediaLayer() {
+        return true;
+    }
 
-  @Override
-  protected
-  boolean isCoveredTokenMarked()
-  {
-    return true;
-  }
-  
-  
-  
+    @Override
+    protected boolean isAddingPlaybackRow() {
+        return true;
+    }
 
-  @Override
-  protected String getMainStyle()
-  {
-    return "kwic";
-  }
+    @Override
+    protected boolean isCoveredTokenMarked() {
+        return true;
+    }
 
-  @Override
-  public final void setVisibleTokenAnnos(Set<String> annos)
-  {
-    super.setVisibleTokenAnnos(annos);
-    getGrid().setShowCaption(false);
-  }
+    @Override
+    protected String getMainStyle() {
+        return "kwic";
+    }
+
+    @Override
+    public final void setVisibleTokenAnnos(Set<String> annos) {
+        super.setVisibleTokenAnnos(annos);
+        getGrid().setShowCaption(false);
+    }
 
 }

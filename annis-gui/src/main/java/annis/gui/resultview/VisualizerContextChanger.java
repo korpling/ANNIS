@@ -15,8 +15,9 @@
  */
 package annis.gui.resultview;
 
-import annis.gui.objects.PagedResultQuery;
 import annis.libgui.ResolverProvider;
+import annis.model.PagedResultQuery;
+
 import java.io.Serializable;
 import org.corpus_tools.salt.common.SaltProject;
 
@@ -27,7 +28,7 @@ import org.corpus_tools.salt.common.SaltProject;
  *
  * @see SingleResultPanel
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public interface VisualizerContextChanger extends Serializable
 {

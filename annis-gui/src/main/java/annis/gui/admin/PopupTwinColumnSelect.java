@@ -19,26 +19,26 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.vaadin.data.Container;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.data.util.ItemSorter;
-import com.vaadin.data.util.converter.Converter;
-import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.PopupView;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TwinColSelect;
+import com.vaadin.v7.data.Container;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.IndexedContainer;
+import com.vaadin.v7.data.util.ItemSorter;
+import com.vaadin.v7.ui.AbstractTextField;
+import com.vaadin.v7.ui.CustomField;
+import com.vaadin.v7.ui.TextField;
+import com.vaadin.v7.ui.TwinColSelect;
 
 import annis.CaseSensitiveOrder;
 import annis.gui.converter.CommaSeperatedStringConverterSet;
 import annis.gui.converter.TreeSetConverter;
+import ch.qos.logback.core.pattern.Converter;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class PopupTwinColumnSelect extends CustomField<Set>
 {
@@ -116,7 +116,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
 
 
   @Override
-  public void setValue(Set newFieldValue) throws ReadOnlyException, Converter.ConversionException
+  public void setValue(Set newFieldValue) throws ReadOnlyException
   {
     // always use a sorted TreeSet
     if (newFieldValue != null

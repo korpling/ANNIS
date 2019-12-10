@@ -15,24 +15,27 @@
  */
 package annis.visualizers.component;
 
+import java.util.regex.Pattern;
+
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SaltProject;
+
+import com.vaadin.server.Sizeable;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
 import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.RawTextWrapper;
-import com.vaadin.server.Sizeable;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.GridLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.regex.Pattern;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import org.corpus_tools.salt.common.STextualDS;
-import org.corpus_tools.salt.common.SaltProject;
 
 /**
  * Renders the plain text from the text table.
@@ -46,7 +49,7 @@ import org.corpus_tools.salt.common.SaltProject;
  * alignment of multiple text, e. g. for parralel corpora it is a convenient
  * visualization<./p>
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @PluginImplementation
 public class RawTextVisualizer extends AbstractVisualizer<Panel> {
@@ -127,7 +130,7 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
                     lblText = new Label(s, ContentMode.TEXT);
                 }
                 
-                if(!Helper.isRTLDisabled() && CommonHelper.containsRTLText(s))
+                if(!Helper.isRTLDisabled(visInput.getUI()) && CommonHelper.containsRTLText(s))
                 {
                   lblText.addStyleName("rtl");
                 }
@@ -148,7 +151,7 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
         if (texts.hasTexts() && !hasOnlyWhiteSpace(texts.getFirstText())) {
             lblText = new Label(texts.getFirstText(), ContentMode.TEXT);
             
-            if(!Helper.isRTLDisabled() && CommonHelper.containsRTLText(texts.getFirstText()))
+            if(!Helper.isRTLDisabled(visInput.getUI()) && CommonHelper.containsRTLText(texts.getFirstText()))
             {
               lblText.addStyleName("rtl");
             }

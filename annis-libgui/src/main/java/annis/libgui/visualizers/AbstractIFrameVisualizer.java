@@ -18,6 +18,7 @@ package annis.libgui.visualizers;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 import com.vaadin.server.VaadinSession;
@@ -25,67 +26,75 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 
 import annis.gui.widgets.AutoHeightIFrame;
+import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 
 /**
  * Base class for all iframe visualizer plugins
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements ResourcePlugin
-{
-  /**
-   * Returns the character encoding for this particular Visualizer output. For
-   * more information see
-   * {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}. Must be
-   * overridden to change default "utf-8".
-   *
-   * @return the CharacterEncoding
-   */
-  public String getCharacterEncoding()
-  {
-    return "utf-8";
-  }
+public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements ResourcePlugin {
 
-  public String getContentType()
-  {
-    return "text/html";
-  }
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AbstractIFrameVisualizer.class);
 
-  /**
-   * Writes the final output to passed OutputStream. The stream should remain
-   * open.
-   *
-   * @param input The input from which the visualization should be generated
-   * from
-   * @param outstream The OutputStream to be used
-   */
-  public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
+	/**
+	 * Returns the character encoding for this particular Visualizer output. For
+	 * more information see
+	 * {@link javax.servlet.ServletResponse#setCharacterEncoding(String)}. Must be
+	 * overridden to change default "utf-8".
+	 *
+	 * @return the CharacterEncoding
+	 */
+	public String getCharacterEncoding() {
+		return "utf-8";
+	}
 
-  @Override
-  public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle)
-  { 
-    
-    VaadinSession session = VaadinSession.getCurrent();
-    if(session.getAttribute(IFrameResourceMap.class) == null)
-    {
-      session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
-    }
-    
-    ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-    writeOutput(vis, outStream);
-    
-    IFrameResource res  = new IFrameResource();
-    res.setData(outStream.toByteArray());
-    res.setMimeType(getContentType());
-    
-    UUID uuid = UUID.randomUUID();
-    session.getAttribute(IFrameResourceMap.class).put(uuid, res);
-  
-    URI base = UI.getCurrent().getPage().getLocation();
-    AutoHeightIFrame iframe = 
-      new AutoHeightIFrame(base.resolve("vis-iframe-res/" + uuid.toString()));
-    return iframe;
-  }
+	public String getContentType() {
+		return "text/html";
+	}
+
+	/**
+	 * Writes the final output to passed OutputStream. The stream should remain
+	 * open.
+	 *
+	 * @param input     The input from which the visualization should be generated
+	 *                  from
+	 * @param outstream The OutputStream to be used
+	 */
+	public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
+
+	@Override
+	public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle) {
+
+		VaadinSession session = vis.getUI().getSession();
+
+		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+		writeOutput(vis, outStream);
+
+		IFrameResource res = new IFrameResource();
+		res.setData(outStream.toByteArray());
+		res.setMimeType(getContentType());
+
+		UUID uuid = UUID.randomUUID();
+		session.getAttribute(IFrameResourceMap.class).put(uuid, res);
+
+		URI base;
+		try {
+			String ctx = Helper.getContext(vis.getUI());
+			if(!ctx.endsWith("/")) {
+				ctx = ctx + "/";
+			}
+			base = new URI(ctx);
+			
+		} catch (URISyntaxException e) {
+			log.warn(
+					"Getting context failed, falling back to using the complete URL, which will fail if ANNIS used with an instance URL",
+					e);
+			base = vis.getUI().getPage().getLocation();
+		}
+		AutoHeightIFrame iframe = new AutoHeightIFrame(base.resolve("vis-iframe-res/" + uuid.toString()));
+		return iframe;
+	}
 }

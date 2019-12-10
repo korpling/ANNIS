@@ -20,7 +20,7 @@ import com.google.gwt.core.client.JavaScriptObject;
 /**
  * Wraps the visualization into a java class.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class JITVisualization extends JavaScriptObject
 {

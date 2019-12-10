@@ -16,16 +16,19 @@
 
 package annis.gui.converter;
 
-import annis.CaseSensitiveOrder;
-import com.google.common.base.Preconditions;
-import com.vaadin.data.util.converter.Converter;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.TreeSet;
 
+import com.google.common.base.Preconditions;
+import com.vaadin.v7.data.util.converter.Converter;
+import com.vaadin.v7.data.util.converter.Converter.ConversionException;
+
+import annis.CaseSensitiveOrder;
+
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class TreeSetConverter implements Converter<Object, TreeSet>
 {

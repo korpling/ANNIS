@@ -15,28 +15,25 @@
  */
 package annis.gui;
 
-import com.vaadin.annotations.DesignRoot;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.declarative.Design;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.data.Property.ValueChangeListener;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.event.ItemClickEvent;
+import com.vaadin.v7.event.ItemClickEvent.ItemClickListener;
+import com.vaadin.v7.ui.Table;
 
-import annis.gui.objects.Query;
 import annis.libgui.Helper;
+import annis.model.Query;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@DesignRoot
 public class HistoryPanel extends Panel
   implements ValueChangeListener, ItemClickListener
 {
@@ -49,10 +46,17 @@ public class HistoryPanel extends Panel
     QueryController controller)
   {
     this.controller = controller;
+
+    setSizeFull();
     
-    Design.read("HistoryPanel.html", this);
-    
+    tblHistory = new Table();
+    tblHistory.setSelectable(true);
+    tblHistory.setPageLength(8);
+    tblHistory.setImmediate(true);
+    tblHistory.setSizeFull();
+
     tblHistory.setContainerDataSource(containerHistory);
+
 
     tblHistory.addGeneratedColumn("gennumber", new Table.ColumnGenerator()
     {
@@ -64,13 +68,21 @@ public class HistoryPanel extends Panel
         return new Label("" + (idx+1));
       }
     });
+
+    tblHistory.setColumnExpandRatio("query", 1.0f);
+
     citationGenerator = new CitationLinkGenerator();
     tblHistory.addGeneratedColumn("genlink", citationGenerator);
     tblHistory.setVisibleColumns("gennumber", "query", "genlink");
+    tblHistory.setColumnHeaders("#", "Query", "URL");
 
     tblHistory.addStyleName(Helper.CORPUS_FONT);
     tblHistory.addValueChangeListener((ValueChangeListener) this);
     tblHistory.addItemClickListener((ItemClickListener) this);
+
+    VerticalLayout layout = new VerticalLayout(tblHistory);
+    layout.setSizeFull();
+    setContent(layout);
 
   }
 

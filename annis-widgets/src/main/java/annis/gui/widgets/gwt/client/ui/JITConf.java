@@ -23,7 +23,7 @@ import com.google.gwt.json.client.JSONString;
 
 /**
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class JITConf extends JSONObject
 {

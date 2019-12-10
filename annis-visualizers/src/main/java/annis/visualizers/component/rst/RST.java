@@ -71,7 +71,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * result". Important is, that the first node dominates the second one, also the
  * visualization shows it the other way around.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @PluginImplementation
 public class RST extends AbstractVisualizer<RSTPanel> {

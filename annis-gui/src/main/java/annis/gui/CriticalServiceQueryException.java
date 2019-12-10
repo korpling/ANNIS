@@ -18,7 +18,7 @@ package annis.gui;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CriticalServiceQueryException extends ServiceQueryException
 {

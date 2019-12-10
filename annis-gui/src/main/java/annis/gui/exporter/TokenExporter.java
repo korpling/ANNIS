@@ -15,29 +15,39 @@
  */
 package annis.gui.exporter;
 
-import annis.model.AnnisNode;
-import annis.model.Annotation;
-import annis.service.ifaces.AnnisResult;
-import annis.service.ifaces.AnnisResultSet;
-import annis.service.objects.SubgraphFilter;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
-import com.google.common.base.Splitter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
+
+import com.google.common.base.Splitter;
+import com.vaadin.ui.UI;
+
+import annis.CommonHelper;
+import annis.model.Annotation;
+import annis.service.objects.SubgraphFilter;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
 public class TokenExporter extends GeneralTextExporter
 {
 
   @Override
-  public void convertText(AnnisResultSet queryResult, List<String> keys, 
-    Map<String,String> args, Writer out, int offset) throws IOException
+  public void convertText(SaltProject queryResult, List<String> keys, 
+    Map<String,String> args, Writer out, int offset, UI ui) throws IOException
   {
     
     Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
@@ -56,45 +66,50 @@ public class TokenExporter extends GeneralTextExporter
     
     
     int counter = 0;
-    for (AnnisResult annisResult : queryResult)
+    for (SCorpusGraph corpusGraph : queryResult.getCorpusGraphs())
     {
-      Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
-
-      counter++;
-      out.append((counter+offset) + ". ");
-      List<AnnisNode> tok = annisResult.getGraph().getTokens();
-
-      for (AnnisNode annisNode : tok)
+      for (SDocument doc : corpusGraph.getDocuments())
       {
-        Long tokID = annisNode.getId();
-        if (matchedNodeIds.contains(tokID))
-        {
-          out.append("[");
-          out.append(annisNode.getSpannedText());
-          out.append("]");
-        }
-        else
-        {
-          out.append(annisNode.getSpannedText());
-        }
+        SDocumentGraph graph = doc.getDocumentGraph();
+        
+        counter++;
+        out.append((counter+offset) + ". ");
+        List<SToken> tok = graph.getSortedTokenByText();
 
-        for (Annotation annotation : annisNode.getNodeAnnotations())
+        for (SToken annisNode : tok)
         {
-          out.append("/" + annotation.getValue());
+          SFeature featMatched = annisNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          Long match = featMatched == null ? null : featMatched.
+                   getValue_SNUMERIC();
+          if (match != null)
+          {
+            out.append("[");
+            out.append(graph.getText(annisNode));
+            out.append("]");
+          }
+          else
+          {
+            out.append(graph.getText(annisNode));
+          }
+
+          for (SAnnotation annotation : annisNode.getAnnotations())
+          {
+            out.append("/" + annotation.getValue());
+          }
+
+          out.append(" ");
+
         }
+        out.append("\n");
 
-        out.append(" ");
 
+        if(!metaKeys.isEmpty())
+        {
+          String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
+          super.appendMetaData(out, metaKeys, path[path.length-1], path[0], metadataCache, ui);
+        }
+        out.append("\n");
       }
-      out.append("\n");
-      
-      
-      if(!metaKeys.isEmpty())
-      {
-        String[] path = annisResult.getPath();
-        super.appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
-      }
-      out.append("\n");
     }
   }
 

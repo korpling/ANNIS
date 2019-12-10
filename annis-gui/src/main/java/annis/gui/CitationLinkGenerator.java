@@ -24,15 +24,15 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
+import com.vaadin.v7.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 
+import annis.QueryGenerator;
 import annis.gui.beans.CitationProvider;
-import annis.gui.objects.ContextualizedQuery;
-import annis.gui.objects.DisplayedResultQuery;
-import annis.gui.objects.Query;
-import annis.gui.objects.QueryGenerator;
+import annis.model.ContextualizedQuery;
+import annis.model.DisplayedResultQuery;
+import annis.model.Query;
 import annis.libgui.Helper;
 
 /**

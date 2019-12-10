@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @JavaScript({"js.cookie-2.0.3.min.js", "settingsstorage.js"})
 public class SettingsStorage extends AbstractJavaScriptExtension
@@ -39,8 +39,11 @@ public class SettingsStorage extends AbstractJavaScriptExtension
   private final ConcurrentMap<String, String> storage = new ConcurrentHashMap<>();
   private final List<LoadedListener> loadedListeners = new LinkedList<>();
   
+  private final UI ui;
+  
   public SettingsStorage(UI ui)
   { 
+    this.ui = ui;
     if(ui != null)
     {
       extend(ui);
@@ -83,7 +86,7 @@ public class SettingsStorage extends AbstractJavaScriptExtension
   public void set(String name, String value, int lifetimeInDays)
   {
     storage.put(name, value);
-    callFunction("set", name, value, Helper.getContext(), lifetimeInDays);
+    callFunction("set", name, value, Helper.getContext(ui), lifetimeInDays);
   }
   
   public String get(String name)

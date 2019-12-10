@@ -21,9 +21,9 @@ import java.util.regex.Pattern;
 
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.BlurListener;
-import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Panel;
+import com.vaadin.v7.ui.AbstractSelect;
+import com.vaadin.v7.ui.ComboBox;
 
 /**
  * @author Martin Klotz (martin.klotz@hu-berlin.de)

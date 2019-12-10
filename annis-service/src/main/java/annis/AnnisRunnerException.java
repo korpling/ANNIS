@@ -18,7 +18,7 @@ package annis;
 /**
  * Base class for errors that occur during the execution of an AnnisRunner.
  * 
- * @author Viktor Rosenfeld <rosenfel@informatik.hu-berlin.de>
+ * @author Viktor Rosenfeld {@literal <rosenfel@informatik.hu-berlin.de>}
  */
 @SuppressWarnings("serial")
 public class AnnisRunnerException extends RuntimeException {

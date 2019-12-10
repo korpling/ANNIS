@@ -15,6 +15,15 @@
  */
 package annis.service.internal;
 
+import java.util.concurrent.BlockingQueue;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Queues;
+
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
 import annis.service.objects.ImportJob;
@@ -24,139 +33,97 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Queues;
-import java.util.concurrent.BlockingQueue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@Component
-public class ImportWorker extends Thread
-{
+public class ImportWorker extends Thread {
 
-  private final static Logger log = LoggerFactory.getLogger(ImportWorker.class);
+    private final static Logger log = LoggerFactory.getLogger(ImportWorker.class);
 
-  private CorpusAdministration corpusAdmin;
+    private final CorpusAdministration corpusAdmin;
 
-  private final BlockingQueue<ImportJob> importQueue = Queues.newLinkedBlockingDeque();
+    private final BlockingQueue<ImportJob> importQueue = Queues.newLinkedBlockingDeque();
 
-  private ImportJob currentJob;
+    private ImportJob currentJob;
 
-  private final Cache<String, ImportJob> finishedJobs = CacheBuilder.newBuilder().
-    maximumSize(100).build();
+    private final Cache<String, ImportJob> finishedJobs = CacheBuilder.newBuilder().maximumSize(100).build();
 
-  public ImportWorker()
-  {
-    addAppender();
-  }
-
-  @Override
-  public void run()
-  {
-    while (isAlive())
-    {
-      try
-      {
-        currentJob = importQueue.take();
-        importSingleCorpusFile(currentJob);
-      }
-      catch (InterruptedException ex)
-      {
-        log.error(null, ex);
-        break;
-      }
+    public ImportWorker(CorpusAdministration corpusAdmin) {
+        this.corpusAdmin = corpusAdmin;
+        addAppender();
     }
-  }
 
-  private void addAppender()
-  {
-    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-    JoranConfigurator jc = new JoranConfigurator();
-    jc.setContext(lc);
-
-
-    Appender<ILoggingEvent> appender = new AppenderBase<ILoggingEvent>()
-    {
-      @Override
-      protected void append(ILoggingEvent event)
-      {
-        if (currentJob != null 
-          && event.getLevel().isGreaterOrEqual(Level.INFO)
-          && event.getLoggerName().equals("annis.administration.AdministrationDao"))
-        {
-          currentJob.getMessages().add(event.toString());
+    @Override
+    public void run() {
+        while (isAlive()) {
+            try {
+                currentJob = importQueue.take();
+                importSingleCorpusFile(currentJob);
+            } catch (InterruptedException ex) {
+                log.error(null, ex);
+                break;
+            }
         }
-      }
-    };
-    ch.qos.logback.classic.Logger rootLogger = lc.getLogger(
-      Logger.ROOT_LOGGER_NAME);
-    rootLogger.addAppender(appender);
-    appender.start();
-  }
-
-  private void importSingleCorpusFile(ImportJob job)
-  {
-    currentJob.setStatus(ImportJob.Status.RUNNING);
-    corpusAdmin.sendImportStatusMail(currentJob.getStatusEmail(), 
-          job.getCaption(), ImportJob.Status.RUNNING, null);
-    
-   
-    boolean success = true;
-    
-    // do the actual import
-    if(job.getImportRootDirectory() != null)
-    {
-      ImportStatus importStats = corpusAdmin.importCorporaSave(
-        job.isOverwrite(), job.getAlias(), job.getStatusEmail(), true, job.getImportRootDirectory().getAbsolutePath());
-    
-      if (!importStats.getStatus())
-      {
-        success = false; 
-      }
     }
 
-    if(success)
-    {
-      currentJob.setStatus(ImportJob.Status.SUCCESS);
+    private void addAppender() {
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        JoranConfigurator jc = new JoranConfigurator();
+        jc.setContext(lc);
+
+        Appender<ILoggingEvent> appender = new AppenderBase<ILoggingEvent>() {
+            @Override
+            protected void append(ILoggingEvent event) {
+                if (currentJob != null && event.getLevel().isGreaterOrEqual(Level.INFO)
+                        && event.getLoggerName().equals("annis.administration.AdministrationDao")) {
+                    currentJob.getMessages().add(event.toString());
+                }
+            }
+        };
+        ch.qos.logback.classic.Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
+        rootLogger.addAppender(appender);
+        appender.start();
     }
-    else
-    {
-      currentJob.setStatus(ImportJob.Status.ERROR);
+
+    private void importSingleCorpusFile(ImportJob job) {
+        currentJob.setStatus(ImportJob.Status.RUNNING);
+        corpusAdmin.getAdministrationDao().sendImportStatusMail(currentJob.getStatusEmail(), job.getCaption(),
+                ImportJob.Status.RUNNING, null);
+
+        boolean success = true;
+
+        // do the actual import
+        if (job.getImportRootDirectory() != null) {
+            ImportStatus importStats = corpusAdmin.importCorporaSave(job.isOverwrite(), job.getAlias(),
+                    job.getStatusEmail(), true, job.getImportRootDirectory().getAbsolutePath());
+
+            if (!importStats.getStatus()) {
+                success = false;
+            }
+        }
+
+        if (success) {
+            currentJob.setStatus(ImportJob.Status.SUCCESS);
+        } else {
+            currentJob.setStatus(ImportJob.Status.ERROR);
+        }
+        finishedJobs.put(currentJob.getUuid(), currentJob);
     }
-    finishedJobs.put(currentJob.getUuid(), currentJob);
-  }
-  
-  public ImportJob getFinishedJob(String uuid)
-  {
-    ImportJob job = finishedJobs.getIfPresent(uuid);
-    finishedJobs.invalidate(uuid);
-    return job;
-  }
 
-  public BlockingQueue<ImportJob> getImportQueue()
-  {
-    return importQueue;
-  }
+    public ImportJob getFinishedJob(String uuid) {
+        ImportJob job = finishedJobs.getIfPresent(uuid);
+        finishedJobs.invalidate(uuid);
+        return job;
+    }
 
-  public ImportJob getCurrentJob()
-  {
-    return currentJob;
-  }
+    public BlockingQueue<ImportJob> getImportQueue() {
+        return importQueue;
+    }
 
-  public CorpusAdministration getCorpusAdmin()
-  {
-    return corpusAdmin;
-  }
+    public ImportJob getCurrentJob() {
+        return currentJob;
+    }
 
-  public void setCorpusAdmin(CorpusAdministration corpusAdmin)
-  {
-    this.corpusAdmin = corpusAdmin;
-  }
-  
 }

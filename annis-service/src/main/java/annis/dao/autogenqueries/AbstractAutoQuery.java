@@ -23,7 +23,7 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
  * Implements the initializing of the {@link ExampleQuery} class, which might be
  * convenient for several auto generated query objects, and set some defaults.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 abstract public class AbstractAutoQuery implements QueriesGenerator.QueryBuilder
 {
@@ -73,10 +73,7 @@ abstract public class AbstractAutoQuery implements QueriesGenerator.QueryBuilder
   public ExampleQuery getExampleQuery()
   {
     ExampleQuery exampleQuery = new ExampleQuery();
-    exampleQuery.setNodes(getNodes());
-    exampleQuery.setType(getType());
     exampleQuery.setDescription(getDescription());
-    exampleQuery.setUsedOperators(getOperators());
     exampleQuery.setExampleQuery(getFinalAQLQuery());
 
     return exampleQuery;

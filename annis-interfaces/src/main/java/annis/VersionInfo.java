@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Provides static helper methods that give access to the version of ANNIS.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class VersionInfo
 {

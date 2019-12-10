@@ -15,32 +15,38 @@
  */
 package annis.gui.paging;
 
-import annis.gui.AnnisUI;
-import annis.gui.ShareQueryReferenceWindow;
-import annis.gui.util.ANNISFontIcon;
-import annis.libgui.Helper;
-import com.vaadin.data.Validator;
-import com.vaadin.data.validator.AbstractStringValidator;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.slf4j.LoggerFactory;
+
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.slf4j.LoggerFactory;
+import com.vaadin.v7.data.Validator;
+import com.vaadin.v7.data.validator.AbstractStringValidator;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.TextField;
+import com.vaadin.v7.ui.themes.ChameleonTheme;
+
+import annis.gui.AnnisUI;
+import annis.gui.ShareQueryReferenceWindow;
+import annis.gui.util.ANNISFontIcon;
+import annis.libgui.Helper;
+import annis.libgui.UIConfig;
 
 /**
  *
@@ -52,6 +58,8 @@ public class PagingComponent extends Panel implements
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     PagingComponent.class);
+  
+  private final UIConfig cfg = ConfigFactory.create(UIConfig.class);
 
   public static final Resource LEFT_ARROW = ANNISFontIcon.LEFT_ARROW;
 
@@ -79,7 +87,7 @@ public class PagingComponent extends Panel implements
 
   private Set<PagingCallback> callbacks;
 
-  private AtomicInteger count;
+  private AtomicLong count;
 
   private int pageSize;
 
@@ -104,7 +112,7 @@ public class PagingComponent extends Panel implements
       count = 0;
     }
     currentPage = 1;
-    this.count = new AtomicInteger(pageSize);
+    this.count = new AtomicLong(pageSize);
     this.pageSize = pageSize;
 
     setWidth("100%");
@@ -226,7 +234,7 @@ public class PagingComponent extends Panel implements
 
   private void update(boolean informCallbacks)
   {
-    int myCount = count.get();
+    long myCount = count.get();
     txtPage.setValue("" + currentPage);
     lblMaxPages.setValue("/ " + getMaxPage());
 
@@ -259,9 +267,9 @@ public class PagingComponent extends Panel implements
     return callbacks.remove(callback);
   }
 
-  public int getMaxPage()
+  public long getMaxPage()
   {
-    int mycount = Math.max(0, count.get() - 1);
+    long mycount = Math.max(0, count.get() - 1);
     return (1 + (mycount / pageSize));
   }
 
@@ -276,12 +284,12 @@ public class PagingComponent extends Panel implements
     update(false);
   }
 
-  public int getCount()
+  public long getCount()
   {
     return count.get();
   }
 
-  public void setCount(int count, boolean update)
+  public void setCount(long count, boolean update)
   {
     if (count < 0)
     {
@@ -359,7 +367,7 @@ public class PagingComponent extends Panel implements
     {
       ShareQueryReferenceWindow w = new ShareQueryReferenceWindow(
         ui.getQueryController().getSearchQuery(),
-        !Helper.isKickstarter(getSession())
+        cfg.shortenURLs() && !Helper.isKickstarter(getSession())
       );
       getUI().addWindow(w);
       w.center();

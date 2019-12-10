@@ -31,16 +31,15 @@ import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
+import com.vaadin.ui.UI;
 
 import annis.gui.components.ExceptionDialog;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.GridExporter;
-import annis.gui.exporter.CSVMultiTokExporter;
+import annis.gui.exporter.SimpleTextExporter;
 //import annis.gui.exporter.MatchWithContextExporter;
 import annis.gui.exporter.TextColumnExporter;
-import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TokenExporter;
-import annis.gui.exporter.WekaExporter;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
@@ -53,10 +52,10 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
 /**
  * GUI for searching in corpora.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Theme("annis")
-@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
+@Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 public class AnnisUI extends CommonUI
   implements ErrorHandler, ViewChangeListener
 {
@@ -136,16 +135,16 @@ public class AnnisUI extends CommonUI
     {
       searchView.setToolbar(toolbar);
       toolbar.setSidebar(searchView);
-      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN);
+      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN, AnnisUI.this);
     }
     else if (event.getNewView() == adminView)
     {
       adminView.setToolbar(toolbar);
-      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.SEARCH);
+      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.SEARCH, AnnisUI.this);
     }
     else
     {
-      toolbar.setNavigationTarget(null);
+      toolbar.setNavigationTarget(null, AnnisUI.this);
     }
 
     return true;
@@ -190,7 +189,7 @@ public class AnnisUI extends CommonUI
       {
         source = source.getCause();
       }
-      ExceptionDialog.show(source);
+      ExceptionDialog.show(source, this);
     }
   }
 
@@ -203,11 +202,10 @@ public class AnnisUI extends CommonUI
     super.addCustomUIPlugins(pluginManager);
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).
       toURI());
-    pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
-      toURI());
+    // TODO: enable flat query builder when problems with fetching all annotation values are resolved
+    // pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
+    //   toURI());
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVMultiTokExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(WekaExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
     pluginManager.addPluginsFrom(ClassURI.PLUGIN(GridExporter.class));
@@ -230,11 +228,11 @@ public class AnnisUI extends CommonUI
       {
         if (corpus.equals(DEFAULT_CONFIG))
         {
-          config = Helper.getDefaultCorpusConfig();
+          config = Helper.getDefaultCorpusConfig(AnnisUI.this);
         }
         else
         {
-          config = Helper.getCorpusConfig(corpus);
+          config = Helper.getCorpusConfig(corpus, AnnisUI.this);
         }
 
         corpusConfigCache.put(corpus, config);

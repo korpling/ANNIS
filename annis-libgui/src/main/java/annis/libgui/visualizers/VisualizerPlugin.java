@@ -15,11 +15,16 @@
  */
 package annis.libgui.visualizers;
 
-import annis.libgui.VisualizationToggle;
-import com.vaadin.ui.Component;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
+
+import org.corpus_tools.salt.core.SNode;
+
+import com.vaadin.ui.Component;
+import com.vaadin.ui.UI;
+
+import annis.libgui.VisualizationToggle;
 import net.xeoh.plugins.base.Plugin;
 
 /**
@@ -33,69 +38,69 @@ import net.xeoh.plugins.base.Plugin;
  * method.
  *
  * For the case of using Vaadin Component directly its recommended to extend the
- * {@link AbstractVisualizer} class. There you will have to implement the {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)
- * } method. Normally you need a inner or additional class which extends a
- * vaadin implementation of the {@link Component} interface. The
+ * {@link AbstractVisualizer} class. There you will have to implement the
+ * {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput) }
+ * method. Normally you need a inner or additional class which extends a vaadin
+ * implementation of the {@link Component} interface. The
  * {@link annis.gui.visualizers.component.KWICPanel} is an example for that.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public interface VisualizerPlugin<I extends Component> extends Plugin,
-  Serializable
-{
+public interface VisualizerPlugin<I extends Component> extends Plugin, Serializable {
 
-  /**
-   * Get the shorted name of the linguistic type of this visualizer ("partitur",
-   * "tree", etc.)
-   *
-   * @return
-   */
-  public String getShortName();
+    /**
+     * Get the shorted name of the linguistic type of this visualizer ("partitur",
+     * "tree", etc.)
+     *
+     * @return
+     */
+    public String getShortName();
 
-  /**
-   * It is used by the ANNIS plugin system to generate something viewable for
-   * vaadin.
-   *
-   */
-  public I createComponent(VisualizerInput visInput,
-    VisualizationToggle visToggle);
+    /**
+     * It is used by the ANNIS plugin system to generate something viewable for
+     * vaadin.
+     *
+     */
+    public I createComponent(VisualizerInput visInput, VisualizationToggle visToggle);
 
-  /**
-   * Checks if the Plugin needs the primary text source.
-   */
-  public boolean isUsingText();
+    /**
+     * Checks if the Plugin needs the primary text source.
+     */
+    public boolean isUsingText();
 
-  /**
-   * If applicable change the visible token annotations.
-   *
-   * @param annos Which token annotations (qualified name) to show.
-   */
-  public void setVisibleTokenAnnosVisible(I visualizerImplementation,
-    Set<String> annos);
+    /**
+     * If applicable change the visible token annotations.
+     *
+     * @param annos
+     *            Which token annotations (qualified name) to show.
+     */
+    public void setVisibleTokenAnnosVisible(I visualizerImplementation, Set<String> annos);
 
-  /**
-   * If applicable change the displayed segmentation.
-   *
-   * @param segmentationName
-   */
-  public void setSegmentationLayer(I visualizerImplementation,
-    String segmentationName, Map<String, Long> markedAndCovered);
+    /**
+     * If applicable change the displayed segmentation.
+     *
+     * @param segmentationName
+     */
+    public void setSegmentationLayer(I visualizerImplementation, String segmentationName,
+            Map<SNode, Long> markedAndCovered);
 
-  /**
-   * Determines if this visaulizer wants to use the original text.
-   *
-   * <p>
-   * This is a convenient and very fast method for extracting the whole text of
-   * a document, since this method simply reads database tupels and does not map
-   * anything to salt. It is recommended to use the raw text over the
-   * {@link VisualizerPlugin#isUsingText()} method, which indicates, that the
-   * visualizer needs the whole document graph, which can slow down the user
-   * experience.</p>
-   *
-   * <p>
-   * It can be use in parralel with {@link #isUsingText()}, but makes in most
-   * cases no sense.</p>
-   *
-   */
-  public boolean isUsingRawText();
+    /**
+     * Determines if this visaulizer wants to use the original text.
+     *
+     * <p>
+     * This is a convenient and very fast method for extracting the whole text of a
+     * document, since this method simply reads database tupels and does not map
+     * anything to salt. It is recommended to use the raw text over the
+     * {@link VisualizerPlugin#isUsingText()} method, which indicates, that the
+     * visualizer needs the whole document graph, which can slow down the user
+     * experience.
+     * </p>
+     *
+     * <p>
+     * It can be use in parralel with {@link #isUsingText()}, but makes in most
+     * cases no sense.
+     * </p>
+     *
+     */
+    public boolean isUsingRawText();
 }

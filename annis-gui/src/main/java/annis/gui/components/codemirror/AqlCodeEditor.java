@@ -15,29 +15,32 @@
  */
 package annis.gui.components.codemirror;
 
-import annis.model.AqlParseError;
-import annis.model.QueryNode;
-import com.vaadin.annotations.JavaScript;
-import com.vaadin.annotations.StyleSheet;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.ObjectProperty;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.ui.AbstractJavaScriptComponent;
-import com.vaadin.ui.JavaScriptFunction;
-import elemental.json.JsonArray;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vaadin.annotations.JavaScript;
+import com.vaadin.annotations.StyleSheet;
+import com.vaadin.ui.AbstractJavaScriptComponent;
+import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.ObjectProperty;
+import com.vaadin.v7.event.FieldEvents;
+
+import annis.model.AqlParseError;
+import annis.model.NodeDesc;
+import elemental.json.JsonArray;
+
 /**
  * A code editor component for the ANNIQ Query Language.
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @JavaScript(
   {
@@ -164,7 +167,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     }
   }
 
-  public void setNodes(List<QueryNode> nodes)
+  public void setNodes(List<NodeDesc> nodes)
   {
     getState().nodeMappings.clear();
     if(nodes != null)
@@ -173,29 +176,31 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     }
   }
 
-  private TreeMap<String, Integer> mapQueryNodes(List<QueryNode> nodes)
+  private TreeMap<String, Integer> mapQueryNodes(List<NodeDesc> nodes)
   {
     TreeMap<String, Integer> result = new TreeMap<>();
-    Map<Integer, TreeSet<Long>> alternative2Nodes = new HashMap<>();
+    Map<Long, TreeSet<Integer>> alternative2Nodes = new HashMap<>();
 
-    for (QueryNode n : nodes)
+    int nodeIdx = 1;
+    for (NodeDesc n : nodes)
     {
-      TreeSet<Long> orderedNodeSet = alternative2Nodes.get(n.
-        getAlternativeNumber());
+      TreeSet<Integer> orderedNodeSet = alternative2Nodes.get(n.
+        getComponentNr());
       if (orderedNodeSet == null)
       {
         orderedNodeSet = new TreeSet<>();
-        alternative2Nodes.put(n.getAlternativeNumber(), orderedNodeSet);
+        alternative2Nodes.put(n.getComponentNr(), orderedNodeSet);
       }
-      orderedNodeSet.add(n.getId());
+      // the nodes list is already ordered by the occurrence of the node in the AQL query stream
+      orderedNodeSet.add(nodeIdx++);
     }
 
-    for (TreeSet<Long> orderedNodeSet : alternative2Nodes.values())
+    for (TreeSet<Integer> orderedNodeSet : alternative2Nodes.values())
     {
       int newID = 1;
-      for (long var : orderedNodeSet)
+      for (Integer idx : orderedNodeSet)
       {
-        result.put("" + var, newID);
+        result.put("" + idx, newID);
         newID++;
       }
     }
@@ -239,12 +244,6 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   }
 
   @Override
-  public void addListener(FieldEvents.TextChangeListener listener)
-  {
-    addTextChangeListener(listener);
-  }
-
-  @Override
   public void removeTextChangeListener(FieldEvents.TextChangeListener listener)
   {
     removeListener(FieldEvents.TextChangeListener.EVENT_ID,
@@ -252,11 +251,6 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
       listener);
   }
 
-  @Override
-  public void removeListener(FieldEvents.TextChangeListener listener)
-  {
-    removeTextChangeListener(listener);
-  }
 
   public String getValue()
   {

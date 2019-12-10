@@ -24,7 +24,7 @@ import com.vaadin.shared.ui.Connect;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Connect(GripDragComponent.class)
 public class GripDragComponentConnector extends CustomComponentConnector

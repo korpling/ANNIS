@@ -15,7 +15,6 @@
  */
 package annis.dao.autogenqueries;
 
-import annis.CommonHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -27,6 +26,8 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
 
+import annis.CommonHelper;
+
 /**
  * Generates a simple regex query.
  *
@@ -37,7 +38,7 @@ import org.corpus_tools.salt.core.SNode;
  * <p>Description:
  * <code>Search for the "sie" with upper or lower-case 's' (regular expression)</code></p>
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class AutoSimpleRegexQuery extends AbstractAutoQuery
 {

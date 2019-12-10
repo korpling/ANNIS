@@ -16,14 +16,17 @@
 
 package annis.gui.converter;
 
-import com.vaadin.data.util.converter.Converter;
 import java.util.Date;
 import java.util.Locale;
+
 import org.joda.time.DateTime;
+
+import com.vaadin.v7.data.util.converter.Converter;
+import com.vaadin.v7.data.util.converter.Converter.ConversionException;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class DateTimeConverter implements Converter<Date, DateTime>
 {

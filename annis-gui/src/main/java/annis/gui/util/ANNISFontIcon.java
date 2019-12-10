@@ -20,7 +20,7 @@ import com.vaadin.server.FontIcon;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public enum ANNISFontIcon implements FontIcon
 {

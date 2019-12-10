@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * its own configuration. The configuration defines the visualizer and sorting
  * of the document browser as well as which annotations are displayed.
  *
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @XmlRootElement
 @SuppressWarnings("serial")

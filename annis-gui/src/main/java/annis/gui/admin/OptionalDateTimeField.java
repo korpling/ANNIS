@@ -15,19 +15,22 @@
  */
 package annis.gui.admin;
 
-import annis.gui.converter.DateTimeConverter;
-import com.vaadin.data.Property;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomField;
-import com.vaadin.ui.DateField;
-import com.vaadin.ui.HorizontalLayout;
 import java.util.Objects;
+
 import org.joda.time.DateTime;
+
+import com.vaadin.ui.Component;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.ui.CheckBox;
+import com.vaadin.v7.ui.CustomField;
+import com.vaadin.v7.ui.DateField;
+
+import annis.gui.converter.DateTimeConverter;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class OptionalDateTimeField extends CustomField<DateTime>
 {

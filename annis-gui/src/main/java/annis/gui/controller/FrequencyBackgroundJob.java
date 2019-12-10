@@ -17,8 +17,8 @@ package annis.gui.controller;
 
 import annis.gui.AnnisUI;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.objects.FrequencyQuery;
 import annis.libgui.Helper;
+import annis.model.FrequencyQuery;
 import annis.service.objects.FrequencyTable;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class FrequencyBackgroundJob implements Callable<FrequencyTable>
 {
@@ -68,12 +68,13 @@ public class FrequencyBackgroundJob implements Callable<FrequencyTable>
   private FrequencyTable loadBeans()
   {
     FrequencyTable result = new FrequencyTable();
-    WebResource annisResource = Helper.getAnnisWebResource();
+    WebResource annisResource = Helper.getAnnisWebResource(ui);
     try
     {
       annisResource = annisResource.path("query").path("search").
         path("frequency").queryParam("q", Helper.encodeJersey(query.getQuery())).
         queryParam("corpora", StringUtils.join(query.getCorpora(), ",")).
+        queryParam("query-language", query.getQueryLanguage().name()).
         queryParam("fields", query.getFrequencyDefinition().toString());
       result = annisResource.get(FrequencyTable.class);
     }

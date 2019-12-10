@@ -20,52 +20,40 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.dbutils.handlers.AbstractListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.RowMapper;
 
 import com.google.common.base.Joiner;
 
 import annis.service.objects.AnnisCorpus;
 
-public class ListCorpusSqlHelper implements RowMapper<AnnisCorpus>
-{
-  
-  private static final Logger log = LoggerFactory.getLogger(ListCorpusSqlHelper.class);
+public class ListCorpusSqlHelper extends AbstractListHandler<AnnisCorpus> {
 
-  
-  public String createSqlQuery()
-  {
-    return "SELECT * FROM corpus_stats";
-  }
-  
-  public String createSqlQueryWithList(int numberOfIds)
-  {
-    List<String> questionMarks = new ArrayList<>();
-    for(int i=0; i < numberOfIds; i++)
-    {
-      questionMarks.add("?");
+    private static final Logger log = LoggerFactory.getLogger(ListCorpusSqlHelper.class);
+
+    public String createSqlQuery() {
+        return "SELECT * FROM corpus_info";
     }
-    return "SELECT * FROM corpus_stats WHERE id IN (" 
-      + (questionMarks.isEmpty() ? "NULL" : Joiner.on(",").join(questionMarks)) 
-      + ")";
-  }
-  
-  public AnnisCorpus mapRow(ResultSet rs, int rowNum) throws SQLException
-  {
-    AnnisCorpus corpus = new AnnisCorpus();
-    corpus.setId(rs.getLong("id"));
-    corpus.setName(rs.getString("name"));
-    corpus.setTextCount(rs.getInt("text"));
-    corpus.setTokenCount(rs.getInt("tokens"));
-    try
-    {
-      corpus.setSourcePath(rs.getString("source_path"));
+
+    public String createSqlQueryWithList(int numberOfCorpora) {
+        List<String> questionMarks = new ArrayList<>();
+        for (int i = 0; i < numberOfCorpora; i++) {
+            questionMarks.add("?");
+        }
+        return "SELECT * FROM corpus_info WHERE name IN ("
+                + (questionMarks.isEmpty() ? "NULL" : Joiner.on(",").join(questionMarks)) + ")";
     }
-    catch (SQLException ex)
-    {
-      log.debug(null, ex);    
+
+
+    @Override
+    protected AnnisCorpus handleRow(ResultSet rs) throws SQLException {
+        AnnisCorpus corpus = new AnnisCorpus();
+        corpus.setName(rs.getString("name"));
+        corpus.setDocumentCount(rs.getInt("docs"));
+        corpus.setTokenCount(rs.getInt("tokens"));
+        corpus.setSourcePath(rs.getString("source_path"));
+        
+        return corpus;
     }
-    return corpus;
-  }
 }
