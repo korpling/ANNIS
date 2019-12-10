@@ -17,6 +17,10 @@ before_script:
   - mkdir -p $HOME/.cargo/bin
   - export PATH=$HOME/.cargo/bin:$PATH
   - misc/download-mdbook.sh 0.3.5
+  - wget https://github.com/mozilla/geckodriver/releases/download/v0.26.0/geckodriver-v0.26.0-linux64.tar.gz
+  - tar -xzf geckodriver-v0.26.0-linux64.tar.gz
+  - cp geckodriver $HOME/bin/
+
   
 script:
   - mvn test -B
