@@ -24,6 +24,8 @@ before_script:
   - geckodriver --version
   # download pcc2 corpus
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
+  - unzip pcc2_relANNIS.zip
+  - ls pcc2_v6_relANNIS
 
 
   
@@ -32,7 +34,7 @@ script:
   - mvn package -Dmaven.test.skip=true
   - cd annis-kickstarter/target/annis-kickstarter-*-distribution/annis-kickstarter-*/
   - source bin/setup.sh
-  - bin/annis-admin.sh import $HOME/pcc2_relANNIS.zip
+  - bin/annis-admin.sh import $HOME/pcc2_v6_relANNIS
   - cd $TRAVIS_BUILD_DIR
   # execute Maven Tests
   - mvn test -B
