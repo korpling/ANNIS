@@ -14,6 +14,7 @@ cache:
   - $HOME/.m2
   
 before_script:
+  - cd $HOME
   - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
   - mkdir -p $HOME/.cargo/bin
   - export PATH=$HOME/.cargo/bin:$PATH
@@ -29,6 +30,7 @@ before_script:
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
   - unzip pcc2_relANNIS.zip
   - ls pcc2_v6_relANNIS
+  - cd $TRAVIS_BUILD_DIR
 
 
   
