@@ -21,6 +21,9 @@ before_script:
   # Install Selenium Runner with geckodriver
   - npm install selenium-side-runner
   - npm install geckodriver
+  - ls $HOME
+  - ls -lisa $HOME/node_modules
+  - ls -lisa .
   # download and unzip Tomcat
   - wget http://ftp.fau.de/apache/tomcat/tomcat-8/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
   - tar xvzf apache-tomcat-$TOMCAT_VERSION.tar.gz
