@@ -24,6 +24,7 @@ before_script:
   # download and unzip Tomcat
   - wget http://ftp.fau.de/apache/tomcat/tomcat-8/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
   - tar xvzf apache-tomcat-$TOMCAT_VERSION.tar.gz
+  - ls $HOME/*
   # download pcc2 corpus
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
   - unzip pcc2_relANNIS.zip
