@@ -47,7 +47,7 @@ script:
   - $TRAVIS_BUILD_DIR/apache-tomcat-$TOMCAT_VERSION/bin/startup.sh
   # execute integration tests
   - cd $TRAVIS_BUILD_DIR/
-  - selenium-side-runner -c "browserName=firefox" misc/annis_integration_tests.side
+  - selenium-side-runner --base-url http://localhost:8080/ -c "browserName=firefox" misc/annis_integration_tests.side
   # stop services
   - annis-service-no-security.sh stop
   - $TRAVIS_BUILD_DIR/apache-tomcat-$TOMCAT_VERSION/bin/shutdown.sh
