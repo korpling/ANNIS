@@ -16,7 +16,7 @@ cache:
 before_script:
   - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
   - mkdir -p $HOME/.cargo/bin
-  - export PATH=$HOME/.cargo/bin:$PATH
+  - export PATH=$HOME/.cargo/bin:$HOME/node_modules/.bin/:$PATH
   - misc/download-mdbook.sh 0.3.5
   # Install Selenium Runner with geckodriver
   - npm install selenium-side-runner
@@ -27,8 +27,6 @@ before_script:
   # download pcc2 corpus
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
   - unzip pcc2_relANNIS.zip
-  - ls pcc2_v6_relANNIS
-  - cd $TRAVIS_BUILD_DIR
 
 
   
