@@ -1,7 +1,7 @@
 {
   "id": "3b30cc20-f4fb-4383-b96f-37d2a9690d2c",
   "version": "2.0",
-  "name": "ANNIS Acceptance Tests",
+  "name": "ANNIS Integration Tests",
   "url": "http://localhost:8080/annis-gui/",
   "tests": [{
     "id": "bae08028-13be-4a4e-8383-9b6091d1be6d",
@@ -149,24 +149,31 @@
       "targets": [],
       "value": ""
     }, {
-      "id": "93f096a4-df9d-4fad-842a-77142b701fee",
+      "id": "9f4bc2fa-c939-4555-83d5-cc8b7b1be7eb",
       "comment": "",
       "command": "click",
       "target": "css=.CodeMirror-scroll",
       "targets": [
         ["css=.CodeMirror-scroll", "css:finder"],
-        ["xpath=//div[@id='targetc087d88e_f88c_4ca7_9ce7_4a347b65262c']/div/div[6]", "xpath:idRelative"],
+        ["xpath=//div[@id='target348fca21_2ba9_475f_987f_61b700a8db95']/div/div[6]", "xpath:idRelative"],
         ["xpath=//div/div/div/div/div[2]/div/div/div[6]", "xpath:position"]
       ],
       "value": ""
     }, {
-      "id": "8a284d1a-ccd4-4f45-a061-c460223f15d9",
+      "id": "d66c08bb-de5a-4ad4-a1f4-5d9ad6b76f46",
+      "comment": "",
+      "command": "waitForElementEditable",
+      "target": "css=div:nth-child(1) > textarea",
+      "targets": [],
+      "value": "15"
+    }, {
+      "id": "424602ca-bf5d-4d3c-84fa-a790fb974ec9",
       "comment": "",
       "command": "type",
       "target": "css=div:nth-child(1) > textarea",
       "targets": [
         ["css=div:nth-child(1) > textarea", "css:finder"],
-        ["xpath=//div[@id='targetc087d88e_f88c_4ca7_9ce7_4a347b65262c']/div/div/textarea", "xpath:idRelative"],
+        ["xpath=//div[@id='target348fca21_2ba9_475f_987f_61b700a8db95']/div/div/textarea", "xpath:idRelative"],
         ["xpath=//textarea", "xpath:position"]
       ],
       "value": "tok"
@@ -350,11 +357,18 @@
   }],
   "suites": [{
     "id": "77771cf3-bcf3-4659-a691-0211e9aad537",
-    "name": "Default Suite",
+    "name": "Acceptance Tests",
     "persistSession": false,
     "parallel": false,
     "timeout": 300,
     "tests": ["bae08028-13be-4a4e-8383-9b6091d1be6d", "0b9a1226-5ed1-4417-92c4-172fb823d0ba", "ed433747-d97b-4038-81ac-081f9b4cd85f"]
+  }, {
+    "id": "798b626a-57e9-4bc7-8478-b4c093992e10",
+    "name": "Regression Tests",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["98ed0d3f-a077-4e29-a42c-e8c3f64b7855"]
   }],
   "urls": ["http://localhost:8080/", "http://localhost:8080/annis-gui", "http://localhost:8080/annis-gui/"],
   "plugins": []
