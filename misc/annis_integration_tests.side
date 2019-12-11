@@ -2,7 +2,7 @@
   "id": "3b30cc20-f4fb-4383-b96f-37d2a9690d2c",
   "version": "2.0",
   "name": "annis_integration_tests",
-  "url": "http://localhost:8080/annis-gui/",
+  "url": "http://localhost:5712/annis-gui/",
   "tests": [{
     "id": "bae08028-13be-4a4e-8383-9b6091d1be6d",
     "name": "About Window",
@@ -367,6 +367,6 @@
     "timeout": 300,
     "tests": ["98ed0d3f-a077-4e29-a42c-e8c3f64b7855"]
   }],
-  "urls": ["http://localhost:8080/", "http://localhost:8080/annis-gui", "http://localhost:8080/annis-gui/"],
+  "urls": ["http://localhost:8080/", "http://localhost:8080/annis-gui", "http://localhost:8080/annis-gui/", "http://localhost:5712/annis-gui/"],
   "plugins": []
 }
