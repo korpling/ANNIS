@@ -1,7 +1,7 @@
 {
   "id": "3b30cc20-f4fb-4383-b96f-37d2a9690d2c",
   "version": "2.0",
-  "name": "ANNIS Integration Tests",
+  "name": "annis_integration_tests",
   "url": "http://localhost:8080/annis-gui/",
   "tests": [{
     "id": "bae08028-13be-4a4e-8383-9b6091d1be6d",
@@ -149,33 +149,30 @@
       "targets": [],
       "value": ""
     }, {
-      "id": "9f4bc2fa-c939-4555-83d5-cc8b7b1be7eb",
+      "id": "68e265cb-7cb9-4750-80f4-52b2ceb5f224",
+      "comment": "",
+      "command": "runScript",
+      "target": "window.scrollTo(0,0)",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "df386d8d-0544-4f6d-9743-0fadab90fede",
       "comment": "",
       "command": "click",
-      "target": "css=.CodeMirror-scroll",
+      "target": "css=.CodeMirror-line",
       "targets": [
-        ["css=.CodeMirror-scroll", "css:finder"],
-        ["xpath=//div[@id='target348fca21_2ba9_475f_987f_61b700a8db95']/div/div[6]", "xpath:idRelative"],
-        ["xpath=//div/div/div/div/div[2]/div/div/div[6]", "xpath:position"]
+        ["css=.CodeMirror-line", "css:finder"],
+        ["xpath=//div[@id='target6f07c50f_4e59_411f_be63_6c7e0a302ac5']/div/div[6]/div/div/div/div/div[5]/pre", "xpath:idRelative"],
+        ["xpath=//div[5]/pre", "xpath:position"],
+        ["xpath=//pre[contains(.,'​')]", "xpath:innerText"]
       ],
       "value": ""
     }, {
-      "id": "d66c08bb-de5a-4ad4-a1f4-5d9ad6b76f46",
-      "comment": "",
-      "command": "waitForElementEditable",
-      "target": "css=div:nth-child(1) > textarea",
-      "targets": [],
-      "value": "15"
-    }, {
       "id": "424602ca-bf5d-4d3c-84fa-a790fb974ec9",
       "comment": "",
-      "command": "type",
-      "target": "css=div:nth-child(1) > textarea",
-      "targets": [
-        ["css=div:nth-child(1) > textarea", "css:finder"],
-        ["xpath=//div[@id='target348fca21_2ba9_475f_987f_61b700a8db95']/div/div/textarea", "xpath:idRelative"],
-        ["xpath=//textarea", "xpath:position"]
-      ],
+      "command": "sendKeys",
+      "target": "css=.CodeMirror textarea",
+      "targets": [],
       "value": "tok"
     }, {
       "id": "8703f2b4-9b4f-40dc-8422-a7bb360d7d7a",
