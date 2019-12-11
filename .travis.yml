@@ -5,6 +5,7 @@ jdk:
 env:
   global:
     - MOZ_HEADLESS=1
+    - TOMCAT_VERSION=8.5.49
   addons:
     firefox: latest
   
@@ -20,6 +21,9 @@ before_script:
   # Install Selenium Runner with geckodriver
   - npm install selenium-side-runner
   - npm install geckodriver
+  # download and unzip Tomcat
+  - wget http://ftp.fau.de/apache/tomcat/tomcat-8/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
+  - tar xvzf apache-tomcat-$TOMCAT_VERSION.tar.gz
   # download pcc2 corpus
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
   - unzip pcc2_relANNIS.zip
@@ -37,13 +41,17 @@ script:
   # import corpora needed for integration tests
   - cd annis-service/target/annis-service-*-distribution/annis-service-*/
   - source bin/setup.sh
-  - bin/annis-admin.sh import $HOME/pcc2_v6_relANNIS
+  - annis-admin.sh import $HOME/pcc2_v6_relANNIS
   # start needed (web-) services
-  - bin/annis-service-no-security.sh start
-  - cd $TRAVIS_BUILD_DIR/annis-gui/
-  - mvn jetty:start &
+  - annis-service-no-security.sh start
+  - cp $TRAVIS_BUILD_DIR/annis-gui/target/annis-gui.war $HOME/apache-tomcat-$TOMCAT_VERSION/webapps
+  - $HOME/apache-tomcat-$TOMCAT_VERSION/bin/startup.sh
   # execute integration tests
+  - cd $TRAVIS_BUILD_DIR/
   - selenium-side-runner -c "browserName=firefox" misc/annis_integration_tests.side
+  # stop services
+  - annis-service-no-security.sh stop
+  - $HOME/apache-tomcat-$TOMCAT_VERSION/bin/shutdown.sh
   
 deploy:
   - provider: script
