@@ -114,6 +114,7 @@ public class AdminView extends VerticalLayout
 
         addComponents(tabSheet);
         setSizeFull();
+        setMargin(false);
 
         setExpandRatio(tabSheet, 1.0f);
 
