@@ -11,11 +11,15 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **To Reproduce**
+
 Steps to reproduce the behavior:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
+
+If possible, please provide the corpus data needed to test the behavior.
+The ANNIS software developers can't access the corpus data of ANNIS server installations.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
