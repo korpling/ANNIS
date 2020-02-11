@@ -59,7 +59,7 @@
 	<repositories>
 		<repository>
 			<id>korpling</id>
-			<url>http://korpling.german.hu-berlin.de/maven2/</url>
+			<url>https://korpling.german.hu-berlin.de/maven2/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
