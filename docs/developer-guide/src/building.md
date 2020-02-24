@@ -28,7 +28,7 @@ Some sub-projects don't provide a library but will produce a zip or tar/gz-
 file when they are compiled. These assembly steps (see [Maven Assembly documentation](http://maven.apache.org/plugins/maven-assembly-plugin/)) are automatically
 invoked on `mvn install`.
 
-## Using and IDE
+## Using an IDE
 
 While you can use any text editor of your choice to change ANNIS and compile
 it completely on the command line using Maven, a proper IDE will be a huge help
