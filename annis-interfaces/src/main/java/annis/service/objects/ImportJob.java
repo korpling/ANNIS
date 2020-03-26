@@ -25,107 +25,102 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Describes an import job.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @XmlRootElement
-public class ImportJob
-{
+public class ImportJob {
   /**
    * Processing status of the job.
    */
-  public enum Status
-  {
+  public enum Status {
     /**
      * Waits to be started.
      */
-    WAITING, 
+    WAITING,
     /**
      * Import is currently running.
      */
-    RUNNING, 
+    RUNNING,
     /**
      * Import finished successfully.
      */
-    SUCCESS, 
+    SUCCESS,
     /**
      * Import finished with an error.
      */
     ERROR
   }
-  
+
   private String uuid;
   private File importRootDirectory;
   private String caption;
   private Status status;
   private final List<String> messages = new LinkedList<String>();
   private boolean overwrite;
+  private boolean diskBased;
   private String alias;
   private String statusEmail;
 
   /**
    * Get the unique identifier of this job.
-   * @return  the UUID
+   * 
+   * @return the UUID
    */
-  public String getUuid()
-  {
+  public String getUuid() {
     return uuid;
   }
 
   /**
-   * @see #getUuid() 
-   * @param uuid  the UUID
+   * @see #getUuid()
+   * @param uuid the UUID
    */
-  public void setUuid(String uuid)
-  {
+  public void setUuid(String uuid) {
     this.uuid = uuid;
   }
 
   /**
    * Get the directory where the corpora to import are located
+   * 
    * @return a reference to the directory
    */
   @XmlTransient
-  public File getImportRootDirectory()
-  {
+  public File getImportRootDirectory() {
     return importRootDirectory;
   }
 
   /**
-   * @see #getImportRootDirectory() 
-   * @param importRootDirectory  the root directory
+   * @see #getImportRootDirectory()
+   * @param importRootDirectory the root directory
    */
-  public void setImportRootDirectory(File importRootDirectory)
-  {
+  public void setImportRootDirectory(File importRootDirectory) {
     this.importRootDirectory = importRootDirectory;
   }
-  
-  
 
   /**
-   * Get the visible caption of the import job.
-   * The caption can be e.g. the corpus name.
+   * Get the visible caption of the import job. The caption can be e.g. the corpus
+   * name.
+   * 
    * @return the caption
    */
-  public String getCaption()
-  {
+  public String getCaption() {
     return caption;
   }
 
   /**
-   * @see #getCaption() 
+   * @see #getCaption()
    * @param caption the caption to set
    */
-  public void setCaption(String caption)
-  {
+  public void setCaption(String caption) {
     this.caption = caption;
   }
 
   /**
    * Current status of the import.
+   * 
    * @return the status
    */
-  public Status getStatus()
-  {
+  public Status getStatus() {
     return status;
   }
 
@@ -133,77 +128,88 @@ public class ImportJob
    * @see #getStatus()
    * @param status the status to set
    */
-  public void setStatus(Status status)
-  {
+  public void setStatus(Status status) {
     this.status = status;
   }
 
   /**
    * A list of messages that where produces during the import process.
+   * 
    * @return list of messages as string
    */
   @XmlElementWrapper(name = "messages")
-  @XmlElement(name="m")
-  public List<String> getMessages()
-  {
+  @XmlElement(name = "m")
+  public List<String> getMessages() {
     return messages;
   }
 
   /**
    * Get if the import is configured in a way that the corpus will be overwritten
    * when it already exists.
+   * 
    * @return True if overwrite configured
    */
-  public boolean isOverwrite()
-  {
+  public boolean isOverwrite() {
     return overwrite;
   }
 
   /**
-   * @see #isOverwrite() 
+   * @see #isOverwrite()
    * @param overwrite whether to overwrite an existing corpus
    */
-  public void setOverwrite(boolean overwrite)
-  {
+  public void setOverwrite(boolean overwrite) {
     this.overwrite = overwrite;
   }
 
   /**
+   * Get if the import is configured in a way that the corpus use disk based storage wherever possible.
+   * 
+   * @return True if prefering disk-based corpus storage.
+   */
+  public boolean isDiskBased() {
+    return diskBased;
+  }
+
+  /**
+   * @see #isDiskBased()
+   * @param diskBased Whether disk-based corpus storage is prefered.
+   */
+  public void setDiskBased(boolean diskBased) {
+    this.diskBased = diskBased;
+  }
+
+  /**
    * Get the email address to which status reports should be send.
+   * 
    * @return the e-mail status address
    */
-  public String getStatusEmail()
-  {
+  public String getStatusEmail() {
     return statusEmail;
   }
 
   /**
-   * @see #getStatusEmail() 
+   * @see #getStatusEmail()
    * @param statusEmail the e-mail status address
    */
-  public void setStatusEmail(String statusEmail)
-  {
+  public void setStatusEmail(String statusEmail) {
     this.statusEmail = statusEmail;
   }
 
   /**
    * Get alias name of the corpus as defined by the import request.
+   * 
    * @return the alias
    */
-  public String getAlias()
-  {
+  public String getAlias() {
     return alias;
   }
 
   /**
-   * @see #getAlias() 
+   * @see #getAlias()
    * @param alias the alias
    */
-  public void setAlias(String alias)
-  {
+  public void setAlias(String alias) {
     this.alias = alias;
   }
-  
-  
-  
+
 }

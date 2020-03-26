@@ -147,7 +147,7 @@ public interface QueryDao {
 
     public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
-    int count(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException;
+    long count(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException;
 
     MatchAndDocumentCount countMatchesAndDocuments(String query, QueryLanguage queryLanguage, List<String> corpusList) throws GraphANNISException;
 

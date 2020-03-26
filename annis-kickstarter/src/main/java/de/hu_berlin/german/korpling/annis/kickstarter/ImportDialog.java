@@ -146,7 +146,7 @@ public class ImportDialog extends javax.swing.JDialog
             statementController);
 
           importStatus.add(corpusAdministration.importCorporaSave(
-            jCheckBox1.isSelected(), null, null, false, txtInputDir.getText()));
+            jCheckBox1.isSelected(), false, null, null, false, txtInputDir.getText()));
 
         }
         catch (Exception ex)
@@ -200,7 +200,7 @@ public class ImportDialog extends javax.swing.JDialog
                 registerGUICancelThread(statementController);
 
               importStatus.add(corpusAdministration.importCorporaSave(
-                jCheckBox1.isSelected(), null, null, false, path));
+                jCheckBox1.isSelected(), false, null, null, false, path));
             }
             catch (Exception ex)
             {

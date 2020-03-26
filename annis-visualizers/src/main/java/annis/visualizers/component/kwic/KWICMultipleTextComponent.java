@@ -39,6 +39,8 @@ public class KWICMultipleTextComponent extends CssLayout implements KWICInterfac
 
     public KWICMultipleTextComponent(VisualizerInput visInput, MediaController mediaController,
             PDFController pdfController) {
+        setWidth("100%");
+        setHeight("-1");
         this.kwicPanels = new LinkedList<KWICInterface>();
         if (visInput != null) {
             List<STextualDS> texts = visInput.getDocument().getDocumentGraph().getTextualDSs();
@@ -61,7 +63,7 @@ public class KWICMultipleTextComponent extends CssLayout implements KWICInterfac
     public boolean setSegmentationLayer(String segmentationName, Map<SNode, Long> markedAndCovered) {
         boolean result = false;
         for (KWICInterface kwic : kwicPanels) {
-            if(kwic.setSegmentationLayer(segmentationName, markedAndCovered)) {
+            if (kwic.setSegmentationLayer(segmentationName, markedAndCovered)) {
                 result = true;
             }
         }

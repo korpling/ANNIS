@@ -45,7 +45,7 @@ public class TestAnnisAdminRunner {
 		run("import data/corpus1 data/corpus2 data/corpus3");
 
 		List<String> expected = Arrays.asList("data/corpus1 data/corpus2 data/corpus3".split(" "));
-		verify(administration).importCorporaSave(false, null, null, false, expected);
+		verify(administration).importCorporaSave(false, false, null, null, false, expected);
 	}
 	
 	private void run(String cmdline) throws InterruptedException {

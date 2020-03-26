@@ -1,0 +1,372 @@
+{
+  "id": "3b30cc20-f4fb-4383-b96f-37d2a9690d2c",
+  "version": "2.0",
+  "name": "annis_integration_tests",
+  "url": "http://localhost:5712/annis-gui/",
+  "tests": [{
+    "id": "bae08028-13be-4a4e-8383-9b6091d1be6d",
+    "name": "About Window",
+    "commands": [{
+      "id": "9e1b5654-8722-4469-a9ee-7fd6bc701cde",
+      "comment": "",
+      "command": "open",
+      "target": "/annis-gui/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "142aeaee-4ee6-4c96-ba9e-01d5dc016d90",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1024x768",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ea49e764-1b13-427e-b0b5-2c677d602df6",
+      "comment": "",
+      "command": "runScript",
+      "target": "window.scrollTo(0,0)",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "88a0ff8a-a1b1-44fc-bfe9-c8e13ed59c90",
+      "comment": "",
+      "command": "click",
+      "target": "id=SearchView:MainToolbar:btAboutAnnis",
+      "targets": [
+        ["id=SearchView:MainToolbar:btAboutAnnis", "id"],
+        ["css=#SearchView\\3AMainToolbar\\3A btAboutAnnis", "css:finder"],
+        ["xpath=//div[@id='SearchView:MainToolbar:btAboutAnnis']", "xpath:attributes"],
+        ["xpath=//div[@id='SearchView:MainToolbar']/div/div[3]/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "10f63975-aadb-4592-a811-8f5c86a3cc0f",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "id=AboutWindow:VerticalLayout:btClose",
+      "targets": [
+        ["id=AboutWindow:VerticalLayout:btClose", "id"],
+        ["css=#AboutWindow\\3AVerticalLayout\\3A btClose", "css:finder"],
+        ["xpath=//div[@id='AboutWindow:VerticalLayout:btClose']", "xpath:attributes"],
+        ["xpath=//div[@id='AboutWindow:VerticalLayout']/div/div[13]/div", "xpath:idRelative"],
+        ["xpath=//div[13]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c78048fe-6958-4cda-914f-53881ad0287a",
+      "comment": "",
+      "command": "click",
+      "target": "id=AboutWindow:VerticalLayout:btClose",
+      "targets": [
+        ["id=AboutWindow:VerticalLayout:btClose", "id"],
+        ["css=#AboutWindow\\3AVerticalLayout\\3A btClose", "css:finder"],
+        ["xpath=//div[@id='AboutWindow:VerticalLayout:btClose']", "xpath:attributes"],
+        ["xpath=//div[@id='AboutWindow:VerticalLayout']/div/div[13]/div", "xpath:idRelative"],
+        ["xpath=//div[13]/div", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }, {
+    "id": "0b9a1226-5ed1-4417-92c4-172fb823d0ba",
+    "name": "Open Source Window",
+    "commands": [{
+      "id": "a51f0734-016b-4c1d-a1ae-8895d10d1668",
+      "comment": "",
+      "command": "open",
+      "target": "/annis-gui/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "22c81271-4bcf-45e8-917f-34b8f55993af",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1024x768",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "f12acd47-ecf4-4b90-a26c-e540a4a5960c",
+      "comment": "",
+      "command": "click",
+      "target": "id=SearchView:MainToolbar:btOpenSource",
+      "targets": [
+        ["id=SearchView:MainToolbar:btOpenSource", "id"],
+        ["css=#SearchView\\3AMainToolbar\\3A btOpenSource", "css:finder"],
+        ["xpath=//div[@id='SearchView:MainToolbar:btOpenSource']", "xpath:attributes"],
+        ["xpath=//div[@id='SearchView:MainToolbar']/div/div[7]/div", "xpath:idRelative"],
+        ["xpath=//div[7]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "cda6e88d-9253-4b60-95fe-7cae6133037e",
+      "comment": "",
+      "command": "runScript",
+      "target": "window.scrollTo(0,0)",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "acd09718-e2a4-440a-b81c-703cfa4d9ef4",
+      "comment": "",
+      "command": "assertElementPresent",
+      "target": "id=HelpUsWindow:VerticalLayout:btClose",
+      "targets": [
+        ["id=HelpUsWindow:VerticalLayout:btClose", "id"],
+        ["css=#HelpUsWindow\\3AVerticalLayout\\3A btClose", "css:finder"],
+        ["xpath=//div[@id='HelpUsWindow:VerticalLayout:btClose']", "xpath:attributes"],
+        ["xpath=//div[@id='HelpUsWindow:VerticalLayout']/div/div[3]/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div/div/div[3]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "b9a8ce80-f04f-4bdd-b8f8-8d16732f55c4",
+      "comment": "",
+      "command": "click",
+      "target": "id=HelpUsWindow:VerticalLayout:btClose",
+      "targets": [
+        ["id=HelpUsWindow:VerticalLayout:btClose", "id"],
+        ["css=#HelpUsWindow\\3AVerticalLayout\\3A btClose", "css:finder"],
+        ["xpath=//div[@id='HelpUsWindow:VerticalLayout:btClose']", "xpath:attributes"],
+        ["xpath=//div[@id='HelpUsWindow:VerticalLayout']/div/div[3]/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div/div/div[3]/div", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }, {
+    "id": "ed433747-d97b-4038-81ac-081f9b4cd85f",
+    "name": "Token search (pcc2)",
+    "commands": [{
+      "id": "5685a4d9-59eb-420d-bc8d-d1e4befe5557",
+      "comment": "",
+      "command": "open",
+      "target": "/annis-gui/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "9f7fada4-b83b-4a91-b9a3-f662f1d7930d",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1024x768",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "68e265cb-7cb9-4750-80f4-52b2ceb5f224",
+      "comment": "",
+      "command": "runScript",
+      "target": "window.scrollTo(0,0)",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "df386d8d-0544-4f6d-9743-0fadab90fede",
+      "comment": "",
+      "command": "click",
+      "target": "css=.CodeMirror-line",
+      "targets": [
+        ["css=.CodeMirror-line", "css:finder"],
+        ["xpath=//div[@id='target6f07c50f_4e59_411f_be63_6c7e0a302ac5']/div/div[6]/div/div/div/div/div[5]/pre", "xpath:idRelative"],
+        ["xpath=//div[5]/pre", "xpath:position"],
+        ["xpath=//pre[contains(.,'​')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "424602ca-bf5d-4d3c-84fa-a790fb974ec9",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "css=.CodeMirror textarea",
+      "targets": [],
+      "value": "tok"
+    }, {
+      "id": "8703f2b4-9b4f-40dc-8422-a7bb360d7d7a",
+      "comment": "",
+      "command": "click",
+      "target": "id=SearchView:ControlPanel:TabSheet:CorpusListPanel:txtFilter",
+      "targets": [
+        ["id=SearchView:ControlPanel:TabSheet:CorpusListPanel:txtFilter", "id"],
+        ["css=#SearchView\\3A ControlPanel\\3ATabSheet\\3A CorpusListPanel\\3AtxtFilter", "css:finder"],
+        ["xpath=//input[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:txtFilter']", "xpath:attributes"],
+        ["xpath=//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel']/div/div[3]/input", "xpath:idRelative"],
+        ["xpath=//div[3]/input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "c5e04a99-a100-4a62-ad7a-b4ea0268aa6b",
+      "comment": "",
+      "command": "type",
+      "target": "id=SearchView:ControlPanel:TabSheet:CorpusListPanel:txtFilter",
+      "targets": [
+        ["id=SearchView:ControlPanel:TabSheet:CorpusListPanel:txtFilter", "id"],
+        ["css=#SearchView\\3A ControlPanel\\3ATabSheet\\3A CorpusListPanel\\3AtxtFilter", "css:finder"],
+        ["xpath=//input[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:txtFilter']", "xpath:attributes"],
+        ["xpath=//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel']/div/div[3]/input", "xpath:idRelative"],
+        ["xpath=//div[3]/input", "xpath:position"]
+      ],
+      "value": "pcc"
+    }, {
+      "id": "d37c4155-f782-4a21-8ae5-1881fd97f210",
+      "comment": "",
+      "command": "click",
+      "target": "css=.v-selected > .v-table-cell-content:nth-child(1) > .v-table-cell-wrapper",
+      "targets": [
+        ["css=.v-selected > .v-table-cell-content:nth-child(1) > .v-table-cell-wrapper", "css:finder"],
+        ["xpath=//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']/div[2]/div/table/tbody/tr/td/div", "xpath:idRelative"],
+        ["xpath=//div[2]/div/table/tbody/tr/td/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "713f77e4-39eb-490f-a961-397d998f73ab",
+      "comment": "",
+      "command": "click",
+      "target": "id=SearchView:ControlPanel:QueryPanel:btShowResult",
+      "targets": [
+        ["id=SearchView:ControlPanel:QueryPanel:btShowResult", "id"],
+        ["css=#SearchView\\3A ControlPanel\\3AQueryPanel\\3A btShowResult", "css:finder"],
+        ["xpath=//div[@id='SearchView:ControlPanel:QueryPanel:btShowResult']", "xpath:attributes"],
+        ["xpath=//div[@id='SearchView:ControlPanel:QueryPanel']/div[6]/div", "xpath:idRelative"],
+        ["xpath=//div[3]/div/div/div/div/div[6]/div", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "0b2bc3a5-12ea-45eb-a288-a8f7f711f854",
+      "comment": "",
+      "command": "runScript",
+      "target": "window.scrollTo(0,0)",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b92df655-c5b8-42a5-b8b9-699f4be00204",
+      "comment": "",
+      "command": "waitForElementPresent",
+      "target": "css=#SearchView\\3ATabSheet\\3AResultViewPanel\\3APanel\\3AresultLayout\\3ASingleResultPanel\\.1 .token:nth-child(1)",
+      "targets": [
+        ["css=#SearchView\\3ATabSheet\\3AResultViewPanel\\3APanel\\3AresultLayout\\3ASingleResultPanel\\.1 .token:nth-child(1)", "css:finder"],
+        ["xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td", "xpath:position"]
+      ],
+      "value": "30000"
+    }, {
+      "id": "428c87c0-9376-497c-8f4f-0d18fca1277c",
+      "comment": "",
+      "command": "assertText",
+      "target": "xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td",
+      "targets": [
+        ["css=#SearchView\\3ATabSheet\\3AResultViewPanel\\3APanel\\3AresultLayout\\3ASingleResultPanel\\.1 .token:nth-child(1)", "css:finder"],
+        ["xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td", "xpath:position"]
+      ],
+      "value": "Feigenblatt"
+    }, {
+      "id": "a4a12678-704d-4a65-80bf-f89ba5d51df0",
+      "comment": "",
+      "command": "assertText",
+      "target": "xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]",
+      "targets": [
+        ["css=.v-table-cell-content-match_1:nth-child(2)", "css:finder"],
+        ["xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[2]", "xpath:position"]
+      ],
+      "value": "Die"
+    }, {
+      "id": "fb9238e1-548b-42ca-a29f-fe2cac8cc60b",
+      "comment": "",
+      "command": "assertText",
+      "target": "css=#SearchView\\3ATabSheet\\3AResultViewPanel\\3APanel\\3AresultLayout\\3ASingleResultPanel\\.1 .token:nth-child(3)",
+      "targets": [
+        ["css=#SearchView\\3ATabSheet\\3AResultViewPanel\\3APanel\\3AresultLayout\\3ASingleResultPanel\\.1 .token:nth-child(3)", "css:finder"],
+        ["xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[3]", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[3]", "xpath:position"]
+      ],
+      "value": "Jugendlichen"
+    }, {
+      "id": "037fbd7a-bbcd-4791-b6e2-698f7ece93f2",
+      "comment": "",
+      "command": "assertText",
+      "target": "xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[4]",
+      "targets": [
+        ["css=#SearchView\\3ATabSheet\\3AResultViewPanel\\3APanel\\3AresultLayout\\3ASingleResultPanel\\.1 .token:nth-child(4)", "css:finder"],
+        ["xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[4]", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[4]", "xpath:position"]
+      ],
+      "value": "in"
+    }, {
+      "id": "6d5bb7e6-c367-4e22-836d-8462c0ed3ce4",
+      "comment": "",
+      "command": "assertText",
+      "target": "xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[5]",
+      "targets": [
+        ["css=#SearchView\\3ATabSheet\\3AResultViewPanel\\3APanel\\3AresultLayout\\3ASingleResultPanel\\.1 .token:nth-child(5)", "css:finder"],
+        ["xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[5]", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[5]", "xpath:position"]
+      ],
+      "value": "Zossen"
+    }, {
+      "id": "579f0d17-5a89-4c70-9cd6-015449697db8",
+      "comment": "",
+      "command": "assertText",
+      "target": "xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[6]",
+      "targets": [
+        ["css=#SearchView\\3ATabSheet\\3AResultViewPanel\\3APanel\\3AresultLayout\\3ASingleResultPanel\\.1 .token:nth-child(6)", "css:finder"],
+        ["xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[6]", "xpath:idRelative"],
+        ["xpath=//div[2]/div[2]/div/div[2]/div/div/table/tbody/tr/td[6]", "xpath:position"]
+      ],
+      "value": "wollen"
+    }, {
+      "id": "15d9a0a7-443f-4bf4-a13a-fd5fcfa9761e",
+      "comment": "",
+      "command": "assertText",
+      "target": "xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[7]",
+      "targets": [
+        ["css=#SearchView\\3ATabSheet\\3AResultViewPanel\\3APanel\\3AresultLayout\\3ASingleResultPanel\\.1 .token:nth-child(7)", "css:finder"],
+        ["xpath=//div[@id='SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[7]", "xpath:idRelative"],
+        ["xpath=//td[7]", "xpath:position"],
+        ["xpath=//td[contains(.,'ein')]", "xpath:innerText"]
+      ],
+      "value": "ein"
+    }]
+  }, {
+    "id": "98ed0d3f-a077-4e29-a42c-e8c3f64b7855",
+    "name": "Regression #509",
+    "commands": [{
+      "id": "93ef7ddb-a4fe-4f49-bab9-a7c291415883",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1024x768",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "abf43714-d9ad-4231-a869-fc54c1426807",
+      "comment": "",
+      "command": "open",
+      "target": "/annis-gui/embeddedvis/grid?embedded_ns=exmaralda&embedded_instance=&embedded_salt=http%3A%2F%2Flocalhost%3A5711%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dsalt%3A%2Fpcc2%2F11299%2F%2523tok_1%26left%3D5%26right%3D5&embedded_interface=http://localhost:8080/annis-gui/%23_q%3DdG9r%26_c%3DcGNjMg%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26m%3D0",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "0ea3a483-8197-4ada-936a-57bbb9b76131",
+      "comment": "Make sure the \"Show in ANNIS search interface\" link is shown in embedded. Regression test for https://github.com/korpling/ANNIS/issues/509",
+      "command": "assertText",
+      "target": "xpath=//div[@id='VerticalLayout:Link']/a/span[2]",
+      "targets": [
+        ["css=a > span:nth-child(2)", "css:finder"],
+        ["xpath=//div[@id='VerticalLayout:Link']/a/span[2]", "xpath:idRelative"],
+        ["xpath=//span[2]", "xpath:position"],
+        ["xpath=//span[contains(.,'Show in ANNIS search interface')]", "xpath:innerText"]
+      ],
+      "value": "Show in ANNIS search interface"
+    }]
+  }],
+  "suites": [{
+    "id": "77771cf3-bcf3-4659-a691-0211e9aad537",
+    "name": "Acceptance Tests",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["bae08028-13be-4a4e-8383-9b6091d1be6d", "0b9a1226-5ed1-4417-92c4-172fb823d0ba", "ed433747-d97b-4038-81ac-081f9b4cd85f"]
+  }, {
+    "id": "798b626a-57e9-4bc7-8478-b4c093992e10",
+    "name": "Regression Tests",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["98ed0d3f-a077-4e29-a42c-e8c3f64b7855"]
+  }],
+  "urls": ["http://localhost:8080/", "http://localhost:8080/annis-gui", "http://localhost:8080/annis-gui/", "http://localhost:5712/annis-gui/"],
+  "plugins": []
+}

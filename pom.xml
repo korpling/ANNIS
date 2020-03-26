@@ -7,7 +7,7 @@
 	<artifactId>annis-all</artifactId>
 	<packaging>pom</packaging>
 	<name>ANNIS corpus search</name>
-	<version>4.0.0-beta.3</version>
+	<version>4.0.0-beta.4</version>
 	<description>
     ANNIS is an open source, versatile web browser-based search and
     visualization architecture for complex multilevel linguistic corpora with
@@ -59,7 +59,7 @@
 	<repositories>
 		<repository>
 			<id>korpling</id>
-			<url>http://korpling.german.hu-berlin.de/maven2/</url>
+			<url>https://korpling.german.hu-berlin.de/maven2/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -80,9 +80,9 @@
 	</repositories>
 	<properties>
 		<servlet.version>3.0.1</servlet.version>
-		<vaadin.version>7.7.16</vaadin.version>
-		<jetty.version>9.4.18.v20190429</jetty.version>
-		<jersey.version>2.27</jersey.version>
+		<vaadin.version>8.9.4</vaadin.version>
+		<jetty.version>9.3.28.v20191105</jetty.version>
+        <jersey.version>2.27</jersey.version>
 		<main.basedir>${project.basedir}</main.basedir>
 	</properties>
 	<build>

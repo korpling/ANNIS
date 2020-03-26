@@ -15,11 +15,17 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.QueryController;
-import annis.gui.widgets.GripDragComponent;
-import annis.gui.widgets.SimpleCanvas;
-import annis.libgui.Helper;
-import annis.service.objects.AnnisAttribute;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.slf4j.LoggerFactory;
+
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -35,15 +41,13 @@ import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import java.awt.geom.Line2D;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import org.slf4j.LoggerFactory;
+import com.vaadin.ui.UI;
+
+import annis.gui.QueryController;
+import annis.gui.widgets.GripDragComponent;
+import annis.gui.widgets.SimpleCanvas;
+import annis.libgui.Helper;
+import annis.service.objects.AnnisAttribute;
 
 /**
  *
@@ -70,7 +74,6 @@ public class TigerQueryBuilderCanvas extends Panel
     edges = new ArrayList<>();
 
     setSizeFull();
-    setImmediate(true);
 
     area = new AbsoluteLayout();
     area.setWidth("2000px");
@@ -108,7 +111,7 @@ public class TigerQueryBuilderCanvas extends Panel
   {
     Set<String> result = new TreeSet<>();
 
-    WebResource service = Helper.getAnnisWebResource();
+    WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
 
     // get current corpus selection
     Set<String> corpusSelection = controller.getState().getSelectedCorpora().getValue();
@@ -252,7 +255,7 @@ public class TigerQueryBuilderCanvas extends Panel
       {
         EdgeWindow e = new EdgeWindow(this, preparedEdgeSource, target);
         e.setWidth("170px");
-        e.setHeight("70px");
+        e.setHeight("80px");
         e.addStyleName("tigerquery-builder-overlay");
         edges.add(e);
         area.addComponent(e);

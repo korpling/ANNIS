@@ -101,7 +101,7 @@ public class SaltExportTest {
 
         storage.applyUpdate("testCorpus", result);
 
-        assertEquals(26, storage.count("testCorpus", "node", QueryLanguage.AQL));
+        assertEquals(26, storage.count(Arrays.asList("testCorpus"), "node", QueryLanguage.AQL));
 
         SToken sampleTok = doc.getDocumentGraph().getTokens().get(2);
 
@@ -162,7 +162,7 @@ public class SaltExportTest {
 
         storage.applyUpdate("testCorpus", result);
 
-        assertEquals(26, storage.count("testCorpus", "node", QueryLanguage.AQL));
+        assertEquals(26, storage.count(Arrays.asList("testCorpus"), "node", QueryLanguage.AQL));
 
         // get a subgraph for the complete document
         SDocumentGraph exportedGraph = SaltExport.map(storage.subcorpusGraph("testCorpus", Arrays.asList(doc.getId())));

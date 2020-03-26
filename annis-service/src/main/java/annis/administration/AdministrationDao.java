@@ -300,10 +300,11 @@ public class AdministrationDao extends AbstractAdminstrationDao {
      * @param waitForOtherTasks
      *                              If true wait for other tasks to finish, if false
      *                              abort.
+     * @param diskBased             If true, the imported corpus will be queried from on-disk storage whererver possible and in-memory storage is avoided.
      *
      * @return true if successful
      */
-    public boolean importCorpus(String path, String aliasName, boolean overwrite) {
+    public boolean importCorpus(String path, String aliasName, boolean overwrite, boolean diskBased) {
 
         // this will throw an exception if the database has the wrong schema version
         checkDatabaseSchemaVersion();
@@ -332,7 +333,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         importBinaryData(path, toplevelCorpusName);
 
         try {
-            convertToGraphANNIS(toplevelCorpusName, path, version);
+            convertToGraphANNIS(toplevelCorpusName, path, version, diskBased);
             computeCorpusStatistics(toplevelCorpusName, path);
         } catch (GraphANNISException e) {
             log.error("Could not import graphANNIS", e);
@@ -388,11 +389,12 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         }
     }
 
-    protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version)
+    protected void convertToGraphANNIS(String corpusName, String path, ANNISFormatVersion version, boolean diskBased)
             throws GraphANNISException {
 
         log.info("importing corpus {} into graphANNIS", corpusName);
-        getQueryDao().getCorpusStorageManager().importFromFileSystem(path, ImportFormat.RelANNIS, corpusName);
+        getQueryDao().getCorpusStorageManager().importFromFileSystem(path, ImportFormat.RelANNIS, corpusName,
+                diskBased);
 
     }
 
@@ -776,7 +778,7 @@ public class AdministrationDao extends AbstractAdminstrationDao {
         log.info("computing statistics for top-level corpus");
 
         // get number of tokens
-        int tokCount = getQueryDao().count("tok", QueryLanguage.AQL, Arrays.asList(toplevelCorpusName));
+        long tokCount = getQueryDao().count("tok", QueryLanguage.AQL, Arrays.asList(toplevelCorpusName));
 
         // get number of documents
         SCorpusGraph corpusGraph = SaltExport
@@ -1032,12 +1034,12 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     public void dumpServiceDataTable(Table table, File csvFile) {
         try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
-            
+
             exportTableIntoCSV(conn, table, true, csvFile, null);
 
-         } catch (SQLException ex) {
-             log.error("Could not save table to file", ex);
-         }
+        } catch (SQLException ex) {
+            log.error("Could not save table to file", ex);
+        }
     }
 
     ///// Getter / Setter

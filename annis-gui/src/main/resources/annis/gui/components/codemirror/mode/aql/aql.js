@@ -173,7 +173,7 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
             return addNode(state);
           }
         }
-        else if(stream.match(/#[0-9a-zA-Z]+/))
+        else if(stream.match(/#[a-zA-Z0-9_\-%]+/))
         {
           return "variable-2";
         }

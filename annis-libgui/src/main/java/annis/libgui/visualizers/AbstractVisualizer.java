@@ -23,6 +23,7 @@ import java.util.Set;
 import org.corpus_tools.salt.core.SNode;
 
 import com.vaadin.ui.Component;
+import com.vaadin.ui.UI;
 
 /**
  * Base class for all Visualizer. This class sets some defaults, so you may
@@ -64,7 +65,7 @@ public abstract class AbstractVisualizer<I extends Component> implements Visuali
 
   @Override
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, 
-    String documentName, Properties mappings)
+    String documentName, Properties mappings, UI ui)
   {
     return null;
   }

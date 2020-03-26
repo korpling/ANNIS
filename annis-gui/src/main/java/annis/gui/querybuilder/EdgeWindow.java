@@ -15,20 +15,21 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.querybuilder.NodeWindow.SimpleNewItemHandler;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.Property.ValueChangeEvent;
+import com.vaadin.v7.data.Property.ValueChangeListener;
+import com.vaadin.v7.ui.ComboBox;
+import com.vaadin.v7.ui.TextField;
+
+import annis.gui.querybuilder.NodeWindow.SimpleNewItemHandler;
 
 /**
  *
@@ -63,6 +64,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     VerticalLayout vLayout = new VerticalLayout();
     setContent(vLayout);
     vLayout.setMargin(false);
+    vLayout.setSpacing(false);
     
     HorizontalLayout toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");

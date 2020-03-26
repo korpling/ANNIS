@@ -139,10 +139,14 @@ public class CorpusAdministration {
      *                              false abort the import.
      * @param paths
      *                              Valid pathes to corpora.
+     * @param diskBased
+     *                              If true, the imported corpus will be queried
+     *                              from on-disk storage whererver possible and
+     *                              in-memory storage is avoided.
      * @return True if all corpora where imported successfully.
      */
-    public ImportStatus importCorporaSave(boolean overwrite, String aliasName, String statusEmailAdress,
-            boolean waitForOtherTasks, List<String> paths) {
+    public ImportStatus importCorporaSave(boolean overwrite, boolean diskBased, String aliasName,
+            String statusEmailAdress, boolean waitForOtherTasks, List<String> paths) {
 
         // init the import stats. From the beginning everything is ok
         ImportStatus importStats = new ImportStatsImpl();
@@ -163,7 +167,7 @@ public class CorpusAdministration {
                     // unzip and add all resulting corpora to import list
                     log.info("Unzipping " + f.getPath());
                     String corpusNames = Joiner.on(", ").join(corpora.keySet());
-                    if(corpusNames.length() > 200) {
+                    if (corpusNames.length() > 200) {
                         // some systems don't handle large file names well
                         corpusNames = corpusNames.substring(0, 200);
                     }
@@ -190,7 +194,7 @@ public class CorpusAdministration {
         for (File r : roots) {
             try {
                 log.info("Importing corpus from: " + r.getPath());
-                if (getAdministrationDao().importCorpus(r.getPath(), aliasName, overwrite)) {
+                if (getAdministrationDao().importCorpus(r.getPath(), aliasName, overwrite, diskBased)) {
                     log.info("Finished import from: " + r.getPath());
                     getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(),
                             ImportJob.Status.SUCCESS, null);
@@ -668,6 +672,10 @@ public class CorpusAdministration {
      * @param overwrite
      *                              if false, a conflicting top level corpus is
      *                              silently skipped.
+     * @param diskBased
+     *                              If true, the imported corpus will be queried
+     *                              from on-disk storage whererver possible and
+     *                              in-memory storage is avoided.
      * @param aliasName
      *                              An common alias name for all imported corpora or
      *                              null
@@ -681,9 +689,10 @@ public class CorpusAdministration {
      *                              the paths to the corpora
      * @return True if all corpora where imported successfully.
      */
-    public ImportStatus importCorporaSave(boolean overwrite, String aliasName, String statusEmailAdress,
-            boolean waitForOtherTasks, String... paths) {
-        return importCorporaSave(overwrite, aliasName, statusEmailAdress, waitForOtherTasks, Arrays.asList(paths));
+    public ImportStatus importCorporaSave(boolean overwrite, boolean diskBased, String aliasName,
+            String statusEmailAdress, boolean waitForOtherTasks, String... paths) {
+        return importCorporaSave(overwrite, cfg.preferDiskBased(), aliasName, statusEmailAdress, waitForOtherTasks,
+                Arrays.asList(paths));
     }
 
     public void dumpTable(String tableName, File outputFile) {

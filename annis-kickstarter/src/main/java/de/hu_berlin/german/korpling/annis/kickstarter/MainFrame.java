@@ -111,7 +111,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     /**
      * Creates new form MainFrame
-     * @throws GraphANNISException 
+     * 
+     * @throws GraphANNISException
      */
     public MainFrame() throws GraphANNISException {
         Integer[] sizes = new Integer[] { 192, 128, 64, 48, 32, 16, 14 };

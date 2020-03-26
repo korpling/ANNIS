@@ -15,12 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.CommonHelper;
-import annis.model.Annotation;
-import annis.service.objects.SubgraphFilter;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-
-import com.google.common.base.Splitter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -28,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -36,13 +31,21 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SNode;
 
+import com.google.common.base.Splitter;
+import com.vaadin.ui.UI;
+
+import annis.CommonHelper;
+import annis.model.Annotation;
+import annis.service.objects.SubgraphFilter;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+
 @PluginImplementation
 public class GridExporter extends GeneralTextExporter
 {
 
   @Override
   public void convertText(SaltProject queryResult, List<String> keys, 
-    Map<String,String> args, Writer out, int offset) throws IOException
+    Map<String,String> args, Writer out, int offset, UI ui) throws IOException
   {
     
     Map<String, Map<String, Annotation>> metadataCache = 
@@ -159,7 +162,7 @@ public class GridExporter extends GeneralTextExporter
         if(!metaKeys.isEmpty())
         {
           String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
-          super.appendMetaData(out, metaKeys, path[path.length-1], path[0], metadataCache);
+          super.appendMetaData(out, metaKeys, path[path.length-1], path[0], metadataCache, ui);
         }
         out.append("\n\n");
       }

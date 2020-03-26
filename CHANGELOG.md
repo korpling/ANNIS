@@ -5,6 +5,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0-beta.4] - 2020-03-26
+
+### Changed
+
+- Upgraded Vaadin from 7 to 8 using the compatibility layer
+- Updated graphANNIS to version 0.27.1 with multiple fixes for issues discovered in the previous beta release
+
+### Fixed
+
+- Create multiple textual data sources in Salt document for parallel corpora instead of merging them into one STextualDS
+- When querying multiple corpora at once, getting the next page could fail because of some issues with the offset generation
+- Allow underscore in named node critera [#643](https://github.com/korpling/ANNIS/issues/643)
+
 ## [4.0.0-beta.3] - 2019-10-18
 
 ### Fixed
@@ -853,6 +866,7 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.3...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.4...HEAD
+[4.0.0-beta.4]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.3...v4.0.0-beta.4
 [4.0.0-beta.3]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.2...v4.0.0-beta.3
 [4.0.0-beta.2]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.1...v4.0.0-beta.2

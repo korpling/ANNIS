@@ -15,14 +15,6 @@
  */
 package annis.libgui;
 
-import annis.resolver.ResolverEntry;
-import annis.resolver.SingleResolverRequest;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -31,12 +23,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.UI;
+
+import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
 
 /**
  *
@@ -55,7 +59,7 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
     }
 
     @Override
-    public ResolverEntry[] getResolverEntries(SDocument doc) {
+    public ResolverEntry[] getResolverEntries(SDocument doc, UI ui) {
         HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
 
         // create a request for resolver entries
@@ -98,7 +102,7 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
         } else {
             List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
 
-            WebResource resResolver = Helper.getAnnisWebResource().path("query").path("resolver");
+            WebResource resResolver = Helper.getAnnisWebResource(ui).path("query").path("resolver");
             for (SingleResolverRequest r : resolverRequests) {
                 List<ResolverEntry> tmp;
 

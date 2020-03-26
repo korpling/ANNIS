@@ -68,7 +68,7 @@ public class FrequencyBackgroundJob implements Callable<FrequencyTable>
   private FrequencyTable loadBeans()
   {
     FrequencyTable result = new FrequencyTable();
-    WebResource annisResource = Helper.getAnnisWebResource();
+    WebResource annisResource = Helper.getAnnisWebResource(ui);
     try
     {
       annisResource = annisResource.path("query").path("search").

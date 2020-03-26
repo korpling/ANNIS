@@ -96,8 +96,8 @@ public class ImportWorker extends Thread {
 
         // do the actual import
         if (job.getImportRootDirectory() != null) {
-            ImportStatus importStats = corpusAdmin.importCorporaSave(job.isOverwrite(), job.getAlias(),
-                    job.getStatusEmail(), true, job.getImportRootDirectory().getAbsolutePath());
+            ImportStatus importStats = corpusAdmin.importCorporaSave(job.isOverwrite(), job.isDiskBased(),
+                    job.getAlias(), job.getStatusEmail(), true, job.getImportRootDirectory().getAbsolutePath());
 
             if (!importStats.getStatus()) {
                 success = false;

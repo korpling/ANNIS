@@ -81,7 +81,7 @@ public class CommonUI extends AnnisBaseUI
     }
     
     // get the actual URL
-    WebResource res = Helper.getAnnisWebResource();
+    WebResource res = Helper.getAnnisWebResource(CommonUI.this);
     res = res.path("shortener").path(id);
     String longURL = res.get(String.class);
     

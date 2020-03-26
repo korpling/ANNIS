@@ -15,7 +15,6 @@
  */
 package annis.gui;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -23,16 +22,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.shared.ui.label.ContentMode;
 
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.Helper;
@@ -46,8 +45,16 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
 
     private static final Logger log = LoggerFactory.getLogger(ShareQueryReferenceWindow.class);
 
+    private final DisplayedResultQuery query;
+    private final boolean shorten;
+
+    private TextArea txtCitation;
+
     public ShareQueryReferenceWindow(DisplayedResultQuery query, boolean shorten) {
         super("Query reference link");
+
+        this.query = query;
+        this.shorten = shorten;
 
         VerticalLayout wLayout = new VerticalLayout();
         setContent(wLayout);
@@ -61,34 +68,12 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
         wLayout.addComponent(lblInfo);
         wLayout.setExpandRatio(lblInfo, 0.0f);
 
-        String shortURL = "ERROR";
-        if (query != null) {
-            URI appURI = UI.getCurrent().getPage().getLocation();
-            String fragment;
-            try {
-                fragment = StringUtils.join(query.toCitationFragment(), "&");
-                URI url = new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), appURI.getPath(), null,
-                        fragment);
-
-                if (shorten) {
-                    shortURL = Helper.shortenURL(url);
-                } else {
-                    shortURL = url.toASCIIString();
-                }
-            } catch (URISyntaxException e) {
-                log.error("Could not generate query share link", e);
-                ExceptionDialog.show(e, "Could not generate query share link");
-            }
-
-        }
-
-        TextArea txtCitation = new TextArea();
+        txtCitation = new TextArea();
 
         txtCitation.setWidth("100%");
         txtCitation.setHeight("100%");
         txtCitation.addStyleName(ValoTheme.TEXTFIELD_LARGE);
         txtCitation.addStyleName("shared-text");
-        txtCitation.setValue(shortURL);
         txtCitation.setWordwrap(true);
         txtCitation.setReadOnly(true);
 
@@ -106,6 +91,36 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
         setWidth("400px");
         setHeight("300px");
 
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
+
+        String shortURL = "ERROR";
+        if (query != null) {
+            URI appURI = UI.getCurrent().getPage().getLocation();
+            String fragment;
+            try {
+                fragment = StringUtils.join(query.toCitationFragment(), "&");
+                URI url = new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), appURI.getPath(), null,
+                        fragment);
+
+                if (shorten) {
+                    shortURL = Helper.shortenURL(url, UI.getCurrent());
+                } else {
+                    shortURL = url.toASCIIString();
+                }
+            } catch (URISyntaxException e) {
+                log.error("Could not generate query share link", e);
+                ExceptionDialog.show(e, "Could not generate query share link", UI.getCurrent());
+            }
+
+        }
+        
+        txtCitation.setReadOnly(false);
+        txtCitation.setValue(shortURL);
+        txtCitation.setReadOnly(true);
     }
 
     @Override

@@ -88,7 +88,7 @@ public class PagedResultQuery extends ContextualizedQuery {
         result.put("s", "" + getOffset());
         result.put("l", "" + getLimit());
         if (getSegmentation() != null) {
-            result.put("_seg", CommonHelper.encodeBase64URL(getSegmentation()));
+            result.put("_seg", getSegmentation());
         }
 
         return result;

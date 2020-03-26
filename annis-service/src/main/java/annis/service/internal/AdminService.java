@@ -41,6 +41,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 
+import com.google.common.base.Joiner;
+import com.google.common.io.ByteStreams;
+
+import org.aeonbits.owner.ConfigFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha256Hash;
@@ -50,9 +54,7 @@ import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
-import com.google.common.io.ByteStreams;
-
+import annis.ServiceConfig;
 import annis.administration.AdministrationDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
@@ -77,6 +79,7 @@ public class AdminService {
     @Context
     Configuration config;
 
+    private final ServiceConfig serviceCfg = ConfigFactory.create(ServiceConfig.class);
 
     @Context
     HttpServletRequest request;
@@ -390,6 +393,7 @@ public class AdminService {
                     job.setImportRootDirectory(tmpZip);
                     job.setStatus(ImportJob.Status.WAITING);
                     job.setOverwrite(overwrite);
+                    job.setDiskBased(serviceCfg.preferDiskBased());
                     job.setStatusEmail(statusMail);
                     job.setAlias(alias);
 
@@ -439,7 +443,7 @@ public class AdminService {
         }
         return null;
     }
-    
+
     public ImportWorker getImportWorker() {
         Object prop = config.getProperty("importWorker");
         if (prop instanceof ImportWorker) {

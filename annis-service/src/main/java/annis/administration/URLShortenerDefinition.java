@@ -27,6 +27,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
 
+import com.google.common.base.Joiner;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
@@ -37,8 +39,6 @@ import org.joda.time.format.DateTimeFormatterBuilder;
 import org.joda.time.format.DateTimeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Joiner;
 
 import annis.CommonHelper;
 import annis.QueryGenerator;
@@ -232,7 +232,7 @@ public class URLShortenerDefinition {
         }
 
         // check count first (also warmup for the corpus)
-        int countGraphANNIS;
+        long countGraphANNIS;
 
         try {
             countGraphANNIS = queryDao.count(query.getQuery(), query.getQueryLanguage(),
@@ -248,7 +248,7 @@ public class URLShortenerDefinition {
 
             QueryStatus status = QueryStatus.Ok;
 
-            Optional<Integer> countLegacy = Optional.empty();
+            Optional<Long> countLegacy = Optional.empty();
             try {
                 for (int tries = 0; tries < MAX_RETRY; tries++) {
                     try {
@@ -266,7 +266,7 @@ public class URLShortenerDefinition {
                     }
                 }
             } catch (BadRequestException ex) {
-                countLegacy = Optional.of(0);
+                countLegacy = Optional.of(0l);
             }
 
             if (countGraphANNIS != countLegacy.get()) {

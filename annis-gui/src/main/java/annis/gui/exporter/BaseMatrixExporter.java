@@ -47,6 +47,7 @@ import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.UI;
 
 import annis.CommonHelper;
 import annis.TimelineReconstructor;
@@ -80,11 +81,11 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(BaseMatrixExporter.class);
 
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-
+  
   @Override
   public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc,
-    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs)
+    WebResource annisResource, Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs, UI ui)
   {
 	  CacheManager cacheManager = CacheManager.create();
         
@@ -159,7 +160,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
         .get(InputStream.class);
       
       //get node count for the query
-      WebResource resource = Helper.getAnnisWebResource();
+      WebResource resource = Helper.getAnnisWebResource(ui);
       List<NodeDesc> nodes = resource.path("query/parse/nodes")
               .queryParam("q", Helper.encodeJersey(queryAnnisQL))
               .queryParam("query-language", queryLanguage.name())
@@ -214,7 +215,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
             }
                 
             
-            convertSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out, nodeCount);
+            convertSaltProject(p, keys, args, alignmc, offset-currentMatches.getMatches().size(), corpusConfigs, out, nodeCount, ui);
             
             offsets.put(pCounter, offset-currentMatches.getMatches().size());
             cache.put(new Element (pCounter++, p));
@@ -254,7 +255,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
           SaltProject p = res.post(SaltProject.class, currentMatches);
           
           convertSaltProject(p, keys, args, alignmc, offset - currentMatches.getMatches().size() - 1,
-              corpusConfigs, out, nodeCount);
+              corpusConfigs, out, nodeCount, ui);
           
           offsets.put(pCounter, offset - currentMatches.getMatches().size() - 1);
           cache.put(new Element (pCounter++, p));   
@@ -283,7 +284,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 	     for (Integer key : listOfKeys)
 	     {	    	
 	   	 SaltProject p = (SaltProject) cache.get(key).getObjectValue();
-	   	 convertSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out, null);
+	   	 convertSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out, null, ui);
 	     }  
 	              
       
@@ -320,7 +321,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   
   // invokes the createAdjacencyMatrix method, if nodeCount != null or outputText otherwise
   private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc, int offset,
-      Map<String, CorpusConfig> corpusConfigs, Writer out, Integer nodeCount) throws IOException, IllegalArgumentException
+      Map<String, CorpusConfig> corpusConfigs, Writer out, Integer nodeCount, UI ui) throws IOException, IllegalArgumentException
   {
     int recordNumber = offset;
     if(p != null && p.getCorpusGraphs() != null)
@@ -380,7 +381,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
             	 createAdjacencyMatrix(doc.getDocumentGraph(), args, recordNumber++, nodeCount);
             }
             else{
-            	 outputText(doc.getDocumentGraph(),  alignmc, recordNumber++, out);
+            	 outputText(doc.getDocumentGraph(),  alignmc, recordNumber++, out, ui);
             }
             
            
@@ -393,7 +394,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   
 
 
-  public abstract void outputText(SDocumentGraph graph,	  boolean alignmc, int recordNumber,  Writer out) throws IOException, IllegalArgumentException;
+  public abstract void outputText(SDocumentGraph graph,	  boolean alignmc, int recordNumber,  Writer out, UI ui) throws IOException, IllegalArgumentException;
   
   
   public abstract void createAdjacencyMatrix(SDocumentGraph graph, 

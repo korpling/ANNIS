@@ -16,12 +16,15 @@
 
 package annis.gui.converter;
 
-import annis.CaseSensitiveOrder;
-import com.google.common.base.Preconditions;
-import com.vaadin.data.util.converter.Converter;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.TreeSet;
+
+import com.google.common.base.Preconditions;
+import com.vaadin.v7.data.util.converter.Converter;
+import com.vaadin.v7.data.util.converter.Converter.ConversionException;
+
+import annis.CaseSensitiveOrder;
 
 /**
  *

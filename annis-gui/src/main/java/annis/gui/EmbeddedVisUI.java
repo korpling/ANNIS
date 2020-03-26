@@ -53,13 +53,14 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
-import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
+import com.vaadin.v7.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import annis.CommonHelper;
@@ -163,7 +164,7 @@ public class EmbeddedVisUI extends CommonUI {
             URI uri = new URI(rawUri);
             // fetch content of the URI
             Client client = null;
-            AnnisUser user = Helper.getUser();
+            AnnisUser user = Helper.getUser(EmbeddedVisUI.this);
             if (user != null) {
                 client = user.getClient();
             }
@@ -257,10 +258,11 @@ public class EmbeddedVisUI extends CommonUI {
 
                     Map<SNode, Long> markedAndCovered = Helper.calculateMarkedAndCovered(doc, segNodes, baseText);
                     visInput.setMarkedAndCovered(markedAndCovered);
-                    visInput.setContextPath(Helper.getContext());
-                    String template = Helper.getContext() + "/Resource/" + visName + "/%s";
+                    visInput.setContextPath(Helper.getContext(UI.getCurrent()));
+                    String template = Helper.getContext(UI.getCurrent()) + "/Resource/" + visName + "/%s";
                     visInput.setResourcePathTemplate(template);
                     visInput.setSegmentationName(baseText);
+                    visInput.setUI(UI.getCurrent());
                     // TODO: which other thing do we have to provide?
 
                     Component c = visPlugin.createComponent(visInput, null);
@@ -302,7 +304,7 @@ public class EmbeddedVisUI extends CommonUI {
             if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode()) {
                 displayMessage("Corpus access forbidden",
                         "You are not allowed to access this corpus. "
-                                + "Please login at the <a target=\"_blank\" href=\"" + Helper.getContext()
+                                + "Please login at the <a target=\"_blank\" href=\"" + Helper.getContext(UI.getCurrent())
                                 + "\">main application</a> first and then reload this page.");
             } else {
                 displayMessage("Service error", ex.getMessage());
@@ -341,7 +343,7 @@ public class EmbeddedVisUI extends CommonUI {
 
             // create input
             try {
-                input = DocBrowserController.createInput(corpus, doc, visConfig, false, null);
+                input = DocBrowserController.createInput(corpus, doc, visConfig, false, null, EmbeddedVisUI.this);
                 // create components, put in a panel
                 Panel viszr = visualizer.createComponent(input, null);
 

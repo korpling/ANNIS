@@ -61,7 +61,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import annis.CommonHelper;
 import annis.QueryGenerator;
 import annis.VersionInfo;
-import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -125,9 +124,6 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
         // init a doc browser controller
         this.docBrowserController = new DocBrowserController(ui);
 
-        // always get the resize events directly
-        setImmediate(true);
-
         setSizeFull();
         setMargin(false);
         setRowExpandRatio(1, 1.0f);
@@ -185,7 +181,7 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
         Background.run(new VersionChecker());
         evaluateFragment(Page.getCurrent().getUriFragment());
 
-        if (config.isLoginOnStart() && toolbar != null && Helper.getUser() == null) {
+        if (config.isLoginOnStart() && toolbar != null && Helper.getUser(ui) == null) {
             toolbar.showLoginWindow(false);
         }
 
@@ -244,7 +240,7 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
 
             // filter by actually avaible user corpora in order not to get any exception
             // later
-            WebResource res = Helper.getAnnisWebResource();
+            WebResource res = Helper.getAnnisWebResource(ui);
             List<AnnisCorpus> userCorpora = res.path("query").path("corpora").get(new AnnisCorpusListType());
 
             LinkedList<String> userCorporaStrings = new LinkedList<>();
@@ -443,7 +439,7 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
      * @return
      */
     private Set<String> getMappedCorpora(List<String> originalNames) {
-        WebResource rootRes = Helper.getAnnisWebResource();
+        WebResource rootRes = Helper.getAnnisWebResource(ui);
         Set<String> mappedNames = new HashSet<>();
         // iterate over given corpora and map names if necessary
         for (String selectedCorpusName : originalNames) {
@@ -480,7 +476,7 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
             Set<String> corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
 
             if (corpora.isEmpty()) {
-                if (Helper.getUser() == null && toolbar != null) {
+                if (Helper.getUser(ui) == null && toolbar != null) {
                     // not logged in, show login window
                     boolean onlyCorpusSelected = args.containsKey("c") && args.size() == 1;
                     toolbar.showLoginWindow(!onlyCorpusSelected);
@@ -637,11 +633,11 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
         @Override
         public void run() {
             try {
-                WebResource resRelease = Helper.getAnnisWebResource().path("version").path("release");
+                WebResource resRelease = Helper.getAnnisWebResource(ui).path("version").path("release");
                 final String releaseService = resRelease.get(String.class);
                 final String releaseGUI = VersionInfo.getReleaseName();
 
-                WebResource resRevision = Helper.getAnnisWebResource().path("version").path("revision");
+                WebResource resRevision = Helper.getAnnisWebResource(ui).path("version").path("revision");
                 final String revisionService = resRevision.get(String.class);
                 final String revisionGUI = VersionInfo.getBuildRevision();
 

@@ -23,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,27 +33,8 @@ import java.util.TreeMap;
 
 import javax.ws.rs.core.UriBuilder;
 
-import org.aeonbits.owner.ConfigFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SDominanceRelation;
-import org.corpus_tools.salt.common.SSpanningRelation;
-import org.corpus_tools.salt.common.SToken;
-import org.corpus_tools.salt.core.GraphTraverseHandler;
-import org.corpus_tools.salt.core.SAnnotation;
-import org.corpus_tools.salt.core.SFeature;
-import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
-import org.corpus_tools.salt.core.SNode;
-import org.corpus_tools.salt.core.SRelation;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
@@ -73,6 +55,29 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
+
+import org.aeonbits.owner.ConfigFactory;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SSpanningRelation;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.GraphTraverseHandler;
+import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
+import org.slf4j.LoggerFactory;
 
 import annis.CommonHelper;
 import annis.model.Annotation;
@@ -123,10 +128,8 @@ public class Helper {
     /**
      * Creates an authenticated REST client
      *
-     * @param userName
-     *                     user name to authenticate with
-     * @param password
-     *                     password to authenticate with
+     * @param userName user name to authenticate with
+     * @param password password to authenticate with
      * @return A newly created client.
      */
     public static Client createRESTClient(String userName, String password) {
@@ -160,9 +163,17 @@ public class Helper {
         return createRESTClient(null, null);
     }
 
-    public static AnnisUser getUser() {
+    public static AnnisUser getUser(UI ui) {
 
-        VaadinSession vSession = VaadinSession.getCurrent();
+        if (ui != null) {
+            VaadinSession vSession = ui.getSession();
+            return getUser(vSession);
+        }
+        return null;
+    }
+
+    public static AnnisUser getUser(VaadinSession vSession) {
+
         WrappedSession wrappedSession = null;
 
         if (vSession != null) {
@@ -171,12 +182,11 @@ public class Helper {
 
         if (wrappedSession != null) {
 
-            Object o = VaadinSession.getCurrent().getSession().getAttribute(AnnisBaseUI.USER_KEY);
+            Object o = wrappedSession.getAttribute(AnnisBaseUI.USER_KEY);
             if (o != null && o instanceof AnnisUser) {
                 return (AnnisUser) o;
             }
         }
-
         return null;
     }
 
@@ -191,11 +201,8 @@ public class Helper {
     /**
      * Gets or creates a web resource to the ANNIS service.
      *
-     * @param uri
-     *                 The URI where the service can be found
-     * @param user
-     *                 The user object or null (should be of type
-     *                 {@link AnnisUser}).
+     * @param uri  The URI where the service can be found
+     * @param user The user object or null (should be of type {@link AnnisUser}).
      * @return A reference to the ANNIS service root resource.
      */
     public static WebResource getAnnisWebResource(String uri, AnnisUser user) {
@@ -225,11 +232,8 @@ public class Helper {
     /**
      * Gets or creates an asynchronous web resource to the ANNIS service.
      *
-     * @param uri
-     *                 The URI where the service can be found
-     * @param user
-     *                 The user object or null (should be of type
-     *                 {@link AnnisUser}).
+     * @param uri  The URI where the service can be found
+     * @param user The user object or null (should be of type {@link AnnisUser}).
      * @return A reference to the ANNIS service root resource.
      */
     public static AsyncWebResource getAnnisAsyncWebResource(String uri, AnnisUser user) {
@@ -257,15 +261,15 @@ public class Helper {
     }
 
     public static String getServiceURL(VaadinSession session) {
-        if(session != null) {
-            String overriddenByInit = session.getConfiguration().getInitParameters()
-                    .getProperty("AnnisWebService.URL");;
-            if(overriddenByInit != null) {
+        if (session != null) {
+            String overriddenByInit = session.getConfiguration().getInitParameters().getProperty("AnnisWebService.URL");
+            ;
+            if (overriddenByInit != null) {
                 return overriddenByInit;
             }
         }
         return cfg.webserviceURL();
-            
+
     }
 
     /**
@@ -277,17 +281,27 @@ public class Helper {
      *
      * @return A reference to the ANNIS service root resource.
      */
-    public static WebResource getAnnisWebResource() {
+    public static WebResource getAnnisWebResource(UI ui) {
 
-        VaadinSession vSession = VaadinSession.getCurrent();
+        if (ui != null) {
+            VaadinSession vSession = ui.getSession();
+
+            return getAnnisWebResource(vSession);
+        } else {
+            return null;
+        }
+    }
+
+    public static WebResource getAnnisWebResource(VaadinSession vSession) {
 
         // get URI used by the application
         String uri = getServiceURL(vSession);
 
         // if already authentificated the REST client is set as the "user" property
-        AnnisUser user = getUser();
+        AnnisUser user = getUser(vSession);
 
         return getAnnisWebResource(uri, user);
+
     }
 
     /**
@@ -299,23 +313,21 @@ public class Helper {
      *
      * @return A reference to the ANNIS service root resource.
      */
-    public static AsyncWebResource getAnnisAsyncWebResource() {
-        VaadinSession vSession = VaadinSession.getCurrent();
-        
+    public static AsyncWebResource getAnnisAsyncWebResource(UI ui) {
         // get URI used by the application
-        String uri = getServiceURL(vSession);
+        String uri = getServiceURL(ui.getSession());
 
         // if already authentificated the REST client is set as the "user" property
-        AnnisUser user = getUser();
+        AnnisUser user = getUser(ui);
 
         return getAnnisAsyncWebResource(uri, user);
     }
 
-    public static String getContext() {
+    public static String getContext(UI ui) {
         if (VaadinService.getCurrentRequest() != null) {
             return VaadinService.getCurrentRequest().getContextPath();
         } else {
-            return (String) VaadinSession.getCurrent().getAttribute(AnnisBaseUI.CONTEXT_PATH);
+            return (String) ui.getSession().getAttribute(AnnisBaseUI.CONTEXT_PATH);
         }
 
     }
@@ -337,15 +349,13 @@ public class Helper {
     /**
      * Retrieve the meta data for a given document of a corpus.
      *
-     * @param toplevelCorpusName
-     *                               specifies the toplevel corpus
-     * @param documentName
-     *                               specifies the document.
+     * @param toplevelCorpusName specifies the toplevel corpus
+     * @param documentName       specifies the document.
      * @return returns only the meta data for a single document.
      */
-    public static List<Annotation> getMetaDataDoc(String toplevelCorpusName, String documentName) {
+    public static List<Annotation> getMetaDataDoc(String toplevelCorpusName, String documentName, UI ui) {
         List<Annotation> result = new ArrayList<Annotation>();
-        WebResource res = Helper.getAnnisWebResource();
+        WebResource res = Helper.getAnnisWebResource(ui);
         try {
             res = res.path("meta").path("doc").path(urlPathEscape.escape(toplevelCorpusName));
             res = res.path(urlPathEscape.escape(documentName));
@@ -365,16 +375,14 @@ public class Helper {
      * Retrieve all the meta data for a given document of a corpus including the
      * metadata of all corora in the path to the document.
      *
-     * @param toplevelCorpusName
-     *                               Specifies the the toplevel corpus
-     * @param documentName
-     *                               Specifies the document
+     * @param toplevelCorpusName Specifies the the toplevel corpus
+     * @param documentName       Specifies the document
      * @return Returns also the metada of the all parent corpora. There must be at
      *         least one of them.
      */
-    public static List<Annotation> getMetaData(String toplevelCorpusName, String documentName) {
+    public static List<Annotation> getMetaData(String toplevelCorpusName, String documentName, UI ui) {
         List<Annotation> result = new ArrayList<Annotation>();
-        WebResource res = Helper.getAnnisWebResource();
+        WebResource res = Helper.getAnnisWebResource(ui);
         try {
             res = res.path("meta").path("doc").path(urlPathEscape.escape(toplevelCorpusName));
 
@@ -397,9 +405,9 @@ public class Helper {
         return result;
     }
 
-    public static DocumentBrowserConfig getDocBrowserConfig(String corpus) {
+    public static DocumentBrowserConfig getDocBrowserConfig(String corpus, UI ui) {
         try {
-            DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource().path("query").path("corpora")
+            DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource(ui).path("query").path("corpora")
                     .path("doc_browser_config").path(urlPathEscape.escape(corpus)).get(DocumentBrowserConfig.class);
 
             return docBrowserConfig;
@@ -417,13 +425,12 @@ public class Helper {
     /**
      * Loads the corpus config of a specific corpus.
      *
-     * @param corpus
-     *                   The name of the corpus, for which the config is fetched.
+     * @param corpus The name of the corpus, for which the config is fetched.
      * @return A {@link CorpusConfig} object, which wraps a {@link Properties}
      *         object. This Properties object stores the corpus configuration as
      *         simple key-value pairs.
      */
-    public static CorpusConfig getCorpusConfig(String corpus) {
+    public static CorpusConfig getCorpusConfig(String corpus, UI ui) {
 
         if (corpus == null || corpus.isEmpty()) {
             Notification.show("no corpus is selected", "please select at leas one corpus and execute query again",
@@ -434,8 +441,8 @@ public class Helper {
         CorpusConfig corpusConfig = new CorpusConfig();
 
         try {
-            corpusConfig = Helper.getAnnisWebResource().path("query").path("corpora").path(urlPathEscape.escape(corpus))
-                    .path("config").get(CorpusConfig.class);
+            corpusConfig = Helper.getAnnisWebResource(ui).path("query").path("corpora")
+                    .path(urlPathEscape.escape(corpus)).path("config").get(CorpusConfig.class);
         } catch (UniformInterfaceException | ClientHandlerException ex) {
             if (!AnnisBaseUI.handleCommonError(ex, "get corpus configuration")) {
                 new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER, ERROR_MESSAGE_CORPUS_PROPS,
@@ -446,12 +453,12 @@ public class Helper {
         return corpusConfig;
     }
 
-    public static CorpusConfig getDefaultCorpusConfig() {
+    public static CorpusConfig getDefaultCorpusConfig(UI ui) {
 
         CorpusConfig defaultCorpusConfig = new CorpusConfig();
 
         try {
-            defaultCorpusConfig = Helper.getAnnisWebResource().path("query").path("corpora").path(DEFAULT_CONFIG)
+            defaultCorpusConfig = Helper.getAnnisWebResource(ui).path("query").path("corpora").path(DEFAULT_CONFIG)
                     .get(CorpusConfig.class);
         } catch (UniformInterfaceException | ClientHandlerException ex) {
             if (!AnnisBaseUI.handleCommonError(ex, "get default corpus configuration")) {
@@ -473,12 +480,12 @@ public class Helper {
      *         key-value pairs. The Map includes also the default corpus
      *         configuration.
      */
-    public static CorpusConfigMap getCorpusConfigs() {
+    public static CorpusConfigMap getCorpusConfigs(UI ui) {
 
         CorpusConfigMap corpusConfigurations = null;
 
         try {
-            corpusConfigurations = Helper.getAnnisWebResource().path("query").path("corpora").path("config")
+            corpusConfigurations = Helper.getAnnisWebResource(ui).path("query").path("corpora").path("config")
                     .get(CorpusConfigMap.class);
         } catch (UniformInterfaceException | ClientHandlerException ex) {
             UI.getCurrent().access(new Runnable() {
@@ -497,7 +504,7 @@ public class Helper {
             corpusConfigurations = new CorpusConfigMap();
         }
 
-        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
+        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig(ui));
 
         return corpusConfigurations;
     }
@@ -506,22 +513,21 @@ public class Helper {
      * Loads the available corpus configurations for a list of specific corpora.
      *
      *
-     * @param corpora
-     *                    A Set of corpora names.
+     * @param corpora A Set of corpora names.
      * @return A {@link CorpusConfigMap} object, which wraps a Map of
      *         {@link Properties} objects. The keys to the properties are the corpus
      *         names. A Properties object stores the corpus configuration as simple
      *         key-value pairs. The map includes the default configuration.
      */
-    public static CorpusConfigMap getCorpusConfigs(Set<String> corpora) {
+    public static CorpusConfigMap getCorpusConfigs(Set<String> corpora, UI ui) {
 
         CorpusConfigMap corpusConfigurations = new CorpusConfigMap();
 
         for (String corpus : corpora) {
-            corpusConfigurations.put(corpus, getCorpusConfig(corpus));
+            corpusConfigurations.put(corpus, getCorpusConfig(corpus, ui));
         }
 
-        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
+        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig(ui));
         return corpusConfigurations;
     }
 
@@ -529,8 +535,7 @@ public class Helper {
      * Returns a formatted string containing the type of the exception, the message
      * and the stacktrace.
      *
-     * @param ex
-     *               Exception
+     * @param ex Exception
      * @return message
      */
     public static String convertExceptionToMessage(Throwable ex) {
@@ -548,10 +553,10 @@ public class Helper {
         return sb.toString();
     }
 
-    public static RawTextWrapper getRawText(String corpusName, String documentName) {
+    public static RawTextWrapper getRawText(String corpusName, String documentName, UI ui) {
         RawTextWrapper texts = null;
         try {
-            WebResource webResource = getAnnisWebResource();
+            WebResource webResource = getAnnisWebResource(ui);
             webResource = webResource.path("query").path("rawtext").path(corpusName).path(documentName);
             texts = webResource.get(RawTextWrapper.class);
         }
@@ -570,8 +575,7 @@ public class Helper {
     /**
      * Get the qualified name separated by a single ":" when a namespace exists.
      *
-     * @param anno
-     *                 annotation
+     * @param anno annotation
      * @return qualified name
      */
     public static String getQualifiedName(SAnnotation anno) {
@@ -590,8 +594,8 @@ public class Helper {
      *
      * @return True if RTL is disabled
      */
-    public static boolean isRTLDisabled() {
-        String disableRtl = (String) VaadinSession.getCurrent().getAttribute("disable-rtl");
+    public static boolean isRTLDisabled(UI ui) {
+        String disableRtl = (String) ui.getSession().getAttribute("disable-rtl");
         return "true".equalsIgnoreCase(disableRtl);
     }
 
@@ -600,8 +604,7 @@ public class Helper {
      * "{...}") and the percent character. Both would not be esccaped by jersey
      * and/or would cause an error when this is not a valid template.
      *
-     * @param v
-     *              the value
+     * @param v the value
      * @return encoded value
      */
     public static String encodeJersey(String v) {
@@ -612,8 +615,7 @@ public class Helper {
     /**
      * Encodes a String so it can be used as path parameter.
      *
-     * @param v
-     *              value
+     * @param v value
      * @return encoded value
      */
     public static String encodePath(String v) {
@@ -624,8 +626,7 @@ public class Helper {
     /**
      * Encodes a String so it can be used as query parameter.
      *
-     * @param v
-     *              value
+     * @param v value
      * @return encoded value
      */
     public static String encodeQueryParam(String v) {
@@ -647,20 +648,39 @@ public class Helper {
         return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).getEncodedValue();
     }
 
-    public static Map<SToken, Integer> createToken2IndexMap(SDocumentGraph graph) {
-        Map<SToken, Integer> token2index = new LinkedHashMap<>();
+    public static Map<SToken, Integer> createToken2IndexMap(final SDocumentGraph graph, final STextualDS textualDS) {
+        final Map<SToken, Integer> token2index = new LinkedHashMap<>();
 
         if (graph == null) {
             return token2index;
         }
 
-        List<SToken> sortedTokens = graph.getSortedTokenByText();
+        Multimap<String, SNode> orderRootsByType = graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
+        Set<SNode> orderRoots = new HashSet<>(orderRootsByType.get(""));
+        List<SToken> sortedTokens;
+
+        if (textualDS == null) {
+            // get tokens of all texts
+            sortedTokens = graph.getSortedTokenByText();
+        } else {
+            final DataSourceSequence<Number> seq = new DataSourceSequence<>();
+            seq.setDataSource(textualDS);
+            seq.setStart(0);
+            seq.setEnd(textualDS.getText() != null ? textualDS.getText().length() : 0);
+            sortedTokens = graph.getSortedTokenByText(graph.getTokensBySequence(seq));
+        }
+
         if (sortedTokens != null) {
             int i = 0;
-            for (SToken t : sortedTokens) {
+            for (final SToken t : sortedTokens) {
+                if (i > 0 && orderRoots.contains(t)) {
+                    // introduce a gap because the token stream is not complete
+                    i += 1;
+                }
                 token2index.put(t, i++);
             }
         }
+
         return token2index;
     }
 
@@ -694,7 +714,7 @@ public class Helper {
                 initialCovered.put(n, match);
             }
         }
-        final Map<SToken, Integer> token2index = Helper.createToken2IndexMap(doc.getDocumentGraph());
+        final Map<SToken, Integer> token2index = Helper.createToken2IndexMap(doc.getDocumentGraph(), null);
 
         // calculate covered nodes
         CoveredMatchesCalculator cmc = new CoveredMatchesCalculator(doc.getDocumentGraph(), initialCovered,
@@ -847,9 +867,9 @@ public class Helper {
         }
     }
 
-    public static String shortenURL(URI original) {
-        WebResource res = Helper.getAnnisWebResource().path("shortener");
-        String appContext = Helper.getContext();
+    public static String shortenURL(URI original, UI ui) {
+        WebResource res = Helper.getAnnisWebResource(ui).path("shortener");
+        String appContext = Helper.getContext(ui);
 
         String path = original.getRawPath();
         if (path.startsWith(appContext)) {

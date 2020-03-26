@@ -26,3 +26,16 @@ You can also use the `-o` flag to overwrite existing corpora:
 ~~~bash
 bin/annis-admin.sh import -o path1 ...
 ~~~
+
+### Disk-based corpus representation
+
+***Warning!*** This is functionality is beta-quality at best. It is not possible to store the corpora completely on-disk, yet.
+
+It is possible to select if a corpus should be imported as in-memory corpus or if it should prefer disk-based storage
+with the `--disk-based` parameter, which can be either `true` or `false`.
+
+~~~bash
+bin/annis-admin.sh import --disk-based true path1 ...
+~~~
+
+You can also set the default value using the `prefer-disk-based` setting in the `annis-service.properties` configuration file.

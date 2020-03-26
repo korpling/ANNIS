@@ -16,8 +16,8 @@
 
 package annis.gui.controlpanel;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.util.DefaultItemSorter;
+import com.vaadin.v7.data.Item;
+import com.vaadin.v7.data.util.DefaultItemSorter;
 
 /**
  *

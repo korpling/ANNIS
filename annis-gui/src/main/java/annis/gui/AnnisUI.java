@@ -31,6 +31,7 @@ import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
+import com.vaadin.ui.UI;
 
 import annis.gui.components.ExceptionDialog;
 import annis.gui.exporter.CSVExporter;
@@ -54,7 +55,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Theme("annis")
-@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
+@Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 public class AnnisUI extends CommonUI
   implements ErrorHandler, ViewChangeListener
 {
@@ -134,16 +135,16 @@ public class AnnisUI extends CommonUI
     {
       searchView.setToolbar(toolbar);
       toolbar.setSidebar(searchView);
-      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN);
+      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN, AnnisUI.this);
     }
     else if (event.getNewView() == adminView)
     {
       adminView.setToolbar(toolbar);
-      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.SEARCH);
+      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.SEARCH, AnnisUI.this);
     }
     else
     {
-      toolbar.setNavigationTarget(null);
+      toolbar.setNavigationTarget(null, AnnisUI.this);
     }
 
     return true;
@@ -188,7 +189,7 @@ public class AnnisUI extends CommonUI
       {
         source = source.getCause();
       }
-      ExceptionDialog.show(source);
+      ExceptionDialog.show(source, this);
     }
   }
 
@@ -227,11 +228,11 @@ public class AnnisUI extends CommonUI
       {
         if (corpus.equals(DEFAULT_CONFIG))
         {
-          config = Helper.getDefaultCorpusConfig();
+          config = Helper.getDefaultCorpusConfig(AnnisUI.this);
         }
         else
         {
-          config = Helper.getCorpusConfig(corpus);
+          config = Helper.getCorpusConfig(corpus, AnnisUI.this);
         }
 
         corpusConfigCache.put(corpus, config);

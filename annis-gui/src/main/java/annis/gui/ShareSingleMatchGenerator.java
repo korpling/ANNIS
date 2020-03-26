@@ -29,23 +29,23 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.ObjectProperty;
-import com.vaadin.event.SelectionEvent;
 import com.vaadin.server.ExternalResource;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.data.util.ObjectProperty;
+import com.vaadin.v7.event.SelectionEvent;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Grid;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.TextArea;
 
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
@@ -128,6 +128,7 @@ public class ShareSingleMatchGenerator extends Window implements
     generatedLinks.setComponentAlignment(txtDirectURL, Alignment.TOP_LEFT);
     generatedLinks.setComponentAlignment(txtIFrameCode, Alignment.TOP_LEFT);
     generatedLinks.setExpandRatio(preview, 1.0f);
+    generatedLinks.setSpacing(false);
     
     visSelector = new Grid(visContainer);
     visSelector.setCaption("Select visualization");
@@ -152,7 +153,7 @@ public class ShareSingleMatchGenerator extends Window implements
     
     HorizontalLayout hLayout = new HorizontalLayout(visSelector, generatedLinks);
     hLayout.setSizeFull();
-    hLayout.setSpacing(true);
+    hLayout.setSpacing(false);
     hLayout.setExpandRatio(generatedLinks, 1.0f);
     
     Button btClose = new Button("Close");
@@ -170,6 +171,7 @@ public class ShareSingleMatchGenerator extends Window implements
     layout = new VerticalLayout(infoText, hLayout, btClose);
     layout.setSizeFull();
     layout.setExpandRatio(hLayout, 1.0f);
+    layout.setSpacing(false);
     layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
     
     setContent(layout);
@@ -178,7 +180,7 @@ public class ShareSingleMatchGenerator extends Window implements
   
   private URI generatorURLForVisualizer(ResolverEntry entry)
   {
-    String appContext = Helper.getContext();
+    String appContext = Helper.getContext(UI.getCurrent());
     URI appURI = UI.getCurrent().getPage().getLocation();
     UriBuilder result = UriBuilder.fromUri(appURI)
       .replacePath(appContext)
@@ -202,7 +204,7 @@ public class ShareSingleMatchGenerator extends Window implements
     }
     
     UriBuilder serviceURL =
-      UriBuilder.fromUri(Helper.getAnnisWebResource().path(
+      UriBuilder.fromUri(Helper.getAnnisWebResource(UI.getCurrent()).path(
       "query").getURI());
     
     VisualizerPlugin visPlugin = ps.getVisualizer(entry.getVisType());
@@ -228,7 +230,7 @@ public class ShareSingleMatchGenerator extends Window implements
       if(visPlugin instanceof FilteringVisualizerPlugin)
       {
         List<String> visAnnos = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
-          corpusName, documentName, entry.getMappings());
+          corpusName, documentName, entry.getMappings(), UI.getCurrent());
         if(visAnnos != null)
         {
           Set<String> annos = new HashSet<>(visAnnos);
@@ -309,7 +311,7 @@ public class ShareSingleMatchGenerator extends Window implements
       generatedLinks.setVisible(true);
       
       URI url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
-      String shortURL = Helper.shortenURL(url);
+      String shortURL = Helper.shortenURL(url, UI.getCurrent());
       directURL.setValue(shortURL);
       iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + shortURL + "\"></iframe>");
       preview.setSource(new ExternalResource(shortURL));

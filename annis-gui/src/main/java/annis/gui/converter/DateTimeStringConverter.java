@@ -16,10 +16,13 @@
 
 package annis.gui.converter;
 
-import com.vaadin.data.util.converter.Converter;
 import java.util.Locale;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
+
+import com.vaadin.v7.data.util.converter.Converter;
+import com.vaadin.v7.data.util.converter.Converter.ConversionException;
 
 /**
  *

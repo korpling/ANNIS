@@ -15,20 +15,22 @@
  */
 package annis.gui.admin;
 
-import annis.gui.admin.view.CorpusListView;
-import annis.service.objects.AnnisCorpus;
-import com.vaadin.data.util.BeanContainer;
-import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Grid;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.v7.ui.Grid;
+
+import annis.gui.admin.view.CorpusListView;
+import annis.service.objects.AnnisCorpus;
 
 /**
  *

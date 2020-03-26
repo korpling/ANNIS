@@ -123,7 +123,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
              */
             final Map<String, ArrayList<Row>> table = new TreeMap<String, ArrayList<Row>>();
 
-            final Map<SToken, Integer> token2index = Helper.createToken2IndexMap(graph);
+            final Map<SToken, Integer> token2index = Helper.createToken2IndexMap(graph, null);
 
             /**
              * Get a list of sorted token for retrieving the token index of the most left

@@ -354,7 +354,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
         
         AbstractImageGraphicsItem item = cl.createLayout(
           new LayoutOptions(VerticalOrientation.TOP_ROOT, AnnisGraphTools.
-            detectLayoutDirection(input.getDocument().getDocumentGraph())));
+            detectLayoutDirection(input.getDocument().getDocumentGraph(), input.getUI())));
         
         Rectangle2D treeSize = item.getBounds();
         

@@ -26,7 +26,7 @@ example:
     4. and " Scarne on Magic [Tricks] " . That started me 
 ```
 
-The TextExporter adds all annotations of each token separated by slashes
+The TokenExporter adds all annotations of each token separated by slashes
 (e.g. dogs/NNS/dog for a token dogs annotated with a part-of-speech NNS
 and a lemma dog).
 

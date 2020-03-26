@@ -76,7 +76,8 @@ public class ExportBackgroundJob implements Callable<File> {
             
             exportError = exporter.convertText(query.getQuery(), query.getQueryLanguage(), leftCtx,
                     rightCtx, query.getCorpora(), query.getAnnotationKeys(), query.getParameters(),
-                    query.getAlignmc(), Helper.getAnnisWebResource().path("query"), outWriter, eventBus, corpusConfigs);
+                    query.getAlignmc(), Helper.getAnnisWebResource(ui).path("query"), outWriter, eventBus, corpusConfigs, 
+                    ui);
         } finally {
             ui.access(new Runnable() {
                 @Override
