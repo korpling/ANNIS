@@ -382,7 +382,7 @@ public class AdminService {
                     job.setImportRootDirectory(tmpZip);
                     job.setStatus(ImportJob.Status.WAITING);
                     job.setOverwrite(overwrite);
-                    job.setDiskBased(getAdminDao().);
+                    job.setDiskBased(getAdminDao());
                     job.setStatusEmail(statusMail);
                     job.setAlias(alias);
 
@@ -432,7 +432,7 @@ public class AdminService {
         }
         return null;
     }
-    
+
     public ImportWorker getImportWorker() {
         Object prop = config.getProperty("importWorker");
         if (prop instanceof ImportWorker) {
