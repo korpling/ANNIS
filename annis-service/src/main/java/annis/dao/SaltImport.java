@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.corpus_tools.graphannis.GraphUpdate;
+import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
@@ -57,7 +58,7 @@ public class SaltImport {
     return updateList;
   }
 
-  public SaltImport map(SDocumentGraph g) {
+  public SaltImport map(SDocumentGraph g) throws GraphANNISException {
     
     // create the (sub-) corpus and the document nodes
     URI docPath = g.getPath();
@@ -116,7 +117,7 @@ public class SaltImport {
     return this;
   }
 
-  private void addTokenInformation(SDocumentGraph g) {
+  private void addTokenInformation(SDocumentGraph g) throws GraphANNISException {
 
     SToken lastToken = null;
     STextualDS lastTextDS = null;
@@ -149,7 +150,7 @@ public class SaltImport {
   * @param node
   * @param graph
   */
-  private void addCoverageInformation(SNode node, SDocumentGraph graph) {
+  private void addCoverageInformation(SNode node, SDocumentGraph graph) throws GraphANNISException {
     List<SToken> overlappedToken;
     if (node instanceof SToken) {
       overlappedToken = Arrays.asList((SToken) node);
@@ -225,7 +226,7 @@ public class SaltImport {
     return result;
   }
 
-  private void addNode(SNode n, String documentNodeName) {
+  private void addNode(SNode n, String documentNodeName) throws GraphANNISException {
     if (n instanceof SStructuredNode) {
       // use the unique name
       String name = nodeName(n);
@@ -242,7 +243,7 @@ public class SaltImport {
     }
   }
 
-  private void addEdgeLabels(SRelation<?, ?> rel, String layer, String componentType, String componentName) {
+  private void addEdgeLabels(SRelation<?, ?> rel, String layer, String componentType, String componentName) throws GraphANNISException {
     Set<SAnnotation> annos = rel.getAnnotations();
     if (annos != null) {
       for (SAnnotation anno : annos) {

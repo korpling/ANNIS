@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Upgraded Vaadin from 7 to 8 using the compatibility layer 
+- Upgraded Vaadin from 7 to 8 using the compatibility layer
+- Updated graphANNIS to version 0.27.1 with multiple fixes for issues discovered in the previous beta release
 
 ### Fixed
 

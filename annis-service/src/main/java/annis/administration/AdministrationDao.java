@@ -392,7 +392,8 @@ public class AdministrationDao extends AbstractAdminstrationDao {
             throws GraphANNISException {
 
         log.info("importing corpus {} into graphANNIS", corpusName);
-        getQueryDao().getCorpusStorageManager().importFromFileSystem(path, ImportFormat.RelANNIS, corpusName);
+        getQueryDao().getCorpusStorageManager().importFromFileSystem(path, ImportFormat.RelANNIS, corpusName,
+                cfg.preferDiskBased());
 
     }
 
@@ -1032,12 +1033,12 @@ public class AdministrationDao extends AbstractAdminstrationDao {
 
     public void dumpServiceDataTable(Table table, File csvFile) {
         try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
-            
+
             exportTableIntoCSV(conn, table, true, csvFile, null);
 
-         } catch (SQLException ex) {
-             log.error("Could not save table to file", ex);
-         }
+        } catch (SQLException ex) {
+            log.error("Could not save table to file", ex);
+        }
     }
 
     ///// Getter / Setter
