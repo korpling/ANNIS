@@ -11,18 +11,18 @@ The behavior of these components can be customized changing their configuration.
 ## Back-end service
 
 There is a configuration folder `conf/` in the installation directory with the main configuration file `annis-service.properties`.
-In addition, there is the `shiro.info` file to change the location of the [user configuration](import-and-config-user.md).
+Besides, there is the `shiro.info` file to change the location of the [user configuration](import-and-config-user.md).
 You should not need to change any of the other files in this directory.
 
 ## Front-end web-application
 
-The ANNIS front-end will search in different folders for it's configuration.
+The ANNIS front-end will search in different folders for its configuration.
 
 Folder | Description
 ------ | -----------
 `<Installation>/WEB-INF/conf/` | Default configuration inside the deployed web application folder. Should not be changed.
 `$ANNIS_CFG` or `/etc/annis/` | The global configuration folder defined by the environment variable `ANNIS_CFG` or a default path if not set.
-`~/.annis/` | User specific configuration inside the `.annis` sub-folder inside the home folder of the user who is running the frontend.
+`~/.annis/` | User-specific configuration inside the `.annis` sub-folder inside the home folder of the user who is running the frontend.
 
 Configuration files can be either in the [Java Properties](http://en.wikipedia.org/w/index.php?title=.properties&oldid=521500688)
 or [JSON](http://www.json.org/) format. Configuration files from the user directory can

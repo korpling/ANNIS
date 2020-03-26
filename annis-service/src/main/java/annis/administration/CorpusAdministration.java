@@ -139,9 +139,10 @@ public class CorpusAdministration {
      *                              false abort the import.
      * @param paths
      *                              Valid pathes to corpora.
+     * @param diskBased             If true, the imported corpus will be queried from on-disk storage whererver possible and in-memory storage is avoided.
      * @return True if all corpora where imported successfully.
      */
-    public ImportStatus importCorporaSave(boolean overwrite, String aliasName, String statusEmailAdress,
+    public ImportStatus importCorporaSave(boolean overwrite, boolean diskBased, String aliasName, String statusEmailAdress,
             boolean waitForOtherTasks, List<String> paths) {
 
         // init the import stats. From the beginning everything is ok
@@ -190,7 +191,7 @@ public class CorpusAdministration {
         for (File r : roots) {
             try {
                 log.info("Importing corpus from: " + r.getPath());
-                if (getAdministrationDao().importCorpus(r.getPath(), aliasName, overwrite)) {
+                if (getAdministrationDao().importCorpus(r.getPath(), aliasName, overwrite, diskBased)) {
                     log.info("Finished import from: " + r.getPath());
                     getAdministrationDao().sendImportStatusMail(statusEmailAdress, r.getPath(),
                             ImportJob.Status.SUCCESS, null);
@@ -683,7 +684,7 @@ public class CorpusAdministration {
      */
     public ImportStatus importCorporaSave(boolean overwrite, String aliasName, String statusEmailAdress,
             boolean waitForOtherTasks, String... paths) {
-        return importCorporaSave(overwrite, aliasName, statusEmailAdress, waitForOtherTasks, Arrays.asList(paths));
+        return importCorporaSave(overwrite, cfg.preferDiskBased(), aliasName, statusEmailAdress, waitForOtherTasks, Arrays.asList(paths));
     }
 
     public void dumpTable(String tableName, File outputFile) {
