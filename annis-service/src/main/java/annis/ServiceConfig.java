@@ -65,5 +65,9 @@ public interface ServiceConfig extends Config {
     @Key("parallel-query-execution")
     @DefaultValue("true")
     boolean parallelQueryExecution();
+
+    @Key("prefer-disk-based")
+    @DefaultValue("false")
+    boolean preferDiskBased();
     
 }
