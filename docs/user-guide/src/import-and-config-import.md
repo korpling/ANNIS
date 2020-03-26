@@ -35,7 +35,7 @@ It is possible to select if a corpus should be imported as in-memory corpus or i
 with the `--disk-based` parameter, which can be either `true` or `false`.
 
 ~~~bash
-bin/annis-admin.sh import --disk-based=true path1 ...
+bin/annis-admin.sh import --disk-based true path1 ...
 ~~~
 
 You can also set the default value using the `prefer-disk-based` setting in the `annis-service.properties` configuration file.
