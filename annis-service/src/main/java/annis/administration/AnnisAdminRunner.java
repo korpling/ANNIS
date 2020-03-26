@@ -230,8 +230,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner {
             password = null;
 
             final boolean overwrite = cmdLine.hasOption('o');
-            final boolean diskBased = cmdLine.hasOption('d') ? cfg.preferDiskBased()
-                    : Boolean.parseBoolean(cmdLine.getOptionValue('d'));
+            final boolean diskBased = cmdLine.hasOption('d') ? Boolean.parseBoolean(cmdLine.getOptionValue('d'))
+                    : cfg.preferDiskBased();
 
             corpusAdministration.importCorporaSave(overwrite, diskBased, cmdLine.getOptionValue("alias"),
                     cmdLine.getOptionValue("mail"), false, corpusPaths);
