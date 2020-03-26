@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0-beta.4] - 2020-03-26
+
 ### Changed
 
 - Upgraded Vaadin from 7 to 8 using the compatibility layer
@@ -864,6 +866,7 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.3...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.4...HEAD
+[4.0.0-beta.4]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.3...v4.0.0-beta.4
 [4.0.0-beta.3]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.2...v4.0.0-beta.3
 [4.0.0-beta.2]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.1...v4.0.0-beta.2
