@@ -498,7 +498,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
                 if (args.containsKey("c") && args.size() == 1) {
                     // special case: we were called from outside and should only select,
                     // but not query, the selected corpora
-                    ui.getQueryState().getSelectedCorpora().setValue(corpora);
+                    ui.getQueryState().getSelectedCorpora().getItems().clear();
+                    ui.getQueryState().getSelectedCorpora().getItems().addAll(corpora);
                 } else if (args.get("cl") != null && args.get("cr") != null) {
                     // make sure the properties are not overwritten by the background process
                     getControlPanel().getSearchOptions().setUpdateStateFromConfig(false);

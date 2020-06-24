@@ -16,6 +16,8 @@
 package annis.gui.controlpanel;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -92,7 +94,7 @@ public class SearchOptionsPanel extends FormLayout {
     private final HelpButton segmentationHelp;
 
     private final ComboBox cbOrder;
-    
+
     private final ComboBox cbQueryLanguage;
 
     // TODO: make this configurable
@@ -169,7 +171,7 @@ public class SearchOptionsPanel extends FormLayout {
         cbOrder.setNewItemsAllowed(false);
         cbOrder.setNullSelectionAllowed(false);
         cbOrder.setImmediate(true);
-        
+
         cbQueryLanguage = new ComboBox("Query Language", queryLanguage);
         cbQueryLanguage.setNewItemsAllowed(false);
         cbQueryLanguage.setNullSelectionAllowed(false);
@@ -211,7 +213,8 @@ public class SearchOptionsPanel extends FormLayout {
 
             state = ui.getQueryState();
 
-            Background.run(new CorpusConfigUpdater(ui, state.getSelectedCorpora().getValue(), false));
+            Background.run(
+                    new CorpusConfigUpdater(ui, new LinkedHashSet<>(state.getSelectedCorpora().getItems()), false));
 
             cbLeftContext
                     .setNewItemHandler(new CustomContext(maxLeftContext, contextContainerLeft, state.getLeftContext()));
@@ -229,13 +232,13 @@ public class SearchOptionsPanel extends FormLayout {
                 orderContainer.addItem(t);
             }
             cbOrder.setPropertyDataSource(state.getOrder());
-            
+
             cbQueryLanguage.setPropertyDataSource(state.getQueryLanguage());
 
         }
     }
 
-    public void updateSearchPanelConfigurationInBackground(final Set<String> corpora, final AnnisUI ui) {
+    public void updateSearchPanelConfigurationInBackground(final Collection<String> corpora, final AnnisUI ui) {
         setLoadingState(true);
         // remove custom adjustments
         contextContainerLeft.removeAllItems();
@@ -254,7 +257,7 @@ public class SearchOptionsPanel extends FormLayout {
         return null;
     }
 
-    private static List<String> getSegmentationNamesFromService(Set<String> corpora, UI ui) {
+    private static List<String> getSegmentationNamesFromService(Collection<String> corpora, UI ui) {
         List<String> segNames = new ArrayList<>();
         WebResource service = Helper.getAnnisWebResource(ui);
         if (service != null) {
@@ -313,7 +316,7 @@ public class SearchOptionsPanel extends FormLayout {
      * @return A value defined in the copurs.properties file or in the
      *         admin-service.properties
      */
-    private String mergeConfigValue(String key, Set<String> corpora, CorpusConfigMap corpusConfigurations) {
+    private String mergeConfigValue(String key, Collection<String> corpora, CorpusConfigMap corpusConfigurations) {
         Set<String> values = new TreeSet<>();
         for (String corpus : corpora) {
             CorpusConfig config = corpusConfigurations.get(corpus);
@@ -352,7 +355,7 @@ public class SearchOptionsPanel extends FormLayout {
      * @return A new config which takes into account the segementation of all
      *         selected corpora.
      */
-    private CorpusConfig mergeConfigs(Set<String> corpora, CorpusConfigMap corpusConfigurations) {
+    private CorpusConfig mergeConfigs(Collection<String> corpora, CorpusConfigMap corpusConfigurations) {
         CorpusConfig corpusConfig = new CorpusConfig();
 
         // calculate the left and right context.
@@ -391,7 +394,7 @@ public class SearchOptionsPanel extends FormLayout {
      *                    the corpora which has to be checked.
      * @return "tok" or a segment which is defined in all corpora.
      */
-    private String checkSegments(String key, Set<String> corpora, CorpusConfigMap corpusConfigurations) {
+    private String checkSegments(String key, Collection<String> corpora, CorpusConfigMap corpusConfigurations) {
         String segmentation = null;
         for (String corpus : corpora) {
 
@@ -520,11 +523,11 @@ public class SearchOptionsPanel extends FormLayout {
     private class CorpusConfigUpdater implements Runnable {
 
         private final AnnisUI ui;
-        private final Set<String> corpora;
+        private final Collection<String> corpora;
         private final QueryUIState state;
         private final boolean corpusSelectionChanged;
 
-        public CorpusConfigUpdater(AnnisUI ui, Set<String> corpora, boolean corpusSelectionChanged) {
+        public CorpusConfigUpdater(AnnisUI ui, Collection<String> corpora, boolean corpusSelectionChanged) {
             this.ui = ui;
             this.state = ui.getQueryState();
             this.corpora = corpora;

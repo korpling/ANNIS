@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.corpus_tools.annis.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.escape.Escaper;
@@ -54,6 +55,7 @@ import annis.libgui.Helper;
 import annis.model.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfig;
 import annis.service.objects.QueryLanguage;
 
 /**
@@ -72,7 +74,8 @@ public class CorpusBrowserPanel extends Panel {
      */
     private static final long serialVersionUID = -1029743017413951838L;
 
-    private AnnisCorpus corpus;
+    private String corpus;
+    private CorpusConfiguration corpusConfig;
 
     private ExampleTable tblNodeAnno;
 
@@ -110,12 +113,13 @@ public class CorpusBrowserPanel extends Panel {
    
 
     public CorpusBrowserPanel() {
-        this(null, null);
+        this(null, null, null);
     }
 
-    public CorpusBrowserPanel(final AnnisCorpus corpus, QueryController controller) {
+    public CorpusBrowserPanel(String corpus, final CorpusConfiguration corpusConfig, QueryController controller) {
         super("Available annotations");
         this.corpus = corpus;
+        this.corpusConfig = corpusConfig;
         this.controller = controller;
         
 
@@ -183,7 +187,7 @@ public class CorpusBrowserPanel extends Panel {
    
 
             final List<AnnisAttribute> attributes = corpus == null ? new LinkedList<AnnisAttribute>()
-                    : fetchAnnos(corpus.getName(), ui);
+                    : fetchAnnos(corpus, ui);
            
             
             ((AnnisUI) getUI()).access(new Runnable() {
@@ -364,7 +368,7 @@ public class CorpusBrowserPanel extends Panel {
             CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
             Set<String> corpusNameSet = new HashSet<>();
             if (corpus != null) {
-                corpusNameSet.add(corpus.getName());
+                corpusNameSet.add(corpus);
             }
             if (controller != null && cbe != null) {
                 controller.setQuery(new Query(cbe.getExample(), QueryLanguage.AQL,  corpusNameSet));

@@ -26,11 +26,11 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
 
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.v7.data.util.BeanContainer;
 import com.vaadin.v7.data.util.BeanItemContainer;
 import com.vaadin.v7.data.util.ObjectProperty;
 
-import annis.gui.controlpanel.CorpusSorter;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.libgui.exporter.ExporterPlugin;
@@ -51,8 +51,7 @@ public class QueryUIState implements Serializable {
     }
 
     private final ObjectProperty<String> aql = new ObjectProperty<>("");
-    private final ObjectProperty<Set<String>> selectedCorpora = new ObjectProperty<Set<String>>(
-            new LinkedHashSet<String>());
+    private final ListDataProvider<String> selectedCorpora = new ListDataProvider<>(new LinkedHashSet<String>());
 
     private final ObjectProperty<Integer> leftContext = new ObjectProperty<>(5);
     private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
@@ -83,19 +82,17 @@ public class QueryUIState implements Serializable {
 
     private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
 
-    private final BeanContainer<String, AnnisCorpus> availableCorpora = new BeanContainer<>(AnnisCorpus.class);;
+    private final ListDataProvider<String> availableCorpora = new ListDataProvider<>(new ArrayList<>());
 
     public QueryUIState() {
         initTransients();
-        availableCorpora.setBeanIdProperty("name");
-        availableCorpora.setItemSorter(new CorpusSorter());
     }
 
     private void initTransients() {
         executedTasks = new EnumMap<>(QueryType.class);
     }
 
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(final java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         initTransients();
     }
@@ -104,7 +101,7 @@ public class QueryUIState implements Serializable {
         return aql;
     }
 
-    public ObjectProperty<Set<String>> getSelectedCorpora() {
+    public ListDataProvider<String> getSelectedCorpora() {
         return selectedCorpora;
     }
 
@@ -168,7 +165,7 @@ public class QueryUIState implements Serializable {
         return order;
     }
 
-    public BeanContainer<String, AnnisCorpus> getAvailableCorpora() {
+    public ListDataProvider<String> getAvailableCorpora() {
         return availableCorpora;
     }
 
