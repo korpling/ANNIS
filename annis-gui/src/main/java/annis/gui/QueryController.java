@@ -17,6 +17,8 @@ package annis.gui;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -41,6 +43,9 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.v7.data.Property;
 import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.data.provider.DataChangeEvent;
+import com.vaadin.data.provider.DataProviderListener;
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
@@ -111,18 +116,19 @@ public class QueryController implements Serializable {
             }
         });
 
-        this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener() {
+        this.state.getSelectedCorpora().addDataProviderListener(new DataProviderListener<String>() {
+
             @Override
-            public void valueChange(Property.ValueChangeEvent event) {
+            public void onDataChange(DataChangeEvent<String> event) {
                 validateQuery();
             }
         });
-        
-        this.state.getQueryLanguage().addValueChangeListener(new Property.ValueChangeListener() {
-            
+
+        this.state.getQueryLanguage().addListener(new Property.ValueChangeListener() {
+
             @Override
             public void valueChange(Property.ValueChangeEvent event) {
-                validateQuery();                
+                validateQuery();
             }
         });
 
@@ -155,8 +161,8 @@ public class QueryController implements Serializable {
 
                     qp.setNodes(nodes);
 
-                    if (state.getSelectedCorpora().getValue() == null
-                            || state.getSelectedCorpora().getValue().isEmpty()) {
+                    if (state.getSelectedCorpora().getItems() == null
+                            || state.getSelectedCorpora().getItems().isEmpty()) {
                         qp.setStatus("Please select a corpus from the list below, then click on \"Search\".");
                     } else {
                         qp.setStatus("Valid query, click on \"Search\" to start searching.");
@@ -244,13 +250,27 @@ public class QueryController implements Serializable {
     /**
      * Only changes the value of the property if it is not equals to the old one.
      * 
-     * @param          <T>
+     * @param <T>
      * @param prop
      * @param newValue
      */
     private static <T> void setIfNew(Property<T> prop, T newValue) {
         if (!Objects.equals(prop.getValue(), newValue)) {
             prop.setValue(newValue);
+        }
+    }
+
+    /**
+     * Only changes the value of the property if it is not equals to the old one.
+     * 
+     * @param <T>
+     * @param prop
+     * @param newValue
+     */
+    private static <T> void setIfNew(ListDataProvider<T> prop, Collection<T> newValue) {
+        if (!Objects.equals(prop.getItems(), newValue)) {
+            prop.getItems().clear();
+            prop.getItems().addAll(newValue);
         }
     }
 
@@ -290,11 +310,12 @@ public class QueryController implements Serializable {
      */
     public DisplayedResultQuery getSearchQuery() {
         return QueryGenerator.displayed().query(state.getAql().getValue())
-                .corpora(state.getSelectedCorpora().getValue()).queryLanguage(state.getQueryLanguage().getValue())
-                .left(state.getLeftContext().getValue()).right(state.getRightContext().getValue())
-                .segmentation(state.getContextSegmentation().getValue()).baseText(state.getVisibleBaseText().getValue())
-                .limit(state.getLimit().getValue()).offset(state.getOffset().getValue())
-                .order(state.getOrder().getValue()).selectedMatches(state.getSelectedMatches().getValue()).build();
+                .corpora(new LinkedHashSet<>(state.getSelectedCorpora().getItems()))
+                .queryLanguage(state.getQueryLanguage().getValue()).left(state.getLeftContext().getValue())
+                .right(state.getRightContext().getValue()).segmentation(state.getContextSegmentation().getValue())
+                .baseText(state.getVisibleBaseText().getValue()).limit(state.getLimit().getValue())
+                .offset(state.getOffset().getValue()).order(state.getOrder().getValue())
+                .selectedMatches(state.getSelectedMatches().getValue()).build();
     }
 
     /**
@@ -304,11 +325,11 @@ public class QueryController implements Serializable {
      */
     public ExportQuery getExportQuery() {
         return new ExportQueryGenerator().query(state.getAql().getValue())
-                .corpora(state.getSelectedCorpora().getValue()).queryLanguage(state.getQueryLanguage().getValue())
-                .left(state.getLeftContext().getValue()).right(state.getRightContext().getValue())
-                .segmentation(state.getVisibleBaseText().getValue()).exporter(state.getExporter().getValue())
-                .annotations(state.getExportAnnotationKeys().getValue()).param(state.getExportParameters().getValue())
-                .alignmc(state.getAlignmc().getValue()).build();
+                .corpora(new LinkedHashSet<>(state.getSelectedCorpora().getItems()))
+                .queryLanguage(state.getQueryLanguage().getValue()).left(state.getLeftContext().getValue())
+                .right(state.getRightContext().getValue()).segmentation(state.getVisibleBaseText().getValue())
+                .exporter(state.getExporter().getValue()).annotations(state.getExportAnnotationKeys().getValue())
+                .param(state.getExportParameters().getValue()).alignmc(state.getAlignmc().getValue()).build();
     }
 
     private void checkQuirksMode(Query query) {
@@ -335,7 +356,7 @@ public class QueryController implements Serializable {
             getState().getOffset().setValue(0l);
             getState().getSelectedMatches().setValue(new TreeSet<Long>());
             // get the value for the visible segmentation from the configured context
-            Set<String> selectedCorpora = getState().getSelectedCorpora().getValue();
+            Collection<String> selectedCorpora = getState().getSelectedCorpora().getItems();
             CorpusConfig config = new CorpusConfig();
             if (selectedCorpora != null && !selectedCorpora.isEmpty()) {
                 config = ui.getCorpusConfigWithCache(selectedCorpora.iterator().next());
@@ -472,7 +493,7 @@ public class QueryController implements Serializable {
             Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
             panel.showQueryDefinitionPanel();
             return;
-        } else if (state.getSelectedCorpora().getValue().isEmpty()) {
+        } else if (state.getSelectedCorpora().getItems().isEmpty()) {
             Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
             panel.showQueryDefinitionPanel();
             return;
@@ -485,10 +506,10 @@ public class QueryController implements Serializable {
             UserGeneratedFrequencyEntry userGen = container.getItem(id).getBean();
             freqDefinition.add(userGen.toFrequencyTableEntry());
         }
-        
+
         FrequencyQuery query = QueryGenerator.frequency().query(state.getAql().getValue())
-                .corpora(state.getSelectedCorpora().getValue()).queryLanguage(state.getQueryLanguage().getValue())
-                .def(freqDefinition).build();
+                .corpora(new LinkedHashSet<>(state.getSelectedCorpora().getItems()))
+                .queryLanguage(state.getQueryLanguage().getValue()).def(freqDefinition).build();
 
         checkQuirksMode(query);
 
@@ -568,18 +589,19 @@ public class QueryController implements Serializable {
 
             newQuery.setOffset(offset);
 
-            Background.runWithCallback(new SingleResultFetchJob(match, newQuery, UI.getCurrent()), new FutureCallback<SaltProject>() {
+            Background.runWithCallback(new SingleResultFetchJob(match, newQuery, UI.getCurrent()),
+                    new FutureCallback<SaltProject>() {
 
-                @Override
-                public void onSuccess(SaltProject result) {
-                    visCtxChange.updateResult(result, newQuery);
-                }
+                        @Override
+                        public void onSuccess(SaltProject result) {
+                            visCtxChange.updateResult(result, newQuery);
+                        }
 
-                @Override
-                public void onFailure(Throwable t) {
-                    ExceptionDialog.show(t, "Could not extend context.", ui);
-                }
-            });
+                        @Override
+                        public void onFailure(Throwable t) {
+                            ExceptionDialog.show(t, "Could not extend context.", ui);
+                        }
+                    });
         } catch (CloneNotSupportedException ex) {
             log.error("Can't clone the query", ex);
         }
@@ -587,7 +609,7 @@ public class QueryController implements Serializable {
 
     public void corpusSelectionChangedInBackground() {
         searchView.getControlPanel().getSearchOptions()
-                .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora().getValue(), ui);
+                .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora().getItems(), ui);
     }
 
     public QueryUIState getState() {

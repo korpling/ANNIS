@@ -13,7 +13,7 @@ Access the graphANNIS corpora and execute AQL queries with this service.
 ## Requirements
 
 Building the API client library requires:
-1. Java 1.7+
+1. Java 1.8+
 2. Maven/Gradle
 
 ## Installation

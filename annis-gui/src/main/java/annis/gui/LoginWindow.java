@@ -84,7 +84,7 @@ public class LoginWindow extends Window
   public void close(boolean loginSuccessful)
   {
     if(executeSearchAfterClose && loginSuccessful && queryController != null
-      && !queryController.getState().getSelectedCorpora().getValue().isEmpty())
+      && !queryController.getState().getSelectedCorpora().getItems().isEmpty())
     {
       queryController.executeSearch(true, true);
     }

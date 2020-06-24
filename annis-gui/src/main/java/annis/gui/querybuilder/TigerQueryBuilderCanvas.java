@@ -17,6 +17,7 @@ package annis.gui.querybuilder;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -114,7 +115,7 @@ public class TigerQueryBuilderCanvas extends Panel
     WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
 
     // get current corpus selection
-    Set<String> corpusSelection = controller.getState().getSelectedCorpora().getValue();
+    Collection<String> corpusSelection = controller.getState().getSelectedCorpora().getItems();
 
     if (service != null && corpusSelection != null)
     {

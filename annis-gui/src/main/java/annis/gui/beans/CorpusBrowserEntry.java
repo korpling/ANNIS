@@ -24,99 +24,81 @@ import java.util.Set;
  *
  * @author thomas
  */
-public class CorpusBrowserEntry implements CitationProvider, Serializable
-{
+public class CorpusBrowserEntry implements CitationProvider, Serializable {
   private String name;
   private String example;
-  private AnnisCorpus corpus;
+  private String corpus;
 
-  public String getExample()
-  {
+  public String getExample() {
     return example;
   }
 
-  public void setExample(String example)
-  {
+  public void setExample(String example) {
     this.example = example;
   }
 
-  public String getName()
-  {
+  public String getName() {
     return name;
   }
 
-  public void setName(String name)
-  {
+  public void setName(String name) {
     this.name = name;
   }
 
-  public AnnisCorpus getCorpus()
-  {
+  public String getCorpus() {
     return corpus;
   }
 
-  public void setCorpus(AnnisCorpus corpus)
-  {
+  public void setCorpus(String corpus) {
     this.corpus = corpus;
   }
 
   @Override
-  public boolean equals(Object obj)
-  {
-    if(obj == null)
-    {
+  public boolean equals(Object obj) {
+    if (obj == null) {
       return false;
     }
-    if(getClass() != obj.getClass())
-    {
+    if (getClass() != obj.getClass()) {
       return false;
     }
     final CorpusBrowserEntry other = (CorpusBrowserEntry) obj;
-    if((this.name == null) ? (other.name != null) : !this.name.equals(other.name))
-    {
+    if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
       return false;
     }
-    if(this.corpus != other.corpus && (this.corpus == null || !this.corpus.equals(other.corpus)))
-    {
+    if (this.corpus != other.corpus && (this.corpus == null || !this.corpus.equals(other.corpus))) {
       return false;
     }
     return true;
   }
 
   @Override
-  public int hashCode()
-  {
+  public int hashCode() {
     int hash = 5;
     hash = 13 * hash + (this.name != null ? this.name.hashCode() : 0);
     hash = 13 * hash + (this.corpus != null ? this.corpus.hashCode() : 0);
     return hash;
   }
 
-  
   @Override
-  public String getQuery()
-  {
+  public String getQuery() {
     return example;
   }
 
   @Override
-  public Set<String> getCorpora()
-  {
+  public Set<String> getCorpora() {
     Set<String> result = new HashSet<>();
-    result.add(corpus.getName());
+    result.add(corpus);
     return result;
   }
 
   @Override
-  public int getLeftContext()
-  {
+  public int getLeftContext() {
     return 5;
   }
 
   @Override
-  public int getRightContext()
-  {
+  public int getRightContext() {
     return 5;
   }
-  
+
 }

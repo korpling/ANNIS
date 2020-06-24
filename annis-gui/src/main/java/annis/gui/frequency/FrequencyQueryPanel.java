@@ -37,6 +37,8 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.provider.DataChangeEvent;
+import com.vaadin.data.provider.DataProviderListener;
 import com.vaadin.event.LayoutEvents;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -73,11 +75,10 @@ import annis.service.objects.QueryLanguage;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener
-{
-  
+public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener {
+
   private static final Logger log = LoggerFactory.getLogger(FrequencyQueryPanel.class);
-  
+
   private Table tblFrequencyDefinition;
   private final Button btAdd;
   private final Button btReset;
@@ -91,52 +92,48 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
-  
-  private transient WeakHashMap<Field<?>,Object> field2ItemID;
-  
+
+  private transient WeakHashMap<Field<?>, Object> field2ItemID;
+
   private final ProgressBar pbQuery = new ProgressBar();
-  
+
   private final QueryUIState state;
-  
+
   private final QueryController controller;
 
-  
-  public FrequencyQueryPanel(final QueryController controller, QueryUIState state)
-  {    
+  public FrequencyQueryPanel(final QueryController controller, QueryUIState state) {
     this.state = state;
     this.controller = controller;
-    
+
     setWidth("99%");
     setHeight("99%");
     setMargin(true);
-    
+
     queryLayout = new VerticalLayout();
     queryLayout.setWidth("100%");
     queryLayout.setHeight("100%");
-    
+
     HorizontalLayout queryDescriptionLayout = new HorizontalLayout();
     queryDescriptionLayout.setSpacing(true);
     queryDescriptionLayout.setWidth("100%");
     queryDescriptionLayout.setHeight("-1px");
     queryLayout.addComponent(queryDescriptionLayout);
-    
+
     lblCorpusList = new Label("");
     lblCorpusList.setCaption("selected corpora:");
     lblCorpusList.setWidth("100%");
-    
+
     lblAQL = new Label("");
     lblAQL.setCaption("query to analyze:");
     lblAQL.setWidth("100%");
     lblAQL.addStyleName(Helper.CORPUS_FONT_FORCE);
-    
+
     queryDescriptionLayout.addComponent(lblCorpusList);
     queryDescriptionLayout.addComponent(lblAQL);
-    
-    queryDescriptionLayout.setComponentAlignment(lblCorpusList,
-      Alignment.MIDDLE_LEFT);
-    queryDescriptionLayout.setComponentAlignment(lblAQL,
-      Alignment.MIDDLE_RIGHT);
-    
+
+    queryDescriptionLayout.setComponentAlignment(lblCorpusList, Alignment.MIDDLE_LEFT);
+    queryDescriptionLayout.setComponentAlignment(lblAQL, Alignment.MIDDLE_RIGHT);
+
     tblFrequencyDefinition = new Table();
     tblFrequencyDefinition.setImmediate(true);
     tblFrequencyDefinition.setSortEnabled(false);
@@ -144,243 +141,193 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.setMultiSelect(true);
     tblFrequencyDefinition.setTableFieldFactory(new FieldFactory());
     tblFrequencyDefinition.setEditable(true);
-    tblFrequencyDefinition.addValueChangeListener(new Property.ValueChangeListener() 
-    {
+    tblFrequencyDefinition.addValueChangeListener(new Property.ValueChangeListener() {
       @Override
-      public void valueChange(ValueChangeEvent event)
-      {
-        if(tblFrequencyDefinition.getValue() == null 
-          || ((Set<Object>) tblFrequencyDefinition.getValue()).isEmpty())
-        {
+      public void valueChange(ValueChangeEvent event) {
+        if (tblFrequencyDefinition.getValue() == null || ((Set<Object>) tblFrequencyDefinition.getValue()).isEmpty()) {
           btDeleteRow.setEnabled(false);
-        }
-        else
-        {
+        } else {
           btDeleteRow.setEnabled(true);
         }
       }
     });
-    
-    lblErrorOrMsg = new Label(
-      "No node with explicit name in OR expression found! "
-      + "When using OR expression you need to explicitly name the nodes "
-      + "you want to include in the frequency analysis with \"#\", "
-      + "like e.g. in <br />"
-      + "<pre>"
-      + "(n1#tok=\"fun\" | n1#tok=\"severity\")"
-      + "</pre>");
+
+    lblErrorOrMsg = new Label("No node with explicit name in OR expression found! "
+        + "When using OR expression you need to explicitly name the nodes "
+        + "you want to include in the frequency analysis with \"#\", " + "like e.g. in <br />" + "<pre>"
+        + "(n1#tok=\"fun\" | n1#tok=\"severity\")" + "</pre>");
     lblErrorOrMsg.setContentMode(ContentMode.HTML);
     lblErrorOrMsg.addStyleName("embedded-warning");
     lblErrorOrMsg.setWidth("100%");
     lblErrorOrMsg.setVisible(false);
     queryLayout.addComponent(lblErrorOrMsg);
-    
+
     tblFrequencyDefinition.setWidth("100%");
     tblFrequencyDefinition.setHeight("100%");
-  
-   
+
     tblFrequencyDefinition.setContainerDataSource(state.getFrequencyTableDefinition());
-    
+
     tblFrequencyDefinition.setColumnHeader("nr", "Node number/name");
     tblFrequencyDefinition.setColumnHeader("annotation", "Selected annotation of node");
     tblFrequencyDefinition.setColumnHeader("comment", "Comment");
-    
+
     tblFrequencyDefinition.addStyleName(Helper.CORPUS_FONT_FORCE);
-    
+
     tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
-    
-    
+
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
     tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.35f);
     tblFrequencyDefinition.setColumnExpandRatio("comment", 0.5f);
     tblFrequencyDefinition.setVisibleColumns("nr", "annotation", "comment");
-    
+
     queryLayout.addComponent(tblFrequencyDefinition);
-    
-    
-    if(controller != null)
-    {
+
+    if (controller != null) {
       createAutomaticEntriesForQuery(state.getAql().getValue(), state.getQueryLanguage().getValue());
       updateQueryInfo(state.getAql().getValue());
     }
-    
+
     HorizontalLayout layoutButtons = new HorizontalLayout();
-    
+
     btAdd = new Button("Add");
-    btAdd.addClickListener(new Button.ClickListener() 
-    {
+    btAdd.addClickListener(new Button.ClickListener() {
       @Override
-      public void buttonClick(ClickEvent event)
-      {
+      public void buttonClick(ClickEvent event) {
         cbAutomaticMode.setValue(Boolean.FALSE);
-        
+
         int nr = 1;
         // get the highest number of values from the existing defitions
-        for(Object id : tblFrequencyDefinition.getItemIds())
-        {
-          String textNr = (String) tblFrequencyDefinition.getItem(id)
-            .getItemProperty("nr").getValue();
-          try
-          {
+        for (Object id : tblFrequencyDefinition.getItemIds()) {
+          String textNr = (String) tblFrequencyDefinition.getItem(id).getItemProperty("nr").getValue();
+          try {
             nr = Math.max(nr, Integer.parseInt(textNr));
-          }
-          catch(NumberFormatException ex)
-          {
+          } catch (NumberFormatException ex) {
             // was not a number but a named node
           }
         }
-        if(controller != null)
-        {
-          List<NodeDesc> nodes = parseQuery(FrequencyQueryPanel.this.state.getAql().getValue(), 
+        if (controller != null) {
+          List<NodeDesc> nodes = parseQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
               FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
-          nr = Math.min(nr, nodes.size()-1);
+          nr = Math.min(nr, nodes.size() - 1);
           int id = counter++;
           UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
           entry.setAnnotation("tok");
           entry.setComment("");
-          entry.setNr("" + (nr+1));
-          FrequencyQueryPanel.this.state
-            .getFrequencyTableDefinition().addItem(id, entry);
+          entry.setNr("" + (nr + 1));
+          FrequencyQueryPanel.this.state.getFrequencyTableDefinition().addItem(id, entry);
         }
       }
     });
     layoutButtons.addComponent(btAdd);
-    
+
     btDeleteRow = new Button("Delete selected row(s)");
     btDeleteRow.setEnabled(false);
-    btDeleteRow.addClickListener(new Button.ClickListener() 
-    {
+    btDeleteRow.addClickListener(new Button.ClickListener() {
       @Override
-      public void buttonClick(ClickEvent event)
-      {
+      public void buttonClick(ClickEvent event) {
         Object rawValue = tblFrequencyDefinition.getValue();
-        if(rawValue instanceof Collection<?>)
-        {
+        if (rawValue instanceof Collection<?>) {
           Set<Object> selected = new HashSet<Object>((Collection<?>) rawValue);
-          for(Object o : selected)
-          {
+          for (Object o : selected) {
             cbAutomaticMode.setValue(Boolean.FALSE);
             tblFrequencyDefinition.removeItem(o);
-            
+
           }
         }
       }
     });
     layoutButtons.addComponent(btDeleteRow);
-    
+
     cbAutomaticMode = new CheckBox("Automatic mode", true);
     cbAutomaticMode.setImmediate(true);
-    cbAutomaticMode.addValueChangeListener(new Property.ValueChangeListener()
-    {
+    cbAutomaticMode.addValueChangeListener(new Property.ValueChangeListener() {
       @Override
-      public void valueChange(ValueChangeEvent event)
-      {
+      public void valueChange(ValueChangeEvent event) {
         btShowFrequencies.setEnabled(true);
-        if(cbAutomaticMode.getValue())
-        {
+        if (cbAutomaticMode.getValue()) {
           tblFrequencyDefinition.removeAllItems();
-          if(controller != null)
-          {
-            createAutomaticEntriesForQuery(
-              FrequencyQueryPanel.this.state.getAql().getValue(), 
-              FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
+          if (controller != null) {
+            createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
+                FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
           }
         }
       }
     });
     layoutButtons.addComponent(cbAutomaticMode);
-    
+
     btReset = new Button("Reset to default");
-    btReset.addClickListener(new Button.ClickListener() 
-    {
+    btReset.addClickListener(new Button.ClickListener() {
       @Override
-      public void buttonClick(ClickEvent event)
-      {
+      public void buttonClick(ClickEvent event) {
         cbAutomaticMode.setValue(Boolean.TRUE);
         btShowFrequencies.setEnabled(true);
         tblFrequencyDefinition.removeAllItems();
-        if(controller != null)
-        {
-          createAutomaticEntriesForQuery(
-            FrequencyQueryPanel.this.state.getAql().getValue(),
-            FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
+        if (controller != null) {
+          createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
+              FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
         }
       }
     });
-    //layoutButtons.addComponent(btReset);
-    
+    // layoutButtons.addComponent(btReset);
+
     layoutButtons.setComponentAlignment(btAdd, Alignment.MIDDLE_LEFT);
     layoutButtons.setComponentAlignment(btDeleteRow, Alignment.MIDDLE_LEFT);
     layoutButtons.setComponentAlignment(cbAutomaticMode, Alignment.MIDDLE_RIGHT);
     layoutButtons.setExpandRatio(btAdd, 0.0f);
     layoutButtons.setExpandRatio(btDeleteRow, 0.0f);
     layoutButtons.setExpandRatio(cbAutomaticMode, 1.0f);
-    
+
     layoutButtons.setMargin(true);
     layoutButtons.setSpacing(true);
     layoutButtons.setHeight("-1px");
     layoutButtons.setWidth("100%");
-    
+
     queryLayout.addComponent(layoutButtons);
-    
+
     btShowFrequencies = new Button("Perform frequency analysis");
     btShowFrequencies.setDisableOnClick(true);
-    btShowFrequencies.addClickListener(new Button.ClickListener() 
-    {
+    btShowFrequencies.addClickListener(new Button.ClickListener() {
       @Override
-      public void buttonClick(ClickEvent event)
-      {
-        
-        
-        if(controller != null)
-        {
-          try
-          {
-            if (resultPanel != null)
-            {
+      public void buttonClick(ClickEvent event) {
+
+        if (controller != null) {
+          try {
+            if (resultPanel != null) {
               removeComponent(resultPanel);
             }
             queryLayout.setVisible(false);
-            
-            pbQuery.setCaption(
-              "Please wait, the frequencies analysis can take some time");
+
+            pbQuery.setCaption("Please wait, the frequencies analysis can take some time");
             pbQuery.setIndeterminate(true);
             pbQuery.setEnabled(true);
             pbQuery.setVisible(true);
-            
+
             controller.executeFrequency(FrequencyQueryPanel.this);
-          }
-          catch(Exception ex)
-          {
+          } catch (Exception ex) {
             btShowFrequencies.setEnabled(true);
           }
         }
-          
+
       }
     });
     queryLayout.addComponent(btShowFrequencies);
-    
+
     queryLayout.setComponentAlignment(tblFrequencyDefinition, Alignment.TOP_CENTER);
     queryLayout.setComponentAlignment(layoutButtons, Alignment.TOP_CENTER);
     queryLayout.setComponentAlignment(btShowFrequencies, Alignment.TOP_CENTER);
-    
+
     queryLayout.setExpandRatio(tblFrequencyDefinition, 1.0f);
     queryLayout.setExpandRatio(layoutButtons, 0.0f);
     queryLayout.setExpandRatio(btShowFrequencies, 0.0f);
-    
-    queryLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener()
-    {
+
+    queryLayout.addLayoutClickListener(new LayoutEvents.LayoutClickListener() {
       @Override
-      public void layoutClick(LayoutEvents.LayoutClickEvent event)
-      {
+      public void layoutClick(LayoutEvents.LayoutClickEvent event) {
         Component c = event.getClickedComponent();
-        if(c instanceof Field)
-        {
+        if (c instanceof Field) {
           Object itemID = getField2ItemID().get((Field<?>) c);
-          if(itemID != null)
-          {
-            if(!event.isCtrlKey() && !event.isShiftKey())
-            {
+          if (itemID != null) {
+            if (!event.isCtrlKey() && !event.isShiftKey()) {
               // deselect everything else if no modifier key was clicked
               tblFrequencyDefinition.setValue(null);
             }
@@ -390,88 +337,68 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         }
       }
     });
-    
-    btShowQuery = new Button("New Analysis", new Button.ClickListener() 
-    {
+
+    btShowQuery = new Button("New Analysis", new Button.ClickListener() {
 
       @Override
-      public void buttonClick(ClickEvent event)
-      {
+      public void buttonClick(ClickEvent event) {
         showQueryDefinitionPanel();
       }
     });
     btShowQuery.setVisible(false);
-    
+
     pbQuery.setVisible(false);
     addComponent(pbQuery);
-    
+
     addComponent(queryLayout);
     addComponent(btShowQuery);
-    
+
     setComponentAlignment(btShowQuery, Alignment.TOP_CENTER);
     setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
 
-    if(controller != null)
-    {
-      state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
-      {
+    if (controller != null) {
+      state.getSelectedCorpora().addDataProviderListener(new DataProviderListener<String>() {
 
         @Override
-        public void valueChange(ValueChangeEvent event)
-        {
-          if (cbAutomaticMode.getValue())
-          {
-            createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
+        public void onDataChange(DataChangeEvent<String> event) {
+          createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
               FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
-          }
           updateQueryInfo(FrequencyQueryPanel.this.state.getAql().getValue());
         }
       });
     }
   }
-  
-  @Override
-    public void attach() {
-        super.attach();
 
-        if(controller != null)
-        {
-          createAutomaticEntriesForQuery(state.getAql().getValue(), state.getQueryLanguage().getValue());
-          updateQueryInfo(state.getAql().getValue());
-        }
+  @Override
+  public void attach() {
+    super.attach();
+
+    if (controller != null) {
+      createAutomaticEntriesForQuery(state.getAql().getValue(), state.getQueryLanguage().getValue());
+      updateQueryInfo(state.getAql().getValue());
     }
-  
-  public Set<String> getAvailableMetaNames()
-  {
+  }
+
+  public Set<String> getAvailableMetaNames() {
     Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
     // get current corpus selection
-    Set<String> corpusSelection = state.getSelectedCorpora().getValue();
-    if (service != null)
-    {
-      try
-      {
+    Collection<String> corpusSelection = state.getSelectedCorpora().getItems();
+    if (service != null) {
+      try {
         List<AnnisAttribute> atts = new LinkedList<>();
 
-        for (String corpus : corpusSelection)
-        {
-          atts.addAll(service.path("query").path("corpora").path(corpus)
-            .path("annotations")
-            .get(new GenericType<List<AnnisAttribute>>()
-              {
-            })
-          );
+        for (String corpus : corpusSelection) {
+          atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
+              .get(new GenericType<List<AnnisAttribute>>() {
+              }));
         }
-        for (AnnisAttribute a : atts)
-        {
-          if (a.getType() == AnnisAttribute.Type.meta)
-          {
+        for (AnnisAttribute a : atts) {
+          if (a.getType() == AnnisAttribute.Type.meta) {
             result.add(a.getName());
           }
         }
-      }
-      catch (ClientHandlerException | UniformInterfaceException ex)
-      {
+      } catch (ClientHandlerException | UniformInterfaceException ex) {
         log.error(null, ex);
       }
     }
@@ -479,18 +406,14 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   }
 
   @Override
-  public void textChange(FieldEvents.TextChangeEvent event)
-  {
-    if(cbAutomaticMode.getValue())
-    {
+  public void textChange(FieldEvents.TextChangeEvent event) {
+    if (cbAutomaticMode.getValue()) {
       createAutomaticEntriesForQuery(event.getText(), state.getQueryLanguage().getValue());
     }
     updateQueryInfo(event.getText());
   }
-  
-  
-  public void showResult(FrequencyTable result, FrequencyQuery query)
-  {
+
+  public void showResult(FrequencyTable result, FrequencyQuery query) {
     pbQuery.setVisible(false);
     resultPanel = new FrequencyResultPanel(result, query, this);
     addComponent(resultPanel);
@@ -498,114 +421,93 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
 
     queryLayout.setVisible(false);
   }
-  
-  public void showQueryDefinitionPanel()
-  {
+
+  public void showQueryDefinitionPanel() {
     btShowFrequencies.setEnabled(true);
     pbQuery.setVisible(false);
     btShowQuery.setVisible(false);
     queryLayout.setVisible(true);
     resultPanel.setVisible(false);
   }
-  
-  private List<NodeDesc> parseQuery(String query, QueryLanguage queryLanguage)
-  {
-    if(query == null || query.isEmpty())
-    {
+
+  private List<NodeDesc> parseQuery(String query, QueryLanguage queryLanguage) {
+    if (query == null || query.isEmpty()) {
       return new LinkedList<>();
     }
     // let the service parse the query
     WebResource res = Helper.getAnnisWebResource(UI.getCurrent());
-    List<NodeDesc> nodes = res.path("query/parse/nodes")
-      .queryParam("q", Helper.encodeJersey(query))
-      .queryParam("query-language", queryLanguage.name())
-      .get(new GenericType<List<NodeDesc>>() {});
-    
+    List<NodeDesc> nodes = res.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(query))
+        .queryParam("query-language", queryLanguage.name()).get(new GenericType<List<NodeDesc>>() {
+        });
+
     return nodes;
   }
-  
-  private void createAutomaticEntriesForQuery(String query, QueryLanguage queryLanguage)
-  {
-    if(query == null || query.isEmpty())
-    {
+
+  private void createAutomaticEntriesForQuery(String query, QueryLanguage queryLanguage) {
+    if (query == null || query.isEmpty()) {
       return;
     }
-    
-    try
-    { 
+
+    try {
 
       state.getFrequencyTableDefinition().removeAllItems();
       lblErrorOrMsg.setVisible(false);
-      
+
       counter = 0;
       List<NodeDesc> nodes = parseQuery(query, queryLanguage);
-      Collections.sort(nodes, new Comparator<NodeDesc>()
-      {
+      Collections.sort(nodes, new Comparator<NodeDesc>() {
 
         @Override
-        public int compare(NodeDesc o1, NodeDesc o2)
-        {
-          if(o1.getVariable() == null)
-          {
+        public int compare(NodeDesc o1, NodeDesc o2) {
+          if (o1.getVariable() == null) {
             return o2 == null ? 0 : -1;
           }
           return o1.getVariable().compareTo(o2.getVariable());
         }
       });
-      
+
       // calculate the nodes that are part of every alternative
       Multimap<String, Long> alternativesOfVariable = LinkedHashMultimap.create();
       long maxAlternative = 0;
-      for(NodeDesc n : nodes)
-      {
-          maxAlternative = Math.max(n.getComponentNr(), maxAlternative);
-          alternativesOfVariable.put(n.getVariable(), n.getComponentNr()); 
+      for (NodeDesc n : nodes) {
+        maxAlternative = Math.max(n.getComponentNr(), maxAlternative);
+        alternativesOfVariable.put(n.getVariable(), n.getComponentNr());
       }
       Set<String> allowedVariables = new LinkedHashSet<>();
-      for(NodeDesc n : nodes)
-      {
+      for (NodeDesc n : nodes) {
         // we assume that the alternative numbering is continuous and without gaps
-        if(alternativesOfVariable.get(n.getVariable()).size() == (maxAlternative+1))
-        {
+        if (alternativesOfVariable.get(n.getVariable()).size() == (maxAlternative + 1)) {
           allowedVariables.add(n.getVariable());
         }
       }
-      
-      if(maxAlternative > 0 && allowedVariables.isEmpty())
-      {
+
+      if (maxAlternative > 0 && allowedVariables.isEmpty()) {
         lblErrorOrMsg.setVisible(true);
       }
-      
+
       Set<UserGeneratedFrequencyEntry> generatedEntries = new HashSet<>();
-      
-      for(NodeDesc n : nodes)
-      {
-        if(allowedVariables.contains(n.getVariable()))
-        {
-          if(n.getAnnoName() == null)
-          {
+
+      for (NodeDesc n : nodes) {
+        if (allowedVariables.contains(n.getVariable())) {
+          if (n.getAnnoName() == null) {
             UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
             entry.setAnnotation("tok");
             entry.setComment("automatically created from " + n.getAqlFragment());
             entry.setNr(n.getVariable());
-            
-            if(!generatedEntries.contains(entry))
-            {
+
+            if (!generatedEntries.contains(entry)) {
               int id = counter++;
               state.getFrequencyTableDefinition().addItem(id, entry);
               generatedEntries.add(entry);
             }
-          }
-          else
-          {
-            
+          } else {
+
             UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
             entry.setAnnotation(n.getAnnoName());
             entry.setComment("automatically created from " + n.getAqlFragment());
             entry.setNr(n.getVariable());
-            
-            if(!generatedEntries.contains(entry))
-            {
+
+            if (!generatedEntries.contains(entry)) {
               int id = counter++;
               state.getFrequencyTableDefinition().addItem(id, entry);
               generatedEntries.add(entry);
@@ -613,84 +515,60 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           }
         }
       }
-    }
-    catch(UniformInterfaceException ex)
-    {
+    } catch (UniformInterfaceException ex) {
       // non-valid query, ignore
     }
-    
+
   }
-  
-  private void updateQueryInfo(String query)
-  {    
-    Set<String> selectedCorpora = state.getSelectedCorpora().getValue();
-    if(selectedCorpora.isEmpty())
-    {
+
+  private void updateQueryInfo(String query) {
+    Collection<String> selectedCorpora = state.getSelectedCorpora().getItems();
+    if (selectedCorpora.isEmpty()) {
       lblCorpusList.setValue("none");
+    } else {
+      lblCorpusList.setValue(Joiner.on(", ").join(selectedCorpora));
     }
-    else
-    {
-      lblCorpusList.
-        setValue(Joiner.on(", ").join(selectedCorpora));
-    }
-    if(query == null || query.isEmpty())
-    {
+    if (query == null || query.isEmpty()) {
       lblAQL.setValue("<empty query>");
-    }
-    else
-    {
+    } else {
       lblAQL.setValue(query.replaceAll("[\n\r]+", " "));
     }
   }
-  
-  public void notifiyQueryFinished()
-  {
+
+  public void notifiyQueryFinished() {
     btShowFrequencies.setEnabled(true);
     btShowQuery.setVisible(true);
   }
-  
-  public class FieldFactory extends DefaultFieldFactory
-  {
 
-    public FieldFactory()
-    {
+  public class FieldFactory extends DefaultFieldFactory {
+
+    public FieldFactory() {
     }
-    
+
     @Override
-    public Field<?> createField(Container container, final Object itemId,
-      Object propertyId, Component uiContext)
-    {
-      if ("nr".equals(propertyId) || "annotation".equals(propertyId))
-      {
-        TextField txt = new TextField(container.getContainerProperty(itemId,
-          propertyId));
+    public Field<?> createField(Container container, final Object itemId, Object propertyId, Component uiContext) {
+      if ("nr".equals(propertyId) || "annotation".equals(propertyId)) {
+        TextField txt = new TextField(container.getContainerProperty(itemId, propertyId));
         txt.setWidth("100%");
-        if(itemId != null)
-        {
+        if (itemId != null) {
           getField2ItemID().put(txt, itemId);
         }
         return txt;
-      }
-      else if("comment".equals(propertyId))
-      {
+      } else if ("comment".equals(propertyId)) {
         // explicitly request a read-only label
         return null;
       }
-      
+
       return super.createField(container, itemId, propertyId, uiContext);
     }
-    
+
   }
 
-  private WeakHashMap<Field<?>, Object> getField2ItemID()
-  {
-    if(field2ItemID == null)
-    {
+  private WeakHashMap<Field<?>, Object> getField2ItemID() {
+    if (field2ItemID == null) {
       field2ItemID = new WeakHashMap<>();
     }
     return field2ItemID;
   }
-  
-  
-  
+
 }
