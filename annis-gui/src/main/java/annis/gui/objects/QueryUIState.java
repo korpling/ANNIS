@@ -25,17 +25,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import javax.management.RuntimeErrorException;
+
+import com.vaadin.data.provider.CallbackDataProvider;
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.v7.data.util.BeanContainer;
 import com.vaadin.v7.data.util.BeanItemContainer;
 import com.vaadin.v7.data.util.ObjectProperty;
 
+import org.corpus_tools.ApiException;
+import org.corpus_tools.annis.CorporaApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import annis.gui.exporter.CSVExporter;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.model.Query;
-import annis.service.objects.AnnisCorpus;
 import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;
 
@@ -45,6 +55,8 @@ import annis.service.objects.QueryLanguage;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class QueryUIState implements Serializable {
+
+    private final static Logger log = LoggerFactory.getLogger(QueryUIState.class);
 
     public enum QueryType {
         COUNT, FIND, FREQUENCY, EXPORT
@@ -81,8 +93,6 @@ public class QueryUIState implements Serializable {
             UserGeneratedFrequencyEntry.class);
 
     private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
-
-    private final ListDataProvider<String> availableCorpora = new ListDataProvider<>(new ArrayList<>());
 
     public QueryUIState() {
         initTransients();
@@ -163,10 +173,6 @@ public class QueryUIState implements Serializable {
 
     public ObjectProperty<OrderType> getOrder() {
         return order;
-    }
-
-    public ListDataProvider<String> getAvailableCorpora() {
-        return availableCorpora;
     }
 
     public ObjectProperty<QueryLanguage> getQueryLanguage() {
