@@ -2,3 +2,4 @@
 *.eclipse.wst.jsdt.ui.superType.name
 *.jsdtscope
 *.eclipse.jdt.apt.core.prefs
+*.eclipse.wst.common.component
