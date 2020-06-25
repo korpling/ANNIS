@@ -17,10 +17,18 @@ package annis.gui;
 
 import static annis.libgui.Helper.DEFAULT_CONFIG;
 
-import java.io.IOException;
-
-import org.slf4j.LoggerFactory;
-
+import annis.gui.components.ExceptionDialog;
+import annis.gui.exporter.CSVExporter;
+import annis.gui.exporter.GridExporter;
+import annis.gui.exporter.SimpleTextExporter;
+//import annis.gui.exporter.MatchWithContextExporter;
+import annis.gui.exporter.TextColumnExporter;
+import annis.gui.exporter.TokenExporter;
+import annis.gui.objects.QueryUIState;
+import annis.gui.querybuilder.TigerQueryBuilderPlugin;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
+import annis.service.objects.CorpusConfig;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
@@ -31,23 +39,11 @@ import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
-import com.vaadin.ui.UI;
-
-import annis.gui.components.ExceptionDialog;
-import annis.gui.exporter.CSVExporter;
-import annis.gui.exporter.GridExporter;
-import annis.gui.exporter.SimpleTextExporter;
-//import annis.gui.exporter.MatchWithContextExporter;
-import annis.gui.exporter.TextColumnExporter;
-import annis.gui.exporter.TokenExporter;
-import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
-import annis.gui.objects.QueryUIState;
-import annis.gui.querybuilder.TigerQueryBuilderPlugin;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import annis.service.objects.CorpusConfig;
+import com.vaadin.spring.annotation.SpringUI;
+import java.io.IOException;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
+import org.slf4j.LoggerFactory;
 
 /**
  * GUI for searching in corpora.
@@ -55,6 +51,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Theme("annis")
+@SpringUI
 @Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 public class AnnisUI extends CommonUI
   implements ErrorHandler, ViewChangeListener

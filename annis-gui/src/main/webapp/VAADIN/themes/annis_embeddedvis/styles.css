@@ -1077,7 +1077,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "8.9.4";
+	content: "8.11.0";
 }
 
 .v-widget {
@@ -3996,6 +3996,26 @@ div.v-layout.v-horizontal.v-widget {
 	display: none;
 }
 
+.annis_embeddedvis .v-filterselect.v-readonly.borderless [class*="input"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-filterselect.v-readonly.borderless [class*="input"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-filterselect.v-readonly.borderless [class*="input"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
+}
+
 .annis_embeddedvis .v-filterselect .v-icon {
 	position: absolute;
 	pointer-events: none;
@@ -4447,6 +4467,26 @@ div.v-layout.v-horizontal.v-widget {
 	display: none;
 }
 
+.annis_embeddedvis .v-filterselect-tiny.v-readonly.borderless [class*="input"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-filterselect-tiny.v-readonly.borderless [class*="input"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-filterselect-tiny.v-readonly.borderless [class*="input"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
+}
+
 .annis_embeddedvis .v-filterselect-compact, .annis_embeddedvis .v-filterselect-small {
 	height: 31px;
 	
@@ -4559,6 +4599,26 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-filterselect-compact.v-readonly [class$="button"]:active:after, .annis_embeddedvis .v-filterselect-small.v-readonly [class$="button"]:active:after {
 	display: none;
+}
+
+.annis_embeddedvis .v-filterselect-compact.v-readonly.borderless [class*="input"], .annis_embeddedvis .v-filterselect-small.v-readonly.borderless [class*="input"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-filterselect-compact.v-readonly.borderless [class*="input"]:focus, .annis_embeddedvis .v-filterselect-small.v-readonly.borderless [class*="input"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-filterselect-compact.v-readonly.borderless [class*="input"][class*="prompt"], .annis_embeddedvis .v-filterselect-small.v-readonly.borderless [class*="input"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
 }
 
 .annis_embeddedvis .v-filterselect-small {
@@ -4680,6 +4740,26 @@ div.v-layout.v-horizontal.v-widget {
 	display: none;
 }
 
+.annis_embeddedvis .v-filterselect-large.v-readonly.borderless [class*="input"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-filterselect-large.v-readonly.borderless [class*="input"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-filterselect-large.v-readonly.borderless [class*="input"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
+}
+
 .annis_embeddedvis .v-filterselect-huge {
 	height: 59px;
 	
@@ -4793,6 +4873,26 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-filterselect-huge.v-readonly [class$="button"]:active:after {
 	display: none;
+}
+
+.annis_embeddedvis .v-filterselect-huge.v-readonly.borderless [class*="input"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-filterselect-huge.v-readonly.borderless [class*="input"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-filterselect-huge.v-readonly.borderless [class*="input"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
 }
 
 .annis_embeddedvis .v-csslayout-well {
@@ -6782,6 +6882,26 @@ div.v-layout.v-horizontal.v-widget {
 	display: none;
 }
 
+.annis_embeddedvis .v-datefield.v-readonly.borderless [class*="textfield"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-datefield.v-readonly.borderless [class*="textfield"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-datefield.v-readonly.borderless [class*="textfield"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
+}
+
 .annis_embeddedvis .v-datefield-error .v-datefield-textfield {
 	border-color: #ed473b !important;
 	background: #fffbfb;
@@ -7397,6 +7517,26 @@ div.v-layout.v-horizontal.v-widget {
 	display: none;
 }
 
+.annis_embeddedvis .v-datefield-tiny.v-readonly.borderless [class*="textfield"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-datefield-tiny.v-readonly.borderless [class*="textfield"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-datefield-tiny.v-readonly.borderless [class*="textfield"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
+}
+
 .annis_embeddedvis .v-datefield-compact, .annis_embeddedvis .v-datefield-small {
 	height: 31px;
 	border-radius: 4px;
@@ -7496,6 +7636,26 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-datefield-compact.v-readonly [class*="button"]:active:after, .annis_embeddedvis .v-datefield-small.v-readonly [class*="button"]:active:after {
 	display: none;
+}
+
+.annis_embeddedvis .v-datefield-compact.v-readonly.borderless [class*="textfield"], .annis_embeddedvis .v-datefield-small.v-readonly.borderless [class*="textfield"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-datefield-compact.v-readonly.borderless [class*="textfield"]:focus, .annis_embeddedvis .v-datefield-small.v-readonly.borderless [class*="textfield"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-datefield-compact.v-readonly.borderless [class*="textfield"][class*="prompt"], .annis_embeddedvis .v-datefield-small.v-readonly.borderless [class*="textfield"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
 }
 
 .annis_embeddedvis .v-datefield-small {
@@ -7604,6 +7764,26 @@ div.v-layout.v-horizontal.v-widget {
 	display: none;
 }
 
+.annis_embeddedvis .v-datefield-large.v-readonly.borderless [class*="textfield"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-datefield-large.v-readonly.borderless [class*="textfield"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-datefield-large.v-readonly.borderless [class*="textfield"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
+}
+
 .annis_embeddedvis .v-datefield-huge {
 	height: 59px;
 	border-radius: 4px;
@@ -7704,6 +7884,26 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-datefield-huge.v-readonly [class*="button"]:active:after {
 	display: none;
+}
+
+.annis_embeddedvis .v-datefield-huge.v-readonly.borderless [class*="textfield"] {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: inherit;
+}
+
+.annis_embeddedvis .v-datefield-huge.v-readonly.borderless [class*="textfield"]:focus {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+}
+
+.annis_embeddedvis .v-datefield-huge.v-readonly.borderless [class*="textfield"][class*="prompt"] {
+	color: inherit;
+	opacity: 0.5;
+	filter: alpha(opacity=50) ;
 }
 
 .annis_embeddedvis .v-inline-datefield-calendarpanel {
@@ -11923,6 +12123,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-table-body {
 	border: 1px solid #d4d4d4;
+	overflow-anchor: none;
 	-webkit-user-select: text;
 	-moz-user-select: text;
 	-ms-user-select: text;
