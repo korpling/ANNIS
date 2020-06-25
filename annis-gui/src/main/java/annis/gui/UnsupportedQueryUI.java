@@ -15,8 +15,10 @@
  */
 package annis.gui;
 
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Panel;
@@ -25,6 +27,8 @@ import com.vaadin.ui.declarative.Design;
 
 import annis.libgui.Helper;
 
+@SpringUI(path="/unsupported-query")
+@Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
 public class UnsupportedQueryUI extends CommonUI {
 
     public static final String URL_PREFIX = "/unsupported-query";

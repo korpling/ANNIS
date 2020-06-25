@@ -28,17 +28,6 @@
   <servlet>
     <servlet-name>VaadinUI</servlet-name>
     <servlet-class>annis.gui.servlets.AnnisServlet</servlet-class>
-    <init-param>
-      <param-name>UIProvider</param-name>
-      <param-value>annis.gui.AnnisUIProvider</param-value>
-    </init-param>
-    <init-param>
-      <description>
-        Application widgetset
-      </description>
-      <param-name>widgetset</param-name>        	
-      <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
-    </init-param>
     <async-supported>true</async-supported>
   </servlet>
  

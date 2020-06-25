@@ -50,11 +50,13 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.shared.ui.ui.Transport;
+import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
 import com.vaadin.v7.ui.Label;
@@ -84,6 +86,8 @@ import annis.visualizers.htmlvis.HTMLVis;
  */
 @Theme("annis_embeddedvis")
 @Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
+@SpringUI(path="/embeddedvis")
+@Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
 public class EmbeddedVisUI extends CommonUI {
 
     private static final Logger log = LoggerFactory.getLogger(EmbeddedVisUI.class);
