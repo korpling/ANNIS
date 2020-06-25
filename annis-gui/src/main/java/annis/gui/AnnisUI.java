@@ -33,6 +33,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ErrorHandler;
@@ -51,6 +52,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Theme("annis")
+@Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
 @SpringUI
 @Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 public class AnnisUI extends CommonUI
