@@ -1,52 +1,41 @@
 package annis.gui;
 
-import com.vaadin.annotations.DesignRoot;
-import com.vaadin.v7.shared.ui.label.ContentMode;
-import com.vaadin.v7.ui.Label;
-import com.vaadin.v7.ui.Table;
-import com.vaadin.v7.ui.Table.ColumnGenerator;
-import com.vaadin.ui.declarative.Design;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.renderers.HtmlRenderer;
+import com.vaadin.ui.themes.ValoTheme;
 
+import annis.QueryGenerator;
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.libgui.Helper;
 
-@DesignRoot
-public class ExampleTable extends Table
-{
-  
+public class ExampleTable extends Grid<CorpusBrowserEntry> {
 
-  public ExampleTable()
-  {
-    Design.read("ExampleTable.html", this);
+  private static final long serialVersionUID = 4240653432503717501L;
+
+  public ExampleTable() {
+    super(CorpusBrowserEntry.class);
   }
-  
-  public void setCitationLinkGenerator(CitationLinkGenerator citationGenerator)
-  {
-    addGeneratedColumn("genlink", citationGenerator);
-  }
-  
+
   @Override
-  public void attach()
-  {
+  public void attach() {
     super.attach();
-    
-    addGeneratedColumn("example", new ColumnGenerator()
-    {
-      @Override
-      public Object generateCell(Table source, Object itemId, Object columnId)
-      {
-        CorpusBrowserEntry corpusBrowserEntry = (CorpusBrowserEntry) itemId;
-        Label l = new Label(corpusBrowserEntry.getExample());
-        l.setContentMode(ContentMode.TEXT);
-        l.addStyleName(Helper.CORPUS_FONT_FORCE);
-        return l;
-      }
-    });
 
-    setVisibleColumns("name", "example", "genlink");
-    setColumnHeaders("Name", "Example (click to use query)", "URL");
-    setColumnExpandRatio("name", 0.3f);
-    setColumnExpandRatio("example", 0.7f);
-    setImmediate(true);
+    setSizeFull();
+
+    getColumn("name").setCaption("Name");
+
+    Column<?, ?> exampleColumn = addColumn(cbe -> {
+      return "<div class=\"" + Helper.CORPUS_FONT_FORCE + "\">" + cbe.getExample() + "</div>";
+    }, new HtmlRenderer());
+    exampleColumn.setId("genexample");
+    exampleColumn.setCaption("Example (click to use query)");
+    exampleColumn.setExpandRatio(1);
+    setColumns("name", "genexample");
+
   }
 }

@@ -16,401 +16,326 @@
 package annis.gui;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
-import org.corpus_tools.annis.CorpusConfiguration;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.annotations.DesignRoot;
+import com.vaadin.event.selection.SelectionEvent;
+import com.vaadin.event.selection.SelectionListener;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.declarative.Design;
-import com.vaadin.v7.data.Item;
-import com.vaadin.v7.data.Property.ValueChangeEvent;
-import com.vaadin.v7.data.Property.ValueChangeListener;
-import com.vaadin.v7.data.util.BeanItemContainer;
-import com.vaadin.v7.data.util.DefaultItemSorter;
+
+import org.corpus_tools.ApiException;
+import org.corpus_tools.annis.AnnoKey;
+import org.corpus_tools.annis.Annotation;
+import org.corpus_tools.annis.AnnotationComponentType;
+import org.corpus_tools.annis.Component;
+import org.corpus_tools.annis.CorporaApi;
 
 import annis.gui.beans.CorpusBrowserEntry;
-import annis.libgui.AnnisBaseUI;
+import annis.gui.components.ExceptionDialog;
 import annis.libgui.Background;
-import annis.libgui.Helper;
 import annis.model.Query;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisCorpus;
-import annis.service.objects.CorpusConfig;
 import annis.service.objects.QueryLanguage;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@DesignRoot
 public class CorpusBrowserPanel extends Panel {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorpusBrowserPanel.class);
-
-    private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-
-    /**
-     *
-     */
     private static final long serialVersionUID = -1029743017413951838L;
 
     private String corpus;
-    private CorpusConfiguration corpusConfig;
 
     private ExampleTable tblNodeAnno;
-
-    private BeanItemContainer<CorpusBrowserEntry> containerNodeAnno;
 
     private Label lblNoNodeAnno;
 
     private ExampleTable tblEdgeTypes;
 
-    private BeanItemContainer<CorpusBrowserEntry> containerEdgeType;
-
     private Label lblNoEdgeTypes;
 
     private ExampleTable tblEdgeAnno;
-
-    private BeanItemContainer<CorpusBrowserEntry> containerEdgeAnno;
 
     private Label lblNoEdgeAnno;
 
     private ExampleTable tblMetaAnno;
 
-    private BeanItemContainer<CorpusBrowserEntry> containerMetaAnno;
-
     private Label lblNoMetaAnno;
 
-    private CitationLinkGenerator citationGenerator;
-
     private QueryController controller;
-    
+
     private ProgressBar progress;
-    
+
     private Accordion accordion;
-    
+
     private VerticalLayout layout;
-   
 
     public CorpusBrowserPanel() {
-        this(null, null, null);
+        this(null, null);
     }
 
-    public CorpusBrowserPanel(String corpus, final CorpusConfiguration corpusConfig, QueryController controller) {
+    public CorpusBrowserPanel(String corpus, QueryController controller) {
         super("Available annotations");
         this.corpus = corpus;
-        this.corpusConfig = corpusConfig;
         this.controller = controller;
-        
 
-        Design.read("CorpusBrowserPanel.html", this);
+        setSizeFull();
+        progress = new ProgressBar();
+        progress.setIndeterminate(true);
 
-        containerNodeAnno = new BeanItemContainer<>(CorpusBrowserEntry.class);
-        containerNodeAnno.setItemSorter(new ExampleSorter());
+        tblNodeAnno = new ExampleTable();
+        tblEdgeTypes = new ExampleTable();
+        tblEdgeAnno = new ExampleTable();
+        tblMetaAnno = new ExampleTable();
 
-        containerEdgeType = new BeanItemContainer<>(CorpusBrowserEntry.class);
-        containerEdgeType.setItemSorter(new ExampleSorter());
+        tblNodeAnno.addSelectionListener(new ExampleListener());
+        tblEdgeTypes.addSelectionListener(new ExampleListener());
+        tblEdgeAnno.addSelectionListener(new ExampleListener());
+        tblMetaAnno.addSelectionListener(new ExampleListener());
 
-        containerEdgeAnno = new BeanItemContainer<>(CorpusBrowserEntry.class);
-        containerEdgeAnno.setItemSorter(new ExampleSorter());
+        tblNodeAnno.sort("name");
+        tblEdgeTypes.sort("name");
+        tblEdgeAnno.sort("name");
 
-        containerMetaAnno = new BeanItemContainer<>(CorpusBrowserEntry.class);
-        containerMetaAnno.setItemSorter(new ExampleSorter());
+        lblNoNodeAnno = new Label("(No Node Annotations)");
+        VerticalLayout tabNodeAnno = new VerticalLayout(tblNodeAnno, lblNoNodeAnno);
+        tabNodeAnno.setCaption("Node Annotations");
 
-        citationGenerator = new CitationLinkGenerator();
+        lblNoEdgeAnno = new Label("(No Edge Annotations)");
+        VerticalLayout tabEdgeAnno = new VerticalLayout(tblEdgeAnno, lblNoEdgeAnno);
+        tabEdgeAnno.setCaption("Edge Annotations");
 
-        tblNodeAnno.addValueChangeListener(new ExampleListener());
-        tblEdgeTypes.addValueChangeListener(new ExampleListener());
-        tblEdgeAnno.addValueChangeListener(new ExampleListener());
-        tblMetaAnno.addValueChangeListener(new ExampleListener());
+        lblNoEdgeTypes = new Label("(No Edge Types)");
+        VerticalLayout tabEdgeTypes = new VerticalLayout(tblEdgeTypes, lblNoEdgeTypes);
+        tabEdgeTypes.setCaption("Edge Types");
 
-        tblNodeAnno.setContainerDataSource(containerNodeAnno);
-        tblEdgeAnno.setContainerDataSource(containerEdgeAnno);
-        tblEdgeTypes.setContainerDataSource(containerEdgeType);
-        tblMetaAnno.setContainerDataSource(containerMetaAnno);
+        lblNoMetaAnno = new Label("(No Meta Annotations)");
+        VerticalLayout tabMetaAnno = new VerticalLayout(tblMetaAnno, lblNoMetaAnno);
+        tabMetaAnno.setCaption("Meta Annotations");
 
-        tblNodeAnno.setCitationLinkGenerator(citationGenerator);
-        tblEdgeAnno.setCitationLinkGenerator(citationGenerator);
-        tblEdgeTypes.setCitationLinkGenerator(citationGenerator);
-        tblMetaAnno.setCitationLinkGenerator(citationGenerator);
-
-        tblNodeAnno.setSortContainerPropertyId("name");
-        tblEdgeTypes.setSortContainerPropertyId("name");
-        tblEdgeAnno.setSortContainerPropertyId("name");
-        
-        accordion.setVisible(false);
+        accordion = new Accordion(tabNodeAnno, tabEdgeAnno, tabEdgeTypes, tabMetaAnno);
+        accordion.setSizeFull();
+        accordion.setVisible(true);
+        progress.setVisible(true);
         progress.setSizeFull();
+
+        layout = new VerticalLayout();
+        layout.addComponents(progress, accordion);
         layout.setSizeFull();
+        layout.setMargin(false);
         layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
-        
+        setContent(layout);
 
     }
 
     @Override
     public void attach() {
         super.attach();
-        
-        Background.run(new AnnotationFetcher(UI.getCurrent()));
 
+        Background.run(() -> fetchAnnotationsInBackground());
     }
 
-    private class AnnotationFetcher implements Runnable {
-        
-        private final UI ui;
-        
-        public AnnotationFetcher(UI ui) {
-            this.ui = ui;
-        }
-        
-        @Override
-        public void run() {
-   
+    private void fetchAnnotationsInBackground() {
+        CorporaApi api = new CorporaApi();
 
-            final List<AnnisAttribute> attributes = corpus == null ? new LinkedList<AnnisAttribute>()
-                    : fetchAnnos(corpus, ui);
-           
-            
-            ((AnnisUI) getUI()).access(new Runnable() {
-                
-                @Override
-                public void run() {
-                    
-                    progress.setVisible(false);
-                    accordion.setVisible(true);
-                    
-                    boolean stripNodeAnno = true;
-                    boolean stripEdgeName = true;
-                    boolean stripEdgeAnno = true;
-                    HashSet<String> nodeAnnoNames = new HashSet<>();
-                    HashSet<String> edgeAnnoNames = new HashSet<>();
-                    HashSet<String> edgeNames = new HashSet<>();
-                    HashSet<String> fullEdgeNames = new HashSet<>();
-                    boolean hasDominance = false;
-                    boolean hasEmptyDominance = false;
-                    
-
-                    // do some preparations first
-                    for (AnnisAttribute a : attributes) {
-                        if (a.getType() == AnnisAttribute.Type.node) {
-                            // check for ambiguous names
-                            String name = killNamespace(a.getName());
-                            if (nodeAnnoNames.contains(name)) {
-                                stripNodeAnno = false;
-                            }
-                            nodeAnnoNames.add(name);
-                        } else if (a.getType() == AnnisAttribute.Type.edge) {
-                            fullEdgeNames.add(a.getEdgeName());
-
-                            // check if we need to add the general dominance example edge
-                            if (a.getSubtype() == AnnisAttribute.SubType.d) {
-                                hasDominance = true;
-                                if (a.getEdgeName() == null || a.getEdgeName().isEmpty()) {
-                                    hasEmptyDominance = true;
-                                }
-                            }
-
-                            String annoName = killNamespace(a.getName());
-                            if (edgeAnnoNames.contains(annoName)) {
-                                stripEdgeAnno = false;
-                            }
-                            edgeAnnoNames.add(annoName);
-
-                        }
-                    }
-
-                    // check if collected edge names are unique
-                    for (String edgeName : fullEdgeNames) {
-                        String name = killNamespace(edgeName);
-                        if (edgeNames.contains(name)) {
-                            stripEdgeName = false;
-                        }
-                        edgeNames.add(name);
-                    }
-                    
-                    
-                    if (hasDominance && !hasEmptyDominance) {
-                        CorpusBrowserEntry cbe = new CorpusBrowserEntry();
-                        cbe.setName("(dominance)");
-                        cbe.setCorpus(corpus);
-                        cbe.setExample("node & node & #1 > #2");
-                        containerEdgeType.addBean(cbe);
-                    }
-
-                    // second round, fill the actual containers
-                    Set<String> metaAnnosKey = new HashSet<>();
-                    for (AnnisAttribute a : attributes) {
-                        // if the annotation name is already in the example skip this.
-                        if (a.getType() == AnnisAttribute.Type.meta && !metaAnnosKey.contains(killNamespace(a.getName()))) {
-                            String name = killNamespace(a.getName());
-                            metaAnnosKey.add(name);
-                            CorpusBrowserEntry cbe = new CorpusBrowserEntry();
-                            cbe.setName(name);
-                            cbe.setExample("node @* " + name + "=\"" + getFirst(a.getValueSet()) + "\"");
-                            cbe.setCorpus(corpus);
-                            containerMetaAnno.addBean(cbe);
-                        }
-
-                        if (a.getType() == AnnisAttribute.Type.node) {
-                            String name = stripNodeAnno ? killNamespace(a.getName()) : a.getName();
-                            CorpusBrowserEntry cbe = new CorpusBrowserEntry();
-                            cbe.setName(name);
-                            cbe.setExample(name + "=\"" + getFirst(a.getValueSet()) + "\"");
-                            cbe.setCorpus(corpus);
-                            containerNodeAnno.addBean(cbe);
-                        } else if (a.getType() == AnnisAttribute.Type.edge) {
-                            // edge type entry (multiple entries will be removed automatically)
-                            CorpusBrowserEntry cbeEdgeType = new CorpusBrowserEntry();
-                            String name = stripEdgeName ? killNamespace(a.getEdgeName()) : a.getEdgeName();
-                            if ((name == null || name.isEmpty()) && a.getSubtype() == AnnisAttribute.SubType.d) {
-                                cbeEdgeType.setName("(dominance)");
-                            } else {
-                                cbeEdgeType.setName(name);
-                            }
-                            cbeEdgeType.setCorpus(corpus);
-                            if (a.getSubtype() == AnnisAttribute.SubType.p) {
-                                cbeEdgeType.setExample("node & node & #1 ->" + killNamespace(name) + " #2");
-                            } else if (a.getSubtype() == AnnisAttribute.SubType.d) {
-                                cbeEdgeType.setExample("node & node & #1 >" + killNamespace(name) + " #2");
-                            }
-                            containerEdgeType.addBean(cbeEdgeType);
-
-                            // the edge annotation entry
-
-                            if (!a.getValueSet().isEmpty()) {
-                                CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
-                                String edgeAnno = stripEdgeAnno ? killNamespace(a.getName()) : a.getName();
-                                cbeEdgeAnno.setName(edgeAnno);
-                                cbeEdgeAnno.setCorpus(corpus);
-                                if (a.getSubtype() == AnnisAttribute.SubType.p) {
-                                    cbeEdgeAnno.setExample("node & node & #1 ->" + killNamespace(a.getEdgeName()) + "["
-                                            + killNamespace(a.getName()) + "=\"" + getFirst(a.getValueSet()) + "\"] #2");
-                                } else if (a.getSubtype() == AnnisAttribute.SubType.d) {
-                                    cbeEdgeAnno.setExample("node & node & #1 >[" + killNamespace(a.getName()) + "=\""
-                                            + getFirst(a.getValueSet()) + "\"] #2");
-                                }
-                                containerEdgeAnno.addBean(cbeEdgeAnno);
-                            }
-                        }
-                    }
-                    
-
-                    if (containerNodeAnno.size() == 0) {
-                        lblNoNodeAnno.setVisible(true);
-                        tblNodeAnno.setVisible(false);
-                        ;
-                    }
-
-                    if (tblEdgeAnno.getContainerDataSource().size() == 0) {
-                        lblNoEdgeAnno.setVisible(true);
-                        tblEdgeAnno.setVisible(false);
-                    }
-
-                    if (tblEdgeTypes.getContainerDataSource().size() == 0) {
-                        lblNoEdgeTypes.setVisible(true);
-                        tblEdgeTypes.setVisible(false);
-                    }
-
-                    if (tblMetaAnno.getContainerDataSource().size() == 0) {
-                        lblNoMetaAnno.setVisible(true);
-                        tblMetaAnno.setVisible(false);
-                    }
-                    
+        try {
+            final List<Annotation> nodeAnnos = api.corpusNodeAnnotations(corpus, true, true);
+            final List<Component> components = api.corpusComponents(corpus, "Dominance", null);
+            final Map<Component, List<Annotation>> edgeAnnos = new LinkedHashMap<>();
+            components.addAll(api.corpusComponents(corpus, "Pointing", null));
+            for (Component c : components) {
+                try {
+                    edgeAnnos.put(c, api.corpusEdgeAnnotations(corpus, c.getType().getValue(), c.getLayer(),
+                            c.getName(), true, true));
+                } catch (ApiException ex) {
+                    // Ignore any not found errors
                 }
+            }
+
+            getUI().access(() -> {
+
+                TreeSet<CorpusBrowserEntry> nodeAnnoItems = new TreeSet<>();
+                TreeSet<CorpusBrowserEntry> edgeAnnoItems = new TreeSet<>();
+                TreeSet<CorpusBrowserEntry> edgeTypeItems = new TreeSet<>();
+                TreeSet<CorpusBrowserEntry> metaAnnoItems = new TreeSet<>();
+
+                progress.setVisible(false);
+                accordion.setVisible(true);
+
+                boolean stripNodeAnno = true;
+                boolean stripEdgeName = true;
+                boolean stripEdgeAnno = true;
+                HashSet<String> nodeAnnoNames = new HashSet<>();
+                HashSet<String> edgeAnnoNames = new HashSet<>();
+                HashSet<String> edgeNames = new HashSet<>();
+                boolean hasDominance = false;
+                boolean hasEmptyDominance = false;
+
+                // do some preparations first
+                for (Annotation a : nodeAnnos) {
+                    // check for ambiguous names
+                    if (!nodeAnnoNames.add(a.getKey().getName())) {
+                        stripNodeAnno = false;
+                    }
+                }
+                for (Component c : components) {
+                    // check if collected edge names are unique
+                    if (!edgeNames.add(getQName(c))) {
+                        stripEdgeName = false;
+                    }
+                    // check if we need to add the general dominance example edge
+                    if (c.getType() == AnnotationComponentType.DOMINANCE) {
+                        hasDominance = true;
+                        if (c.getName() == null || c.getName().isEmpty()) {
+                            hasEmptyDominance = true;
+                        }
+                    }
+                }
+
+                for (List<Annotation> annos : edgeAnnos.values()) {
+                    for (Annotation a : annos) {
+                        // check for ambiguous names
+                        if (!edgeAnnoNames.add(a.getKey().getName())) {
+                            stripEdgeAnno = false;
+                        }
+                    }
+                }
+
+                // fill the actual containers
+                for (Annotation a : nodeAnnos) {
+                    String name = stripNodeAnno ? a.getKey().getName() : getQName(a.getKey());
+                    CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+                    cbe.setName(name);
+                    cbe.setExample(name + "=\"" + a.getVal() + "\"");
+                    cbe.setCorpus(corpus);
+                    nodeAnnoItems.add(cbe);
+                }
+
+                // edge type entry
+                if (hasDominance && !hasEmptyDominance) {
+                    CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+                    cbe.setName("(dominance)");
+                    cbe.setCorpus(corpus);
+                    cbe.setExample("node & node & #1 > #2");
+                    edgeTypeItems.add(cbe);
+                }
+                for (Component c : components) {
+                    CorpusBrowserEntry cbeEdgeType = new CorpusBrowserEntry();
+                    String name = stripEdgeName ? c.getName() : getQName(c);
+                    if ((name == null || name.isEmpty()) && c.getType() == AnnotationComponentType.DOMINANCE) {
+                        cbeEdgeType.setName("(dominance)");
+                    } else {
+                        cbeEdgeType.setName(name);
+                    }
+                    cbeEdgeType.setCorpus(corpus);
+                    if (c.getType() == AnnotationComponentType.POINTING) {
+                        cbeEdgeType.setExample("node & node & #1 ->" + c.getName() + " #2");
+                    } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
+                        cbeEdgeType.setExample("node & node & #1 >" + c.getName() + " #2");
+                    }
+                    edgeTypeItems.add(cbeEdgeType);
+                }
+
+                // edge annotation entries
+                for (Map.Entry<Component, List<Annotation>> entry : edgeAnnos.entrySet()) {
+                    Component c = entry.getKey();
+                    for (Annotation a : entry.getValue()) {
+                        CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
+                        String edgeAnno = stripEdgeAnno ? a.getKey().getName() : getQName(a.getKey());
+                        cbeEdgeAnno.setName(edgeAnno);
+                        cbeEdgeAnno.setCorpus(corpus);
+                        if (c.getType() == AnnotationComponentType.POINTING) {
+                            cbeEdgeAnno.setExample("node & node & #1 ->" + c.getName() + "[" + a.getKey().getName()
+                                    + "=\"" + a.getVal() + "\"] #2");
+                        } else if (c.getType() == AnnotationComponentType.POINTING) {
+                            cbeEdgeAnno.setExample(
+                                    "node & node & #1 >[" + a.getKey().getName() + "=\"" + a.getVal() + "\"] #2");
+                        }
+                        edgeAnnoItems.add(cbeEdgeAnno);
+
+                    }
+                }
+
+                // TODO: meta???
+                Set<String> metaAnnosKey = new HashSet<>();
+                // if the annotation name is already in the example skip this.
+                // if (a.getType() == AnnisAttribute.Type.meta &&
+                // !metaAnnosKey.contains(killNamespace(a.getName()))) {
+                // String name = killNamespace(a.getName());
+                // metaAnnosKey.add(name);
+                // CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+                // cbe.setName(name);
+                // cbe.setExample("node @* " + name + "=\"" + getFirst(a.getValueSet()) + "\"");
+                // cbe.setCorpus(corpus);
+                // containerMetaAnno.addBean(cbe);
+                // }
+
+                lblNoNodeAnno.setVisible(nodeAnnoItems.isEmpty());
+                tblNodeAnno.setVisible(!nodeAnnoItems.isEmpty());
+                tblNodeAnno.setItems(new ArrayList<>(nodeAnnoItems));
+
+                lblNoEdgeAnno.setVisible(edgeAnnoItems.isEmpty());
+                tblEdgeAnno.setVisible(!edgeAnnoItems.isEmpty());
+                tblEdgeAnno.setItems(edgeAnnoItems);
+
+                lblNoEdgeTypes.setVisible(edgeTypeItems.isEmpty());
+                tblEdgeTypes.setVisible(!edgeTypeItems.isEmpty());
+                tblEdgeTypes.setItems(edgeTypeItems);
+
+                lblNoMetaAnno.setVisible(metaAnnoItems.isEmpty());
+                tblMetaAnno.setVisible(!metaAnnoItems.isEmpty());
+                tblMetaAnno.setItems(metaAnnoItems);
+
             });
 
-          
+        } catch (ApiException e) {
+            getUI().access(() -> {
+                ExceptionDialog.show(e, "Error fetching corpus annotations", getUI());
+            });
         }
-    }
-    private List<AnnisAttribute> fetchAnnos(String toplevelCorpus, UI ui) {
-        Collection<AnnisAttribute> result = new ArrayList<>();
-        try {
-            WebResource service = Helper.getAnnisWebResource(ui);
-            if (service != null) {
-                WebResource query = service.path("query").path("corpora").path(urlPathEscape.escape(toplevelCorpus))
-                        .path("annotations").queryParam("fetchvalues", "true")
-                        .queryParam("onlymostfrequentvalues", "true");
-                result = query.get(new AnnisAttributeListType());
-            }
-        } catch (UniformInterfaceException | ClientHandlerException ex) {
-            log.error(null, ex);
-            if (!AnnisBaseUI.handleCommonError(ex, "fetch example annotations")) {
-                Notification.show("Remote exception: " + ex.getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-            }
-        }
-        return new LinkedList<>(result);
+
     }
 
-    public class ExampleListener implements ValueChangeListener {
+    private static String getQName(AnnoKey key) {
+        if (key.getNs() == null || key.getNs().isEmpty()) {
+            return key.getName();
+        } else {
+            return key.getNs() + ":" + key.getName();
+        }
+    }
+
+    private static String getQName(Component c) {
+        if (c.getLayer() == null || c.getLayer().isEmpty()) {
+            return c.getName();
+        } else {
+            return c.getLayer() + ":" + c.getName();
+        }
+    }
+
+    public class ExampleListener implements SelectionListener<CorpusBrowserEntry> {
+
+        private static final long serialVersionUID = 5456621606184042619L;
 
         @Override
-        public void valueChange(ValueChangeEvent event) {
-
-            CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().getValue();
+        public void selectionChange(SelectionEvent<CorpusBrowserEntry> event) {
+            Optional<CorpusBrowserEntry> selected = event.getFirstSelectedItem();
             Set<String> corpusNameSet = new HashSet<>();
             if (corpus != null) {
                 corpusNameSet.add(corpus);
             }
-            if (controller != null && cbe != null) {
-                controller.setQuery(new Query(cbe.getExample(), QueryLanguage.AQL,  corpusNameSet));
+            if (controller != null && selected.isPresent()) {
+                controller.setQuery(new Query(selected.get().getQuery(), QueryLanguage.AQL, corpusNameSet));
             }
-        }
-    }
-
-    public static class ExampleSorter extends DefaultItemSorter {
-
-        @Override
-        protected int compareProperty(Object propertyId, boolean sortDirection, Item item1, Item item2) {
-            if ("name".equals(propertyId)) {
-                String val1 = (String) item1.getItemProperty(propertyId).getValue();
-                String val2 = (String) item2.getItemProperty(propertyId).getValue();
-
-                if (sortDirection) {
-                    return val1.compareToIgnoreCase(val2);
-                } else {
-                    return val2.compareToIgnoreCase(val1);
-                }
-            } else {
-                return super.compareProperty(propertyId, sortDirection, item1, item2);
-            }
-        }
-    }
-
-    private String killNamespace(String qName) {
-        if (qName == null) {
-            return "";
-        }
-        String[] splitted = qName.split(":");
-        return splitted[splitted.length - 1];
-    }
-
-    private String getFirst(Collection<String> list) {
-        Iterator<String> it = list.iterator();
-        return it.hasNext() ? it.next() : null;
-    }
-
-    private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>> {
-
-        public AnnisAttributeListType() {
         }
     }
 }

@@ -297,18 +297,9 @@ public class CorpusListPanel extends VerticalLayout {
 
   public void initCorpusBrowser(String topLevelCorpusName, final Button l) {
 
-    CorporaApi api = new CorporaApi();
-    CorpusConfiguration c;
-    try {
-      c = api.corpusConfiguration(topLevelCorpusName);
-    } catch (ApiException ex) {
-      ExceptionDialog.show(ex, "Fetching corpus details failed", ui);
-      return;
-    }
-
     MetaDataPanel meta = new MetaDataPanel(topLevelCorpusName);
 
-    CorpusBrowserPanel browse = new CorpusBrowserPanel(topLevelCorpusName, c, ui.getQueryController());
+    CorpusBrowserPanel browse = new CorpusBrowserPanel(topLevelCorpusName, ui.getQueryController());
     GridLayout infoLayout = new GridLayout(2, 2);
     infoLayout.setSizeFull();
 

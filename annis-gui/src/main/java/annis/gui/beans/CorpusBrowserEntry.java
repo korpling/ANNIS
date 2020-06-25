@@ -20,11 +20,13 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.common.collect.ComparisonChain;
+
 /**
  *
  * @author thomas
  */
-public class CorpusBrowserEntry implements CitationProvider, Serializable {
+public class CorpusBrowserEntry implements CitationProvider, Serializable, Comparable<CorpusBrowserEntry> {
   private String name;
   private String example;
   private String corpus;
@@ -69,6 +71,12 @@ public class CorpusBrowserEntry implements CitationProvider, Serializable {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public int compareTo(CorpusBrowserEntry o) {
+    return ComparisonChain.start().compare(this.getName(), o.getName()).compare(this.getCorpus(), o.getCorpus())
+        .result();
   }
 
   @Override
