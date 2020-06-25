@@ -44,6 +44,8 @@ import com.vaadin.spring.annotation.SpringUI;
 import java.io.IOException;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
+
+import org.atmosphere.config.service.UUIDProviderService;
 import org.slf4j.LoggerFactory;
 
 /**

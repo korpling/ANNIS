@@ -15,13 +15,12 @@
  */
 package annis.gui.controlpanel;
 
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ValoTheme;
-
 import annis.gui.AnnisUI;
 import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * This panel allows the user to control and execute queries.

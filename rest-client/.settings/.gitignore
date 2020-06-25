@@ -1,3 +1,4 @@
 *.eclipse.jdt.core.prefs
 *.eclipse.wst.common.component
 *.eclipse.wst.common.project.facet.core.xml
+*.eclipse.buildship.core.prefs
