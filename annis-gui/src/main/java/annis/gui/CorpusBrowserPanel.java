@@ -16,13 +16,17 @@
 package annis.gui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.event.selection.SelectionListener;
@@ -39,6 +43,11 @@ import org.corpus_tools.annis.Annotation;
 import org.corpus_tools.annis.AnnotationComponentType;
 import org.corpus_tools.annis.Component;
 import org.corpus_tools.annis.CorporaApi;
+import org.corpus_tools.annis.CorpusList;
+import org.corpus_tools.annis.FindQuery;
+import org.corpus_tools.annis.SearchApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.components.ExceptionDialog;
@@ -53,6 +62,8 @@ import annis.service.objects.QueryLanguage;
 public class CorpusBrowserPanel extends Panel {
 
     private static final long serialVersionUID = -1029743017413951838L;
+
+    private Logger log = LoggerFactory.getLogger(CorpusBrowserPanel.class);
 
     private String corpus;
 
@@ -147,16 +158,46 @@ public class CorpusBrowserPanel extends Panel {
 
     private void fetchAnnotationsInBackground() {
         CorporaApi api = new CorporaApi();
+        SearchApi search = new SearchApi();
 
         try {
-            final List<Annotation> nodeAnnos = api.corpusNodeAnnotations(corpus, true, true);
+            final List<Annotation> nodeAnnos = api.corpusNodeAnnotations(corpus, true, true).stream().filter(
+                    a -> !Objects.equals(a.getKey().getNs(), "annis") && !Objects.equals(a.getKey().getName(), "tok"))
+                    .collect(Collectors.toList());
+
+            final Set<Annotation> metaAnnos = new HashSet<>();
+            // Check for each annotation if its actually a meta-annotation
+            for (Annotation a : nodeAnnos) {
+                CorpusList c = new CorpusList();
+                c.add(corpus);
+                FindQuery q = new FindQuery();
+                q.setCorpora(c);
+                q.setLimit(1);
+                q.setOffset(0);
+                q.setQuery("node @* " + getQName(a.getKey()));
+                q.setQueryLanguage(org.corpus_tools.annis.QueryLanguage.AQL);
+                try {
+                    String findResult = search.find(q);
+                    if (findResult != null && !findResult.isEmpty()) {
+                        metaAnnos.add(a);
+                    }
+                } catch (ApiException ex) {
+                    // Ignore
+                    log.warn("Could not execute query '{}'", q.getQuery(), ex);
+                }
+            }
+            nodeAnnos.removeAll(metaAnnos);
+
             final List<Component> components = api.corpusComponents(corpus, "Dominance", null);
-            final Map<Component, List<Annotation>> edgeAnnos = new LinkedHashMap<>();
+            final List<Annotation> allEdgeAnnos = new LinkedList<>();
+            final Map<Component, List<Annotation>> edgeAnnosByComponent = new LinkedHashMap<>();
             components.addAll(api.corpusComponents(corpus, "Pointing", null));
             for (Component c : components) {
                 try {
-                    edgeAnnos.put(c, api.corpusEdgeAnnotations(corpus, c.getType().getValue(), c.getLayer(),
-                            c.getName(), true, true));
+                    List<Annotation> annos = api.corpusEdgeAnnotations(corpus, c.getType().getValue(), c.getLayer(),
+                            c.getName(), true, true);
+                    edgeAnnosByComponent.put(c, annos);
+                    allEdgeAnnos.addAll(annos);
                 } catch (ApiException ex) {
                     // Ignore any not found errors
                 }
@@ -172,8 +213,8 @@ public class CorpusBrowserPanel extends Panel {
                 progress.setVisible(false);
                 accordion.setVisible(true);
 
-                boolean stripNodeAnno = true;
-                boolean stripEdgeName = true;
+                boolean stripNodeAnno = canExcludeNamespace(nodeAnnos);
+                boolean stripEdgeName = canExcludeNamespace(allEdgeAnnos);
                 boolean stripEdgeAnno = true;
                 HashSet<String> nodeAnnoNames = new HashSet<>();
                 HashSet<String> edgeAnnoNames = new HashSet<>();
@@ -202,7 +243,7 @@ public class CorpusBrowserPanel extends Panel {
                     }
                 }
 
-                for (List<Annotation> annos : edgeAnnos.values()) {
+                for (List<Annotation> annos : edgeAnnosByComponent.values()) {
                     for (Annotation a : annos) {
                         // check for ambiguous names
                         if (!edgeAnnoNames.add(a.getKey().getName())) {
@@ -247,7 +288,7 @@ public class CorpusBrowserPanel extends Panel {
                 }
 
                 // edge annotation entries
-                for (Map.Entry<Component, List<Annotation>> entry : edgeAnnos.entrySet()) {
+                for (Map.Entry<Component, List<Annotation>> entry : edgeAnnosByComponent.entrySet()) {
                     Component c = entry.getKey();
                     for (Annotation a : entry.getValue()) {
                         CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
@@ -266,19 +307,23 @@ public class CorpusBrowserPanel extends Panel {
                     }
                 }
 
-                // TODO: meta???
-                Set<String> metaAnnosKey = new HashSet<>();
-                // if the annotation name is already in the example skip this.
-                // if (a.getType() == AnnisAttribute.Type.meta &&
-                // !metaAnnosKey.contains(killNamespace(a.getName()))) {
-                // String name = killNamespace(a.getName());
-                // metaAnnosKey.add(name);
-                // CorpusBrowserEntry cbe = new CorpusBrowserEntry();
-                // cbe.setName(name);
-                // cbe.setExample("node @* " + name + "=\"" + getFirst(a.getValueSet()) + "\"");
-                // cbe.setCorpus(corpus);
-                // containerMetaAnno.addBean(cbe);
-                // }
+                boolean stripMetaName = canExcludeNamespace(metaAnnos);
+                for (Annotation a : nodeAnnos) {
+                    String name = stripMetaName ? a.getKey().getName() : getQName(a.getKey());
+                    CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+                    cbe.setName(name);
+                    cbe.setExample(name + "=\"" + a.getVal() + "\"");
+                    cbe.setCorpus(corpus);
+                    nodeAnnoItems.add(cbe);
+                }
+                for (Annotation a : metaAnnos) {
+                    String name = stripNodeAnno ? a.getKey().getName() : getQName(a.getKey());
+                    CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+                    cbe.setName(name);
+                    cbe.setExample(name + "=\"" + a.getVal() + "\"");
+                    cbe.setCorpus(corpus);
+                    metaAnnoItems.add(cbe);
+                }
 
                 lblNoNodeAnno.setVisible(nodeAnnoItems.isEmpty());
                 tblNodeAnno.setVisible(!nodeAnnoItems.isEmpty());
@@ -304,6 +349,16 @@ public class CorpusBrowserPanel extends Panel {
             });
         }
 
+    }
+
+    private boolean canExcludeNamespace(Collection<Annotation> annos) {
+        Set<String> names = new HashSet<>();
+        for (Annotation a : annos) {
+            if (!names.add(a.getKey().getName())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static String getQName(AnnoKey key) {
