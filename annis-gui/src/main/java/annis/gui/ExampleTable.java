@@ -1,15 +1,8 @@
 package annis.gui;
 
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.ui.ContentMode;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.renderers.HtmlRenderer;
-import com.vaadin.ui.themes.ValoTheme;
 
-import annis.QueryGenerator;
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.libgui.Helper;
 
