@@ -15,30 +15,22 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.AnnisUI;
-import annis.gui.CorpusBrowserPanel;
-import annis.gui.ExampleQueriesPanel;
-import annis.gui.MetaDataPanel;
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.Background;
-import annis.libgui.CorpusSet;
-import annis.libgui.Helper;
-import annis.libgui.IDGenerator;
-import annis.libgui.InstanceConfig;
-import annis.security.UserConfig;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import com.google.common.collect.Sets;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.HasValue.ValueChangeEvent;
 import com.vaadin.data.HasValue.ValueChangeListener;
-import com.vaadin.data.provider.InMemoryDataProvider;
 import com.vaadin.data.provider.ListDataProvider;
-import com.vaadin.server.FontAwesome;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Resource;
 import com.vaadin.server.SerializablePredicate;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
@@ -53,16 +45,19 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import org.corpus_tools.ApiException;
+
 import org.corpus_tools.annis.CorporaApi;
-import org.corpus_tools.annis.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
+
+import annis.gui.AnnisUI;
+import annis.gui.CorpusBrowserPanel;
+import annis.gui.ExampleQueriesPanel;
+import annis.gui.MetaDataPanel;
+import annis.libgui.Background;
+import annis.libgui.CorpusSet;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.libgui.InstanceConfig;
 
 /**
  *
@@ -70,11 +65,13 @@ import org.slf4j.LoggerFactory;
  */
 public class CorpusListPanel extends VerticalLayout {
 
+  private static final long serialVersionUID = -6395601812288089382L;
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorpusListPanel.class);
 
-  private static final Resource INFO_ICON = FontAwesome.INFO_CIRCLE;
+  private static final Resource INFO_ICON = VaadinIcons.INFO_CIRCLE;
 
-  private static final Resource DOC_ICON = FontAwesome.FILE_TEXT_O;
+  private static final Resource DOC_ICON = VaadinIcons.FILE_TEXT_O;
 
   public static final String ALL_CORPORA = "All";
 
@@ -143,6 +140,9 @@ public class CorpusListPanel extends VerticalLayout {
     txtFilter.setWidth("100%");
     txtFilter.setHeight("-1px");
     txtFilter.addStyleName(ValoTheme.TEXTFIELD_SMALL);
+    txtFilter.addValueChangeListener(event -> {
+      tblCorpora.getDataProvider().refreshAll();
+    });
     addComponent(txtFilter);
 
     this.filter = (corpus) -> {
@@ -173,18 +173,13 @@ public class CorpusListPanel extends VerticalLayout {
       }
       return true;
     };
-    txtFilter.addValueChangeListener(event -> {
-      ((InMemoryDataProvider<String>) tblCorpora.getDataProvider()).setFilter(filter);
-    });
 
     pbLoadCorpora = new ProgressBar();
     pbLoadCorpora.setCaption("Loading corpus list...");
     pbLoadCorpora.setIndeterminate(true);
     addComponent(pbLoadCorpora);
 
-    ListDataProvider<String> availableCorpora = new ListDataProvider<>(new ArrayList<>());
-    availableCorpora.setFilter(filter);
-    tblCorpora = new Grid<>(availableCorpora);
+    tblCorpora = new Grid<>();
     tblCorpora.setWidthFull();
 
     tblCorpora.setSelectionMode(SelectionMode.MULTI);
@@ -196,13 +191,10 @@ public class CorpusListPanel extends VerticalLayout {
       final Button l = new Button();
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + corpus);
-      l.addClickListener(new Button.ClickListener() {
-        @Override
-        public void buttonClick(ClickEvent event) {
-          if (ui.getQueryController() != null) {
-            l.setEnabled(false);
-            initCorpusBrowser(corpus, l);
-          }
+      l.addClickListener(event -> {
+        if (ui.getQueryController() != null) {
+          l.setEnabled(false);
+          initCorpusBrowser(corpus, l);
         }
       });
       l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY);
@@ -210,17 +202,26 @@ public class CorpusListPanel extends VerticalLayout {
     });
     infoColumn.setCaption("Info");
 
+    Column<?, ?> docColumn = tblCorpora.addComponentColumn(corpus -> {
+      final Button l = new Button();
+      l.setIcon(DOC_ICON);
+      l.setDescription("opens the document browser for " + corpus);
+      l.addClickListener(event -> {
+        ui.getSearchView().getDocBrowserController().openDocBrowser(corpus);
+      });
+      l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY);
+      return l;
+    });
+    docColumn.setCaption("Doc");
+
     addComponent(tblCorpora);
 
     Button btReload = new Button();
-    btReload.addClickListener(new Button.ClickListener() {
-      @Override
-      public void buttonClick(ClickEvent event) {
-        updateCorpusSetList(false, false);
-        Notification.show("Reloaded corpus list", Notification.Type.HUMANIZED_MESSAGE);
-      }
+    btReload.addClickListener(event -> {
+      updateCorpusSetList(false, false);
+      Notification.show("Reloaded corpus list", Notification.Type.HUMANIZED_MESSAGE);
     });
-    btReload.setIcon(FontAwesome.REFRESH);
+    btReload.setIcon(VaadinIcons.REFRESH);
     btReload.setDescription("Reload corpus list");
     btReload.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
@@ -260,12 +261,6 @@ public class CorpusListPanel extends VerticalLayout {
     Set<String> corpora = new HashSet<>(ui.getQueryState().getSelectedCorpora().getItems());
 
     autoGenQueries.setSelectedCorpusInBackground(corpora);
-  }
-
-  private UserConfig getUserConfigFromRemote() {
-    WebResource rootRes = Helper.getAnnisWebResource(ui);
-    // get the current corpus configuration
-    return rootRes.path("admin").path("userconfig").get(UserConfig.class);
   }
 
   public void scrollToSelectedCorpus() {
@@ -321,13 +316,7 @@ public class CorpusListPanel extends VerticalLayout {
     window.setModal(false);
     window.setResizeLazy(true);
 
-    window.addCloseListener(new Window.CloseListener() {
-
-      @Override
-      public void windowClose(Window.CloseEvent e) {
-        l.setEnabled(true);
-      }
-    });
+    window.addCloseListener(e -> l.setEnabled(true));
 
     UI.getCurrent().addWindow(window);
     window.center();
@@ -355,11 +344,20 @@ public class CorpusListPanel extends VerticalLayout {
 
         // update the GUI
         ui.access(() -> {
-          tblCorpora.setItems(corpora);
-          ((InMemoryDataProvider<String>) tblCorpora.getDataProvider()).setFilter(filter);
+          ListDataProvider<String> availableCorpora = new ListDataProvider<>(corpora);
+          availableCorpora.setFilter(filter);
+          tblCorpora.setDataProvider(availableCorpora);
           List<CorpusSet> corpusSets = new LinkedList<>();
           if (instanceConfig != null && instanceConfig.getCorpusSets() != null) {
             corpusSets.addAll(instanceConfig.getCorpusSets());
+          }
+
+          if (showLoginMessage) {
+            if (corpora.isEmpty()) {
+              Notification.show(
+                  "No corpora found. Please login " + "(use button at upper right corner) to see more corpora.",
+                  Notification.Type.HUMANIZED_MESSAGE);
+            }
           }
 
           updateAutoGeneratedQueriesPanel();
