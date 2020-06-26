@@ -15,44 +15,36 @@
  */
 package annis.gui;
 
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.model.Annotation;
-import com.google.common.collect.ComparisonChain;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.v7.data.Property;
-import com.vaadin.v7.data.util.BeanItemContainer;
-import com.vaadin.v7.shared.ui.label.ContentMode;
-import com.vaadin.v7.ui.ComboBox;
-import com.vaadin.v7.ui.Label;
-import com.vaadin.v7.ui.Table;
-import com.vaadin.v7.ui.Table.ColumnGenerator;
-import com.vaadin.v7.ui.themes.ChameleonTheme;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-import org.slf4j.LoggerFactory;
+import java.util.Optional;
+import java.util.Set;
+
+import com.google.common.util.concurrent.FutureCallback;
+import com.vaadin.data.ValueProvider;
+import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.shared.data.sort.SortDirection;
+import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.Column;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.VerticalLayout;
+
+import org.corpus_tools.annis.AnnoKey;
+import org.corpus_tools.annis.Annotation;
+import org.corpus_tools.annis.CorpusList;
+import org.corpus_tools.annis.FrequencyQuery;
+import org.corpus_tools.annis.FrequencyQueryDefinition;
+import org.corpus_tools.annis.FrequencyTable;
+import org.corpus_tools.annis.SearchApi;
+
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.Background;
 
 /**
  * Provides all corpus annotations for a corpus or for a specific search result.
@@ -62,79 +54,22 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public class MetaDataPanel extends Panel implements Property.ValueChangeListener {
-
-    public static class MetaTableNameGenerator implements ColumnGenerator {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 4679566369923023648L;
-        private final BeanItemContainer<Annotation> mData;
-
-        public MetaTableNameGenerator(BeanItemContainer<Annotation> mData) {
-            this.mData = mData;
-        }
-
-        @Override
-        public Component generateCell(Table source, Object itemId, Object columnId) {
-            Annotation anno = mData.getItem(itemId).getBean();
-            String qName = anno.getName();
-            if (anno.getNamespace() != null) {
-                qName = anno.getNamespace() + ":" + qName;
-            }
-            Label l = new Label(qName);
-            l.setSizeUndefined();
-            return l;
-        }
-    }
-
-    public static class MetaTableValueGenerator implements ColumnGenerator {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -1942705923028234175L;
-        private final BeanItemContainer<Annotation> mData;
-
-        public MetaTableValueGenerator(BeanItemContainer<Annotation> mData) {
-            this.mData = mData;
-        }
-
-        @Override
-        public Component generateCell(Table source, Object itemId, Object columnId) {
-            Annotation anno = mData.getItem(itemId).getBean();
-            Label l = new Label(anno.getValue(), ContentMode.HTML);
-            return l;
-        }
-    }
-
+public class MetaDataPanel extends Panel {
     /**
      * 
      */
     private static final long serialVersionUID = -3607697674053863447L;
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaDataPanel.class);
-
-    private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
     private VerticalLayout layout;
 
     private String toplevelCorpusName;
 
     // this is only set if the metadata panel is called from a specific result.
-    private String documentName;
-
-    private ComboBox corpusSelection;
-
-    // last selected corpus or document of the combobox
-    private String lastSelectedItem;
-
-    // holds all corpus and documents for the combox in the corpus browser panel
-    private List<Annotation> docs;
+    private Optional<String> documentName;
 
     // holds the current corpus annotation table, when called from corpus browser
-    private Table corpusAnnotationTable = null;
+    private Grid<Annotation> corpusAnnotationTable = null;
 
     private final ProgressBar progress = new ProgressBar();
 
@@ -145,10 +80,10 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     private Label emptyLabel = new Label("(no metadata)");
 
     public MetaDataPanel(String toplevelCorpusName) {
-        this(toplevelCorpusName, null);
+        this(toplevelCorpusName, Optional.empty());
     }
 
-    public MetaDataPanel(String toplevelCorpusName, String documentName) {
+    public MetaDataPanel(String toplevelCorpusName, Optional<String> documentName) {
         super("Metadata");
 
         this.toplevelCorpusName = toplevelCorpusName;
@@ -193,206 +128,87 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     public void attach() {
         super.attach();
 
-        final UI ui = UI.getCurrent();
-
-        if (documentName == null) {
-            Callable<List<Annotation>> backgroundJob = () -> getAllSubcorpora(toplevelCorpusName, ui);
-            Background.runWithCallback(backgroundJob, new FutureCallback<List<Annotation>>() {
-
-                @Override
-                public void onFailure(Throwable t) {
-                    ExceptionDialog.show(t, "Could not get meta data.", ui);
-                    layout.removeComponent(progress);
-
-                }
-
-                @Override
-                public void onSuccess(List<Annotation> result) {
-
-                    layout.removeComponent(progress);
-
-                    docs = result;
-
-                    HorizontalLayout selectionLayout = new HorizontalLayout();
-                    Label selectLabel = new Label("Select corpus/document: ");
-                    corpusSelection = new ComboBox();
-                    selectionLayout.addComponents(selectLabel, corpusSelection);
-                    layout.addComponent(selectionLayout);
-
-                    selectLabel.setSizeUndefined();
-
-                    corpusSelection.setWidth(100, Unit.PERCENTAGE);
-                    corpusSelection.setHeight("-1px");
-                    corpusSelection.addValueChangeListener(MetaDataPanel.this);
-
-                    selectionLayout.setWidth(100, Unit.PERCENTAGE);
-                    selectionLayout.setHeight("-1px");
-                    selectionLayout.setSpacing(true);
-                    selectionLayout.setComponentAlignment(selectLabel, Alignment.MIDDLE_LEFT);
-                    selectionLayout.setComponentAlignment(corpusSelection, Alignment.MIDDLE_LEFT);
-                    selectionLayout.setExpandRatio(selectLabel, 0.4f);
-                    selectionLayout.setExpandRatio(corpusSelection, 0.6f);
-
-                    corpusSelection.addItem(toplevelCorpusName);
-                    corpusSelection.select(toplevelCorpusName);
-                    corpusSelection.setNullSelectionAllowed(false);
-                    corpusSelection.setImmediate(true);
-
-                    for (Annotation c : docs) {
-                        corpusSelection.addItem(c.getName());
-                    }
-                }
-            });
-        } else {
-            layout.removeComponent(progress);
-
-            Map<Integer, List<Annotation>> hashMData = splitListAnnotations();
-            List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
-            Accordion accordion = new Accordion();
-            accordion.setSizeFull();
-
-            // set output to none if no metadata are available
-            if (l.isEmpty()) {
-                addEmptyLabel();
-            } else {
-
-                for (BeanItemContainer<Annotation> item : l) {
-                    String corpusName = item.getIdByIndex(0).getCorpusName();
-                    String path = toplevelCorpusName.equals(corpusName) ? "corpus: " + corpusName
-                            : "document: " + corpusName;
-
-                    if (item.getItemIds().isEmpty()) {
-                        accordion.addTab(new Label("none"), path);
-                    } else {
-                        accordion.addTab(setupTable(item), path);
-                    }
-                }
-
-                layout.addComponent(accordion);
-            }
-        }
-    }
-
-    private List<Annotation> getAllSubcorpora(String toplevelCorpusName, UI ui) {
-        List<Annotation> result = new LinkedList<>();
-        WebResource res = Helper.getAnnisWebResource(ui);
-        try {
-            res = res.path("meta").path("docnames").path(urlPathEscape.escape(toplevelCorpusName));
-            result = res.get(new Helper.AnnotationListType());
-
-            Collections.sort(result,
-                    (arg0, arg1) -> ComparisonChain.start().compare(arg0.getName(), arg1.getName()).result());
-
-        } catch (UniformInterfaceException | ClientHandlerException ex) {
-            log.error(null, ex);
-            if (!AnnisBaseUI.handleCommonError(ex, "get documents")) {
-                Notification.show("Remote exception: " + ex.getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-            }
-        }
-
-        return result;
-    }
-
-    private void loadTable(String item, List<Annotation> metaData) {
-        BeanItemContainer<Annotation> metaContainer = new BeanItemContainer<>(Annotation.class);
-        metaContainer.addAll(metaData);
-
-        if (corpusAnnotationTable != null) {
-            layout.removeComponent(corpusAnnotationTable);
-        }
-
-        layout.removeComponent(emptyLabel);
-        corpusAnnotationTable = setupTable(metaContainer);
-        corpusAnnotationTable.setHeight(100, Unit.PERCENTAGE);
-        corpusAnnotationTable.setWidth(100, Unit.PERCENTAGE);
-        layout.addComponent(corpusAnnotationTable);
-        layout.setExpandRatio(corpusAnnotationTable, 1.0f);
-    }
-
-    private List<BeanItemContainer<Annotation>> putInBeanContainer(
-            Map<Integer, List<Annotation>> splittedAnnotationsList) {
-        List<BeanItemContainer<Annotation>> listOfBeanItemCon = new ArrayList<>();
-
-        for (List<Annotation> list : splittedAnnotationsList.values()) {
-            BeanItemContainer<Annotation> metaContainer = new BeanItemContainer<>(Annotation.class);
-            metaContainer.addAll(list);
-
-            listOfBeanItemCon.add(metaContainer);
-        }
-        return listOfBeanItemCon;
-    }
-
-    private void removeEmptyLabel() {
-        if (emptyLabel != null) {
-            layout.removeComponent(emptyLabel);
-        }
-    }
-
-    private Table setupTable(BeanItemContainer<Annotation> metaData) {
-        final BeanItemContainer<Annotation> mData = metaData;
-        mData.sort(new Object[] { "namespace", "name" }, new boolean[] { true, true });
-        Table tblMeta = new Table();
-        tblMeta.setContainerDataSource(mData);
-        tblMeta.addGeneratedColumn("genname", new MetaTableNameGenerator(mData));
-        tblMeta.addGeneratedColumn("genvalue", new MetaTableValueGenerator(mData));
-
-        tblMeta.setVisibleColumns("genname", "genvalue");
-
-        tblMeta.setColumnHeaders("Name", "Value");
-        tblMeta.setSizeFull();
-        tblMeta.setColumnWidth("genname", -1);
-        tblMeta.setColumnExpandRatio("genvalue", 1.0f);
-        tblMeta.addStyleName(ChameleonTheme.TABLE_STRIPED);
-        return tblMeta;
-    }
-
-    /**
-     * Returns empty map if no metadata are available.
-     */
-    private Map<Integer, List<Annotation>> splitListAnnotations() {
-        List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName, documentName, UI.getCurrent());
-
-        Map<Integer, List<Annotation>> hashMetaData = new HashMap<>();
-
-        if (metadata != null && !metadata.isEmpty()) {
-            // if called from corpus browser sort the other way around.
-            if (documentName != null) {
-                hashMetaData = new TreeMap<>(Collections.reverseOrder());
-            } else {
-                hashMetaData = new TreeMap<>();
-            }
-
-            for (Annotation metaDatum : metadata) {
-                int pre = metaDatum.getPre();
-                if (!hashMetaData.containsKey(pre)) {
-                    hashMetaData.put(pre, new ArrayList<Annotation>());
-                    hashMetaData.get(pre).add(metaDatum);
+        Background.runWithCallback(() -> {
+            Set<AnnoKey> metaKeys = ServiceHelper.getMetaAnnotationNames(toplevelCorpusName);
+            List<Annotation> result = new LinkedList<>();
+            SearchApi api = new SearchApi();
+            for (AnnoKey key : metaKeys) {
+                // get the value for this annotation using a frequency query
+                FrequencyQuery q = new FrequencyQuery();
+                CorpusList c = new CorpusList();
+                c.add(toplevelCorpusName);
+                q.setCorpora(c);
+                if (documentName.isPresent()) {
+                    q.setQuery("annis:node_type=\"corpus\" _ident_ annis:doc=\"" + documentName + "\"");
                 } else {
-                    hashMetaData.get(pre).add(metaDatum);
+                    q.setQuery("annis:node_type=\"corpus\" _ident_ annis:node_name=\"" + toplevelCorpusName + "\"");
+                }
+                FrequencyQueryDefinition def = new FrequencyQueryDefinition();
+                def.setNodeRef("1");
+                def.setNs(key.getNs());
+                def.setName(key.getName());
+                q.setDefinition(Arrays.asList(def));
+                FrequencyTable table = api.frequency(q);
+                if (!table.isEmpty() && !table.get(0).getValues().isEmpty()) {
+                    Annotation anno = new Annotation();
+                    anno.setKey(key);
+                    String val = table.get(0).getValues().get(0);
+                    if (val != null && !val.isEmpty()) {
+                        anno.setVal(table.get(0).getValues().get(0));
+                        result.add(anno);
+                    }
                 }
             }
-        }
+            return result;
+        }, new FutureCallback<List<Annotation>>() {
+            @Override
+            public void onFailure(Throwable t) {
+                layout.removeComponent(progress);
+                ExceptionDialog.show(t, "Could not get meta data", getUI());
+            }
 
-        return hashMetaData;
+            @Override
+            public void onSuccess(List<Annotation> result) {
+                layout.removeComponent(progress);
+                Accordion accordion = new Accordion();
+                accordion.setSizeFull();
+
+                // set output to none if no metadata are available
+                if (result.isEmpty()) {
+                    addEmptyLabel();
+                } else {
+                    String path = documentName.isPresent() ? "document: " + documentName.get()
+                            : "corpus: " + toplevelCorpusName;
+
+                    accordion.addTab(setupTable(new ListDataProvider<>(result)), path);
+
+                    layout.addComponent(accordion);
+                }
+
+            }
+        });
+
     }
 
-    @Override
-    public void valueChange(Property.ValueChangeEvent event) {
-        if (lastSelectedItem == null || !lastSelectedItem.equals(event.getProperty().getValue())) {
-            lastSelectedItem = event.getProperty().getValue().toString();
-            List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName, lastSelectedItem, UI.getCurrent());
+    private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData) {
+        ValueProvider<Annotation, String> nameProvider = anno -> ServiceHelper.getQName(anno.getKey());
+        metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
 
-            if (metaData == null || metaData.isEmpty()) {
-                super.setCaption("No metadata available");
-                addEmptyLabel();
-                if (corpusAnnotationTable != null) {
-                    corpusAnnotationTable.removeAllItems();
-                }
-            } else {
-                super.setCaption("Metadata");
-                removeEmptyLabel();
-                loadTable(toplevelCorpusName, metaData);
-            }
-        }
+        Grid<Annotation> tblMeta = new Grid<>(Annotation.class);
+        tblMeta.setDataProvider(metaData);
+        Column<Annotation, String> nameColumn = tblMeta.addColumn(nameProvider);
+        nameColumn.setWidthUndefined();
+        nameColumn.setCaption("Name");
+        nameColumn.setId("genname");
+        Column<Annotation, ?> valueColumn = tblMeta
+                .addComponentColumn(anno -> new Label(anno.getVal(), ContentMode.HTML));
+        valueColumn.setId("genval");
+        valueColumn.setCaption("Value");
+
+        tblMeta.setColumns(nameColumn.getId(), valueColumn.getId());
+
+        tblMeta.setSizeFull();
+        valueColumn.setExpandRatio(1);
+        return tblMeta;
     }
 }

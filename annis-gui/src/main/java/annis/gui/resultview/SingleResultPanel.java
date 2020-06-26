@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -347,7 +348,7 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
             Window infoWindow = new Window("Info for " + result.getId());
 
             infoWindow.setModal(false);
-            MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size() - 1));
+            MetaDataPanel meta = new MetaDataPanel(path.get(0), Optional.of(path.get(path.size() - 1)));
             infoWindow.setContent(meta);
             infoWindow.setWidth("400px");
             infoWindow.setHeight("400px");

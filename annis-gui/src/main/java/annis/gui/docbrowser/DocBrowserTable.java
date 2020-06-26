@@ -16,6 +16,7 @@
 package annis.gui.docbrowser;
 
 import annis.gui.MetaDataPanel;
+import annis.gui.ServiceHelper;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.DocumentBrowserConfig;
@@ -28,7 +29,9 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -234,8 +237,21 @@ public class DocBrowserTable extends Table {
 
                 Table metaTable = new Table();
                 metaTable.setContainerDataSource(metaContainer);
-                metaTable.addGeneratedColumn("genname", new MetaDataPanel.MetaTableNameGenerator(metaContainer));
-                metaTable.addGeneratedColumn("genvalue", new MetaDataPanel.MetaTableValueGenerator(metaContainer));
+                metaTable.addGeneratedColumn("genname", (source, itemId, columnId) -> {
+                    Annotation anno = metaContainer.getItem(itemId).getBean();
+                    String qName = anno.getName();
+                    if (anno.getNamespace() != null) {
+                        qName = anno.getNamespace() + ":" + qName;
+                    }
+                    Label l = new Label(qName);
+                    l.setSizeUndefined();
+                    return l;
+                });
+                metaTable.addGeneratedColumn("genvalue", (source, itemId, columnId) -> {
+                    Annotation anno = metaContainer.getItem(itemId).getBean();
+                    Label l = new Label(anno.getValue(), ContentMode.HTML);
+                    return l;
+                });
 
                 metaTable.setVisibleColumns("genname", "genvalue");
 
@@ -318,7 +334,7 @@ public class DocBrowserTable extends Table {
      * document.
      *
      * @param document
-     *            The document the data are fetched for.
+     *                     The document the data are fetched for.
      * @return The a list of meta data. Can be empty but never null.
      */
     private List<Annotation> getDocMetaData(String document) {
@@ -361,7 +377,7 @@ public class DocBrowserTable extends Table {
      * by the user.
      *
      * @param docs
-     *            the list of documents, wrapped in the {@link Annotation} POJO
+     *                 the list of documents, wrapped in the {@link Annotation} POJO
      */
     void setDocNames(List<Annotation> docs) {
 
