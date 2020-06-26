@@ -40,6 +40,8 @@ import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SCorpus;
 import org.slf4j.LoggerFactory;
@@ -124,7 +126,7 @@ public class SingleCorpusResultPanel extends CssLayout {
                         Window infoWindow = new Window("Info for " + c.getId());
 
                         infoWindow.setModal(false);
-                        MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size() - 1));
+                        MetaDataPanel meta = new MetaDataPanel(path.get(0), Optional.of(path.get(path.size() - 1)));
                         infoWindow.setContent(meta);
                         infoWindow.setWidth("400px");
                         infoWindow.setHeight("400px");

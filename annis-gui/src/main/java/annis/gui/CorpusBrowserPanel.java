@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import static annis.gui.ServiceHelper.getQName;
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.Background;
@@ -77,22 +78,6 @@ public class CorpusBrowserPanel extends Panel {
     }
 
     private static final long serialVersionUID = -1029743017413951838L;
-
-    private static String getQName(AnnoKey key) {
-        if (key.getNs() == null || key.getNs().isEmpty()) {
-            return key.getName();
-        } else {
-            return key.getNs() + ":" + key.getName();
-        }
-    }
-
-    private static String getQName(Component c) {
-        if (c.getLayer() == null || c.getLayer().isEmpty()) {
-            return c.getName();
-        } else {
-            return c.getLayer() + ":" + c.getName();
-        }
-    }
 
     private Logger log = LoggerFactory.getLogger(CorpusBrowserPanel.class);
 
@@ -203,40 +188,17 @@ public class CorpusBrowserPanel extends Panel {
 
     private void fetchAnnotationsInBackground() {
         CorporaApi api = new CorporaApi();
-        SearchApi search = new SearchApi();
 
         try {
             final List<Annotation> nodeAnnos = api.corpusNodeAnnotations(corpus, true, true).stream().filter(
                     a -> !Objects.equals(a.getKey().getNs(), "annis") && !Objects.equals(a.getKey().getName(), "tok"))
                     .collect(Collectors.toList());
 
-            final Set<Annotation> metaAnnos = new HashSet<>();
-            // Check for each annotation if its actually a meta-annotation
-            for (Annotation a : nodeAnnos) {
-                CorpusList c = new CorpusList();
-                c.add(corpus);
-                FindQuery q = new FindQuery();
-                q.setCorpora(c);
-                q.setQuery("annis:node_type=\"corpus\" _ident_ " + getQName(a.getKey()));
-                // Not sorting the results is much faster, especially if we only fetch the first
-                // item
-                // (we are only interested if a match exists, not how many items or which one)
-                q.setOrder(OrderEnum.NOTSORTED);
-                q.setLimit(1);
-                q.setOffset(0);
+            final List<Annotation> metaAnnos = new LinkedList<>(nodeAnnos);
 
-                q.setQueryLanguage(org.corpus_tools.annis.QueryLanguage.AQL);
-                try {
-                    String findResult = search.find(q);
-                    if (findResult != null && !findResult.isEmpty()) {
-                        metaAnnos.add(a);
-                    }
-                } catch (ApiException ex) {
-                    // Ignore
-                    log.warn("Could not execute query '{}'", q.getQuery(), ex);
-                }
-            }
-            nodeAnnos.removeAll(metaAnnos);
+            final Set<AnnoKey> metaAnnoKeys = ServiceHelper.getMetaAnnotationNames(corpus);
+            nodeAnnos.removeIf(anno -> metaAnnoKeys.contains(anno.getKey()));
+            metaAnnos.removeIf(anno -> !metaAnnoKeys.contains(anno.getKey()));
 
             final List<Component> components = api.corpusComponents(corpus, "Dominance", null);
             final List<Annotation> allEdgeAnnos = new LinkedList<>();
