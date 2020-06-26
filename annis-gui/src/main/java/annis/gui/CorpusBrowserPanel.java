@@ -122,18 +122,22 @@ public class CorpusBrowserPanel extends Panel {
         lblNoNodeAnno = new Label("(No Node Annotations)");
         VerticalLayout tabNodeAnno = new VerticalLayout(tblNodeAnno, lblNoNodeAnno);
         tabNodeAnno.setCaption("Node Annotations");
+        tabNodeAnno.setMargin(false);
 
         lblNoEdgeAnno = new Label("(No Edge Annotations)");
         VerticalLayout tabEdgeAnno = new VerticalLayout(tblEdgeAnno, lblNoEdgeAnno);
         tabEdgeAnno.setCaption("Edge Annotations");
+        tabEdgeAnno.setMargin(false);
 
         lblNoEdgeTypes = new Label("(No Edge Types)");
         VerticalLayout tabEdgeTypes = new VerticalLayout(tblEdgeTypes, lblNoEdgeTypes);
         tabEdgeTypes.setCaption("Edge Types");
+        tabEdgeTypes.setMargin(false);
 
         lblNoMetaAnno = new Label("(No Meta Annotations)");
         VerticalLayout tabMetaAnno = new VerticalLayout(tblMetaAnno, lblNoMetaAnno);
         tabMetaAnno.setCaption("Meta Annotations");
+        tabMetaAnno.setMargin(false);
 
         accordion = new Accordion(tabNodeAnno, tabEdgeAnno, tabEdgeTypes, tabMetaAnno);
         accordion.setSizeFull();
