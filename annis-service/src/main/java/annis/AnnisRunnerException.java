@@ -23,29 +23,32 @@ package annis;
 @SuppressWarnings("serial")
 public class AnnisRunnerException extends RuntimeException {
 
-  private int exitCode = 1;
-  
-	public AnnisRunnerException(int exitCode) {
-		super();
-    this.exitCode = exitCode;
-	}
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7596786189862835493L;
+    private int exitCode = 1;
 
-	public AnnisRunnerException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public AnnisRunnerException(int exitCode) {
+        super();
+        this.exitCode = exitCode;
+    }
 
-	public AnnisRunnerException(String message, int exitCode) {
-		super(message);
-    this.exitCode = exitCode;
-	}
+    public AnnisRunnerException(String message, int exitCode) {
+        super(message);
+        this.exitCode = exitCode;
+    }
 
-	public AnnisRunnerException(Throwable cause, int exitCode) {
-		super(cause);
-	}
+    public AnnisRunnerException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-  public final int getExitCode()
-  {
-    return exitCode;
-  }
-  
+    public AnnisRunnerException(Throwable cause, int exitCode) {
+        super(cause);
+    }
+
+    public final int getExitCode() {
+        return exitCode;
+    }
+
 }

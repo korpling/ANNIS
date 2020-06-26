@@ -29,88 +29,62 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CountCallback implements Runnable
-{
-  private static final Logger log = LoggerFactory.getLogger(
-    CountCallback.class);
-  
-  private final ResultViewPanel panel;
+public class CountCallback implements Runnable {
+    private static final Logger log = LoggerFactory.getLogger(CountCallback.class);
 
-  private final int pageSize;
+    private final ResultViewPanel panel;
 
-  private final AnnisUI ui;
+    private final int pageSize;
 
-  public CountCallback(ResultViewPanel panel, int pageSize, AnnisUI ui)
-  {
-    this.panel = panel;
-    this.pageSize = pageSize;
-    this.ui = ui;
-  }
+    private final AnnisUI ui;
 
-  @Override
-  public void run()
-  {
-    Future futureCount = ui.getQueryState().getExecutedTasks().
-      get(QueryUIState.QueryType.COUNT);
-    final MatchAndDocumentCount countResult;
-    MatchAndDocumentCount tmpCountResult = null;
-    if (futureCount != null)
-    {
-      UniformInterfaceException cause = null;
-      try
-      {
-        tmpCountResult = (MatchAndDocumentCount) futureCount.get();
-      }
-      catch (InterruptedException ex)
-      {
-        log.warn(null, ex);
-      }
-      catch (ExecutionException root)
-      {
-        if (root.getCause() instanceof UniformInterfaceException)
-        {
-          cause = (UniformInterfaceException) root.getCause();
-        }
-        else
-        {
-          log.error("Unexcepted ExecutionException cause", root);
-        }
-      }
-      finally
-      {
-        countResult = tmpCountResult;
-      }
-      ui.getQueryState().getExecutedTasks().
-        remove(QueryUIState.QueryType.COUNT);
-      final UniformInterfaceException causeFinal = cause;
-      ui.accessSynchronously(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          if (causeFinal == null)
-          {
-            if (countResult != null)
-            {
-              String documentString = countResult.getDocumentCount() > 1 ? "documents" : "document";
-              String matchesString = countResult.getMatchCount() > 1 ? "matches" : "match";
-              ui.getSearchView().getControlPanel().getQueryPanel().
-                setStatus("" + countResult.getMatchCount() + " " + matchesString + "\nin " + countResult.getDocumentCount() + " " + documentString);
-              if (countResult.getMatchCount() > 0 && panel != null)
-              {
-                panel.getPaging().setPageSize(pageSize, false);
-                panel.setCount(countResult.getMatchCount());
-              }
-            }
-          }
-          else
-          {
-            ui.getQueryController().reportServiceException(causeFinal, true);
-          } // end if cause != null
-          ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-        }
-      });
+    public CountCallback(ResultViewPanel panel, int pageSize, AnnisUI ui) {
+        this.panel = panel;
+        this.pageSize = pageSize;
+        this.ui = ui;
     }
-  }
-  
+
+    @Override
+    public void run() {
+        Future futureCount = ui.getQueryState().getExecutedTasks().get(QueryUIState.QueryType.COUNT);
+        final MatchAndDocumentCount countResult;
+        MatchAndDocumentCount tmpCountResult = null;
+        if (futureCount != null) {
+            UniformInterfaceException cause = null;
+            try {
+                tmpCountResult = (MatchAndDocumentCount) futureCount.get();
+            } catch (InterruptedException ex) {
+                log.warn(null, ex);
+            } catch (ExecutionException root) {
+                if (root.getCause() instanceof UniformInterfaceException) {
+                    cause = (UniformInterfaceException) root.getCause();
+                } else {
+                    log.error("Unexcepted ExecutionException cause", root);
+                }
+            } finally {
+                countResult = tmpCountResult;
+            }
+            ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
+            final UniformInterfaceException causeFinal = cause;
+            ui.accessSynchronously(() -> {
+                if (causeFinal == null) {
+                    if (countResult != null) {
+                        String documentString = countResult.getDocumentCount() > 1 ? "documents" : "document";
+                        String matchesString = countResult.getMatchCount() > 1 ? "matches" : "match";
+                        ui.getSearchView().getControlPanel().getQueryPanel()
+                                .setStatus("" + countResult.getMatchCount() + " " + matchesString + "\nin "
+                                        + countResult.getDocumentCount() + " " + documentString);
+                        if (countResult.getMatchCount() > 0 && panel != null) {
+                            panel.getPaging().setPageSize(pageSize, false);
+                            panel.setCount(countResult.getMatchCount());
+                        }
+                    }
+                } else {
+                    ui.getQueryController().reportServiceException(causeFinal, true);
+                } // end if cause != null
+                ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+            });
+        }
+    }
+
 }

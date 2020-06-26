@@ -15,33 +15,35 @@
  */
 package annis.gui;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.Helper;
+import annis.model.DisplayedResultQuery;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.v7.ui.Label;
-import com.vaadin.v7.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.shared.ui.label.ContentMode;
-
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.Helper;
-import annis.model.DisplayedResultQuery;
+import com.vaadin.v7.ui.Label;
+import com.vaadin.v7.ui.TextArea;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ShareQueryReferenceWindow extends Window implements Button.ClickListener {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8839761991143179718L;
 
     private static final Logger log = LoggerFactory.getLogger(ShareQueryReferenceWindow.class);
 
@@ -80,7 +82,7 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
         wLayout.addComponent(txtCitation);
 
         Button btClose = new Button("Close");
-        btClose.addClickListener((Button.ClickListener) this);
+        btClose.addClickListener(this);
         btClose.setSizeUndefined();
 
         wLayout.addComponent(btClose);
@@ -117,7 +119,7 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
             }
 
         }
-        
+
         txtCitation.setReadOnly(false);
         txtCitation.setValue(shortURL);
         txtCitation.setReadOnly(true);

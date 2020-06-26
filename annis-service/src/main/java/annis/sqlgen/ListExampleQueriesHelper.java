@@ -15,12 +15,10 @@
  */
 package annis.sqlgen;
 
+import annis.examplequeries.ExampleQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import org.apache.commons.dbutils.handlers.AbstractListHandler;
-
-import annis.examplequeries.ExampleQuery;
 
 /**
  * Generates SQL query for example queries

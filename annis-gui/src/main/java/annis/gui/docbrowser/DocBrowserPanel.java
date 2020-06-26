@@ -15,8 +15,12 @@
  */
 package annis.gui.docbrowser;
 
-import java.util.List;
-
+import annis.gui.AnnisUI;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.model.Annotation;
+import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.Visualizer;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.WebResource;
@@ -26,147 +30,122 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.util.filter.SimpleStringFilter;
-import com.vaadin.v7.event.FieldEvents;
 import com.vaadin.v7.ui.TextField;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
-
-import annis.gui.AnnisUI;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.model.Annotation;
-import annis.service.objects.DocumentBrowserConfig;
-import annis.service.objects.Visualizer;
+import java.util.List;
 
 /**
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public class DocBrowserPanel extends Panel
-{
+public class DocBrowserPanel extends Panel {
 
-  private final AnnisUI ui;
+    private class LoadingDocs implements Runnable {
 
-  private VerticalLayout layout;
+        @Override
+        public void run() {
 
-  // the name of the corpus from which the documents are fetched
-  private String corpus;
+            WebResource res = Helper.getAnnisWebResource(ui);
+            final List<Annotation> docs = res.path("meta/docnames/" + urlPathEscape.escape(corpus))
+                    .get(new Helper.AnnotationListType());
 
-  private DocBrowserTable table;
+            ui.access(() -> {
+                table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
+                layout.removeComponent(progress);
 
-  final ProgressBar progress;
-  
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-  
-  private DocBrowserPanel(AnnisUI ui, String corpus)
-  {
-    this.ui = ui;
-    this.corpus = corpus;
+                TextField txtFilter = new TextField();
+                txtFilter.setWidth("100%");
+                txtFilter.setInputPrompt("Filter documents by name");
+                txtFilter.setImmediate(true);
+                txtFilter.setTextChangeTimeout(500);
+                txtFilter.addTextChangeListener(event -> {
+                    if (table != null) {
+                        table.setContainerFilter(
+                                new SimpleStringFilter(DocBrowserTable.PROP_DOC_NAME, event.getText(), true, false));
+                    }
+                });
 
-    // init layout 
-    layout = new VerticalLayout();
-    setContent(layout);
-    layout.setSizeFull();
-    layout.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+                layout.addComponent(txtFilter);
+                layout.addComponent(table);
+                layout.setExpandRatio(table, 1.0f);
 
-    setSizeFull();
-
-    progress = new ProgressBar();
-    progress.setIndeterminate(true);
-    progress.setSizeFull();
-    
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-
-    // start fetching table only if not done yet.
-    if (table == null)
-    {
-      layout.addComponent(progress);
-      layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
-      Background.run(new LoadingDocs());
+                table.setDocNames(docs);
+            });
+        }
     }
-  }
 
-  public DocumentBrowserConfig getDocBrowserConfig()
-  {
-    return Helper.getDocBrowserConfig(corpus, ui);
-  }
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -1785316182826648719L;
 
-  /**
-   * Initiated the {@link DocBrowserPanel} and put the main tab navigation.
-   *
-   * @param ui The main application class of the gui.
-   * @param corpus The corpus, for which the doc browser is initiated.
-   * @return A new wrapper panel for a doc browser. Make sure, that this is not
-   * done several times.
-   */
-  public static DocBrowserPanel initDocBrowserPanel(AnnisUI ui, String corpus)
-  {
-    return new DocBrowserPanel(ui, corpus);
-  }
+    private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
-  public void openVis(String doc, Visualizer config, Button btn)
-  {
-    ui.getSearchView().getDocBrowserController().openDocVis(corpus, doc, config, btn);
-  }
+    /**
+     * Initiated the {@link DocBrowserPanel} and put the main tab navigation.
+     *
+     * @param ui
+     *            The main application class of the gui.
+     * @param corpus
+     *            The corpus, for which the doc browser is initiated.
+     * @return A new wrapper panel for a doc browser. Make sure, that this is not
+     *         done several times.
+     */
+    public static DocBrowserPanel initDocBrowserPanel(AnnisUI ui, String corpus) {
+        return new DocBrowserPanel(ui, corpus);
+    }
 
-  private class LoadingDocs implements Runnable
-  {
+    private final AnnisUI ui;
+
+    private VerticalLayout layout;
+
+    // the name of the corpus from which the documents are fetched
+    private String corpus;
+
+    private DocBrowserTable table;
+
+    final ProgressBar progress;
+
+    private DocBrowserPanel(AnnisUI ui, String corpus) {
+        this.ui = ui;
+        this.corpus = corpus;
+
+        // init layout
+        layout = new VerticalLayout();
+        setContent(layout);
+        layout.setSizeFull();
+        layout.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+
+        setSizeFull();
+
+        progress = new ProgressBar();
+        progress.setIndeterminate(true);
+        progress.setSizeFull();
+
+    }
 
     @Override
-    public void run()
-    {
+    public void attach() {
+        super.attach();
 
-      WebResource res = Helper.getAnnisWebResource(ui);
-      final List<Annotation> docs = res.path("meta/docnames/"
-        + urlPathEscape.escape(corpus)).
-        get(new Helper.AnnotationListType());
-
-      ui.access(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
-          layout.removeComponent(progress);
-          
-          TextField txtFilter = new TextField();
-          txtFilter.setWidth("100%");
-          txtFilter.setInputPrompt("Filter documents by name");
-          txtFilter.setImmediate(true);
-          txtFilter.setTextChangeTimeout(500);
-          txtFilter.addTextChangeListener(new FieldEvents.TextChangeListener()
-          {
-
-            @Override
-            public void textChange(FieldEvents.TextChangeEvent event)
-            {
-              if (table != null)
-              {
-                table.setContainerFilter(new SimpleStringFilter(
-                  DocBrowserTable.PROP_DOC_NAME, event.getText(), true,
-                  false));
-              }
-            }
-          });
-          
-          layout.addComponent(txtFilter);
-          layout.addComponent(table);
-          layout.setExpandRatio(table, 1.0f);
-          
-
-          table.setDocNames(docs);
+        // start fetching table only if not done yet.
+        if (table == null) {
+            layout.addComponent(progress);
+            layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
+            Background.run(new LoadingDocs());
         }
-      });
     }
-  }
 
-  public String getCorpus()
-  {
-    return corpus;
-  }
+    public String getCorpus() {
+        return corpus;
+    }
+
+    public DocumentBrowserConfig getDocBrowserConfig() {
+        return Helper.getDocBrowserConfig(corpus, ui);
+    }
+
+    public void openVis(String doc, Visualizer config, Button btn) {
+        ui.getSearchView().getDocBrowserController().openDocVis(corpus, doc, config, btn);
+    }
 
 }

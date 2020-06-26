@@ -21,11 +21,13 @@ import java.util.Set;
  *
  * @author thomas
  */
-public interface CitationProvider
-{
-  public String getQuery();
-  public Set<String> getCorpora();
-  public int getLeftContext();
-  public int getRightContext();
-  
+public interface CitationProvider {
+    public Set<String> getCorpora();
+
+    public int getLeftContext();
+
+    public String getQuery();
+
+    public int getRightContext();
+
 }

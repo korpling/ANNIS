@@ -15,30 +15,6 @@
  */
 package annis.gui.resultview;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.salt.common.SCorpus;
-import org.slf4j.LoggerFactory;
-
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.Resource;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
-import com.vaadin.ui.CssLayout;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ValoTheme;
-import com.vaadin.v7.shared.ui.label.ContentMode;
-import com.vaadin.v7.ui.Label;
-
 import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.MetaDataPanel;
@@ -48,6 +24,25 @@ import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ValoTheme;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Label;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.salt.common.SCorpus;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -57,6 +52,8 @@ public class SingleCorpusResultPanel extends CssLayout {
     private static final long serialVersionUID = 2L;
 
     private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(SingleCorpusResultPanel.class);
 
     private Collection<SCorpus> result;
 
@@ -69,8 +66,6 @@ public class SingleCorpusResultPanel extends CssLayout {
     private final HorizontalLayout infoBar;
 
     private final long resultNumber;
-
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(SingleCorpusResultPanel.class);
 
     private PagedResultQuery query;
     private final Match match;
@@ -108,7 +103,7 @@ public class SingleCorpusResultPanel extends CssLayout {
         long matchIdx = 0;
         for (SCorpus c : this.result) {
             matchIdx++;
-            
+
             try {
                 List<String> path = CommonHelper.getCorpusPath(new URI(c.getPath().toString()));
 
@@ -124,29 +119,25 @@ public class SingleCorpusResultPanel extends CssLayout {
                 btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
                 btInfo.setIcon(ICON_RESOURCE);
                 btInfo.setDescription("Show metadata");
-                btInfo.addClickListener(new ClickListener() {
+                btInfo.addClickListener(event -> {
+                    if (event.getButton() == btInfo && result != null) {
+                        Window infoWindow = new Window("Info for " + c.getId());
 
-                    @Override
-                    public void buttonClick(ClickEvent event) {
-                        if (event.getButton() == btInfo && result != null) {
-                            Window infoWindow = new Window("Info for " + c.getId());
+                        infoWindow.setModal(false);
+                        MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size() - 1));
+                        infoWindow.setContent(meta);
+                        infoWindow.setWidth("400px");
+                        infoWindow.setHeight("400px");
 
-                            infoWindow.setModal(false);
-                            MetaDataPanel meta = new MetaDataPanel(path.get(0), path.get(path.size() - 1));
-                            infoWindow.setContent(meta);
-                            infoWindow.setWidth("400px");
-                            infoWindow.setHeight("400px");
-
-                            UI.getCurrent().addWindow(infoWindow);
-                        }
-
+                        UI.getCurrent().addWindow(infoWindow);
                     }
+
                 });
                 corpusInfoLayout.addComponent(btInfo);
 
                 Label lblPath = new Label(sb.toString());
                 lblPath.addStyleName("path-label");
-                //lblPath.addStyleName(MatchedNodeColors.colorClassByMatch(matchIdx));
+                // lblPath.addStyleName(MatchedNodeColors.colorClassByMatch(matchIdx));
 
                 lblPath.setWidth("100%");
                 lblPath.setHeight("-1px");
@@ -161,8 +152,7 @@ public class SingleCorpusResultPanel extends CssLayout {
 
         addComponent(infoBar);
 
-        Label lblEmpty = new Label(
-                "Result matches only (sub-) corpora and their metadata. "
+        Label lblEmpty = new Label("Result matches only (sub-) corpora and their metadata. "
                 + "You might want to extend your query to include a token search. <br/> "
                 + "An example would be: <br/> <code>tok @* my_meta_attribute=\"somevalue\"</code>");
         lblEmpty.setContentMode(ContentMode.HTML);
@@ -170,8 +160,6 @@ public class SingleCorpusResultPanel extends CssLayout {
 
         addComponent(lblEmpty);
     }
-
-
 
     @Override
     public void attach() {

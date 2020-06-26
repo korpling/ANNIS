@@ -25,15 +25,12 @@ import org.apache.shiro.authz.AuthorizationException;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Provider
-public class AuthorizationExceptionMapper implements ExceptionMapper<AuthorizationException>
-{
+public class AuthorizationExceptionMapper implements ExceptionMapper<AuthorizationException> {
 
-  @Override
-  public Response toResponse(AuthorizationException ex)
-  {
-    Response r = Response.status(Response.Status.FORBIDDEN)
-      .entity(ex.getMessage()).build();
-    return r;
-  }
-  
+    @Override
+    public Response toResponse(AuthorizationException ex) {
+        Response r = Response.status(Response.Status.FORBIDDEN).entity(ex.getMessage()).build();
+        return r;
+    }
+
 }

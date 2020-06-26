@@ -15,14 +15,12 @@
  */
 package annis.dao;
 
+import com.google.common.base.Preconditions;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import com.google.common.base.Preconditions;
-
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.slf4j.Logger;
@@ -40,6 +38,34 @@ public class ShortenerDao extends AbstractDao {
 
     public static ShortenerDao create() {
         return new ShortenerDao();
+    }
+
+    private UUID getExistingShortID(Connection conn, String str) throws SQLException {
+
+        List<String> result = getQueryRunner().query(conn, "SELECT id FROM url_shortener WHERE url=? LIMIT 1",
+                new ColumnListHandler<>(1), str);
+        return result.isEmpty() ? null : UUID.fromString(result.get(0));
+    }
+
+    public void migrate(String url, String temporary, String userName, UUID uuid, Date creationTime) {
+
+        try (Connection conn = createConnection(DB.SERVICE_DATA)) {
+            conn.setAutoCommit(false);
+
+            int existing = getQueryRunner().query(conn, "SELECT count(*) FROM url_shortener WHERE id = ?",
+                    new ScalarHandler<>(1), uuid);
+
+            Preconditions.checkState(existing == 0,
+                    "Attempted to migrate UUID {} which already exists in the database.", uuid);
+
+            getQueryRunner().update(conn,
+                    "INSERT INTO url_shortener(id, \"owner\", created, url, temporary_url) VALUES(?, ?, ?, ?, ?)", uuid,
+                    userName, DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(creationTime), url, temporary);
+            conn.commit();
+
+        } catch (SQLException ex) {
+            log.error("Could not shorten URL {} for user {}", url, userName, ex);
+        }
     }
 
     /**
@@ -87,26 +113,6 @@ public class ShortenerDao extends AbstractDao {
         return result;
     }
 
-    public void migrate(String url, String temporary, String userName, UUID uuid, Date creationTime) {
-
-        try (Connection conn = createConnection(DB.SERVICE_DATA)) {
-            conn.setAutoCommit(false);
-
-            int existing = getQueryRunner().query(conn, "SELECT count(*) FROM url_shortener WHERE id = ?",
-                    new ScalarHandler<>(1), uuid);
-
-            Preconditions.checkState(existing == 0,
-                    "Attempted to migrate UUID {} which already exists in the database.", uuid);
-
-            getQueryRunner().update(conn, "INSERT INTO url_shortener(id, \"owner\", created, url, temporary_url) VALUES(?, ?, ?, ?, ?)",
-                    uuid, userName, DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(creationTime), url, temporary);
-            conn.commit();
-
-        } catch (SQLException ex) {
-            log.error("Could not shorten URL {} for user {}", url, userName, ex);
-        }
-    }
-
     public String unshorten(UUID id) {
         try (Connection conn = createConnection(DB.SERVICE_DATA, true)) {
 
@@ -121,13 +127,6 @@ public class ShortenerDao extends AbstractDao {
         }
 
         return null;
-    }
-
-    private UUID getExistingShortID(Connection conn, String str) throws SQLException {
-
-        List<String> result = getQueryRunner().query(conn, "SELECT id FROM url_shortener WHERE url=? LIMIT 1",
-                new ColumnListHandler<>(1), str);
-        return result.isEmpty() ? null : UUID.fromString(result.get(0));
     }
 
 }

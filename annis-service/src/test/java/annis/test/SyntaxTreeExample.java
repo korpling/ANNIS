@@ -18,29 +18,32 @@ package annis.test;
 import org.junit.experimental.theories.PotentialAssignment;
 
 public class SyntaxTreeExample extends PotentialAssignment {
-	private String query;
-	private String syntaxTree;
+    private String query;
+    private String syntaxTree;
 
-	@Override
-	public Object getValue() throws CouldNotGenerateValueException {
-		return this;
-	}
-	
-	public String getQuery() {
-		return query;
-	}
-	public void setQuery(String query) {
-		this.query = query;
-	}
-	public String getSyntaxTree() {
-		return syntaxTree;
-	}
-	public void setSyntaxTree(String syntaxTree) {
-		this.syntaxTree = syntaxTree;
-	}
+    @Override
+    public String getDescription() throws CouldNotGenerateValueException {
+        return "query = " + query;
+    }
 
-	@Override
-	public String getDescription() throws CouldNotGenerateValueException {
-		return "query = " + query;
-	}
+    public String getQuery() {
+        return query;
+    }
+
+    public String getSyntaxTree() {
+        return syntaxTree;
+    }
+
+    @Override
+    public Object getValue() throws CouldNotGenerateValueException {
+        return this;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
+    }
+
+    public void setSyntaxTree(String syntaxTree) {
+        this.syntaxTree = syntaxTree;
+    }
 }

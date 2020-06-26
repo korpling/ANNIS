@@ -30,86 +30,77 @@ import org.json.JSONException;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@StyleSheet(
-{
-  "keyboard.css"
-})
-@JavaScript(
-{
-  "vaadin://jquery.js", "keyboard.js", "virtualkeyboard_codeeditor.js"
-})
-public class VirtualKeyboardCodeEditor extends AbstractJavaScriptExtension
-{
+@StyleSheet({ "keyboard.css" })
+@JavaScript({ "vaadin://jquery.js", "keyboard.js", "virtualkeyboard_codeeditor.js" })
+public class VirtualKeyboardCodeEditor extends AbstractJavaScriptExtension {
 
-  public VirtualKeyboardCodeEditor()
-  {
-    addFunction("updateLang", new UpdateLangJSFunction());
-  }
+    private class UpdateLangJSFunction implements JavaScriptFunction {
 
-  @Override
-  protected Class<? extends ClientConnector> getSupportedParentType()
-  {
-    return AqlCodeEditor.class;
-  }
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 3828724167697774835L;
 
-  public void extend(AqlCodeEditor target)
-  {
-    super.extend(target);
+        public UpdateLangJSFunction() {}
 
-  }
-
-  @Override
-  protected VKState getState()
-  {
-    return (VKState) super.getState();
-  }
-
-  public void show()
-  {
-    callFunction("show");
-  }
-
-  public void setKeyboardLayout(String layout)
-  {
-    getState().setKeyboardLayout(layout);
-  }
-
-  public static class VKState extends JavaScriptExtensionState
-  {
-
-    private String keyboardLayout = "";
-
-    public String getKeyboardLayout()
-    {
-      return keyboardLayout;
+        @Override
+        public void call(JsonArray arguments) throws JSONException {
+            if (arguments.length() > 0 && !(arguments.get(0) instanceof JreJsonNull)) {
+                getState().setKeyboardLayout(arguments.getString(0));
+            } else {
+                getState().setKeyboardLayout(null);
+            }
+        }
     }
 
-    public void setKeyboardLayout(String keyboardLayout)
-    {
-      this.keyboardLayout = keyboardLayout;
+    public static class VKState extends JavaScriptExtensionState {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 4249522664300067205L;
+        private String keyboardLayout = "";
+
+        public String getKeyboardLayout() {
+            return keyboardLayout;
+        }
+
+        public void setKeyboardLayout(String keyboardLayout) {
+            this.keyboardLayout = keyboardLayout;
+        }
+
     }
 
-  }
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6695962630237599561L;
 
-  private class UpdateLangJSFunction implements JavaScriptFunction
-  {
+    public VirtualKeyboardCodeEditor() {
+        addFunction("updateLang", new UpdateLangJSFunction());
+    }
 
-    public UpdateLangJSFunction()
-    {
+    public void extend(AqlCodeEditor target) {
+        super.extend(target);
+
     }
 
     @Override
-    public void call(JsonArray arguments) throws JSONException
-    {
-      if (arguments.length() > 0 && !(arguments.get(0) instanceof JreJsonNull))
-      {
-        ((VKState) getState()).setKeyboardLayout(arguments.getString(0));
-      }
-      else
-      {
-        ((VKState) getState()).setKeyboardLayout(null);
-      }
+    protected VKState getState() {
+        return (VKState) super.getState();
     }
-  }
+
+    @Override
+    protected Class<? extends ClientConnector> getSupportedParentType() {
+        return AqlCodeEditor.class;
+    }
+
+    public void setKeyboardLayout(String layout) {
+        getState().setKeyboardLayout(layout);
+    }
+
+    public void show() {
+        callFunction("show");
+    }
 
 }

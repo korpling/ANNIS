@@ -21,7 +21,6 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,33 +44,6 @@ public class ANNISFormatHelper {
 
     private static final Logger log = LoggerFactory.getLogger(ANNISFormatHelper.class);
 
-    /**
-     * List all corpora of a ZIP file and their paths.
-     * 
-     * @param zip
-     * @return
-     * @throws IOException
-     */
-    public static Map<String, ZipEntry> corporaInZipfile(ZipFile zip) throws IOException {
-        Map<String, ZipEntry> result = new HashMap<>();
-
-        for (ZipEntry e : getANNISEntry(zip, "corpus")) {
-            String name = extractToplevelCorpusNames(zip.getInputStream(e));
-            result.put(name, e);
-        }
-
-        return result;
-    }
-
-    public static Map<String, ZipEntry> corporaInZipfile(File f) throws IOException {
-        Map<String, ZipEntry> result = new HashMap<>();
-        try (ZipFile zip = new ZipFile(f)) {
-            result.putAll(corporaInZipfile(zip));
-        }
-
-        return result;
-    }
-
     public static Map<String, File> corporaInDirectory(File d) throws IOException {
         Map<String, File> result = new HashMap<>();
 
@@ -90,24 +62,50 @@ public class ANNISFormatHelper {
         return result;
     }
 
-  /**
-   * Extract the name of the toplevel corpus from the content of the
-   * corpus.tab file.
-   *
-   * @param corpusFile
-   * @return
-   */
-  public static String extractToplevelCorpusNames(File corpusFile)
-  {
-      try(FileInputStream stream = new FileInputStream(corpusFile)) {
-          return extractToplevelCorpusNames(stream);
-      } catch (FileNotFoundException ex) {
-        log.warn("No corpus file found to extract name from", ex);
-    } catch (IOException ex) {
-        log.warn("Cannot extract corpus name from file {}", corpusFile.getAbsolutePath(), ex);
+    public static Map<String, ZipEntry> corporaInZipfile(File f) throws IOException {
+        Map<String, ZipEntry> result = new HashMap<>();
+        try (ZipFile zip = new ZipFile(f)) {
+            result.putAll(corporaInZipfile(zip));
+        }
+
+        return result;
     }
-      return null;
-  }
+
+    /**
+     * List all corpora of a ZIP file and their paths.
+     * 
+     * @param zip
+     * @return
+     * @throws IOException
+     */
+    public static Map<String, ZipEntry> corporaInZipfile(ZipFile zip) throws IOException {
+        Map<String, ZipEntry> result = new HashMap<>();
+
+        for (ZipEntry e : getANNISEntry(zip, "corpus")) {
+            String name = extractToplevelCorpusNames(zip.getInputStream(e));
+            result.put(name, e);
+        }
+
+        return result;
+    }
+
+    /**
+     * Extract the name of the toplevel corpus from the content of the corpus.tab
+     * file.
+     *
+     * @param corpusFile
+     * @return
+     */
+    public static String extractToplevelCorpusNames(File corpusFile) {
+        try (FileInputStream stream = new FileInputStream(corpusFile)) {
+            return extractToplevelCorpusNames(stream);
+        } catch (FileNotFoundException ex) {
+            log.warn("No corpus file found to extract name from", ex);
+        } catch (IOException ex) {
+            log.warn("Cannot extract corpus name from file {}", corpusFile.getAbsolutePath(), ex);
+        }
+        return null;
+    }
 
     /**
      * Extract the name of the toplevel corpus from the content of the corpus.tab

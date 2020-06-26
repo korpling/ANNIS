@@ -15,41 +15,41 @@
  */
 package annis.administration;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import java.util.Arrays;
 import java.util.List;
-
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 
 public class TestAnnisAdminRunner {
 
-	@Mock private CorpusAdministration administration;
-	private AnnisAdminRunner main;
+    @Mock
+    private CorpusAdministration administration;
+    private AnnisAdminRunner main;
 
-	@Before
-	public void setup() throws GraphANNISException {
-		initMocks(this);
+    @Test
+    public void importManyCorpora() throws InterruptedException {
+        run("import data/corpus1 data/corpus2 data/corpus3");
 
-		main = new AnnisAdminRunner();
-		main.setCorpusAdministration(null);
-		main.setCorpusAdministration(administration);
-	}
+        List<String> expected = Arrays.asList("data/corpus1 data/corpus2 data/corpus3".split(" "));
+        verify(administration).importCorporaSave(false, false, null, null, false, expected);
+    }
 
-	@Test
-	public void importManyCorpora() throws InterruptedException {
-		run("import data/corpus1 data/corpus2 data/corpus3");
+    private void run(String cmdline) throws InterruptedException {
+        main.run(cmdline.split(" "));
+    }
 
-		List<String> expected = Arrays.asList("data/corpus1 data/corpus2 data/corpus3".split(" "));
-		verify(administration).importCorporaSave(false, false, null, null, false, expected);
-	}
-	
-	private void run(String cmdline) throws InterruptedException {
-		main.run(cmdline.split(" "));
-	}
+    @Before
+    public void setup() throws GraphANNISException {
+        initMocks(this);
+
+        main = new AnnisAdminRunner();
+        main.setCorpusAdministration(null);
+        main.setCorpusAdministration(administration);
+    }
 
 }

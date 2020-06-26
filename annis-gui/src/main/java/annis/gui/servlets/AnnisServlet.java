@@ -15,45 +15,29 @@
  */
 package annis.gui.servlets;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Properties;
-
-import javax.servlet.ServletException;
-
-import org.aeonbits.owner.ConfigFactory;
-
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
-import com.vaadin.server.VaadinService;
+import annis.gui.requesthandler.ShortenerRequestHandler;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
-
-import annis.gui.requesthandler.ShortenerRequestHandler;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import annis.libgui.UIConfig;
+import javax.servlet.ServletException;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class AnnisServlet extends VaadinServlet {
-    
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7915386484002647283L;
+
     @Override
     protected void servletInitialized() throws ServletException {
         super.servletInitialized();
 
-        getService().addSessionInitListener(new SessionInitListener() {
-
-            @Override
-            public void sessionInit(SessionInitEvent event) throws ServiceException {
-                VaadinSession session = event.getSession();
-                event.getSession().addRequestHandler(new ShortenerRequestHandler());
-            }
+        getService().addSessionInitListener(event -> {
+            VaadinSession session = event.getSession();
+            event.getSession().addRequestHandler(new ShortenerRequestHandler());
         });
     }
 

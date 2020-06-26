@@ -32,79 +32,61 @@ import com.vaadin.v7.data.util.IndexedContainer;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @DesignRoot
-public class EditSingleUser extends Panel
-{
+public class EditSingleUser extends Panel {
 
-  private Label lblUser;
+    private static final long serialVersionUID = -527297981329001966L;
 
-  private Button btSave;
+    private Label lblUser;
 
-  private Button btCancel;
+    private Button btSave;
 
-  private PopupTwinColumnSelect groupSelector;
+    private Button btCancel;
 
-  private PopupTwinColumnSelect permissionSelector;
+    private PopupTwinColumnSelect groupSelector;
 
-  private OptionalDateTimeField expirationSelector;
+    private PopupTwinColumnSelect permissionSelector;
 
-  public EditSingleUser(final FieldGroup fields,
-    IndexedContainer groupsContainer,
-    IndexedContainer permissionsContainer)
-  {
-    Design.read(EditSingleUser.this);
+    private OptionalDateTimeField expirationSelector;
 
-    groupSelector.setSelectableContainer(groupsContainer);
-    permissionSelector.setSelectableContainer(permissionsContainer);
-    
-    lblUser.setValue((String) fields.getItemDataSource().getItemProperty("name").getValue());
+    public EditSingleUser(final FieldGroup fields, IndexedContainer groupsContainer,
+            IndexedContainer permissionsContainer) {
+        Design.read(EditSingleUser.this);
 
-    // bind the fields
-    fields.bind(groupSelector, "groups");
-    fields.bind(permissionSelector, "permissions");
-    fields.bind(expirationSelector, "expires");
-    
-    // events
-    btSave.addClickListener(new Button.ClickListener()
-    {
-      @Override
-      public void buttonClick(Button.ClickEvent event)
-      {
-        try
-        {
-          fields.commit();
-        }
-        catch (FieldGroup.CommitException ex)
-        {
-        }
+        groupSelector.setSelectableContainer(groupsContainer);
+        permissionSelector.setSelectableContainer(permissionsContainer);
 
+        lblUser.setValue((String) fields.getItemDataSource().getItemProperty("name").getValue());
 
-        HasComponents parent = getParent();
-        if (parent instanceof Window)
-        {
-          ((Window) parent).close();
-        }
-      }
-    });
-    btSave.setClickShortcut(ShortcutAction.KeyCode.ENTER, ShortcutAction.ModifierKey.CTRL);
+        // bind the fields
+        fields.bind(groupSelector, "groups");
+        fields.bind(permissionSelector, "permissions");
+        fields.bind(expirationSelector, "expires");
 
-    btCancel.addClickListener(new Button.ClickListener()
-    {
+        // events
+        btSave.addClickListener(event -> {
+            try {
+                fields.commit();
+            } catch (FieldGroup.CommitException ex) {
+            }
 
-      @Override
-      public void buttonClick(Button.ClickEvent event)
-      {
-        fields.discard();
+            HasComponents parent = getParent();
+            if (parent instanceof Window) {
+                ((Window) parent).close();
+            }
+        });
+        btSave.setClickShortcut(ShortcutAction.KeyCode.ENTER, ShortcutAction.ModifierKey.CTRL);
 
-        HasComponents parent = getParent();
-        if (parent instanceof Window)
-        {
-          ((Window) parent).close();
-        }
-      }
-    });
+        btCancel.addClickListener(event -> {
+            fields.discard();
 
-    expirationSelector.setCheckboxCaption("expires");
+            HasComponents parent = getParent();
+            if (parent instanceof Window) {
+                ((Window) parent).close();
+            }
+        });
 
-  }
+        expirationSelector.setCheckboxCaption("expires");
+
+    }
 
 }

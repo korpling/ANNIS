@@ -22,17 +22,15 @@ import com.vaadin.v7.ui.TextArea;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class PopupTwinColumnSelectMultiline extends PopupTwinColumnSelect
-{
+public class PopupTwinColumnSelectMultiline extends PopupTwinColumnSelect {
 
-  @Override
-  protected AbstractTextField createTextField()
-  {
-    TextArea text = new TextArea();
-    text.setRows(5);
-    return text;
-  }
+    private static final long serialVersionUID = -3339538219283294736L;
 
-  
-  
+    @Override
+    protected AbstractTextField createTextField() {
+        TextArea text = new TextArea();
+        text.setRows(5);
+        return text;
+    }
+
 }

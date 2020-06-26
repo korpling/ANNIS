@@ -15,53 +15,50 @@
  */
 package annis.gui.filter;
 
-import java.util.Set;
-
 import com.vaadin.v7.data.Container;
 import com.vaadin.v7.data.Item;
 import com.vaadin.v7.data.Property;
+import java.util.Set;
 
 /**
- * A filter for containers to include only items available in a specific
- * set.
+ * A filter for containers to include only items available in a specific set.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @param <T>
  */
-public class SetFilter<T> implements Container.Filter
-{
-  
-  private final Set<T> allowedItems;
-  
-  private final Object propertyId;
+public class SetFilter<T> implements Container.Filter {
 
-  /**
-   * 
-   * @param allowedItems
-   * @param propertyId 
-   */
-  public SetFilter(Set<T> allowedItems, Object propertyId)
-  {
-    this.allowedItems = allowedItems;
-    this.propertyId = propertyId;
-  }
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3379137657164992982L;
 
-  
-  
-  @Override
-  public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException
-  {
-    Property p = item.getItemProperty(propertyId);
-    if(p != null)
-    {
-      return allowedItems.contains((T) p.getValue());
+    private final Set<T> allowedItems;
+
+    private final Object propertyId;
+
+    /**
+     * 
+     * @param allowedItems
+     * @param propertyId
+     */
+    public SetFilter(Set<T> allowedItems, Object propertyId) {
+        this.allowedItems = allowedItems;
+        this.propertyId = propertyId;
     }
-    return false;
-  }
 
-  @Override
-  public boolean appliesToProperty(Object propertyId)
-  {
-    return this.propertyId.equals(propertyId);
-  }
-  
+    @Override
+    public boolean appliesToProperty(Object propertyId) {
+        return this.propertyId.equals(propertyId);
+    }
+
+    @Override
+    public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException {
+        Property p = item.getItemProperty(propertyId);
+        if (p != null) {
+            return allowedItems.contains(p.getValue());
+        }
+        return false;
+    }
+
 }

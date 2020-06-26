@@ -17,6 +17,7 @@ package annis.gui;
 
 import static annis.gui.MainToolbar.LOGIN_MAXIMIZED_KEY;
 import static annis.gui.MainToolbar.LOGIN_URL_KEY;
+
 import annis.libgui.Helper;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Resource;
@@ -31,88 +32,74 @@ import com.vaadin.ui.Window;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class LoginWindow extends Window
-{
+public class LoginWindow extends Window {
 
-  private String loginURL;
-  private QueryController queryController;
-  private boolean executeSearchAfterClose;
-  
-  public LoginWindow()
-  {
-    super("ANNIS Login");
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1567905636551177877L;
+    private String loginURL;
+    private QueryController queryController;
+    private boolean executeSearchAfterClose;
 
-    setModal(true);
+    public LoginWindow() {
+        super("ANNIS Login");
 
-    setWidth("400px");
-    setHeight("250px");
-  }
+        setModal(true);
 
-  @Override
-  public void attach()
-  {
-    super.attach();
-
-    this.loginURL = (String) VaadinSession.getCurrent().getAttribute(
-      LOGIN_URL_KEY);
-
-    Resource loginRes;
-    if (loginURL == null || loginURL.isEmpty())
-    {
-      loginRes = new ExternalResource(
-        Helper.getContext(UI.getCurrent()) + "/login");
-    }
-    else
-    {
-      loginRes = new ExternalResource(loginURL);
+        setWidth("400px");
+        setHeight("250px");
     }
 
-    BrowserFrame frame = new BrowserFrame("login", loginRes);
-    frame.setWidth("100%");
-    frame.setHeight("100%");
+    @Override
+    public void attach() {
+        super.attach();
 
-    setContent(frame);
+        this.loginURL = (String) VaadinSession.getCurrent().getAttribute(LOGIN_URL_KEY);
 
-    String loginMaximizedRaw = (String) getSession().getAttribute(
-      LOGIN_MAXIMIZED_KEY);
-    if (Boolean.parseBoolean(loginMaximizedRaw))
-    {
-      setWindowMode(WindowMode.MAXIMIZED);
+        Resource loginRes;
+        if (loginURL == null || loginURL.isEmpty()) {
+            loginRes = new ExternalResource(Helper.getContext(UI.getCurrent()) + "/login");
+        } else {
+            loginRes = new ExternalResource(loginURL);
+        }
+
+        BrowserFrame frame = new BrowserFrame("login", loginRes);
+        frame.setWidth("100%");
+        frame.setHeight("100%");
+
+        setContent(frame);
+
+        String loginMaximizedRaw = (String) getSession().getAttribute(LOGIN_MAXIMIZED_KEY);
+        if (Boolean.parseBoolean(loginMaximizedRaw)) {
+            setWindowMode(WindowMode.MAXIMIZED);
+        }
     }
-  }
-  
-  public void close(boolean loginSuccessful)
-  {
-    if(executeSearchAfterClose && loginSuccessful && queryController != null
-      && !queryController.getState().getSelectedCorpora().getItems().isEmpty())
-    {
-      queryController.executeSearch(true, true);
+
+    public void close(boolean loginSuccessful) {
+        if (executeSearchAfterClose && loginSuccessful && queryController != null
+                && !queryController.getState().getSelectedCorpora().getItems().isEmpty()) {
+            queryController.executeSearch(true, true);
+        }
+
+        super.close();
+
     }
-    
-    super.close();
-    
-  }
 
-  public QueryController getQueryController()
-  {
-    return queryController;
-  }
+    public QueryController getQueryController() {
+        return queryController;
+    }
 
-  public void setQueryController(QueryController queryController)
-  {
-    this.queryController = queryController;
-  }
+    public boolean isExecuteSearchAfterClose() {
+        return executeSearchAfterClose;
+    }
 
-  public boolean isExecuteSearchAfterClose()
-  {
-    return executeSearchAfterClose;
-  }
+    public void setExecuteSearchAfterClose(boolean executeSearchAfterClose) {
+        this.executeSearchAfterClose = executeSearchAfterClose;
+    }
 
-  public void setExecuteSearchAfterClose(boolean executeSearchAfterClose)
-  {
-    this.executeSearchAfterClose = executeSearchAfterClose;
-  }
-  
-  
+    public void setQueryController(QueryController queryController) {
+        this.queryController = queryController;
+    }
 
 }

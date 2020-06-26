@@ -18,9 +18,7 @@ package annis.gui.components;
 import annis.libgui.Helper;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractJavaScriptExtension;
-import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.UI;
-import elemental.json.JsonArray;
 import elemental.json.JsonObject;
 import elemental.json.JsonType;
 import elemental.json.JsonValue;
@@ -33,78 +31,66 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@JavaScript({"js.cookie-2.0.3.min.js", "settingsstorage.js"})
-public class SettingsStorage extends AbstractJavaScriptExtension
-{
-  private final ConcurrentMap<String, String> storage = new ConcurrentHashMap<>();
-  private final List<LoadedListener> loadedListeners = new LinkedList<>();
-  
-  private final UI ui;
-  
-  public SettingsStorage(UI ui)
-  { 
-    this.ui = ui;
-    if(ui != null)
-    {
-      extend(ui);
-    }
-    
-    addFunction("loadFromClient", new JavaScriptFunction()
-    {
-      @Override
-      public void call(JsonArray args)
-      {
-        JsonObject values = args.get(0);
-        for(String key : values.keys())
-        {
-          JsonValue v = values.get(key);
-          if(v.getType() == JsonType.STRING)
-          {
-            storage.put(key, v.asString());
-          }
-          else if(v.getType() == JsonType.OBJECT)
-          {
-            storage.put(key, v.toJson());
-          }
-        }
-        
-        for(LoadedListener l : loadedListeners)
-        {
-          l.onSettingsLoaded(SettingsStorage.this);
-        }
-        
-      }
-    });
-    
-  }
-  
-  public void addedLoadedListener(LoadedListener listener)
-  {
-    loadedListeners.add(listener);
-  }
-  
-  public void set(String name, String value, int lifetimeInDays)
-  {
-    storage.put(name, value);
-    callFunction("set", name, value, Helper.getContext(ui), lifetimeInDays);
-  }
-  
-  public String get(String name)
-  {
-    return storage.get(name);
-  }
-  
-  /**
-   * Callback for the event that the settings have been loaded
-   * from the client.
-   */
-  public static interface LoadedListener
-  {
+@JavaScript({ "js.cookie-2.0.3.min.js", "settingsstorage.js" })
+public class SettingsStorage extends AbstractJavaScriptExtension {
     /**
-     * Called when the settings have been loaded from the client.
-     * Will be only called once.
-     * @param settings 
+     * Callback for the event that the settings have been loaded from the client.
      */
-    public void onSettingsLoaded(SettingsStorage settings);
-  }
+    public static interface LoadedListener {
+        /**
+         * Called when the settings have been loaded from the client. Will be only
+         * called once.
+         * 
+         * @param settings
+         */
+        public void onSettingsLoaded(SettingsStorage settings);
+    }
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6054834521339901439L;
+    private final ConcurrentMap<String, String> storage = new ConcurrentHashMap<>();
+
+    private final List<LoadedListener> loadedListeners = new LinkedList<>();
+
+    private final UI ui;
+
+    public SettingsStorage(UI ui) {
+        this.ui = ui;
+        if (ui != null) {
+            extend(ui);
+        }
+
+        addFunction("loadFromClient", args -> {
+            JsonObject values = args.get(0);
+            for (String key : values.keys()) {
+                JsonValue v = values.get(key);
+                if (v.getType() == JsonType.STRING) {
+                    storage.put(key, v.asString());
+                } else if (v.getType() == JsonType.OBJECT) {
+                    storage.put(key, v.toJson());
+                }
+            }
+
+            for (LoadedListener l : loadedListeners) {
+                l.onSettingsLoaded(SettingsStorage.this);
+            }
+
+        });
+
+    }
+
+    public void addedLoadedListener(LoadedListener listener) {
+        loadedListeners.add(listener);
+    }
+
+    public String get(String name) {
+        return storage.get(name);
+    }
+
+    public void set(String name, String value, int lifetimeInDays) {
+        storage.put(name, value);
+        callFunction("set", name, value, Helper.getContext(ui), lifetimeInDays);
+    }
 }

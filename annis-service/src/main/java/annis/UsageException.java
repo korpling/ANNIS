@@ -23,22 +23,25 @@ package annis;
 @SuppressWarnings("serial")
 public class UsageException extends AnnisRunnerException {
 
-	public UsageException() {
-		super(4);
-	}
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2343212722715663141L;
 
-	public UsageException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public UsageException() {
+        super(4);
+    }
 
-	public UsageException(String message) {
-		super(message, 4);
-	}
+    public UsageException(String message) {
+        super(message, 4);
+    }
 
-	public UsageException(Throwable cause) {
-		super(cause, 4);
-	}
+    public UsageException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
+    public UsageException(Throwable cause) {
+        super(cause, 4);
+    }
 
-  
 }

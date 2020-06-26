@@ -18,13 +18,14 @@ package annis.gui;
 
 /**
  * A general interface for a sidebar which can be hidden.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface Sidebar
-{
-  /**
-   * update controls according to new state
-   * @param state
-   */
-  public void updateSidebarState(SidebarState state);
+public interface Sidebar {
+    /**
+     * update controls according to new state
+     * 
+     * @param state
+     */
+    public void updateSidebarState(SidebarState state);
 }

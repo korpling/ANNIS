@@ -19,32 +19,31 @@ import annis.gui.QueryController;
 import annis.gui.querybuilder.QueryBuilderPlugin;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
-
-
 /**
  * @author martin
  * @author tom
  */
 
 @PluginImplementation
-public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuilder>
-{  
-  @Override
-  public String getShortName()
-  {
-    return "flatquerybuilder";
-  }
+public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuilder> {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5742603543433685793L;
 
-  @Override
-  public String getCaption()
-  {
-    return "Word sequences and meta information";
-  }
+    @Override
+    public FlatQueryBuilder createComponent(QueryController controlPanel) {
+        FlatQueryBuilder qb = new FlatQueryBuilder(controlPanel);
+        return qb;
+    }
 
-  @Override
-  public FlatQueryBuilder createComponent(QueryController controlPanel)
-  {
-    FlatQueryBuilder qb = new FlatQueryBuilder(controlPanel);
-    return qb;
-  }
+    @Override
+    public String getCaption() {
+        return "Word sequences and meta information";
+    }
+
+    @Override
+    public String getShortName() {
+        return "flatquerybuilder";
+    }
 }

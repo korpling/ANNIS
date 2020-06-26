@@ -15,74 +15,59 @@
  */
 package annis.gui.components;
 
-import org.json.JSONException;
-
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.AbstractJavaScriptExtension;
-import com.vaadin.ui.JavaScriptFunction;
-
-import elemental.json.JsonArray;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@JavaScript(
-{
-  "vaadin://jquery.js", "onloadcallback.js"
-})
-public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
-{
-
-  private AbstractClientConnector target;
-
-  public OnLoadCallbackExtension(Callback c)
-  {
-    this(c, 250);
-  }
-
-  public OnLoadCallbackExtension(final Callback c, final int recallDelay)
-  {
-    addFunction("loaded", new JavaScriptFunction()
-    {
-      @Override
-      public void call(JsonArray arguments) throws JSONException
-      {
-        if (c != null)
-        {
-          boolean handled = c.onCompononentLoaded(target);
-          if (!handled)
-          {
-            callFunction("requestRecall", recallDelay);
-          }
-        }
-      }
-    });
-  }
-
-  @Override
-  public void extend(AbstractClientConnector target)
-  {
-    super.extend(target);
-    this.target = target;
-  }
-
-  /**
-   * A callback for {@link OnLoadCallbackExtension}.
-   */
-  public static interface Callback
-  {
+@JavaScript({ "vaadin://jquery.js", "onloadcallback.js" })
+public class OnLoadCallbackExtension extends AbstractJavaScriptExtension {
 
     /**
-     * Called whenever the extended component was rendered. If you want to get a
-     * repeated callback (e.g. because you are waiting for a longer process to
-     * complete it's calculation) you can return "false".
-     *
-     * @param source
-     * @return True if handled, if false the callback will be called again after
-     * a certain time span.
+     * A callback for {@link OnLoadCallbackExtension}.
      */
-    public boolean onCompononentLoaded(AbstractClientConnector source);
-  }
+    public static interface Callback {
+
+        /**
+         * Called whenever the extended component was rendered. If you want to get a
+         * repeated callback (e.g. because you are waiting for a longer process to
+         * complete it's calculation) you can return "false".
+         *
+         * @param source
+         * @return True if handled, if false the callback will be called again after a
+         *         certain time span.
+         */
+        public boolean onCompononentLoaded(AbstractClientConnector source);
+    }
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -6065894806434418964L;
+
+    private AbstractClientConnector target;
+
+    public OnLoadCallbackExtension(Callback c) {
+        this(c, 250);
+    }
+
+    public OnLoadCallbackExtension(final Callback c, final int recallDelay) {
+        addFunction("loaded", arguments -> {
+            if (c != null) {
+                boolean handled = c.onCompononentLoaded(target);
+                if (!handled) {
+                    callFunction("requestRecall", recallDelay);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void extend(AbstractClientConnector target) {
+        super.extend(target);
+        this.target = target;
+    }
 }

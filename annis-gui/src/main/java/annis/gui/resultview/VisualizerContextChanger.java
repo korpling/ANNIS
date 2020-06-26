@@ -17,7 +17,6 @@ package annis.gui.resultview;
 
 import annis.libgui.ResolverProvider;
 import annis.model.PagedResultQuery;
-
 import java.io.Serializable;
 import org.corpus_tools.salt.common.SaltProject;
 
@@ -30,38 +29,43 @@ import org.corpus_tools.salt.common.SaltProject;
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public interface VisualizerContextChanger extends Serializable
-{
+public interface VisualizerContextChanger extends Serializable {
 
-  /**
-   * Registers the visibility status of single visualizer. The ordinary state is
-   * determined by the resolver entry, which is usually provided by the
-   * {@link ResolverProvider}. If this status is changed, it must be propagated
-   * to an instance of the interface.
-   *
-   * @param entryId The entry id, which represents the row id in the resolver
-   * map table, thus this value should be unique.
-   * @param status If true the visualizer is visible.
-   */
-  public void registerVisibilityStatus(long entryId, boolean status);
+    /**
+     * Sends a new query to the ANNIS-Service in order to increase/decrease the
+     * context of a single result.
+     *
+     * @param resultNumber
+     *            the number of the result.
+     * @param context
+     *            The size of the context.
+     * @param left
+     *            Which context must be change. If true the left context is changed,
+     *            otherwise the right one.
+     */
+    public void changeContext(long resultNumber, int context, boolean left);
 
-  /**
-   * Reinitiates all registered visualizer with a new salt project.
-   *
-   * @param p the project, all visualizer are updated with.
-   * @param q originally query, for determine the current context
-   */
-  public void updateResult(SaltProject p, PagedResultQuery q);
+    /**
+     * Registers the visibility status of single visualizer. The ordinary state is
+     * determined by the resolver entry, which is usually provided by the
+     * {@link ResolverProvider}. If this status is changed, it must be propagated to
+     * an instance of the interface.
+     *
+     * @param entryId
+     *            The entry id, which represents the row id in the resolver map
+     *            table, thus this value should be unique.
+     * @param status
+     *            If true the visualizer is visible.
+     */
+    public void registerVisibilityStatus(long entryId, boolean status);
 
-  /**
-   * Sends a new query to the ANNIS-Service in order to increase/decrease the
-   * context of a single result.
-   *
-   * @param resultNumber the number of the result.
-   * @param context The size of the context.
-   * @param left Which context must be change. If true the left context is
-   * changed, otherwise the right one.
-   */
-  public void changeContext(long resultNumber, int context,
-    boolean left);
+    /**
+     * Reinitiates all registered visualizer with a new salt project.
+     *
+     * @param p
+     *            the project, all visualizer are updated with.
+     * @param q
+     *            originally query, for determine the current context
+     */
+    public void updateResult(SaltProject p, PagedResultQuery q);
 }

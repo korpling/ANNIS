@@ -13,20 +13,8 @@
 package org.corpus_tools.annis;
 
 import org.corpus_tools.ApiException;
-import org.corpus_tools.annis.AnnotationComponentType;
-import org.corpus_tools.annis.CountExtra;
-import org.corpus_tools.annis.CountQuery;
-import org.corpus_tools.annis.FindQuery;
-import org.corpus_tools.annis.FrequencyQuery;
-import org.corpus_tools.annis.FrequencyTable;
-import org.corpus_tools.annis.QueryLanguage;
-import org.junit.Test;
 import org.junit.Ignore;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.junit.Test;
 
 /**
  * API tests for SearchApi

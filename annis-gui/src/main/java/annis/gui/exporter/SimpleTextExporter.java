@@ -20,33 +20,33 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  * Simple text exporter.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @PluginImplementation
-public class SimpleTextExporter extends GeneralTextExporter
-{
+public class SimpleTextExporter extends GeneralTextExporter {
 
-  @Override
-  public SubgraphFilter getSubgraphFilter()
-  {
-    return SubgraphFilter.token;
-  }
-  
-  @Override
-  public String getHelpMessage()
-  {
-    return "The SimpleTextExporter exports only the plain text of every search result. "
-    + "<p>"
-    + "<strong>This exporter does not work well with dialog data "
-    + "(corpora that have more than one primary text). "
-    + "Use the GridExporter instead.</strong>"
-    + "</p>" ;
-  }
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7160326173200872339L;
 
-@Override
-public boolean isAlignable() 
-	{
-		return false;
-	}
-  
+    @Override
+    public String getHelpMessage() {
+        return "The SimpleTextExporter exports only the plain text of every search result. " + "<p>"
+                + "<strong>This exporter does not work well with dialog data "
+                + "(corpora that have more than one primary text). " + "Use the GridExporter instead.</strong>"
+                + "</p>";
+    }
+
+    @Override
+    public SubgraphFilter getSubgraphFilter() {
+        return SubgraphFilter.token;
+    }
+
+    @Override
+    public boolean isAlignable() {
+        return false;
+    }
+
 }

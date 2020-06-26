@@ -48,211 +48,136 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
-{
+public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
 
-  protected static final Logger log = LoggerFactory.getLogger(
-    ResultFetchJob.class);
+    protected static final Logger log = LoggerFactory.getLogger(ResultFetchJob.class);
 
-  protected ResultViewPanel resultPanel;
+    protected ResultViewPanel resultPanel;
 
-  private final Future<MatchGroup> futureMatches;
+    private final Future<MatchGroup> futureMatches;
 
-  protected AsyncWebResource res;
+    protected AsyncWebResource res;
 
-  protected PagedResultQuery query;
+    protected PagedResultQuery query;
 
-  protected AnnisUI ui;
+    protected AnnisUI ui;
 
-  public ResultFetchJob(PagedResultQuery query,
-    ResultViewPanel resultPanel,
-    AnnisUI ui)
-  {
-    this.resultPanel = resultPanel;
-    this.query = query;
-    this.ui = ui;
-    
-    res = Helper.getAnnisAsyncWebResource(ui);
-    
-    futureMatches = res.path("query").path("search").path("find")
-      .queryParam("q", Helper.encodeJersey(query.getQuery()))
-      .queryParam("offset", "" + query.getOffset())
-      .queryParam("limit", "" + query.getLimit())
-      .queryParam("corpora", Helper.encodeJersey(StringUtils.join(query.getCorpora(), ",")))
-      .queryParam("order", query.getOrder().toString())
-      .queryParam("query-language", query.getQueryLanguage().name())
-      .accept(MediaType.APPLICATION_XML_TYPE)
-      .get(MatchGroup.class);
+    public ResultFetchJob(PagedResultQuery query, ResultViewPanel resultPanel, AnnisUI ui) {
+        this.resultPanel = resultPanel;
+        this.query = query;
+        this.ui = ui;
 
-  }
+        res = Helper.getAnnisAsyncWebResource(ui);
 
-  @Override
-  public void run()
-  {
-    WebResource subgraphRes
-      = Helper.getAnnisWebResource(ui).path("query/search/subgraph");
+        futureMatches = res.path("query").path("search").path("find")
+                .queryParam("q", Helper.encodeJersey(query.getQuery())).queryParam("offset", "" + query.getOffset())
+                .queryParam("limit", "" + query.getLimit())
+                .queryParam("corpora", Helper.encodeJersey(StringUtils.join(query.getCorpora(), ",")))
+                .queryParam("order", query.getOrder().toString())
+                .queryParam("query-language", query.getQueryLanguage().name()).accept(MediaType.APPLICATION_XML_TYPE)
+                .get(MatchGroup.class);
 
-    // holds the ids of the matches.
-    MatchGroup result;
+    }
 
-    try
-    {
-      if (Thread.interrupted())
-      {
-        return;
-      }
+    @Override
+    public void run() {
+        WebResource subgraphRes = Helper.getAnnisWebResource(ui).path("query/search/subgraph");
 
-      // set the the progress bar, for given the user some information about the loading process
-      ui.accessSynchronously(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          resultPanel.showMatchSearchInProgress(query);
-        }
-      });
+        // holds the ids of the matches.
+        MatchGroup result;
 
-      // get the matches
-      result = futureMatches.get();
-      
-      // get the subgraph for each match, when the result is not empty
-      if (result.getMatches().isEmpty())
-      {
+        try {
+            if (Thread.interrupted()) {
+                return;
+            }
 
-        // check if thread was interrupted
-        if (Thread.interrupted())
-        {
-          return;
-        }
+            // set the the progress bar, for given the user some information about the
+            // loading process
+            ui.accessSynchronously(() -> resultPanel.showMatchSearchInProgress(query));
 
-        // nothing found, so inform the user about this.
-        ui.access(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            resultPanel.showNoResult();
-          }
-        });
-      }
-      else
-      {
-        if (Thread.interrupted())
-        {
-          return;
-        }
+            // get the matches
+            result = futureMatches.get();
 
-        // since annis found something, inform the user that subgraphs are created
-        ui.access(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            resultPanel.showSubgraphSearchInProgress(query, 0.0f);
-          }
-        });
+            // get the subgraph for each match, when the result is not empty
+            if (result.getMatches().isEmpty()) {
 
-        // prepare fetching subgraphs
-       
-        final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<>(
-          result.getMatches().size());
-        int current = 0;        
-        final ArrayList<Match> matchList = new ArrayList<>(result.getMatches());
+                // check if thread was interrupted
+                if (Thread.interrupted()) {
+                    return;
+                }
 
-        for (Match m : matchList)
-        {
-          if (Thread.interrupted())
-          {
-            return;
-          }
+                // nothing found, so inform the user about this.
+                ui.access(() -> resultPanel.showNoResult());
+            } else {
+                if (Thread.interrupted()) {
+                    return;
+                }
 
-          List<Match> subList = new LinkedList<>();
-          subList.add(m);
-          final SaltProject p = executeQuery(subgraphRes, 
-            new MatchGroup(subList), 
-            query.getLeftContext(), query.getRightContext(),
-            query.getSegmentation(), SubgraphFilter.all);
+                // since annis found something, inform the user that subgraphs are created
+                ui.access(() -> resultPanel.showSubgraphSearchInProgress(query, 0.0f));
 
-          queue.put(p);
-          log.debug("added match {} to queue", current+1);
+                // prepare fetching subgraphs
 
-          
-          if (current == 0)
-          {
-            ui.access(new Runnable()
-            {
-              @Override
-              public void run()
-              {
-                resultPanel.setQueryResultQueue(queue, query, matchList);
-              }
+                final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<>(result.getMatches().size());
+                int current = 0;
+                final ArrayList<Match> matchList = new ArrayList<>(result.getMatches());
+
+                for (Match m : matchList) {
+                    if (Thread.interrupted()) {
+                        return;
+                    }
+
+                    List<Match> subList = new LinkedList<>();
+                    subList.add(m);
+                    final SaltProject p = executeQuery(subgraphRes, new MatchGroup(subList), query.getLeftContext(),
+                            query.getRightContext(), query.getSegmentation(), SubgraphFilter.all);
+
+                    queue.put(p);
+                    log.debug("added match {} to queue", current + 1);
+
+                    if (current == 0) {
+                        ui.access(() -> resultPanel.setQueryResultQueue(queue, query, matchList));
+                    }
+
+                    if (Thread.interrupted()) {
+                        return;
+                    }
+
+                    current++;
+                }
+            } // end if no results
+
+        } catch (InterruptedException ex) {
+            // just return
+        } catch (final ExecutionException root) {
+            ui.accessSynchronously(() -> {
+                if (resultPanel != null && resultPanel.getPaging() != null) {
+                    PagingComponent paging = resultPanel.getPaging();
+                    Throwable cause = root.getCause();
+
+                    if (cause instanceof UniformInterfaceException) {
+                        UniformInterfaceException ex = (UniformInterfaceException) cause;
+                        if (ex.getResponse().getStatus() == 400) {
+                            List<AqlParseError> errors = ex.getResponse()
+                                    .getEntity(new GenericType<List<AqlParseError>>() {});
+                            String errMsg = Joiner.on(" | ").join(errors);
+
+                            paging.setInfo("parsing error: " + errMsg);
+                        } else if (ex.getResponse().getStatus() == 504) {
+                            paging.setInfo("Timeout: query execution took too long");
+                        } else if (ex.getResponse().getStatus() == 403) {
+                            paging.setInfo("Not authorized to query this corpus.");
+                        } else {
+                            paging.setInfo("unknown error: " + ex);
+                        }
+                    } else {
+                        log.error("Unexcepted ExecutionException cause", root);
+                    }
+
+                    resultPanel.showFinishedSubgraphSearch();
+
+                }
             });
-          }
-
-          if (Thread.interrupted())
-          {
-            return;
-          }
-
-          current++;
-        }
-      } // end if no results
-
+        } // end catch
     }
-    catch (InterruptedException ex)
-    {
-      // just return
-    }
-    catch (final ExecutionException root)
-    {
-      ui.accessSynchronously(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          if (resultPanel != null && resultPanel.getPaging() != null)
-          {
-            PagingComponent paging = resultPanel.getPaging();
-            Throwable cause = root.getCause();
-            
-            if (cause instanceof UniformInterfaceException)
-            {
-              UniformInterfaceException ex = (UniformInterfaceException) cause;
-              if (ex.getResponse().getStatus() == 400)
-              {
-                List<AqlParseError> errors
-                  = ex.getResponse().getEntity(
-                    new GenericType<List<AqlParseError>>()
-                    {
-                    });
-                String errMsg = Joiner.on(" | ").join(errors);
-
-                paging.setInfo("parsing error: " + errMsg);
-              }
-              else if (ex.getResponse().getStatus() == 504)
-              {
-                paging.setInfo("Timeout: query execution took too long");
-              }
-              else if(ex.getResponse().getStatus() == 403)
-              {
-                paging.setInfo("Not authorized to query this corpus.");
-              }
-              else
-              {
-                paging.setInfo("unknown error: " + ex);
-              }
-            }
-            else
-            {
-              log.error("Unexcepted ExecutionException cause",
-                root);
-            }
-
-            resultPanel.showFinishedSubgraphSearch();
-
-          }
-        }
-      });
-    } // end catch
-  }
 }

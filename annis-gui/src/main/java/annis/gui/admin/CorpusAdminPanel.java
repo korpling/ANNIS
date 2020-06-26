@@ -15,12 +15,8 @@
  */
 package annis.gui.admin;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
+import annis.gui.admin.view.CorpusListView;
+import annis.service.objects.AnnisCorpus;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -28,83 +24,72 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.util.BeanContainer;
 import com.vaadin.v7.ui.Grid;
-
-import annis.gui.admin.view.CorpusListView;
-import annis.service.objects.AnnisCorpus;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CorpusAdminPanel extends Panel
-  implements CorpusListView
-{
+public class CorpusAdminPanel extends Panel implements CorpusListView {
 
-  private final List<CorpusListView.Listener> listeners = new LinkedList<>();
+    private static final long serialVersionUID = 2132712553250095606L;
 
-  private final BeanContainer<String, AnnisCorpus> corpusContainer = new BeanContainer<>(
-    AnnisCorpus.class);
+    private final List<CorpusListView.Listener> listeners = new LinkedList<>();
 
-  public CorpusAdminPanel()
-  {
-    corpusContainer.setBeanIdProperty("name");
+    private final BeanContainer<String, AnnisCorpus> corpusContainer = new BeanContainer<>(AnnisCorpus.class);
 
-    final Grid corporaGrid = new Grid(corpusContainer);
-    corporaGrid.setSizeFull();
-    corporaGrid.setSelectionMode(Grid.SelectionMode.MULTI);
-    corporaGrid.setColumns("name", "documentCount", "tokenCount", "sourcePath");
+    public CorpusAdminPanel() {
+        corpusContainer.setBeanIdProperty("name");
 
-    corporaGrid.getColumn("documentCount").setHeaderCaption("Documents");
-    corporaGrid.getColumn("tokenCount").setHeaderCaption("Tokens");
-    corporaGrid.getColumn("sourcePath").setHeaderCaption("Source Path");
+        final Grid corporaGrid = new Grid(corpusContainer);
+        corporaGrid.setSizeFull();
+        corporaGrid.setSelectionMode(Grid.SelectionMode.MULTI);
+        corporaGrid.setColumns("name", "documentCount", "tokenCount", "sourcePath");
 
-    Button btDelete = new Button("Delete selected");
-    btDelete.addClickListener(new Button.ClickListener()
-    {
+        corporaGrid.getColumn("documentCount").setHeaderCaption("Documents");
+        corporaGrid.getColumn("tokenCount").setHeaderCaption("Tokens");
+        corporaGrid.getColumn("sourcePath").setHeaderCaption("Source Path");
 
-      @Override
-      public void buttonClick(Button.ClickEvent event)
-      {
-        Set<String> selection = new TreeSet<>();
-        for (Object o : corporaGrid.getSelectedRows())
-        {
-          selection.add((String) o);
-        }
-        corporaGrid.getSelectionModel().reset();
-        if (!selection.isEmpty())
-        {
+        Button btDelete = new Button("Delete selected");
+        btDelete.addClickListener(event -> {
+            Set<String> selection = new TreeSet<>();
+            for (Object o : corporaGrid.getSelectedRows()) {
+                selection.add((String) o);
+            }
+            corporaGrid.getSelectionModel().reset();
+            if (!selection.isEmpty()) {
 
-          for (CorpusListView.Listener l : listeners)
-          {
-            l.deleteCorpora(selection);
-          }
-        }
-      }
-    });
+                for (CorpusListView.Listener l : listeners) {
+                    l.deleteCorpora(selection);
+                }
+            }
+        });
 
-    VerticalLayout layout = new VerticalLayout(btDelete, corporaGrid);
-    layout.setSizeFull();
-    layout.setExpandRatio(corporaGrid, 1.0f);
-    layout.setSpacing(true);
-    layout.setMargin(new MarginInfo(true, false, false, false));
+        VerticalLayout layout = new VerticalLayout(btDelete, corporaGrid);
+        layout.setSizeFull();
+        layout.setExpandRatio(corporaGrid, 1.0f);
+        layout.setSpacing(true);
+        layout.setMargin(new MarginInfo(true, false, false, false));
 
-    layout.setComponentAlignment(btDelete, Alignment.MIDDLE_CENTER);
+        layout.setComponentAlignment(btDelete, Alignment.MIDDLE_CENTER);
 
-    setContent(layout);
-    setSizeFull();
-  }
+        setContent(layout);
+        setSizeFull();
+    }
 
-  @Override
-  public void addListener(CorpusListView.Listener listener)
-  {
-    listeners.add(listener);
-  }
+    @Override
+    public void addListener(CorpusListView.Listener listener) {
+        listeners.add(listener);
+    }
 
-  @Override
-  public void setAvailableCorpora(Collection<AnnisCorpus> corpora)
-  {
-    corpusContainer.removeAllItems();
-    corpusContainer.addAll(corpora);
-  }
+    @Override
+    public void setAvailableCorpora(Collection<AnnisCorpus> corpora) {
+        corpusContainer.removeAllItems();
+        corpusContainer.addAll(corpora);
+    }
 
 }

@@ -22,17 +22,22 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class AnnotatedMatch extends ArrayList<AnnotatedSpan> {
 
-	public AnnotatedMatch() {
-		super();
-	}
-	
-	public AnnotatedMatch(List<AnnotatedSpan> spans) {
-		this();
-		addAll(spans);
-	}
-	
-	public AnnotatedMatch(AnnotatedSpan... spans) {
-		this(Arrays.asList(spans));
-	}
-	
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 732868353767849124L;
+
+    public AnnotatedMatch() {
+        super();
+    }
+
+    public AnnotatedMatch(AnnotatedSpan... spans) {
+        this(Arrays.asList(spans));
+    }
+
+    public AnnotatedMatch(List<AnnotatedSpan> spans) {
+        this();
+        addAll(spans);
+    }
+
 }

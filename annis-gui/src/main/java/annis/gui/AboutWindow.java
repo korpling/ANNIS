@@ -15,34 +15,31 @@
  */
 package annis.gui;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import annis.VersionInfo;
+import annis.libgui.IDGenerator;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.shared.Version;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Embedded;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.v7.ui.Label;
+import com.vaadin.ui.Image;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
-import com.vaadin.v7.ui.TextArea;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.v7.shared.ui.label.ContentMode;
-
-import annis.VersionInfo;
-import annis.libgui.IDGenerator;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -50,111 +47,112 @@ import annis.libgui.IDGenerator;
  */
 public class AboutWindow extends Window {
 
-	private static final Logger log = LoggerFactory.getLogger(AboutWindow.class);
+    private static class OkClickListener implements Button.ClickListener {
 
-	private VerticalLayout layout;
+        private static final long serialVersionUID = -4082849367760765188L;
+        private final AboutWindow finalThis;
 
-	private Button btClose;
+        public OkClickListener(AboutWindow finalThis) {
+            this.finalThis = finalThis;
+        }
 
-	public AboutWindow() {
-		setSizeFull();
+        @Override
+        public void buttonClick(ClickEvent event) {
+            UI.getCurrent().removeWindow(finalThis);
+        }
+    }
 
-		layout = new VerticalLayout();
-		setContent(layout);
-		layout.setSizeFull();
-		layout.setMargin(true);
+    private static final long serialVersionUID = -7355736941508460795L;
 
-		HorizontalLayout hLayout = new HorizontalLayout();
+    private static final Logger log = LoggerFactory.getLogger(AboutWindow.class);
 
-		Embedded logoAnnis = new Embedded();
-		logoAnnis.setSource(new ThemeResource("images/annis-logo-128.png"));
-		logoAnnis.setType(Embedded.TYPE_IMAGE);
-		hLayout.addComponent(logoAnnis);
+    private VerticalLayout layout;
 
-		Embedded logoSfb = new Embedded();
-		logoSfb.setSource(new ThemeResource("images/sfb-logo.jpg"));
-		logoSfb.setType(Embedded.TYPE_IMAGE);
-		hLayout.addComponent(logoSfb);
+    private Button btClose;
 
-		Link lnkFork = new Link();
-		lnkFork.setResource(new ExternalResource("https://github.com/korpling/ANNIS"));
-		lnkFork.setIcon(new ExternalResource("https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"));
-		lnkFork.setTargetName("_blank");
-		hLayout.addComponent(lnkFork);
+    public AboutWindow() {
+        setSizeFull();
 
-		hLayout.setComponentAlignment(logoAnnis, Alignment.MIDDLE_LEFT);
-		hLayout.setComponentAlignment(logoSfb, Alignment.MIDDLE_RIGHT);
-		hLayout.setComponentAlignment(lnkFork, Alignment.TOP_RIGHT);
+        layout = new VerticalLayout();
+        setContent(layout);
+        layout.setSizeFull();
+        layout.setMargin(true);
 
-		layout.addComponent(hLayout);
+        HorizontalLayout hLayout = new HorizontalLayout();
 
-		layout.addComponent(
-				new Label("ANNIS is a project of the " + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.",
-						ContentMode.HTML));
-		layout.addComponent(new Label(
-				"Homepage: " + "<a href=\"http://corpus-tools.org/annis/\">" + "http://corpus-tools.org/annis/</a>.",
-				ContentMode.HTML));
-		layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
-		layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
+        Image logoAnnis = new Image();
+        logoAnnis.setSource(new ThemeResource("images/annis-logo-128.png"));
+        hLayout.addComponent(logoAnnis);
 
-		TextArea txtThirdParty = new TextArea();
-		txtThirdParty.setSizeFull();
+        Image logoSfb = new Image();
+        logoSfb.setSource(new ThemeResource("images/sfb-logo.jpg"));
+        hLayout.addComponent(logoSfb);
 
-		StringBuilder sb = new StringBuilder();
+        Link lnkFork = new Link();
+        lnkFork.setResource(new ExternalResource("https://github.com/korpling/ANNIS"));
+        lnkFork.setIcon(new ExternalResource("https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"));
+        lnkFork.setTargetName("_blank");
+        hLayout.addComponent(lnkFork);
 
-		sb.append("The ANNIS team wants to thank these third party software that " + "made the ANNIS GUI possible:\n");
+        hLayout.setComponentAlignment(logoAnnis, Alignment.MIDDLE_LEFT);
+        hLayout.setComponentAlignment(logoSfb, Alignment.MIDDLE_RIGHT);
+        hLayout.setComponentAlignment(lnkFork, Alignment.TOP_RIGHT);
 
-		File thirdPartyFolder = new File(VaadinService.getCurrent().getBaseDirectory(), "THIRD-PARTY");
-		if (thirdPartyFolder.isDirectory()) {
-			File[] thirdPartyFolderFiles = thirdPartyFolder.listFiles((FileFilter) new WildcardFileFilter("*.txt"));
-			if(thirdPartyFolderFiles != null) {
-				for (File c : thirdPartyFolderFiles) {
-					if (c.isFile()) {
-						try {
-							sb.append(FileUtils.readFileToString(c)).append("\n");
-						} catch (IOException ex) {
-							log.error("Could not read file", ex);
-						}
-					}
-				}
-			}
-		}
+        layout.addComponent(hLayout);
 
-		txtThirdParty.setValue(sb.toString());
-		txtThirdParty.setReadOnly(true);
-		txtThirdParty.addStyleName("shared-text");
-		txtThirdParty.setWordwrap(false);
+        layout.addComponent(
+                new Label("ANNIS is a project of the " + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.",
+                        ContentMode.HTML));
+        layout.addComponent(new Label(
+                "Homepage: " + "<a href=\"http://corpus-tools.org/annis/\">" + "http://corpus-tools.org/annis/</a>.",
+                ContentMode.HTML));
+        layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
+        layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
 
-		layout.addComponent(txtThirdParty);
+        TextArea txtThirdParty = new TextArea();
+        txtThirdParty.setSizeFull();
 
-		btClose = new Button("Close");
-		final AboutWindow finalThis = this;
-		btClose.addClickListener(new OkClickListener(finalThis));
-		layout.addComponent(btClose);
+        StringBuilder sb = new StringBuilder();
 
-		layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
-		layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
-		layout.setExpandRatio(txtThirdParty, 1.0f);
+        sb.append("The ANNIS team wants to thank these third party software that " + "made the ANNIS GUI possible:\n");
 
-	}
+        File thirdPartyFolder = new File(VaadinService.getCurrent().getBaseDirectory(), "THIRD-PARTY");
+        if (thirdPartyFolder.isDirectory()) {
+            File[] thirdPartyFolderFiles = thirdPartyFolder.listFiles((FileFilter) new WildcardFileFilter("*.txt"));
+            if (thirdPartyFolderFiles != null) {
+                for (File c : thirdPartyFolderFiles) {
+                    if (c.isFile()) {
+                        try {
+                            sb.append(FileUtils.readFileToString(c)).append("\n");
+                        } catch (IOException ex) {
+                            log.error("Could not read file", ex);
+                        }
+                    }
+                }
+            }
+        }
 
-	@Override
-	public void attach() {
-		super.attach();
-		IDGenerator.assignIDForFields(AboutWindow.this, btClose);
-	}
+        txtThirdParty.setValue(sb.toString());
+        txtThirdParty.setReadOnly(true);
+        txtThirdParty.addStyleName("shared-text");
+        txtThirdParty.setWordWrap(false);
 
-	private static class OkClickListener implements Button.ClickListener {
+        layout.addComponent(txtThirdParty);
 
-		private final AboutWindow finalThis;
+        btClose = new Button("Close");
+        final AboutWindow finalThis = this;
+        btClose.addClickListener(new OkClickListener(finalThis));
+        layout.addComponent(btClose);
 
-		public OkClickListener(AboutWindow finalThis) {
-			this.finalThis = finalThis;
-		}
+        layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
+        layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
+        layout.setExpandRatio(txtThirdParty, 1.0f);
 
-		@Override
-		public void buttonClick(ClickEvent event) {
-			UI.getCurrent().removeWindow(finalThis);
-		}
-	}
+    }
+
+    @Override
+    public void attach() {
+        super.attach();
+        IDGenerator.assignIDForFields(AboutWindow.this, btClose);
+    }
 }

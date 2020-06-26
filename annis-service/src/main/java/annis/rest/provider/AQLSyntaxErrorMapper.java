@@ -16,7 +16,6 @@
 package annis.rest.provider;
 
 import javax.ws.rs.ext.Provider;
-
 import org.corpus_tools.graphannis.errors.AQLSyntaxError;
 
 /**
@@ -26,5 +25,4 @@ import org.corpus_tools.graphannis.errors.AQLSyntaxError;
 @Provider
 public class AQLSyntaxErrorMapper extends AQLErrorMapperBase<AQLSyntaxError> {
 
-  
 }

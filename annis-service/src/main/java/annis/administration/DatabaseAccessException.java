@@ -20,20 +20,25 @@ import annis.AnnisRunnerException;
 @SuppressWarnings("serial")
 public class DatabaseAccessException extends AnnisRunnerException {
 
-	public DatabaseAccessException() {
-		super(5);
-	}
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3396570754872537191L;
 
-	public DatabaseAccessException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public DatabaseAccessException() {
+        super(5);
+    }
 
-	public DatabaseAccessException(String message) {
-		super(message, 5);
-	}
+    public DatabaseAccessException(String message) {
+        super(message, 5);
+    }
 
-	public DatabaseAccessException(Throwable cause) {
-		super(cause, 5);
-	}
+    public DatabaseAccessException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public DatabaseAccessException(Throwable cause) {
+        super(cause, 5);
+    }
 
 }

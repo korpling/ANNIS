@@ -24,23 +24,22 @@ import java.util.Set;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface GroupListView
-{
-  public void addListener(Listener listener);
-  
-  public void setGroupList(Collection<Group> groups);
-  
-  public void emptyNewGroupNameTextField();
-  
-  public void addAvailableCorpusNames(Collection<String> corpusNames);
-  
-  public void setLoadingAnimation(boolean show);
-  
-  public interface Listener
-  {
-    public void groupUpdated(Group user);
-    
-    public void addNewGroup(String groupName);
-    public void deleteGroups(Set<String> groupName);
-  }
+public interface GroupListView {
+    public interface Listener {
+        public void addNewGroup(String groupName);
+
+        public void deleteGroups(Set<String> groupName);
+
+        public void groupUpdated(Group user);
+    }
+
+    public void addAvailableCorpusNames(Collection<String> corpusNames);
+
+    public void addListener(Listener listener);
+
+    public void emptyNewGroupNameTextField();
+
+    public void setGroupList(Collection<Group> groups);
+
+    public void setLoadingAnimation(boolean show);
 }

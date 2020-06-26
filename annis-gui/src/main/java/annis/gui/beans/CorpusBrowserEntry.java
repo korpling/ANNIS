@@ -15,98 +15,98 @@
  */
 package annis.gui.beans;
 
-import annis.service.objects.AnnisCorpus;
+import com.google.common.collect.ComparisonChain;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-
-import com.google.common.collect.ComparisonChain;
 
 /**
  *
  * @author thomas
  */
 public class CorpusBrowserEntry implements CitationProvider, Serializable, Comparable<CorpusBrowserEntry> {
-  private String name;
-  private String example;
-  private String corpus;
 
-  public String getExample() {
-    return example;
-  }
+    private static final long serialVersionUID = 3609486046248403457L;
+    private String name;
+    private String example;
+    private String corpus;
 
-  public void setExample(String example) {
-    this.example = example;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getCorpus() {
-    return corpus;
-  }
-
-  public void setCorpus(String corpus) {
-    this.corpus = corpus;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
+    @Override
+    public int compareTo(CorpusBrowserEntry o) {
+        return ComparisonChain.start().compare(this.getName(), o.getName()).compare(this.getCorpus(), o.getCorpus())
+                .result();
     }
-    if (getClass() != obj.getClass()) {
-      return false;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final CorpusBrowserEntry other = (CorpusBrowserEntry) obj;
+        if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
+            return false;
+        }
+        if (this.corpus != other.corpus && (this.corpus == null || !this.corpus.equals(other.corpus))) {
+            return false;
+        }
+        return true;
     }
-    final CorpusBrowserEntry other = (CorpusBrowserEntry) obj;
-    if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
-      return false;
+
+    @Override
+    public Set<String> getCorpora() {
+        Set<String> result = new HashSet<>();
+        result.add(corpus);
+        return result;
     }
-    if (this.corpus != other.corpus && (this.corpus == null || !this.corpus.equals(other.corpus))) {
-      return false;
+
+    public String getCorpus() {
+        return corpus;
     }
-    return true;
-  }
 
-  @Override
-  public int compareTo(CorpusBrowserEntry o) {
-    return ComparisonChain.start().compare(this.getName(), o.getName()).compare(this.getCorpus(), o.getCorpus())
-        .result();
-  }
+    public String getExample() {
+        return example;
+    }
 
-  @Override
-  public int hashCode() {
-    int hash = 5;
-    hash = 13 * hash + (this.name != null ? this.name.hashCode() : 0);
-    hash = 13 * hash + (this.corpus != null ? this.corpus.hashCode() : 0);
-    return hash;
-  }
+    @Override
+    public int getLeftContext() {
+        return 5;
+    }
 
-  @Override
-  public String getQuery() {
-    return example;
-  }
+    public String getName() {
+        return name;
+    }
 
-  @Override
-  public Set<String> getCorpora() {
-    Set<String> result = new HashSet<>();
-    result.add(corpus);
-    return result;
-  }
+    @Override
+    public String getQuery() {
+        return example;
+    }
 
-  @Override
-  public int getLeftContext() {
-    return 5;
-  }
+    @Override
+    public int getRightContext() {
+        return 5;
+    }
 
-  @Override
-  public int getRightContext() {
-    return 5;
-  }
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 13 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 13 * hash + (this.corpus != null ? this.corpus.hashCode() : 0);
+        return hash;
+    }
+
+    public void setCorpus(String corpus) {
+        this.corpus = corpus;
+    }
+
+    public void setExample(String example) {
+        this.example = example;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

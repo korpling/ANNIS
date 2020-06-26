@@ -26,165 +26,144 @@ import java.util.regex.Pattern;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ContentRange
-{
-  private final long start;
+public class ContentRange {
+    public static class InvalidRangeException extends Exception {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -3702087931431165910L;
 
-  private final long end;
-
-  private final long totalSize;
-  
-  private static final Pattern fullPattern 
-    = Pattern.compile("^bytes=[0-9]*-[0-9]*(,[0-9]d*-[0-9]d*)*$");
-  
-  private static final Pattern partPattern 
-    = Pattern.compile("^([0-9]*)-([0-9]*)$");
-
-  public ContentRange(long start, long end, long totalSize)
-  {
-    this.start = start;
-    this.end = end;
-    this.totalSize = totalSize;
-  }
-
-  /**
-   * Parses the header value of a HTTP Range request
-   * @param rawRange raw range value as given by the header
-   * @param totalSize total size of the content
-   * @param maxNum maximal number of allowed ranges. Will throw exception if client requests more ranges.
-   * @return
-   * @throws annis.gui.requesthandler.ContentRange.InvalidRangeException 
-   */
-  public static List<ContentRange> parseFromHeader(String rawRange, 
-    long totalSize,
-    int maxNum) throws InvalidRangeException
-  {
-    List<ContentRange> result = new ArrayList<>();
-    if (rawRange != null)
-    {
-      if(!fullPattern.matcher(rawRange).matches())
-      {
-        throw new InvalidRangeException("invalid syntax");
-      }
-      
-      rawRange = rawRange.substring("bytes=".length(), rawRange.length());
-      
-      
-      for(String partRange : Splitter.on(",")
-        .omitEmptyStrings().trimResults().split(rawRange))
-      {
-        if(result.size() >= totalSize)
-        {
-          throw new InvalidRangeException("more ranges than acceptable");
+        public InvalidRangeException() {
+            super("");
         }
-        
-        long from = 0;
-        long to = totalSize-1;
-        
-        Matcher m = partPattern.matcher(partRange);
-        if(!m.find())
-        {
-          throw new InvalidRangeException("invalid syntax for partial range");
+
+        public InvalidRangeException(String message) {
+            super(message);
         }
-        
-        String fromString = m.group(1);
-        String toString = m.group(2);
-        
-        if(fromString != null && !fromString.isEmpty())
-        {
-          from = Long.parseLong(fromString);
+    }
+
+    private static final Pattern fullPattern = Pattern.compile("^bytes=[0-9]*-[0-9]*(,[0-9]d*-[0-9]d*)*$");
+
+    private static final Pattern partPattern = Pattern.compile("^([0-9]*)-([0-9]*)$");
+
+    /**
+     * Parses the header value of a HTTP Range request
+     * 
+     * @param rawRange
+     *            raw range value as given by the header
+     * @param totalSize
+     *            total size of the content
+     * @param maxNum
+     *            maximal number of allowed ranges. Will throw exception if client
+     *            requests more ranges.
+     * @return
+     * @throws annis.gui.requesthandler.ContentRange.InvalidRangeException
+     */
+    public static List<ContentRange> parseFromHeader(String rawRange, long totalSize, int maxNum)
+            throws InvalidRangeException {
+        List<ContentRange> result = new ArrayList<>();
+        if (rawRange != null) {
+            if (!fullPattern.matcher(rawRange).matches()) {
+                throw new InvalidRangeException("invalid syntax");
+            }
+
+            rawRange = rawRange.substring("bytes=".length(), rawRange.length());
+
+            for (String partRange : Splitter.on(",").omitEmptyStrings().trimResults().split(rawRange)) {
+                if (result.size() >= totalSize) {
+                    throw new InvalidRangeException("more ranges than acceptable");
+                }
+
+                long from = 0;
+                long to = totalSize - 1;
+
+                Matcher m = partPattern.matcher(partRange);
+                if (!m.find()) {
+                    throw new InvalidRangeException("invalid syntax for partial range");
+                }
+
+                String fromString = m.group(1);
+                String toString = m.group(2);
+
+                if (fromString != null && !fromString.isEmpty()) {
+                    from = Long.parseLong(fromString);
+                }
+                if (toString != null && !toString.isEmpty()) {
+                    to = Long.parseLong(toString);
+                }
+
+                if (from > to) {
+                    throw new InvalidRangeException("start is larger then end");
+                }
+
+                result.add(new ContentRange(from, to, totalSize));
+
+            }
         }
-        if(toString != null && !toString.isEmpty())
-        {
-          to = Long.parseLong(toString);
+        return result;
+    }
+
+    private final long start;
+
+    private final long end;
+
+    private final long totalSize;
+
+    public ContentRange(long start, long end, long totalSize) {
+        this.start = start;
+        this.end = end;
+        this.totalSize = totalSize;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
         }
-        
-        if(from > to)
-        {
-          throw new InvalidRangeException("start is larger then end");
+        if (getClass() != obj.getClass()) {
+            return false;
         }
-        
-        result.add(new ContentRange(from, to, totalSize));
-        
-      }
+        final ContentRange other = (ContentRange) obj;
+        if (this.start != other.start) {
+            return false;
+        }
+        if (this.end != other.end) {
+            return false;
+        }
+        if (this.totalSize != other.totalSize) {
+            return false;
+        }
+        return true;
     }
-    return result;
-  }
 
-  public long getStart()
-  {
-    return start;
-  }
+    public long getEnd() {
+        return end;
+    }
 
-  public long getEnd()
-  {
-    return end;
-  }
+    public long getLength() {
+        return end - start + 1;
+    }
 
-  public long getTotalSize()
-  {
-    return totalSize;
-  }
+    public long getStart() {
+        return start;
+    }
 
-  public long getLength()
-  {
-    return end - start + 1;
-  }
+    public long getTotalSize() {
+        return totalSize;
+    }
 
-  @Override
-  public int hashCode()
-  {
-    int hash = 7;
-    hash = 59 * hash + (int) (this.start ^ (this.start >>> 32));
-    hash = 59 * hash + (int) (this.end ^ (this.end >>> 32));
-    hash = 59 * hash + (int) (this.totalSize ^ (this.totalSize >>> 32));
-    return hash;
-  }
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (int) (this.start ^ (this.start >>> 32));
+        hash = 59 * hash + (int) (this.end ^ (this.end >>> 32));
+        hash = 59 * hash + (int) (this.totalSize ^ (this.totalSize >>> 32));
+        return hash;
+    }
 
-  @Override
-  public boolean equals(Object obj)
-  {
-    if (obj == null)
-    {
-      return false;
+    @Override
+    public String toString() {
+        return "bytes " + start + "-" + end + "/" + totalSize;
     }
-    if (getClass() != obj.getClass())
-    {
-      return false;
-    }
-    final ContentRange other = (ContentRange) obj;
-    if (this.start != other.start)
-    {
-      return false;
-    }
-    if (this.end != other.end)
-    {
-      return false;
-    }
-    if (this.totalSize != other.totalSize)
-    {
-      return false;
-    }
-    return true;
-  }
 
-  @Override
-  public String toString()
-  {
-    return "bytes " + start + "-" + end + "/" + totalSize;
-  }
-  
-  public static class InvalidRangeException extends Exception
-  {
-    public InvalidRangeException()
-    {
-      super("");
-    }
-    
-    public InvalidRangeException(String message)
-    {
-      super(message);
-    }
-  }
-  
 }

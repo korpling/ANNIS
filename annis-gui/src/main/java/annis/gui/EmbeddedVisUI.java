@@ -15,56 +15,6 @@
  */
 package annis.gui;
 
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
-import static annis.model.AnnisConstants.FEAT_MATCHEDIDS;
-import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Callable;
-
-import javax.ws.rs.core.Response;
-
-import org.corpus_tools.salt.SaltFactory;
-import org.corpus_tools.salt.common.SCorpusGraph;
-import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.core.SFeature;
-import org.corpus_tools.salt.core.SNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.annotations.Push;
-import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.Widgetset;
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.shared.communication.PushMode;
-import com.vaadin.v7.shared.ui.label.ContentMode;
-import com.vaadin.shared.ui.ui.Transport;
-import com.vaadin.spring.annotation.SpringUI;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Component;
-import com.vaadin.v7.ui.Label;
-import com.vaadin.ui.Link;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-
 import annis.CommonHelper;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.util.ANNISFontIcon;
@@ -79,6 +29,42 @@ import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.Match;
 import annis.service.objects.Visualizer;
 import annis.visualizers.htmlvis.HTMLVis;
+import com.google.common.base.Splitter;
+import com.google.common.util.concurrent.FutureCallback;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.Push;
+import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Widgetset;
+import com.vaadin.server.ExternalResource;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
+import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Link;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Label;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import javax.ws.rs.core.Response;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -86,9 +72,14 @@ import annis.visualizers.htmlvis.HTMLVis;
  */
 @Theme("annis_embeddedvis")
 @Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
-@SpringUI(path="/embeddedvis")
+@SpringUI(path = "/embeddedvis")
 @Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
 public class EmbeddedVisUI extends CommonUI {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3171707930515328817L;
 
     private static final Logger log = LoggerFactory.getLogger(EmbeddedVisUI.class);
 
@@ -112,39 +103,6 @@ public class EmbeddedVisUI extends CommonUI {
         super(URL_PREFIX);
     }
 
-    @Override
-    protected void init(VaadinRequest request) {
-        super.init(request);
-
-        String rawPath = request.getPathInfo();
-        List<String> splittedPath = new LinkedList<>();
-        if (rawPath != null) {
-            rawPath = rawPath.substring(URL_PREFIX.length());
-            splittedPath = Splitter.on("/").omitEmptyStrings().trimResults().limit(3).splitToList(rawPath);
-        }
-
-        if (splittedPath.size() == 1) {
-            // a visualizer definition which get the results from a remote salt file
-            String saltUrl = request.getParameter(KEY_SALT);
-            if (saltUrl == null) {
-                displayGeneralHelp();
-            } else {
-                generateVisFromRemoteURL(splittedPath.get(0), saltUrl, request.getParameterMap());
-            }
-        } else if (splittedPath.size() >= 3) {
-            // a visualizer definition visname/corpusname/documentname
-            if ("htmldoc".equals(splittedPath.get(0))) {
-                showHtmlDoc(splittedPath.get(1), splittedPath.get(2), request.getParameterMap());
-            } else {
-                displayMessage("Unknown visualizer \"" + splittedPath.get(0) + "\"",
-                        "Only \"htmldoc\" is supported yet.");
-            }
-        } else {
-            displayGeneralHelp();
-        }
-        addStyleName("loaded-embedded-vis");
-    }
-
     private void displayGeneralHelp() {
         displayMessage("Path not complete",
                 "You have to specify what visualizer to use and which document of which corpus you want to visualizer by giving the correct path:<br />"
@@ -153,6 +111,21 @@ public class EmbeddedVisUI extends CommonUI {
                         + "<li><code>vis</code>: visualizer name (currently only \"htmldoc\" is supported)</li>"
                         + "<li><code>corpus</code>: corpus name</li>"
                         + "<li><code>doc</code>: name of the document to visualize</li>" + "</ul>");
+    }
+
+    private void displayLoadingIndicator() {
+        VerticalLayout layout = new VerticalLayout();
+
+        layout.addStyleName("v-app-loading");
+        layout.setSizeFull();
+
+        setContent(layout);
+    }
+
+    private void displayMessage(String header, String content) {
+        Label label = new Label("<h1>" + header + "</h1>" + "<div>" + content + "</div>", ContentMode.HTML);
+        label.setSizeFull();
+        setContent(label);
     }
 
     private void generateVisFromRemoteURL(final String visName, final String rawUri, Map<String, String[]> args) {
@@ -182,12 +155,7 @@ public class EmbeddedVisUI extends CommonUI {
             // copy the arguments for using them later in the callback
             final Map<String, String[]> argsCopy = new LinkedHashMap<>(args);
 
-            Background.runWithCallback(new Callable<SaltProject>() {
-                @Override
-                public SaltProject call() throws Exception {
-                    return saltRes.get(SaltProject.class);
-                }
-            }, new FutureCallback<SaltProject>() {
+            Background.runWithCallback(() -> saltRes.get(SaltProject.class), new FutureCallback<SaltProject>() {
                 @Override
                 public void onFailure(Throwable t) {
                     log.error("Could not query Salt graph for embedded visualization.", t);
@@ -306,10 +274,9 @@ public class EmbeddedVisUI extends CommonUI {
                     "No login data available any longer in the session:<br /> " + ex.getMessage());
         } catch (UniformInterfaceException ex) {
             if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode()) {
-                displayMessage("Corpus access forbidden",
-                        "You are not allowed to access this corpus. "
-                                + "Please login at the <a target=\"_blank\" href=\"" + Helper.getContext(UI.getCurrent())
-                                + "\">main application</a> first and then reload this page.");
+                displayMessage("Corpus access forbidden", "You are not allowed to access this corpus. "
+                        + "Please login at the <a target=\"_blank\" href=\"" + Helper.getContext(UI.getCurrent())
+                        + "\">main application</a> first and then reload this page.");
             } else {
                 displayMessage("Service error", ex.getMessage());
             }
@@ -322,6 +289,39 @@ public class EmbeddedVisUI extends CommonUI {
                             ? ("An unknown error of type " + ex.getClass().getSimpleName()) + " occured."
                             : ex.getMessage());
         }
+    }
+
+    @Override
+    protected void init(VaadinRequest request) {
+        super.init(request);
+
+        String rawPath = request.getPathInfo();
+        List<String> splittedPath = new LinkedList<>();
+        if (rawPath != null) {
+            rawPath = rawPath.substring(URL_PREFIX.length());
+            splittedPath = Splitter.on("/").omitEmptyStrings().trimResults().limit(3).splitToList(rawPath);
+        }
+
+        if (splittedPath.size() == 1) {
+            // a visualizer definition which get the results from a remote salt file
+            String saltUrl = request.getParameter(KEY_SALT);
+            if (saltUrl == null) {
+                displayGeneralHelp();
+            } else {
+                generateVisFromRemoteURL(splittedPath.get(0), saltUrl, request.getParameterMap());
+            }
+        } else if (splittedPath.size() >= 3) {
+            // a visualizer definition visname/corpusname/documentname
+            if ("htmldoc".equals(splittedPath.get(0))) {
+                showHtmlDoc(splittedPath.get(1), splittedPath.get(2), request.getParameterMap());
+            } else {
+                displayMessage("Unknown visualizer \"" + splittedPath.get(0) + "\"",
+                        "Only \"htmldoc\" is supported yet.");
+            }
+        } else {
+            displayGeneralHelp();
+        }
+        addStyleName("loaded-embedded-vis");
     }
 
     private void showHtmlDoc(String corpus, String doc, Map<String, String[]> args) {
@@ -365,21 +365,6 @@ public class EmbeddedVisUI extends CommonUI {
                             + "<li><code>config</code>: the internal config file to use (same as <a href=\"http://korpling.github.io/ANNIS/doc/classannis_1_1visualizers_1_1htmlvis_1_1HTMLVis.html\">\"config\" mapping parameter)</a></li>"
                             + "</ul>");
         }
-    }
-
-    private void displayLoadingIndicator() {
-        VerticalLayout layout = new VerticalLayout();
-
-        layout.addStyleName("v-app-loading");
-        layout.setSizeFull();
-
-        setContent(layout);
-    }
-
-    private void displayMessage(String header, String content) {
-        Label label = new Label("<h1>" + header + "</h1>" + "<div>" + content + "</div>", ContentMode.HTML);
-        label.setSizeFull();
-        setContent(label);
     }
 
 }

@@ -1,22 +1,21 @@
 /*
  * Copyright 2013 SFB 632.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.visualizers.component.pdf;
 
-import annis.libgui.PDFPageHelper;
 import static annis.libgui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
+
+import annis.libgui.PDFPageHelper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFViewer;
@@ -30,18 +29,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Creates a pdf visualizer based on pdf.js. Talking with pdf.js is done in
- * {@link PDFPanel}.
+ * Creates a pdf visualizer based on pdf.js. Talking with pdf.js is done in {@link PDFPanel}.
  *
- * <p>There are mappings available:
+ * <p>
+ * There are mappings available:
  * <ul>
- * <li> Setting a fixed height (recommended for the
- * {@link PDFFullVisualizer}):height:&lt;height in px&gt;</li>
- * </ul></p>
+ * <li>Setting a fixed height (recommended for the {@link PDFFullVisualizer}):height:&lt;height in
+ * px&gt;</li>
+ * </ul>
+ * </p>
  *
- * <p>Since the pdf visualizer could be opened by clicking annotations in
- * {@link GridVisualizer}, this visualizer should set to the value "preloaded"
- * in the resolver_vis_map.tab file.</p>
+ * <p>
+ * Since the pdf visualizer could be opened by clicking annotations in {@link GridVisualizer}, this
+ * visualizer should set to the value "preloaded" in the resolver_vis_map.tab file.
+ * </p>
  *
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
@@ -49,37 +50,12 @@ import org.slf4j.LoggerFactory;
 @PluginImplementation
 public class PDFVisualizer extends AbstractVisualizer<Panel> {
 
-  private final Logger log = LoggerFactory.getLogger(PDFVisualizer.class);
-
-  @Override
-  public String getShortName() {
-    return "pdf";
-  }
-
-  @Override
-  public Panel createComponent(VisualizerInput input,
-          VisualizationToggle visToggle) {
-
-    PDFViewer pdfViewer = null;
-
-    try {
-
-      if (VaadinSession.getCurrent().getAttribute(PDFController.class) != null) {
-
-        VaadinSession session = VaadinSession.getCurrent();
-        PDFController pdfController = session.getAttribute(PDFController.class);
-        pdfViewer = new PDFViewerImpl(input, visToggle);
-        pdfController.addPDF(input.getId(), pdfViewer);
-      }
-
-    } catch (Exception ex) {
-      log.error("could not create pdf vis", ex);
-    }
-
-    return (Panel) pdfViewer;
-  }
-
   private static class PDFViewerImpl extends Panel implements PDFViewer {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -2541354371319522012L;
 
     VisualizerInput input;
 
@@ -90,6 +66,17 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
     public PDFViewerImpl(VisualizerInput input, VisualizationToggle visToggle) {
       this.visToggle = visToggle;
       this.input = input;
+    }
+
+    private void initPDFPanel(String page) {
+
+      if (pdfPanel != null) {
+        pdfPanel = null;
+      }
+
+      pdfPanel = new PDFPanel(this.input, page);
+      this.setContent(pdfPanel);
+      this.setHeight(input.getMappings().getProperty("height", "-1") + "px");
     }
 
     @Override
@@ -110,16 +97,39 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
       }
 
     }
+  }
 
-    private void initPDFPanel(String page) {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -5208334507204533281L;
 
-      if (pdfPanel != null) {
-        pdfPanel = null;
+  private final Logger log = LoggerFactory.getLogger(PDFVisualizer.class);
+
+  @Override
+  public Panel createComponent(VisualizerInput input, VisualizationToggle visToggle) {
+
+    PDFViewer pdfViewer = null;
+
+    try {
+
+      if (VaadinSession.getCurrent().getAttribute(PDFController.class) != null) {
+
+        VaadinSession session = VaadinSession.getCurrent();
+        PDFController pdfController = session.getAttribute(PDFController.class);
+        pdfViewer = new PDFViewerImpl(input, visToggle);
+        pdfController.addPDF(input.getId(), pdfViewer);
       }
 
-      pdfPanel = new PDFPanel(this.input, page);
-      this.setContent(pdfPanel);
-      this.setHeight(input.getMappings().getProperty("height", "-1") + "px");
+    } catch (Exception ex) {
+      log.error("could not create pdf vis", ex);
     }
+
+    return (Panel) pdfViewer;
+  }
+
+  @Override
+  public String getShortName() {
+    return "pdf";
   }
 }

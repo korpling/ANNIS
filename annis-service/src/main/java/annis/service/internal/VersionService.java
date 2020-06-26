@@ -16,51 +16,45 @@
 
 package annis.service.internal;
 
+import annis.VersionInfo;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 
-import annis.VersionInfo;
-
 /**
- * This service part only provides a method to get the version of this 
- * ANNIS instance.
+ * This service part only provides a method to get the version of this ANNIS
+ * instance.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Path("annis/version")
-public class VersionService
-{ 
-  
-  @GET
-  public String getFull()
-  {
-    String rev = getRevisionNumber();
-    StringBuilder result = new StringBuilder();
+public class VersionService {
 
-    result.append(getReleaseName());
-    if (!rev.isEmpty())
-    {
-      result.append(" (");
+    @GET
+    public String getFull() {
+        String rev = getRevisionNumber();
+        StringBuilder result = new StringBuilder();
 
-      result.append("rev. ");
-      result.append(rev);
+        result.append(getReleaseName());
+        if (!rev.isEmpty()) {
+            result.append(" (");
 
+            result.append("rev. ");
+            result.append(rev);
 
-      result.append(")");
+            result.append(")");
+        }
+        return result.toString();
     }
-    return result.toString();
-  }
-  
-  @GET
-  @Path("release")
-  public String getReleaseName()
-  {
-    return VersionInfo.getReleaseName();
-  }
-  
-  @GET
-  @Path("revision")
-  public String getRevisionNumber()
-  {
-    return VersionInfo.getBuildRevision();
-  }
+
+    @GET
+    @Path("release")
+    public String getReleaseName() {
+        return VersionInfo.getReleaseName();
+    }
+
+    @GET
+    @Path("revision")
+    public String getRevisionNumber() {
+        return VersionInfo.getBuildRevision();
+    }
 }

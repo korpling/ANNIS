@@ -20,17 +20,19 @@ package annis.gui;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CriticalServiceQueryException extends ServiceQueryException
-{
+public class CriticalServiceQueryException extends ServiceQueryException {
 
-  public CriticalServiceQueryException(String msg)
-  {
-    super(msg);
-  }
-  
-  public CriticalServiceQueryException(String msg, String description)
-  {
-    super(msg, description);
-  }
-  
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4258490966775420183L;
+
+    public CriticalServiceQueryException(String msg) {
+        super(msg);
+    }
+
+    public CriticalServiceQueryException(String msg, String description) {
+        super(msg, description);
+    }
+
 }

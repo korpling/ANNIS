@@ -15,17 +15,10 @@
  */
 package annis.gui.admin;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
-import java.text.DecimalFormat;
-import java.util.List;
-
-import javax.ws.rs.core.Response;
-
+import annis.gui.LoginListener;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.service.objects.ImportJob;
 import com.google.common.base.Splitter;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -47,361 +40,351 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.ui.themes.BaseTheme;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.text.DecimalFormat;
+import java.util.List;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import annis.gui.LoginListener;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.service.objects.ImportJob;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ImportPanel extends Panel implements Upload.ProgressListener, Upload.FinishedListener,
-    Upload.StartedListener, Upload.Receiver, LoginListener {
+        Upload.StartedListener, Upload.Receiver, LoginListener {
 
-  public static class ImportRequest {
-    String email;
+    public static class ImportRequest {
+        String email;
 
-    /**
-     * @return the email
-     */
-    public String getEmail() {
-      return email;
+        /**
+         * @return the email
+         */
+        public String getEmail() {
+            return email;
+        }
+
+        /**
+         * @param email
+         *            the email to set
+         */
+        public void setEmail(String email) {
+            this.email = email;
+        }
     }
 
-    /**
-     * @param email
-     *                the email to set
-     */
-    public void setEmail(String email) {
-      this.email = email;
-    }
-  }
+    private class WaitForFinishRunner implements Runnable {
+        private final UI ui;
+        private final String uuid;
 
-  private static final Logger log = LoggerFactory.getLogger(ImportPanel.class);
-  private final VerticalLayout layout;
-  private final TextArea txtMessages;
-  private final Upload upload;
-  private final TextField txtMail;
-  private final CheckBox cbOverwrite;
-  private final TextField txtAlias;
-  private final ProgressBar progress;
-  private final Label lblProgress;
-  private final Button btDetailedLog;
+        private int currentMessageIndex = 0;
 
-  private File temporaryCorpusFile;
+        public WaitForFinishRunner(URI location, UI ui) {
+            this.ui = ui;
 
-  private boolean kickstarterMode;
+            List<String> path = Splitter.on('/').trimResults().omitEmptyStrings().splitToList(location.getPath());
 
-  private final ImportRequest importRequest = new ImportRequest();
-  private Binder<ImportRequest> requestBinder = new Binder<>();
+            uuid = path.get(path.size() - 1);
+        }
 
-  public ImportPanel() {
+        private void appendFromBackground(List<String> message) {
+            for (String m : message) {
+                appendFromBackground(m);
+            }
+        }
 
-    setSizeFull();
+        private void appendFromBackground(final String message) {
+            ui.access(() -> appendMessage(message));
+        }
 
-    layout = new VerticalLayout();
-    layout.setWidth("100%");
-    layout.setHeight("100%");
-    layout.setMargin(true);
+        private void outputNewMessages(List<String> allMessages) {
+            if (currentMessageIndex < allMessages.size()) {
+                final List<String> newMessages = allMessages.subList(currentMessageIndex, allMessages.size());
 
-    setContent(layout);
+                currentMessageIndex = allMessages.size();
 
-    FormLayout form = new FormLayout();
-    layout.addComponent(form);
+                appendFromBackground(newMessages);
 
-    cbOverwrite = new CheckBox("Overwrite existing corpus");
-    form.addComponent(cbOverwrite);
+            }
+        }
 
-    txtMail = new TextField("e-mail address for status updates");
+        @Override
+        public void run() {
+            // check the overall status
+            WebResource res = Helper.getAnnisWebResource(ui).path("admin").path("import").path("status");
 
-    requestBinder.forField(txtMail).withValidator(new EmailValidator("Must be a valid e-mail address"))
-        .bind(ImportRequest::getEmail, ImportRequest::setEmail);
-    requestBinder.setBean(importRequest);
-    form.addComponent(txtMail);
+            ImportJob.Status lastStatus = ImportJob.Status.WAITING;
+            try {
+                while (lastStatus == ImportJob.Status.WAITING || lastStatus == ImportJob.Status.RUNNING) {
 
-    txtAlias = new TextField("alias name");
-    form.addComponent(txtAlias);
+                    lastStatus = ImportJob.Status.ERROR;
 
-    HorizontalLayout actionBar = new HorizontalLayout();
-    actionBar.setSpacing(true);
-    actionBar.setWidth("100%");
+                    List<ImportJob> jobs = res.get(new GenericType<List<ImportJob>>() {});
+                    for (ImportJob j : jobs) {
+                        if (uuid.equals(j.getUuid())) {
+                            lastStatus = j.getStatus();
 
-    upload = new Upload("", this);
-    upload.setButtonCaption("Upload ZIP file with relANNIS corpus and start import");
-    upload.addStartedListener(this);
-    upload.addFinishedListener(this);
-    upload.setEnabled(true);
+                            if (lastStatus == ImportJob.Status.WAITING) {
+                                appendFromBackground("Still waiting for other imports to finish...");
+                            } else if (lastStatus == ImportJob.Status.RUNNING) {
+                                outputNewMessages(j.getMessages());
+                            }
+                            break;
+                        }
+                    }
+                    Thread.sleep(500);
+                }
+            } catch (InterruptedException ex) {
+                log.error(null, ex);
+            }
 
-    actionBar.addComponent(upload);
+            ImportJob finishInfo = res.path("finished").path(uuid).get(ImportJob.class);
+            // print all remaining messages
+            outputNewMessages(finishInfo.getMessages());
 
-    progress = new ProgressBar();
-    progress.setIndeterminate(true);
-    progress.setVisible(false);
+            if (finishInfo.getStatus() == ImportJob.Status.SUCCESS) {
+                appendFromBackground("Finished successfully.");
+            } else if (finishInfo.getStatus() == ImportJob.Status.ERROR) {
+                appendFromBackground("Failed.");
+            } else {
+                appendFromBackground("Unknown status.");
+            }
 
-    actionBar.addComponent(progress);
+            ui.access(() -> {
+                progress.setVisible(false);
+                upload.setEnabled(true);
+            });
 
-    lblProgress = new Label();
-    lblProgress.setWidth("100%");
+        }
 
-    actionBar.addComponent(lblProgress);
-
-    actionBar.setExpandRatio(lblProgress, 1.0f);
-    actionBar.setComponentAlignment(lblProgress, Alignment.MIDDLE_LEFT);
-    actionBar.setComponentAlignment(upload, Alignment.MIDDLE_LEFT);
-    actionBar.setComponentAlignment(progress, Alignment.MIDDLE_LEFT);
-
-    layout.addComponent(actionBar);
-
-    btDetailedLog = new Button();
-    btDetailedLog.setStyleName(BaseTheme.BUTTON_LINK);
-    btDetailedLog.addClickListener(new Button.ClickListener() {
-
-      @Override
-      public void buttonClick(Button.ClickEvent event) {
-        setLogVisible(!isLogVisible());
-      }
-    });
-    layout.addComponent(btDetailedLog);
-
-    txtMessages = new TextArea();
-    txtMessages.setSizeFull();
-    txtMessages.setValue("");
-    txtMessages.setReadOnly(true);
-    layout.addComponent(txtMessages);
-
-    layout.setExpandRatio(txtMessages, 1.0f);
-
-    setLogVisible(false);
-    appendMessage("Ready.");
-
-  }
-
-  private boolean isLogVisible() {
-    return txtMessages.isVisible();
-  }
-
-  private void setLogVisible(boolean visible) {
-    txtMessages.setVisible(visible);
-    if (visible) {
-      btDetailedLog.setCaption("Hide log");
-      btDetailedLog.setIcon(VaadinIcons.MINUS_SQUARE_LEFT_O, "minus sign");
-      layout.setExpandRatio(btDetailedLog, 0.0f);
-    } else {
-      btDetailedLog.setCaption("Show log");
-      btDetailedLog.setIcon(VaadinIcons.PLUS_SQUARE_LEFT_O, "plus sign");
-      layout.setExpandRatio(btDetailedLog, 1.0f);
-    }
-  }
-
-  private void appendMessage(String message) {
-    lblProgress.setValue(message);
-
-    txtMessages.setReadOnly(false);
-    String oldVal = txtMessages.getValue();
-    if (oldVal == null || oldVal.isEmpty()) {
-      txtMessages.setValue(message);
-    } else {
-      txtMessages.setValue(oldVal + "\n" + message);
     }
 
-    txtMessages.setCursorPosition(txtMessages.getValue().length() - 1);
-    txtMessages.setReadOnly(true);
-  }
+    private static final long serialVersionUID = 2246043360503976290L;
+    private static final Logger log = LoggerFactory.getLogger(ImportPanel.class);
+    private final VerticalLayout layout;
+    private final TextArea txtMessages;
+    private final Upload upload;
+    private final TextField txtMail;
+    private final CheckBox cbOverwrite;
+    private final TextField txtAlias;
+    private final ProgressBar progress;
+    private final Label lblProgress;
 
-  @Override
-  public void updateProgress(long readBytes, long contentLength) {
-    float ratioComplete = (float) readBytes / (float) contentLength;
+    private final Button btDetailedLog;
 
-    DecimalFormat format = new DecimalFormat("#0.00");
-    appendMessage("uploaded " + format.format(ratioComplete * 100.0f) + "%");
-  }
+    private File temporaryCorpusFile;
 
-  @Override
-  public void uploadFinished(Upload.FinishedEvent event) {
+    private boolean kickstarterMode;
+    private final ImportRequest importRequest = new ImportRequest();
 
-    appendMessage("Finished upload, starting import");
-    startImport();
-  }
+    private Binder<ImportRequest> requestBinder = new Binder<>();
 
-  @Override
-  public void uploadStarted(Upload.StartedEvent event) {
-    upload.setEnabled(false);
-    progress.setVisible(true);
-    progress.setEnabled(true);
-    appendMessage("Started upload");
-    event.getUpload().addProgressListener(this);
-  }
+    public ImportPanel() {
 
-  @Override
-  public OutputStream receiveUpload(String filename, String mimeType) {
-    try {
-      temporaryCorpusFile = File.createTempFile(filename, ".zip");
-      temporaryCorpusFile.deleteOnExit();
-      return new FileOutputStream(temporaryCorpusFile);
-    } catch (IOException ex) {
-      log.error(null, ex);
-    }
-    return null;
-  }
+        setSizeFull();
 
-  private void startImport() {
+        layout = new VerticalLayout();
+        layout.setWidth("100%");
+        layout.setHeight("100%");
+        layout.setMargin(true);
 
-    WebResource res = Helper.getAnnisWebResource(UI.getCurrent()).path("admin").path("import");
-    String mail = txtMail.getValue();
-    if (requestBinder.isValid() && mail != null && !mail.isEmpty()) {
-      res = res.queryParam("statusMail", mail);
-    }
-    if (cbOverwrite.getValue() == true) {
-      res = res.queryParam("overwrite", "true");
-    }
-    String alias = txtAlias.getValue();
-    if (alias != null && !alias.isEmpty()) {
-      res = res.queryParam("alias", alias);
-    }
-    try (FileInputStream tmpFileStream = new FileInputStream(temporaryCorpusFile)) {
-      ClientResponse response = res.entity(tmpFileStream).type("application/zip").post(ClientResponse.class);
+        setContent(layout);
 
-      if (response.getStatus() == Response.Status.ACCEPTED.getStatusCode()) {
-        URI location = response.getLocation();
-        appendMessage("Import requested, update URL is " + location);
+        FormLayout form = new FormLayout();
+        layout.addComponent(form);
 
-        UI ui = UI.getCurrent();
-        Background.run(new WaitForFinishRunner(location, ui));
+        cbOverwrite = new CheckBox("Overwrite existing corpus");
+        form.addComponent(cbOverwrite);
 
-      } else {
+        txtMail = new TextField("e-mail address for status updates");
+
+        requestBinder.forField(txtMail).withValidator(new EmailValidator("Must be a valid e-mail address"))
+                .bind(ImportRequest::getEmail, ImportRequest::setEmail);
+        requestBinder.setBean(importRequest);
+        form.addComponent(txtMail);
+
+        txtAlias = new TextField("alias name");
+        form.addComponent(txtAlias);
+
+        HorizontalLayout actionBar = new HorizontalLayout();
+        actionBar.setSpacing(true);
+        actionBar.setWidth("100%");
+
+        upload = new Upload("", this);
+        upload.setButtonCaption("Upload ZIP file with relANNIS corpus and start import");
+        upload.addStartedListener(this);
+        upload.addFinishedListener(this);
         upload.setEnabled(true);
-        progress.setVisible(false);
-        appendMessage("Error (response code " + response.getStatus() + "): " + response.getEntity(String.class));
-      }
 
-    } catch (IOException ex) {
-      log.error(null, ex);
+        actionBar.addComponent(upload);
+
+        progress = new ProgressBar();
+        progress.setIndeterminate(true);
+        progress.setVisible(false);
+
+        actionBar.addComponent(progress);
+
+        lblProgress = new Label();
+        lblProgress.setWidth("100%");
+
+        actionBar.addComponent(lblProgress);
+
+        actionBar.setExpandRatio(lblProgress, 1.0f);
+        actionBar.setComponentAlignment(lblProgress, Alignment.MIDDLE_LEFT);
+        actionBar.setComponentAlignment(upload, Alignment.MIDDLE_LEFT);
+        actionBar.setComponentAlignment(progress, Alignment.MIDDLE_LEFT);
+
+        layout.addComponent(actionBar);
+
+        btDetailedLog = new Button();
+        btDetailedLog.setStyleName(BaseTheme.BUTTON_LINK);
+        btDetailedLog.addClickListener(event -> setLogVisible(!isLogVisible()));
+        layout.addComponent(btDetailedLog);
+
+        txtMessages = new TextArea();
+        txtMessages.setSizeFull();
+        txtMessages.setValue("");
+        txtMessages.setReadOnly(true);
+        layout.addComponent(txtMessages);
+
+        layout.setExpandRatio(txtMessages, 1.0f);
+
+        setLogVisible(false);
+        appendMessage("Ready.");
+
     }
 
-  }
+    private void appendMessage(String message) {
+        lblProgress.setValue(message);
 
-  private class WaitForFinishRunner implements Runnable {
-    private final UI ui;
-    private final String uuid;
+        txtMessages.setReadOnly(false);
+        String oldVal = txtMessages.getValue();
+        if (oldVal == null || oldVal.isEmpty()) {
+            txtMessages.setValue(message);
+        } else {
+            txtMessages.setValue(oldVal + "\n" + message);
+        }
 
-    private int currentMessageIndex = 0;
+        txtMessages.setCursorPosition(txtMessages.getValue().length() - 1);
+        txtMessages.setReadOnly(true);
+    }
 
-    public WaitForFinishRunner(URI location, UI ui) {
-      this.ui = ui;
-
-      List<String> path = Splitter.on('/').trimResults().omitEmptyStrings().splitToList(location.getPath());
-
-      uuid = path.get(path.size() - 1);
+    private boolean isLogVisible() {
+        return txtMessages.isVisible();
     }
 
     @Override
-    public void run() {
-      // check the overall status
-      WebResource res = Helper.getAnnisWebResource(ui).path("admin").path("import").path("status");
+    public void onLogin() {
+        if (!kickstarterMode) {
+            upload.setEnabled(true);
+        }
+    }
 
-      ImportJob.Status lastStatus = ImportJob.Status.WAITING;
-      try {
-        while (lastStatus == ImportJob.Status.WAITING || lastStatus == ImportJob.Status.RUNNING) {
+    @Override
+    public void onLogout() {
+        if (!kickstarterMode) {
+            upload.setEnabled(false);
+        }
+    }
 
-          lastStatus = ImportJob.Status.ERROR;
+    @Override
+    public OutputStream receiveUpload(String filename, String mimeType) {
+        try {
+            temporaryCorpusFile = File.createTempFile(filename, ".zip");
+            temporaryCorpusFile.deleteOnExit();
+            return new FileOutputStream(temporaryCorpusFile);
+        } catch (IOException ex) {
+            log.error(null, ex);
+        }
+        return null;
+    }
 
-          List<ImportJob> jobs = res.get(new GenericType<List<ImportJob>>() {
-          });
-          for (ImportJob j : jobs) {
-            if (uuid.equals(j.getUuid())) {
-              lastStatus = j.getStatus();
+    private void setLogVisible(boolean visible) {
+        txtMessages.setVisible(visible);
+        if (visible) {
+            btDetailedLog.setCaption("Hide log");
+            btDetailedLog.setIcon(VaadinIcons.MINUS_SQUARE_LEFT_O, "minus sign");
+            layout.setExpandRatio(btDetailedLog, 0.0f);
+        } else {
+            btDetailedLog.setCaption("Show log");
+            btDetailedLog.setIcon(VaadinIcons.PLUS_SQUARE_LEFT_O, "plus sign");
+            layout.setExpandRatio(btDetailedLog, 1.0f);
+        }
+    }
 
-              if (lastStatus == ImportJob.Status.WAITING) {
-                appendFromBackground("Still waiting for other imports to finish...");
-              } else if (lastStatus == ImportJob.Status.RUNNING) {
-                outputNewMessages(j.getMessages());
-              }
-              break;
+    private void startImport() {
+
+        WebResource res = Helper.getAnnisWebResource(UI.getCurrent()).path("admin").path("import");
+        String mail = txtMail.getValue();
+        if (requestBinder.isValid() && mail != null && !mail.isEmpty()) {
+            res = res.queryParam("statusMail", mail);
+        }
+        if (cbOverwrite.getValue() == true) {
+            res = res.queryParam("overwrite", "true");
+        }
+        String alias = txtAlias.getValue();
+        if (alias != null && !alias.isEmpty()) {
+            res = res.queryParam("alias", alias);
+        }
+        try (FileInputStream tmpFileStream = new FileInputStream(temporaryCorpusFile)) {
+            ClientResponse response = res.entity(tmpFileStream).type("application/zip").post(ClientResponse.class);
+
+            if (response.getStatus() == Response.Status.ACCEPTED.getStatusCode()) {
+                URI location = response.getLocation();
+                appendMessage("Import requested, update URL is " + location);
+
+                UI ui = UI.getCurrent();
+                Background.run(new WaitForFinishRunner(location, ui));
+
+            } else {
+                upload.setEnabled(true);
+                progress.setVisible(false);
+                appendMessage(
+                        "Error (response code " + response.getStatus() + "): " + response.getEntity(String.class));
             }
-          }
-          Thread.sleep(500);
+
+        } catch (IOException ex) {
+            log.error(null, ex);
         }
-      } catch (InterruptedException ex) {
-        log.error(null, ex);
-      }
 
-      ImportJob finishInfo = res.path("finished").path(uuid).get(ImportJob.class);
-      // print all remaining messages
-      outputNewMessages(finishInfo.getMessages());
+    }
 
-      if (finishInfo.getStatus() == ImportJob.Status.SUCCESS) {
-        appendFromBackground("Finished successfully.");
-      } else if (finishInfo.getStatus() == ImportJob.Status.ERROR) {
-        appendFromBackground("Failed.");
-      } else {
-        appendFromBackground("Unknown status.");
-      }
-
-      ui.access(new Runnable() {
-
-        @Override
-        public void run() {
-          progress.setVisible(false);
-          upload.setEnabled(true);
+    public void updateMode(boolean kickstarterMode, boolean isLoggedIn) {
+        this.kickstarterMode = kickstarterMode;
+        if (kickstarterMode) {
+            upload.setEnabled(true);
+        } else {
+            upload.setEnabled(isLoggedIn);
         }
-      });
-
     }
 
-    private void outputNewMessages(List<String> allMessages) {
-      if (currentMessageIndex < allMessages.size()) {
-        final List<String> newMessages = allMessages.subList(currentMessageIndex, allMessages.size());
+    @Override
+    public void updateProgress(long readBytes, long contentLength) {
+        float ratioComplete = (float) readBytes / (float) contentLength;
 
-        currentMessageIndex = allMessages.size();
-
-        appendFromBackground(newMessages);
-
-      }
+        DecimalFormat format = new DecimalFormat("#0.00");
+        appendMessage("uploaded " + format.format(ratioComplete * 100.0f) + "%");
     }
 
-    private void appendFromBackground(final String message) {
-      ui.access(new Runnable() {
-        @Override
-        public void run() {
-          appendMessage(message);
-        }
-      });
+    @Override
+    public void uploadFinished(Upload.FinishedEvent event) {
+
+        appendMessage("Finished upload, starting import");
+        startImport();
     }
 
-    private void appendFromBackground(List<String> message) {
-      for (String m : message) {
-        appendFromBackground(m);
-      }
+    @Override
+    public void uploadStarted(Upload.StartedEvent event) {
+        upload.setEnabled(false);
+        progress.setVisible(true);
+        progress.setEnabled(true);
+        appendMessage("Started upload");
+        event.getUpload().addProgressListener(this);
     }
-
-  }
-
-  @Override
-  public void onLogin() {
-    if (!kickstarterMode) {
-      upload.setEnabled(true);
-    }
-  }
-
-  @Override
-  public void onLogout() {
-    if (!kickstarterMode) {
-      upload.setEnabled(false);
-    }
-  }
-
-  public void updateMode(boolean kickstarterMode, boolean isLoggedIn) {
-    this.kickstarterMode = kickstarterMode;
-    if (kickstarterMode) {
-      upload.setEnabled(true);
-    } else {
-      upload.setEnabled(isLoggedIn);
-    }
-  }
 
 }

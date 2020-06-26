@@ -15,6 +15,8 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
+import annis.model.Query;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
@@ -27,88 +29,72 @@ import com.vaadin.v7.event.ItemClickEvent;
 import com.vaadin.v7.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.v7.ui.Table;
 
-import annis.libgui.Helper;
-import annis.model.Query;
-
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class HistoryPanel extends Panel
-  implements ValueChangeListener, ItemClickListener
-{
+public class HistoryPanel extends Panel implements ValueChangeListener, ItemClickListener {
 
-  private Table tblHistory;
-  private QueryController controller;
-  private final CitationLinkGenerator citationGenerator;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3747177440870920327L;
+    private Table tblHistory;
+    private QueryController controller;
+    private final CitationLinkGenerator citationGenerator;
 
-  public HistoryPanel(final BeanItemContainer<Query> containerHistory, 
-    QueryController controller)
-  {
-    this.controller = controller;
+    public HistoryPanel(final BeanItemContainer<Query> containerHistory, QueryController controller) {
+        this.controller = controller;
 
-    setSizeFull();
-    
-    tblHistory = new Table();
-    tblHistory.setSelectable(true);
-    tblHistory.setPageLength(8);
-    tblHistory.setImmediate(true);
-    tblHistory.setSizeFull();
+        setSizeFull();
 
-    tblHistory.setContainerDataSource(containerHistory);
+        tblHistory = new Table();
+        tblHistory.setSelectable(true);
+        tblHistory.setPageLength(8);
+        tblHistory.setImmediate(true);
+        tblHistory.setSizeFull();
 
+        tblHistory.setContainerDataSource(containerHistory);
 
-    tblHistory.addGeneratedColumn("gennumber", new Table.ColumnGenerator()
-    {
+        tblHistory.addGeneratedColumn("gennumber", (source, itemId, columnId) -> {
+            int idx = containerHistory.indexOfId(itemId);
+            return new Label("" + (idx + 1));
+        });
 
-      @Override
-      public Object generateCell(Table source, Object itemId, Object columnId)
-      {
-        int idx = containerHistory.indexOfId(itemId);
-        return new Label("" + (idx+1));
-      }
-    });
+        tblHistory.setColumnExpandRatio("query", 1.0f);
 
-    tblHistory.setColumnExpandRatio("query", 1.0f);
+        citationGenerator = new CitationLinkGenerator();
+        tblHistory.addGeneratedColumn("genlink", citationGenerator);
+        tblHistory.setVisibleColumns("gennumber", "query", "genlink");
+        tblHistory.setColumnHeaders("#", "Query", "URL");
 
-    citationGenerator = new CitationLinkGenerator();
-    tblHistory.addGeneratedColumn("genlink", citationGenerator);
-    tblHistory.setVisibleColumns("gennumber", "query", "genlink");
-    tblHistory.setColumnHeaders("#", "Query", "URL");
+        tblHistory.addStyleName(Helper.CORPUS_FONT);
+        tblHistory.addValueChangeListener(this);
+        tblHistory.addItemClickListener(this);
 
-    tblHistory.addStyleName(Helper.CORPUS_FONT);
-    tblHistory.addValueChangeListener((ValueChangeListener) this);
-    tblHistory.addItemClickListener((ItemClickListener) this);
+        VerticalLayout layout = new VerticalLayout(tblHistory);
+        layout.setSizeFull();
+        setContent(layout);
 
-    VerticalLayout layout = new VerticalLayout(tblHistory);
-    layout.setSizeFull();
-    setContent(layout);
-
-  }
-
-  @Override
-  public void valueChange(ValueChangeEvent event)
-  {
-    Query q = (Query) event.getProperty().getValue();
-    
-    if(q != null && controller != null)
-    {
-      controller.setQuery(q);
     }
-  }
 
-  @Override
-  public void itemClick(ItemClickEvent event)
-  {
-    if(controller != null && event.isDoubleClick())
-    {
-      controller.executeSearch(true, true);
-      if(getParent() instanceof Window)
-      {
-        UI.getCurrent().removeWindow((Window) getParent());
-      }
+    @Override
+    public void itemClick(ItemClickEvent event) {
+        if (controller != null && event.isDoubleClick()) {
+            controller.executeSearch(true, true);
+            if (getParent() instanceof Window) {
+                UI.getCurrent().removeWindow((Window) getParent());
+            }
+        }
     }
-  }
-  
-  
+
+    @Override
+    public void valueChange(ValueChangeEvent event) {
+        Query q = (Query) event.getProperty().getValue();
+
+        if (q != null && controller != null) {
+            controller.setQuery(q);
+        }
+    }
+
 }

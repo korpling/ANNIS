@@ -15,12 +15,9 @@
  */
 package annis.gui.admin;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
+import annis.gui.admin.view.GroupListView;
+import annis.gui.converter.CommaSeperatedStringConverterSet;
+import annis.security.Group;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
@@ -41,333 +38,265 @@ import com.vaadin.v7.data.util.GeneratedPropertyContainer;
 import com.vaadin.v7.data.util.IndexedContainer;
 import com.vaadin.v7.data.util.PropertyValueGenerator;
 import com.vaadin.v7.data.util.filter.SimpleStringFilter;
-import com.vaadin.v7.event.FieldEvents;
 import com.vaadin.v7.ui.Grid;
 import com.vaadin.v7.ui.TextField;
 import com.vaadin.v7.ui.renderers.ButtonRenderer;
-import com.vaadin.v7.ui.renderers.ClickableRenderer;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
-
-import annis.gui.admin.view.GroupListView;
-import annis.gui.converter.CommaSeperatedStringConverterSet;
-import annis.security.Group;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class GroupManagementPanel extends Panel
-  implements GroupListView
-{
+public class GroupManagementPanel extends Panel implements GroupListView {
 
-  private final List<GroupListView.Listener> listeners = new LinkedList<>();
+    public class AddGroupHandler implements Action.Handler {
 
-  private final Grid groupsGrid = new Grid();
+        private static final long serialVersionUID = -4855324916352101750L;
 
-  private final TextField txtGroupName;
+        private final Action enterKeyShortcutAction = new ShortcutAction(null, ShortcutAction.KeyCode.ENTER, null);
 
-  private final ProgressBar progress;
+        private final Object registeredTarget;
 
-  private final HorizontalLayout actionLayout;
-
-  private final BeanContainer<String, Group> groupsContainer = new BeanContainer<>(
-    Group.class);
-
-  private final IndexedContainer corpusContainer = new IndexedContainer();
-
-  public GroupManagementPanel()
-  {
-    groupsContainer.setBeanIdProperty("name");
-
-    progress = new ProgressBar();
-    progress.setCaption("Loading group list");
-    progress.setIndeterminate(true);
-    progress.setVisible(false);
-
-    GeneratedPropertyContainer generated = new GeneratedPropertyContainer(
-      groupsContainer);
-    generated.addGeneratedProperty("edit", new PropertyValueGenerator<String>()
-    {
-
-      @Override
-      public String getValue(Item item, Object itemId, Object propertyId)
-      {
-        return "Edit";
-      }
-
-      @Override
-      public Class<String> getType()
-      {
-        return String.class;
-      }
-    });
-    groupsGrid.setContainerDataSource(generated);
-    groupsGrid.setSelectionMode(Grid.SelectionMode.MULTI);
-    groupsGrid.setSizeFull();
-    groupsGrid.setColumns("name", "edit", "corpora");
-    
-    Grid.HeaderRow filterRow = groupsGrid.appendHeaderRow();
-    TextField groupFilterField = new TextField();
-    groupFilterField.setInputPrompt("Filter");
-    groupFilterField.addTextChangeListener(new FieldEvents.TextChangeListener()
-    {
-
-      @Override
-      public void textChange(FieldEvents.TextChangeEvent event)
-      {
-        groupsContainer.removeContainerFilters("name");
-        if(!event.getText().isEmpty())
-        {
-          groupsContainer.addContainerFilter(new SimpleStringFilter("name",
-            event.getText(), true, false));
+        public AddGroupHandler(Object registeredTarget) {
+            this.registeredTarget = registeredTarget;
         }
-      }
-    });
-    filterRow.getCell("name").setComponent(groupFilterField);
-    
-    TextField corpusFilterField = new TextField();
-    corpusFilterField.setInputPrompt("Filter by corpus");
-    corpusFilterField.addTextChangeListener(new FieldEvents.TextChangeListener()
-    {
-
-      @Override
-      public void textChange(FieldEvents.TextChangeEvent event)
-      {
-        groupsContainer.removeContainerFilters("corpora");
-        if(!event.getText().isEmpty())
-        {
-          groupsContainer.addContainerFilter(new StringPatternInSetFilter("corpora", event.getText()));
-        }
-      }
-    });
-    filterRow.getCell("corpora").setComponent(corpusFilterField);
-    
-    Grid.Column editColumn = groupsGrid.getColumn("edit");
-    editColumn.setRenderer(new ButtonRenderer(
-      new ClickableRenderer.RendererClickListener()
-      {
 
         @Override
-        public void click(ClickableRenderer.RendererClickEvent event)
-        {
-          Group g = groupsContainer.getItem(event.getItemId()).getBean();
-
-          FieldGroup fields = new FieldGroup(groupsContainer.getItem(event.
-              getItemId()));
-          fields.addCommitHandler(new GroupCommitHandler(g.getName()));
-
-          EditSingleGroup edit = new EditSingleGroup(fields, corpusContainer);
-
-          Window w = new Window("Edit group \"" + g.getName() + "\"");
-          w.setContent(edit);
-          w.setModal(true);
-          w.setWidth("500px");
-          w.setHeight("250px");
-          UI.getCurrent().addWindow(w);
+        public Action[] getActions(Object target, Object sender) {
+            return new Action[] { enterKeyShortcutAction };
         }
-      }));
 
-    Grid.Column corporaColumn = groupsGrid.getColumn("corpora");;
-    corporaColumn.setConverter(new CommaSeperatedStringConverterSet());
-
-    txtGroupName = new TextField();
-    txtGroupName.setInputPrompt("New group name");
-
-    Button btAddNewGroup = new Button("Add new group");
-    btAddNewGroup.addClickListener(new Button.ClickListener()
-    {
-      @Override
-      public void buttonClick(Button.ClickEvent event)
-      {
-        handleAdd();
-      }
-    });
-    btAddNewGroup.addStyleName(ChameleonTheme.BUTTON_DEFAULT);
-
-    Button btDeleteGroup = new Button("Delete selected group(s)");
-    btDeleteGroup.addClickListener(new Button.ClickListener()
-    {
-
-      @Override
-      public void buttonClick(Button.ClickEvent event)
-      {
-        // get selected groups
-        Set<String> selectedGroups = new TreeSet<>();
-        for (Object id : groupsGrid.getSelectedRows())
-        {
-          selectedGroups.add((String) id);
+        @Override
+        public void handleAction(Action action, Object sender, Object target) {
+            if (action == enterKeyShortcutAction && target == registeredTarget) {
+                handleAdd();
+            }
         }
-        groupsGrid.getSelectionModel().reset();
-        for (GroupListView.Listener l : listeners)
-        {
-          l.deleteGroups(selectedGroups);
+    }
+
+    private class GroupCommitHandler implements FieldGroup.CommitHandler {
+
+        private static final long serialVersionUID = -3816526526945191335L;
+        private String groupName;
+
+        public GroupCommitHandler(String groupName) {
+            this.groupName = groupName;
         }
-      }
-    });
 
-    actionLayout = new HorizontalLayout(txtGroupName,
-      btAddNewGroup, btDeleteGroup);
+        @Override
+        public void postCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
+            for (GroupListView.Listener l : listeners) {
+                l.groupUpdated(groupsContainer.getItem(groupName).getBean());
+            }
+        }
 
-    VerticalLayout layout = new VerticalLayout(actionLayout, progress,
-      groupsGrid);
-    layout.setSizeFull();
-    layout.setExpandRatio(groupsGrid, 1.0f);
-    layout.setExpandRatio(progress, 1.0f);
-    layout.setSpacing(true);
-    layout.setMargin(new MarginInfo(true, false, false, false));
+        @Override
+        public void preCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException {
 
-    layout.setComponentAlignment(actionLayout, Alignment.MIDDLE_CENTER);
-    layout.setComponentAlignment(progress, Alignment.TOP_CENTER);
+        }
 
-    setContent(layout);
-    setSizeFull();
-
-    addActionHandler(new AddGroupHandler(txtGroupName));
-  }
-
-  private void handleAdd()
-  {
-    for (GroupListView.Listener l : listeners)
-    {
-      l.addNewGroup(txtGroupName.getValue());
     }
-  }
 
-  @Override
-  public void addListener(GroupListView.Listener listener)
-  {
-    listeners.add(listener);
-  }
+    public static class StringPatternInSetFilter implements Container.Filter {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 4056375452214888364L;
+        private final Object propertyId;
+        private final String pattern;
 
-  @Override
-  public void setGroupList(Collection<Group> groups)
-  {
-    groupsContainer.removeAllItems();
-    groupsContainer.addAll(groups);
-  }
+        public StringPatternInSetFilter(Object propertyId, String pattern) {
+            this.propertyId = propertyId;
+            this.pattern = pattern.toLowerCase();
+        }
 
-  @Override
-  public void emptyNewGroupNameTextField()
-  {
-    txtGroupName.setValue("");
-  }
+        @Override
+        public boolean appliesToProperty(Object propertyId) {
+            return this.propertyId.equals(propertyId);
+        }
 
-  @Override
-  public void addAvailableCorpusNames(Collection<String> corpusNames)
-  {
-    for (String c : corpusNames)
-    {
-      corpusContainer.addItem(c);
+        @Override
+        public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException {
+            Property<?> p = item.getItemProperty(propertyId);
+            if (p.getValue() instanceof Set) {
+                Set val = (Set) p.getValue();
+                for (Object o : val) {
+                    if ((o.toString().toLowerCase()).contains(pattern)) {
+                        return true;
+                    }
+                }
+            } else {
+                throw new UnsupportedOperationException();
+            }
+
+            return false;
+        }
+
     }
-  }
 
-  @Override
-  public void setLoadingAnimation(boolean show)
-  {
-    progress.setVisible(show);
-    groupsGrid.setVisible(!show);
-    actionLayout.setEnabled(!show);
-  }
+    private static final long serialVersionUID = -4159690760269810930L;
 
-  public class AddGroupHandler implements Action.Handler
-  {
+    private final List<GroupListView.Listener> listeners = new LinkedList<>();
 
-    private final Action enterKeyShortcutAction
-      = new ShortcutAction(null, ShortcutAction.KeyCode.ENTER, null);
+    private final Grid groupsGrid = new Grid();
 
-    private final Object registeredTarget;
+    private final TextField txtGroupName;
 
-    public AddGroupHandler(Object registeredTarget)
-    {
-      this.registeredTarget = registeredTarget;
+    private final ProgressBar progress;
+
+    private final HorizontalLayout actionLayout;
+
+    private final BeanContainer<String, Group> groupsContainer = new BeanContainer<>(Group.class);
+
+    private final IndexedContainer corpusContainer = new IndexedContainer();
+
+    public GroupManagementPanel() {
+        groupsContainer.setBeanIdProperty("name");
+
+        progress = new ProgressBar();
+        progress.setCaption("Loading group list");
+        progress.setIndeterminate(true);
+        progress.setVisible(false);
+
+        GeneratedPropertyContainer generated = new GeneratedPropertyContainer(groupsContainer);
+        generated.addGeneratedProperty("edit", new PropertyValueGenerator<String>() {
+
+            private static final long serialVersionUID = -4167110257296656329L;
+
+            @Override
+            public Class<String> getType() {
+                return String.class;
+            }
+
+            @Override
+            public String getValue(Item item, Object itemId, Object propertyId) {
+                return "Edit";
+            }
+        });
+        groupsGrid.setContainerDataSource(generated);
+        groupsGrid.setSelectionMode(Grid.SelectionMode.MULTI);
+        groupsGrid.setSizeFull();
+        groupsGrid.setColumns("name", "edit", "corpora");
+
+        Grid.HeaderRow filterRow = groupsGrid.appendHeaderRow();
+        TextField groupFilterField = new TextField();
+        groupFilterField.setInputPrompt("Filter");
+        groupFilterField.addTextChangeListener(event -> {
+            groupsContainer.removeContainerFilters("name");
+            if (!event.getText().isEmpty()) {
+                groupsContainer.addContainerFilter(new SimpleStringFilter("name", event.getText(), true, false));
+            }
+        });
+        filterRow.getCell("name").setComponent(groupFilterField);
+
+        TextField corpusFilterField = new TextField();
+        corpusFilterField.setInputPrompt("Filter by corpus");
+        corpusFilterField.addTextChangeListener(event -> {
+            groupsContainer.removeContainerFilters("corpora");
+            if (!event.getText().isEmpty()) {
+                groupsContainer.addContainerFilter(new StringPatternInSetFilter("corpora", event.getText()));
+            }
+        });
+        filterRow.getCell("corpora").setComponent(corpusFilterField);
+
+        Grid.Column editColumn = groupsGrid.getColumn("edit");
+        editColumn.setRenderer(new ButtonRenderer(event -> {
+            Group g = groupsContainer.getItem(event.getItemId()).getBean();
+
+            FieldGroup fields = new FieldGroup(groupsContainer.getItem(event.getItemId()));
+            fields.addCommitHandler(new GroupCommitHandler(g.getName()));
+
+            EditSingleGroup edit = new EditSingleGroup(fields, corpusContainer);
+
+            Window w = new Window("Edit group \"" + g.getName() + "\"");
+            w.setContent(edit);
+            w.setModal(true);
+            w.setWidth("500px");
+            w.setHeight("250px");
+            UI.getCurrent().addWindow(w);
+        }));
+
+        Grid.Column corporaColumn = groupsGrid.getColumn("corpora");
+        ;
+        corporaColumn.setConverter(new CommaSeperatedStringConverterSet());
+
+        txtGroupName = new TextField();
+        txtGroupName.setInputPrompt("New group name");
+
+        Button btAddNewGroup = new Button("Add new group");
+        btAddNewGroup.addClickListener(event -> handleAdd());
+        btAddNewGroup.addStyleName(ChameleonTheme.BUTTON_DEFAULT);
+
+        Button btDeleteGroup = new Button("Delete selected group(s)");
+        btDeleteGroup.addClickListener(event -> {
+            // get selected groups
+            Set<String> selectedGroups = new TreeSet<>();
+            for (Object id : groupsGrid.getSelectedRows()) {
+                selectedGroups.add((String) id);
+            }
+            groupsGrid.getSelectionModel().reset();
+            for (GroupListView.Listener l : listeners) {
+                l.deleteGroups(selectedGroups);
+            }
+        });
+
+        actionLayout = new HorizontalLayout(txtGroupName, btAddNewGroup, btDeleteGroup);
+
+        VerticalLayout layout = new VerticalLayout(actionLayout, progress, groupsGrid);
+        layout.setSizeFull();
+        layout.setExpandRatio(groupsGrid, 1.0f);
+        layout.setExpandRatio(progress, 1.0f);
+        layout.setSpacing(true);
+        layout.setMargin(new MarginInfo(true, false, false, false));
+
+        layout.setComponentAlignment(actionLayout, Alignment.MIDDLE_CENTER);
+        layout.setComponentAlignment(progress, Alignment.TOP_CENTER);
+
+        setContent(layout);
+        setSizeFull();
+
+        addActionHandler(new AddGroupHandler(txtGroupName));
     }
 
     @Override
-    public Action[] getActions(Object target, Object sender)
-    {
-      return new Action[]
-      {
-        enterKeyShortcutAction
-      };
+    public void addAvailableCorpusNames(Collection<String> corpusNames) {
+        for (String c : corpusNames) {
+            corpusContainer.addItem(c);
+        }
     }
 
     @Override
-    public void handleAction(Action action, Object sender, Object target)
-    {
-      if (action == enterKeyShortcutAction && target == registeredTarget)
-      {
-        handleAdd();
-      }
-    }
-  }
-
-  private class GroupCommitHandler implements FieldGroup.CommitHandler
-  {
-
-    private String groupName;
-
-    public GroupCommitHandler(String groupName)
-    {
-      this.groupName = groupName;
+    public void addListener(GroupListView.Listener listener) {
+        listeners.add(listener);
     }
 
     @Override
-    public void preCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException
-    {
+    public void emptyNewGroupNameTextField() {
+        txtGroupName.setValue("");
+    }
 
+    private void handleAdd() {
+        for (GroupListView.Listener l : listeners) {
+            l.addNewGroup(txtGroupName.getValue());
+        }
     }
 
     @Override
-    public void postCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException
-    {
-      for (GroupListView.Listener l : listeners)
-      {
-        l.groupUpdated(groupsContainer.getItem(groupName).getBean());
-      }
-    }
-
-  }
-  
-  public static class StringPatternInSetFilter implements Container.Filter
-  {
-    private final Object propertyId;
-    private final String pattern;
-
-    public StringPatternInSetFilter(Object propertyId, String pattern)
-    {
-      this.propertyId = propertyId;
-      this.pattern = pattern.toLowerCase();
+    public void setGroupList(Collection<Group> groups) {
+        groupsContainer.removeAllItems();
+        groupsContainer.addAll(groups);
     }
 
     @Override
-    public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException
-    {
-      Property<?> p = item.getItemProperty(propertyId);
-      if(p.getValue() instanceof Set)
-      {
-        Set val = (Set) p.getValue();
-        for(Object o : val)
-        {
-          if((o.toString().toLowerCase()).contains(pattern))
-          {
-            return true;
-          }
-       }
-      }
-      else
-      {
-        throw new UnsupportedOperationException();
-      }
-      
-      return false;
+    public void setLoadingAnimation(boolean show) {
+        progress.setVisible(show);
+        groupsGrid.setVisible(!show);
+        actionLayout.setEnabled(!show);
     }
-
-    @Override
-    public boolean appliesToProperty(Object propertyId)
-    {
-      return this.propertyId.equals(propertyId);
-    }
-    
-  }
 
 }

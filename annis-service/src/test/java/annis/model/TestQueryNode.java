@@ -24,52 +24,51 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestQueryNode {
-	
-	// object under test
-	private QueryNode node;
-	
 
-	@Before
-	public void setup() {
-		node = new QueryNode(0);
-	}
-	
-	@Test
-	public void qNameFullyQualified() {
-		assertThat(QueryNode.qName("namespace", "name"), is("namespace:name"));
-	}
-	
-	@Test
-	public void qNameNoNamespace() {
-		assertThat(QueryNode.qName(null, "name"), is("name"));
-	}
-	
-	@Test
-	public void setSpannedText() {
-		// sanity check: values are null
-		assertThat(node.getSpannedText(), is(nullValue()));
-		
-		// set span and text matching
-		String spannedText = "span";
-		node.setSpannedText(spannedText);
-		
-		// test functionality of setter
-		assertThat(node.getSpannedText(), is(spannedText));
-	}
-	
-	@Test
-	public void clearSpannedText() {
-		// set some values
-		node.setSpannedText("span");
-		
-		// sanity check
-		assertThat(node.getSpannedText(), is(not(nullValue())));
-		
-		// clear values
-		node.clearSpannedText();
-		
-		// test for null values
-		assertThat(node.getSpannedText(), is(nullValue()));
-	}
+    // object under test
+    private QueryNode node;
+
+    @Test
+    public void clearSpannedText() {
+        // set some values
+        node.setSpannedText("span");
+
+        // sanity check
+        assertThat(node.getSpannedText(), is(not(nullValue())));
+
+        // clear values
+        node.clearSpannedText();
+
+        // test for null values
+        assertThat(node.getSpannedText(), is(nullValue()));
+    }
+
+    @Test
+    public void qNameFullyQualified() {
+        assertThat(QueryNode.qName("namespace", "name"), is("namespace:name"));
+    }
+
+    @Test
+    public void qNameNoNamespace() {
+        assertThat(QueryNode.qName(null, "name"), is("name"));
+    }
+
+    @Test
+    public void setSpannedText() {
+        // sanity check: values are null
+        assertThat(node.getSpannedText(), is(nullValue()));
+
+        // set span and text matching
+        String spannedText = "span";
+        node.setSpannedText(spannedText);
+
+        // test functionality of setter
+        assertThat(node.getSpannedText(), is(spannedText));
+    }
+
+    @Before
+    public void setup() {
+        node = new QueryNode(0);
+    }
 
 }

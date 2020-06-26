@@ -21,76 +21,64 @@ import org.apache.shiro.util.SimpleByteSource;
 
 /**
  * A wrapper around {@link SimpleByteSource} to make it {@link Serializable}
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class SerializableByteSource implements ByteSource, Serializable
-{
-  
-  /**
-   * The wrapped object.
-   * Since {@link SimpleByteSource} is not serializable itself this field
-   * is transient.
-   * Therfore only access it with the {@link #getDelegate() } getter function.
-   * 
-   */
-  private transient SimpleByteSource delegate;
-  
-  private final byte[] bytes;
-  
-  public SerializableByteSource()
-  {
-    this.bytes = new byte[0];
-  }
-  
-  public SerializableByteSource(byte[] bytes)
-  {
-    this.bytes = bytes;
-  }
-  
-  public SerializableByteSource(ByteSource source)
-  {
-    if(source == null)
-    {
-      this.bytes = new byte[0];
+public class SerializableByteSource implements ByteSource, Serializable {
+
+    private static final long serialVersionUID = 2826554471409666941L;
+
+    /**
+     * The wrapped object. Since {@link SimpleByteSource} is not serializable itself
+     * this field is transient. Therfore only access it with the
+     * {@link #getDelegate() } getter function.
+     * 
+     */
+    private transient SimpleByteSource delegate;
+
+    private final byte[] bytes;
+
+    public SerializableByteSource() {
+        this.bytes = new byte[0];
     }
-    else
-    {
-      this.bytes = source.getBytes();
+
+    public SerializableByteSource(byte[] bytes) {
+        this.bytes = bytes;
     }
-  }
 
-  public SimpleByteSource getDelegate()
-  {
-    if(delegate == null)
-    {
-      delegate = new SimpleByteSource(bytes);
+    public SerializableByteSource(ByteSource source) {
+        if (source == null) {
+            this.bytes = new byte[0];
+        } else {
+            this.bytes = source.getBytes();
+        }
     }
-    return delegate;
-  }
 
-  @Override
-  public byte[] getBytes()
-  {
-    return this.bytes;
-  }
+    @Override
+    public byte[] getBytes() {
+        return this.bytes;
+    }
 
-  @Override
-  public String toHex()
-  {
-    return getDelegate().toHex();
-  }
+    public SimpleByteSource getDelegate() {
+        if (delegate == null) {
+            delegate = new SimpleByteSource(bytes);
+        }
+        return delegate;
+    }
 
-  @Override
-  public String toBase64()
-  {
-    return getDelegate().toBase64();
-  }
+    @Override
+    public boolean isEmpty() {
+        return getDelegate().isEmpty();
+    }
 
-  @Override
-  public boolean isEmpty()
-  {
-    return getDelegate().isEmpty();
-  }
+    @Override
+    public String toBase64() {
+        return getDelegate().toBase64();
+    }
 
-  
+    @Override
+    public String toHex() {
+        return getDelegate().toHex();
+    }
+
 }

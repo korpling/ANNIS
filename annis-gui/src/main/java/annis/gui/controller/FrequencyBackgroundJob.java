@@ -32,69 +32,43 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class FrequencyBackgroundJob implements Callable<FrequencyTable>
-{
-  private static final Logger log = LoggerFactory.getLogger(
-    FrequencyBackgroundJob.class);
-  
-  private final AnnisUI ui;
-  private final FrequencyQuery query;
+public class FrequencyBackgroundJob implements Callable<FrequencyTable> {
+    private static final Logger log = LoggerFactory.getLogger(FrequencyBackgroundJob.class);
 
-  private final FrequencyQueryPanel panel;
+    private final AnnisUI ui;
+    private final FrequencyQuery query;
 
-  public FrequencyBackgroundJob(AnnisUI ui, FrequencyQuery query,
-    FrequencyQueryPanel panel)
-  {
-    this.ui = ui;
-    this.query = query;
-    this.panel = panel;
-  }
+    private final FrequencyQueryPanel panel;
 
-  @Override
-  public FrequencyTable call() throws Exception
-  {
-    final FrequencyTable t = loadBeans();
-    ui.access(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        panel.showResult(t, query);
-      }
-    });
-    return t;
-  }
-
-  private FrequencyTable loadBeans()
-  {
-    FrequencyTable result = new FrequencyTable();
-    WebResource annisResource = Helper.getAnnisWebResource(ui);
-    try
-    {
-      annisResource = annisResource.path("query").path("search").
-        path("frequency").queryParam("q", Helper.encodeJersey(query.getQuery())).
-        queryParam("corpora", StringUtils.join(query.getCorpora(), ",")).
-        queryParam("query-language", query.getQueryLanguage().name()).
-        queryParam("fields", query.getFrequencyDefinition().toString());
-      result = annisResource.get(FrequencyTable.class);
+    public FrequencyBackgroundJob(AnnisUI ui, FrequencyQuery query, FrequencyQueryPanel panel) {
+        this.ui = ui;
+        this.query = query;
+        this.panel = panel;
     }
-    catch (final UniformInterfaceException ex)
-    {
-      ui.access(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          ui.getQueryController().reportServiceException(ex, true);
+
+    @Override
+    public FrequencyTable call() throws Exception {
+        final FrequencyTable t = loadBeans();
+        ui.access(() -> panel.showResult(t, query));
+        return t;
+    }
+
+    private FrequencyTable loadBeans() {
+        FrequencyTable result = new FrequencyTable();
+        WebResource annisResource = Helper.getAnnisWebResource(ui);
+        try {
+            annisResource = annisResource.path("query").path("search").path("frequency")
+                    .queryParam("q", Helper.encodeJersey(query.getQuery()))
+                    .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
+                    .queryParam("query-language", query.getQueryLanguage().name())
+                    .queryParam("fields", query.getFrequencyDefinition().toString());
+            result = annisResource.get(FrequencyTable.class);
+        } catch (final UniformInterfaceException ex) {
+            ui.access(() -> ui.getQueryController().reportServiceException(ex, true));
+        } catch (ClientHandlerException ex) {
+            log.error("could not execute REST call to query frequency", ex);
         }
-      });
+        return result;
     }
-    catch (ClientHandlerException ex)
-    {
-      log.error("could not execute REST call to query frequency",
-        ex);
-    }
-    return result;
-  }
-  
+
 }

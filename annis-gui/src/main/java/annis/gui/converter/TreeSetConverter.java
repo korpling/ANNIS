@@ -16,68 +16,58 @@
 
 package annis.gui.converter;
 
+import annis.CaseSensitiveOrder;
+import com.google.common.base.Preconditions;
+import com.vaadin.v7.data.util.converter.Converter;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.TreeSet;
-
-import com.google.common.base.Preconditions;
-import com.vaadin.v7.data.util.converter.Converter;
-import com.vaadin.v7.data.util.converter.Converter.ConversionException;
-
-import annis.CaseSensitiveOrder;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class TreeSetConverter implements Converter<Object, TreeSet>
-{
-  @Override
-  public TreeSet convertToModel(Object value,
-    Class<? extends TreeSet> targetType, Locale locale) throws ConversionException
-  {
-    TreeSet<String> result = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
-    if(value instanceof Collection<?>)
-    {
-      for(Object item : (Collection<?>) value)
-      {
-        if(item instanceof String)
-        {
-          result.add((String) item);
+public class TreeSetConverter implements Converter<Object, TreeSet> {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 843093641164263522L;
+
+    @Override
+    public TreeSet convertToModel(Object value, Class<? extends TreeSet> targetType, Locale locale)
+            throws ConversionException {
+        TreeSet<String> result = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
+        if (value instanceof Collection<?>) {
+            for (Object item : (Collection<?>) value) {
+                if (item instanceof String) {
+                    result.add((String) item);
+                }
+            }
+            Preconditions.checkState(result.size() == ((Collection) value).size(),
+                    "Collection which was used with the TreeSetConverter had duplicate entries.");
+        } else if (value instanceof String) {
+            result.add((String) value);
+        } else {
+            throw new IllegalStateException(
+                    "Value used in the TreeSetConverter is neither a Collection of Strings nor a String");
         }
-      }
-      Preconditions.checkState(result.size() == ((Collection) value).size(), 
-        "Collection which was used with the TreeSetConverter had duplicate entries.");
+        return result;
     }
-    else if(value instanceof String)
-    {
-      result.add((String) value);
+
+    @Override
+    public Object convertToPresentation(TreeSet value, Class<? extends Object> targetType, Locale locale)
+            throws ConversionException {
+        return value;
     }
-    else
-    {
-      throw new IllegalStateException("Value used in the TreeSetConverter is neither a Collection of Strings nor a String");
+
+    @Override
+    public Class<TreeSet> getModelType() {
+        return TreeSet.class;
     }
-    return result;
-  }
 
-  @Override
-  public Object convertToPresentation(TreeSet value,
-    Class<? extends Object> targetType, Locale locale) throws ConversionException
-  {
-    return value;
-  }
-
-  @Override
-  public Class<TreeSet> getModelType()
-  {
-    return TreeSet.class;
-  }
-
-  @Override
-  public Class<Object> getPresentationType()
-  {
-    return Object.class;
-  }
-
+    @Override
+    public Class<Object> getPresentationType() {
+        return Object.class;
+    }
 
 }

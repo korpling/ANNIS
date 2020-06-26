@@ -21,8 +21,6 @@ import annis.gui.objects.ExportQuery;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.service.objects.CorpusConfig;
-import annis.service.objects.CorpusConfigMap;
-
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import java.io.File;
@@ -70,24 +68,20 @@ public class ExportBackgroundJob implements Callable<File> {
 
         try (final OutputStreamWriter outWriter = new OutputStreamWriter(new FileOutputStream(currentTmpFile),
                 "UTF-8")) {
-            
+
             int leftCtx = exporter.needsContext() ? query.getLeftContext() : 0;
             int rightCtx = exporter.needsContext() ? query.getRightContext() : 0;
-            
-            exportError = exporter.convertText(query.getQuery(), query.getQueryLanguage(), leftCtx,
-                    rightCtx, query.getCorpora(), query.getAnnotationKeys(), query.getParameters(),
-                    query.getAlignmc(), Helper.getAnnisWebResource(ui).path("query"), outWriter, eventBus, corpusConfigs, 
-                    ui);
+
+            exportError = exporter.convertText(query.getQuery(), query.getQueryLanguage(), leftCtx, rightCtx,
+                    query.getCorpora(), query.getAnnotationKeys(), query.getParameters(), query.getAlignmc(),
+                    Helper.getAnnisWebResource(ui).path("query"), outWriter, eventBus, corpusConfigs, ui);
         } finally {
-            ui.access(new Runnable() {
-                @Override
-                public void run() {
-                    if (panel != null) {
-                        panel.showResult(currentTmpFile, exportError);
-                    }
-                    if (exportError instanceof UniformInterfaceException) {
-                        ui.getQueryController().reportServiceException((UniformInterfaceException) exportError, true);
-                    }
+            ui.access(() -> {
+                if (panel != null) {
+                    panel.showResult(currentTmpFile, exportError);
+                }
+                if (exportError instanceof UniformInterfaceException) {
+                    ui.getQueryController().reportServiceException((UniformInterfaceException) exportError, true);
                 }
             });
         }

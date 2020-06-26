@@ -28,26 +28,25 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class CitationRedirectionServlet extends HttpServlet
-{
-  
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(CitationRedirectionServlet.class);
+public class CitationRedirectionServlet extends HttpServlet {
 
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
-  {
-    try
-    {
-      URI uri = new URI(req.getRequestURI());
-      req.getSession().setAttribute("citation", uri.getPath());
-      resp.sendRedirect(req.getContextPath() + "/");
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5264592666872908858L;
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(CitationRedirectionServlet.class);
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        try {
+            URI uri = new URI(req.getRequestURI());
+            req.getSession().setAttribute("citation", uri.getPath());
+            resp.sendRedirect(req.getContextPath() + "/");
+        } catch (URISyntaxException ex) {
+            log.error(null, ex);
+
+            resp.sendError(500, ex.getMessage());
+        }
     }
-    catch(URISyntaxException ex)
-    {
-      log.error(null, ex);
-      
-      resp.sendError(500, ex.getMessage());
-    }
-  }
-  
+
 }

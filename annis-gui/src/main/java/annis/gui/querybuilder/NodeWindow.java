@@ -15,11 +15,6 @@
  */
 package annis.gui.querybuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.server.FontAwesome;
@@ -39,406 +34,348 @@ import com.vaadin.v7.data.Property.ValueChangeListener;
 import com.vaadin.v7.ui.AbstractSelect.NewItemHandler;
 import com.vaadin.v7.ui.ComboBox;
 import com.vaadin.v7.ui.TextField;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
  * @author thomas
  */
-public class NodeWindow extends Panel implements Button.ClickListener
-{
-  
-  public static final int HEIGHT=100;
-  public static final int WIDTH=275;
-  
-  private static final String[] NODE_OPERATORS = new String[] 
-  {
-    "=", "~", "!=", "!~"
-  };
-  
-  private final Set<String> annoNames;
-  
-  private final TigerQueryBuilderCanvas parent;
-  private final Button btEdge;
-  private final Button btAdd;
-  private final Button btClear;
-  private final Button btClose;
-  private final Button btMove;
-  private final HorizontalLayout toolbar;
-  private final List<ConstraintLayout> constraints;
-  private boolean prepareEdgeDock;
-  private final int id;
-  private final VerticalLayout vLayout;
+public class NodeWindow extends Panel implements Button.ClickListener {
 
-  public NodeWindow(int id, TigerQueryBuilderCanvas parent)
-  {
-    this.parent = parent;
-    this.id = id;
-    this.annoNames = new TreeSet<>();
-    
-    for(String a :parent.getAvailableAnnotationNames())
-    {
-      annoNames.add(a.replaceFirst("^[^:]*:", ""));
-    }
-    constraints = new ArrayList<>();
-    
-    setSizeFull();
-    
-    // HACK: use our own border since the one from chameleon does not really work
-    addStyleName(ValoTheme.PANEL_WELL);
-    //addStyleName("border-layout");
-    
-    prepareEdgeDock = false;
+    public class ConstraintLayout extends HorizontalLayout implements LayoutClickListener, ValueChangeListener {
 
-    vLayout = new VerticalLayout();
-    setContent(vLayout);
-    vLayout.setWidth("100%");
-    vLayout.setHeight("-1px");
-    vLayout.setMargin(false);
-    vLayout.setSpacing(true);
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 7188297587108882576L;
+        private final TigerQueryBuilderCanvas parent;
+        private final ComboBox cbName;
+        private final ComboBox cbOperator;
+        private final TextField txtValue;
+        private final Button btDelete;
 
-    toolbar = new HorizontalLayout();
-    toolbar.addStyleName("toolbar");
-    toolbar.setWidth("100%");
-    toolbar.setHeight("-1px");
-    toolbar.setMargin(false);
-    toolbar.setSpacing(false);
-    vLayout.addComponent(toolbar);
+        public ConstraintLayout(TigerQueryBuilderCanvas parent, Set<String> annoNames) {
+            this.parent = parent;
 
-    btMove = new Button();
-    btMove.setWidth("100%");
-    btMove.setIcon(FontAwesome.ARROWS);
-    btMove.setDescription("<strong>Move node</strong><br />Click, hold and move mouse to move the node.");
-    btMove.addStyleName(ValoTheme.BUTTON_SMALL);
-    btMove.addStyleName("drag-source-enabled");
-    toolbar.addComponent(btMove);
-   
-    
-    btEdge = new Button("Edge");
-    btEdge.setIcon(FontAwesome.EXTERNAL_LINK);
-    btEdge.addClickListener((Button.ClickListener) this);
-    btEdge.addStyleName(ValoTheme.BUTTON_SMALL);
-    //btEdge.addStyleName(ChameleonTheme.BUTTON_LINK);
-    btEdge.setDescription("<strong>Add Edge</strong><br />"
-      + "To create a new edge between "
-      + "two nodes click this button first. "
-      + "Then define a destination node by clicking its \"Dock\" "
-      + "button.<br>You can cancel the action by clicking this button "
-      + "(\"Cancel\") again.");
-    toolbar.addComponent(btEdge);
-    
-    btAdd = new Button("Add");
-    btAdd.setIcon(FontAwesome.PLUS);
-    btAdd.addStyleName(ValoTheme.BUTTON_SMALL);
-    //btAdd.addStyleName(ChameleonTheme.BUTTON_LINK);
-    btAdd.addClickListener((Button.ClickListener) this);
-    btAdd.setDescription("<strong>Add Node Condition</strong><br />"
-      + "Every condition will constraint the node described by this window. "
-      + "Most conditions limit the node by defining which annotations and which "
-      + "values of the annotation a node needs to have.");
-    toolbar.addComponent(btAdd);
-    
-    btClear = new Button("Clear");
-    btClear.setIcon(FontAwesome.TRASH_O);
-    btClear.addStyleName(ValoTheme.BUTTON_SMALL);
-    //btClear.addStyleName(ChameleonTheme.BUTTON_LINK);
-    btClear.addClickListener((Button.ClickListener) this);
-    btClear.setDescription("<strong>Clear All Node Conditions</strong>");
-    toolbar.addComponent(btClear);
+            setWidth("100%");
 
-    btClose = new Button();
-    btClose.setIcon(FontAwesome.TIMES_CIRCLE);
-    btClose.setDescription("<strong>Close</strong><br />Close this node description window");
-    btClose.addStyleName(ValoTheme.BUTTON_SMALL);
-    btClose.addClickListener((Button.ClickListener) this);
-    toolbar.addComponent(btClose);
+            cbName = new ComboBox();
+            cbName.setNewItemsAllowed(true);
+            cbName.setNewItemHandler(new SimpleNewItemHandler(cbName));
+            cbName.setImmediate(true);
+            cbName.setNullSelectionAllowed(true);
+            cbName.setNullSelectionItemId("tok");
+            cbName.addItem("tok");
+            for (String n : annoNames) {
+                cbName.addItem(n);
+            }
+            cbName.setValue("tok");
+            cbName.addValueChangeListener(this);
 
-    toolbar.setComponentAlignment(btMove, Alignment.TOP_LEFT);
-    toolbar.setExpandRatio(btMove, 1.0f);
-    
-    toolbar.setComponentAlignment(btEdge, Alignment.TOP_CENTER);
-    toolbar.setComponentAlignment(btAdd, Alignment.TOP_CENTER);
-    toolbar.setComponentAlignment(btClear, Alignment.TOP_CENTER);
-    toolbar.setComponentAlignment(btClose, Alignment.TOP_RIGHT);
+            cbOperator = new ComboBox();
+            cbOperator.setNewItemsAllowed(false);
+            cbOperator.setNullSelectionAllowed(false);
+            cbOperator.setImmediate(true);
+            for (String o : NODE_OPERATORS) {
+                cbOperator.addItem(o);
+            }
+            cbOperator.setValue(NODE_OPERATORS[0]);
+            cbOperator.addValueChangeListener(this);
 
-  }
+            txtValue = new TextField();
+            txtValue.addValueChangeListener(this);
 
-  public void setPrepareEdgeDock(boolean prepare)
-  {
-    this.prepareEdgeDock = prepare;
+            cbOperator.setWidth("4em");
+            cbName.setWidth("100%");
+            txtValue.setWidth("100%");
 
-    btClear.setVisible(!prepare);
-    btClose.setVisible(!prepare);
-    btAdd.setVisible(!prepare);
-    btMove.setVisible(!prepare);
+            btDelete = new Button("X");
+            btDelete.addStyleName(ValoTheme.BUTTON_LINK);
+            btDelete.setDescription("Remove node condition");
+            btDelete.addClickListener(event -> {
+                vLayout.removeComponent(ConstraintLayout.this);
+                constraints.remove(ConstraintLayout.this);
+            });
 
-    if(prepare)
-    {
-      btEdge.setCaption("Dock");
-      btEdge.setIcon(new ThemeResource("images/pixel.png"));
-    }
-    else
-    {
-      btEdge.setIcon(FontAwesome.EXTERNAL_LINK);
-      btEdge.setCaption("Edge");
-    }
-  }
+            addComponent(cbName);
+            addComponent(cbOperator);
+            addComponent(txtValue);
+            addComponent(btDelete);
 
-  @Override
-  public void buttonClick(ClickEvent event)
-  {
-    if(event.getButton() == btEdge)
-    {
-      if(prepareEdgeDock)
-      {
-        setPrepareEdgeDock(false);
-        parent.addEdge(this);
-      }
-      else
-      {
-        parent.prepareAddingEdge(this);
-        setPrepareEdgeDock(true);
-        btEdge.setIcon(new ThemeResource("images/pixel.png"));
-        btEdge.setCaption("Cancel");
-      }
-    }
-    else if(event.getButton() == btClose)
-    {
-      parent.deleteNode(this);
-    }
-    else if(event.getButton() == btAdd)
-    {
-      ConstraintLayout c = new ConstraintLayout(parent, annoNames);
-      c.setWidth("100%");
-      c.setHeight("-1px");
-      constraints.add(c);
-      vLayout.addComponent(c);
-      if(parent != null)
-      {
-        parent.updateQuery();
-      }
-    }
-    else if(event.getButton() == btClear)
-    {
-      for(ConstraintLayout c : constraints)
-      {
-        vLayout.removeComponent(c);
-      }
-      constraints.clear();
-      if(parent != null)
-      {
-        parent.updateQuery();
-      }
-    }
-  }
+            setExpandRatio(cbName, 0.8f);
+            setExpandRatio(txtValue, 1.0f);
+            setExpandRatio(btDelete, 0.0f);
 
-  public Button getBtMove()
-  {
-    return btMove;
-  }
-  
-  
+            setComponentAlignment(btDelete, Alignment.MIDDLE_RIGHT);
 
-  public int getID()
-  {
-    return id;
-  }
+            addLayoutClickListener(this);
 
-  @Override
-  public boolean equals(Object obj)
-  {
-    if(obj == null)
-    {
-      return false;
-    }
-    if(getClass() != obj.getClass())
-    {
-      return false;
-    }
-    final NodeWindow other = (NodeWindow) obj;
-    return other.getID() == getID();
-  }
+        }
 
-  @Override
-  public int hashCode()
-  {
-    int hash = 5;
-    hash = 41 * hash + this.id;
-    return hash;
-  }
+        public String getName() {
+            if (cbName.getValue() == null) {
+                return "tok";
+            } else {
+                return (String) cbName.getValue();
+            }
+        }
 
-  public List<ConstraintLayout> getConstraints()
-  {
-    return constraints;
-  }
-  
-  
+        public String getOperator() {
+            if (cbOperator.getValue() == null) {
+                return "";
+            } else {
+                return (String) cbOperator.getValue();
+            }
+        }
 
-  public class ConstraintLayout extends HorizontalLayout 
-  implements LayoutClickListener, ValueChangeListener
-  {
-
-    private final TigerQueryBuilderCanvas parent;
-    private final ComboBox cbName;
-    private final ComboBox cbOperator;
-    private final TextField txtValue;
-    private final Button btDelete;
-
-    public ConstraintLayout(TigerQueryBuilderCanvas parent, Set<String> annoNames)
-    {
-      this.parent = parent;
-      
-      setWidth("100%");
-      
-      cbName = new ComboBox();
-      cbName.setNewItemsAllowed(true);
-      cbName.setNewItemHandler(new SimpleNewItemHandler(cbName));
-      cbName.setImmediate(true);
-      cbName.setNullSelectionAllowed(true);
-      cbName.setNullSelectionItemId("tok");
-      cbName.addItem("tok");
-      for(String n : annoNames)
-      {
-        cbName.addItem(n);
-      }
-      cbName.setValue("tok");
-      cbName.addValueChangeListener((ValueChangeListener) this);
-      
-      
-      cbOperator = new ComboBox();
-      cbOperator.setNewItemsAllowed(false);
-      cbOperator.setNullSelectionAllowed(false);
-      cbOperator.setImmediate(true);
-      for(String o : NODE_OPERATORS)
-      {
-        cbOperator.addItem(o);
-      }
-      cbOperator.setValue(NODE_OPERATORS[0]);
-      cbOperator.addValueChangeListener((ValueChangeListener) this);
-      
-      txtValue = new TextField();
-      txtValue.addValueChangeListener((ValueChangeListener) this);
-      
-      cbOperator.setWidth("4em");
-      cbName.setWidth("100%");
-      txtValue.setWidth("100%");
-
-      btDelete = new Button("X");
-      btDelete.addStyleName(ValoTheme.BUTTON_LINK);
-      btDelete.setDescription("Remove node condition");
-      btDelete.addClickListener(new Button.ClickListener()
-      {
+        public String getValue() {
+            if (txtValue.getValue() == null) {
+                return "";
+            } else {
+                return txtValue.getValue();
+            }
+        }
 
         @Override
-        public void buttonClick(ClickEvent event)
-        {
-          vLayout.removeComponent(ConstraintLayout.this);
-          constraints.remove(ConstraintLayout.this);
+        public void layoutClick(LayoutClickEvent event) {
+            Component c = event.getClickedComponent();
+            if (c != null && c instanceof AbstractField) {
+                AbstractField f = (AbstractField) c;
+                f.focus();
+                if (event.isDoubleClick()) {
+                    if (f instanceof AbstractTextField) {
+                        ((AbstractTextField) f).selectAll();
+                    }
+                }
+            }
         }
-      });
-      
-      addComponent(cbName);
-      addComponent(cbOperator);
-      addComponent(txtValue);
-      addComponent(btDelete);
 
-      setExpandRatio(cbName, 0.8f);
-      setExpandRatio(txtValue, 1.0f);
-      setExpandRatio(btDelete, 0.0f);
-      
-      setComponentAlignment(btDelete, Alignment.MIDDLE_RIGHT);
-      
-      addLayoutClickListener((LayoutClickListener) this);
-      
-    }
-
-    @Override
-    public void layoutClick(LayoutClickEvent event)
-    {
-      Component c = event.getClickedComponent();
-      if(c != null && c instanceof AbstractField)
-      {
-        AbstractField f = (AbstractField) c;
-        f.focus();
-        if(event.isDoubleClick())
-        {
-          if(f instanceof AbstractTextField)
-          {
-            ((AbstractTextField) f).selectAll();
-          }
+        @Override
+        public void valueChange(ValueChangeEvent event) {
+            if (parent != null) {
+                parent.updateQuery();
+            }
         }
-      }
+
     }
-    
-    public String getOperator()
-    {
-      if(cbOperator.getValue() == null)
-      {
-        return "";
-      }
-      else
-      {
-        return (String) cbOperator.getValue();
-      }
+
+    public static class SimpleNewItemHandler implements NewItemHandler {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 3779354553679599585L;
+        private ComboBox comboBox;
+
+        public SimpleNewItemHandler(ComboBox comboBox) {
+            this.comboBox = comboBox;
+        }
+
+        @Override
+        public void addNewItem(String newItemCaption) {
+            if (comboBox != null) {
+                comboBox.addItem(newItemCaption);
+                comboBox.setValue(newItemCaption);
+
+            }
+        }
     }
-    
-    public String getName()
-    {
-      if(cbName.getValue() == null)
-      {
-        return "tok";
-      }
-      else
-      {
-        return (String) cbName.getValue();
-      }
-    }
-    
-    public String getValue()
-    {
-      if(txtValue.getValue() == null)
-      {
-        return "";
-      }
-      else
-      {
-        return (String) txtValue.getValue();
-      }
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3343814240482043643L;
+
+    public static final int HEIGHT = 100;
+
+    public static final int WIDTH = 275;
+
+    private static final String[] NODE_OPERATORS = new String[] { "=", "~", "!=", "!~" };
+    private final Set<String> annoNames;
+    private final TigerQueryBuilderCanvas parent;
+    private final Button btEdge;
+    private final Button btAdd;
+    private final Button btClear;
+    private final Button btClose;
+    private final Button btMove;
+    private final HorizontalLayout toolbar;
+    private final List<ConstraintLayout> constraints;
+    private boolean prepareEdgeDock;
+
+    private final int id;
+
+    private final VerticalLayout vLayout;
+
+    public NodeWindow(int id, TigerQueryBuilderCanvas parent) {
+        this.parent = parent;
+        this.id = id;
+        this.annoNames = new TreeSet<>();
+
+        for (String a : parent.getAvailableAnnotationNames()) {
+            annoNames.add(a.replaceFirst("^[^:]*:", ""));
+        }
+        constraints = new ArrayList<>();
+
+        setSizeFull();
+
+        // HACK: use our own border since the one from chameleon does not really work
+        addStyleName(ValoTheme.PANEL_WELL);
+        // addStyleName("border-layout");
+
+        prepareEdgeDock = false;
+
+        vLayout = new VerticalLayout();
+        setContent(vLayout);
+        vLayout.setWidth("100%");
+        vLayout.setHeight("-1px");
+        vLayout.setMargin(false);
+        vLayout.setSpacing(true);
+
+        toolbar = new HorizontalLayout();
+        toolbar.addStyleName("toolbar");
+        toolbar.setWidth("100%");
+        toolbar.setHeight("-1px");
+        toolbar.setMargin(false);
+        toolbar.setSpacing(false);
+        vLayout.addComponent(toolbar);
+
+        btMove = new Button();
+        btMove.setWidth("100%");
+        btMove.setIcon(FontAwesome.ARROWS);
+        btMove.setDescription("<strong>Move node</strong><br />Click, hold and move mouse to move the node.");
+        btMove.addStyleName(ValoTheme.BUTTON_SMALL);
+        btMove.addStyleName("drag-source-enabled");
+        toolbar.addComponent(btMove);
+
+        btEdge = new Button("Edge");
+        btEdge.setIcon(FontAwesome.EXTERNAL_LINK);
+        btEdge.addClickListener(this);
+        btEdge.addStyleName(ValoTheme.BUTTON_SMALL);
+        // btEdge.addStyleName(ChameleonTheme.BUTTON_LINK);
+        btEdge.setDescription("<strong>Add Edge</strong><br />" + "To create a new edge between "
+                + "two nodes click this button first. " + "Then define a destination node by clicking its \"Dock\" "
+                + "button.<br>You can cancel the action by clicking this button " + "(\"Cancel\") again.");
+        toolbar.addComponent(btEdge);
+
+        btAdd = new Button("Add");
+        btAdd.setIcon(FontAwesome.PLUS);
+        btAdd.addStyleName(ValoTheme.BUTTON_SMALL);
+        // btAdd.addStyleName(ChameleonTheme.BUTTON_LINK);
+        btAdd.addClickListener(this);
+        btAdd.setDescription("<strong>Add Node Condition</strong><br />"
+                + "Every condition will constraint the node described by this window. "
+                + "Most conditions limit the node by defining which annotations and which "
+                + "values of the annotation a node needs to have.");
+        toolbar.addComponent(btAdd);
+
+        btClear = new Button("Clear");
+        btClear.setIcon(FontAwesome.TRASH_O);
+        btClear.addStyleName(ValoTheme.BUTTON_SMALL);
+        // btClear.addStyleName(ChameleonTheme.BUTTON_LINK);
+        btClear.addClickListener(this);
+        btClear.setDescription("<strong>Clear All Node Conditions</strong>");
+        toolbar.addComponent(btClear);
+
+        btClose = new Button();
+        btClose.setIcon(FontAwesome.TIMES_CIRCLE);
+        btClose.setDescription("<strong>Close</strong><br />Close this node description window");
+        btClose.addStyleName(ValoTheme.BUTTON_SMALL);
+        btClose.addClickListener(this);
+        toolbar.addComponent(btClose);
+
+        toolbar.setComponentAlignment(btMove, Alignment.TOP_LEFT);
+        toolbar.setExpandRatio(btMove, 1.0f);
+
+        toolbar.setComponentAlignment(btEdge, Alignment.TOP_CENTER);
+        toolbar.setComponentAlignment(btAdd, Alignment.TOP_CENTER);
+        toolbar.setComponentAlignment(btClear, Alignment.TOP_CENTER);
+        toolbar.setComponentAlignment(btClose, Alignment.TOP_RIGHT);
+
     }
 
     @Override
-    public void valueChange(ValueChangeEvent event)
-    {
-      if(parent != null)
-      {
-        parent.updateQuery();
-      }
+    public void buttonClick(ClickEvent event) {
+        if (event.getButton() == btEdge) {
+            if (prepareEdgeDock) {
+                setPrepareEdgeDock(false);
+                parent.addEdge(this);
+            } else {
+                parent.prepareAddingEdge(this);
+                setPrepareEdgeDock(true);
+                btEdge.setIcon(new ThemeResource("images/pixel.png"));
+                btEdge.setCaption("Cancel");
+            }
+        } else if (event.getButton() == btClose) {
+            parent.deleteNode(this);
+        } else if (event.getButton() == btAdd) {
+            ConstraintLayout c = new ConstraintLayout(parent, annoNames);
+            c.setWidth("100%");
+            c.setHeight("-1px");
+            constraints.add(c);
+            vLayout.addComponent(c);
+            if (parent != null) {
+                parent.updateQuery();
+            }
+        } else if (event.getButton() == btClear) {
+            for (ConstraintLayout c : constraints) {
+                vLayout.removeComponent(c);
+            }
+            constraints.clear();
+            if (parent != null) {
+                parent.updateQuery();
+            }
+        }
     }
-    
-  }
-  public static class SimpleNewItemHandler  implements NewItemHandler  
-  {
 
-    private ComboBox comboBox;
-
-    public SimpleNewItemHandler(ComboBox comboBox)
-    {
-      this.comboBox = comboBox;
-    }
-    
-    
-    
     @Override
-    public void addNewItem(String newItemCaption)
-    {
-      if(comboBox != null)
-      {
-        comboBox.addItem(newItemCaption);
-        comboBox.setValue(newItemCaption);
-        
-      }
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NodeWindow other = (NodeWindow) obj;
+        return other.getID() == getID();
     }
-  }
-  
-  
+
+    public Button getBtMove() {
+        return btMove;
+    }
+
+    public List<ConstraintLayout> getConstraints() {
+        return constraints;
+    }
+
+    public int getID() {
+        return id;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 41 * hash + this.id;
+        return hash;
+    }
+
+    public void setPrepareEdgeDock(boolean prepare) {
+        this.prepareEdgeDock = prepare;
+
+        btClear.setVisible(!prepare);
+        btClose.setVisible(!prepare);
+        btAdd.setVisible(!prepare);
+        btMove.setVisible(!prepare);
+
+        if (prepare) {
+            btEdge.setCaption("Dock");
+            btEdge.setIcon(new ThemeResource("images/pixel.png"));
+        } else {
+            btEdge.setIcon(FontAwesome.EXTERNAL_LINK);
+            btEdge.setCaption("Edge");
+        }
+    }
 
 }

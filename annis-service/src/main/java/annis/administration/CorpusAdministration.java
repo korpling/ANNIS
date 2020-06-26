@@ -15,6 +15,20 @@
  */
 package annis.administration;
 
+import annis.AnnisRunnerException;
+import annis.CommonHelper;
+import annis.ServiceConfig;
+import annis.dao.ShortenerDao;
+import annis.exceptions.AnnisException;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.ImportJob;
+import annis.tabledefs.Table;
+import annis.utils.ANNISFormatHelper;
+import au.com.bytecode.opencsv.CSVReader;
+import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Multimap;
+import com.google.common.io.ByteStreams;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,13 +52,11 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
-
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
-
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
@@ -56,37 +68,155 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Multimap;
-import com.google.common.io.ByteStreams;
-
-import annis.AnnisRunnerException;
-import annis.CommonHelper;
-import annis.ServiceConfig;
-import annis.dao.ShortenerDao;
-import annis.exceptions.AnnisException;
-import annis.service.objects.AnnisCorpus;
-import annis.service.objects.ImportJob;
-import annis.tabledefs.Table;
-import annis.utils.ANNISFormatHelper;
-import au.com.bytecode.opencsv.CSVReader;
-
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CorpusAdministration {
 
-    private AdministrationDao administrationDao;
-    private ShortenerDao shortenerDao;
+    public static class ImportStatsImpl implements ImportStatus {
 
-    private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -33185834205367926L;
+
+        private final static String SEPERATOR = "--------------------------\n";
+
+        boolean status = true;
+
+        final Map<String, List<Throwable>> exceptions;
+
+        public ImportStatsImpl() {
+            exceptions = new HashMap<>();
+        }
+
+        @Override
+        public void add(ImportStatus importStats) {
+            if (importStats == null) {
+                return;
+            }
+
+            status &= importStats.getStatus();
+            exceptions.putAll(importStats.getAllThrowable());
+        }
+
+        @Override
+        public void addException(String corpusName, Throwable ex) {
+            if (!exceptions.containsKey(corpusName)) {
+                exceptions.put(corpusName, new ArrayList<Throwable>());
+            }
+
+            exceptions.get(corpusName).add(ex);
+        }
+
+        @Override
+        public Map<String, List<Throwable>> getAllThrowable() {
+            return this.exceptions;
+        }
+
+        @Override
+        public List<Exception> getExceptions() {
+            List<Exception> exs = new ArrayList<>();
+
+            if (exceptions != null) {
+                for (List<Throwable> throwables : exceptions.values()) {
+                    for (Throwable throwable : throwables) {
+                        if (throwable instanceof Exception) {
+                            exs.add((Exception) throwable);
+                        }
+                    }
+                }
+            }
+
+            return exs;
+        }
+
+        @Override
+        public boolean getStatus() {
+            return status;
+        }
+
+        @Override
+        public List<Throwable> getThrowable(String corpusName) {
+            return exceptions.get(corpusName);
+        }
+
+        @Override
+        public List<Throwable> getThrowables() {
+            List<Throwable> allThrowables = new ArrayList<>();
+
+            for (List<Throwable> l : exceptions.values()) {
+                allThrowables.addAll(l);
+            }
+
+            return allThrowables;
+        }
+
+        @Override
+        public String printDetails() {
+            StringBuilder details = new StringBuilder();
+            for (Entry<String, List<Throwable>> e : exceptions.entrySet()) {
+                details.append(SEPERATOR);
+                details.append("Error in corpus: ").append(e.getKey()).append("\n");
+                details.append(SEPERATOR);
+
+                for (Throwable th : e.getValue()) {
+                    details.append(th.getLocalizedMessage()).append("\n");
+                    StackTraceElement[] st = th.getStackTrace();
+
+                    for (int i = 0; i < st.length; i++) {
+                        details.append(st[i].toString());
+                        details.append("\n");
+                    }
+                }
+            }
+
+            return details.toString();
+        }
+
+        @Override
+        public String printMessages() {
+            StringBuilder txtMessages = new StringBuilder();
+            for (Entry<String, List<Throwable>> e : exceptions.entrySet()) {
+                txtMessages.append(SEPERATOR);
+                txtMessages.append("Error in corpus: ").append(e.getKey()).append("\n");
+                txtMessages.append(SEPERATOR);
+
+                for (Throwable th : e.getValue()) {
+                    Exception exception = (Exception) th;
+                    txtMessages.append(exception.getLocalizedMessage()).append("\n");
+                }
+            }
+
+            return txtMessages.toString();
+        }
+
+        @Override
+        public String printType() {
+            StringBuilder type = new StringBuilder();
+
+            for (Entry<String, List<Throwable>> e : exceptions.entrySet()) {
+                String name = e.getKey().split("/")[e.getKey().split("/").length - 1];
+                type.append("(").append(name).append(": ");
+
+                for (Throwable th : e.getValue()) {
+                    type.append(th.getClass().getSimpleName()).append(" ");
+                }
+
+                type.append(") ");
+            }
+
+            return type.toString();
+        }
+
+        @Override
+        public void setStatus(boolean status) {
+            this.status = status;
+        }
+    }
 
     private static final Logger log = LoggerFactory.getLogger(CorpusAdministration.class);
-
-    public CorpusAdministration() {
-    }
 
     public static CorpusAdministration create(AdministrationDao administrationDao, ShortenerDao shortenerDao) {
         CorpusAdministration corpusAdmin = new CorpusAdministration();
@@ -96,6 +226,44 @@ public class CorpusAdministration {
         corpusAdmin.checkDatabaseSchemaVersion();
 
         return corpusAdmin;
+    }
+
+    private AdministrationDao administrationDao;
+
+    private ShortenerDao shortenerDao;
+
+    private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
+
+    public CorpusAdministration() {}
+
+    public boolean checkDatabaseSchemaVersion() {
+        try {
+            administrationDao.checkDatabaseSchemaVersion();
+        } catch (AnnisException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    public void cleanupData() {
+        administrationDao.cleanupData();
+    }
+
+    public File createZIPOutputDir(String corpusName) {
+        File outDir = new File(System.getProperty("user.home"),
+                ".annis/zip-imports/" + CommonHelper.getSafeFileName(corpusName));
+        if (outDir.exists()) {
+            try {
+                // delete old data inside the corpus directory
+                FileUtils.deleteDirectory(outDir);
+            } catch (IOException ex) {
+                log.warn("Could not recursivly delete the output directory", ex);
+            }
+        }
+        if (!outDir.mkdirs()) {
+            throw new IllegalStateException("Could not create directory " + outDir.getAbsolutePath());
+        }
+        return outDir;
     }
 
     public void deleteCorpora(List<String> corpora) {
@@ -115,8 +283,36 @@ public class CorpusAdministration {
         log.info("Finished deleting corpora: " + corpora);
     }
 
-    public void cleanupData() {
-        administrationDao.cleanupData();
+    public void dumpTable(String tableName, File outputFile) {
+        Table table = null;
+        switch (tableName) {
+        case "url_shortener":
+            table = AdministrationDao.urlShortenerTable;
+            break;
+        case "user_config":
+            table = AdministrationDao.userConfigTable;
+            break;
+        }
+        if (table == null) {
+            log.info("Can't dump unknown table with name {}", tableName);
+            return;
+        } else {
+            log.info("Dumping table {} to file {}", tableName, outputFile);
+            administrationDao.dumpServiceDataTable(table, outputFile);
+        }
+    }
+
+    ///// Getter / Setter
+    public AdministrationDao getAdministrationDao() {
+        return administrationDao;
+    }
+
+    public DeleteCorpusDao getDeleteCorpusDao() {
+        return administrationDao.getDeleteCorpusDao();
+    }
+
+    public ShortenerDao getShortenerDao() {
+        return shortenerDao;
     }
 
     /**
@@ -126,23 +322,19 @@ public class CorpusAdministration {
      *
      *
      * @param overwrite
-     *                              If set to false, a conflicting corpus is not
-     *                              silently reimported.
+     *            If set to false, a conflicting corpus is not silently reimported.
      * @param aliasName
-     *                              An common alias name for all imported corpora or
-     *                              null
+     *            An common alias name for all imported corpora or null
      * @param statusEmailAdress
-     *                              an email adress for informating the admin about
-     *                              statuses
+     *            an email adress for informating the admin about statuses
      * @param waitForOtherTasks
-     *                              If true wait for other imports to finish, if
-     *                              false abort the import.
+     *            If true wait for other imports to finish, if false abort the
+     *            import.
      * @param paths
-     *                              Valid pathes to corpora.
+     *            Valid pathes to corpora.
      * @param diskBased
-     *                              If true, the imported corpus will be queried
-     *                              from on-disk storage whererver possible and
-     *                              in-memory storage is avoided.
+     *            If true, the imported corpus will be queried from on-disk storage
+     *            whererver possible and in-memory storage is avoided.
      * @return True if all corpora where imported successfully.
      */
     public ImportStatus importCorporaSave(boolean overwrite, boolean diskBased, String aliasName,
@@ -223,6 +415,31 @@ public class CorpusAdministration {
         return importStats;
     }
 
+    /**
+     * Imports several corpora.
+     *
+     * @param overwrite
+     *            if false, a conflicting top level corpus is silently skipped.
+     * @param diskBased
+     *            If true, the imported corpus will be queried from on-disk storage
+     *            whererver possible and in-memory storage is avoided.
+     * @param aliasName
+     *            An common alias name for all imported corpora or null
+     * @param statusEmailAdress
+     *            If not null the email adress of the user who started the import.
+     * @param waitForOtherTasks
+     *            If true wait for other imports to finish, if false abort the
+     *            import.
+     * @param paths
+     *            the paths to the corpora
+     * @return True if all corpora where imported successfully.
+     */
+    public ImportStatus importCorporaSave(boolean overwrite, boolean diskBased, String aliasName,
+            String statusEmailAdress, boolean waitForOtherTasks, String... paths) {
+        return importCorporaSave(overwrite, cfg.preferDiskBased(), aliasName, statusEmailAdress, waitForOtherTasks,
+                Arrays.asList(paths));
+    }
+
     public int migrateUrlShortener(List<String> paths, String serviceURL, String username, String password,
             boolean skipExisting, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
         if (paths == null || serviceURL == null) {
@@ -261,7 +478,7 @@ public class CorpusAdministration {
                                             ? new LinkedList<>()
                                             : new LinkedList<>(q.getQuery().getCorpora());
                                     Set<String> knownCorpora = getAdministrationDao().getQueryDao()
-                                            .listCorpora(corpusNames).stream().map((c) -> c.getName())
+                                            .listCorpora(corpusNames).stream().map(c -> c.getName())
                                             .collect(Collectors.toSet());
 
                                     for (String c : corpusNames) {
@@ -386,206 +603,22 @@ public class CorpusAdministration {
         return successfulQueries;
     }
 
-    /**
-     * Extract the zipped ANNIS corpus files to an output directory.
-     *
-     * @param outDir
-     *                   The ouput directory.
-     * @param zip
-     *                   ZIP-file to extract.
-     * @return A list of root directories where the tab-files are located if found,
-     *         null otherwise.
-     */
-    private List<File> unzipCorpus(File outDir, ZipFile zip) {
-        List<File> rootDirs = new ArrayList<>();
-
-        Enumeration<? extends ZipEntry> zipEnum = zip.entries();
-        while (zipEnum.hasMoreElements()) {
-            ZipEntry e = zipEnum.nextElement();
-            File outFile = new File(outDir, e.getName().replaceAll("\\/", "/"));
-
-            if (e.isDirectory()) {
-                if (!outFile.mkdirs()) {
-                    log.warn("Could not create output directory " + outFile.getAbsolutePath());
-                }
-            } // end if directory
-            else {
-                if ("corpus.tab".equals(outFile.getName()) || "corpus.annis".equals(outFile.getName())) {
-                    rootDirs.add(outFile.getParentFile());
-                }
-
-                if (!outFile.getParentFile().isDirectory()) {
-                    if (!outFile.getParentFile().mkdirs()) {
-                        {
-                            log.warn("Could not create output directory for file " + outFile.getAbsolutePath());
-                        }
-                    }
-                }
-                try (FileOutputStream outStream = new FileOutputStream(outFile);) {
-
-                    ByteStreams.copy(zip.getInputStream(e), outStream);
-                } catch (FileNotFoundException ex) {
-                    log.error(null, ex);
-                } catch (IOException ex) {
-                    log.error(null, ex);
-                }
-            } // end else is file
-        } // end for each entry in zip file
-
-        return rootDirs;
-    }
-
-    public File createZIPOutputDir(String corpusName) {
-        File outDir = new File(System.getProperty("user.home"),
-                ".annis/zip-imports/" + CommonHelper.getSafeFileName(corpusName));
-        if (outDir.exists()) {
-            try {
-                // delete old data inside the corpus directory
-                FileUtils.deleteDirectory(outDir);
-            } catch (IOException ex) {
-                log.warn("Could not recursivly delete the output directory", ex);
-            }
+    public void restoreTable(String tableName, File inputFile) {
+        Table table = null;
+        switch (tableName) {
+        case "url_shortener":
+            table = AdministrationDao.urlShortenerTable;
+            break;
+        case "user_config":
+            table = AdministrationDao.userConfigTable;
+            break;
         }
-        if (!outDir.mkdirs()) {
-            throw new IllegalStateException("Could not create directory " + outDir.getAbsolutePath());
-        }
-        return outDir;
-    }
-
-    public static class ImportStatsImpl implements ImportStatus {
-
-        boolean status = true;
-
-        private final static String SEPERATOR = "--------------------------\n";
-
-        final Map<String, List<Throwable>> exceptions;
-
-        public ImportStatsImpl() {
-            exceptions = new HashMap<>();
-        }
-
-        @Override
-        public boolean getStatus() {
-            return status;
-        }
-
-        @Override
-        public List<Throwable> getThrowables() {
-            List<Throwable> allThrowables = new ArrayList<>();
-
-            for (List<Throwable> l : exceptions.values()) {
-                allThrowables.addAll(l);
-            }
-
-            return allThrowables;
-        }
-
-        @Override
-        public List<Throwable> getThrowable(String corpusName) {
-            return exceptions.get(corpusName);
-        }
-
-        @Override
-        public void addException(String corpusName, Throwable ex) {
-            if (!exceptions.containsKey(corpusName)) {
-                exceptions.put(corpusName, new ArrayList<Throwable>());
-            }
-
-            exceptions.get(corpusName).add(ex);
-        }
-
-        @Override
-        public void setStatus(boolean status) {
-            this.status = status;
-        }
-
-        @Override
-        public void add(ImportStatus importStats) {
-            if (importStats == null) {
-                return;
-            }
-
-            status &= importStats.getStatus();
-            exceptions.putAll(importStats.getAllThrowable());
-        }
-
-        @Override
-        public List<Exception> getExceptions() {
-            List<Exception> exs = new ArrayList<>();
-
-            if (exceptions != null) {
-                for (List<Throwable> throwables : exceptions.values()) {
-                    for (Throwable throwable : throwables) {
-                        if (throwable instanceof Exception) {
-                            exs.add((Exception) throwable);
-                        }
-                    }
-                }
-            }
-
-            return exs;
-        }
-
-        @Override
-        public Map<String, List<Throwable>> getAllThrowable() {
-            return this.exceptions;
-        }
-
-        @Override
-        public String printMessages() {
-            StringBuilder txtMessages = new StringBuilder();
-            for (Entry<String, List<Throwable>> e : exceptions.entrySet()) {
-                txtMessages.append(SEPERATOR);
-                txtMessages.append("Error in corpus: ").append(e.getKey()).append("\n");
-                txtMessages.append(SEPERATOR);
-
-                for (Throwable th : e.getValue()) {
-                    Exception exception = (Exception) th;
-                    txtMessages.append(exception.getLocalizedMessage()).append("\n");
-                }
-            }
-
-            return txtMessages.toString();
-        }
-
-        @Override
-        public String printDetails() {
-            StringBuilder details = new StringBuilder();
-            for (Entry<String, List<Throwable>> e : exceptions.entrySet()) {
-                details.append(SEPERATOR);
-                details.append("Error in corpus: ").append(e.getKey()).append("\n");
-                details.append(SEPERATOR);
-
-                for (Throwable th : e.getValue()) {
-                    details.append(th.getLocalizedMessage()).append("\n");
-                    StackTraceElement[] st = th.getStackTrace();
-
-                    for (int i = 0; i < st.length; i++) {
-                        details.append(st[i].toString());
-                        details.append("\n");
-                    }
-                }
-            }
-
-            return details.toString();
-        }
-
-        @Override
-        public String printType() {
-            StringBuilder type = new StringBuilder();
-
-            for (Entry<String, List<Throwable>> e : exceptions.entrySet()) {
-                String name = e.getKey().split("/")[e.getKey().split("/").length - 1];
-                type.append("(").append(name).append(": ");
-
-                for (Throwable th : e.getValue()) {
-                    type.append(th.getClass().getSimpleName()).append(" ");
-                }
-
-                type.append(") ");
-            }
-
-            return type.toString();
+        if (table == null) {
+            log.info("Can't restore unknown table with name {}", tableName);
+            return;
+        } else {
+            log.info("Restoring table {} from file {}", tableName, inputFile);
+            administrationDao.restoreServiceDataTable(table, inputFile);
         }
     }
 
@@ -657,80 +690,61 @@ public class CorpusAdministration {
         }
     }
 
-    public boolean checkDatabaseSchemaVersion() {
-        try {
-            administrationDao.checkDatabaseSchemaVersion();
-        } catch (AnnisException ex) {
-            return false;
-        }
-        return true;
+    public void setAdministrationDao(AdministrationDao administrationDao) {
+        this.administrationDao = administrationDao;
+    }
+
+    public void setShortenerDao(ShortenerDao shortenerDao) {
+        this.shortenerDao = shortenerDao;
     }
 
     /**
-     * Imports several corpora.
+     * Extract the zipped ANNIS corpus files to an output directory.
      *
-     * @param overwrite
-     *                              if false, a conflicting top level corpus is
-     *                              silently skipped.
-     * @param diskBased
-     *                              If true, the imported corpus will be queried
-     *                              from on-disk storage whererver possible and
-     *                              in-memory storage is avoided.
-     * @param aliasName
-     *                              An common alias name for all imported corpora or
-     *                              null
-     * @param statusEmailAdress
-     *                              If not null the email adress of the user who
-     *                              started the import.
-     * @param waitForOtherTasks
-     *                              If true wait for other imports to finish, if
-     *                              false abort the import.
-     * @param paths
-     *                              the paths to the corpora
-     * @return True if all corpora where imported successfully.
+     * @param outDir
+     *            The ouput directory.
+     * @param zip
+     *            ZIP-file to extract.
+     * @return A list of root directories where the tab-files are located if found,
+     *         null otherwise.
      */
-    public ImportStatus importCorporaSave(boolean overwrite, boolean diskBased, String aliasName,
-            String statusEmailAdress, boolean waitForOtherTasks, String... paths) {
-        return importCorporaSave(overwrite, cfg.preferDiskBased(), aliasName, statusEmailAdress, waitForOtherTasks,
-                Arrays.asList(paths));
-    }
+    private List<File> unzipCorpus(File outDir, ZipFile zip) {
+        List<File> rootDirs = new ArrayList<>();
 
-    public void dumpTable(String tableName, File outputFile) {
-        Table table = null;
-        switch (tableName) {
-        case "url_shortener":
-            table = AdministrationDao.urlShortenerTable;
-            break;
-        case "user_config":
-            table = AdministrationDao.userConfigTable;
-            break;
-        }
-        if (table == null) {
-            log.info("Can't dump unknown table with name {}", tableName);
-            return;
-        } else {
-            log.info("Dumping table {} to file {}", tableName, outputFile);
-            administrationDao.dumpServiceDataTable(table, outputFile);
-        }
-    }
+        Enumeration<? extends ZipEntry> zipEnum = zip.entries();
+        while (zipEnum.hasMoreElements()) {
+            ZipEntry e = zipEnum.nextElement();
+            File outFile = new File(outDir, e.getName().replaceAll("\\/", "/"));
 
-    public void restoreTable(String tableName, File inputFile) {
-        Table table = null;
-        switch (tableName) {
-        case "url_shortener":
-            table = AdministrationDao.urlShortenerTable;
-            break;
-        case "user_config":
-            table = AdministrationDao.userConfigTable;
-            break;
-        }
-        if (table == null) {
-            log.info("Can't restore unknown table with name {}", tableName);
-            return;
-        } else {
-            log.info("Restoring table {} from file {}", tableName, inputFile);
-            administrationDao.restoreServiceDataTable(table, inputFile);
-        }
+            if (e.isDirectory()) {
+                if (!outFile.mkdirs()) {
+                    log.warn("Could not create output directory " + outFile.getAbsolutePath());
+                }
+            } // end if directory
+            else {
+                if ("corpus.tab".equals(outFile.getName()) || "corpus.annis".equals(outFile.getName())) {
+                    rootDirs.add(outFile.getParentFile());
+                }
+
+                if (!outFile.getParentFile().isDirectory()) {
+                    if (!outFile.getParentFile().mkdirs()) {
+                        {
+                            log.warn("Could not create output directory for file " + outFile.getAbsolutePath());
+                        }
+                    }
+                }
+                try (FileOutputStream outStream = new FileOutputStream(outFile);) {
+
+                    ByteStreams.copy(zip.getInputStream(e), outStream);
+                } catch (FileNotFoundException ex) {
+                    log.error(null, ex);
+                } catch (IOException ex) {
+                    log.error(null, ex);
+                }
+            } // end else is file
+        } // end for each entry in zip file
+
+        return rootDirs;
     }
 
     ///// Helper
@@ -753,27 +767,6 @@ public class CorpusAdministration {
             throw new FileAccessException(e);
         }
         log.info("Wrote database configuration to " + file.getAbsolutePath());
-    }
-
-    ///// Getter / Setter
-    public AdministrationDao getAdministrationDao() {
-        return administrationDao;
-    }
-
-    public void setAdministrationDao(AdministrationDao administrationDao) {
-        this.administrationDao = administrationDao;
-    }
-
-    public DeleteCorpusDao getDeleteCorpusDao() {
-        return administrationDao.getDeleteCorpusDao();
-    }
-
-    public ShortenerDao getShortenerDao() {
-        return shortenerDao;
-    }
-
-    public void setShortenerDao(ShortenerDao shortenerDao) {
-        this.shortenerDao = shortenerDao;
     }
 
 }

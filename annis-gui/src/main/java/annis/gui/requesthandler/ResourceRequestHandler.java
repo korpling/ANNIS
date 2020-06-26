@@ -30,45 +30,38 @@ import org.apache.commons.lang3.StringUtils;
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ResourceRequestHandler implements RequestHandler
-{
-  
-  private final String prefix;
-  
-  public ResourceRequestHandler(String urlPrefix)
-  {
-    this.prefix = urlPrefix + "/vis-iframe-res/";
-  }
+public class ResourceRequestHandler implements RequestHandler {
 
-  @Override
-  public boolean handleRequest(VaadinSession session, VaadinRequest request,
-    VaadinResponse response) throws IOException
-  {
-    if (request.getPathInfo() != null && request.getPathInfo().
-      startsWith(prefix))
-    {
-      String uuidString = StringUtils.removeStart(request.getPathInfo(),
-        prefix);
-      UUID uuid = UUID.fromString(uuidString);
-      IFrameResourceMap map = VaadinSession.getCurrent().
-        getAttribute(IFrameResourceMap.class);
-      if (map == null)
-      {
-        response.setStatus(404);
-      }
-      else
-      {
-        IFrameResource res = map.get(uuid);
-        if (res != null)
-        {
-          response.setStatus(200);
-          response.setContentType(res.getMimeType());
-          response.getOutputStream().write(res.getData());
-        }
-      }
-      return true;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8704115274005802537L;
+    private final String prefix;
+
+    public ResourceRequestHandler(String urlPrefix) {
+        this.prefix = urlPrefix + "/vis-iframe-res/";
     }
-    return false;
-  }
-  
+
+    @Override
+    public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response)
+            throws IOException {
+        if (request.getPathInfo() != null && request.getPathInfo().startsWith(prefix)) {
+            String uuidString = StringUtils.removeStart(request.getPathInfo(), prefix);
+            UUID uuid = UUID.fromString(uuidString);
+            IFrameResourceMap map = VaadinSession.getCurrent().getAttribute(IFrameResourceMap.class);
+            if (map == null) {
+                response.setStatus(404);
+            } else {
+                IFrameResource res = map.get(uuid);
+                if (res != null) {
+                    response.setStatus(200);
+                    response.setContentType(res.getMimeType());
+                    response.getOutputStream().write(res.getData());
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
 }

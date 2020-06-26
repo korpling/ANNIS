@@ -41,166 +41,120 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class LoginServletRequestHandler implements RequestHandler
-{
+public class LoginServletRequestHandler implements RequestHandler {
 
-  private final static Logger log = LoggerFactory.getLogger(
-    LoginServletRequestHandler.class);
-  
-  private final String prefix;
-  
-  public LoginServletRequestHandler(String urlPrefix)
-  {
-    this.prefix = urlPrefix + "/login";
-  }
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8268932823388330166L;
 
-  @Override
-  public boolean handleRequest(VaadinSession session, VaadinRequest request,
-    VaadinResponse response) throws IOException
-  {
-    if(request.getPathInfo() != null && request.getPathInfo().startsWith(prefix))
-    {
-      if("GET".equalsIgnoreCase(request.getMethod()))
-      {
-        doGet(session, request, response);
-        return true;
-      }
-      else if("POST".equalsIgnoreCase(request.getMethod()))
-      {
-        doPost(session, request, response);
-        return true;
-      }
+    private final static Logger log = LoggerFactory.getLogger(LoginServletRequestHandler.class);
+
+    private final String prefix;
+
+    public LoginServletRequestHandler(String urlPrefix) {
+        this.prefix = urlPrefix + "/login";
     }
-    return false; 
-  }
-  
-  private void doGet(VaadinSession session, VaadinRequest request,
-    VaadinResponse response)
-  {
-    response.setContentType("text/html");
-    OutputStream out = null;
-    try
-    {
-      out = response.getOutputStream();
 
-      String htmlSource = Resources.toString(LoginServletRequestHandler.class.
-        getResource(
-        "login.html"), Charsets.UTF_8);
+    private void doGet(VaadinSession session, VaadinRequest request, VaadinResponse response) {
+        response.setContentType("text/html");
+        OutputStream out = null;
+        try {
+            out = response.getOutputStream();
 
-      htmlSource = htmlSource
-        .replaceAll("%usercaption%", "Username")
-        .replaceAll("%passwordcaption%", "Password")
-        .replaceAll("%title%", "ANNIS Login")
-        .replaceAll("%logincaption%", "Login")
-        .replaceAll("%or%", "or")
-        .replaceAll("%cancelcaption%", "Cancel");
+            String htmlSource = Resources.toString(LoginServletRequestHandler.class.getResource("login.html"),
+                    Charsets.UTF_8);
 
-      try (OutputStreamWriter writer = new OutputStreamWriter(out, Charsets.UTF_8))
-      {
-        CharStreams.copy(new StringReader(htmlSource), writer);
-        out.flush();
-      }
+            htmlSource = htmlSource.replaceAll("%usercaption%", "Username").replaceAll("%passwordcaption%", "Password")
+                    .replaceAll("%title%", "ANNIS Login").replaceAll("%logincaption%", "Login").replaceAll("%or%", "or")
+                    .replaceAll("%cancelcaption%", "Cancel");
+
+            try (OutputStreamWriter writer = new OutputStreamWriter(out, Charsets.UTF_8)) {
+                CharStreams.copy(new StringReader(htmlSource), writer);
+                out.flush();
+            }
+        } catch (IOException ex) {
+            log.error(null, ex);
+        } catch (Exception ex) {
+            log.error(null, ex);
+        } finally {
+            response.setStatus(200);
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException ex) {
+                    log.error("closing OutputStream filed", ex);
+                }
+            }
+        }
     }
-    catch (IOException ex)
-    {
-      log.error(null, ex);
+
+    private void doPost(VaadinSession session, VaadinRequest request, VaadinResponse response) throws IOException {
+
+        response.setContentType("text/html");
+
+        String username = request.getParameter("annis-login-user");
+        String password = request.getParameter("annis-login-password");
+
+        if (username != null && password != null) {
+            // forget any old user information
+            session.getSession().removeAttribute(AnnisBaseUI.USER_KEY);
+            session.getSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
+
+            // get the URL for the REST service
+            String webserviceURL = Helper.getServiceURL(VaadinSession.getCurrent());
+
+            try {
+                AnnisUser user = new AnnisUser(username, password);
+                WebResource res = user.getClient().resource(webserviceURL).path("admin").path("is-authenticated");
+                if ("true".equalsIgnoreCase(res.get(String.class))) {
+                    // everything ok, save this user configuration for re-use
+                    Helper.setUser(user);
+                }
+            } catch (ClientHandlerException ex) {
+                session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+                        "Authentification error: " + ex.getMessage());
+                response.setStatus(502); // bad gateway
+            } catch (LoginDataLostException ex) {
+                session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR, "Lost password in memory. Sorry.");
+                response.setStatus(500); // server error
+            } catch (UniformInterfaceException ex) {
+                if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+                    session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR, "Username or password wrong");
+                    response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
+                } else if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode()) {
+                    session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR, "Account has expired");
+                    response.setStatus(Response.Status.FORBIDDEN.getStatusCode()); // Forbidden
+                } else {
+                    log.error(null, ex);
+                    session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+                            "Unexpected exception: " + ex.getMessage());
+                    response.setStatus(500);
+                }
+            }
+
+            try (OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream(), Charsets.UTF_8)) {
+                String html = Resources.toString(LoginServletRequestHandler.class.getResource("closelogin.html"),
+                        Charsets.UTF_8);
+                CharStreams.copy(new StringReader(html), writer);
+            }
+
+        } // end if login attempt
+
     }
-    catch(Exception ex)
-    {
-      log.error(null, ex);
+
+    @Override
+    public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response)
+            throws IOException {
+        if (request.getPathInfo() != null && request.getPathInfo().startsWith(prefix)) {
+            if ("GET".equalsIgnoreCase(request.getMethod())) {
+                doGet(session, request, response);
+                return true;
+            } else if ("POST".equalsIgnoreCase(request.getMethod())) {
+                doPost(session, request, response);
+                return true;
+            }
+        }
+        return false;
     }
-    finally
-    {
-      response.setStatus(200);
-      if(out != null)
-      {
-        try
-        {
-          out.close();
-        }
-        catch (IOException ex)
-        {
-          log.error("closing OutputStream filed", ex);
-        }
-      }
-    }
-  }
-
-  private void doPost(VaadinSession session, VaadinRequest request,
-    VaadinResponse response) throws IOException
-  {
-    
-    response.setContentType("text/html");
-    
-    String username = request.getParameter("annis-login-user");
-    String password = request.getParameter("annis-login-password");
-
-    if (username != null && password != null)
-    {
-      // forget any old user information
-      session.getSession().removeAttribute(AnnisBaseUI.USER_KEY);
-      session.getSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
-
-      // get the URL for the REST service
-      String webserviceURL = Helper.getServiceURL(VaadinSession.getCurrent());
-
-      try
-      {
-        AnnisUser user = new AnnisUser(username, password);
-        WebResource res = user.getClient().resource(webserviceURL)
-          .path("admin").path("is-authenticated");
-        if ("true".equalsIgnoreCase(res.get(String.class)))
-        {
-          // everything ok, save this user configuration for re-use
-          Helper.setUser(user);
-        }
-      }
-      catch (ClientHandlerException ex)
-      {
-        session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-          "Authentification error: " + ex.getMessage());
-        response.setStatus(502); // bad gateway
-      }
-      catch (LoginDataLostException ex)
-      {
-        session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-          "Lost password in memory. Sorry.");
-        response.setStatus(500); // server error
-      }
-      catch (UniformInterfaceException ex)
-      {
-        if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
-          getStatusCode())
-        {
-          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-            "Username or password wrong");
-          response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
-        }
-        else if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.
-          getStatusCode())
-        {
-          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-            "Account has expired");
-          response.setStatus(Response.Status.FORBIDDEN.getStatusCode()); // Forbidden
-        }
-        else
-        {
-          log.error(null, ex);
-          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-            "Unexpected exception: " + ex.getMessage());
-          response.setStatus(500);
-        }
-      }
-
-      try (OutputStreamWriter writer = new OutputStreamWriter(response.
-        getOutputStream(), Charsets.UTF_8)) 
-      {
-        String html = Resources.toString(LoginServletRequestHandler.class.getResource(
-          "closelogin.html"), Charsets.UTF_8);
-        CharStreams.copy(new StringReader(html), writer);
-      }
-
-    } // end if login attempt
-
-  }
 }

@@ -15,15 +15,6 @@
  */
 package annis.service.internal;
 
-import java.util.concurrent.BlockingQueue;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Queues;
-
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
 import annis.service.objects.ImportJob;
@@ -33,6 +24,12 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Queues;
+import java.util.concurrent.BlockingQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -55,19 +52,6 @@ public class ImportWorker extends Thread {
         addAppender();
     }
 
-    @Override
-    public void run() {
-        while (isAlive()) {
-            try {
-                currentJob = importQueue.take();
-                importSingleCorpusFile(currentJob);
-            } catch (InterruptedException ex) {
-                log.error(null, ex);
-                break;
-            }
-        }
-    }
-
     private void addAppender() {
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         JoranConfigurator jc = new JoranConfigurator();
@@ -85,6 +69,20 @@ public class ImportWorker extends Thread {
         ch.qos.logback.classic.Logger rootLogger = lc.getLogger(Logger.ROOT_LOGGER_NAME);
         rootLogger.addAppender(appender);
         appender.start();
+    }
+
+    public ImportJob getCurrentJob() {
+        return currentJob;
+    }
+
+    public ImportJob getFinishedJob(String uuid) {
+        ImportJob job = finishedJobs.getIfPresent(uuid);
+        finishedJobs.invalidate(uuid);
+        return job;
+    }
+
+    public BlockingQueue<ImportJob> getImportQueue() {
+        return importQueue;
     }
 
     private void importSingleCorpusFile(ImportJob job) {
@@ -112,18 +110,17 @@ public class ImportWorker extends Thread {
         finishedJobs.put(currentJob.getUuid(), currentJob);
     }
 
-    public ImportJob getFinishedJob(String uuid) {
-        ImportJob job = finishedJobs.getIfPresent(uuid);
-        finishedJobs.invalidate(uuid);
-        return job;
-    }
-
-    public BlockingQueue<ImportJob> getImportQueue() {
-        return importQueue;
-    }
-
-    public ImportJob getCurrentJob() {
-        return currentJob;
+    @Override
+    public void run() {
+        while (isAlive()) {
+            try {
+                currentJob = importQueue.take();
+                importSingleCorpusFile(currentJob);
+            } catch (InterruptedException ex) {
+                log.error(null, ex);
+                break;
+            }
+        }
     }
 
 }

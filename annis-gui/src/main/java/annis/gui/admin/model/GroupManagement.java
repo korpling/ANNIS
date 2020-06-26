@@ -32,98 +32,78 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A model for groups.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class GroupManagement implements Serializable
-{
-  
-  private final Logger log = LoggerFactory.getLogger(GroupManagement.class);
-  
-  private final Map<String, Group> groups = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
-  
-  private WebResourceProvider webResourceProvider;
-  
-  public void clear()
-  {
-    groups.clear();
-  }
-  
-  public boolean fetchFromService()
-  {
-    if(webResourceProvider != null)
-    {
-      WebResource res = webResourceProvider
-        .getWebResource().path("admin/groups");
-      groups.clear();
-      try
-      {
-        List<Group> list = res.get(new GenericType<List<Group>>() {});
-        for(Group g : list)
-        {
-          groups.put(g.getName(), g);
+public class GroupManagement implements Serializable {
+
+    private static final long serialVersionUID = 7099096327534717378L;
+
+    private final Logger log = LoggerFactory.getLogger(GroupManagement.class);
+
+    private final Map<String, Group> groups = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
+
+    private WebResourceProvider webResourceProvider;
+
+    public void clear() {
+        groups.clear();
+    }
+
+    public void createOrUpdateGroup(Group newGroup) {
+        if (webResourceProvider != null) {
+            WebResource res = webResourceProvider.getWebResource().path("admin/groups").path(newGroup.getName());
+            try {
+                res.put(newGroup);
+                groups.put(newGroup.getName(), newGroup);
+            } catch (UniformInterfaceException ex) {
+                log.warn("Could not update group", ex);
+            }
+
         }
-        return true;
-      }
-      catch(UniformInterfaceException ex)
-      {
-        log.error("Could not get the list of groups", ex);
-      }
     }
-    return false;
-  }
-  
-  public void createOrUpdateGroup(Group newGroup)
-  {
-    if(webResourceProvider != null)
-    {
-      WebResource res = webResourceProvider.getWebResource()
-        .path("admin/groups").path(newGroup.getName());
-      try
-      {
-        res.put(newGroup);
-        groups.put(newGroup.getName(), newGroup);
-      }
-      catch(UniformInterfaceException ex)
-      {
-        log.warn("Could not update group", ex);
-      }
-      
-    }
-  }
-  
-  public void deleteGroup(String groupName)
-  {
-    if(webResourceProvider != null)
-    {
-      WebResource res = webResourceProvider
-        .getWebResource().path("admin/groups").path(groupName);
-      res.delete();
-      groups.remove(groupName);
-    }
-  }
-  
-  public Group getGroup(String groupName)
-  {
-    return groups.get(groupName);
-  }
-  
-  public Collection<Group> getGroups()
-  {
-    return groups.values();
-  }
-  
-  public ImmutableSet<String> getGroupNames()
-  {
-    return ImmutableSet.copyOf(groups.keySet());
-  }
 
-  public WebResourceProvider getWebResourceProvider()
-  {
-    return webResourceProvider;
-  }
+    public void deleteGroup(String groupName) {
+        if (webResourceProvider != null) {
+            WebResource res = webResourceProvider.getWebResource().path("admin/groups").path(groupName);
+            res.delete();
+            groups.remove(groupName);
+        }
+    }
 
-  public void setWebResourceProvider(WebResourceProvider webResourceProvider)
-  {
-    this.webResourceProvider = webResourceProvider;
-  }
+    public boolean fetchFromService() {
+        if (webResourceProvider != null) {
+            WebResource res = webResourceProvider.getWebResource().path("admin/groups");
+            groups.clear();
+            try {
+                List<Group> list = res.get(new GenericType<List<Group>>() {});
+                for (Group g : list) {
+                    groups.put(g.getName(), g);
+                }
+                return true;
+            } catch (UniformInterfaceException ex) {
+                log.error("Could not get the list of groups", ex);
+            }
+        }
+        return false;
+    }
+
+    public Group getGroup(String groupName) {
+        return groups.get(groupName);
+    }
+
+    public ImmutableSet<String> getGroupNames() {
+        return ImmutableSet.copyOf(groups.keySet());
+    }
+
+    public Collection<Group> getGroups() {
+        return groups.values();
+    }
+
+    public WebResourceProvider getWebResourceProvider() {
+        return webResourceProvider;
+    }
+
+    public void setWebResourceProvider(WebResourceProvider webResourceProvider) {
+        this.webResourceProvider = webResourceProvider;
+    }
 }

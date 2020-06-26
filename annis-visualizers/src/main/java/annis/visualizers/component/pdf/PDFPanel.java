@@ -1,48 +1,41 @@
 /*
  * Copyright 2013 SFB 632.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.visualizers.component.pdf;
 
 import static annis.libgui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
 import static annis.libgui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.apache.commons.lang3.Validate;
-
+import annis.CommonHelper;
+import annis.libgui.Helper;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.service.objects.AnnisBinaryMetaData;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
-import com.vaadin.ui.UI;
-
-import annis.CommonHelper;
-import annis.libgui.Helper;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.service.objects.AnnisBinaryMetaData;
+import java.util.List;
+import java.util.UUID;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Inits the wrapper for the pdf visualization. Neccesary steps for this are:
  * <ul>
  * <li>get the link for the pdf file</li>
  * <li>set the start and end page</li>
- * <li>get a unique id for the wrapper, so pdf.js knows where to create the
- * canvas to.</li>
+ * <li>get a unique id for the wrapper, so pdf.js knows where to create the canvas to.</li>
  * </ul>
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
@@ -50,9 +43,13 @@ import annis.service.objects.AnnisBinaryMetaData;
 @JavaScript({"pdf.js", "pdf_connector.js"})
 public class PDFPanel extends AbstractJavaScriptComponent {
 
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 4956567915350147892L;
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   private final static Escaper urlParamEscape = UrlEscapers.urlPathSegmentEscaper();
-  
+
   private VisualizerInput input;
 
   private int firstPage;
@@ -72,7 +69,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
       firstPage = Integer.parseInt(PAGE_NO_VALID_NUMBER);
       lastPage = -1;
     }
-     // if the last page is not defined, set it to the first page.
+    // if the last page is not defined, set it to the first page.
     if (page.split(PAGE_NUMBER_SEPERATOR).length > 1) {
       lastPage = Integer.parseInt(page.split(PAGE_NUMBER_SEPERATOR)[1]);
     } else {
@@ -83,11 +80,6 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     PDF_ID = "pdf-" + UUID.randomUUID();
     setId(PDF_ID);
     addStyleName("pdf-panel");
-  }
-
-  @Override
-  protected PDFState getState() {
-    return (PDFState) super.getState();
   }
 
   @Override
@@ -104,19 +96,16 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
   private String getBinaryPath() {
     List<String> corpusPath =
-            CommonHelper.getCorpusPath(input.getDocument().getGraph(),
-            input.getDocument());
+        CommonHelper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     String documentName = corpusPath.get(0);
     corpusName = urlPathEscape.escape(corpusName);
     documentName = urlPathEscape.escape(documentName);
 
-    WebResource resMeta = Helper.getAnnisWebResource(input.getUI()).path(
-            "meta/binary").path(corpusName).path(documentName);
-    List<AnnisBinaryMetaData> meta = resMeta.get(
-            new GenericType<List<AnnisBinaryMetaData>>() {
-    });
+    WebResource resMeta = Helper.getAnnisWebResource(input.getUI()).path("meta/binary")
+        .path(corpusName).path(documentName);
+    List<AnnisBinaryMetaData> meta = resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
 
     // if there is no document at all don't fail
     String mimeType = meta.size() > 0 ? null : "application/pdf";
@@ -128,18 +117,21 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     }
 
     Validate.notNull(mimeType,
-            "There must be at least one binary file for the document with a video mime type");
+        "There must be at least one binary file for the document with a video mime type");
 
     String mimeTypeEncoded = mimeType;
     mimeTypeEncoded = urlParamEscape.escape(mimeType);
-    
-    return input.getContextPath() + "/Binary?"
-            + "documentName=" + documentName
-            + "&toplevelCorpusName=" + corpusName
-            + "&mime=" + mimeTypeEncoded;
+
+    return input.getContextPath() + "/Binary?" + "documentName=" + documentName
+        + "&toplevelCorpusName=" + corpusName + "&mime=" + mimeTypeEncoded;
   }
 
   public String getPDF_ID() {
     return PDF_ID;
+  }
+
+  @Override
+  protected PDFState getState() {
+    return (PDFState) super.getState();
   }
 }

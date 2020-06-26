@@ -15,27 +15,23 @@
  */
 package annis.rest.provider;
 
+import annis.exceptions.AnnisTimeoutException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
-import annis.exceptions.AnnisTimeoutException;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Provider
-public class AnnisTimeoutExceptionMapper implements ExceptionMapper<AnnisTimeoutException>
-{
+public class AnnisTimeoutExceptionMapper implements ExceptionMapper<AnnisTimeoutException> {
 
-  @Override
-  public Response toResponse(AnnisTimeoutException ex)
-  {
-    // default
-    return Response.status(504).entity(ex.getMessage()).build();
-    
-  }
-  
-  
+    @Override
+    public Response toResponse(AnnisTimeoutException ex) {
+        // default
+        return Response.status(504).entity(ex.getMessage()).build();
+
+    }
+
 }

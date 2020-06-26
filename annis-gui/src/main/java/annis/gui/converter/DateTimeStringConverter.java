@@ -16,54 +16,47 @@
 
 package annis.gui.converter;
 
+import com.vaadin.v7.data.util.converter.Converter;
 import java.util.Locale;
-
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
-
-import com.vaadin.v7.data.util.converter.Converter;
-import com.vaadin.v7.data.util.converter.Converter.ConversionException;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class DateTimeStringConverter implements Converter<String, DateTime>
-{
-  @Override
-  public DateTime convertToModel(String value,
-    Class<? extends DateTime> targetType, Locale locale) throws ConversionException
-  {
-    if(value == null)
-    {
-      return null;
+public class DateTimeStringConverter implements Converter<String, DateTime> {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7364535014856578107L;
+
+    @Override
+    public DateTime convertToModel(String value, Class<? extends DateTime> targetType, Locale locale)
+            throws ConversionException {
+        if (value == null) {
+            return null;
+        }
+        return ISODateTimeFormat.dateParser().parseDateTime(value);
     }
-    return ISODateTimeFormat.dateParser().parseDateTime(value);
-  }
 
-  @Override
-  public String convertToPresentation(DateTime value,
-    Class<? extends String> targetType, Locale locale) throws ConversionException
-  {
-    if(value == null)
-    {
-      return null;
+    @Override
+    public String convertToPresentation(DateTime value, Class<? extends String> targetType, Locale locale)
+            throws ConversionException {
+        if (value == null) {
+            return null;
+        }
+        return ISODateTimeFormat.date().print(value);
     }
-    return ISODateTimeFormat.date().print(value);
-  }
 
-  @Override
-  public Class<DateTime> getModelType()
-  {
-    return DateTime.class;
-  }
+    @Override
+    public Class<DateTime> getModelType() {
+        return DateTime.class;
+    }
 
-  @Override
-  public Class<String> getPresentationType()
-  {
-    return String.class;
-  }
+    @Override
+    public Class<String> getPresentationType() {
+        return String.class;
+    }
 
-  
-  
 }

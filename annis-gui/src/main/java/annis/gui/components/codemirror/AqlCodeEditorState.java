@@ -29,86 +29,83 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-//state of the AqlCodeEditor-component
-public class AqlCodeEditorState extends JavaScriptComponentState
-{
+// state of the AqlCodeEditor-component
+public class AqlCodeEditorState extends JavaScriptComponentState {
 
-  /**
-   * The current text of the editor *
-   */
-  public String text = "";
+    /**
+     * Class that is suitable of transporting the parse error state via JSON to the
+     * client.
+     */
+    @XmlRootElement
+    public static class ParseError implements Serializable {
 
-  public String inputPrompt = "";
+        private static final long serialVersionUID = -5677925443009922921L;
 
-  public final List<ParseError> errors = new ArrayList<>();
+        public int startLine;
 
-  public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(
-    new StringComparator());
+        public int startColumn;
 
-  public String textareaClass;
+        public int endLine;
 
-  /**
-   * Everytime the server wants to set the {@link #text} variable this counter
-   * needs to be increased.
-   */
-  public long serverRequestCounter = 0;
+        public int endColumn;
 
-  /**
-   * An explictly {@link Serializable} {@link Comparator} for strings.
-   */
-  private static class StringComparator implements Comparator<String>,
-    Serializable
-  {
+        public String message;
 
-    @Override
-    public int compare(String o1, String o2)
-    {
-      if (o1 == null || o2 == null)
-      {
-        throw new NullPointerException();
-      }
-      return o1.compareTo(o2);
+        public ParseError() {
+            // use the same defaults as the original class
+            this(new AqlParseError());
+        }
+
+        public ParseError(AqlParseError orig) {
+            this(orig.getLocation(), orig.getMessage());
+        }
+
+        public ParseError(ParsedEntityLocation location, String message) {
+            this.startLine = location.getStartLine();
+            this.startColumn = location.getStartColumn();
+            this.endLine = location.getEndLine();
+            this.endColumn = location.getEndColumn();
+            this.message = message;
+        }
+
     }
 
-  }
+    /**
+     * An explictly {@link Serializable} {@link Comparator} for strings.
+     */
+    private static class StringComparator implements Comparator<String>, Serializable {
 
-  /**
-   * Class that is suitable of transporting the parse error state via JSON to the client.
-   */
-  @XmlRootElement
-  public static class ParseError implements Serializable
-  {
+        private static final long serialVersionUID = -2949588142652208669L;
 
-    public int startLine;
+        @Override
+        public int compare(String o1, String o2) {
+            if (o1 == null || o2 == null) {
+                throw new NullPointerException();
+            }
+            return o1.compareTo(o2);
+        }
 
-    public int startColumn;
-
-    public int endLine;
-
-    public int endColumn;
-    
-    public String message;
-    
-    public ParseError()
-    {
-      // use the same defaults as the original class
-      this(new AqlParseError());
-    }
-    
-    public ParseError(AqlParseError orig)
-    {
-      this(orig.getLocation(), orig.getMessage());
-    }
-    
-    public ParseError(ParsedEntityLocation location, String message)
-    {
-      this.startLine = location.getStartLine();
-      this.startColumn = location.getStartColumn();
-      this.endLine = location.getEndLine();
-      this.endColumn = location.getEndColumn();
-      this.message = message;
     }
 
-  }
+    private static final long serialVersionUID = -9042515261512849313L;
+
+    /**
+     * The current text of the editor *
+     */
+    public String text = "";
+
+    public String inputPrompt = "";
+
+    public final List<ParseError> errors = new ArrayList<>();
+
+    public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator());
+
+    public String textareaClass;
+
+    /**
+     * Everytime the server wants to set the {@link #text} variable this counter
+     * needs to be increased.
+     */
+    public long serverRequestCounter = 0;
 
 }

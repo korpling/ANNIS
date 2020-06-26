@@ -1,32 +1,31 @@
 package annis.sqlgen;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import org.apache.commons.dbutils.handlers.AbstractListHandler;
-
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisAttribute.SubType;
 import annis.service.objects.AnnisAttribute.Type;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import org.apache.commons.dbutils.handlers.AbstractListHandler;
 
 public class AnnisAttributeHelper extends AbstractListHandler<AnnisAttribute> {
 
     @Override
     public AnnisAttribute handleRow(ResultSet rs) throws SQLException {
         AnnisAttribute result = new AnnisAttribute();
-        
+
         result.setName(rs.getString("name"));
         String typeRaw = rs.getString("type");
-        if(typeRaw != null) {
+        if (typeRaw != null) {
             result.setType(Type.valueOf(typeRaw));
         }
         String subTypeRaw = rs.getString("sub_type");
-        if(subTypeRaw != null) {
+        if (subTypeRaw != null) {
             result.setSubtype(SubType.valueOf(subTypeRaw));
         }
         String edgeName = rs.getString("edge_name");
         result.setEdgeName(edgeName);
         String value = rs.getString("value");
-        if(value != null) {
+        if (value != null) {
             result.getValueSet().add(value);
         }
         return result;

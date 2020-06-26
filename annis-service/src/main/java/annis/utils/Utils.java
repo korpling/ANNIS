@@ -25,95 +25,76 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Utils
-{
-  
-  private static final Logger log = LoggerFactory.getLogger(Utils.class);
+public class Utils {
 
-  public static File getAnnisHomeLocation()
-  {
-    String annisHome = System.getProperty("annis.home");
-    Validate.notNull(annisHome);
-    File fAnnisHome = new File(annisHome);
-    return fAnnisHome;
-  }
-  
-  public static File getAnnisFile(String subpath)
-  {
-    File annisConfig = getAnnisHomeLocation();
-    return new File(annisConfig, subpath);
-  }
-  
-  public static String min(List<Long> runtimeList)
-  {
-    long min = Long.MAX_VALUE;
-    for (long value : runtimeList)
-    {
-      min = Math.min(min, value);
-    }
-    return String.valueOf(min);
-  }
+    private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
-  public static String max(List<Long> runtimeList)
-  {
-    long max = Long.MIN_VALUE;
-    for (long value : runtimeList)
-    {
-      max = Math.max(max, value);
-    }
-    return String.valueOf(max);
-  }
+    public static String avg(List<Long> runtimeList) {
+        if (runtimeList.isEmpty()) {
+            return "";
+        }
 
-  public static String avg(List<Long> runtimeList)
-  {
-    if (runtimeList.isEmpty())
-    {
-      return "";
+        long sum = 0;
+        for (long value : runtimeList) {
+            sum += value;
+        }
+        return String.valueOf(sum / runtimeList.size());
     }
 
-    long sum = 0;
-    for (long value : runtimeList)
-    {
-      sum += value;
-    }
-    return String.valueOf(sum / runtimeList.size());
-  }
+    /** Hashes a string using SHA-256. */
+    public static String calculateSHAHash(String s) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(s.getBytes("UTF-8"));
+        byte[] digest = md.digest();
 
-  public static Long[] split2Long(String text, char seperator)
-  {
-    String[] str = StringUtils.split(text, seperator);
-    Long[] lng = new Long[str.length];
+        StringBuilder hashVal = new StringBuilder();
+        for (byte b : digest) {
+            hashVal.append(String.format("%02x", b));
+        }
 
-    for (int i = 0; i < lng.length; i++)
-    {
-      try
-      {
-        lng[i] = Long.parseLong(str[i]);
-      }
-      catch (NumberFormatException ex)
-      {
-        log.error(
-          "Could not parse long value, assuming \"0\" as default", ex);
-      }
+        return hashVal.toString();
     }
 
-    return lng;
-  }
-
-  /** Hashes a string using SHA-256. */
-  public static String calculateSHAHash(String s) throws
-    NoSuchAlgorithmException, UnsupportedEncodingException
-  {
-    MessageDigest md = MessageDigest.getInstance("SHA-256");
-    md.update(s.getBytes("UTF-8"));
-    byte[] digest = md.digest();
-
-    StringBuilder hashVal = new StringBuilder();
-    for (byte b : digest)
-    {
-      hashVal.append(String.format("%02x", b));
+    public static File getAnnisFile(String subpath) {
+        File annisConfig = getAnnisHomeLocation();
+        return new File(annisConfig, subpath);
     }
 
-    return hashVal.toString();
-  }
+    public static File getAnnisHomeLocation() {
+        String annisHome = System.getProperty("annis.home");
+        Validate.notNull(annisHome);
+        File fAnnisHome = new File(annisHome);
+        return fAnnisHome;
+    }
+
+    public static String max(List<Long> runtimeList) {
+        long max = Long.MIN_VALUE;
+        for (long value : runtimeList) {
+            max = Math.max(max, value);
+        }
+        return String.valueOf(max);
+    }
+
+    public static String min(List<Long> runtimeList) {
+        long min = Long.MAX_VALUE;
+        for (long value : runtimeList) {
+            min = Math.min(min, value);
+        }
+        return String.valueOf(min);
+    }
+
+    public static Long[] split2Long(String text, char seperator) {
+        String[] str = StringUtils.split(text, seperator);
+        Long[] lng = new Long[str.length];
+
+        for (int i = 0; i < lng.length; i++) {
+            try {
+                lng[i] = Long.parseLong(str[i]);
+            } catch (NumberFormatException ex) {
+                log.error("Could not parse long value, assuming \"0\" as default", ex);
+            }
+        }
+
+        return lng;
+    }
 }
