@@ -46,6 +46,7 @@ import org.corpus_tools.annis.CorporaApi;
 import org.corpus_tools.annis.CorpusList;
 import org.corpus_tools.annis.FindQuery;
 import org.corpus_tools.annis.SearchApi;
+import org.corpus_tools.annis.FindQuery.OrderEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,9 +173,13 @@ public class CorpusBrowserPanel extends Panel {
                 c.add(corpus);
                 FindQuery q = new FindQuery();
                 q.setCorpora(c);
+                q.setQuery("annis:node_type=\"corpus\" _ident_ " + getQName(a.getKey()));
+                // Not sorting the results is much faster, especially if we only fetch the first item
+                // (we are only interested if a match exists, not how many items or which one)
+                q.setOrder(OrderEnum.NOTSORTED);
                 q.setLimit(1);
                 q.setOffset(0);
-                q.setQuery("node @* " + getQName(a.getKey()));
+
                 q.setQueryLanguage(org.corpus_tools.annis.QueryLanguage.AQL);
                 try {
                     String findResult = search.find(q);

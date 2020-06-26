@@ -27,7 +27,7 @@ import java.util.List;
  * Defines a subgraph of an annotation graph using node IDs and a context.
  */
 @Schema(description = "Defines a subgraph of an annotation graph using node IDs and a context.")
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-24T14:51:23.486442+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-26T15:55:16.485632+02:00[Europe/Berlin]")
 public class SubgraphWithContext {
   @SerializedName("node_ids")
   private List<String> nodeIds = null;

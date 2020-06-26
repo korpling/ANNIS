@@ -26,7 +26,7 @@ import org.corpus_tools.annis.AnnoKey;
  * An annotation with a qualified name and a value.
  */
 @Schema(description = "An annotation with a qualified name and a value.")
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-24T14:51:23.486442+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-26T15:55:16.485632+02:00[Europe/Berlin]")
 public class Annotation {
   @SerializedName("key")
   private AnnoKey key = null;

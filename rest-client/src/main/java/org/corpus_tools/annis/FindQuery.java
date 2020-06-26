@@ -27,7 +27,7 @@ import org.corpus_tools.annis.QueryLanguage;
  * Query definition to find matches
  */
 @Schema(description = "Query definition to find matches")
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-24T14:51:23.486442+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-26T15:55:16.485632+02:00[Europe/Berlin]")
 public class FindQuery {
   @SerializedName("query")
   private String query = null;
@@ -43,6 +43,52 @@ public class FindQuery {
 
   @SerializedName("offset")
   private Integer offset = 0;
+
+  /**
+   * Gets or Sets order
+   */
+  @JsonAdapter(OrderEnum.Adapter.class)
+  public enum OrderEnum {
+    NORMAL("Normal"),
+    INVERTED("Inverted"),
+    RANDOMIZED("Randomized"),
+    NOTSORTED("NotSorted");
+
+    private String value;
+
+    OrderEnum(String value) {
+      this.value = value;
+    }
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+    public static OrderEnum fromValue(String text) {
+      for (OrderEnum b : OrderEnum.values()) {
+        if (String.valueOf(b.value).equals(text)) {
+          return b;
+        }
+      }
+      return null;
+    }
+    public static class Adapter extends TypeAdapter<OrderEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final OrderEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public OrderEnum read(final JsonReader jsonReader) throws IOException {
+        String value = jsonReader.nextString();
+        return OrderEnum.fromValue(String.valueOf(value));
+      }
+    }
+  }  @SerializedName("order")
+  private OrderEnum order = OrderEnum.NORMAL;
 
   public FindQuery query(String query) {
     this.query = query;
@@ -134,6 +180,24 @@ public class FindQuery {
     this.offset = offset;
   }
 
+  public FindQuery order(OrderEnum order) {
+    this.order = order;
+    return this;
+  }
+
+   /**
+   * Get order
+   * @return order
+  **/
+  @Schema(description = "")
+  public OrderEnum getOrder() {
+    return order;
+  }
+
+  public void setOrder(OrderEnum order) {
+    this.order = order;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -148,12 +212,13 @@ public class FindQuery {
         Objects.equals(this.queryLanguage, findQuery.queryLanguage) &&
         Objects.equals(this.corpora, findQuery.corpora) &&
         Objects.equals(this.limit, findQuery.limit) &&
-        Objects.equals(this.offset, findQuery.offset);
+        Objects.equals(this.offset, findQuery.offset) &&
+        Objects.equals(this.order, findQuery.order);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(query, queryLanguage, corpora, limit, offset);
+    return Objects.hash(query, queryLanguage, corpora, limit, offset, order);
   }
 
 
@@ -167,6 +232,7 @@ public class FindQuery {
     sb.append("    corpora: ").append(toIndentedString(corpora)).append("\n");
     sb.append("    limit: ").append(toIndentedString(limit)).append("\n");
     sb.append("    offset: ").append(toIndentedString(offset)).append("\n");
+    sb.append("    order: ").append(toIndentedString(order)).append("\n");
     sb.append("}");
     return sb.toString();
   }
