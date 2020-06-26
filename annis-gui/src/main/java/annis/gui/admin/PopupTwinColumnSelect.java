@@ -37,6 +37,7 @@ import java.util.TreeSet;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
+@SuppressWarnings("rawtypes")
 public class PopupTwinColumnSelect extends CustomField<Set> {
 
     public static class StringItemSorter implements ItemSorter {

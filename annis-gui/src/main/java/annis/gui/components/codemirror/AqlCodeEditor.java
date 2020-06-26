@@ -101,7 +101,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     }
 
     @Override
-    public Property getPropertyDataSource() {
+    public Property<String> getPropertyDataSource() {
         return this.dataSource;
     }
 

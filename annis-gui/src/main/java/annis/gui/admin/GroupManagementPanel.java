@@ -124,7 +124,7 @@ public class GroupManagementPanel extends Panel implements GroupListView {
         public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException {
             Property<?> p = item.getItemProperty(propertyId);
             if (p.getValue() instanceof Set) {
-                Set val = (Set) p.getValue();
+                Set<?> val = (Set<?>) p.getValue();
                 for (Object o : val) {
                     if ((o.toString().toLowerCase()).contains(pattern)) {
                         return true;

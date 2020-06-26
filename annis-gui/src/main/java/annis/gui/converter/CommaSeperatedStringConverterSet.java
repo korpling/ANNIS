@@ -26,6 +26,7 @@ import java.util.TreeSet;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
+@SuppressWarnings("rawtypes")
 public class CommaSeperatedStringConverterSet implements Converter<String, TreeSet> {
 
     /**

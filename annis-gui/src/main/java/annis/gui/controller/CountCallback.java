@@ -46,7 +46,7 @@ public class CountCallback implements Runnable {
 
     @Override
     public void run() {
-        Future futureCount = ui.getQueryState().getExecutedTasks().get(QueryUIState.QueryType.COUNT);
+        Future<?> futureCount = ui.getQueryState().getExecutedTasks().get(QueryUIState.QueryType.COUNT);
         final MatchAndDocumentCount countResult;
         MatchAndDocumentCount tmpCountResult = null;
         if (futureCount != null) {

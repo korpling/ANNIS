@@ -92,7 +92,7 @@ public class DocBrowserController implements Serializable {
 
             final boolean createVis = !initiatedVis.containsKey(canonicalTitle);
 
-            final VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(type);
+            final VisualizerPlugin<?> visualizer = ((PluginSystem) ui).getVisualizer(type);
 
             List<String> nodeAnnoFilter = null;
             if (visualizer instanceof FilteringVisualizerPlugin) {

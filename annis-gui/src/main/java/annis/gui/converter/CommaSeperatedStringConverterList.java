@@ -26,6 +26,7 @@ import java.util.Locale;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
+@SuppressWarnings("rawtypes")
 public class CommaSeperatedStringConverterList implements Converter<String, List> {
 
     /**
@@ -38,7 +39,7 @@ public class CommaSeperatedStringConverterList implements Converter<String, List
     private static final Joiner joiner = Joiner.on(", ");
 
     @Override
-    public List convertToModel(String value, Class<? extends List> targetType, Locale locale)
+    public List<?> convertToModel(String value, Class<? extends List> targetType, Locale locale)
             throws ConversionException {
         List<String> result = new ArrayList<>();
         for (String s : splitter.split(value)) {
