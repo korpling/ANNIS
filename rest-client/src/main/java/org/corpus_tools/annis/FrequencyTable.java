@@ -22,7 +22,7 @@ import org.corpus_tools.annis.FrequencyTableRow;
  * Definition of the result of a &#x60;frequency&#x60; query. This is an array of rows, and each row is an array of columns with the different attribute values and a number of matches having this combination of attribute values. 
  */
 @Schema(description = "Definition of the result of a `frequency` query. This is an array of rows, and each row is an array of columns with the different attribute values and a number of matches having this combination of attribute values. ")
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-24T14:51:23.486442+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-26T15:55:16.485632+02:00[Europe/Berlin]")
 public class FrequencyTable extends ArrayList<FrequencyTableRow> {
 
   @Override

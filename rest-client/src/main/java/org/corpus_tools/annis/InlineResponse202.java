@@ -25,7 +25,7 @@ import java.io.IOException;
  * The UUID for the background job. Status can be queried via the /job endpoint and this UUID.
  */
 @Schema(description = "The UUID for the background job. Status can be queried via the /job endpoint and this UUID.")
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-24T14:51:23.486442+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-26T15:55:16.485632+02:00[Europe/Berlin]")
 public class InlineResponse202 {
   @SerializedName("uuid")
   private String uuid = null;

@@ -30,7 +30,7 @@ import org.corpus_tools.annis.QueryLanguage;
  * Query definition to find matches
  */
 @Schema(description = "Query definition to find matches")
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-24T14:51:23.486442+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.JavaClientCodegen", date = "2020-06-26T15:55:16.485632+02:00[Europe/Berlin]")
 public class FrequencyQuery {
   @SerializedName("query")
   private String query = null;
