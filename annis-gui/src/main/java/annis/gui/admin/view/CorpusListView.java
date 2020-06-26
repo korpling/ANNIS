@@ -25,14 +25,13 @@ import java.util.Set;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface CorpusListView extends Serializable
-{
-  public void addListener(Listener listener);
-  public void setAvailableCorpora(Collection<AnnisCorpus> corpora);
-  
-  public interface Listener
-  {
-    public void deleteCorpora(Set<String> corpusName);
+public interface CorpusListView extends Serializable {
+    public interface Listener {
+        public void deleteCorpora(Set<String> corpusName);
 
-  }
+    }
+
+    public void addListener(Listener listener);
+
+    public void setAvailableCorpora(Collection<AnnisCorpus> corpora);
 }

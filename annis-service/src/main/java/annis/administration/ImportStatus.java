@@ -23,68 +23,72 @@ import java.util.Map;
  * Collects the exceptions (throwables) from an import process and provides
  * several methods for extracting them.
  */
-public interface ImportStatus extends Serializable
-{
+public interface ImportStatus extends Serializable {
 
-  /**
-   * Set status of import
-   *
-   * @param status true, if everything is fine.
-   */
-  public void setStatus(boolean status);
+    /**
+     * Makes an conjuction of the {@link ImportStatus}, which means that if at least
+     * one import failed the status is set to false.
+     *
+     * @param importStats
+     *            The imported statistics which are connected.
+     */
+    public void add(ImportStatus importStats);
 
-  /**
-   * Identifies the general success of an import. When at least one corpus
-   * import fails, this returns false.
-   *
-   * @return the import status.
-   */
-  public boolean getStatus();
+    /**
+     * Assigns every Exception to a corpus.
+     *
+     * @param corpusName
+     *            the name of the corpus
+     * @param ex
+     *            the exception
+     */
+    public void addException(String corpusName, Throwable ex);
 
-  /**
-   * Returns all throwables.
-   *
-   * @return empty if no exceptions occurs.
-   */
-  public List<Throwable> getThrowables();
+    public Map<String, List<Throwable>> getAllThrowable();
 
-  /**
-   * Returns all excecptions.
-   *
-   * @return empty if no exceptions occurs.
-   */
-  public List<Exception> getExceptions();
+    /**
+     * Returns all excecptions.
+     *
+     * @return empty if no exceptions occurs.
+     */
+    public List<Exception> getExceptions();
 
-  /**
-   * Returns all throwables of a specific corpus.
-   *
-   * @param corpusName the name of the corpus
-   * @return null if no error occured with this corpus.
-   */
-  public List<Throwable> getThrowable(String corpusName);
+    /**
+     * Identifies the general success of an import. When at least one corpus import
+     * fails, this returns false.
+     *
+     * @return the import status.
+     */
+    public boolean getStatus();
 
-  public Map<String, List<Throwable>> getAllThrowable();
+    /**
+     * Returns all throwables of a specific corpus.
+     *
+     * @param corpusName
+     *            the name of the corpus
+     * @return null if no error occured with this corpus.
+     */
+    public List<Throwable> getThrowable(String corpusName);
 
-  /**
-   * Assigns every Exception to a corpus.
-   *
-   * @param corpusName the name of the corpus
-   * @param ex the exception
-   */
-  public void addException(String corpusName, Throwable ex);
+    /**
+     * Returns all throwables.
+     *
+     * @return empty if no exceptions occurs.
+     */
+    public List<Throwable> getThrowables();
 
-  /**
-   * Makes an conjuction of the {@link ImportStatus}, which means that if at
-   * least one import failed the status is set to false.
-   *
-   * @param importStats The imported statistics which are connected.
-   */
-  public void add(ImportStatus importStats);
+    public String printDetails();
 
-  public String printMessages();
+    public String printMessages();
 
-  public String printDetails();
+    public String printType();
 
-  public String printType();
-  
+    /**
+     * Set status of import
+     *
+     * @param status
+     *            true, if everything is fine.
+     */
+    public void setStatus(boolean status);
+
 }

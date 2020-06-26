@@ -21,7 +21,6 @@ import java.io.Serializable;
  *
  * @author thomas
  */
-public interface PagingCallback extends Serializable
-{
-  public void switchPage(long offset, int limit);
+public interface PagingCallback extends Serializable {
+    public void switchPage(long offset, int limit);
 }

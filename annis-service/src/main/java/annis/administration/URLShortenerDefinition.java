@@ -1,5 +1,16 @@
 package annis.administration;
 
+import annis.CommonHelper;
+import annis.QueryGenerator;
+import annis.dao.QueryDao;
+import annis.exceptions.AnnisTimeoutException;
+import annis.model.DisplayedResultQuery;
+import annis.model.Query;
+import annis.service.objects.Match;
+import annis.service.objects.MatchAndDocumentCount;
+import annis.service.objects.QueryLanguage;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.common.base.Joiner;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,16 +30,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
-
-import com.google.common.base.Joiner;
-
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
@@ -40,54 +47,11 @@ import org.joda.time.format.DateTimeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import annis.CommonHelper;
-import annis.QueryGenerator;
-import annis.dao.QueryDao;
-import annis.exceptions.AnnisTimeoutException;
-import annis.model.DisplayedResultQuery;
-import annis.model.Query;
-import annis.service.objects.Match;
-import annis.service.objects.MatchAndDocumentCount;
-import annis.service.objects.QueryLanguage;
-import annis.sqlgen.extensions.LimitOffsetQueryData;
-
 public class URLShortenerDefinition {
 
     private final static Logger log = LoggerFactory.getLogger(URLShortenerDefinition.class);
 
-    private URI uri;
-    private DisplayedResultQuery query;
-    private UUID uuid;
-    private DateTime creationTime;
-    private Set<String> unknownCorpora = new LinkedHashSet<>();
-
-    private String errorMsg;
-
-    protected URLShortenerDefinition(URI uri, UUID uuid, DateTime creationTime) {
-        this(uri, uuid, creationTime, new DisplayedResultQuery());
-    }
-
-    protected URLShortenerDefinition(URI uri, UUID uuid, DateTime creationTime, DisplayedResultQuery query) {
-        this.uri = uri;
-        this.uuid = uuid;
-        this.query = query;
-        this.creationTime = creationTime;
-        this.errorMsg = null;
-    }
-
-    public static UUID parseUUID(String uuid) {
-        return UUID.fromString(uuid);
-    }
-
-    public static DateTime parseCreationTime(String creationTime) {
-
-        DateTimeParser[] parsers = { DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ").getParser(),
-                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ").getParser(), 
-                DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").getParser()};
-
-        DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().append(null, parsers).toFormatter();
-        return dateFormatter.parseDateTime(creationTime);
-    }
+    public static int MAX_RETRY = 5;
 
     public static URLShortenerDefinition parse(String url, String uuid, String creationTime)
             throws URISyntaxException, UnsupportedEncodingException {
@@ -114,6 +78,16 @@ public class URLShortenerDefinition {
         return result;
     }
 
+    public static DateTime parseCreationTime(String creationTime) {
+
+        DateTimeParser[] parsers = { DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSSZZ").getParser(),
+                DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ssZZ").getParser(),
+                DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ").getParser() };
+
+        DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder().append(null, parsers).toFormatter();
+        return dateFormatter.parseDateTime(creationTime);
+    }
+
     private static DisplayedResultQuery parseFragment(String fragment) {
         Map<String, String> args = CommonHelper.parseFragment(fragment);
         String corporaRaw = args.get("c");
@@ -127,6 +101,62 @@ public class URLShortenerDefinition {
                     .query(args.get("q")).corpora(corpora).build();
         }
         return null;
+    }
+
+    public static UUID parseUUID(String uuid) {
+        return UUID.fromString(uuid);
+    }
+
+    private URI uri;
+
+    private DisplayedResultQuery query;
+
+    private UUID uuid;
+
+    private DateTime creationTime;
+
+    private Set<String> unknownCorpora = new LinkedHashSet<>();
+
+    private String errorMsg;
+
+    protected URLShortenerDefinition(URI uri, UUID uuid, DateTime creationTime) {
+        this(uri, uuid, creationTime, new DisplayedResultQuery());
+    }
+
+    protected URLShortenerDefinition(URI uri, UUID uuid, DateTime creationTime, DisplayedResultQuery query) {
+        this.uri = uri;
+        this.uuid = uuid;
+        this.query = query;
+        this.creationTime = creationTime;
+        this.errorMsg = null;
+    }
+
+    public void addUnknownCorpus(String corpus) {
+        unknownCorpora.add(corpus);
+    }
+
+    public DateTime getCreationTime() {
+        return creationTime;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public Query getQuery() {
+        return query;
+    }
+
+    public Set<String> getUnknownCorpora() {
+        return unknownCorpora;
+    }
+
+    public URI getUri() {
+        return uri;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     public URLShortenerDefinition rewriteInQuirksMode() {
@@ -146,82 +176,8 @@ public class URLShortenerDefinition {
         return new URLShortenerDefinition(rewrittenUri.build(), this.uuid, this.creationTime, rewrittenQuery);
     }
 
-    public Query getQuery() {
-        return query;
-    }
-
-    public String getErrorMsg() {
-        return errorMsg;
-    }
-    
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public URI getUri() {
-        return uri;
-    }
-
-    public DateTime getCreationTime() {
-        return creationTime;
-    }
-    
-    public Set<String> getUnknownCorpora() {
-        return unknownCorpora;
-    }
-    
-    public void addUnknownCorpus(String corpus) {
-        unknownCorpora.add(corpus);
-    }
-
-    public static int MAX_RETRY = 5;
-
-    private QueryStatus testFind(QueryDao queryDao, WebTarget annisSearchService)
-            throws GraphANNISException, IOException {
-
-        WebTarget findTarget = annisSearchService.path("find").queryParam("q", query.getQuery()).queryParam("corpora",
-                Joiner.on(",").join(query.getCorpora()));
-
-        File matchesGraphANNISFile = File.createTempFile("annis-migrate-url-shortener-graphannis", ".txt");
-        
-        // write all graphANNIS matches to temporary file
-        try (BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(matchesGraphANNISFile))) {
-            queryDao.find(query.getQuery(), query.getQueryLanguage(), new LinkedList<>(query.getCorpora()),
-                    new LimitOffsetQueryData(0, Integer.MAX_VALUE), fileOutput);
-        }
-
-        // read in the file again line by line and compare it with the legacy ANNIS
-        // version
-        int matchNr = 0;
-        try (BufferedReader matchesGraphANNIS = new BufferedReader(new FileReader(matchesGraphANNISFile));
-                BufferedReader matchesLegacy = new BufferedReader(
-                        new InputStreamReader(findTarget.request(MediaType.TEXT_PLAIN_TYPE).get(InputStream.class)))) {
-            // compare each line
-            String m1;
-            String m2;
-            while ((m1 = matchesGraphANNIS.readLine()) != null && (m2 = matchesLegacy.readLine()) != null) {
-                matchNr++;
-                
-                Match parsed_m1 = Match.parseFromString(m1);
-                Match parsed_m2 = Match.parseFromString(m2);
-
-                if (!Objects.equals(parsed_m1, parsed_m2)) {
-                    this.errorMsg = "Match " + matchNr + " (should be)" + System.lineSeparator() + m2
-                            + System.lineSeparator() + "(but was)" + System.lineSeparator() + m1;
-                    return QueryStatus.MatchesDiffer;
-                }
-            }
-        } finally {
-            if (!matchesGraphANNISFile.delete()) {
-                log.warn("Could not delete temporary file {}", matchesGraphANNISFile.getAbsolutePath());
-            }
-        }
-
-        return QueryStatus.Ok;
     }
 
     public QueryStatus test(QueryDao queryDao, WebTarget annisSearchService) throws GraphANNISException {
@@ -306,5 +262,49 @@ public class URLShortenerDefinition {
             this.errorMsg = ex.toString();
             return QueryStatus.ServerError;
         }
+    }
+
+    private QueryStatus testFind(QueryDao queryDao, WebTarget annisSearchService)
+            throws GraphANNISException, IOException {
+
+        WebTarget findTarget = annisSearchService.path("find").queryParam("q", query.getQuery()).queryParam("corpora",
+                Joiner.on(",").join(query.getCorpora()));
+
+        File matchesGraphANNISFile = File.createTempFile("annis-migrate-url-shortener-graphannis", ".txt");
+
+        // write all graphANNIS matches to temporary file
+        try (BufferedOutputStream fileOutput = new BufferedOutputStream(new FileOutputStream(matchesGraphANNISFile))) {
+            queryDao.find(query.getQuery(), query.getQueryLanguage(), new LinkedList<>(query.getCorpora()),
+                    new LimitOffsetQueryData(0, Integer.MAX_VALUE), fileOutput);
+        }
+
+        // read in the file again line by line and compare it with the legacy ANNIS
+        // version
+        int matchNr = 0;
+        try (BufferedReader matchesGraphANNIS = new BufferedReader(new FileReader(matchesGraphANNISFile));
+                BufferedReader matchesLegacy = new BufferedReader(
+                        new InputStreamReader(findTarget.request(MediaType.TEXT_PLAIN_TYPE).get(InputStream.class)))) {
+            // compare each line
+            String m1;
+            String m2;
+            while ((m1 = matchesGraphANNIS.readLine()) != null && (m2 = matchesLegacy.readLine()) != null) {
+                matchNr++;
+
+                Match parsed_m1 = Match.parseFromString(m1);
+                Match parsed_m2 = Match.parseFromString(m2);
+
+                if (!Objects.equals(parsed_m1, parsed_m2)) {
+                    this.errorMsg = "Match " + matchNr + " (should be)" + System.lineSeparator() + m2
+                            + System.lineSeparator() + "(but was)" + System.lineSeparator() + m1;
+                    return QueryStatus.MatchesDiffer;
+                }
+            }
+        } finally {
+            if (!matchesGraphANNISFile.delete()) {
+                log.warn("Could not delete temporary file {}", matchesGraphANNISFile.getAbsolutePath());
+            }
+        }
+
+        return QueryStatus.Ok;
     }
 }

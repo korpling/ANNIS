@@ -12,6 +12,10 @@ import java.util.ArrayList;
 @SuppressWarnings("serial")
 public class Table implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2664809412236466233L;
     private final String name;
     private final ArrayList<Column> columns;
     private final ArrayList<ArrayList<Column>> indexes;
@@ -46,14 +50,6 @@ public class Table implements Serializable {
         return copy;
     }
 
-    public Table c_int(String name) {
-        return c(name, Column.Type.INTEGER);
-    }
-
-    public Table c_blob(String name) {
-        return c(name, Column.Type.BLOB);
-    }
-
     public Table c(String name, Column.Type type, boolean isUnique) {
         Table copy = new Table(this);
         Column newColumn = new Column(name).type(type);
@@ -64,30 +60,28 @@ public class Table implements Serializable {
         return copy;
     }
 
+    public Table c_blob(String name) {
+        return c(name, Column.Type.BLOB);
+    }
+
+    public Table c_int(String name) {
+        return c(name, Column.Type.INTEGER);
+    }
+
     public Table c_int_uniq(String name) {
         return c(name, Column.Type.INTEGER, true);
-    }
-    
-    public Table index(String... columnNames) {
-        Table copy = new Table(this);
-        
-        ArrayList<Column> idx = new ArrayList<>();
-        for(String cname : columnNames) {
-            for(Column c : copy.columns) {
-                if(cname.equals(c.getName())) {
-                    idx.add(c);
-                    break;
-                }
-            }
-        }
-        if(!idx.isEmpty()) {
-            copy.indexes.add(idx);
-        }
-        return copy;
     }
 
     public ArrayList<Column> getColumns() {
         return new ArrayList<>(columns);
+    }
+
+    public ArrayList<ArrayList<Column>> getIndexes() {
+        return this.indexes;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public ArrayList<Column> getNonKeyColumns() {
@@ -99,13 +93,23 @@ public class Table implements Serializable {
         }
         return result;
     }
-    
-    public ArrayList<ArrayList<Column>> getIndexes() {
-        return this.indexes;
-    }
 
-    public String getName() {
-        return name;
+    public Table index(String... columnNames) {
+        Table copy = new Table(this);
+
+        ArrayList<Column> idx = new ArrayList<>();
+        for (String cname : columnNames) {
+            for (Column c : copy.columns) {
+                if (cname.equals(c.getName())) {
+                    idx.add(c);
+                    break;
+                }
+            }
+        }
+        if (!idx.isEmpty()) {
+            copy.indexes.add(idx);
+        }
+        return copy;
     }
 
 }

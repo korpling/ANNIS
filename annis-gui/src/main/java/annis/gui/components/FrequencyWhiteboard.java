@@ -15,112 +15,93 @@
  */
 package annis.gui.components;
 
-import annis.gui.frequency.FrequencyResultPanel;
 import static annis.libgui.Helper.encodeGeneric;
+
+import annis.gui.frequency.FrequencyResultPanel;
 import annis.service.objects.FrequencyTable;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.AbstractJavaScriptComponent;
-import com.vaadin.ui.JavaScriptFunction;
-import elemental.json.JsonArray;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@JavaScript(value =
-{
-  "flotr2.js", "vaadin://jquery.js", "frequencychart.js"
-})
-public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements OnLoadCallbackExtension.Callback
-{
-  public static final int PIXEL_PER_VALUE = 45;
-  public static final int ADDTIONAL_PIXEL_WIDTH = 100;
+@JavaScript(value = { "flotr2.js", "vaadin://jquery.js", "frequencychart.js" })
+public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements OnLoadCallbackExtension.Callback {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3666118907756684861L;
 
-  public enum Scale
-  {
-    LINEAR("linear"), LOG10("logarithmic");
-    
-    public final String desc;
-    Scale(String desc)
-    {
-      this.desc = desc;
-    }
-  }
-  
-  private List<String> labels;
-  private List<Long> values;
-  private Scale lastScale;
-  private String lastFont;
-  private float lastFontSize = 10.0f;
-  
-  public FrequencyWhiteboard(final FrequencyResultPanel freqPanel)
-  {  
-    setHeight("100%");
-    setWidth("200px");
-    addStyleName("frequency-chart");
-    
-    addFunction("selectRow", new JavaScriptFunction() {
+    public enum Scale {
+        LINEAR("linear"), LOG10("logarithmic");
 
-      @Override
-      public void call(JsonArray arguments) throws JSONException
-      {
-        freqPanel.selectRow((int) arguments.getNumber(0));
-      }
-    });
-    
-    
-    OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this);
-    ext.extend((FrequencyWhiteboard) this);
-    
-  }
-  @Override
-  public void beforeClientResponse(boolean initial)
-  {
-    super.beforeClientResponse(initial);
-    if(labels != null && values != null && lastScale != null && lastFont != null)
-    {
-      callFunction("showData", encodeGeneric(labels), encodeGeneric(values), 
-        lastScale.desc, lastFont, lastFontSize);
-    }
-  }
-  
-  
-  
-  public void setFrequencyData(FrequencyTable table, Scale scale, String font, 
-    float fontSize)
-  {
-    labels = new LinkedList<>();
-    values = new LinkedList<>();
+        public final String desc;
 
-    for (FrequencyTable.Entry e : table.getEntries())
-    {
-      labels.add(StringUtils.join(e.getTupel(), "/") + " (" + e.getCount() + ")");
-      values.add(e.getCount());
+        Scale(String desc) {
+            this.desc = desc;
+        }
     }
-    setWidth(ADDTIONAL_PIXEL_WIDTH + (PIXEL_PER_VALUE * values.size()), Unit.PIXELS);
-    lastScale = scale;
-    lastFont = font;
-    lastFontSize = fontSize;
-    
-//    callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
-  }
-  
-  
-  @Override
-  public boolean onCompononentLoaded(AbstractClientConnector source)
-  {
-    if(labels != null && values != null && lastScale != null && lastFont != null)
-    {
-      callFunction("showData", encodeGeneric(labels), encodeGeneric(values), 
-        lastScale.desc, lastFont, lastFontSize);
+
+    public static final int PIXEL_PER_VALUE = 45;
+
+    public static final int ADDTIONAL_PIXEL_WIDTH = 100;
+
+    private List<String> labels;
+    private List<Long> values;
+    private Scale lastScale;
+    private String lastFont;
+    private float lastFontSize = 10.0f;
+
+    public FrequencyWhiteboard(final FrequencyResultPanel freqPanel) {
+        setHeight("100%");
+        setWidth("200px");
+        addStyleName("frequency-chart");
+
+        addFunction("selectRow", arguments -> freqPanel.selectRow((int) arguments.getNumber(0)));
+
+        OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this);
+        ext.extend(this);
+
     }
-    return true;
-  }
-  
-  
+
+    @Override
+    public void beforeClientResponse(boolean initial) {
+        super.beforeClientResponse(initial);
+        if (labels != null && values != null && lastScale != null && lastFont != null) {
+            callFunction("showData", encodeGeneric(labels), encodeGeneric(values), lastScale.desc, lastFont,
+                    lastFontSize);
+        }
+    }
+
+    @Override
+    public boolean onCompononentLoaded(AbstractClientConnector source) {
+        if (labels != null && values != null && lastScale != null && lastFont != null) {
+            callFunction("showData", encodeGeneric(labels), encodeGeneric(values), lastScale.desc, lastFont,
+                    lastFontSize);
+        }
+        return true;
+    }
+
+    public void setFrequencyData(FrequencyTable table, Scale scale, String font, float fontSize) {
+        labels = new LinkedList<>();
+        values = new LinkedList<>();
+
+        for (FrequencyTable.Entry e : table.getEntries()) {
+            labels.add(StringUtils.join(e.getTupel(), "/") + " (" + e.getCount() + ")");
+            values.add(e.getCount());
+        }
+        setWidth(ADDTIONAL_PIXEL_WIDTH + (PIXEL_PER_VALUE * values.size()), Unit.PIXELS);
+        lastScale = scale;
+        lastFont = font;
+        lastFontSize = fontSize;
+
+        // callFunction("showData", labels, values, lastScale.desc, lastFont,
+        // lastFontSize);
+    }
+
 }

@@ -15,10 +15,8 @@
  */
 package annis.administration;
 
-import com.google.common.base.Joiner;
-
 import annis.dao.QueryDao;
-
+import com.google.common.base.Joiner;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,15 +36,15 @@ import org.slf4j.LoggerFactory;
 public class DeleteCorpusDao extends AbstractAdminstrationDao {
 
     private final static Logger log = LoggerFactory.getLogger(AdministrationDao.class);
-    
-    private DeleteCorpusDao() {
-        
-    }
-    
+
     public static DeleteCorpusDao create(QueryDao queryDao) {
         DeleteCorpusDao result = new DeleteCorpusDao();
         result.setQueryDao(queryDao);
         return result;
+    }
+
+    private DeleteCorpusDao() {
+
     }
 
     /**
@@ -66,7 +64,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
         if (names == null || names.isEmpty()) {
             return;
         }
-        
+
         File dataDir = getRealDataDir();
 
         try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
@@ -89,7 +87,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
                 getQueryRunner().update(conn,
                         "DELETE FROM media_files\n" + "WHERE\n" + "  corpus_path = ? OR corpus_path like ?", corpusName,
                         corpusName + "/%");
-                
+
             }
 
             log.info("deleting resolver entries");
@@ -107,7 +105,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
                     delStmt.executeUpdate();
                 }
             }
-            
+
             log.info("deleting annotation table entries");
             try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM annotations WHERE corpus=?")) {
                 for (String n : names) {
@@ -115,7 +113,7 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
                     delStmt.executeUpdate();
                 }
             }
-            
+
             log.info("deleting metadata_cache table entries");
             try (PreparedStatement delStmt = conn.prepareStatement("DELETE FROM metadata_cache WHERE corpus=?")) {
                 for (String n : names) {
@@ -138,15 +136,15 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
                     delStmt.executeUpdate();
                 }
             }
-            
+
             log.info("deleting from graphANNIS");
             for (String corpusName : names) {
                 getQueryDao().getCorpusStorageManager().deleteCorpus(corpusName);
             }
-            
+
             conn.commit();
 
-        } catch (SQLException  | GraphANNISException ex) {
+        } catch (SQLException | GraphANNISException ex) {
             log.error("Error when deleting corpus {}", Joiner.on(",").join(names), ex);
         }
 
@@ -154,7 +152,6 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao {
         for (String n : names) {
             quotedNames.add("'" + n + "'");
         }
-
 
     }
 

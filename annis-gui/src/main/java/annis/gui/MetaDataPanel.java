@@ -15,18 +15,11 @@
  */
 package annis.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.Callable;
-
-import org.slf4j.LoggerFactory;
-
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.model.Annotation;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -51,12 +44,15 @@ import com.vaadin.v7.ui.Label;
 import com.vaadin.v7.ui.Table;
 import com.vaadin.v7.ui.Table.ColumnGenerator;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
-
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.model.Annotation;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides all corpus annotations for a corpus or for a specific search result.
@@ -67,6 +63,56 @@ import annis.model.Annotation;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class MetaDataPanel extends Panel implements Property.ValueChangeListener {
+
+    public static class MetaTableNameGenerator implements ColumnGenerator {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 4679566369923023648L;
+        private final BeanItemContainer<Annotation> mData;
+
+        public MetaTableNameGenerator(BeanItemContainer<Annotation> mData) {
+            this.mData = mData;
+        }
+
+        @Override
+        public Component generateCell(Table source, Object itemId, Object columnId) {
+            Annotation anno = mData.getItem(itemId).getBean();
+            String qName = anno.getName();
+            if (anno.getNamespace() != null) {
+                qName = anno.getNamespace() + ":" + qName;
+            }
+            Label l = new Label(qName);
+            l.setSizeUndefined();
+            return l;
+        }
+    }
+
+    public static class MetaTableValueGenerator implements ColumnGenerator {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -1942705923028234175L;
+        private final BeanItemContainer<Annotation> mData;
+
+        public MetaTableValueGenerator(BeanItemContainer<Annotation> mData) {
+            this.mData = mData;
+        }
+
+        @Override
+        public Component generateCell(Table source, Object itemId, Object columnId) {
+            Annotation anno = mData.getItem(itemId).getBean();
+            Label l = new Label(anno.getValue(), ContentMode.HTML);
+            return l;
+        }
+    }
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -3607697674053863447L;
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaDataPanel.class);
 
@@ -89,7 +135,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
     // holds the current corpus annotation table, when called from corpus browser
     private Table corpusAnnotationTable = null;
-    
+
     private final ProgressBar progress = new ProgressBar();
 
     /**
@@ -107,38 +153,66 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
         this.toplevelCorpusName = toplevelCorpusName;
         this.documentName = documentName;
-        
+
         setSizeFull();
         layout = new VerticalLayout();
         layout.setSizeFull();
         setContent(layout);
-        
-        progress.setIndeterminate(true);        
+
+        progress.setIndeterminate(true);
         progress.setSizeFull();
-        
+
         layout.addComponent(progress);
         layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
-        
+
+    }
+
+    /**
+     * Places a label in the middle center of the corpus browser panel.
+     */
+    private void addEmptyLabel() {
+        if (emptyLabel == null) {
+            emptyLabel = new Label("none");
+        }
+
+        if (corpusAnnotationTable != null) {
+            layout.removeComponent(corpusAnnotationTable);
+        }
+
+        layout.addComponent(emptyLabel);
+
+        // this has only an effect after adding the component to a parent. Bug by
+        // vaadin?
+        emptyLabel.setSizeUndefined();
+
+        layout.setComponentAlignment(emptyLabel, Alignment.MIDDLE_CENTER);
+        layout.setExpandRatio(emptyLabel, 1.0f);
     }
 
     @Override
     public void attach() {
         super.attach();
-        
-        final UI ui =  UI.getCurrent();
+
+        final UI ui = UI.getCurrent();
 
         if (documentName == null) {
-            Callable<List<Annotation>> backgroundJob = () -> {
-                return getAllSubcorpora(toplevelCorpusName, ui);
-            };
+            Callable<List<Annotation>> backgroundJob = () -> getAllSubcorpora(toplevelCorpusName, ui);
             Background.runWithCallback(backgroundJob, new FutureCallback<List<Annotation>>() {
 
-                public void onSuccess(List<Annotation> result) {
-                    
+                @Override
+                public void onFailure(Throwable t) {
+                    ExceptionDialog.show(t, "Could not get meta data.", ui);
                     layout.removeComponent(progress);
-                    
+
+                }
+
+                @Override
+                public void onSuccess(List<Annotation> result) {
+
+                    layout.removeComponent(progress);
+
                     docs = result;
-                    
+
                     HorizontalLayout selectionLayout = new HorizontalLayout();
                     Label selectLabel = new Label("Select corpus/document: ");
                     corpusSelection = new ComboBox();
@@ -168,17 +242,10 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
                         corpusSelection.addItem(c.getName());
                     }
                 }
-
-                @Override
-                public void onFailure(Throwable t) {
-                    ExceptionDialog.show(t, "Could not get meta data.", ui);
-                    layout.removeComponent(progress);
-
-                }
             });
         } else {
             layout.removeComponent(progress);
-            
+
             Map<Integer, List<Annotation>> hashMData = splitListAnnotations();
             List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
             Accordion accordion = new Accordion();
@@ -203,6 +270,61 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
                 layout.addComponent(accordion);
             }
+        }
+    }
+
+    private List<Annotation> getAllSubcorpora(String toplevelCorpusName, UI ui) {
+        List<Annotation> result = new LinkedList<>();
+        WebResource res = Helper.getAnnisWebResource(ui);
+        try {
+            res = res.path("meta").path("docnames").path(urlPathEscape.escape(toplevelCorpusName));
+            result = res.get(new Helper.AnnotationListType());
+
+            Collections.sort(result,
+                    (arg0, arg1) -> ComparisonChain.start().compare(arg0.getName(), arg1.getName()).result());
+
+        } catch (UniformInterfaceException | ClientHandlerException ex) {
+            log.error(null, ex);
+            if (!AnnisBaseUI.handleCommonError(ex, "get documents")) {
+                Notification.show("Remote exception: " + ex.getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+            }
+        }
+
+        return result;
+    }
+
+    private void loadTable(String item, List<Annotation> metaData) {
+        BeanItemContainer<Annotation> metaContainer = new BeanItemContainer<>(Annotation.class);
+        metaContainer.addAll(metaData);
+
+        if (corpusAnnotationTable != null) {
+            layout.removeComponent(corpusAnnotationTable);
+        }
+
+        layout.removeComponent(emptyLabel);
+        corpusAnnotationTable = setupTable(metaContainer);
+        corpusAnnotationTable.setHeight(100, Unit.PERCENTAGE);
+        corpusAnnotationTable.setWidth(100, Unit.PERCENTAGE);
+        layout.addComponent(corpusAnnotationTable);
+        layout.setExpandRatio(corpusAnnotationTable, 1.0f);
+    }
+
+    private List<BeanItemContainer<Annotation>> putInBeanContainer(
+            Map<Integer, List<Annotation>> splittedAnnotationsList) {
+        List<BeanItemContainer<Annotation>> listOfBeanItemCon = new ArrayList<>();
+
+        for (List<Annotation> list : splittedAnnotationsList.values()) {
+            BeanItemContainer<Annotation> metaContainer = new BeanItemContainer<>(Annotation.class);
+            metaContainer.addAll(list);
+
+            listOfBeanItemCon.add(metaContainer);
+        }
+        return listOfBeanItemCon;
+    }
+
+    private void removeEmptyLabel() {
+        if (emptyLabel != null) {
+            layout.removeComponent(emptyLabel);
         }
     }
 
@@ -254,44 +376,6 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
         return hashMetaData;
     }
 
-    private List<BeanItemContainer<Annotation>> putInBeanContainer(
-            Map<Integer, List<Annotation>> splittedAnnotationsList) {
-        List<BeanItemContainer<Annotation>> listOfBeanItemCon = new ArrayList<>();
-
-        for (List<Annotation> list : splittedAnnotationsList.values()) {
-            BeanItemContainer<Annotation> metaContainer = new BeanItemContainer<>(Annotation.class);
-            metaContainer.addAll(list);
-
-            listOfBeanItemCon.add(metaContainer);
-        }
-        return listOfBeanItemCon;
-    }
-
-    private List<Annotation> getAllSubcorpora(String toplevelCorpusName, UI ui) {
-        List<Annotation> result = new LinkedList<>();
-        WebResource res = Helper.getAnnisWebResource(ui);
-        try {
-            res = res.path("meta").path("docnames").path(urlPathEscape.escape(toplevelCorpusName));
-            result = res.get(new Helper.AnnotationListType());
-
-            Collections.sort(result, new Comparator<Annotation>() {
-
-                @Override
-                public int compare(Annotation arg0, Annotation arg1) {
-                    return ComparisonChain.start().compare(arg0.getName(), arg1.getName()).result();
-                }
-            });
-
-        } catch (UniformInterfaceException | ClientHandlerException ex) {
-            log.error(null, ex);
-            if (!AnnisBaseUI.handleCommonError(ex, "get documents")) {
-                Notification.show("Remote exception: " + ex.getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-            }
-        }
-
-        return result;
-    }
-
     @Override
     public void valueChange(Property.ValueChangeEvent event) {
         if (lastSelectedItem == null || !lastSelectedItem.equals(event.getProperty().getValue())) {
@@ -309,87 +393,6 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
                 removeEmptyLabel();
                 loadTable(toplevelCorpusName, metaData);
             }
-        }
-    }
-
-    private void loadTable(String item, List<Annotation> metaData) {
-        BeanItemContainer<Annotation> metaContainer = new BeanItemContainer<>(Annotation.class);
-        metaContainer.addAll(metaData);
-
-        if (corpusAnnotationTable != null) {
-            layout.removeComponent(corpusAnnotationTable);
-        }
-
-        layout.removeComponent(emptyLabel);
-        corpusAnnotationTable = setupTable(metaContainer);
-        corpusAnnotationTable.setHeight(100, Unit.PERCENTAGE);
-        corpusAnnotationTable.setWidth(100, Unit.PERCENTAGE);
-        layout.addComponent(corpusAnnotationTable);
-        layout.setExpandRatio(corpusAnnotationTable, 1.0f);
-    }
-
-    /**
-     * Places a label in the middle center of the corpus browser panel.
-     */
-    private void addEmptyLabel() {
-        if (emptyLabel == null) {
-            emptyLabel = new Label("none");
-        }
-
-        if (corpusAnnotationTable != null) {
-            layout.removeComponent(corpusAnnotationTable);
-        }
-
-        layout.addComponent(emptyLabel);
-
-        // this has only an effect after adding the component to a parent. Bug by
-        // vaadin?
-        emptyLabel.setSizeUndefined();
-
-        layout.setComponentAlignment(emptyLabel, Alignment.MIDDLE_CENTER);
-        layout.setExpandRatio(emptyLabel, 1.0f);
-    }
-
-    private void removeEmptyLabel() {
-        if (emptyLabel != null) {
-            layout.removeComponent(emptyLabel);
-        }
-    }
-
-    public static class MetaTableNameGenerator implements ColumnGenerator {
-
-        private final BeanItemContainer<Annotation> mData;
-
-        public MetaTableNameGenerator(BeanItemContainer<Annotation> mData) {
-            this.mData = mData;
-        }
-
-        @Override
-        public Component generateCell(Table source, Object itemId, Object columnId) {
-            Annotation anno = mData.getItem(itemId).getBean();
-            String qName = anno.getName();
-            if (anno.getNamespace() != null) {
-                qName = anno.getNamespace() + ":" + qName;
-            }
-            Label l = new Label(qName);
-            l.setSizeUndefined();
-            return l;
-        }
-    }
-
-    public static class MetaTableValueGenerator implements ColumnGenerator {
-
-        private final BeanItemContainer<Annotation> mData;
-
-        public MetaTableValueGenerator(BeanItemContainer<Annotation> mData) {
-            this.mData = mData;
-        }
-
-        @Override
-        public Component generateCell(Table source, Object itemId, Object columnId) {
-            Annotation anno = mData.getItem(itemId).getBean();
-            Label l = new Label(anno.getValue(), ContentMode.HTML);
-            return l;
         }
     }
 }

@@ -15,95 +15,74 @@
  */
 package annis.gui.admin;
 
-import java.util.Objects;
-
-import org.joda.time.DateTime;
-
+import annis.gui.converter.DateTimeConverter;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.v7.data.Property;
 import com.vaadin.v7.ui.CheckBox;
 import com.vaadin.v7.ui.CustomField;
 import com.vaadin.v7.ui.DateField;
-
-import annis.gui.converter.DateTimeConverter;
+import java.util.Objects;
+import org.joda.time.DateTime;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class OptionalDateTimeField extends CustomField<DateTime>
-{
+public class OptionalDateTimeField extends CustomField<DateTime> {
 
-  private final DateField dateField;
-  private final CheckBox checkBox;
-  private final HorizontalLayout layout;
-  
-  public OptionalDateTimeField()
-  {
-    this("");
-  }
+    private static final long serialVersionUID = 1697098787476067758L;
+    private final DateField dateField;
+    private final CheckBox checkBox;
+    private final HorizontalLayout layout;
 
-  public OptionalDateTimeField(String checkboxCaption)
-  {
-    dateField = new DateField();
-    dateField.setConverter(new DateTimeConverter());
-    dateField.setDateFormat("yyyy-MM-dd");
-    dateField.setImmediate(true);
-    dateField.setPropertyDataSource(OptionalDateTimeField.this);
+    public OptionalDateTimeField() {
+        this("");
+    }
 
-    checkBox = new CheckBox(checkboxCaption);
-    checkBox.addValueChangeListener(new ValueChangeListener()
-    {
-      @Override
-      public void valueChange(Property.ValueChangeEvent event)
-      {
-        if (Objects.equals(event.getProperty().getValue(), Boolean.TRUE))
-        {
-          if(getValue() == null)
-          {
-            // only set something if changed
-            setValue(DateTime.now());
-          }
-        }
-        else
-        {
-          if(getValue() != null)
-          {
-            // only set something if changed
-            setValue(null);
-          }
-        }
-      }
-    });
-    
-    layout = new HorizontalLayout(dateField, checkBox);
-  }
+    public OptionalDateTimeField(String checkboxCaption) {
+        dateField = new DateField();
+        dateField.setConverter(new DateTimeConverter());
+        dateField.setDateFormat("yyyy-MM-dd");
+        dateField.setImmediate(true);
+        dateField.setPropertyDataSource(OptionalDateTimeField.this);
 
-  @Override
-  protected Component initContent()
-  {
-    return layout;
-  }
-  
-  public void setCheckboxCaption(String caption)
-  {
-    checkBox.setCaption(caption);
-  }
+        checkBox = new CheckBox(checkboxCaption);
+        checkBox.addValueChangeListener(event -> {
+            if (Objects.equals(event.getProperty().getValue(), Boolean.TRUE)) {
+                if (getValue() == null) {
+                    // only set something if changed
+                    setValue(DateTime.now());
+                }
+            } else {
+                if (getValue() != null) {
+                    // only set something if changed
+                    setValue(null);
+                }
+            }
+        });
 
-  @Override
-  protected void setInternalValue(DateTime newValue)
-  {
-    super.setInternalValue(newValue);
-    dateField.setEnabled(newValue != null);
-    checkBox.setValue(newValue != null);
-  }
-  
+        layout = new HorizontalLayout(dateField, checkBox);
+    }
 
-  @Override
-  public Class<? extends DateTime> getType()
-  {
-    return DateTime.class;
-  }
+    @Override
+    public Class<? extends DateTime> getType() {
+        return DateTime.class;
+    }
+
+    @Override
+    protected Component initContent() {
+        return layout;
+    }
+
+    public void setCheckboxCaption(String caption) {
+        checkBox.setCaption(caption);
+    }
+
+    @Override
+    protected void setInternalValue(DateTime newValue) {
+        super.setInternalValue(newValue);
+        dateField.setEnabled(newValue != null);
+        checkBox.setValue(newValue != null);
+    }
 
 }

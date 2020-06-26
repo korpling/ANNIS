@@ -15,63 +15,56 @@
  */
 package annis.gui.converter;
 
-import java.util.Locale;
-import java.util.TreeSet;
-
+import annis.CaseSensitiveOrder;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.vaadin.v7.data.util.converter.Converter;
-
-import annis.CaseSensitiveOrder;
+import java.util.Locale;
+import java.util.TreeSet;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CommaSeperatedStringConverterSet implements Converter<String, TreeSet>
-{
+public class CommaSeperatedStringConverterSet implements Converter<String, TreeSet> {
 
-  private static final Splitter splitter = Splitter.on(',').trimResults().
-    omitEmptyStrings();
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -2875078513051528093L;
 
-  private static final Joiner joiner = Joiner.on(", ");
+    private static final Splitter splitter = Splitter.on(',').trimResults().omitEmptyStrings();
 
-  @Override
-  public TreeSet convertToModel(String value,
-    Class<? extends TreeSet> targetType, Locale locale) throws ConversionException
-  {
-    TreeSet<String> result = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
-    for(String s : splitter.split(value))
-    {
-      result.add(s);
+    private static final Joiner joiner = Joiner.on(", ");
+
+    @Override
+    public TreeSet convertToModel(String value, Class<? extends TreeSet> targetType, Locale locale)
+            throws ConversionException {
+        TreeSet<String> result = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
+        for (String s : splitter.split(value)) {
+            result.add(s);
+        }
+        return result;
     }
-    return result;
-  }
 
-  @Override
-  public String convertToPresentation(TreeSet value,
-    Class<? extends String> targetType, Locale locale) throws ConversionException
-  {
-    if(value == null)
-    {
-      return null;
+    @Override
+    public String convertToPresentation(TreeSet value, Class<? extends String> targetType, Locale locale)
+            throws ConversionException {
+        if (value == null) {
+            return null;
+        } else {
+            return joiner.join(value);
+        }
     }
-    else
-    {
-      return joiner.join(value);
+
+    @Override
+    public Class<TreeSet> getModelType() {
+        return TreeSet.class;
     }
-  }
 
-  @Override
-  public Class<String> getPresentationType()
-  {
-    return String.class;
-  }
+    @Override
+    public Class<String> getPresentationType() {
+        return String.class;
+    }
 
-  @Override
-  public Class<TreeSet> getModelType()
-  {
-    return TreeSet.class;
-  }
-  
 }

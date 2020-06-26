@@ -20,20 +20,25 @@ import annis.AnnisRunnerException;
 @SuppressWarnings("serial")
 public class FileAccessException extends AnnisRunnerException {
 
-	public FileAccessException() {
-		super(6);
-	}
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -8382932664477077611L;
 
-	public FileAccessException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public FileAccessException() {
+        super(6);
+    }
 
-	public FileAccessException(String message) {
-		super(message, 6);
-	}
+    public FileAccessException(String message) {
+        super(message, 6);
+    }
 
-	public FileAccessException(Throwable cause) {
-		super(cause, 6);
-	}
+    public FileAccessException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public FileAccessException(Throwable cause) {
+        super(cause, 6);
+    }
 
 }

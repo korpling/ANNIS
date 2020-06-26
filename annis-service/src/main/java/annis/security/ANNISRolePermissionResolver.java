@@ -17,7 +17,6 @@ package annis.security;
 
 import java.util.Collection;
 import java.util.HashSet;
-
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -26,57 +25,44 @@ import org.apache.shiro.authz.permission.WildcardPermission;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ANNISRolePermissionResolver implements RolePermissionResolver
-{
+public class ANNISRolePermissionResolver implements RolePermissionResolver {
 
-  private ANNISUserConfigurationManager confManager;
+    private ANNISUserConfigurationManager confManager;
 
-  @Override
-  public Collection<Permission> resolvePermissionsInRole(String roleString)
-  {
-    HashSet<Permission> perms = new HashSet<>();
-
-    if ("*".equals(roleString))
-    {
-      perms.add(new WildcardPermission("query:*:*"));
-      perms.add(new WildcardPermission("meta:*"));
+    public ANNISUserConfigurationManager getConfManager() {
+        return confManager;
     }
-    else
-    {
-      if (Group.DEFAULT_USER_ROLE.equals(roleString))
-      {
-        // every user can read/write its user configuration
-        perms.add(new WildcardPermission("admin:*:userconfig"));
-      }
-      else if (Group.ANONYMOUS.equals(roleString))
-      {
-        // every anonymous user can read its user configuration
-        perms.add(new WildcardPermission("admin:read:userconfig"));
-      }
-      
 
-      // add all corpora for this role
-      Group group = confManager.getGroups().get(roleString);
-      if (group != null)
-      {
-        for (String c : group.getCorpora())
-        {
-          perms.add(new WildcardPermission("query:*:" + c));
-          perms.add(new WildcardPermission("meta:" + c));
+    @Override
+    public Collection<Permission> resolvePermissionsInRole(String roleString) {
+        HashSet<Permission> perms = new HashSet<>();
+
+        if ("*".equals(roleString)) {
+            perms.add(new WildcardPermission("query:*:*"));
+            perms.add(new WildcardPermission("meta:*"));
+        } else {
+            if (Group.DEFAULT_USER_ROLE.equals(roleString)) {
+                // every user can read/write its user configuration
+                perms.add(new WildcardPermission("admin:*:userconfig"));
+            } else if (Group.ANONYMOUS.equals(roleString)) {
+                // every anonymous user can read its user configuration
+                perms.add(new WildcardPermission("admin:read:userconfig"));
+            }
+
+            // add all corpora for this role
+            Group group = confManager.getGroups().get(roleString);
+            if (group != null) {
+                for (String c : group.getCorpora()) {
+                    perms.add(new WildcardPermission("query:*:" + c));
+                    perms.add(new WildcardPermission("meta:" + c));
+                }
+            }
         }
-      }
+        return perms;
     }
-    return perms;
-  }
 
-  public ANNISUserConfigurationManager getConfManager()
-  {
-    return confManager;
-  }
-
-  public void setConfManager(ANNISUserConfigurationManager confManager)
-  {
-    this.confManager = confManager;
-  }
+    public void setConfManager(ANNISUserConfigurationManager confManager) {
+        this.confManager = confManager;
+    }
 
 }

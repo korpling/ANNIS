@@ -15,60 +15,48 @@
  */
 package annis.administration;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-
-import org.aeonbits.owner.ConfigFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import annis.ServiceConfig;
 import annis.dao.AbstractDao;
 import annis.dao.QueryDao;
 import annis.service.objects.AnnisCorpus;
+import java.util.Arrays;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Contains common functions used in the different adminstration DAOs
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public abstract class AbstractAdminstrationDao extends AbstractDao
-{
+public abstract class AbstractAdminstrationDao extends AbstractDao {
 
-  private final static Logger log = LoggerFactory.getLogger(
-    AbstractAdminstrationDao.class);
-  
-  private QueryDao queryDao;
+    private final static Logger log = LoggerFactory.getLogger(AbstractAdminstrationDao.class);
 
-  /**
-   * Checks, if there already exists a top level corpus.
-   *
-   * @param topLevelCorpusName The name of the corpus, which is checked.
-   * @return Is false, if the no top level coprpus exists.
-   */
-  protected boolean existConflictingTopLevelCorpus(String topLevelCorpusName)
-  {
-    List<AnnisCorpus> existing = queryDao.listCorpora(Arrays.asList(topLevelCorpusName));
-    return !existing.isEmpty();
-  }
-  
-  // tables in the staging area have their names prefixed with "_"
-  protected String tableInStagingArea(String table)
-  {
-    return "_" + table;
-  }
+    private QueryDao queryDao;
 
-  
-  public QueryDao getQueryDao()
-  {
-    return queryDao;
-  }
+    /**
+     * Checks, if there already exists a top level corpus.
+     *
+     * @param topLevelCorpusName
+     *            The name of the corpus, which is checked.
+     * @return Is false, if the no top level coprpus exists.
+     */
+    protected boolean existConflictingTopLevelCorpus(String topLevelCorpusName) {
+        List<AnnisCorpus> existing = queryDao.listCorpora(Arrays.asList(topLevelCorpusName));
+        return !existing.isEmpty();
+    }
 
-  public void setQueryDao(QueryDao queryDao)
-  {
-    this.queryDao = queryDao;
-  }
-  
+    public QueryDao getQueryDao() {
+        return queryDao;
+    }
+
+    public void setQueryDao(QueryDao queryDao) {
+        this.queryDao = queryDao;
+    }
+
+    // tables in the staging area have their names prefixed with "_"
+    protected String tableInStagingArea(String table) {
+        return "_" + table;
+    }
 
 }

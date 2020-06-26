@@ -16,6 +16,7 @@
 package annis.gui.resultfetch;
 
 import static annis.gui.resultfetch.ResultFetchJob.log;
+
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -27,45 +28,41 @@ import org.corpus_tools.salt.common.SaltProject;
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public abstract class AbstractResultFetchJob
-{
+public abstract class AbstractResultFetchJob {
 
-  /**
-   * Asks for salt graphs with a given list of matches {@link MatchGroup}.
-   *
-   * @param subgraphRes Handles the REST connection with the annis service.
-   * @param matches A list of matches. This implies, that the "find" method of
-   * the annis-service was executed before.
-   * @param left The left context. 
-   * @param right The right context.
-   * @param segmentation restrict results to this segmentations
-   * @param filter 
-   * @return
-   */
-  final protected SaltProject executeQuery(WebResource subgraphRes,
-    MatchGroup matches, int left, int right, String segmentation,
-    SubgraphFilter filter)
-  {
-    SaltProject p = null;
-    WebResource res = subgraphRes.queryParam("left", "" + left).queryParam(
-      "right", "" + right);
-    try
-    {
-      if (segmentation != null)
-      {
-        res = res.queryParam("segmentation", segmentation);
-      }
-      if (filter != null)
-      {
-        res = res.queryParam("filter", filter.name());
-      }
-      p = res.post(SaltProject.class, matches);
-    }
-    catch (UniformInterfaceException ex)
-    {
-      log.error(ex.getMessage(), ex);
-    }
+    /**
+     * Asks for salt graphs with a given list of matches {@link MatchGroup}.
+     *
+     * @param subgraphRes
+     *            Handles the REST connection with the annis service.
+     * @param matches
+     *            A list of matches. This implies, that the "find" method of the
+     *            annis-service was executed before.
+     * @param left
+     *            The left context.
+     * @param right
+     *            The right context.
+     * @param segmentation
+     *            restrict results to this segmentations
+     * @param filter
+     * @return
+     */
+    final protected SaltProject executeQuery(WebResource subgraphRes, MatchGroup matches, int left, int right,
+            String segmentation, SubgraphFilter filter) {
+        SaltProject p = null;
+        WebResource res = subgraphRes.queryParam("left", "" + left).queryParam("right", "" + right);
+        try {
+            if (segmentation != null) {
+                res = res.queryParam("segmentation", segmentation);
+            }
+            if (filter != null) {
+                res = res.queryParam("filter", filter.name());
+            }
+            p = res.post(SaltProject.class, matches);
+        } catch (UniformInterfaceException ex) {
+            log.error(ex.getMessage(), ex);
+        }
 
-    return p;
-  }
+        return p;
+    }
 }

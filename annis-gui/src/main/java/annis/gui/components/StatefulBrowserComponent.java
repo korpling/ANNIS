@@ -15,20 +15,12 @@
  */
 package annis.gui.components;
 
-import java.net.URI;
-
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
-import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.VerticalLayout;
-
-import org.json.JSONException;
+import java.net.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import elemental.json.JsonArray;
-import elemental.json.JsonType;
-import elemental.json.JsonValue;
 
 /**
  * Embedds a single HTML page and adds navigation to it's headers (if they have
@@ -38,68 +30,50 @@ import elemental.json.JsonValue;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class StatefulBrowserComponent extends VerticalLayout
-{
+public class StatefulBrowserComponent extends VerticalLayout {
 
-  private final static Logger log = LoggerFactory.getLogger(
-    StatefulBrowserComponent.class);
+    @JavaScript({ "vaadin://jquery.js", "statefulbrowsercomponent.js" })
+    private class IFrameComponent extends AbstractJavaScriptComponent {
 
-  private final IFrameComponent iframe = new IFrameComponent();
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -4822333489764804388L;
 
-  public StatefulBrowserComponent(URI externalURI)
-  {
-    iframe.setSizeFull();
-
-    addComponent(iframe);
-
-    setExpandRatio(iframe, 1.0f);
-
-    setSource(externalURI);
-  }
-
-
-  private void setSource(URI externalURI)
-  {
-    iframe.getState().setSource(externalURI.toASCIIString());
-  }
-
-
-
-  @JavaScript(
-    {
-      "vaadin://jquery.js", "statefulbrowsercomponent.js"
-    })
-  private class IFrameComponent extends AbstractJavaScriptComponent
-  {
-
-    public IFrameComponent()
-    {
-      addFunction("urlChanged", new JavaScriptFunction()
-      {
+        public IFrameComponent() {
+            addFunction("urlChanged", arguments -> {
+                getState().setSource(arguments.get(0).asString());
+                getState().setLastScrollPos(0);
+            });
+            addFunction("scrolled", arguments -> getState().setLastScrollPos((int) arguments.getNumber(0)));
+        }
 
         @Override
-        public void call(JsonArray arguments) throws JSONException
-        {
-          getState().setSource(arguments.get(0).asString());
-          getState().setLastScrollPos(0);
+        public final IframeState getState() {
+            return (IframeState) super.getState();
         }
-      });
-      addFunction("scrolled", new JavaScriptFunction()
-      {
-
-        @Override
-        public void call(JsonArray arguments) throws JSONException
-        {
-          getState().setLastScrollPos((int) arguments.getNumber(0));
-        }
-      });
     }
 
-    
-    @Override
-    public final IframeState getState()
-    {
-      return (IframeState) super.getState();
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7089777149165739882L;
+
+    private final static Logger log = LoggerFactory.getLogger(StatefulBrowserComponent.class);
+
+    private final IFrameComponent iframe = new IFrameComponent();
+
+    public StatefulBrowserComponent(URI externalURI) {
+        iframe.setSizeFull();
+
+        addComponent(iframe);
+
+        setExpandRatio(iframe, 1.0f);
+
+        setSource(externalURI);
     }
-  }
+
+    private void setSource(URI externalURI) {
+        iframe.getState().setSource(externalURI.toASCIIString());
+    }
 }

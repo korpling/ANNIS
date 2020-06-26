@@ -25,57 +25,50 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-abstract public class AbstractAutoQuery implements QueriesGenerator.QueryBuilder
-{
+abstract public class AbstractAutoQuery implements QueriesGenerator.QueryBuilder {
 
-  /**
-   * Retrieve the amount of nodes, which are contained by the {@link #getAQL()}
-   * query.
-   *
-   * @return An integer, which represents the amount of nodes.
-   */
-  abstract public int getNodes();
+    @Override
+    public AnnotateQueryData getAnnotateQueryData() {
+        return new AnnotateQueryData(5, 5, null);
+    }
 
+    abstract public String getDescription();
 
-  abstract public String getFinalAQLQuery();
+    @Override
+    public ExampleQuery getExampleQuery() {
+        ExampleQuery exampleQuery = new ExampleQuery();
+        exampleQuery.setDescription(getDescription());
+        exampleQuery.setExampleQuery(getFinalAQLQuery());
 
-  abstract public String getDescription();
+        return exampleQuery;
+    }
 
-  /**
-   * TODO define types
-   */
-  public String getType()
-  {
-    return null;
-  }
+    abstract public String getFinalAQLQuery();
 
-  @Override
-  public LimitOffsetQueryData getLimitOffsetQueryData()
-  {
-    return new LimitOffsetQueryData(5, 5);
-  }
+    @Override
+    public LimitOffsetQueryData getLimitOffsetQueryData() {
+        return new LimitOffsetQueryData(5, 5);
+    }
 
-  @Override
-  public AnnotateQueryData getAnnotateQueryData()
-  {
-    return new AnnotateQueryData(5, 5, null);
-  }
+    /**
+     * Retrieve the amount of nodes, which are contained by the {@link #getAQL()}
+     * query.
+     *
+     * @return An integer, which represents the amount of nodes.
+     */
+    abstract public int getNodes();
 
-  /**
-   * TODO restricted operators for type safeness
-   */
-  public String getOperators()
-  {
-    return null;
-  }
+    /**
+     * TODO restricted operators for type safeness
+     */
+    public String getOperators() {
+        return null;
+    }
 
-  @Override
-  public ExampleQuery getExampleQuery()
-  {
-    ExampleQuery exampleQuery = new ExampleQuery();
-    exampleQuery.setDescription(getDescription());
-    exampleQuery.setExampleQuery(getFinalAQLQuery());
-
-    return exampleQuery;
-  }
+    /**
+     * TODO define types
+     */
+    public String getType() {
+        return null;
+    }
 }

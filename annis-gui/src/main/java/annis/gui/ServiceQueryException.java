@@ -20,25 +20,25 @@ package annis.gui;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ServiceQueryException extends Exception
-{ 
-  private final String description;
-  
-  public ServiceQueryException(String msg)
-  {
-    super(msg);
-    this.description = null;
-  }
-  
-  public ServiceQueryException(String msg, String description)
-  {
-    super(msg);
-    this.description = description;
-  }
+public class ServiceQueryException extends Exception {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -5450329610054870110L;
+    private final String description;
 
-  public String getDescription()
-  {
-    return description;
-  }
-  
+    public ServiceQueryException(String msg) {
+        super(msg);
+        this.description = null;
+    }
+
+    public ServiceQueryException(String msg, String description) {
+        super(msg);
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
 }

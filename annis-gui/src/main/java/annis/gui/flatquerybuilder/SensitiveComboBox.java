@@ -15,47 +15,53 @@
  */
 package annis.gui.flatquerybuilder;
 
-import java.util.Map;
-
 import com.vaadin.v7.event.FieldEvents.TextChangeEvent;
 import com.vaadin.v7.event.FieldEvents.TextChangeListener;
 import com.vaadin.v7.ui.ComboBox;
+import java.util.Map;
 
 /**
  *
  * @author klotzmaz
  */
-public class SensitiveComboBox extends ComboBox
-{
-  /*
-   * Source Code found on: http://dev.vaadin.com/ticket/7436
-   * (On 2013-03-07)
-   */
-   @Override
+public class SensitiveComboBox extends ComboBox {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 8541211405360275906L;
+
+    public void addListener(TextChangeListener listener) {
+        addListener(TextChangeListener.EVENT_ID, TextChangeEvent.class, listener, TextChangeListener.EVENT_METHOD);
+    }
+
+    /*
+     * Source Code found on: http://dev.vaadin.com/ticket/7436 (On 2013-03-07)
+     */
+    @Override
     public void changeVariables(Object source, Map<String, Object> variables) {
         if (variables.containsKey("filter")) {
             final String text = variables.get("filter").toString();
             fireEvent(new TextChangeEvent(this) {
-                @Override
-                public String getText() {
-                    return text;
-                }
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = -5421017053579222951L;
+
                 @Override
                 public int getCursorPosition() {
                     return text.length();
+                }
+
+                @Override
+                public String getText() {
+                    return text;
                 }
             });
         }
         super.changeVariables(source, variables);
     }
 
-    public void addListener(TextChangeListener listener) {
-        addListener(TextChangeListener.EVENT_ID, TextChangeEvent.class,
-                listener, TextChangeListener.EVENT_METHOD);
-    }
-
     public void removeListener(TextChangeListener listener) {
-        removeListener(TextChangeListener.EVENT_ID, TextChangeEvent.class,
-                listener); 
+        removeListener(TextChangeListener.EVENT_ID, TextChangeEvent.class, listener);
     }
 }

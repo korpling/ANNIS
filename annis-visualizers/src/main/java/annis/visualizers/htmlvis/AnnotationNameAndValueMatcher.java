@@ -1,17 +1,15 @@
 /*
  * Copyright 2013 SFB 632.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.visualizers.htmlvis;
 
@@ -26,73 +24,62 @@ import org.corpus_tools.salt.core.SNode;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class AnnotationNameAndValueMatcher implements SpanMatcher
-{
+public class AnnotationNameAndValueMatcher implements SpanMatcher {
   private AnnotationNameMatcher nameMatcher;
   private String annotationValue;
 
   /**
    * 
    * @param annotationNamespace
-   * @param annotationName 
+   * @param annotationName
    * @param annotationValue
    */
-  public AnnotationNameAndValueMatcher(String annotationNamespace, 
-    String annotationName, String annotationValue)
-  {
+  public AnnotationNameAndValueMatcher(String annotationNamespace, String annotationName,
+      String annotationValue) {
     Validate.notNull(annotationName, "The annotation name parameter must never be null.");
     Validate.notNull(annotationValue, "The annotation value parameter must never be null.");
-    
+
     this.nameMatcher = new AnnotationNameMatcher(annotationNamespace, annotationName);
     this.annotationValue = annotationValue;
   }
-  
+
+  public String getAnnotationValue() {
+    return annotationValue;
+  }
+
+  public AnnotationNameMatcher getNameMatcher() {
+    return nameMatcher;
+  }
+
   @Override
-  public String matchedAnnotation(SNode node)
-  {
-    if(node instanceof SSpan || node instanceof SToken)
-    {
+  public List<String> getRequiredAnnotationNames() {
+    return nameMatcher.getRequiredAnnotationNames();
+  }
+
+  @Override
+  public String matchedAnnotation(SNode node) {
+    if (node instanceof SSpan || node instanceof SToken) {
       String match = nameMatcher.matchedAnnotation(node);
-      if(match != null)
-      {
+      if (match != null) {
         SAnnotation anno = node.getAnnotation(match);
-        if(anno != null && annotationValue.equals(anno.getValue_STEXT()))
-        {
+        if (anno != null && annotationValue.equals(anno.getValue_STEXT())) {
           return match;
         }
       }
     }
-    
+
     return null;
 
   }
 
-  public AnnotationNameMatcher getNameMatcher()
-  {
-    return nameMatcher;
-  }
-
-  public void setNameMatcher(AnnotationNameMatcher nameMatcher)
-  {
-    this.nameMatcher = nameMatcher;
-  }
-
-  public String getAnnotationValue()
-  {
-    return annotationValue;
-  }
-
-  public void setAnnotationValue(String annotationValue)
-  {
+  public void setAnnotationValue(String annotationValue) {
     this.annotationValue = annotationValue;
   }
 
-  @Override
-  public List<String> getRequiredAnnotationNames()
-  {
-    return nameMatcher.getRequiredAnnotationNames();
+  public void setNameMatcher(AnnotationNameMatcher nameMatcher) {
+    this.nameMatcher = nameMatcher;
   }
-  
-  
-  
+
+
+
 }

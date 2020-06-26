@@ -32,144 +32,117 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A model that manages users.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class UserManagement implements Serializable
-{
-  private WebResourceProvider webResourceProvider;
+public class UserManagement implements Serializable {
+    private static final long serialVersionUID = 9003127192150738183L;
 
-  private final Map<String, User> users = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
-  private final TreeSet<String> usedGroupNames = new TreeSet<>();
-  private final TreeSet<String> usedPermissions = new TreeSet<>();
-  
-  private final Logger log = LoggerFactory.getLogger(UserManagement.class);
-  
-  public boolean createOrUpdateUser(User newUser)
-  {
-    if(webResourceProvider != null)
-    {
-      WebResource res = webResourceProvider.getWebResource()
-        .path("admin/users").path(newUser.getName());
-      try
-      {
-        res.put(newUser);
-        users.put(newUser.getName(), newUser);
-        
-        updateUsedGroupNamesAndPermissions();
-        return true;
-      }
-      catch(UniformInterfaceException ex)
-      {
-        log.warn("Could not update user", ex);
-      }
-    }
-    return false;
-  }
-  
-  public void deleteUser(String userName)
-  {
-    if(webResourceProvider != null)
-    {
-      WebResource res = webResourceProvider.getWebResource()
-        .path("admin/users").path(userName);
-      res.delete();
-      users.remove(userName);
-      updateUsedGroupNamesAndPermissions();
-    }
-  }
-  
-  public User setPassword(String userName, String newPassword)
-  {
-    User newUser = null;
+    private WebResourceProvider webResourceProvider;
 
-    if(webResourceProvider != null)
-    {
-      WebResource res = webResourceProvider.getWebResource().path("admin/users").path(userName).path("password");
-      newUser = res.post(User.class, newPassword);
-      if(newUser != null)
-      {
-        users.put(newUser.getName(), newUser);
-      }
-    }
-    return newUser;
+    private final Map<String, User> users = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
+    private final TreeSet<String> usedGroupNames = new TreeSet<>();
+    private final TreeSet<String> usedPermissions = new TreeSet<>();
 
-  }
-  
-  public void clear()
-  {
-    users.clear();
-    usedGroupNames.clear();
-    usedPermissions.clear();
-  }
-  
-  public boolean fetchFromService()
-  {
-    if(webResourceProvider != null)
-    {
-      WebResource res = webResourceProvider.getWebResource().path("admin/users");
-      users.clear();
-      usedGroupNames.clear();
-      usedPermissions.clear();
-      try
-      {
-        List<User> list = res.get(new GenericType<List<User>>() {});
-        for(User u : list)
-        {
-          users.put(u.getName(), u);
-          usedGroupNames.addAll(u.getGroups());
-          usedPermissions.addAll(u.getPermissions());
+    private final Logger log = LoggerFactory.getLogger(UserManagement.class);
+
+    public void clear() {
+        users.clear();
+        usedGroupNames.clear();
+        usedPermissions.clear();
+    }
+
+    public boolean createOrUpdateUser(User newUser) {
+        if (webResourceProvider != null) {
+            WebResource res = webResourceProvider.getWebResource().path("admin/users").path(newUser.getName());
+            try {
+                res.put(newUser);
+                users.put(newUser.getName(), newUser);
+
+                updateUsedGroupNamesAndPermissions();
+                return true;
+            } catch (UniformInterfaceException ex) {
+                log.warn("Could not update user", ex);
+            }
         }
-        return true;
-      }
-      catch(UniformInterfaceException ex)
-      {
-        log.error("Could not get the list of users", ex);
-      }
+        return false;
     }
-    return false;
-  }
-  
-  private void updateUsedGroupNamesAndPermissions()
-  {
-    usedGroupNames.clear();
-    usedPermissions.clear();
-    for(User u : users.values())
-    {
-      usedGroupNames.addAll(u.getGroups());
-      usedPermissions.addAll(u.getPermissions());
+
+    public void deleteUser(String userName) {
+        if (webResourceProvider != null) {
+            WebResource res = webResourceProvider.getWebResource().path("admin/users").path(userName);
+            res.delete();
+            users.remove(userName);
+            updateUsedGroupNamesAndPermissions();
+        }
     }
-  }
-  
-  public User getUser(String userName)
-  {
-    return users.get(userName);
-  }
-  
-  public Collection<User> getUsers()
-  {
-    return users.values();
-  }
 
-  public TreeSet<String> getUsedGroupNames()
-  {
-    return usedGroupNames;
-  }
-  
-  public TreeSet<String> getUsedPermissions()
-  {
-    return usedPermissions;
-  }
+    public boolean fetchFromService() {
+        if (webResourceProvider != null) {
+            WebResource res = webResourceProvider.getWebResource().path("admin/users");
+            users.clear();
+            usedGroupNames.clear();
+            usedPermissions.clear();
+            try {
+                List<User> list = res.get(new GenericType<List<User>>() {});
+                for (User u : list) {
+                    users.put(u.getName(), u);
+                    usedGroupNames.addAll(u.getGroups());
+                    usedPermissions.addAll(u.getPermissions());
+                }
+                return true;
+            } catch (UniformInterfaceException ex) {
+                log.error("Could not get the list of users", ex);
+            }
+        }
+        return false;
+    }
 
-  public WebResourceProvider getWebResourceProvider()
-  {
-    return webResourceProvider;
-  }
+    public TreeSet<String> getUsedGroupNames() {
+        return usedGroupNames;
+    }
 
-  public void setWebResourceProvider(WebResourceProvider webResourceProvider)
-  {
-    this.webResourceProvider = webResourceProvider;
-  }
-  
-  
-  
+    public TreeSet<String> getUsedPermissions() {
+        return usedPermissions;
+    }
+
+    public User getUser(String userName) {
+        return users.get(userName);
+    }
+
+    public Collection<User> getUsers() {
+        return users.values();
+    }
+
+    public WebResourceProvider getWebResourceProvider() {
+        return webResourceProvider;
+    }
+
+    public User setPassword(String userName, String newPassword) {
+        User newUser = null;
+
+        if (webResourceProvider != null) {
+            WebResource res = webResourceProvider.getWebResource().path("admin/users").path(userName).path("password");
+            newUser = res.post(User.class, newPassword);
+            if (newUser != null) {
+                users.put(newUser.getName(), newUser);
+            }
+        }
+        return newUser;
+
+    }
+
+    public void setWebResourceProvider(WebResourceProvider webResourceProvider) {
+        this.webResourceProvider = webResourceProvider;
+    }
+
+    private void updateUsedGroupNamesAndPermissions() {
+        usedGroupNames.clear();
+        usedPermissions.clear();
+        for (User u : users.values()) {
+            usedGroupNames.addAll(u.getGroups());
+            usedPermissions.addAll(u.getPermissions());
+        }
+    }
+
 }

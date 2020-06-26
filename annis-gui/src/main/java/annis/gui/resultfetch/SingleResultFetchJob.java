@@ -15,20 +15,17 @@
  */
 package annis.gui.resultfetch;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import org.corpus_tools.salt.common.SaltProject;
-
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.ui.UI;
-
 import annis.libgui.Helper;
 import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.UI;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import org.corpus_tools.salt.common.SaltProject;
 
 /**
  * Fetches a result which contains only one subgraph. This single query always
@@ -41,43 +38,35 @@ import annis.service.objects.SubgraphFilter;
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public class SingleResultFetchJob extends AbstractResultFetchJob implements
-  Callable<SaltProject>
-{
+public class SingleResultFetchJob extends AbstractResultFetchJob implements Callable<SaltProject> {
 
-  private final Match match;
+    private final Match match;
 
-  private final PagedResultQuery query;
-  
-  private final UI ui;
+    private final PagedResultQuery query;
 
-  public SingleResultFetchJob(Match match, PagedResultQuery query, UI ui)
-  {
-    this.match = match;
-    this.query = query;
-    this.ui = ui;
-  }
+    private final UI ui;
 
-  @Override
-  public SaltProject call() throws Exception
-  {
-    WebResource subgraphRes
-      = Helper.getAnnisWebResource(ui).path("query/search/subgraph");
-
-    if (Thread.interrupted())
-    {
-      return null;
+    public SingleResultFetchJob(Match match, PagedResultQuery query, UI ui) {
+        this.match = match;
+        this.query = query;
+        this.ui = ui;
     }
 
-    List<Match> subList = new LinkedList<>();
-    subList.add(match);
-    SaltProject p = executeQuery(subgraphRes,
-      new MatchGroup(subList),
-      query.getLeftContext(), query.getRightContext(),
-      query.getSegmentation(), SubgraphFilter.all);
+    @Override
+    public SaltProject call() throws Exception {
+        WebResource subgraphRes = Helper.getAnnisWebResource(ui).path("query/search/subgraph");
 
-    return p;
-    
-  }
-  
+        if (Thread.interrupted()) {
+            return null;
+        }
+
+        List<Match> subList = new LinkedList<>();
+        subList.add(match);
+        SaltProject p = executeQuery(subgraphRes, new MatchGroup(subList), query.getLeftContext(),
+                query.getRightContext(), query.getSegmentation(), SubgraphFilter.all);
+
+        return p;
+
+    }
+
 }

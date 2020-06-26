@@ -22,35 +22,37 @@ import java.io.Serializable;
 /**
  * Defines a way to get a {@link WebResource} needed to make REST calls.
  * 
- * This interface extends {@link Serializable} so it can be included in
- * other serializable classes (the {@link WebResource} itself is not 
- * serializable).
+ * This interface extends {@link Serializable} so it can be included in other
+ * serializable classes (the {@link WebResource} itself is not serializable).
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface WebResourceProvider extends Serializable
-{
-  
-  /**
-   * Returns a (possible cached) {@link WebResource}.
-   * 
-   * If the the user is authentifaced this includes the authentifaction information.
-   * @return The {@link WebResource} but never {@code null}.
-   */
-  public WebResource getWebResource();
-  
-  /**
-   * Returns a (possible cached) {@link AsyncWebResource}.
-   * 
-   * If the the user is authentifaced this includes the authentifaction information.
-   * @return  The {@link AsyncWebResource} but never {@code null}.
-   */
-  public AsyncWebResource getAsyncWebResource();  
-  
-  /**
-   * Called when the web resource got invalid.
-   * E.g. the login might have changed and the cached resource can't be used any longer.
-   * Will force the provider to update the resources.
-   */
-  public void invalidateWebResource();
+public interface WebResourceProvider extends Serializable {
+
+    /**
+     * Returns a (possible cached) {@link AsyncWebResource}.
+     * 
+     * If the the user is authentifaced this includes the authentifaction
+     * information.
+     * 
+     * @return The {@link AsyncWebResource} but never {@code null}.
+     */
+    public AsyncWebResource getAsyncWebResource();
+
+    /**
+     * Returns a (possible cached) {@link WebResource}.
+     * 
+     * If the the user is authentifaced this includes the authentifaction
+     * information.
+     * 
+     * @return The {@link WebResource} but never {@code null}.
+     */
+    public WebResource getWebResource();
+
+    /**
+     * Called when the web resource got invalid. E.g. the login might have changed
+     * and the cached resource can't be used any longer. Will force the provider to
+     * update the resources.
+     */
+    public void invalidateWebResource();
 }

@@ -15,10 +15,18 @@
  */
 package annis.gui;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
-
+import annis.gui.admin.CorpusAdminPanel;
+import annis.gui.admin.GroupManagementPanel;
+import annis.gui.admin.ImportPanel;
+import annis.gui.admin.controller.CorpusController;
+import annis.gui.admin.controller.GroupController;
+import annis.gui.admin.model.CorpusManagement;
+import annis.gui.admin.model.GroupManagement;
+import annis.gui.admin.model.UserManagement;
+import annis.gui.admin.model.WebResourceProvider;
+import annis.gui.admin.view.UIView;
+import annis.libgui.Background;
+import annis.libgui.Helper;
 import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.WebResource;
@@ -29,24 +37,11 @@ import com.vaadin.server.Page;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-
-import annis.gui.admin.CorpusAdminPanel;
-import annis.gui.admin.GroupManagementPanel;
-import annis.gui.admin.ImportPanel;
-import annis.gui.admin.UserManagementPanel;
-import annis.gui.admin.controller.CorpusController;
-import annis.gui.admin.controller.GroupController;
-import annis.gui.admin.controller.UserController;
-import annis.gui.admin.model.CorpusManagement;
-import annis.gui.admin.model.GroupManagement;
-import annis.gui.admin.model.UserManagement;
-import annis.gui.admin.model.WebResourceProvider;
-import annis.gui.admin.view.UIView;
-import annis.libgui.Background;
-import annis.libgui.Helper;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  *
@@ -54,6 +49,8 @@ import annis.libgui.Helper;
  */
 public class AdminView extends VerticalLayout
         implements View, UIView, LoginListener, TabSheet.SelectedTabChangeListener, WebResourceProvider {
+
+    private static final long serialVersionUID = -5142632455076589645L;
 
     public static final String NAME = "admin";
 
@@ -64,8 +61,6 @@ public class AdminView extends VerticalLayout
     private final ImportPanel importPanel;
 
     private final CorpusAdminPanel corpusAdminPanel;
-
-    private final UserManagementPanel userManagementPanel;
 
     private final GroupManagementPanel groupManagementPanel;
 
@@ -93,19 +88,14 @@ public class AdminView extends VerticalLayout
         corpusAdminPanel = new CorpusAdminPanel();
         new CorpusController(corpusManagement, corpusAdminPanel, this, isLoggedIn);
 
-        userManagementPanel = new UserManagementPanel();
-        new UserController(userManagement, userManagementPanel, this, isLoggedIn);
-
         groupManagementPanel = new GroupManagementPanel();
-        new GroupController(groupManagement, corpusManagement, groupManagementPanel, this, userManagementPanel,
-                isLoggedIn);
+        new GroupController(groupManagement, corpusManagement, groupManagementPanel, this, isLoggedIn);
 
         importPanel = new ImportPanel();
 
         tabSheet = new TabSheet();
         tabSheet.addTab(importPanel, "Import Corpus", FontAwesome.UPLOAD);
         tabSheet.addTab(corpusAdminPanel, "Corpus management", FontAwesome.LIST_ALT);
-        tabSheet.addTab(userManagementPanel, "User management", FontAwesome.USER);
         tabSheet.addTab(groupManagementPanel, "Group management", FontAwesome.USERS);
 
         tabSheet.setSizeFull();
@@ -122,20 +112,19 @@ public class AdminView extends VerticalLayout
 
     }
 
-    public void setToolbar(MainToolbar newToolbar) {
-        // remove old one if necessary
-        if (this.toolbar != null) {
-            removeComponent(this.toolbar);
-            this.toolbar = null;
+    @Override
+    public void addListener(UIView.Listener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void detach() {
+        // inform the controllers that no tab is active any longer
+        for (UIView.Listener l : listeners) {
+            l.loadedTab(null);
         }
 
-        // add new toolbar
-        if (newToolbar != null) {
-            this.toolbar = newToolbar;
-            addComponent(this.toolbar, 0);
-            setExpandRatio(this.toolbar, 0.0f);
-            this.toolbar.addLoginListener(this);
-        }
+        super.detach();
     }
 
     @Override
@@ -147,7 +136,6 @@ public class AdminView extends VerticalLayout
 
         // group and user management are not applicable in kickstarter
         tabSheet.getTab(groupManagementPanel).setVisible(!kickstarter);
-        tabSheet.getTab(userManagementPanel).setVisible(!kickstarter);
 
         Component selectedTab = getComponentForFragment(event.getParameters());
         if (selectedTab != null && selectedTab != tabSheet.getSelectedTab()) {
@@ -167,13 +155,11 @@ public class AdminView extends VerticalLayout
     }
 
     @Override
-    public void detach() {
-        // inform the controllers that no tab is active any longer
-        for (UIView.Listener l : listeners) {
-            l.loadedTab(null);
+    public AsyncWebResource getAsyncWebResource() {
+        if (asyncWebResource == null) {
+            asyncWebResource = Helper.getAnnisAsyncWebResource(ui);
         }
-
-        super.detach();
+        return asyncWebResource;
     }
 
     private Component getComponentForFragment(String fragment) {
@@ -183,8 +169,6 @@ public class AdminView extends VerticalLayout
                 return importPanel;
             case "corpora":
                 return corpusAdminPanel;
-            case "users":
-                return userManagementPanel;
             case "groups":
                 return groupManagementPanel;
             default:
@@ -199,8 +183,6 @@ public class AdminView extends VerticalLayout
             return "import";
         } else if (c == corpusAdminPanel) {
             return "corpora";
-        } else if (c == userManagementPanel) {
-            return "users";
         } else if (c == groupManagementPanel) {
             return "groups";
         }
@@ -208,42 +190,17 @@ public class AdminView extends VerticalLayout
     }
 
     @Override
-    public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
-        Component selected = event.getTabSheet().getSelectedTab();
-
-        for (UIView.Listener l : listeners) {
-            l.loadedTab(selected);
+    public WebResource getWebResource() {
+        if (webResource == null) {
+            webResource = Helper.getAnnisWebResource(ui);
         }
-        setFragmentParameter(getFragmentForComponent(selected));
-    }
-
-    private void setFragmentParameter(String param) {
-        Page.getCurrent().setUriFragment("!" + NAME + "/" + param, false);
+        return webResource;
     }
 
     @Override
-    public void addListener(UIView.Listener listener) {
-        listeners.add(listener);
-    }
-
-    @Override
-    public void showInfo(String info, String description) {
-        Notification.show(info, description, Notification.Type.HUMANIZED_MESSAGE);
-    }
-
-    @Override
-    public void showBackgroundInfo(String info, String description) {
-        Notification.show(info, description, Notification.Type.TRAY_NOTIFICATION);
-    }
-
-    @Override
-    public void showWarning(String error, String description) {
-        Notification.show(error, description, Notification.Type.WARNING_MESSAGE);
-    }
-
-    @Override
-    public void showError(String error, String description) {
-        Notification.show(error, description, Notification.Type.ERROR_MESSAGE);
+    public void invalidateWebResource() {
+        asyncWebResource = null;
+        webResource = null;
     }
 
     @Override
@@ -274,25 +231,53 @@ public class AdminView extends VerticalLayout
     }
 
     @Override
-    public WebResource getWebResource() {
-        if (webResource == null) {
-            webResource = Helper.getAnnisWebResource(ui);
+    public void selectedTabChange(TabSheet.SelectedTabChangeEvent event) {
+        Component selected = event.getTabSheet().getSelectedTab();
+
+        for (UIView.Listener l : listeners) {
+            l.loadedTab(selected);
         }
-        return webResource;
+        setFragmentParameter(getFragmentForComponent(selected));
+    }
+
+    private void setFragmentParameter(String param) {
+        Page.getCurrent().setUriFragment("!" + NAME + "/" + param, false);
+    }
+
+    public void setToolbar(MainToolbar newToolbar) {
+        // remove old one if necessary
+        if (this.toolbar != null) {
+            removeComponent(this.toolbar);
+            this.toolbar = null;
+        }
+
+        // add new toolbar
+        if (newToolbar != null) {
+            this.toolbar = newToolbar;
+            addComponent(this.toolbar, 0);
+            setExpandRatio(this.toolbar, 0.0f);
+            this.toolbar.addLoginListener(this);
+        }
     }
 
     @Override
-    public AsyncWebResource getAsyncWebResource() {
-        if (asyncWebResource == null) {
-            asyncWebResource = Helper.getAnnisAsyncWebResource(ui);
-        }
-        return asyncWebResource;
+    public void showBackgroundInfo(String info, String description) {
+        Notification.show(info, description, Notification.Type.TRAY_NOTIFICATION);
     }
 
     @Override
-    public void invalidateWebResource() {
-        asyncWebResource = null;
-        webResource = null;
+    public void showError(String error, String description) {
+        Notification.show(error, description, Notification.Type.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void showInfo(String info, String description) {
+        Notification.show(info, description, Notification.Type.HUMANIZED_MESSAGE);
+    }
+
+    @Override
+    public void showWarning(String error, String description) {
+        Notification.show(error, description, Notification.Type.WARNING_MESSAGE);
     }
 
 }

@@ -1,17 +1,15 @@
 /*
  * Copyright 2015 SFB 632.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.libgui;
 
@@ -32,18 +30,39 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class Background
-{
+public class Background {
   private static final Logger log = LoggerFactory.getLogger(Background.class);
-  
-  public static Future<?> run(Runnable job)
-  {
+
+  public static <T> Future<T> call(final Callable<T> callable) {
+
+    if (callable != null) {
+      // create a new thread for every job to ensure that Vaadin.getSession() works
+      // as expected
+      ExecutorService exec = Executors.newSingleThreadExecutor();
+      Future<T> result = exec.submit(() -> {
+        T result1 = null;
+        try {
+          result1 = callable.call();
+        } catch (Exception ex) {
+          log.error("exception in background job", ex);
+          throw (ex);
+        }
+        return result1;
+      });
+
+      return result;
+    }
+
+    return null;
+  }
+
+  public static Future<?> run(Runnable job) {
     return call(Executors.callable(job));
   }
-  
+
   /**
-   * Execute the job in the background and provide a callback which is called
-   * when the job is finished.
+   * Execute the job in the background and provide a callback which is called when the job is
+   * finished.
    * 
    * It is guaranteed that the callback is executed inside of the UI thread.
    * 
@@ -51,80 +70,26 @@ public class Background
    * @param job The job to execute
    * @param callback Callback which is executed when the job is finished
    */
-  public static <T> void runWithCallback(Callable<T> job, final FutureCallback<T> callback)
-  {
+  public static <T> void runWithCallback(Callable<T> job, final FutureCallback<T> callback) {
     final UI ui = UI.getCurrent();
-    
-    ListeningExecutorService exec = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
+
+    ListeningExecutorService exec =
+        MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
     ListenableFuture<T> future = exec.submit(job);
-    if(callback != null)
-    {
-      Futures.addCallback(future, new FutureCallback<T>()
-      {
+    if (callback != null) {
+      Futures.addCallback(future, new FutureCallback<T>() {
 
         @Override
-        public void onSuccess(final T result)
-        {
-          ui.access(new Runnable()
-          {
-
-            @Override
-            public void run()
-            {
-              callback.onSuccess(result);
-            }
-          });
+        public void onFailure(final Throwable t) {
+          ui.access(() -> callback.onFailure(t));
         }
 
         @Override
-        public void onFailure(final Throwable t)
-        {
-          ui.access(new Runnable()
-          {
-
-            @Override
-            public void run()
-            {
-              callback.onFailure(t);
-            }
-          });
+        public void onSuccess(final T result) {
+          ui.access(() -> callback.onSuccess(result));
         }
       });
     }
   }
-  
-  public static <T> Future<T> call(
-    final Callable<T> callable) 
-  {
-    
-    if(callable != null)
-    { 
-      // create a new thread for every job to ensure that Vaadin.getSession() works
-      // as expected
-      ExecutorService exec = Executors.newSingleThreadExecutor();
-      Future<T> result = exec.submit(new Callable<T>()
-      {
-        @Override
-        public T call() throws Exception
-        { 
-          T result = null;
-          try
-          {
-            result = callable.call();
-          }
-          catch(Exception ex)
-          {
-            log.error("exception in background job", ex);
-            throw(ex);
-          }
-          return result;
-        }
-      });
-      
-      return result;
-    }
-    
-    return null;
-  }
-  
+
 }

@@ -31,107 +31,80 @@ import java.util.Set;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CorpusController
-  implements CorpusListView.Listener, UIView.Listener
-{
-  
-  private final CorpusManagement model;
-  private final CorpusListView view;
-  private final UIView uiView;
-  private boolean isLoggedIn = false;
-  private boolean viewIsActive = false;
-  
-  public CorpusController(CorpusManagement model,
-    CorpusListView view, UIView uiView, boolean isLoggedIn)
-  {
-    this.model = model;
-    this.view = view;    
-    this.uiView = uiView;
-    this.isLoggedIn = isLoggedIn;
-    view.addListener(CorpusController.this);
-    uiView.addListener(CorpusController.this);
-  }
-  
-  private void clearModel()
-  {
-    model.clear();
-    view.setAvailableCorpora(model.getCorpora());
-  }
-  
-  private void fetchFromService()
-  {
-    try
-    {
-      model.fetchFromService();
-      view.setAvailableCorpora(model.getCorpora());
-    }
-    catch(CriticalServiceQueryException ex)
-    {
-      uiView.showWarning("Cannot get the corpus list", null);
-      view.setAvailableCorpora(new LinkedList<AnnisCorpus>());
-    }
-    catch(ServiceQueryException ex)
-    {
-      uiView.showInfo("Cannot get the corpus list", null);
-      view.setAvailableCorpora(new LinkedList<AnnisCorpus>());
-    }
-  }
+public class CorpusController implements CorpusListView.Listener, UIView.Listener {
 
-  @Override
-  public void loginChanged(boolean isLoggedIn)
-  {
-    this.isLoggedIn = isLoggedIn;
-    if(model.getWebResourceProvider() != null)
-    {
-      model.getWebResourceProvider().invalidateWebResource();
-    }
-    if(isLoggedIn && viewIsActive)
-    {
-      fetchFromService();
-    }
-    else
-    {
-      clearModel();
-    }
-  }
-  
+    private static final long serialVersionUID = -3931526662554533493L;
+    private final CorpusManagement model;
+    private final CorpusListView view;
+    private final UIView uiView;
+    private boolean isLoggedIn = false;
+    private boolean viewIsActive = false;
 
-  @Override
-  public void loadedTab(Object selectedTab)
-  {
-    viewIsActive = selectedTab == view;
-    if(isLoggedIn && viewIsActive)
-    {
-      fetchFromService();
+    public CorpusController(CorpusManagement model, CorpusListView view, UIView uiView, boolean isLoggedIn) {
+        this.model = model;
+        this.view = view;
+        this.uiView = uiView;
+        this.isLoggedIn = isLoggedIn;
+        view.addListener(CorpusController.this);
+        uiView.addListener(CorpusController.this);
     }
-  }
 
-  @Override
-  public void deleteCorpora(Set<String> corpusName)
-  {
-    Set<String> deleted = new LinkedHashSet<>();
-    for(String c : corpusName)
-    {
-      try
-      {
-        model.delete(c);
-        deleted.add(c);
-      }
-      catch (CriticalServiceQueryException ex)
-      {
-        uiView.showWarning(ex.getMessage(), ex.getDescription());
-      }
-      catch (ServiceQueryException ex)
-      {
-        uiView.showInfo(ex.getMessage(), ex.getDescription());
-      }
+    private void clearModel() {
+        model.clear();
+        view.setAvailableCorpora(model.getCorpora());
     }
-    if(!deleted.isEmpty())
-    {
-      uiView.showInfo("Deleted corpora: " + Joiner.on(", ").join(deleted), null);
+
+    @Override
+    public void deleteCorpora(Set<String> corpusName) {
+        Set<String> deleted = new LinkedHashSet<>();
+        for (String c : corpusName) {
+            try {
+                model.delete(c);
+                deleted.add(c);
+            } catch (CriticalServiceQueryException ex) {
+                uiView.showWarning(ex.getMessage(), ex.getDescription());
+            } catch (ServiceQueryException ex) {
+                uiView.showInfo(ex.getMessage(), ex.getDescription());
+            }
+        }
+        if (!deleted.isEmpty()) {
+            uiView.showInfo("Deleted corpora: " + Joiner.on(", ").join(deleted), null);
+        }
+        view.setAvailableCorpora(model.getCorpora());
     }
-    view.setAvailableCorpora(model.getCorpora());
-  }
-  
-  
+
+    private void fetchFromService() {
+        try {
+            model.fetchFromService();
+            view.setAvailableCorpora(model.getCorpora());
+        } catch (CriticalServiceQueryException ex) {
+            uiView.showWarning("Cannot get the corpus list", null);
+            view.setAvailableCorpora(new LinkedList<AnnisCorpus>());
+        } catch (ServiceQueryException ex) {
+            uiView.showInfo("Cannot get the corpus list", null);
+            view.setAvailableCorpora(new LinkedList<AnnisCorpus>());
+        }
+    }
+
+    @Override
+    public void loadedTab(Object selectedTab) {
+        viewIsActive = selectedTab == view;
+        if (isLoggedIn && viewIsActive) {
+            fetchFromService();
+        }
+    }
+
+    @Override
+    public void loginChanged(boolean isLoggedIn) {
+        this.isLoggedIn = isLoggedIn;
+        if (model.getWebResourceProvider() != null) {
+            model.getWebResourceProvider().invalidateWebResource();
+        }
+        if (isLoggedIn && viewIsActive) {
+            fetchFromService();
+        } else {
+            clearModel();
+        }
+    }
+
 }

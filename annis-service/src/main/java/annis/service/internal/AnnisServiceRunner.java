@@ -15,14 +15,23 @@
  */
 package annis.service.internal;
 
+import annis.AnnisBaseRunner;
+import annis.AnnisRunnerException;
+import annis.ServiceConfig;
+import annis.administration.AdministrationDao;
+import annis.administration.CorpusAdministration;
+import annis.administration.DeleteCorpusDao;
+import annis.dao.QueryDao;
+import annis.dao.ShortenerDao;
+import annis.exceptions.AnnisException;
+import annis.security.MultipleIniWebEnvironment;
+import annis.service.objects.AnnisCorpus;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.servlet.DispatcherType;
-
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.shiro.web.env.EnvironmentLoader;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
@@ -36,85 +45,27 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import annis.AnnisBaseRunner;
-import annis.AnnisRunnerException;
-import annis.ServiceConfig;
-import annis.administration.AdministrationDao;
-import annis.administration.CorpusAdministration;
-import annis.administration.DeleteCorpusDao;
-import annis.dao.QueryDao;
-import annis.dao.ShortenerDao;
-import annis.exceptions.AnnisException;
-import annis.security.MultipleIniWebEnvironment;
-import annis.service.objects.AnnisCorpus;
-
 public class AnnisServiceRunner extends ResourceConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AnnisServiceRunner.class);
 
-    private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
-
     private static AnnisServiceRunner annisServiceRunner;
-
-    private boolean isShutdownRequested = false;
-    private int errorCode = 0;
 
     private static Thread mainThread;
 
-    private Server server;
-
-    private boolean useAuthentification = true;
-    private Integer overridePort = null;
-
-    private final QueryDao queryDao;
-    private final AdministrationDao adminDao;
-    private final DeleteCorpusDao deleteCorpusDao;
-    private final ShortenerDao shortenerDao;
-    private final CorpusAdministration corpusAdministration;
-    private final ImportWorker importWorker;
-    
-
-    public AnnisServiceRunner() throws GraphANNISException {
-        this(null, null);
+    static private void addShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                annisServiceRunner.shutdown();
+            }
+        });
     }
 
-    public AnnisServiceRunner(Integer port, CorpusAdministration corpusAdmin) throws GraphANNISException {
-        this.overridePort = port;
-        boolean nosecurity = Boolean.parseBoolean(System.getProperty("annis.nosecurity", "false"));
-        this.useAuthentification = !nosecurity;
-
-        if(corpusAdmin == null) {
-            this.queryDao = QueryDao.create();
-            this.deleteCorpusDao = DeleteCorpusDao.create(this.queryDao);
-            this.adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
-            this.shortenerDao = ShortenerDao.create();
-            this.corpusAdministration = CorpusAdministration.create(this.adminDao, this.shortenerDao);
-        } else {
-            this.queryDao = corpusAdmin.getAdministrationDao().getQueryDao();
-            this.deleteCorpusDao = corpusAdmin.getAdministrationDao().getDeleteCorpusDao();
-            this.adminDao = corpusAdmin.getAdministrationDao();
-            this.shortenerDao = corpusAdmin.getShortenerDao();
-            this.corpusAdministration = corpusAdmin;
-        }
-        this.importWorker = new ImportWorker(this.corpusAdministration);
-        this.importWorker.start();
-        
-        property("queryDao", this.queryDao);
-        property("adminDao", this.adminDao);
-        property("shortenerDao", this.shortenerDao);
-        property("corpusAdministration", this.corpusAdministration);
-        property("importWorker", this.importWorker);
-        
-        
-
-        packages("annis.service.internal", "annis.provider", "annis.rest.provider");
-
+    private static void closeSystemStreams() {
+        System.err.close();
+        System.out.close();
     }
-    
-    public QueryDao getQueryDao() {
-        return queryDao;
-    }
-    
 
     public static void main(String[] args) throws Exception {
 
@@ -169,32 +120,57 @@ public class AnnisServiceRunner extends ResourceConfig {
         }
     }
 
-    /**
-     * shutdown the AnnisService - ensure that current work load finishes
-     */
-    public void shutdown() {
-        log.info("Shutting down...");
-        isShutdownRequested = true;
+    private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
 
-        try {
-            mainThread.join();
-        } catch (InterruptedException e) {
-            log.error("Interrupted which waiting on main daemon thread to complete.");
+    private boolean isShutdownRequested = false;
+    private int errorCode = 0;
+
+    private Server server;
+    private boolean useAuthentification = true;
+    private Integer overridePort = null;
+    private final QueryDao queryDao;
+    private final AdministrationDao adminDao;
+    private final DeleteCorpusDao deleteCorpusDao;
+
+    private final ShortenerDao shortenerDao;
+
+    private final CorpusAdministration corpusAdministration;
+
+    private final ImportWorker importWorker;
+
+    public AnnisServiceRunner() throws GraphANNISException {
+        this(null, null);
+    }
+
+    public AnnisServiceRunner(Integer port, CorpusAdministration corpusAdmin) throws GraphANNISException {
+        this.overridePort = port;
+        boolean nosecurity = Boolean.parseBoolean(System.getProperty("annis.nosecurity", "false"));
+        this.useAuthentification = !nosecurity;
+
+        if (corpusAdmin == null) {
+            this.queryDao = QueryDao.create();
+            this.deleteCorpusDao = DeleteCorpusDao.create(this.queryDao);
+            this.adminDao = AdministrationDao.create(queryDao, deleteCorpusDao);
+            this.shortenerDao = ShortenerDao.create();
+            this.corpusAdministration = CorpusAdministration.create(this.adminDao, this.shortenerDao);
+        } else {
+            this.queryDao = corpusAdmin.getAdministrationDao().getQueryDao();
+            this.deleteCorpusDao = corpusAdmin.getAdministrationDao().getDeleteCorpusDao();
+            this.adminDao = corpusAdmin.getAdministrationDao();
+            this.shortenerDao = corpusAdmin.getShortenerDao();
+            this.corpusAdministration = corpusAdmin;
         }
-    }
+        this.importWorker = new ImportWorker(this.corpusAdministration);
+        this.importWorker.start();
 
-    private static void closeSystemStreams() {
-        System.err.close();
-        System.out.close();
-    }
+        property("queryDao", this.queryDao);
+        property("adminDao", this.adminDao);
+        property("shortenerDao", this.shortenerDao);
+        property("corpusAdministration", this.corpusAdministration);
+        property("importWorker", this.importWorker);
 
-    static private void addShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                annisServiceRunner.shutdown();
-            }
-        });
+        packages("annis.service.internal", "annis.provider", "annis.rest.provider");
+
     }
 
     private void createWebServer() {
@@ -233,8 +209,8 @@ public class AnnisServiceRunner extends ResourceConfig {
                         "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
             }
 
-            //EnumSet<DispatcherType> gzipDispatcher = EnumSet.of(DispatcherType.REQUEST);
-            //context.addFilter(GzipFilter.class, "/*", gzipDispatcher);
+            // EnumSet<DispatcherType> gzipDispatcher = EnumSet.of(DispatcherType.REQUEST);
+            // context.addFilter(GzipFilter.class, "/*", gzipDispatcher);
 
             // configure Apache Shiro with the web application
             context.addEventListener(new EnvironmentLoaderListener());
@@ -256,12 +232,73 @@ public class AnnisServiceRunner extends ResourceConfig {
 
     }
 
+    public List<AnnisCorpus> getCorpora() {
+        if (queryDao != null) {
+            return queryDao.listCorpora();
+        }
+        return new LinkedList<>();
+    }
+
+    public QueryDao getQueryDao() {
+        return queryDao;
+    }
+
+    public int getTimeout() {
+        return cfg.timeout();
+    }
+
+    /**
+     * True if authorization is enabled.
+     *
+     * @return
+     */
+    public boolean isUseAuthentification() {
+        return useAuthentification;
+    }
+
+    /**
+     * Set the timeout in milliseconds
+     * 
+     * @param milliseconds
+     *            Timeout if greater than zero, disabled timeout if less then zero.
+     */
+    public void setTimeout(int milliseconds) {
+        if (queryDao != null) {
+            queryDao.setTimeout(milliseconds);
+        }
+    }
+
+    /**
+     * Set wether you want to protect the service using authentification.
+     *
+     * Default value is true.
+     *
+     * @param useAuthentification
+     *            True if service should be authentificated, false if not.
+     */
+    public void setUseAuthentification(boolean useAuthentification) {
+        this.useAuthentification = useAuthentification;
+    }
+
+    /**
+     * shutdown the AnnisService - ensure that current work load finishes
+     */
+    public void shutdown() {
+        log.info("Shutting down...");
+        isShutdownRequested = true;
+
+        try {
+            mainThread.join();
+        } catch (InterruptedException e) {
+            log.error("Interrupted which waiting on main daemon thread to complete.");
+        }
+    }
+
     /**
      * Creates and starts the server
      *
      * @param rethrowExceptions
-     *                              Set to true if you want to get exceptions
-     *                              re-thrown to parent
+     *            Set to true if you want to get exceptions re-thrown to parent
      */
     public void start(boolean rethrowExceptions) throws Exception {
         log.info("Starting up REST...");
@@ -287,51 +324,5 @@ public class AnnisServiceRunner extends ResourceConfig {
                 }
             }
         }
-    }
-
-    /**
-     * True if authorization is enabled.
-     *
-     * @return
-     */
-    public boolean isUseAuthentification() {
-        return useAuthentification;
-    }
-
-    /**
-     * Set wether you want to protect the service using authentification.
-     *
-     * Default value is true.
-     *
-     * @param useAuthentification
-     *                                True if service should be authentificated,
-     *                                false if not.
-     */
-    public void setUseAuthentification(boolean useAuthentification) {
-        this.useAuthentification = useAuthentification;
-    }
-
-    /**
-     * Set the timeout in milliseconds
-     * 
-     * @param milliseconds
-     *                         Timeout if greater than zero, disabled timeout if
-     *                         less then zero.
-     */
-    public void setTimeout(int milliseconds) {
-        if (queryDao != null) {
-            queryDao.setTimeout(milliseconds);
-        }
-    }
-
-    public int getTimeout() {
-        return cfg.timeout();
-    }
-
-    public List<AnnisCorpus> getCorpora() {
-        if (queryDao != null) {
-            return queryDao.listCorpora();
-        }
-        return new LinkedList<>();
     }
 }

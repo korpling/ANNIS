@@ -25,46 +25,40 @@ import org.apache.shiro.web.env.IniWebEnvironment;
 
 /**
  * An extension of the {@link DefaultWebEnvironment} class allows several
- * {@link Ini} files. 
+ * {@link Ini} files.
  * 
  * <p>
- * This class assumes that the config locations ({@link #setConfigLocations(java.lang.String[]) ) }
- * are set and has no way of fallbacking to any default locations.
+ * This class assumes that the config locations
+ * ({@link #setConfigLocations(java.lang.String[]) ) } are set and has no way of
+ * fallbacking to any default locations.
  * </p>
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class MultipleIniWebEnvironment extends IniWebEnvironment 
-  implements Initializable
-{
+public class MultipleIniWebEnvironment extends IniWebEnvironment implements Initializable {
 
-  @Override
-  public void init() throws ShiroException
-  {
-    Ini ini = new Ini();
-    
-    Preconditions.checkNotNull(getConfigLocations());
-    
-    for(String p : getConfigLocations())
-    {
-      Ini subIni = new Ini(ini);
-      subIni.loadFromPath(p);
-      
-      // add all values from the sub file to the main configuration
-      for(Section section : subIni.getSections())
-      {
-        Section existing = ini.getSection(section.getName());
-        if(existing == null)
-        {
-          existing = ini.addSection(section.getName());
+    @Override
+    public void init() throws ShiroException {
+        Ini ini = new Ini();
+
+        Preconditions.checkNotNull(getConfigLocations());
+
+        for (String p : getConfigLocations()) {
+            Ini subIni = new Ini(ini);
+            subIni.loadFromPath(p);
+
+            // add all values from the sub file to the main configuration
+            for (Section section : subIni.getSections()) {
+                Section existing = ini.getSection(section.getName());
+                if (existing == null) {
+                    existing = ini.addSection(section.getName());
+                }
+                existing.putAll(section);
+            }
         }
-        existing.putAll(section);
-      }
+
+        setIni(ini);
+        configure();
     }
 
-    setIni(ini);
-    configure();
-  }
-
-  
 }

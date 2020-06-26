@@ -23,61 +23,50 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Authentificate with a static anonymous user account when no real 
- * authentification was given.
- * If there is an authentification given this class will act like it's
- * parent class. The default value for password and user name are "anonymous".
- * You can change them with the {@link #anonymousUser} and {@link #anonymousPassword}
- * properties.
+ * Authentificate with a static anonymous user account when no real
+ * authentification was given. If there is an authentification given this class
+ * will act like it's parent class. The default value for password and user name
+ * are "anonymous". You can change them with the {@link #anonymousUser} and
+ * {@link #anonymousPassword} properties.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class BasicAuthOrAnonymousFilter extends BasicHttpAuthenticationFilter
-{
+public class BasicAuthOrAnonymousFilter extends BasicHttpAuthenticationFilter {
 
-  private static final Logger log = LoggerFactory.getLogger(BasicAuthOrAnonymousFilter.class);
-  
-  private String anonymousUser = Group.ANONYMOUS;
-  private String anonymousPassword = Group.ANONYMOUS; 
-  
-  @Override
-  protected String getAuthzHeader(ServletRequest request)
-  {
-    String result = super.getAuthzHeader(request);
-    if(result == null)
-    {
-      try
-      {
-        // create an new one with anonymous user and password
-        result = "Basic " 
-          + Base64.encodeToString((anonymousUser + ":" + anonymousPassword).getBytes("UTF-8"));
-      }
-      catch (UnsupportedEncodingException ex)
-      {
-        log.error(null, ex);
-      }
+    private static final Logger log = LoggerFactory.getLogger(BasicAuthOrAnonymousFilter.class);
+
+    private String anonymousUser = Group.ANONYMOUS;
+    private String anonymousPassword = Group.ANONYMOUS;
+
+    public String getAnonymousPassword() {
+        return anonymousPassword;
     }
-    
-    return result;
-  }
 
-  public String getAnonymousUser()
-  {
-    return anonymousUser;
-  }
+    public String getAnonymousUser() {
+        return anonymousUser;
+    }
 
-  public void setAnonymousUser(String anonymousUser)
-  {
-    this.anonymousUser = anonymousUser;
-  }
+    @Override
+    protected String getAuthzHeader(ServletRequest request) {
+        String result = super.getAuthzHeader(request);
+        if (result == null) {
+            try {
+                // create an new one with anonymous user and password
+                result = "Basic " + Base64.encodeToString((anonymousUser + ":" + anonymousPassword).getBytes("UTF-8"));
+            } catch (UnsupportedEncodingException ex) {
+                log.error(null, ex);
+            }
+        }
 
-  public String getAnonymousPassword()
-  {
-    return anonymousPassword;
-  }
+        return result;
+    }
 
-  public void setAnonymousPassword(String anonymousPassword)
-  {
-    this.anonymousPassword = anonymousPassword;
-  }
-  
+    public void setAnonymousPassword(String anonymousPassword) {
+        this.anonymousPassword = anonymousPassword;
+    }
+
+    public void setAnonymousUser(String anonymousUser) {
+        this.anonymousUser = anonymousUser;
+    }
+
 }

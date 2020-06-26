@@ -15,23 +15,16 @@
  */
 package annis.gui;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.vaadin.server.ExternalResource;
+import annis.gui.components.StatefulBrowserComponent;
+import annis.libgui.InstanceConfig;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Accordion;
-import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.UI;
-
-import annis.gui.components.StatefulBrowserComponent;
-import annis.libgui.InstanceConfig;
+import java.net.URI;
+import java.net.URISyntaxException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -39,63 +32,68 @@ import annis.libgui.InstanceConfig;
  */
 public class HelpPanel extends Accordion {
 
-	private static final Logger log = LoggerFactory.getLogger(HelpPanel.class);
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3388826883552338877L;
 
-	private StatefulBrowserComponent help;
-	private final ExampleQueriesPanel examples;
+    private static final Logger log = LoggerFactory.getLogger(HelpPanel.class);
 
-	public HelpPanel(AnnisUI ui) {
-		setSizeFull();
-		
-		
-		if (ui != null) {
-			InstanceConfig cfg = ((AnnisUI) ui).getInstanceConfig();
-			
-			URI url = null;
-			if(cfg.getHelpUrl() != null && !cfg.getHelpUrl().isEmpty()) {
-				try {
-					url = new URI(cfg.getHelpUrl());
-				} catch (URISyntaxException ex) {
-					log.error("Invalid help URL {} provided in instance configuration", cfg.getHelpUrl(), ex);
-				}
-			} else {
-				URI appURI = UI.getCurrent().getPage().getLocation();
-				String relativeFile = "/VAADIN/help/index.html";
-		
-				try {
-					String oldPath = VaadinService.getCurrentRequest().getContextPath();
-					if (oldPath == null) {
-						oldPath = "";
-					}
-					if (oldPath.endsWith("/")) {
-						oldPath = oldPath.substring(0, oldPath.length() - 1);
-					}
-					url = new URI(appURI.getScheme(), appURI.getUserInfo(), appURI.getHost(), appURI.getPort(),
-							oldPath + relativeFile, null, null);
-		
-				} catch (URISyntaxException ex) {
-					log.error("Invalid help URI", ex);
-				}	}
-			
-			if(url != null) {
-				help = new StatefulBrowserComponent(url);
-				help.setSizeFull();
-				addComponent(help);
-				help.setHeight("99%");
-				addTab(help, "Help", FontAwesome.BOOK);
-				setSelectedTab(help);
-			}
-		}
-		
-		examples = new ExampleQueriesPanel(ui, this);
-		examples.setHeight("99%");
-		
-		addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
-		addStyleName("help-tab");
-	}
+    private StatefulBrowserComponent help;
+    private final ExampleQueriesPanel examples;
 
-	public ExampleQueriesPanel getExamples() {
-		return examples;
-	}
+    public HelpPanel(AnnisUI ui) {
+        setSizeFull();
+
+        if (ui != null) {
+            InstanceConfig cfg = ui.getInstanceConfig();
+
+            URI url = null;
+            if (cfg.getHelpUrl() != null && !cfg.getHelpUrl().isEmpty()) {
+                try {
+                    url = new URI(cfg.getHelpUrl());
+                } catch (URISyntaxException ex) {
+                    log.error("Invalid help URL {} provided in instance configuration", cfg.getHelpUrl(), ex);
+                }
+            } else {
+                URI appURI = UI.getCurrent().getPage().getLocation();
+                String relativeFile = "/VAADIN/help/index.html";
+
+                try {
+                    String oldPath = VaadinService.getCurrentRequest().getContextPath();
+                    if (oldPath == null) {
+                        oldPath = "";
+                    }
+                    if (oldPath.endsWith("/")) {
+                        oldPath = oldPath.substring(0, oldPath.length() - 1);
+                    }
+                    url = new URI(appURI.getScheme(), appURI.getUserInfo(), appURI.getHost(), appURI.getPort(),
+                            oldPath + relativeFile, null, null);
+
+                } catch (URISyntaxException ex) {
+                    log.error("Invalid help URI", ex);
+                }
+            }
+
+            if (url != null) {
+                help = new StatefulBrowserComponent(url);
+                help.setSizeFull();
+                addComponent(help);
+                help.setHeight("99%");
+                addTab(help, "Help", FontAwesome.BOOK);
+                setSelectedTab(help);
+            }
+        }
+
+        examples = new ExampleQueriesPanel(ui, this);
+        examples.setHeight("99%");
+
+        addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
+        addStyleName("help-tab");
+    }
+
+    public ExampleQueriesPanel getExamples() {
+        return examples;
+    }
 
 }

@@ -15,6 +15,16 @@
  */
 package annis.gui.objects;
 
+import annis.gui.exporter.CSVExporter;
+import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.model.Query;
+import annis.service.objects.OrderType;
+import annis.service.objects.QueryLanguage;
+import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.data.util.ObjectProperty;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,29 +35,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.management.RuntimeErrorException;
-
-import com.vaadin.data.provider.CallbackDataProvider;
-import com.vaadin.data.provider.DataProvider;
-import com.vaadin.data.provider.ListDataProvider;
-import com.vaadin.v7.data.util.BeanContainer;
-import com.vaadin.v7.data.util.BeanItemContainer;
-import com.vaadin.v7.data.util.ObjectProperty;
-
-import org.corpus_tools.ApiException;
-import org.corpus_tools.annis.CorporaApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import annis.gui.exporter.CSVExporter;
-import annis.gui.frequency.UserGeneratedFrequencyEntry;
-import annis.libgui.exporter.ExporterPlugin;
-import annis.model.Query;
-import annis.service.objects.OrderType;
-import annis.service.objects.QueryLanguage;
 
 /**
  * Helper class to bundle all query relevant state information of the UI.
@@ -56,11 +45,16 @@ import annis.service.objects.QueryLanguage;
  */
 public class QueryUIState implements Serializable {
 
-    private final static Logger log = LoggerFactory.getLogger(QueryUIState.class);
-
     public enum QueryType {
         COUNT, FIND, FREQUENCY, EXPORT
     }
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -883486391491336806L;
+
+    private final static Logger log = LoggerFactory.getLogger(QueryUIState.class);
 
     private final ObjectProperty<String> aql = new ObjectProperty<>("");
     private final ListDataProvider<String> selectedCorpora = new ListDataProvider<>(new LinkedHashSet<String>());
@@ -98,45 +92,12 @@ public class QueryUIState implements Serializable {
         initTransients();
     }
 
-    private void initTransients() {
-        executedTasks = new EnumMap<>(QueryType.class);
-    }
-
-    private void readObject(final java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        initTransients();
+    public ObjectProperty<Boolean> getAlignmc() {
+        return alignmc;
     }
 
     public ObjectProperty<String> getAql() {
         return aql;
-    }
-
-    public ListDataProvider<String> getSelectedCorpora() {
-        return selectedCorpora;
-    }
-
-    public ObjectProperty<Integer> getLeftContext() {
-        return leftContext;
-    }
-
-    public ObjectProperty<Integer> getRightContext() {
-        return rightContext;
-    }
-
-    public ObjectProperty<Integer> getLimit() {
-        return limit;
-    }
-
-    public ObjectProperty<Long> getOffset() {
-        return offset;
-    }
-
-    public ObjectProperty<Set<Long>> getSelectedMatches() {
-        return selectedMatches;
-    }
-
-    public ObjectProperty<String> getVisibleBaseText() {
-        return visibleBaseText;
     }
 
     public ObjectProperty<String> getContextSegmentation() {
@@ -147,28 +108,36 @@ public class QueryUIState implements Serializable {
         return executedTasks;
     }
 
-    public BeanItemContainer<Query> getHistory() {
-        return history;
+    public ObjectProperty<List<String>> getExportAnnotationKeys() {
+        return exportAnnotationKeys;
     }
 
     public ObjectProperty<Class<? extends ExporterPlugin>> getExporter() {
         return exporter;
     }
 
-    public ObjectProperty<List<String>> getExportAnnotationKeys() {
-        return exportAnnotationKeys;
-    }
-
     public ObjectProperty<String> getExportParameters() {
         return exportParameters;
     }
 
-    public ObjectProperty<Boolean> getAlignmc() {
-        return alignmc;
-    }
-
     public BeanContainer<Integer, UserGeneratedFrequencyEntry> getFrequencyTableDefinition() {
         return frequencyTableDefinition;
+    }
+
+    public BeanItemContainer<Query> getHistory() {
+        return history;
+    }
+
+    public ObjectProperty<Integer> getLeftContext() {
+        return leftContext;
+    }
+
+    public ObjectProperty<Integer> getLimit() {
+        return limit;
+    }
+
+    public ObjectProperty<Long> getOffset() {
+        return offset;
     }
 
     public ObjectProperty<OrderType> getOrder() {
@@ -177,6 +146,31 @@ public class QueryUIState implements Serializable {
 
     public ObjectProperty<QueryLanguage> getQueryLanguage() {
         return queryLanguage;
+    }
+
+    public ObjectProperty<Integer> getRightContext() {
+        return rightContext;
+    }
+
+    public ListDataProvider<String> getSelectedCorpora() {
+        return selectedCorpora;
+    }
+
+    public ObjectProperty<Set<Long>> getSelectedMatches() {
+        return selectedMatches;
+    }
+
+    public ObjectProperty<String> getVisibleBaseText() {
+        return visibleBaseText;
+    }
+
+    private void initTransients() {
+        executedTasks = new EnumMap<>(QueryType.class);
+    }
+
+    private void readObject(final java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        initTransients();
     }
 
 }

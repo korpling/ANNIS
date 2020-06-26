@@ -22,87 +22,77 @@ import java.util.List;
 
 public class AnnotatedSpan {
 
-	private long id;
-	private String coveredText;
-	private List<Annotation> annotations;
-  private List<Annotation> metadata;
-  private List<Long> key;
+    private long id;
+    private String coveredText;
+    private List<Annotation> annotations;
+    private List<Annotation> metadata;
+    private List<Long> key;
 
-  public AnnotatedSpan(long id, String coveredText,
-    List<Annotation> annotations, List<Long> key)
-  {
-    this(id, coveredText, annotations, new LinkedList<Annotation>(), key);
-  }
-  
-	public AnnotatedSpan(long id, String coveredText, 
-    List<Annotation> annotations, List<Annotation> metadata, List<Long> key) 
-  {
-		super();
-		this.id = id;
-		this.coveredText = coveredText;
-		this.annotations = annotations;
-    this.metadata = metadata;
-    this.key = new ArrayList<>(key);
-	}
-  
-  /**
-   * Copy constructor
-   * @param orig 
-   */
-  public AnnotatedSpan(AnnotatedSpan orig)
-  {
-    this.id = orig.id;
-    this.annotations = orig.annotations == null ? null 
-      : new ArrayList<>(orig.annotations);
-    this.metadata = orig.metadata == null ? null 
-      : new ArrayList<>(orig.metadata);
-    this.coveredText = orig.coveredText;
-    this.key = orig.key;
-  }
+    /**
+     * Copy constructor
+     * 
+     * @param orig
+     */
+    public AnnotatedSpan(AnnotatedSpan orig) {
+        this.id = orig.id;
+        this.annotations = orig.annotations == null ? null : new ArrayList<>(orig.annotations);
+        this.metadata = orig.metadata == null ? null : new ArrayList<>(orig.metadata);
+        this.coveredText = orig.coveredText;
+        this.key = orig.key;
+    }
 
-	public long getId() {
-		return id;
-	}
-	
-	public void setId(long id) {
-		this.id = id;
-	}
-	
-	public String getCoveredText() {
-		return coveredText;
-	}
-	
-	public void setCoveredText(String coveredText) {
-		this.coveredText = coveredText;
-	}
-	
-	public List<Annotation> getAnnotations() {
-		return annotations;
-	}
-	
-	public void setAnnotations(List<Annotation> annotations) {
-		this.annotations = annotations;
-	}
+    public AnnotatedSpan(long id, String coveredText, List<Annotation> annotations, List<Annotation> metadata,
+            List<Long> key) {
+        super();
+        this.id = id;
+        this.coveredText = coveredText;
+        this.annotations = annotations;
+        this.metadata = metadata;
+        this.key = new ArrayList<>(key);
+    }
 
-  public List<Annotation> getMetadata()
-  {
-    return metadata;
-  }
+    public AnnotatedSpan(long id, String coveredText, List<Annotation> annotations, List<Long> key) {
+        this(id, coveredText, annotations, new LinkedList<Annotation>(), key);
+    }
 
-  public void setMetadata(List<Annotation> metadata)
-  {
-    this.metadata = metadata;
-  }
+    public List<Annotation> getAnnotations() {
+        return annotations;
+    }
 
-  public List<Long> getKey()
-  {
-    return key;
-  }
+    public String getCoveredText() {
+        return coveredText;
+    }
 
-  public void setKey(
-    List<Long> key)
-  {
-    this.key = key;
-  }
-	
+    public long getId() {
+        return id;
+    }
+
+    public List<Long> getKey() {
+        return key;
+    }
+
+    public List<Annotation> getMetadata() {
+        return metadata;
+    }
+
+    public void setAnnotations(List<Annotation> annotations) {
+        this.annotations = annotations;
+    }
+
+    public void setCoveredText(String coveredText) {
+        this.coveredText = coveredText;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setKey(List<Long> key) {
+        this.key = key;
+    }
+
+    public void setMetadata(List<Annotation> metadata) {
+        this.metadata = metadata;
+    }
+
 }

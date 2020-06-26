@@ -15,6 +15,19 @@
  */
 package annis.service.internal;
 
+import annis.ServiceConfig;
+import annis.administration.AdministrationDao;
+import annis.security.ANNISSecurityManager;
+import annis.security.ANNISUserConfigurationManager;
+import annis.security.ANNISUserRealm;
+import annis.security.Group;
+import annis.security.User;
+import annis.security.UserConfig;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.ImportJob;
+import annis.utils.ANNISFormatHelper;
+import com.google.common.base.Joiner;
+import com.google.common.io.ByteStreams;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,7 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -40,10 +52,6 @@ import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
-
-import com.google.common.base.Joiner;
-import com.google.common.io.ByteStreams;
-
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.SecureRandomNumberGenerator;
@@ -53,18 +61,6 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import annis.ServiceConfig;
-import annis.administration.AdministrationDao;
-import annis.security.ANNISSecurityManager;
-import annis.security.ANNISUserConfigurationManager;
-import annis.security.ANNISUserRealm;
-import annis.security.Group;
-import annis.security.User;
-import annis.security.UserConfig;
-import annis.service.objects.AnnisCorpus;
-import annis.service.objects.ImportJob;
-import annis.utils.ANNISFormatHelper;
 
 /**
  * Methods for adminstration.
@@ -83,144 +79,6 @@ public class AdminService {
 
     @Context
     HttpServletRequest request;
-
-    @GET
-    @Path("is-authenticated")
-    @Produces("text/plain")
-    public Response isAuthenticated() {
-        Subject user = SecurityUtils.getSubject();
-        Object principal = user.getPrincipal();
-        if (principal instanceof String) {
-            // if a use has an expired account it won't have it's own name as role
-            boolean hasOwnRole = user.hasRole((String) principal);
-            if (!hasOwnRole) {
-                return Response.status(Response.Status.FORBIDDEN).entity("Account expired").build();
-            }
-        }
-
-        return Response.ok(Boolean.toString(user.isAuthenticated())).build();
-    }
-
-    /**
-     * Get the user configuration for the currently logged in user.
-     *
-     * @return
-     */
-    @GET
-    @Path("userconfig")
-    @Produces("application/xml")
-    public UserConfig getUserConfig() {
-        Subject user = SecurityUtils.getSubject();
-        user.checkPermission("admin:read:userconfig");
-
-        return getAdminDao().retrieveUserConfig((String) user.getPrincipal());
-    }
-
-    /**
-     * Sets the user configuration for the currently logged in user.
-     */
-    @POST
-    @Path("userconfig")
-    @Consumes("application/xml")
-    public Response setUserConfig(JAXBElement<UserConfig> config) {
-        Subject user = SecurityUtils.getSubject();
-        user.checkPermission("admin:write:userconfig");
-
-        String userName = (String) user.getPrincipal();
-
-        getAdminDao().storeUserConfig(userName, config.getValue());
-        return Response.ok().build();
-    }
-
-    @GET
-    @Path("users")
-    @Produces("application/xml")
-    public List<User> listUsers() {
-        Subject requestingUser = SecurityUtils.getSubject();
-        requestingUser.checkPermission("admin:read:user");
-
-        if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
-            ANNISUserConfigurationManager confManager = getConfManager();
-            if (confManager != null) {
-                return confManager.listAllUsers();
-            }
-        }
-        return new LinkedList<>();
-    }
-
-    @PUT
-    @Path("users/{userName}")
-    @Consumes("application/xml")
-    public Response updateOrCreateUser(User user, @PathParam("userName") String userName) {
-        Subject requestingUser = SecurityUtils.getSubject();
-        requestingUser.checkPermission("admin:write:user");
-
-        if (!userName.equals(user.getName())) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Username in object is not the same as in path")
-                    .build();
-        }
-
-        // if any permission is an adminstrative one the
-        // requesting user needs more than just a "admin:write:user" permission"
-        for (String permission : user.getPermissions()) {
-            if (permission.startsWith("admin:")) {
-                requestingUser.checkPermission("admin:write:adminuser");
-                break;
-            }
-        }
-
-        ANNISUserRealm userRealm = getUserRealm();
-        if (userRealm != null) {
-            if (userRealm.updateUser(user)) {
-                return Response.ok().build();
-            }
-        }
-
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Could not update/create user").build();
-    }
-
-    @GET
-    @Path("users/{userName}")
-    @Produces("application/xml")
-    public User getUser(@PathParam("userName") String userName) {
-        Subject requestingUser = SecurityUtils.getSubject();
-        requestingUser.checkPermission("admin:read:user");
-
-        ANNISUserConfigurationManager conf = getConfManager();
-        if (conf != null) {
-            User u = conf.getUser(userName);
-            if (u == null) {
-                throw new WebApplicationException(Response.Status.NOT_FOUND);
-            }
-
-            // remove the password hash from the result, we don't want someone with
-            // lower adminstration rights to crack it
-            u.setPasswordHash("");
-
-            return u;
-        }
-        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
-    }
-
-    @DELETE
-    @Path("users/{userName}")
-    public Response deleteUser(@PathParam("userName") String userName) {
-        Subject requestingUser = SecurityUtils.getSubject();
-        requestingUser.checkPermission("admin:write:user");
-
-        if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
-            ANNISUserConfigurationManager confManager = getConfManager();
-            if (confManager != null) {
-                if (confManager.deleteUser(userName)) {
-                    // also delete any possible user configs
-                    getAdminDao().deleteUserConfig(userName);
-                    // if no error until here everything went well
-                    return Response.ok().build();
-                }
-            }
-        }
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Could not delete user").build();
-    }
 
     @POST
     @Path("users/{userName}/password")
@@ -255,43 +113,34 @@ public class AdminService {
     }
 
     @GET
-    @Path("groups")
-    @Produces("application/xml")
-    public List<Group> listGroups() {
-        Subject requestingUser = SecurityUtils.getSubject();
-        requestingUser.checkPermission("admin:read:group");
+    @Path("import/status")
+    public List<ImportJob> currentImports() {
+        Subject user = SecurityUtils.getSubject();
+        user.checkPermission("admin:query-import:running");
 
-        if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
-            ANNISUserConfigurationManager confManager = getConfManager();
-            if (confManager != null) {
-                return new LinkedList<>(confManager.getGroups().values());
-            }
+        List<ImportJob> result = new LinkedList<>();
+        ImportJob current = getImportWorker().getCurrentJob();
+        if (current != null && current.getStatus() != ImportJob.Status.SUCCESS
+                && current.getStatus() != ImportJob.Status.ERROR) {
+            result.add(current);
         }
-        return new LinkedList<>();
+        result.addAll(getImportWorker().getImportQueue());
+        return result;
     }
 
-    @PUT
-    @Path("groups/{groupName}")
-    @Consumes("application/xml")
-    public Response updateOrCreateGroup(Group group, @PathParam("groupName") String groupName) {
-
+    @DELETE
+    @Path("corpora/{corpusName}")
+    public Response deleteCorpus(@PathParam("corpusName") String corpusName) {
         Subject requestingUser = SecurityUtils.getSubject();
-        requestingUser.checkPermission("admin:write:group");
+        requestingUser.checkPermission("admin:write:corpus");
 
-        if (!groupName.equals(group.getName())) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Group name in object is not the same as in path").build();
-        }
+        try {
 
-        if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
-            ANNISUserConfigurationManager confManager = getConfManager();
-            if (confManager != null) {
-                if (confManager.writeGroup(group)) {
-                    return Response.ok().build();
-                }
-            }
+            getAdminDao().getDeleteCorpusDao().deleteCorpora(Arrays.asList(corpusName));
+            return Response.status(Response.Status.OK).build();
+        } catch (IllegalArgumentException ex) {
+            return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Could not update/create group").build();
     }
 
     @DELETE
@@ -315,34 +164,23 @@ public class AdminService {
     }
 
     @DELETE
-    @Path("corpora/{corpusName}")
-    public Response deleteCorpus(@PathParam("corpusName") String corpusName) {
+    @Path("users/{userName}")
+    public Response deleteUser(@PathParam("userName") String userName) {
         Subject requestingUser = SecurityUtils.getSubject();
-        requestingUser.checkPermission("admin:write:corpus");
+        requestingUser.checkPermission("admin:write:user");
 
-        try {
-
-            getAdminDao().getDeleteCorpusDao().deleteCorpora(Arrays.asList(corpusName));
-            return Response.status(Response.Status.OK).build();
-        } catch (IllegalArgumentException ex) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+        if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
+            ANNISUserConfigurationManager confManager = getConfManager();
+            if (confManager != null) {
+                if (confManager.deleteUser(userName)) {
+                    // also delete any possible user configs
+                    getAdminDao().deleteUserConfig(userName);
+                    // if no error until here everything went well
+                    return Response.ok().build();
+                }
+            }
         }
-    }
-
-    @GET
-    @Path("import/status")
-    public List<ImportJob> currentImports() {
-        Subject user = SecurityUtils.getSubject();
-        user.checkPermission("admin:query-import:running");
-
-        List<ImportJob> result = new LinkedList<>();
-        ImportJob current = getImportWorker().getCurrentJob();
-        if (current != null && current.getStatus() != ImportJob.Status.SUCCESS
-                && current.getStatus() != ImportJob.Status.ERROR) {
-            result.add(current);
-        }
-        result.addAll(getImportWorker().getImportQueue());
-        return result;
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Could not delete user").build();
     }
 
     @GET
@@ -356,6 +194,79 @@ public class AdminService {
             throw new WebApplicationException(404);
         }
         return job;
+    }
+
+    public AdministrationDao getAdminDao() {
+        Object prop = config.getProperty("adminDao");
+        if (prop instanceof AdministrationDao) {
+            return (AdministrationDao) prop;
+        } else {
+            return null;
+        }
+    }
+
+    private ANNISUserConfigurationManager getConfManager() {
+        if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
+            ANNISUserConfigurationManager confManager = ((ANNISSecurityManager) SecurityUtils.getSecurityManager())
+                    .getConfManager();
+            return confManager;
+        }
+        return null;
+    }
+
+    public ImportWorker getImportWorker() {
+        Object prop = config.getProperty("importWorker");
+        if (prop instanceof ImportWorker) {
+            return (ImportWorker) prop;
+        } else {
+            return null;
+        }
+    }
+
+    @GET
+    @Path("users/{userName}")
+    @Produces("application/xml")
+    public User getUser(@PathParam("userName") String userName) {
+        Subject requestingUser = SecurityUtils.getSubject();
+        requestingUser.checkPermission("admin:read:user");
+
+        ANNISUserConfigurationManager conf = getConfManager();
+        if (conf != null) {
+            User u = conf.getUser(userName);
+            if (u == null) {
+                throw new WebApplicationException(Response.Status.NOT_FOUND);
+            }
+
+            // remove the password hash from the result, we don't want someone with
+            // lower adminstration rights to crack it
+            u.setPasswordHash("");
+
+            return u;
+        }
+        throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Get the user configuration for the currently logged in user.
+     *
+     * @return
+     */
+    @GET
+    @Path("userconfig")
+    @Produces("application/xml")
+    public UserConfig getUserConfig() {
+        Subject user = SecurityUtils.getSubject();
+        user.checkPermission("admin:read:userconfig");
+
+        return getAdminDao().retrieveUserConfig((String) user.getPrincipal());
+    }
+
+    private ANNISUserRealm getUserRealm() {
+        if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
+            ANNISUserRealm userRealm = ((ANNISSecurityManager) SecurityUtils.getSecurityManager()).getANNISUserRealm();
+            return userRealm;
+        }
+        return null;
     }
 
     @POST
@@ -427,39 +338,124 @@ public class AdminService {
         return Response.serverError().build();
     }
 
-    private ANNISUserConfigurationManager getConfManager() {
+    @GET
+    @Path("is-authenticated")
+    @Produces("text/plain")
+    public Response isAuthenticated() {
+        Subject user = SecurityUtils.getSubject();
+        Object principal = user.getPrincipal();
+        if (principal instanceof String) {
+            // if a use has an expired account it won't have it's own name as role
+            boolean hasOwnRole = user.hasRole((String) principal);
+            if (!hasOwnRole) {
+                return Response.status(Response.Status.FORBIDDEN).entity("Account expired").build();
+            }
+        }
+
+        return Response.ok(Boolean.toString(user.isAuthenticated())).build();
+    }
+
+    @GET
+    @Path("groups")
+    @Produces("application/xml")
+    public List<Group> listGroups() {
+        Subject requestingUser = SecurityUtils.getSubject();
+        requestingUser.checkPermission("admin:read:group");
+
         if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
-            ANNISUserConfigurationManager confManager = ((ANNISSecurityManager) SecurityUtils.getSecurityManager())
-                    .getConfManager();
-            return confManager;
+            ANNISUserConfigurationManager confManager = getConfManager();
+            if (confManager != null) {
+                return new LinkedList<>(confManager.getGroups().values());
+            }
         }
-        return null;
+        return new LinkedList<>();
     }
 
-    private ANNISUserRealm getUserRealm() {
+    @GET
+    @Path("users")
+    @Produces("application/xml")
+    public List<User> listUsers() {
+        Subject requestingUser = SecurityUtils.getSubject();
+        requestingUser.checkPermission("admin:read:user");
+
         if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
-            ANNISUserRealm userRealm = ((ANNISSecurityManager) SecurityUtils.getSecurityManager()).getANNISUserRealm();
-            return userRealm;
+            ANNISUserConfigurationManager confManager = getConfManager();
+            if (confManager != null) {
+                return confManager.listAllUsers();
+            }
         }
-        return null;
+        return new LinkedList<>();
     }
 
-    public ImportWorker getImportWorker() {
-        Object prop = config.getProperty("importWorker");
-        if (prop instanceof ImportWorker) {
-            return (ImportWorker) prop;
-        } else {
-            return null;
-        }
+    /**
+     * Sets the user configuration for the currently logged in user.
+     */
+    @POST
+    @Path("userconfig")
+    @Consumes("application/xml")
+    public Response setUserConfig(JAXBElement<UserConfig> config) {
+        Subject user = SecurityUtils.getSubject();
+        user.checkPermission("admin:write:userconfig");
+
+        String userName = (String) user.getPrincipal();
+
+        getAdminDao().storeUserConfig(userName, config.getValue());
+        return Response.ok().build();
     }
 
-    public AdministrationDao getAdminDao() {
-        Object prop = config.getProperty("adminDao");
-        if (prop instanceof AdministrationDao) {
-            return (AdministrationDao) prop;
-        } else {
-            return null;
+    @PUT
+    @Path("groups/{groupName}")
+    @Consumes("application/xml")
+    public Response updateOrCreateGroup(Group group, @PathParam("groupName") String groupName) {
+
+        Subject requestingUser = SecurityUtils.getSubject();
+        requestingUser.checkPermission("admin:write:group");
+
+        if (!groupName.equals(group.getName())) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("Group name in object is not the same as in path").build();
         }
+
+        if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager) {
+            ANNISUserConfigurationManager confManager = getConfManager();
+            if (confManager != null) {
+                if (confManager.writeGroup(group)) {
+                    return Response.ok().build();
+                }
+            }
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Could not update/create group").build();
+    }
+
+    @PUT
+    @Path("users/{userName}")
+    @Consumes("application/xml")
+    public Response updateOrCreateUser(User user, @PathParam("userName") String userName) {
+        Subject requestingUser = SecurityUtils.getSubject();
+        requestingUser.checkPermission("admin:write:user");
+
+        if (!userName.equals(user.getName())) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Username in object is not the same as in path")
+                    .build();
+        }
+
+        // if any permission is an adminstrative one the
+        // requesting user needs more than just a "admin:write:user" permission"
+        for (String permission : user.getPermissions()) {
+            if (permission.startsWith("admin:")) {
+                requestingUser.checkPermission("admin:write:adminuser");
+                break;
+            }
+        }
+
+        ANNISUserRealm userRealm = getUserRealm();
+        if (userRealm != null) {
+            if (userRealm.updateUser(user)) {
+                return Response.ok().build();
+            }
+        }
+
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Could not update/create user").build();
     }
 
 }

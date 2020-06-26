@@ -1,17 +1,15 @@
 /*
  * Copyright 2013 SFB 632.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.service.objects;
 
@@ -63,20 +61,21 @@ public class ImportJob {
   private String statusEmail;
 
   /**
-   * Get the unique identifier of this job.
+   * Get alias name of the corpus as defined by the import request.
    * 
-   * @return the UUID
+   * @return the alias
    */
-  public String getUuid() {
-    return uuid;
+  public String getAlias() {
+    return alias;
   }
 
   /**
-   * @see #getUuid()
-   * @param uuid the UUID
+   * Get the visible caption of the import job. The caption can be e.g. the corpus name.
+   * 
+   * @return the caption
    */
-  public void setUuid(String uuid) {
-    this.uuid = uuid;
+  public String getCaption() {
+    return caption;
   }
 
   /**
@@ -87,49 +86,6 @@ public class ImportJob {
   @XmlTransient
   public File getImportRootDirectory() {
     return importRootDirectory;
-  }
-
-  /**
-   * @see #getImportRootDirectory()
-   * @param importRootDirectory the root directory
-   */
-  public void setImportRootDirectory(File importRootDirectory) {
-    this.importRootDirectory = importRootDirectory;
-  }
-
-  /**
-   * Get the visible caption of the import job. The caption can be e.g. the corpus
-   * name.
-   * 
-   * @return the caption
-   */
-  public String getCaption() {
-    return caption;
-  }
-
-  /**
-   * @see #getCaption()
-   * @param caption the caption to set
-   */
-  public void setCaption(String caption) {
-    this.caption = caption;
-  }
-
-  /**
-   * Current status of the import.
-   * 
-   * @return the status
-   */
-  public Status getStatus() {
-    return status;
-  }
-
-  /**
-   * @see #getStatus()
-   * @param status the status to set
-   */
-  public void setStatus(Status status) {
-    this.status = status;
   }
 
   /**
@@ -144,38 +100,12 @@ public class ImportJob {
   }
 
   /**
-   * Get if the import is configured in a way that the corpus will be overwritten
-   * when it already exists.
+   * Current status of the import.
    * 
-   * @return True if overwrite configured
+   * @return the status
    */
-  public boolean isOverwrite() {
-    return overwrite;
-  }
-
-  /**
-   * @see #isOverwrite()
-   * @param overwrite whether to overwrite an existing corpus
-   */
-  public void setOverwrite(boolean overwrite) {
-    this.overwrite = overwrite;
-  }
-
-  /**
-   * Get if the import is configured in a way that the corpus use disk based storage wherever possible.
-   * 
-   * @return True if prefering disk-based corpus storage.
-   */
-  public boolean isDiskBased() {
-    return diskBased;
-  }
-
-  /**
-   * @see #isDiskBased()
-   * @param diskBased Whether disk-based corpus storage is prefered.
-   */
-  public void setDiskBased(boolean diskBased) {
-    this.diskBased = diskBased;
+  public Status getStatus() {
+    return status;
   }
 
   /**
@@ -188,20 +118,32 @@ public class ImportJob {
   }
 
   /**
-   * @see #getStatusEmail()
-   * @param statusEmail the e-mail status address
+   * Get the unique identifier of this job.
+   * 
+   * @return the UUID
    */
-  public void setStatusEmail(String statusEmail) {
-    this.statusEmail = statusEmail;
+  public String getUuid() {
+    return uuid;
   }
 
   /**
-   * Get alias name of the corpus as defined by the import request.
+   * Get if the import is configured in a way that the corpus use disk based storage wherever
+   * possible.
    * 
-   * @return the alias
+   * @return True if prefering disk-based corpus storage.
    */
-  public String getAlias() {
-    return alias;
+  public boolean isDiskBased() {
+    return diskBased;
+  }
+
+  /**
+   * Get if the import is configured in a way that the corpus will be overwritten when it already
+   * exists.
+   * 
+   * @return True if overwrite configured
+   */
+  public boolean isOverwrite() {
+    return overwrite;
   }
 
   /**
@@ -210,6 +152,62 @@ public class ImportJob {
    */
   public void setAlias(String alias) {
     this.alias = alias;
+  }
+
+  /**
+   * @see #getCaption()
+   * @param caption the caption to set
+   */
+  public void setCaption(String caption) {
+    this.caption = caption;
+  }
+
+  /**
+   * @see #isDiskBased()
+   * @param diskBased Whether disk-based corpus storage is prefered.
+   */
+  public void setDiskBased(boolean diskBased) {
+    this.diskBased = diskBased;
+  }
+
+  /**
+   * @see #getImportRootDirectory()
+   * @param importRootDirectory the root directory
+   */
+  public void setImportRootDirectory(File importRootDirectory) {
+    this.importRootDirectory = importRootDirectory;
+  }
+
+  /**
+   * @see #isOverwrite()
+   * @param overwrite whether to overwrite an existing corpus
+   */
+  public void setOverwrite(boolean overwrite) {
+    this.overwrite = overwrite;
+  }
+
+  /**
+   * @see #getStatus()
+   * @param status the status to set
+   */
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
+  /**
+   * @see #getStatusEmail()
+   * @param statusEmail the e-mail status address
+   */
+  public void setStatusEmail(String statusEmail) {
+    this.statusEmail = statusEmail;
+  }
+
+  /**
+   * @see #getUuid()
+   * @param uuid the UUID
+   */
+  public void setUuid(String uuid) {
+    this.uuid = uuid;
   }
 
 }

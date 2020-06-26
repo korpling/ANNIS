@@ -27,60 +27,54 @@ import com.vaadin.ui.themes.ValoTheme;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ControlPanel extends VerticalLayout
-{
+public class ControlPanel extends VerticalLayout {
 
-  private static final long serialVersionUID = -2220211539424865671L;
+    private static final long serialVersionUID = -2220211539424865671L;
 
-  private QueryPanel queryPanel;
-  private CorpusListPanel corpusList;
+    private QueryPanel queryPanel;
+    private CorpusListPanel corpusList;
 
-  private SearchOptionsPanel searchOptions;
-  
-  private TabSheet optionsTab;
-  
-  public ControlPanel(InstanceConfig instanceConfig,
-    ExampleQueriesPanel autoGenQueries, AnnisUI ui)
-  {
-    setSizeFull();
-    setMargin(true);
+    private SearchOptionsPanel searchOptions;
 
-    setStyleName(ValoTheme.PANEL_BORDERLESS);
+    private TabSheet optionsTab;
 
-    queryPanel = new QueryPanel(ui);
-    queryPanel.setHeight("-1px");
-    queryPanel.setWidth("100%");
-    
-    optionsTab = new TabSheet();
-    optionsTab.setHeight("100%");
-    optionsTab.setWidth("100%");
-    optionsTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
+    public ControlPanel(InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries, AnnisUI ui) {
+        setSizeFull();
+        setMargin(true);
 
-    corpusList = new CorpusListPanel(instanceConfig, autoGenQueries, ui);
-    
-    searchOptions = new SearchOptionsPanel();
+        setStyleName(ValoTheme.PANEL_BORDERLESS);
 
-    optionsTab.addTab(corpusList, "Corpus List", null);
-    optionsTab.addTab(searchOptions, "Search Options", null);
-   
-    addComponent(queryPanel);
-    addComponent(optionsTab);
-    
-    setExpandRatio(optionsTab, 1.0f);
-  }
-  
-  public CorpusListPanel getCorpusList()
-  {
-    return corpusList;
-  }
+        queryPanel = new QueryPanel(ui);
+        queryPanel.setHeight("-1px");
+        queryPanel.setWidth("100%");
 
-  public QueryPanel getQueryPanel()
-  {
-    return queryPanel;
-  }
+        optionsTab = new TabSheet();
+        optionsTab.setHeight("100%");
+        optionsTab.setWidth("100%");
+        optionsTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
-  public SearchOptionsPanel getSearchOptions()
-  {
-    return searchOptions;
-  }  
+        corpusList = new CorpusListPanel(instanceConfig, autoGenQueries, ui);
+
+        searchOptions = new SearchOptionsPanel();
+
+        optionsTab.addTab(corpusList, "Corpus List", null);
+        optionsTab.addTab(searchOptions, "Search Options", null);
+
+        addComponent(queryPanel);
+        addComponent(optionsTab);
+
+        setExpandRatio(optionsTab, 1.0f);
+    }
+
+    public CorpusListPanel getCorpusList() {
+        return corpusList;
+    }
+
+    public QueryPanel getQueryPanel() {
+        return queryPanel;
+    }
+
+    public SearchOptionsPanel getSearchOptions() {
+        return searchOptions;
+    }
 }

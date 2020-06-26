@@ -15,21 +15,46 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.declarative.Design;
 
-import annis.libgui.Helper;
-
-@SpringUI(path="/unsupported-query")
+@SpringUI(path = "/unsupported-query")
 @Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
 public class UnsupportedQueryUI extends CommonUI {
+
+    public static class UnsupportedQueryPanel extends Panel {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 5891948595136418081L;
+        private Button btExecute;
+        private final String url;
+
+        public UnsupportedQueryPanel(String url) {
+            this.url = url;
+
+            Page.getCurrent().setTitle("ANNIS: Unsupported query for citation link");
+
+            Design.read("UnsupportedQueryPanel.html", this);
+
+            btExecute.addClickListener(event -> {
+                if (url != null) {
+                    getUI().getPage().setLocation(Helper.getContext(UI.getCurrent()) + url);
+                }
+            });
+        }
+
+    }
+
+    private static final long serialVersionUID = 3022711576267350004L;
 
     public static final String URL_PREFIX = "/unsupported-query";
 
@@ -42,30 +67,5 @@ public class UnsupportedQueryUI extends CommonUI {
     protected void init(VaadinRequest request) {
         UnsupportedQueryPanel panel = new UnsupportedQueryPanel(request.getParameter("url"));
         setContent(panel);
-    }
-
-    public static class UnsupportedQueryPanel extends Panel {
-
-        private Button btExecute;
-        private final String url;
-
-        public UnsupportedQueryPanel(String url) {
-            this.url = url;
-
-            Page.getCurrent().setTitle("ANNIS: Unsupported query for citation link");
-
-            Design.read("UnsupportedQueryPanel.html", this);
-
-            btExecute.addClickListener(new Button.ClickListener() {
-
-                @Override
-                public void buttonClick(ClickEvent event) {
-                    if(url != null) {
-                        getUI().getPage().setLocation(Helper.getContext(UI.getCurrent()) + url);
-                    }
-                }
-            });
-        }
-
     }
 }

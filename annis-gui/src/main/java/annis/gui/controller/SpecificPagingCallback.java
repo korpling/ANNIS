@@ -23,52 +23,50 @@ import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Background;
 import annis.model.DisplayedResultQuery;
-
 import java.util.concurrent.Future;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class SpecificPagingCallback implements PagingCallback
-{
-  private final ResultViewPanel panel;
+public class SpecificPagingCallback implements PagingCallback {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 2454609714467964162L;
 
-  private final SearchView searchView;
-  private final AnnisUI ui;
-  private final DisplayedResultQuery query;
-  
-  public SpecificPagingCallback(AnnisUI ui, SearchView searchView,
-    ResultViewPanel panel, DisplayedResultQuery initialQuery)
-  {
-    this.panel = panel;
-    this.ui = ui;
-    this.searchView = searchView;
-    this.query = initialQuery;
-  }
+    private final ResultViewPanel panel;
 
-  @Override
-  public void switchPage(long offset, int limit)
-  {
-    query.setOffset(offset);
-    query.setLimit(limit);
-    ui.getQueryController().setQuery(query);
-    // execute the result query again
-    updateMatches(ui.getQueryController().getSearchQuery(), panel);
+    private final SearchView searchView;
+    private final AnnisUI ui;
+    private final DisplayedResultQuery query;
 
-  }
-
-  private void updateMatches(DisplayedResultQuery newQuery, ResultViewPanel panel)
-  {
-    if (panel != null)
-    {
-      searchView.updateFragment(newQuery);
-      searchView.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
-      searchView.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
-      Future<?> future = Background.run(new ResultFetchJob(newQuery, panel, ui));
-      ui.getQueryState().getExecutedTasks().
-        put(QueryUIState.QueryType.FIND, future);
+    public SpecificPagingCallback(AnnisUI ui, SearchView searchView, ResultViewPanel panel,
+            DisplayedResultQuery initialQuery) {
+        this.panel = panel;
+        this.ui = ui;
+        this.searchView = searchView;
+        this.query = initialQuery;
     }
-  }
-  
+
+    @Override
+    public void switchPage(long offset, int limit) {
+        query.setOffset(offset);
+        query.setLimit(limit);
+        ui.getQueryController().setQuery(query);
+        // execute the result query again
+        updateMatches(ui.getQueryController().getSearchQuery(), panel);
+
+    }
+
+    private void updateMatches(DisplayedResultQuery newQuery, ResultViewPanel panel) {
+        if (panel != null) {
+            searchView.updateFragment(newQuery);
+            searchView.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
+            searchView.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
+            Future<?> future = Background.run(new ResultFetchJob(newQuery, panel, ui));
+            ui.getQueryState().getExecutedTasks().put(QueryUIState.QueryType.FIND, future);
+        }
+    }
+
 }

@@ -30,38 +30,38 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ShortenerRequestHandler implements RequestHandler
-{
+public class ShortenerRequestHandler implements RequestHandler {
 
-  @Override
-  public boolean handleRequest(VaadinSession session, VaadinRequest request,
-    VaadinResponse response) throws IOException
-  {
-    
-    String id = request.getParameter("id");
-    if(id == null)
-    {
-      return false;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 121962727502084106L;
+
+    @Override
+    public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response)
+            throws IOException {
+
+        String id = request.getParameter("id");
+        if (id == null) {
+            return false;
+        }
+
+        // get the actual URL
+        WebResource res = Helper.getAnnisWebResource(session);
+        res = res.path("shortener").path(id);
+        String longURL = res.get(String.class);
+
+        // redirects only work in http servlets
+        if (response instanceof VaadinServletResponse) {
+            ServletResponse servletResponse = ((VaadinServletResponse) response).getResponse();
+            if (servletResponse instanceof HttpServletResponse) {
+                HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+                httpResponse.setHeader("Location", request.getContextPath() + longURL);
+                httpResponse.setStatus(307); // temporary redirect
+                return true;
+            }
+        }
+        return false;
     }
-    
-    // get the actual URL
-    WebResource res = Helper.getAnnisWebResource(session);
-    res = res.path("shortener").path(id);
-    String longURL = res.get(String.class);
-    
-    // redirects only work in http servlets
-    if(response instanceof VaadinServletResponse)
-    {
-      ServletResponse servletResponse = ((VaadinServletResponse) response).getResponse();
-      if(servletResponse instanceof HttpServletResponse)
-      {    
-        HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
-        httpResponse.setHeader("Location", request.getContextPath() +  longURL);
-        httpResponse.setStatus(307); // temporary redirect
-        return true;
-      }
-    }
-    return false;
-  }
-  
+
 }

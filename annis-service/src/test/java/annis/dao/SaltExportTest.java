@@ -19,14 +19,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import javax.xml.stream.XMLStreamException;
-
 import org.corpus_tools.graphannis.CorpusStorageManager;
 import org.corpus_tools.graphannis.CorpusStorageManager.QueryLanguage;
 import org.corpus_tools.graphannis.GraphUpdate;
@@ -48,25 +47,20 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.google.common.io.Files;
-
 /**
  *
  * @author thomas
  */
 public class SaltExportTest {
-    private CorpusStorageManager storage;
-
-    public SaltExportTest() {
-    }
-
     @BeforeClass
-    public static void setUpClass() {
-    }
+    public static void setUpClass() {}
 
     @AfterClass
-    public static void tearDownClass() {
-    }
+    public static void tearDownClass() {}
+
+    private CorpusStorageManager storage;
+
+    public SaltExportTest() {}
 
     @Before
     public void setUp() throws GraphANNISException {
@@ -78,8 +72,7 @@ public class SaltExportTest {
     }
 
     @After
-    public void tearDown() {
-    }
+    public void tearDown() {}
 
     @Test
     public void testMapComplexExample() throws IOException, XMLStreamException, GraphANNISException {

@@ -26,43 +26,41 @@ import java.util.Locale;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CommaSeperatedStringConverterList implements Converter<String, List>
-{
+public class CommaSeperatedStringConverterList implements Converter<String, List> {
 
-  private static final Splitter splitter = Splitter.on(',').trimResults().
-    omitEmptyStrings();
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 4331697805664376859L;
 
-  private static final Joiner joiner = Joiner.on(", ");
+    private static final Splitter splitter = Splitter.on(',').trimResults().omitEmptyStrings();
 
-  @Override
-  public List convertToModel(String value,
-    Class<? extends List> targetType, Locale locale) throws ConversionException
-  {
-    List<String> result = new ArrayList<>();
-    for(String s : splitter.split(value))
-    {
-      result.add(s);
+    private static final Joiner joiner = Joiner.on(", ");
+
+    @Override
+    public List convertToModel(String value, Class<? extends List> targetType, Locale locale)
+            throws ConversionException {
+        List<String> result = new ArrayList<>();
+        for (String s : splitter.split(value)) {
+            result.add(s);
+        }
+        return result;
     }
-    return result;
-  }
 
-  @Override
-  public String convertToPresentation(List value,
-    Class<? extends String> targetType, Locale locale) throws ConversionException
-  {
-    return joiner.join(value);
-  }
+    @Override
+    public String convertToPresentation(List value, Class<? extends String> targetType, Locale locale)
+            throws ConversionException {
+        return joiner.join(value);
+    }
 
-  @Override
-  public Class<String> getPresentationType()
-  {
-    return String.class;
-  }
+    @Override
+    public Class<List> getModelType() {
+        return List.class;
+    }
 
-  @Override
-  public Class<List> getModelType()
-  {
-    return List.class;
-  }
-  
+    @Override
+    public Class<String> getPresentationType() {
+        return String.class;
+    }
+
 }

@@ -21,207 +21,155 @@ import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.view.GroupListView;
 import annis.gui.admin.view.UIView;
-import annis.gui.admin.view.UserListView;
 import annis.security.Group;
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FutureCallback;
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.Callable;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class GroupController implements GroupListView.Listener,
-  UIView.Listener,  Serializable
-{
+public class GroupController implements GroupListView.Listener, UIView.Listener {
 
-  private final GroupManagement model;
+    private static final long serialVersionUID = -6490890559663078065L;
 
-  private final CorpusManagement corpusModel;
+    private final GroupManagement model;
 
-  private final GroupListView view;
+    private final CorpusManagement corpusModel;
 
-  private final UIView uiView;
+    private final GroupListView view;
 
-  private final UserListView userView;
+    private final UIView uiView;
 
-  private boolean isLoggedIn = false;
-  
-  private boolean viewIsActive = false;
+    private boolean isLoggedIn = false;
 
-  public GroupController(GroupManagement model,
-    CorpusManagement corpusModel,
-    GroupListView view, UIView uiView,
-    UserListView userView, boolean isLoggedIn)
-  {
-    this.model = model;
-    this.corpusModel = corpusModel;
-    this.view = view;
-    this.uiView = uiView;
-    this.userView = userView;
-    this.isLoggedIn = isLoggedIn;
+    private boolean viewIsActive = false;
 
-    this.view.addListener(GroupController.this);
-    this.uiView.addListener(GroupController.this);
-  }
+    public GroupController(GroupManagement model, CorpusManagement corpusModel, GroupListView view, UIView uiView,
+            boolean isLoggedIn) {
+        this.model = model;
+        this.corpusModel = corpusModel;
+        this.view = view;
+        this.uiView = uiView;
+        this.isLoggedIn = isLoggedIn;
 
-  private void clearModel()
-  {
-    model.clear();
-    corpusModel.clear();
-    view.setGroupList(model.getGroups());
-  }
+        this.view.addListener(GroupController.this);
+        this.uiView.addListener(GroupController.this);
+    }
 
-  private void fetchDataFromService()
-  {
-    view.setLoadingAnimation(true);
-    uiView.runInBackground(new Callable<Boolean>()
-    {
+    @Override
+    public void addNewGroup(String groupName) {
+        if (groupName == null || groupName.isEmpty()) {
+            uiView.showError("Group name is empty", null);
+        } else if (model.getGroup(groupName) != null) {
+            uiView.showError("Group already exists", null);
+        } else {
+            Group g = new Group(groupName);
+            model.createOrUpdateGroup(g);
+            view.setGroupList(model.getGroups());
+            view.emptyNewGroupNameTextField();
 
-      @Override
-      public Boolean call() throws Exception
-      {
-        boolean result = model.fetchFromService();
-        corpusModel.fetchFromService();
-        return result;
-      }
-    }, new FutureCallback<Boolean>()
-    {
-
-      @Override
-      public void onSuccess(Boolean result)
-      {
-        view.setLoadingAnimation(false);
-        if (result)
-        {
-          view.setGroupList(model.getGroups());
+            updateUserUI();
         }
-        else
-        {
-          uiView.showWarning("Cannot get the group list", null);
-          view.setGroupList(new LinkedList<Group>());
+    }
+
+    private void clearModel() {
+        model.clear();
+        corpusModel.clear();
+        view.setGroupList(model.getGroups());
+    }
+
+    @Override
+    public void deleteGroups(Set<String> groupName) {
+        for (String g : groupName) {
+            model.deleteGroup(g);
         }
-        
-        view.addAvailableCorpusNames(corpusModel.getCorpusNames());
-        
+        view.setGroupList(model.getGroups());
+
+        if (groupName.size() == 1) {
+            uiView.showInfo("Group \"" + groupName.iterator().next() + "\" was deleted", null);
+        } else {
+            uiView.showInfo("Deleted groups: " + Joiner.on(", ").join(groupName), null);
+        }
+
         updateUserUI();
-      }
+    }
 
-      @Override
-      public void onFailure(Throwable ex)
-      {
-        view.setLoadingAnimation(false);
-        if(ex instanceof CriticalServiceQueryException)
-        {
-          uiView.showWarning(ex.getMessage(), ((CriticalServiceQueryException) ex).getDescription());
+    private void fetchDataFromService() {
+        view.setLoadingAnimation(true);
+        uiView.runInBackground(() -> {
+            boolean result = model.fetchFromService();
+            corpusModel.fetchFromService();
+            return result;
+        }, new FutureCallback<Boolean>() {
+
+            @Override
+            public void onFailure(Throwable ex) {
+                view.setLoadingAnimation(false);
+                if (ex instanceof CriticalServiceQueryException) {
+                    uiView.showWarning(ex.getMessage(), ((CriticalServiceQueryException) ex).getDescription());
+                } else if (ex instanceof ServiceQueryException) {
+                    uiView.showInfo(ex.getMessage(), ((ServiceQueryException) ex).getDescription());
+                } else {
+                    uiView.showWarning("Cannot get the group list", ex.getMessage());
+                    view.setGroupList(new LinkedList<Group>());
+                }
+                updateUserUI();
+            }
+
+            @Override
+            public void onSuccess(Boolean result) {
+                view.setLoadingAnimation(false);
+                if (result) {
+                    view.setGroupList(model.getGroups());
+                } else {
+                    uiView.showWarning("Cannot get the group list", null);
+                    view.setGroupList(new LinkedList<Group>());
+                }
+
+                view.addAvailableCorpusNames(corpusModel.getCorpusNames());
+
+                updateUserUI();
+            }
+        });
+
+    }
+
+    @Override
+    public void groupUpdated(Group user) {
+        model.createOrUpdateGroup(user);
+    }
+
+    @Override
+    public void loadedTab(Object selectedTab) {
+        viewIsActive = selectedTab == view;
+        if (isLoggedIn && viewIsActive) {
+            fetchDataFromService();
         }
-        else if(ex instanceof ServiceQueryException)
-        {
-          uiView.showInfo(ex.getMessage(), ((ServiceQueryException)ex).getDescription());
+    }
+
+    @Override
+    public void loginChanged(boolean isLoggedIn) {
+        this.isLoggedIn = isLoggedIn;
+        if (model.getWebResourceProvider() != null) {
+            model.getWebResourceProvider().invalidateWebResource();
         }
-        else
-        {
-          uiView.showWarning("Cannot get the group list", ex.getMessage());
-          view.setGroupList(new LinkedList<Group>());
+        if (corpusModel.getWebResourceProvider() != null) {
+            corpusModel.getWebResourceProvider().invalidateWebResource();
         }
-        updateUserUI();
-      }
-    });
-
-  }
-
-  private void updateUserUI()
-  {
-    Set<String> names = new TreeSet<>(model.getGroupNames());
-    names.add("*");
-    userView.addAvailableGroupNames(names);
-  }
-
-  @Override
-  public void loginChanged(boolean isLoggedIn)
-  {
-    this.isLoggedIn = isLoggedIn;
-    if(model.getWebResourceProvider() != null)
-    {
-      model.getWebResourceProvider().invalidateWebResource();
-    }
-    if(corpusModel.getWebResourceProvider() != null)
-    {
-      corpusModel.getWebResourceProvider().invalidateWebResource();
-    }
-    if (isLoggedIn && viewIsActive)
-    {
-      fetchDataFromService();
-    }
-    else
-    {
-      clearModel();
-    }
-  }
-
-  @Override
-  public void groupUpdated(Group user)
-  {
-    model.createOrUpdateGroup(user);
-  }
-
-  @Override
-  public void addNewGroup(String groupName)
-  {
-    if (groupName == null || groupName.isEmpty())
-    {
-      uiView.showError("Group name is empty", null);
-    }
-    else if (model.getGroup(groupName) != null)
-    {
-      uiView.showError("Group already exists", null);
-    }
-    else
-    {
-      Group g = new Group(groupName);
-      model.createOrUpdateGroup(g);
-      view.setGroupList(model.getGroups());
-      view.emptyNewGroupNameTextField();
-
-      updateUserUI();
-    }
-  }
-
-  @Override
-  public void deleteGroups(Set<String> groupName)
-  {
-    for (String g : groupName)
-    {
-      model.deleteGroup(g);
-    }
-    view.setGroupList(model.getGroups());
-
-    if (groupName.size() == 1)
-    {
-      uiView.showInfo(
-        "Group \"" + groupName.iterator().next() + "\" was deleted", null);
-    }
-    else
-    {
-      uiView.
-        showInfo("Deleted groups: " + Joiner.on(", ").join(groupName), null);
+        if (isLoggedIn && viewIsActive) {
+            fetchDataFromService();
+        } else {
+            clearModel();
+        }
     }
 
-    updateUserUI();
-  }
-
-  @Override
-  public void loadedTab(Object selectedTab)
-  {
-    viewIsActive = selectedTab == view;
-    if (isLoggedIn && viewIsActive)
-    {
-      fetchDataFromService();
+    private void updateUserUI() {
+        Set<String> names = new TreeSet<>(model.getGroupNames());
+        names.add("*");
     }
-  }
 
 }

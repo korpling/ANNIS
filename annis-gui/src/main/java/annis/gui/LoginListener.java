@@ -21,10 +21,10 @@ import java.io.Serializable;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface LoginListener extends Serializable
-{
+public interface LoginListener extends Serializable {
 
-  public void onLogin();
-  public void onLogout();
-  
+    public void onLogin();
+
+    public void onLogout();
+
 }

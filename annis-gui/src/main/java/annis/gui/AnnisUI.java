@@ -44,8 +44,6 @@ import com.vaadin.spring.annotation.SpringUI;
 import java.io.IOException;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
-
-import org.atmosphere.config.service.UUIDProviderService;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -57,214 +55,177 @@ import org.slf4j.LoggerFactory;
 @Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
 @SpringUI
 @Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
-public class AnnisUI extends CommonUI
-  implements ErrorHandler, ViewChangeListener
-{
+public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListener {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    AnnisUI.class);
+    private static final long serialVersionUID = 3022711576267350005L;
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisUI.class);
 
-  private transient Cache<String, CorpusConfig> corpusConfigCache;
+    private transient Cache<String, CorpusConfig> corpusConfigCache;
 
-  private final QueryUIState queryState = new QueryUIState();
+    private final QueryUIState queryState = new QueryUIState();
 
-  private QueryController queryController;
+    private QueryController queryController;
 
-  private SearchView searchView;
+    private SearchView searchView;
 
-  private AdminView adminView;
+    private AdminView adminView;
 
-  private Navigator nav;
+    private Navigator nav;
 
-  /**
-   * A re-usable toolbar for different views.
-   */
-  private MainToolbar toolbar;
+    /**
+     * A re-usable toolbar for different views.
+     */
+    private MainToolbar toolbar;
 
-  public AnnisUI()
-  {
-    super("");
-    initTransients();
-  }
-
-  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
-    initTransients();
-  }
-
-  private void initTransients()
-  {
-    corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
-  }
-
-  @Override
-  protected void init(VaadinRequest request)
-  {
-    super.init(request);
-    setErrorHandler(this);
-
-    searchView = new SearchView(AnnisUI.this);
-    adminView = new AdminView(AnnisUI.this);
-    queryController = new QueryController(searchView, AnnisUI.this);
-    
-    toolbar = new MainToolbar();
-    toolbar.setQueryController(queryController);
-    
-    toolbar.addLoginListener(searchView);
-    toolbar.addLoginListener(adminView);
-    
-    nav = new Navigator(AnnisUI.this, AnnisUI.this);
-    nav.addView(SearchView.NAME, searchView);
-    nav.addView(AdminView.NAME, adminView);
-    nav.addViewChangeListener(AnnisUI.this);
-    
-    addExtension(toolbar.getScreenshotExtension());
-    
-    loadInstanceFonts();
-  }
-
-  @Override
-  public boolean beforeViewChange(ViewChangeEvent event)
-  {
-    // make sure the toolbar is removed from the old view
-    searchView.setToolbar(null);
-    adminView.setToolbar(null);
-    toolbar.setSidebar(null);
-
-    if (event.getNewView() == searchView)
-    {
-      searchView.setToolbar(toolbar);
-      toolbar.setSidebar(searchView);
-      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN, AnnisUI.this);
-    }
-    else if (event.getNewView() == adminView)
-    {
-      adminView.setToolbar(toolbar);
-      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.SEARCH, AnnisUI.this);
-    }
-    else
-    {
-      toolbar.setNavigationTarget(null, AnnisUI.this);
+    public AnnisUI() {
+        super("");
+        initTransients();
     }
 
-    return true;
-  }
-
-  @Override
-  public void afterViewChange(ViewChangeEvent event)
-  {
-
-  }
-
-  public boolean canReportBugs()
-  {
-    if (toolbar != null)
-    {
-      return toolbar.canReportBugs();
+    @Override
+    protected void addCustomUIPlugins(PluginManager pluginManager) {
+        super.addCustomUIPlugins(pluginManager);
+        pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
+        // TODO: enable flat query builder when problems with fetching all annotation
+        // values are resolved
+        // pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
+        // toURI());
+        pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVExporter.class));
+        pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
+        pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
+        pluginManager.addPluginsFrom(ClassURI.PLUGIN(GridExporter.class));
+        pluginManager.addPluginsFrom(ClassURI.PLUGIN(TextColumnExporter.class));
     }
-    return false;
-  }
 
-  public void reportBug()
-  {
-    toolbar.reportBug();
-  }
+    @Override
+    public void afterViewChange(ViewChangeEvent event) {
 
-  public void reportBug(Throwable cause)
-  {
-    toolbar.reportBug(cause);
-  }
-
-  @Override
-  public void error(com.vaadin.server.ErrorEvent event)
-  {
-    log.error("Unknown error in some component: " + event.getThrowable().
-      getLocalizedMessage(),
-      event.getThrowable());
-    // get the source throwable (thus the one that triggered the error)
-    Throwable source = event.getThrowable();
-    if (!AnnisBaseUI.handleCommonError(source, null) && source != null)
-    {
-      while (source.getCause() != null)
-      {
-        source = source.getCause();
-      }
-      ExceptionDialog.show(source, this);
     }
-  }
 
-  
+    @Override
+    public boolean beforeViewChange(ViewChangeEvent event) {
+        // make sure the toolbar is removed from the old view
+        searchView.setToolbar(null);
+        adminView.setToolbar(null);
+        toolbar.setSidebar(null);
 
-
-  @Override
-  protected void addCustomUIPlugins(PluginManager pluginManager)
-  {
-    super.addCustomUIPlugins(pluginManager);
-    pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).
-      toURI());
-    // TODO: enable flat query builder when problems with fetching all annotation values are resolved
-    // pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
-    //   toURI());
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(GridExporter.class));
-    pluginManager.addPluginsFrom(ClassURI.PLUGIN(TextColumnExporter.class));
-  }
-
-  /**
-   * Get a cached version of the {@link CorpusConfig} for a corpus.
-   *
-   * @param corpus
-   * @return
-   */
-  public CorpusConfig getCorpusConfigWithCache(String corpus)
-  {
-    CorpusConfig config = new CorpusConfig();
-    if (corpusConfigCache != null)
-    {
-      config = corpusConfigCache.getIfPresent(corpus);
-      if (config == null)
-      {
-        if (corpus.equals(DEFAULT_CONFIG))
-        {
-          config = Helper.getDefaultCorpusConfig(AnnisUI.this);
-        }
-        else
-        {
-          config = Helper.getCorpusConfig(corpus, AnnisUI.this);
+        if (event.getNewView() == searchView) {
+            searchView.setToolbar(toolbar);
+            toolbar.setSidebar(searchView);
+            toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN, AnnisUI.this);
+        } else if (event.getNewView() == adminView) {
+            adminView.setToolbar(toolbar);
+            toolbar.setNavigationTarget(MainToolbar.NavigationTarget.SEARCH, AnnisUI.this);
+        } else {
+            toolbar.setNavigationTarget(null, AnnisUI.this);
         }
 
-        corpusConfigCache.put(corpus, config);
-      }
+        return true;
     }
 
-    return config;
-  }
-
-  public void clearCorpusConfigCache()
-  {
-    if (corpusConfigCache != null)
-    {
-      corpusConfigCache.invalidateAll();
+    public boolean canReportBugs() {
+        if (toolbar != null) {
+            return toolbar.canReportBugs();
+        }
+        return false;
     }
-  }
 
+    public void clearCorpusConfigCache() {
+        if (corpusConfigCache != null) {
+            corpusConfigCache.invalidateAll();
+        }
+    }
 
-  public QueryController getQueryController()
-  {
-    return queryController;
-  }
+    @Override
+    public void error(com.vaadin.server.ErrorEvent event) {
+        log.error("Unknown error in some component: " + event.getThrowable().getLocalizedMessage(),
+                event.getThrowable());
+        // get the source throwable (thus the one that triggered the error)
+        Throwable source = event.getThrowable();
+        if (!AnnisBaseUI.handleCommonError(source, null) && source != null) {
+            while (source.getCause() != null) {
+                source = source.getCause();
+            }
+            ExceptionDialog.show(source, this);
+        }
+    }
 
-  public SearchView getSearchView()
-  {
-    return searchView;
-  }
+    /**
+     * Get a cached version of the {@link CorpusConfig} for a corpus.
+     *
+     * @param corpus
+     * @return
+     */
+    public CorpusConfig getCorpusConfigWithCache(String corpus) {
+        CorpusConfig config = new CorpusConfig();
+        if (corpusConfigCache != null) {
+            config = corpusConfigCache.getIfPresent(corpus);
+            if (config == null) {
+                if (corpus.equals(DEFAULT_CONFIG)) {
+                    config = Helper.getDefaultCorpusConfig(AnnisUI.this);
+                } else {
+                    config = Helper.getCorpusConfig(corpus, AnnisUI.this);
+                }
 
-  public QueryUIState getQueryState()
-  {
-    return queryState;
-  }
+                corpusConfigCache.put(corpus, config);
+            }
+        }
+
+        return config;
+    }
+
+    public QueryController getQueryController() {
+        return queryController;
+    }
+
+    public QueryUIState getQueryState() {
+        return queryState;
+    }
+
+    public SearchView getSearchView() {
+        return searchView;
+    }
+
+    @Override
+    protected void init(VaadinRequest request) {
+        super.init(request);
+        setErrorHandler(this);
+
+        searchView = new SearchView(AnnisUI.this);
+        adminView = new AdminView(AnnisUI.this);
+        queryController = new QueryController(searchView, AnnisUI.this);
+
+        toolbar = new MainToolbar();
+        toolbar.setQueryController(queryController);
+
+        toolbar.addLoginListener(searchView);
+        toolbar.addLoginListener(adminView);
+
+        nav = new Navigator(AnnisUI.this, AnnisUI.this);
+        nav.addView(SearchView.NAME, searchView);
+        nav.addView(AdminView.NAME, adminView);
+        nav.addViewChangeListener(AnnisUI.this);
+
+        addExtension(toolbar.getScreenshotExtension());
+
+        loadInstanceFonts();
+    }
+
+    private void initTransients() {
+        corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        initTransients();
+    }
+
+    public void reportBug() {
+        toolbar.reportBug();
+    }
+
+    public void reportBug(Throwable cause) {
+        toolbar.reportBug(cause);
+    }
 
 }

@@ -1,13 +1,10 @@
 package annis.sqlgen;
 
+import annis.model.Annotation;
+import com.google.common.base.Splitter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import org.apache.commons.dbutils.handlers.AbstractListHandler;
-
-import com.google.common.base.Splitter;
-
-import annis.model.Annotation;
 
 public class MetadataCacheHelper extends AbstractListHandler<Annotation> {
 
@@ -20,7 +17,7 @@ public class MetadataCacheHelper extends AbstractListHandler<Annotation> {
         anno.setNamespace(rs.getString("namespace"));
         anno.setName(rs.getString("name"));
         anno.setValue(rs.getString("value"));
-        
+
         return anno;
 
     }

@@ -27,25 +27,24 @@ import net.xeoh.plugins.base.Plugin;
  *
  * @author Thomas Krause {@literal <b.pixeldrama@gmail.com>}
  */
-public interface QueryBuilderPlugin<I extends Component> extends Plugin, Serializable
-{
+public interface QueryBuilderPlugin<I extends Component> extends Plugin, Serializable {
 
-  /**
-   * Get the shorted name of the linguistic type of this visualizer ("partitur",
-   * "tree", etc.)
-   *
-   * @return
-   */
-  public String getShortName();
-  
-  public String getCaption();
+    /**
+     * It is used by the ANNIS plugin system to generate something viewable for
+     * Vaadin.
+     *
+     * @param controller
+     */
+    public I createComponent(QueryController controller);
 
-  /**
-   * It is used by the ANNIS plugin system to generate something viewable for
-   * Vaadin.
-   *
-   * @param controller
-   */
-  public I createComponent(QueryController controller);
+    public String getCaption();
+
+    /**
+     * Get the shorted name of the linguistic type of this visualizer ("partitur",
+     * "tree", etc.)
+     *
+     * @return
+     */
+    public String getShortName();
 
 }

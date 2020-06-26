@@ -22,47 +22,35 @@ import com.vaadin.server.FontIcon;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public enum ANNISFontIcon implements FontIcon
-{
+public enum ANNISFontIcon implements FontIcon {
 
-  SPACE(0xe600),
-  RIGHT_ARROW(0xe601),
-  LEFT_ARROW(0xe602),
-  LAST(0xe603),
-  FIRST(0xe604),
-  MENU_RIGHT(0xe605),
-  MENU_LEFT(0xe606),
-  MENU_AUTO(0xe607),
-  LOGO(0xe608);
-  
-  private final int codepoint;
-  
-  ANNISFontIcon(int codepoint)
-  {
-    this.codepoint = codepoint;
-  }
+    SPACE(0xe600), RIGHT_ARROW(0xe601), LEFT_ARROW(0xe602), LAST(0xe603), FIRST(0xe604), MENU_RIGHT(0xe605), MENU_LEFT(
+            0xe606), MENU_AUTO(0xe607), LOGO(0xe608);
 
-  @Override
-  public String getFontFamily()
-  {
-    return "ANNISFontIcon";
-  }
+    private final int codepoint;
 
-  @Override
-  public int getCodepoint()
-  {
-    return codepoint;
-  }
-
-  @Override
-    public String getHtml() {
-        return "<span class=\"v-icon\" style=\"font-family: " + getFontFamily()
-                + ";\">&#x" + Integer.toHexString(codepoint) + ";</span>";
+    ANNISFontIcon(int codepoint) {
+        this.codepoint = codepoint;
     }
 
-  @Override
-  public String getMIMEType()
-  {
-    throw new UnsupportedOperationException("Font icons don't have a MIME type");
-  }
+    @Override
+    public int getCodepoint() {
+        return codepoint;
+    }
+
+    @Override
+    public String getFontFamily() {
+        return "ANNISFontIcon";
+    }
+
+    @Override
+    public String getHtml() {
+        return "<span class=\"v-icon\" style=\"font-family: " + getFontFamily() + ";\">&#x"
+                + Integer.toHexString(codepoint) + ";</span>";
+    }
+
+    @Override
+    public String getMIMEType() {
+        throw new UnsupportedOperationException("Font icons don't have a MIME type");
+    }
 }

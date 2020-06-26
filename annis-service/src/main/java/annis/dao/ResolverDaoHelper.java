@@ -15,6 +15,8 @@
  */
 package annis.dao;
 
+import annis.resolver.ResolverEntry;
+import annis.resolver.SingleResolverRequest;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -25,12 +27,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
 import java.util.Set;
-
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.apache.commons.dbutils.handlers.AbstractListHandler;
-
-import annis.resolver.ResolverEntry;
-import annis.resolver.SingleResolverRequest;
 
 /**
  *
@@ -38,8 +35,57 @@ import annis.resolver.SingleResolverRequest;
  */
 public class ResolverDaoHelper implements ResultSetHandler<List<ResolverEntry>> {
 
-    public ResolverDaoHelper() {
+    private static class RemoveIndexElement {
+        public String namespace;
+        public ResolverEntry.ElementType element;
+        public String vis_type;
+        public String display_name;
+
+        public RemoveIndexElement(ResolverEntry e) {
+            namespace = e.getNamespace();
+            element = e.getElement();
+            vis_type = e.getVisType();
+            display_name = e.getDisplayName();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final RemoveIndexElement other = (RemoveIndexElement) obj;
+            if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace)) {
+                return false;
+            }
+            if (this.element != other.element) {
+                return false;
+            }
+            if ((this.vis_type == null) ? (other.vis_type != null) : !this.vis_type.equals(other.vis_type)) {
+                return false;
+            }
+            if ((this.display_name == null) ? (other.display_name != null)
+                    : !this.display_name.equals(other.display_name)) {
+                return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 41 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+            hash = 41 * hash + (this.element != null ? this.element.hashCode() : 0);
+            hash = 41 * hash + (this.vis_type != null ? this.vis_type.hashCode() : 0);
+            hash = 41 * hash + (this.display_name != null ? this.display_name.hashCode() : 0);
+            return hash;
+        }
+
     }
+
+    public ResolverDaoHelper() {}
 
     public PreparedStatement createPreparedStatement(Connection cnctn) throws SQLException {
         String select = "SELECT " + "resolver_vis_map.id, " + "resolver_vis_map.corpus, " + "resolver_vis_map.version, "
@@ -105,8 +151,6 @@ public class ResolverDaoHelper implements ResultSetHandler<List<ResolverEntry>> 
         stmt.setString(7, resolverRequest.getCorpusName());
         stmt.setString(8, resolverRequest.getCorpusName());
     }
-    
-
 
     @Override
     public List<ResolverEntry> handle(ResultSet rs) throws SQLException {
@@ -155,55 +199,5 @@ public class ResolverDaoHelper implements ResultSetHandler<List<ResolverEntry>> 
         }
 
         return result;
-    }
-
-    private static class RemoveIndexElement {
-        public String namespace;
-        public ResolverEntry.ElementType element;
-        public String vis_type;
-        public String display_name;
-
-        public RemoveIndexElement(ResolverEntry e) {
-            namespace = e.getNamespace();
-            element = e.getElement();
-            vis_type = e.getVisType();
-            display_name = e.getDisplayName();
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 5;
-            hash = 41 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
-            hash = 41 * hash + (this.element != null ? this.element.hashCode() : 0);
-            hash = 41 * hash + (this.vis_type != null ? this.vis_type.hashCode() : 0);
-            hash = 41 * hash + (this.display_name != null ? this.display_name.hashCode() : 0);
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final RemoveIndexElement other = (RemoveIndexElement) obj;
-            if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace)) {
-                return false;
-            }
-            if (this.element != other.element) {
-                return false;
-            }
-            if ((this.vis_type == null) ? (other.vis_type != null) : !this.vis_type.equals(other.vis_type)) {
-                return false;
-            }
-            if ((this.display_name == null) ? (other.display_name != null)
-                    : !this.display_name.equals(other.display_name)) {
-                return false;
-            }
-            return true;
-        }
-
     }
 }

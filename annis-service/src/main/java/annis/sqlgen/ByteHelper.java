@@ -1,13 +1,9 @@
 package annis.sqlgen;
 
+import annis.service.objects.AnnisBinaryMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
-
 import org.apache.commons.dbutils.ResultSetHandler;
-import org.slf4j.LoggerFactory;
-
-import annis.service.objects.AnnisBinaryMetaData;
 
 public class ByteHelper implements ResultSetHandler<AnnisBinaryMetaData> {
 

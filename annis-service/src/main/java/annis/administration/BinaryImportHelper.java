@@ -15,20 +15,17 @@
  */
 package annis.administration;
 
+import annis.CommonHelper;
 import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
-
 import javax.activation.MimetypesFileTypeMap;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.LoggerFactory;
-
-import annis.CommonHelper;
 
 /**
  * Imports binary files.

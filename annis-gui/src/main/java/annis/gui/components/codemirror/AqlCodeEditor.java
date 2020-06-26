@@ -15,16 +15,8 @@
  */
 package annis.gui.components.codemirror;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import org.json.JSONException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import annis.model.AqlParseError;
+import annis.model.NodeDesc;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
@@ -32,253 +24,208 @@ import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.v7.data.Property;
 import com.vaadin.v7.data.util.ObjectProperty;
 import com.vaadin.v7.event.FieldEvents;
-
-import annis.model.AqlParseError;
-import annis.model.NodeDesc;
 import elemental.json.JsonArray;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A code editor component for the ANNIQ Query Language.
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@JavaScript(
-  {
-    "vaadin://jquery.js",
-    "lib/codemirror.js",
-    "mode/aql/aql.js",
-    "lib/edit/matchbrackets.js",
-    "lib/lint/lint.js",
-    "lib/display/placeholder.js",
-    "AqlCodeEditor.js"
-  })
-@StyleSheet(
-  {
-    "lib/codemirror.css",
-    "lib/lint/lint.css",
-    "AqlCodeEditor.css"
-  })
-//basic server-side component
+@JavaScript({ "vaadin://jquery.js", "lib/codemirror.js", "mode/aql/aql.js", "lib/edit/matchbrackets.js",
+        "lib/lint/lint.js", "lib/display/placeholder.js", "AqlCodeEditor.js" })
+@StyleSheet({ "lib/codemirror.css", "lib/lint/lint.css", "AqlCodeEditor.css" })
+// basic server-side component
 public class AqlCodeEditor extends AbstractJavaScriptComponent
-  implements FieldEvents.TextChangeNotifier, Property.Viewer,
-  Property.ValueChangeListener
-{
+        implements FieldEvents.TextChangeNotifier, Property.Viewer, Property.ValueChangeListener {
 
-  private static final Logger log = LoggerFactory.getLogger(AqlCodeEditor.class);
+    private class TextChangedFunction implements JavaScriptFunction {
 
-  private int timeout;
+        private static final long serialVersionUID = 3889013888386596452L;
 
-  private Property<String> dataSource;
+        @Override
+        public void call(JsonArray args) throws JSONException {
+            log.debug("TextChangedFunction \"{}\"", args.getString(0));
+            getState().text = args.getString(0);
+            getPropertyDataSource().setValue(args.getString(0));
 
-  public AqlCodeEditor()
-  {
-    addFunction("textChanged", new TextChangedFunction());
-    addStyleName("aql-code-editor");
+            final String textCopy = dataSource.getValue();
+            final int cursorPos = (int) args.getNumber(1);
+            fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this) {
 
-    AqlCodeEditor.this.setPropertyDataSource(
-      new ObjectProperty<String>("", String.class));
+                private static final long serialVersionUID = 1L;
 
-    // init to one so the client (which starts with 0) at initialization always uses
-    // the the values provided by the server state
-    AqlCodeEditor.this.getState().serverRequestCounter = 1;
-  }
+                @Override
+                public int getCursorPosition() {
+                    return cursorPos;
+                }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void setPropertyDataSource(Property newDataSource)
-  {
-    if (newDataSource == null)
-    {
-      throw new IllegalArgumentException("Data source must not be null");
-    }
-    if(newDataSource.getType() != String.class)
-    {
-      throw new IllegalArgumentException("Data source must be of type String");
+                @Override
+                public String getText() {
+                    return textCopy;
+                }
+            });
+        }
     }
 
-    if (this.dataSource instanceof Property.ValueChangeNotifier)
-    {
-      ((Property.ValueChangeNotifier) this.dataSource).
-        removeValueChangeListener(this);
+    private static final long serialVersionUID = 6912362703243923469L;
+
+    private static final Logger log = LoggerFactory.getLogger(AqlCodeEditor.class);
+
+    private int timeout;
+
+    private Property<String> dataSource;
+
+    public AqlCodeEditor() {
+        addFunction("textChanged", new TextChangedFunction());
+        addStyleName("aql-code-editor");
+
+        AqlCodeEditor.this.setPropertyDataSource(new ObjectProperty<String>("", String.class));
+
+        // init to one so the client (which starts with 0) at initialization always uses
+        // the the values provided by the server state
+        AqlCodeEditor.this.getState().serverRequestCounter = 1;
     }
-
-    this.dataSource = newDataSource;
-
-    if (newDataSource instanceof Property.ValueChangeNotifier)
-    {
-      ((Property.ValueChangeNotifier) this.dataSource).
-        addValueChangeListener(this);
-    }
-
-  }
-
-  @Override
-  public Property getPropertyDataSource()
-  {
-    return this.dataSource;
-  }
-
-  @Override
-  public void valueChange(Property.ValueChangeEvent event)
-  {
-    log.debug("valueChange \"{}\"/\"{}", event.getProperty().getValue(),
-      this.dataSource.getValue());
-    String oldText = getState().text;
-    String newText = this.dataSource.getValue();
-
-    if (oldText == null || !oldText.equals(newText))
-    {
-      getState().text = newText;
-      // this is a server side state change and we have to explicitly tell the client we want to change the text
-      getState().serverRequestCounter++;
-
-      log.debug("invalidating \"{}\"/\"{}\"", oldText, getState().text);
-      markAsDirty();
-    }
-  }
-
-  private class TextChangedFunction implements JavaScriptFunction
-  {
 
     @Override
-    public void call(JsonArray args) throws JSONException
-    {
-      log.debug("TextChangedFunction \"{}\"", args.getString(0));
-      getState().text = args.getString(0);
-      getPropertyDataSource().setValue(args.getString(0));
+    public void addTextChangeListener(FieldEvents.TextChangeListener listener) {
+        addListener(FieldEvents.TextChangeListener.EVENT_ID, FieldEvents.TextChangeEvent.class, listener,
+                FieldEvents.TextChangeListener.EVENT_METHOD);
+    }
 
-      final String textCopy = dataSource.getValue();
-      final int cursorPos = (int) args.getNumber(1);
-      fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this)
-      {
+    @Override
+    public Property getPropertyDataSource() {
+        return this.dataSource;
+    }
 
-        @Override
-        public String getText()
-        {
-          return textCopy;
+    @Override
+    protected AqlCodeEditorState getState() {
+        return (AqlCodeEditorState) super.getState();
+    }
+
+    public String getTextareaStyle() {
+        return getState().textareaClass == null ? "" : getState().textareaClass;
+    }
+
+    public int getTextChangeTimeout() {
+        return this.timeout;
+    }
+
+    public String getValue() {
+        return dataSource.getValue();
+    }
+
+    private TreeMap<String, Integer> mapQueryNodes(List<NodeDesc> nodes) {
+        TreeMap<String, Integer> result = new TreeMap<>();
+        Map<Long, TreeSet<Integer>> alternative2Nodes = new HashMap<>();
+
+        int nodeIdx = 1;
+        for (NodeDesc n : nodes) {
+            TreeSet<Integer> orderedNodeSet = alternative2Nodes.get(n.getComponentNr());
+            if (orderedNodeSet == null) {
+                orderedNodeSet = new TreeSet<>();
+                alternative2Nodes.put(n.getComponentNr(), orderedNodeSet);
+            }
+            // the nodes list is already ordered by the occurrence of the node in the AQL
+            // query stream
+            orderedNodeSet.add(nodeIdx++);
         }
 
-        @Override
-        public int getCursorPosition()
-        {
-          return cursorPos;
+        for (TreeSet<Integer> orderedNodeSet : alternative2Nodes.values()) {
+            int newID = 1;
+            for (Integer idx : orderedNodeSet) {
+                result.put("" + idx, newID);
+                newID++;
+            }
         }
-      });
-    }
-  }
 
-  public void setNodes(List<NodeDesc> nodes)
-  {
-    getState().nodeMappings.clear();
-    if(nodes != null)
-    {
-      getState().nodeMappings.putAll(mapQueryNodes(nodes));
-    }
-  }
-
-  private TreeMap<String, Integer> mapQueryNodes(List<NodeDesc> nodes)
-  {
-    TreeMap<String, Integer> result = new TreeMap<>();
-    Map<Long, TreeSet<Integer>> alternative2Nodes = new HashMap<>();
-
-    int nodeIdx = 1;
-    for (NodeDesc n : nodes)
-    {
-      TreeSet<Integer> orderedNodeSet = alternative2Nodes.get(n.
-        getComponentNr());
-      if (orderedNodeSet == null)
-      {
-        orderedNodeSet = new TreeSet<>();
-        alternative2Nodes.put(n.getComponentNr(), orderedNodeSet);
-      }
-      // the nodes list is already ordered by the occurrence of the node in the AQL query stream
-      orderedNodeSet.add(nodeIdx++);
+        return result;
     }
 
-    for (TreeSet<Integer> orderedNodeSet : alternative2Nodes.values())
-    {
-      int newID = 1;
-      for (Integer idx : orderedNodeSet)
-      {
-        result.put("" + idx, newID);
-        newID++;
-      }
+    @Override
+    public void removeTextChangeListener(FieldEvents.TextChangeListener listener) {
+        removeListener(FieldEvents.TextChangeListener.EVENT_ID, FieldEvents.TextChangeEvent.class, listener);
     }
 
-    return result;
-  }
-
-  public void setInputPrompt(String prompt)
-  {
-    getState().inputPrompt = prompt;
-    markAsDirty();
-  }
-
-  public void setTextChangeTimeout(int timeout)
-  {
-    callFunction("setChangeDelayTime", timeout);
-    this.timeout = timeout;
-  }
-
-  public int getTextChangeTimeout()
-  {
-    return this.timeout;
-  }
-
-  @Override
-  public void addTextChangeListener(FieldEvents.TextChangeListener listener)
-  {
-    addListener(FieldEvents.TextChangeListener.EVENT_ID,
-      FieldEvents.TextChangeEvent.class,
-      listener, FieldEvents.TextChangeListener.EVENT_METHOD);
-  }
-
-  public String getTextareaStyle()
-  {
-    return getState().textareaClass == null ? "" : getState().textareaClass;
-  }
-
-  public void setTextareaStyle(String style)
-  {
-    getState().textareaClass = "".equals(style) ? null : style;
-  }
-
-  @Override
-  public void removeTextChangeListener(FieldEvents.TextChangeListener listener)
-  {
-    removeListener(FieldEvents.TextChangeListener.EVENT_ID,
-      FieldEvents.TextChangeEvent.class,
-      listener);
-  }
-
-
-  public String getValue()
-  {
-    return dataSource.getValue();
-  }
-
-  public void setValue(String value)
-  {
-    dataSource.setValue(value);
-  }
-
-  @Override
-  protected AqlCodeEditorState getState()
-  {
-    return (AqlCodeEditorState) super.getState();
-  }
-
-  public void setErrors(List<AqlParseError> errors)
-  {
-    getState().errors.clear();
-    if (errors != null)
-    {
-      for (AqlParseError e : errors)
-      {
-        getState().errors.add(new AqlCodeEditorState.ParseError(e));
-      }
+    public void setErrors(List<AqlParseError> errors) {
+        getState().errors.clear();
+        if (errors != null) {
+            for (AqlParseError e : errors) {
+                getState().errors.add(new AqlCodeEditorState.ParseError(e));
+            }
+        }
+        markAsDirty();
     }
-    markAsDirty();
-  }
+
+    public void setInputPrompt(String prompt) {
+        getState().inputPrompt = prompt;
+        markAsDirty();
+    }
+
+    public void setNodes(List<NodeDesc> nodes) {
+        getState().nodeMappings.clear();
+        if (nodes != null) {
+            getState().nodeMappings.putAll(mapQueryNodes(nodes));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void setPropertyDataSource(Property newDataSource) {
+        if (newDataSource == null) {
+            throw new IllegalArgumentException("Data source must not be null");
+        }
+        if (newDataSource.getType() != String.class) {
+            throw new IllegalArgumentException("Data source must be of type String");
+        }
+
+        if (this.dataSource instanceof Property.ValueChangeNotifier) {
+            ((Property.ValueChangeNotifier) this.dataSource).removeValueChangeListener(this);
+        }
+
+        this.dataSource = newDataSource;
+
+        if (newDataSource instanceof Property.ValueChangeNotifier) {
+            ((Property.ValueChangeNotifier) this.dataSource).addValueChangeListener(this);
+        }
+
+    }
+
+    public void setTextareaStyle(String style) {
+        getState().textareaClass = "".equals(style) ? null : style;
+    }
+
+    public void setTextChangeTimeout(int timeout) {
+        callFunction("setChangeDelayTime", timeout);
+        this.timeout = timeout;
+    }
+
+    public void setValue(String value) {
+        dataSource.setValue(value);
+    }
+
+    @Override
+    public void valueChange(Property.ValueChangeEvent event) {
+        log.debug("valueChange \"{}\"/\"{}", event.getProperty().getValue(), this.dataSource.getValue());
+        String oldText = getState().text;
+        String newText = this.dataSource.getValue();
+
+        if (oldText == null || !oldText.equals(newText)) {
+            getState().text = newText;
+            // this is a server side state change and we have to explicitly tell the client
+            // we want to change the text
+            getState().serverRequestCounter++;
+
+            log.debug("invalidating \"{}\"/\"{}\"", oldText, getState().text);
+            markAsDirty();
+        }
+    }
 
 }

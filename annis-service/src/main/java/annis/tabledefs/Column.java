@@ -11,6 +11,11 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class Column implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6473388921084297094L;
+
     public enum Type {
         NULL, INTEGER, REAL, TEXT, BLOB
     }
@@ -20,10 +25,6 @@ public class Column implements Serializable {
     private boolean primaryKey = false;
     private boolean unique = false;
     private boolean notNull = false;
-
-    public Column(String name) {
-        this.name = name;
-    }
 
     /**
      * Copy constructor.
@@ -36,16 +37,28 @@ public class Column implements Serializable {
         this.unique = orig.unique;
     }
 
-    public Column type(Type type) {
-        Column copy = new Column(this);
-        copy.type = type;
-        return copy;
+    public Column(String name) {
+        this.name = name;
     }
 
-    public Column unique() {
-        Column copy = new Column(this);
-        copy.unique = true;
-        return copy;
+    public String getName() {
+        return name;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public boolean isNotNull() {
+        return notNull;
+    }
+
+    public boolean isPrimaryKey() {
+        return primaryKey;
+    }
+
+    public boolean isUnique() {
+        return unique;
     }
 
     public Column notNull() {
@@ -60,28 +73,21 @@ public class Column implements Serializable {
         return copy;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public boolean isUnique() {
-        return unique;
-    }
-
-    public boolean isNotNull() {
-        return notNull;
-    }
-
-    public boolean isPrimaryKey() {
-        return primaryKey;
-    }
     @Override
     public String toString() {
         return "\"" + name + "\" " + type.name() + (primaryKey ? " PRIMARY KEY" : "") + (unique ? " UNIQUE" : "")
                 + (notNull ? " NOT NULL" : "");
+    }
+
+    public Column type(Type type) {
+        Column copy = new Column(this);
+        copy.type = type;
+        return copy;
+    }
+
+    public Column unique() {
+        Column copy = new Column(this);
+        copy.unique = true;
+        return copy;
     }
 }

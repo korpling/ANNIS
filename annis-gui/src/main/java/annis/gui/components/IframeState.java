@@ -21,31 +21,28 @@ import com.vaadin.shared.ui.JavaScriptComponentState;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class IframeState extends JavaScriptComponentState
-{
-  private String source;
-  private Integer lastScrollPos;
+public class IframeState extends JavaScriptComponentState {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 3212384429533189253L;
+    private String source;
+    private Integer lastScrollPos;
 
-  public String getSource()
-  {
-    return source;
-  }
+    public Integer getLastScrollPos() {
+        return lastScrollPos;
+    }
 
-  public void setSource(String source)
-  {
-    this.source = source;
-  }
+    public String getSource() {
+        return source;
+    }
 
-  public Integer getLastScrollPos()
-  {
-    return lastScrollPos;
-  }
+    public void setLastScrollPos(Integer lastScrollPos) {
+        this.lastScrollPos = lastScrollPos;
+    }
 
-  public void setLastScrollPos(Integer lastScrollPos)
-  {
-    this.lastScrollPos = lastScrollPos;
-  }
-  
-  
-  
+    public void setSource(String source) {
+        this.source = source;
+    }
+
 }

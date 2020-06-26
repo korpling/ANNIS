@@ -15,17 +15,6 @@
  */
 package annis.dao.autogenqueries;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.corpus_tools.salt.common.SaltProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import annis.dao.DBProvider;
 import annis.dao.QueryDao;
 import annis.examplequeries.ExampleQuery;
@@ -35,6 +24,15 @@ import annis.service.objects.MatchGroup;
 import annis.service.objects.QueryLanguage;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import org.corpus_tools.salt.common.SaltProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controlls the generating of automatic generated queries.
@@ -47,17 +45,6 @@ import annis.sqlgen.extensions.LimitOffsetQueryData;
  */
 public class QueriesGenerator extends DBProvider {
 
-    private final Logger log = LoggerFactory.getLogger(QueriesGenerator.class);
-
-    // for executing AQL queries
-    private final QueryDao queryDao;
-
-    // the name of the imported top level corpus
-    private String corpusName;
-
-    // a set of query builder, which generate the example queries.
-    private Set<QueryBuilder> queryBuilder;
-
     /**
      * All automatic generated queries must implement this interface.
      *
@@ -65,21 +52,13 @@ public class QueriesGenerator extends DBProvider {
     public interface QueryBuilder {
 
         /**
-         * Getter for a trial query, which is not put into the database. This is used
-         * for retrieving a {@link SaltProject}, which could be analyzed with
-         * {@link #analyzingQuery(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject)}.
+         * Analyzes the resut of the {@link #getAQL()}.
          *
-         * @return The final AQL query.
+         * @param saltProject
+         *            Is the result of the query, which is getting from
+         *            {@link #getAQL()}.
          */
-        public String getAQL();
-
-        /**
-         * Specifies the size of the result set.
-         *
-         * @return Returns a {@link LimitOffsetQueryData}. May not be null. The
-         *         {@link AbstractAutoQuery} class provides a good default.
-         */
-        public LimitOffsetQueryData getLimitOffsetQueryData();
+        public void analyzingQuery(SaltProject saltProject);
 
         /**
          * Specifies the left and right context of the query from {@link #getAQL()}.
@@ -91,13 +70,13 @@ public class QueriesGenerator extends DBProvider {
         public AnnotateQueryData getAnnotateQueryData();
 
         /**
-         * Analyzes the resut of the {@link #getAQL()}.
+         * Getter for a trial query, which is not put into the database. This is used
+         * for retrieving a {@link SaltProject}, which could be analyzed with
+         * {@link #analyzingQuery(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject)}.
          *
-         * @param saltProject
-         *                        Is the result of the query, which is getting from
-         *                        {@link #getAQL()}.
+         * @return The final AQL query.
          */
-        public void analyzingQuery(SaltProject saltProject);
+        public String getAQL();
 
         /**
          * Provides the final example query. The {@link AbstractAutoQuery} class
@@ -106,10 +85,14 @@ public class QueriesGenerator extends DBProvider {
          * @return The final {@link ExampleQuery}, which is written to the database.
          */
         public ExampleQuery getExampleQuery();
-    }
 
-    public QueriesGenerator(QueryDao queryDao) {
-        this.queryDao = queryDao;
+        /**
+         * Specifies the size of the result set.
+         *
+         * @return Returns a {@link LimitOffsetQueryData}. May not be null. The
+         *         {@link AbstractAutoQuery} class provides a good default.
+         */
+        public LimitOffsetQueryData getLimitOffsetQueryData();
     }
 
     public static QueriesGenerator create(QueryDao queryDao) {
@@ -122,27 +105,27 @@ public class QueriesGenerator extends DBProvider {
         return queriesGenerator;
     }
 
-    /**
-     * Deletes all example queries for a specific corpus.
-     *
-     * @param corpus
-     *                   The corpus name of the example queries.
-     */
-    public void delExampleQueriesForCorpus(String corpus) {
-        log.info("delete example queries of {}", corpus);
-        try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
-            getQueryRunner().update(conn, "DELETE FROM example_queries WHERE corpus=?", corpus);
-        } catch (SQLException ex) {
-            log.error("Could not delete example queries for corpus {}", corpus, ex);
-        }
+    private final Logger log = LoggerFactory.getLogger(QueriesGenerator.class);
+
+    // for executing AQL queries
+    private final QueryDao queryDao;
+
+    // the name of the imported top level corpus
+    private String corpusName;
+
+    // a set of query builder, which generate the example queries.
+    private Set<QueryBuilder> queryBuilder;
+
+    public QueriesGenerator(QueryDao queryDao) {
+        this.queryDao = queryDao;
     }
 
     /**
      * Deletes all example queries for a given corpus list.
      *
      * @param corpusNames
-     *                        Determines the example queries to delete. If null the
-     *                        example_querie tab is truncated.
+     *            Determines the example queries to delete. If null the
+     *            example_querie tab is truncated.
      */
     public void delExampleQueries(List<String> corpusNames) {
 
@@ -161,23 +144,31 @@ public class QueriesGenerator extends DBProvider {
     }
 
     /**
-     * Iterates over all registered {@link QueryBuilder} and generate example
-     * queries.
+     * Deletes all example queries for a specific corpus.
      *
      * @param corpus
-     *                   Determines the corpus, for which the example queries are
-     *                   generated for.
-     *
-     * @param delete
-     *                   Deletes the already existing example queries in the
-     *                   database.
+     *            The corpus name of the example queries.
      */
-    public void generateQueries(String corpus, boolean delete) {
-        if (delete) {
-            delExampleQueriesForCorpus(corpus);
+    public void delExampleQueriesForCorpus(String corpus) {
+        log.info("delete example queries of {}", corpus);
+        try (Connection conn = createConnection(DB.CORPUS_REGISTRY)) {
+            getQueryRunner().update(conn, "DELETE FROM example_queries WHERE corpus=?", corpus);
+        } catch (SQLException ex) {
+            log.error("Could not delete example queries for corpus {}", corpus, ex);
         }
+    }
 
-        generateQueries(corpus);
+    /**
+     * Generates example queries for all imported corpora.
+     *
+     * @param overwrite
+     *            Deletes already exisiting example queries.
+     */
+    public void generateQueries(Boolean overwrite) {
+        List<AnnisCorpus> corpora = queryDao.listCorpora();
+        for (AnnisCorpus annisCorpus : corpora) {
+            generateQueries(annisCorpus.getName(), overwrite);
+        }
     }
 
     /**
@@ -185,8 +176,8 @@ public class QueriesGenerator extends DBProvider {
      * queries.
      *
      * @param corpus
-     *                   Determines the corpus, for which the example queries are
-     *                   generated for.
+     *            Determines the corpus, for which the example queries are generated
+     *            for.
      */
     public void generateQueries(String corpus) {
         this.corpusName = corpus;
@@ -200,16 +191,22 @@ public class QueriesGenerator extends DBProvider {
     }
 
     /**
-     * Generates example queries for all imported corpora.
+     * Iterates over all registered {@link QueryBuilder} and generate example
+     * queries.
      *
-     * @param overwrite
-     *                      Deletes already exisiting example queries.
+     * @param corpus
+     *            Determines the corpus, for which the example queries are generated
+     *            for.
+     *
+     * @param delete
+     *            Deletes the already existing example queries in the database.
      */
-    public void generateQueries(Boolean overwrite) {
-        List<AnnisCorpus> corpora = queryDao.listCorpora();
-        for (AnnisCorpus annisCorpus : corpora) {
-            generateQueries(annisCorpus.getName(), overwrite);
+    public void generateQueries(String corpus, boolean delete) {
+        if (delete) {
+            delExampleQueriesForCorpus(corpus);
         }
+
+        generateQueries(corpus);
     }
 
     private void generateQuery(QueryBuilder queryBuilder) {
@@ -255,13 +252,6 @@ public class QueriesGenerator extends DBProvider {
     }
 
     /**
-     * @return the queryDao
-     */
-    public QueryDao getQueryDao() {
-        return queryDao;
-    }
-
-    /**
      * @return the queryBuilder
      */
     public Set<QueryBuilder> getQueryBuilder() {
@@ -269,8 +259,15 @@ public class QueriesGenerator extends DBProvider {
     }
 
     /**
+     * @return the queryDao
+     */
+    public QueryDao getQueryDao() {
+        return queryDao;
+    }
+
+    /**
      * @param queryBuilder
-     *                         the queryBuilder to set
+     *            the queryBuilder to set
      */
     public void setQueryBuilder(Set<QueryBuilder> queryBuilder) {
         this.queryBuilder = queryBuilder;

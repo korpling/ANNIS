@@ -15,40 +15,33 @@
  */
 package annis.dao;
 
+import annis.ServiceConfig;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
-
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.dbutils.QueryRunner;
 import org.sqlite.SQLiteConfig;
 import org.sqlite.SQLiteDataSource;
 
-import annis.ServiceConfig;
-
 public class DBProvider {
-    
-    private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
-    
+
     public enum DB {
-        CORPUS_REGISTRY("corpus_registry.sqlite3"),
-        SERVICE_DATA("service_data.sqlite3");
-        
+        CORPUS_REGISTRY("corpus_registry.sqlite3"), SERVICE_DATA("service_data.sqlite3");
+
         final String filename;
-        
+
         DB(String filename) {
             this.filename = filename;
         }
     }
 
+    private final ServiceConfig cfg = ConfigFactory.create(ServiceConfig.class);
+
     private final QueryRunner queryRunner = new QueryRunner();
 
     public Connection createConnection(DB db) throws SQLException {
         return createConnection(db, false);
-    }
-
-    public File getDBFile(DB db) {
-        return new File(getGraphANNISDir(), db.filename);
     }
 
     public Connection createConnection(DB db, boolean readonly) throws SQLException {
@@ -67,23 +60,26 @@ public class DBProvider {
 
     public File getANNISDir() {
         String path = cfg.dataPath();
-        if(path == null || path.isEmpty()) {
+        if (path == null || path.isEmpty()) {
             return new File(System.getProperty("user.home"), ".annis");
         } else {
             return new File(path);
         }
     }
 
+    public File getDBFile(DB db) {
+        return new File(getGraphANNISDir(), db.filename);
+    }
+
     public File getGraphANNISDir() {
         return new File(getANNISDir(), "v4");
-    }
-    
-
-    public File getRealDataDir() {
-        return new File(getANNISDir(), "data");
     }
 
     public QueryRunner getQueryRunner() {
         return queryRunner;
+    }
+
+    public File getRealDataDir() {
+        return new File(getANNISDir(), "data");
     }
 }

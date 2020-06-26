@@ -15,9 +15,8 @@
  */
 package annis.sqlgen.extensions;
 
-import java.util.Optional;
-
 import annis.service.objects.OrderType;
+import java.util.Optional;
 
 /**
  *
@@ -25,40 +24,40 @@ import annis.service.objects.OrderType;
  */
 public class LimitOffsetQueryData {
 
-  private final long offset;
-  private final long limit;
-  private final OrderType order;
+    private final long offset;
+    private final long limit;
+    private final OrderType order;
 
-  public LimitOffsetQueryData(long offset, long limit) {
-    this.offset = offset;
-    this.limit = limit;
-    this.order = OrderType.ascending;
-  }
-
-  public LimitOffsetQueryData(long offset, long limit, OrderType order) {
-    this.offset = offset;
-    this.limit = limit;
-    this.order = order;
-  }
-
-  public Optional<Long> getLimit() {
-    if (limit == 0 || limit == Long.MAX_VALUE) {
-      return Optional.empty();
-    } else {
-      return Optional.of(limit);
+    public LimitOffsetQueryData(long offset, long limit) {
+        this.offset = offset;
+        this.limit = limit;
+        this.order = OrderType.ascending;
     }
-  }
 
-  public long getOffset() {
-    return offset;
-  }
+    public LimitOffsetQueryData(long offset, long limit, OrderType order) {
+        this.offset = offset;
+        this.limit = limit;
+        this.order = order;
+    }
 
-  public boolean isPaged() {
-    return offset != 0 || limit != 0;
-  }
+    public Optional<Long> getLimit() {
+        if (limit == 0 || limit == Long.MAX_VALUE) {
+            return Optional.empty();
+        } else {
+            return Optional.of(limit);
+        }
+    }
 
-  public OrderType getOrder() {
-    return order;
-  }
+    public long getOffset() {
+        return offset;
+    }
+
+    public OrderType getOrder() {
+        return order;
+    }
+
+    public boolean isPaged() {
+        return offset != 0 || limit != 0;
+    }
 
 }

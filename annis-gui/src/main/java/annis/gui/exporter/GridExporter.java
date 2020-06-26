@@ -15,6 +15,11 @@
  */
 package annis.gui.exporter;
 
+import annis.CommonHelper;
+import annis.model.Annotation;
+import annis.service.objects.SubgraphFilter;
+import com.google.common.base.Splitter;
+import com.vaadin.ui.UI;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -22,7 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -31,207 +36,160 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SNode;
 
-import com.google.common.base.Splitter;
-import com.vaadin.ui.UI;
-
-import annis.CommonHelper;
-import annis.model.Annotation;
-import annis.service.objects.SubgraphFilter;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-
 @PluginImplementation
-public class GridExporter extends GeneralTextExporter
-{
+public class GridExporter extends GeneralTextExporter {
 
-  @Override
-  public void convertText(SaltProject queryResult, List<String> keys, 
-    Map<String,String> args, Writer out, int offset, UI ui) throws IOException
-  {
-    
-    Map<String, Map<String, Annotation>> metadataCache = 
-      new HashMap<>();
+    private static class Span {
 
+        private long start;
+        private long end;
+        private String value;
 
-    boolean showNumbers = true;
-    if (args.containsKey("numbers"))
-    {
-      String arg = args.get("numbers");
-      if (arg.equalsIgnoreCase("false")
-        || arg.equalsIgnoreCase("0")
-        || arg.equalsIgnoreCase("off"))
-      {
-        showNumbers = false;
-      }
-    }
-    List<String> metaKeys = new LinkedList<>();
-    if(args.containsKey("metakeys"))
-    {
-      Iterable<String> it = 
-        Splitter.on(",").trimResults().split(args.get("metakeys"));
-      for(String s : it)
-      {
-        metaKeys.add(s);
-      }
-    }
-
-    int counter = 0;
-    for (SCorpusGraph corpusGraph : queryResult.getCorpusGraphs())
-    {
-      for (SDocument doc : corpusGraph.getDocuments())
-      {
-        SDocumentGraph graph = doc.getDocumentGraph();
-        HashMap<String, TreeMap<Long, Span>> annos =
-          new HashMap<>();
-
-        counter++;
-        out.append((counter + offset) + ".");
-        List<SToken> tokens = graph.getSortedTokenByText();
-        Map<SToken, Long> token2index = new HashMap<>();
-        {
-          long i = 0;
-          for(SToken t : tokens) 
-          {
-            token2index.put(t, i++);
-          }
-        }
-        
-        for (SNode resolveNode : graph.getNodes())
-        {          
-
-          List<SToken> coveredTokens = graph.getOverlappedTokens(resolveNode);
-          if(coveredTokens == null || coveredTokens.isEmpty()) {
-            break;
-          }
-          coveredTokens = graph.getSortedTokenByText(coveredTokens);
-
-          for (SAnnotation resolveAnnotation : resolveNode.getAnnotations())
-          {
-            String k = resolveAnnotation.getName();
-            if (annos.get(k) == null)
-            {
-              annos.put(k, new TreeMap<>());
-            }
-            
-
-            // create a separate span for every annotation
-            long left_token_idx = token2index.get(coveredTokens.get(0));
-            long right_token_idx = token2index.get(coveredTokens.get(coveredTokens.size()-1));
-            annos.get(k).put(left_token_idx, new Span(left_token_idx, right_token_idx,
-              resolveAnnotation.getValue().toString()));
-
-          }
+        public Span(long start, long end, String value) {
+            this.start = start;
+            this.end = end;
+            this.value = value;
         }
 
-        for (String k : keys)
-        {
+        public long getEnd() {
+            return end;
+        }
 
-          if ("tok".equals(k))
-          {
-            out.append("\t" + k + "\t ");
-            for (SToken annisNode : tokens)
-            {
-              out.append(graph.getText(annisNode) +  " ");
+        public long getStart() {
+            return start;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+    }
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5344106264419931470L;
+
+    @Override
+    public void convertText(SaltProject queryResult, List<String> keys, Map<String, String> args, Writer out,
+            int offset, UI ui) throws IOException {
+
+        Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
+
+        boolean showNumbers = true;
+        if (args.containsKey("numbers")) {
+            String arg = args.get("numbers");
+            if (arg.equalsIgnoreCase("false") || arg.equalsIgnoreCase("0") || arg.equalsIgnoreCase("off")) {
+                showNumbers = false;
             }
-            out.append("\n");
-          }
-          else
-          {
-            if(annos.get(k) != null)
-            {
-              out.append("\t" + k + "\t ");
-              for(Span s : annos.get(k).values())
-              {
+        }
+        List<String> metaKeys = new LinkedList<>();
+        if (args.containsKey("metakeys")) {
+            Iterable<String> it = Splitter.on(",").trimResults().split(args.get("metakeys"));
+            for (String s : it) {
+                metaKeys.add(s);
+            }
+        }
 
-                out.append(s.getValue());
+        int counter = 0;
+        for (SCorpusGraph corpusGraph : queryResult.getCorpusGraphs()) {
+            for (SDocument doc : corpusGraph.getDocuments()) {
+                SDocumentGraph graph = doc.getDocumentGraph();
+                HashMap<String, TreeMap<Long, Span>> annos = new HashMap<>();
 
-                if (showNumbers)
+                counter++;
+                out.append((counter + offset) + ".");
+                List<SToken> tokens = graph.getSortedTokenByText();
+                Map<SToken, Long> token2index = new HashMap<>();
                 {
-                  long leftIndex = Math.max(1, s.getStart());
-                  long rightIndex = s.getEnd();
-                  out.append("[" + leftIndex
-                    + "-" + rightIndex + "]");
+                    long i = 0;
+                    for (SToken t : tokens) {
+                        token2index.put(t, i++);
+                    }
                 }
-                out.append(" ");
 
-              }
-              out.append("\n");
+                for (SNode resolveNode : graph.getNodes()) {
+
+                    List<SToken> coveredTokens = graph.getOverlappedTokens(resolveNode);
+                    if (coveredTokens == null || coveredTokens.isEmpty()) {
+                        break;
+                    }
+                    coveredTokens = graph.getSortedTokenByText(coveredTokens);
+
+                    for (SAnnotation resolveAnnotation : resolveNode.getAnnotations()) {
+                        String k = resolveAnnotation.getName();
+                        if (annos.get(k) == null) {
+                            annos.put(k, new TreeMap<>());
+                        }
+
+                        // create a separate span for every annotation
+                        long left_token_idx = token2index.get(coveredTokens.get(0));
+                        long right_token_idx = token2index.get(coveredTokens.get(coveredTokens.size() - 1));
+                        annos.get(k).put(left_token_idx,
+                                new Span(left_token_idx, right_token_idx, resolveAnnotation.getValue().toString()));
+
+                    }
+                }
+
+                for (String k : keys) {
+
+                    if ("tok".equals(k)) {
+                        out.append("\t" + k + "\t ");
+                        for (SToken annisNode : tokens) {
+                            out.append(graph.getText(annisNode) + " ");
+                        }
+                        out.append("\n");
+                    } else {
+                        if (annos.get(k) != null) {
+                            out.append("\t" + k + "\t ");
+                            for (Span s : annos.get(k).values()) {
+
+                                out.append(s.getValue());
+
+                                if (showNumbers) {
+                                    long leftIndex = Math.max(1, s.getStart());
+                                    long rightIndex = s.getEnd();
+                                    out.append("[" + leftIndex + "-" + rightIndex + "]");
+                                }
+                                out.append(" ");
+
+                            }
+                            out.append("\n");
+                        }
+                    }
+                }
+
+                if (!metaKeys.isEmpty()) {
+                    String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
+                    super.appendMetaData(out, metaKeys, path[path.length - 1], path[0], metadataCache, ui);
+                }
+                out.append("\n\n");
             }
-          }
         }
-
-        if(!metaKeys.isEmpty())
-        {
-          String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
-          super.appendMetaData(out, metaKeys, path[path.length-1], path[0], metadataCache, ui);
-        }
-        out.append("\n\n");
-      }
-    }
-  }
-  
-  
-
-  @Override
-  public SubgraphFilter getSubgraphFilter()
-  {
-    return SubgraphFilter.all;
-  }
-  
-  @Override
-  public String getHelpMessage()
-  {
-    return "The Grid Exporter can export all annotations of a search result and its "
-    + "context. Each annotation layer is represented in a separate line, and the "
-    + "tokens covered by each annotation are given as number ranges after each "
-    + "annotation in brackets. To suppress token numbers, input numbers=false "
-    + "into the parameters box below. To display only a subset of annotations "
-    + "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
-    + "to show tokens and the "
-    + "annotations pos and cat.<br /><br />"
-    + "Parameters: <br/>"
-    + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-    + "<code>metakeys=title,documentname</code>) <br />"
-    + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
-    + "<code>numbers=false</code>)";
-  }
-
-
-  private static class Span
-  {
-
-    private long start;
-    private long end;
-    private String value;
-
-    public Span(long start, long end, String value)
-    {
-      this.start = start;
-      this.end = end;
-      this.value = value;
     }
 
-    public long getStart()
-    {
-      return start;
+    @Override
+    public String getHelpMessage() {
+        return "The Grid Exporter can export all annotations of a search result and its "
+                + "context. Each annotation layer is represented in a separate line, and the "
+                + "tokens covered by each annotation are given as number ranges after each "
+                + "annotation in brackets. To suppress token numbers, input numbers=false "
+                + "into the parameters box below. To display only a subset of annotations "
+                + "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
+                + "to show tokens and the " + "annotations pos and cat.<br /><br />" + "Parameters: <br/>"
+                + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+                + "<code>metakeys=title,documentname</code>) <br />"
+                + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
+                + "<code>numbers=false</code>)";
     }
 
-    public long getEnd()
-    {
-      return end;
+    @Override
+    public SubgraphFilter getSubgraphFilter() {
+        return SubgraphFilter.all;
     }
 
-
-    public String getValue()
-    {
-      return value;
+    @Override
+    public boolean isAlignable() {
+        return false;
     }
-
-  }
-
-
-@Override
-	public boolean isAlignable() 
-	{
-		return false;
-	}
 }

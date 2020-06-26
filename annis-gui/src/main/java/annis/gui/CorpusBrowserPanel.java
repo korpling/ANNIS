@@ -15,6 +15,19 @@
  */
 package annis.gui;
 
+import annis.gui.beans.CorpusBrowserEntry;
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.Background;
+import annis.model.Query;
+import annis.service.objects.QueryLanguage;
+import com.vaadin.event.selection.SelectionEvent;
+import com.vaadin.event.selection.SelectionListener;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,16 +40,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
-import com.vaadin.event.selection.SelectionEvent;
-import com.vaadin.event.selection.SelectionListener;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.VerticalLayout;
-
 import org.corpus_tools.ApiException;
 import org.corpus_tools.annis.AnnoKey;
 import org.corpus_tools.annis.Annotation;
@@ -45,16 +48,10 @@ import org.corpus_tools.annis.Component;
 import org.corpus_tools.annis.CorporaApi;
 import org.corpus_tools.annis.CorpusList;
 import org.corpus_tools.annis.FindQuery;
-import org.corpus_tools.annis.SearchApi;
 import org.corpus_tools.annis.FindQuery.OrderEnum;
+import org.corpus_tools.annis.SearchApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import annis.gui.beans.CorpusBrowserEntry;
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.Background;
-import annis.model.Query;
-import annis.service.objects.QueryLanguage;
 
 /**
  *
@@ -62,7 +59,40 @@ import annis.service.objects.QueryLanguage;
  */
 public class CorpusBrowserPanel extends Panel {
 
+    public class ExampleListener implements SelectionListener<CorpusBrowserEntry> {
+
+        private static final long serialVersionUID = 5456621606184042619L;
+
+        @Override
+        public void selectionChange(SelectionEvent<CorpusBrowserEntry> event) {
+            Optional<CorpusBrowserEntry> selected = event.getFirstSelectedItem();
+            Set<String> corpusNameSet = new HashSet<>();
+            if (corpus != null) {
+                corpusNameSet.add(corpus);
+            }
+            if (controller != null && selected.isPresent()) {
+                controller.setQuery(new Query(selected.get().getQuery(), QueryLanguage.AQL, corpusNameSet));
+            }
+        }
+    }
+
     private static final long serialVersionUID = -1029743017413951838L;
+
+    private static String getQName(AnnoKey key) {
+        if (key.getNs() == null || key.getNs().isEmpty()) {
+            return key.getName();
+        } else {
+            return key.getNs() + ":" + key.getName();
+        }
+    }
+
+    private static String getQName(Component c) {
+        if (c.getLayer() == null || c.getLayer().isEmpty()) {
+            return c.getName();
+        } else {
+            return c.getLayer() + ":" + c.getName();
+        }
+    }
 
     private Logger log = LoggerFactory.getLogger(CorpusBrowserPanel.class);
 
@@ -158,7 +188,17 @@ public class CorpusBrowserPanel extends Panel {
     public void attach() {
         super.attach();
 
-        Background.run(() -> fetchAnnotationsInBackground());
+        Background.run(this::fetchAnnotationsInBackground);
+    }
+
+    private boolean canExcludeNamespace(Collection<Annotation> annos) {
+        Set<String> names = new HashSet<>();
+        for (Annotation a : annos) {
+            if (!names.add(a.getKey().getName())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void fetchAnnotationsInBackground() {
@@ -178,7 +218,8 @@ public class CorpusBrowserPanel extends Panel {
                 FindQuery q = new FindQuery();
                 q.setCorpora(c);
                 q.setQuery("annis:node_type=\"corpus\" _ident_ " + getQName(a.getKey()));
-                // Not sorting the results is much faster, especially if we only fetch the first item
+                // Not sorting the results is much faster, especially if we only fetch the first
+                // item
                 // (we are only interested if a match exists, not how many items or which one)
                 q.setOrder(OrderEnum.NOTSORTED);
                 q.setLimit(1);
@@ -358,48 +399,5 @@ public class CorpusBrowserPanel extends Panel {
             });
         }
 
-    }
-
-    private boolean canExcludeNamespace(Collection<Annotation> annos) {
-        Set<String> names = new HashSet<>();
-        for (Annotation a : annos) {
-            if (!names.add(a.getKey().getName())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private static String getQName(AnnoKey key) {
-        if (key.getNs() == null || key.getNs().isEmpty()) {
-            return key.getName();
-        } else {
-            return key.getNs() + ":" + key.getName();
-        }
-    }
-
-    private static String getQName(Component c) {
-        if (c.getLayer() == null || c.getLayer().isEmpty()) {
-            return c.getName();
-        } else {
-            return c.getLayer() + ":" + c.getName();
-        }
-    }
-
-    public class ExampleListener implements SelectionListener<CorpusBrowserEntry> {
-
-        private static final long serialVersionUID = 5456621606184042619L;
-
-        @Override
-        public void selectionChange(SelectionEvent<CorpusBrowserEntry> event) {
-            Optional<CorpusBrowserEntry> selected = event.getFirstSelectedItem();
-            Set<String> corpusNameSet = new HashSet<>();
-            if (corpus != null) {
-                corpusNameSet.add(corpus);
-            }
-            if (controller != null && selected.isPresent()) {
-                controller.setQuery(new Query(selected.get().getQuery(), QueryLanguage.AQL, corpusNameSet));
-            }
-        }
     }
 }

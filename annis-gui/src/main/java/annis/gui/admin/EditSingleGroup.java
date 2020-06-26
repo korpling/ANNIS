@@ -32,68 +32,50 @@ import com.vaadin.v7.data.util.IndexedContainer;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @DesignRoot
-public class EditSingleGroup extends Panel
-{
+public class EditSingleGroup extends Panel {
 
-  private Label lblGroup;
+    private static final long serialVersionUID = 4801977262300488107L;
 
-  private Button btSave;
+    private Label lblGroup;
 
-  private Button btCancel;
+    private Button btSave;
 
-  private PopupTwinColumnSelect corporaSelector;
+    private Button btCancel;
 
-  public EditSingleGroup(final FieldGroup fields,
-    IndexedContainer corporaContainer)
-  {
-    Design.read(EditSingleGroup.this);
+    private PopupTwinColumnSelect corporaSelector;
 
-    corporaSelector.setSelectableContainer(corporaContainer);
-    
-    lblGroup.setValue((String) fields.getItemDataSource().getItemProperty("name").getValue());
+    public EditSingleGroup(final FieldGroup fields, IndexedContainer corporaContainer) {
+        Design.read(EditSingleGroup.this);
 
-    // bind the fields
-    fields.bind(corporaSelector, "corpora");
-    
-    // events
-    btSave.addClickListener(new Button.ClickListener()
-    {
-      @Override
-      public void buttonClick(Button.ClickEvent event)
-      {
-        try
-        {
-          fields.commit();
-        }
-        catch (FieldGroup.CommitException ex)
-        {
-        }
+        corporaSelector.setSelectableContainer(corporaContainer);
 
+        lblGroup.setValue((String) fields.getItemDataSource().getItemProperty("name").getValue());
 
-        HasComponents parent = getParent();
-        if (parent instanceof Window)
-        {
-          ((Window) parent).close();
-        }
-      }
-    });
-    btSave.setClickShortcut(ShortcutAction.KeyCode.ENTER, ShortcutAction.ModifierKey.CTRL);
+        // bind the fields
+        fields.bind(corporaSelector, "corpora");
 
-    btCancel.addClickListener(new Button.ClickListener()
-    {
+        // events
+        btSave.addClickListener(event -> {
+            try {
+                fields.commit();
+            } catch (FieldGroup.CommitException ex) {
+            }
 
-      @Override
-      public void buttonClick(Button.ClickEvent event)
-      {
-        fields.discard();
+            HasComponents parent = getParent();
+            if (parent instanceof Window) {
+                ((Window) parent).close();
+            }
+        });
+        btSave.setClickShortcut(ShortcutAction.KeyCode.ENTER, ShortcutAction.ModifierKey.CTRL);
 
-        HasComponents parent = getParent();
-        if (parent instanceof Window)
-        {
-          ((Window) parent).close();
-        }
-      }
-    });
-  }
+        btCancel.addClickListener(event -> {
+            fields.discard();
+
+            HasComponents parent = getParent();
+            if (parent instanceof Window) {
+                ((Window) parent).close();
+            }
+        });
+    }
 
 }

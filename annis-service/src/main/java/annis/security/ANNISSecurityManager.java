@@ -23,35 +23,27 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ANNISSecurityManager extends DefaultWebSecurityManager
-{
-  private ANNISUserConfigurationManager confManager;
+public class ANNISSecurityManager extends DefaultWebSecurityManager {
+    private ANNISUserConfigurationManager confManager;
 
-  public ANNISUserConfigurationManager getConfManager()
-  {
-    return confManager;
-  }
-
-  public void setConfManager(ANNISUserConfigurationManager confManager)
-  {
-    this.confManager = confManager;
-  }
-  
-  public ANNISUserRealm getANNISUserRealm()
-  {
-    if(getRealms() != null)
-    {
-      for(Realm r : getRealms())
-      {
-        if(r instanceof ANNISUserRealm)
-        {
-          return (ANNISUserRealm) r;
+    public ANNISUserRealm getANNISUserRealm() {
+        if (getRealms() != null) {
+            for (Realm r : getRealms()) {
+                if (r instanceof ANNISUserRealm) {
+                    return (ANNISUserRealm) r;
+                }
+            }
         }
-      }
+
+        return null;
     }
-    
-    return null;
-  }
-  
-  
+
+    public ANNISUserConfigurationManager getConfManager() {
+        return confManager;
+    }
+
+    public void setConfManager(ANNISUserConfigurationManager confManager) {
+        this.confManager = confManager;
+    }
+
 }

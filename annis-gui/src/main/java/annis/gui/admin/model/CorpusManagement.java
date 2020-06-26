@@ -37,125 +37,84 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CorpusManagement implements Serializable
-{
+public class CorpusManagement implements Serializable {
 
-  private final Map<String, AnnisCorpus> corpora = new TreeMap<>();
+    private static final long serialVersionUID = -5750760811957151548L;
 
-  private WebResourceProvider webResourceProvider;
+    private final Map<String, AnnisCorpus> corpora = new TreeMap<>();
 
-  private final Logger log = LoggerFactory.getLogger(CorpusManagement.class);
+    private WebResourceProvider webResourceProvider;
 
-  public void clear()
-  {
-    corpora.clear();
-  }
-  
-  public void fetchFromService() throws CriticalServiceQueryException, ServiceQueryException
-  {
-    if (webResourceProvider != null)
-    {
-      corpora.clear();
+    private final Logger log = LoggerFactory.getLogger(CorpusManagement.class);
 
-      try
-      {
-        WebResource rootRes = webResourceProvider.getWebResource();
-        List<AnnisCorpus> corporaList = rootRes.path("query").path("corpora")
-          .get(new GenericType<List<AnnisCorpus>>()
-            {
-          });
-
-        for (AnnisCorpus c : corporaList)
-        {
-          corpora.put(c.getName(), c);
-        }
-      }
-      catch (ClientHandlerException ex)
-      {
-        log.error(null, ex);
-        throw new ServiceQueryException("Service not available: " + ex.
-          getLocalizedMessage());
-      }
-      catch (UniformInterfaceException ex)
-      {
-        if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
-          getStatusCode())
-        {
-          throw new CriticalServiceQueryException(
-            "You are not authorized to get the corpus list.");
-        }
-        else
-        {
-          log.error(null, ex);
-          throw new ServiceQueryException("Remote exception: " + ex.
-            getLocalizedMessage());
-        }
-      }
-
+    public void clear() {
+        corpora.clear();
     }
-  }
-  
-  public void delete(String corpusName)
-    throws CriticalServiceQueryException, ServiceQueryException
-  {
-    if (webResourceProvider != null)
-    {
-      try
-      {
-        WebResource rootRes = webResourceProvider.getWebResource();
-        rootRes.path("admin").path("corpora").path(corpusName).delete();
-        corpora.remove(corpusName);
-      }
-      catch (ClientHandlerException ex)
-      {
-        log.error(null, ex);
-        throw new ServiceQueryException("Service not available: " + ex.
-          getLocalizedMessage());
-      }
-      catch (UniformInterfaceException ex)
-      {
-        if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
-          getStatusCode())
-        {
-          throw new CriticalServiceQueryException(
-            "You are not authorized to delete a corpus");
-        }
-        else if(ex.getResponse().getStatus() == Response.Status.NOT_FOUND.
-          getStatusCode())
-        {
-          throw new ServiceQueryException(
-            "Corpus with name " + corpusName + " not found");
-        }
-        else
-        {
-          log.error(null, ex);
-          throw new ServiceQueryException("Remote exception: " + ex.
-            getLocalizedMessage());
-        }
-      }
 
+    public void delete(String corpusName) throws CriticalServiceQueryException, ServiceQueryException {
+        if (webResourceProvider != null) {
+            try {
+                WebResource rootRes = webResourceProvider.getWebResource();
+                rootRes.path("admin").path("corpora").path(corpusName).delete();
+                corpora.remove(corpusName);
+            } catch (ClientHandlerException ex) {
+                log.error(null, ex);
+                throw new ServiceQueryException("Service not available: " + ex.getLocalizedMessage());
+            } catch (UniformInterfaceException ex) {
+                if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+                    throw new CriticalServiceQueryException("You are not authorized to delete a corpus");
+                } else if (ex.getResponse().getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                    throw new ServiceQueryException("Corpus with name " + corpusName + " not found");
+                } else {
+                    log.error(null, ex);
+                    throw new ServiceQueryException("Remote exception: " + ex.getLocalizedMessage());
+                }
+            }
+
+        }
     }
-  }
 
-  public ImmutableList<AnnisCorpus> getCorpora()
-  {
-    return ImmutableList.copyOf(corpora.values());
-  }
-  
-  public ImmutableSet<String> getCorpusNames()
-  {
-    return ImmutableSet.copyOf(corpora.keySet());
-  }
+    public void fetchFromService() throws CriticalServiceQueryException, ServiceQueryException {
+        if (webResourceProvider != null) {
+            corpora.clear();
 
-  public WebResourceProvider getWebResourceProvider()
-  {
-    return webResourceProvider;
-  }
+            try {
+                WebResource rootRes = webResourceProvider.getWebResource();
+                List<AnnisCorpus> corporaList = rootRes.path("query").path("corpora")
+                        .get(new GenericType<List<AnnisCorpus>>() {});
 
-  public void setWebResourceProvider(WebResourceProvider webResourceProvider)
-  {
-    this.webResourceProvider = webResourceProvider;
-  }
+                for (AnnisCorpus c : corporaList) {
+                    corpora.put(c.getName(), c);
+                }
+            } catch (ClientHandlerException ex) {
+                log.error(null, ex);
+                throw new ServiceQueryException("Service not available: " + ex.getLocalizedMessage());
+            } catch (UniformInterfaceException ex) {
+                if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+                    throw new CriticalServiceQueryException("You are not authorized to get the corpus list.");
+                } else {
+                    log.error(null, ex);
+                    throw new ServiceQueryException("Remote exception: " + ex.getLocalizedMessage());
+                }
+            }
 
-  
+        }
+    }
+
+    public ImmutableList<AnnisCorpus> getCorpora() {
+        return ImmutableList.copyOf(corpora.values());
+    }
+
+    public ImmutableSet<String> getCorpusNames() {
+        return ImmutableSet.copyOf(corpora.keySet());
+    }
+
+    public WebResourceProvider getWebResourceProvider() {
+        return webResourceProvider;
+    }
+
+    public void setWebResourceProvider(WebResourceProvider webResourceProvider) {
+        this.webResourceProvider = webResourceProvider;
+    }
+
 }

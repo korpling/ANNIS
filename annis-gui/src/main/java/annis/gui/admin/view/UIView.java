@@ -25,27 +25,30 @@ import java.util.concurrent.Callable;
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface UIView extends Serializable
-{
-  public void addListener(Listener listener);
-  
-  public void showInfo(String info, String description);
-  public void showBackgroundInfo(String info, String description);
-  public void showWarning(String warning, String description);
-  public void showError(String error, String description);
-  
-  /**
-   * Execute a job in the background and call the callback when finished.
-   * The callback must be executed in the same main UI thread.
-   * @param <T>
-   * @param job
-   * @param callback 
-   */
-  public<T> void runInBackground(Callable<T> job, FutureCallback<T> callback);
-  
-  public interface Listener extends Serializable
-  {
-    public void loginChanged(boolean isLoggedIn);
-    public void loadedTab(Object selectedTab);
-  }
+public interface UIView extends Serializable {
+    public interface Listener extends Serializable {
+        public void loadedTab(Object selectedTab);
+
+        public void loginChanged(boolean isLoggedIn);
+    }
+
+    public void addListener(Listener listener);
+
+    /**
+     * Execute a job in the background and call the callback when finished. The
+     * callback must be executed in the same main UI thread.
+     * 
+     * @param <T>
+     * @param job
+     * @param callback
+     */
+    public <T> void runInBackground(Callable<T> job, FutureCallback<T> callback);
+
+    public void showBackgroundInfo(String info, String description);
+
+    public void showError(String error, String description);
+
+    public void showInfo(String info, String description);
+
+    public void showWarning(String warning, String description);
 }

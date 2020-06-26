@@ -15,119 +15,112 @@
  */
 package annis.gui;
 
+import annis.libgui.IDGenerator;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.v7.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-
-import annis.libgui.IDGenerator;
+import com.vaadin.v7.shared.ui.label.ContentMode;
+import com.vaadin.v7.ui.Label;
 
 /**
  * A window displaying an invitation to participate in the development of ANNIS.
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class HelpUsWindow extends Window
-{
+public class HelpUsWindow extends Window {
 
-  private VerticalLayout layout;
+    private static class OkClickListener implements Button.ClickListener {
 
-  private final Button btClose;
-  
-  public HelpUsWindow()
-  {
-    setSizeFull();
-    layout = new VerticalLayout();
-    setContent(layout);
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 7782733014940535423L;
+        private final HelpUsWindow finalThis;
 
-    layout.setSizeFull();
-    layout.setMargin(new MarginInfo(false, false, true, false));
+        public OkClickListener(HelpUsWindow finalThis) {
+            this.finalThis = finalThis;
+        }
 
-    HorizontalLayout hLayout = new HorizontalLayout();
-    hLayout.setSizeFull();
-    hLayout.setMargin(false);
+        @Override
+        public void buttonClick(ClickEvent event) {
+            UI.getCurrent().removeWindow(finalThis);
+        }
+    }
 
-    VerticalLayout labelLayout = new VerticalLayout();
-    labelLayout.setMargin(true);
-    labelLayout.setSizeFull();
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 6018814170039691231L;
 
-    Label lblOpenSource = new Label();
+    private VerticalLayout layout;
 
-    lblOpenSource.setValue(
-      "<h1>ANNIS is <a href=\"http://opensource.org/osd\">Open Source</a> "
-      + "software.</h1>"
-      + "<p>This means you are free to download the source code and add new "
-      + "features or make other adjustments to ANNIS on your own.<p/>"
-      + "Here are some examples how you can help ANNIS:"
-      + "<ul>"
-      + "<li>Fix or report problems (bugs) you encounter when using the ANNIS software.</li>"
-      + "<li>Add new features.</li>"
-      + "<li>Enhance the documentation</li>"
-      + "</ul>"
-      + "<p>Feel free to visit our GitHub page for more information: <a href=\"https://github.com/korpling/ANNIS\" target=\"_blank\">https://github.com/korpling/ANNIS</a></p>");
-    lblOpenSource.setContentMode(ContentMode.HTML);
-    lblOpenSource.setStyleName("opensource");
-    lblOpenSource.setWidth("100%");
-    lblOpenSource.setHeight("-1px");
-    labelLayout.addComponent(lblOpenSource);
+    private final Button btClose;
 
-    Link lnkFork = new Link();
-    lnkFork.setResource(
-      new ExternalResource("https://github.com/korpling/ANNIS"));
-    lnkFork.setIcon(new ExternalResource(
-      "https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"));
-    lnkFork.setTargetName("_blank");
+    public HelpUsWindow() {
+        setSizeFull();
+        layout = new VerticalLayout();
+        setContent(layout);
 
-    hLayout.addComponent(labelLayout);
-    hLayout.addComponent(lnkFork);
-    hLayout.setComponentAlignment(labelLayout, Alignment.TOP_LEFT);
-    hLayout.setComponentAlignment(lnkFork, Alignment.TOP_RIGHT);
-    hLayout.setExpandRatio(labelLayout, 1.0f);
+        layout.setSizeFull();
+        layout.setMargin(new MarginInfo(false, false, true, false));
 
-    layout.addComponent(hLayout);
+        HorizontalLayout hLayout = new HorizontalLayout();
+        hLayout.setSizeFull();
+        hLayout.setMargin(false);
 
-    final HelpUsWindow finalThis = this;
+        VerticalLayout labelLayout = new VerticalLayout();
+        labelLayout.setMargin(true);
+        labelLayout.setSizeFull();
 
-    btClose = new Button("Close");
-    btClose.addClickListener(new OkClickListener(finalThis));
-    layout.addComponent(btClose);
+        Label lblOpenSource = new Label();
 
-    layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
-    layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
-    layout.setExpandRatio(hLayout, 1.0f);
-  }
+        lblOpenSource.setValue("<h1>ANNIS is <a href=\"http://opensource.org/osd\">Open Source</a> " + "software.</h1>"
+                + "<p>This means you are free to download the source code and add new "
+                + "features or make other adjustments to ANNIS on your own.<p/>"
+                + "Here are some examples how you can help ANNIS:" + "<ul>"
+                + "<li>Fix or report problems (bugs) you encounter when using the ANNIS software.</li>"
+                + "<li>Add new features.</li>" + "<li>Enhance the documentation</li>" + "</ul>"
+                + "<p>Feel free to visit our GitHub page for more information: <a href=\"https://github.com/korpling/ANNIS\" target=\"_blank\">https://github.com/korpling/ANNIS</a></p>");
+        lblOpenSource.setContentMode(ContentMode.HTML);
+        lblOpenSource.setStyleName("opensource");
+        lblOpenSource.setWidth("100%");
+        lblOpenSource.setHeight("-1px");
+        labelLayout.addComponent(lblOpenSource);
 
-  @Override
-  public void attach()
-  {
-    super.attach();
-    IDGenerator.assignIDForFields(HelpUsWindow.this, btClose);
-  }
-  
-  
+        Link lnkFork = new Link();
+        lnkFork.setResource(new ExternalResource("https://github.com/korpling/ANNIS"));
+        lnkFork.setIcon(new ExternalResource("https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"));
+        lnkFork.setTargetName("_blank");
 
-  private static class OkClickListener implements Button.ClickListener
-  {
+        hLayout.addComponent(labelLayout);
+        hLayout.addComponent(lnkFork);
+        hLayout.setComponentAlignment(labelLayout, Alignment.TOP_LEFT);
+        hLayout.setComponentAlignment(lnkFork, Alignment.TOP_RIGHT);
+        hLayout.setExpandRatio(labelLayout, 1.0f);
 
-    private final HelpUsWindow finalThis;
+        layout.addComponent(hLayout);
 
-    public OkClickListener(HelpUsWindow finalThis)
-    {
-      this.finalThis = finalThis;
+        final HelpUsWindow finalThis = this;
+
+        btClose = new Button("Close");
+        btClose.addClickListener(new OkClickListener(finalThis));
+        layout.addComponent(btClose);
+
+        layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
+        layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
+        layout.setExpandRatio(hLayout, 1.0f);
     }
 
     @Override
-    public void buttonClick(ClickEvent event)
-    {
-      UI.getCurrent().removeWindow(finalThis);
+    public void attach() {
+        super.attach();
+        IDGenerator.assignIDForFields(HelpUsWindow.this, btClose);
     }
-  }
 }

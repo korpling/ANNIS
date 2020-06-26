@@ -21,33 +21,27 @@ import com.vaadin.server.Resource;
 
 /**
  * The current behavior state of the side bar.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public enum SidebarState
-{
-  VISIBLE(ANNISFontIcon.MENU_LEFT, true), 
-  HIDDEN(ANNISFontIcon.MENU_RIGHT, false), 
-  AUTO_VISIBLE(ANNISFontIcon.MENU_AUTO, true),
-  AUTO_HIDDEN(ANNISFontIcon.MENU_AUTO, false);
-  
-  private final Resource icon;
-  private final boolean sidebarVisible;
-  
-  SidebarState(Resource icon, boolean sidebarVisible)
-  {
-    this.icon = icon;
-    this.sidebarVisible = sidebarVisible;
-  }
+public enum SidebarState {
+    VISIBLE(ANNISFontIcon.MENU_LEFT, true), HIDDEN(ANNISFontIcon.MENU_RIGHT,
+            false), AUTO_VISIBLE(ANNISFontIcon.MENU_AUTO, true), AUTO_HIDDEN(ANNISFontIcon.MENU_AUTO, false);
 
-  public Resource getIcon()
-  {
-    return icon;
-  }
+    private final Resource icon;
+    private final boolean sidebarVisible;
 
-  public boolean isSidebarVisible()
-  {
-    return sidebarVisible;
-  }
+    SidebarState(Resource icon, boolean sidebarVisible) {
+        this.icon = icon;
+        this.sidebarVisible = sidebarVisible;
+    }
 
-  
+    public Resource getIcon() {
+        return icon;
+    }
+
+    public boolean isSidebarVisible() {
+        return sidebarVisible;
+    }
+
 }

@@ -15,18 +15,15 @@
  */
 package annis.sqlgen;
 
+import annis.service.objects.AnnisCorpus;
+import com.google.common.base.Joiner;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.dbutils.handlers.AbstractListHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Joiner;
-
-import annis.service.objects.AnnisCorpus;
 
 public class ListCorpusSqlHelper extends AbstractListHandler<AnnisCorpus> {
 
@@ -45,7 +42,6 @@ public class ListCorpusSqlHelper extends AbstractListHandler<AnnisCorpus> {
                 + (questionMarks.isEmpty() ? "NULL" : Joiner.on(",").join(questionMarks)) + ")";
     }
 
-
     @Override
     protected AnnisCorpus handleRow(ResultSet rs) throws SQLException {
         AnnisCorpus corpus = new AnnisCorpus();
@@ -53,7 +49,7 @@ public class ListCorpusSqlHelper extends AbstractListHandler<AnnisCorpus> {
         corpus.setDocumentCount(rs.getInt("docs"));
         corpus.setTokenCount(rs.getInt("tokens"));
         corpus.setSourcePath(rs.getString("source_path"));
-        
+
         return corpus;
     }
 }

@@ -23,30 +23,32 @@ import java.util.Set;
 
 /**
  * Definition of interactions for a view displaying the user list.
+ * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface UserListView extends Serializable
-{
-  public void setUserList(Collection<User> users);
-  
-  public void setLoadingAnimation(boolean show);
-  
-  public void addListener(Listener listener);
-  
-  public void askForPasswordChange(String userName);
-  
-  public void emptyNewUserNameTextField();
-  
-  public void addAvailableGroupNames(Collection<String> groupNames);
-  public void addAvailablePermissions(Collection<String> permissions);
-  
-  public interface Listener
-  {
-    public void userUpdated(User user);
-    public void passwordChanged(String userName, String newPassword);
-    
-    public void addNewUser(String userName);
-    public void deleteUsers(Set<String> userName);
-  }
-  
+public interface UserListView extends Serializable {
+    public interface Listener {
+        public void addNewUser(String userName);
+
+        public void deleteUsers(Set<String> userName);
+
+        public void passwordChanged(String userName, String newPassword);
+
+        public void userUpdated(User user);
+    }
+
+    public void addAvailableGroupNames(Collection<String> groupNames);
+
+    public void addAvailablePermissions(Collection<String> permissions);
+
+    public void addListener(Listener listener);
+
+    public void askForPasswordChange(String userName);
+
+    public void emptyNewUserNameTextField();
+
+    public void setLoadingAnimation(boolean show);
+
+    public void setUserList(Collection<User> users);
+
 }

@@ -24,100 +24,86 @@ import java.util.Objects;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class UserGeneratedFrequencyEntry implements Serializable
-{
-  private String nr;
-  private String annotation;
-  private String comment = "manually created";
+public class UserGeneratedFrequencyEntry implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -2233620631396727690L;
+    private String nr;
+    private String annotation;
+    private String comment = "manually created";
 
-  public String getNr()
-  {
-    return nr;
-  }
-
-  public void setNr(String nr)
-  {
-    this.nr = nr;
-  }
-
-  public String getAnnotation()
-  {
-    return annotation;
-  }
-
-  public void setAnnotation(String annotation)
-  {
-    this.annotation = annotation;
-  }
-
-  public String getComment()
-  {
-    return comment;
-  }
-
-  public void setComment(String comment)
-  {
-    this.comment = comment;
-  }
-  
-  /**
-   * Converts this object to a proper definition.
-   * @return 
-   */
-  public FrequencyTableEntry toFrequencyTableEntry()
-  {
-    FrequencyTableEntry result = new FrequencyTableEntry();
-    
-    result.setReferencedNode(nr);
-    
-    if (annotation != null && "tok".equals(annotation))
-    {
-      result.setType(FrequencyTableEntryType.span);
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final UserGeneratedFrequencyEntry other = (UserGeneratedFrequencyEntry) obj;
+        if (!Objects.equals(this.nr, other.nr)) {
+            return false;
+        }
+        if (!Objects.equals(this.annotation, other.annotation)) {
+            return false;
+        }
+        return true;
     }
-    else
-    {
-      result.setType(FrequencyTableEntryType.annotation);
-      result.setKey(annotation);
-    }
-    
-    return result;
-  }
 
-  @Override
-  public int hashCode()
-  {
-    int hash = 7;
-    hash = 53 * hash + Objects.hashCode(this.nr);
-    hash = 53 * hash + Objects.hashCode(this.annotation);
-    return hash;
-  }
+    public String getAnnotation() {
+        return annotation;
+    }
 
-  @Override
-  public boolean equals(Object obj)
-  {
-    if (this == obj)
-    {
-      return true;
+    public String getComment() {
+        return comment;
     }
-    if (obj == null)
-    {
-      return false;
-    }
-    if (getClass() != obj.getClass())
-    {
-      return false;
-    }
-    final UserGeneratedFrequencyEntry other = (UserGeneratedFrequencyEntry) obj;
-    if (!Objects.equals(this.nr, other.nr))
-    {
-      return false;
-    }
-    if (!Objects.equals(this.annotation, other.annotation))
-    {
-      return false;
-    }
-    return true;
-  }
 
-  
+    public String getNr() {
+        return nr;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + Objects.hashCode(this.nr);
+        hash = 53 * hash + Objects.hashCode(this.annotation);
+        return hash;
+    }
+
+    public void setAnnotation(String annotation) {
+        this.annotation = annotation;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public void setNr(String nr) {
+        this.nr = nr;
+    }
+
+    /**
+     * Converts this object to a proper definition.
+     * 
+     * @return
+     */
+    public FrequencyTableEntry toFrequencyTableEntry() {
+        FrequencyTableEntry result = new FrequencyTableEntry();
+
+        result.setReferencedNode(nr);
+
+        if (annotation != null && "tok".equals(annotation)) {
+            result.setType(FrequencyTableEntryType.span);
+        } else {
+            result.setType(FrequencyTableEntryType.annotation);
+            result.setKey(annotation);
+        }
+
+        return result;
+    }
+
 }
