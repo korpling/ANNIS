@@ -27,6 +27,7 @@ import java.util.TreeSet;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
+@SuppressWarnings("rawtypes")
 public class TreeSetConverter implements Converter<Object, TreeSet> {
     /**
      * 

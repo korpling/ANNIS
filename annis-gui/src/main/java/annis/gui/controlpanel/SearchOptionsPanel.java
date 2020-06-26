@@ -308,7 +308,7 @@ public class SearchOptionsPanel extends FormLayout {
 
     private final ComboBox cbResultsPerPage;
     private final ComboBox cbSegmentation;
-    private final HelpButton segmentationHelp;
+    private final HelpButton<?> segmentationHelp;
     private final ComboBox cbOrder;
     private final ComboBox cbQueryLanguage;
     private final ProgressBar pbLoadConfig;
