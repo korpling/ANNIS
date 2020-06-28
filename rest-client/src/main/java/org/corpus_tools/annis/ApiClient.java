@@ -11,7 +11,7 @@
  */
 
 
-package org.corpus_tools;
+package org.corpus_tools.annis;
 
 import okhttp3.*;
 import okhttp3.internal.http.HttpMethod;
@@ -47,10 +47,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.corpus_tools.auth.Authentication;
-import org.corpus_tools.auth.HttpBasicAuth;
-import org.corpus_tools.auth.HttpBearerAuth;
-import org.corpus_tools.auth.ApiKeyAuth;
+import org.corpus_tools.annis.auth.Authentication;
+import org.corpus_tools.annis.auth.HttpBasicAuth;
+import org.corpus_tools.annis.auth.HttpBearerAuth;
+import org.corpus_tools.annis.auth.ApiKeyAuth;
 
 public class ApiClient {
 

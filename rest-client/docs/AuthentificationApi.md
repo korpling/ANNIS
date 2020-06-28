@@ -16,12 +16,12 @@ Create JWT token for credentials of a locally configured account.
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.AuthentificationApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.AuthentificationApi;
 
 public class Example {
   public static void main(String[] args) {

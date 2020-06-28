@@ -11,7 +11,7 @@
  */
 
 
-package org.corpus_tools;
+package org.corpus_tools.annis;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

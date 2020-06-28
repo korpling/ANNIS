@@ -11,9 +11,9 @@
  */
 
 
-package org.corpus_tools.auth;
+package org.corpus_tools.annis.auth;
 
-import org.corpus_tools.Pair;
+import org.corpus_tools.annis.Pair;
 
 import java.util.Map;
 import java.util.List;

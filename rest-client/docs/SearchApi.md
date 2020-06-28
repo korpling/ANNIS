@@ -19,12 +19,12 @@ Count the number of results for a query.
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.SearchApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.SearchApi;
 
 public class Example {
   public static void main(String[] args) {
@@ -84,12 +84,12 @@ Find results for a query and return the IDs of the matched nodes.
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.SearchApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.SearchApi;
 
 public class Example {
   public static void main(String[] args) {
@@ -149,12 +149,12 @@ Find results for a query and return the IDs of the matched nodes.
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.SearchApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.SearchApi;
 
 public class Example {
   public static void main(String[] args) {
@@ -216,12 +216,12 @@ This only includes the nodes that are the result of the given query and no conte
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.SearchApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.SearchApi;
 
 public class Example {
   public static void main(String[] args) {

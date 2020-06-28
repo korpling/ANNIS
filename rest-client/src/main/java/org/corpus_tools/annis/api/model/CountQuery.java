@@ -31,7 +31,7 @@ import org.corpus_tools.annis.api.model.QueryLanguage;
  * Query definition for counting matches.
  */
 @ApiModel(description = "Query definition for counting matches.")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:40:46.578+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:59:24.261+02:00[Europe/Berlin]")
 public class CountQuery {
   public static final String SERIALIZED_NAME_QUERY = "query";
   @SerializedName(SERIALIZED_NAME_QUERY)

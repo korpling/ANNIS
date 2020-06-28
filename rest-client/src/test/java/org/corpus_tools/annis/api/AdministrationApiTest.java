@@ -11,9 +11,9 @@
  */
 
 
-package org.corpus_tools.api;
+package org.corpus_tools.annis.api;
 
-import org.corpus_tools.ApiException;
+import org.corpus_tools.annis.ApiException;
 import java.io.File;
 import org.corpus_tools.annis.api.model.Group;
 import org.corpus_tools.annis.api.model.InlineObject;

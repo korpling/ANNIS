@@ -1,4 +1,4 @@
-package org.corpus_tools;
+package org.corpus_tools.annis;
 
 import java.util.Map;
 

@@ -40,7 +40,7 @@ import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.FrequencyQuery;
 import org.corpus_tools.annis.api.model.FrequencyQueryDefinition;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
-import org.corpus_tools.api.SearchApi;
+import org.corpus_tools.annis.api.SearchApi;
 
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.Background;
