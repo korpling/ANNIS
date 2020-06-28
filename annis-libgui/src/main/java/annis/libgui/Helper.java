@@ -459,19 +459,6 @@ public class Helper {
    */
   public static AsyncWebResource getAnnisAsyncWebResource(String uri, AnnisUser user) {
 
-    if (user != null) {
-      try {
-        return user.getClient().asyncResource(uri);
-      } catch (LoginDataLostException ex) {
-        log.error("Could not restore the login-data from session, user will invalidated", ex);
-        setUser(null);
-        UI ui = UI.getCurrent();
-        if (ui instanceof AnnisBaseUI) {
-          ((AnnisBaseUI) ui).getLoginDataLostBus().post(ex);
-        }
-      }
-    }
-
     // use the anonymous client
     if (anonymousClient.get() == null) {
       // anonymous client not created yet
@@ -509,18 +496,6 @@ public class Helper {
    */
   public static WebResource getAnnisWebResource(String uri, AnnisUser user) {
 
-    if (user != null) {
-      try {
-        return user.getClient().resource(uri);
-      } catch (LoginDataLostException ex) {
-        log.error("Could not restore the login-data from session, user will invalidated", ex);
-        setUser(null);
-        UI ui = UI.getCurrent();
-        if (ui instanceof AnnisBaseUI) {
-          ((AnnisBaseUI) ui).getLoginDataLostBus().post(ex);
-        }
-      }
-    }
 
     // use the anonymous client
     if (anonymousClient.get() == null) {

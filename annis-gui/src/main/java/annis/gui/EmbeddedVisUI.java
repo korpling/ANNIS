@@ -142,9 +142,6 @@ public class EmbeddedVisUI extends CommonUI {
             // fetch content of the URI
             Client client = null;
             AnnisUser user = Helper.getUser(EmbeddedVisUI.this);
-            if (user != null) {
-                client = user.getClient();
-            }
             if (client == null) {
                 client = Helper.createRESTClient();
             }
@@ -269,9 +266,6 @@ public class EmbeddedVisUI extends CommonUI {
 
         } catch (URISyntaxException ex) {
             displayMessage("Invalid URL", "The provided URL is malformed:<br />" + ex.getMessage());
-        } catch (LoginDataLostException ex) {
-            displayMessage("LoginData Lost",
-                    "No login data available any longer in the session:<br /> " + ex.getMessage());
         } catch (UniformInterfaceException ex) {
             if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode()) {
                 displayMessage("Corpus access forbidden", "You are not allowed to access this corpus. "

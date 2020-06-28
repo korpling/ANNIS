@@ -37,6 +37,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import org.corpus_tools.annis.ApiException;
@@ -169,7 +170,11 @@ public class CorpusBrowserPanel extends Panel {
     public void attach() {
         super.attach();
 
-        Background.run(this::fetchAnnotationsInBackground);
+        final UI ui = getUI();
+
+        Background.run(() -> {
+            fetchAnnotationsInBackground(ui);
+        });
     }
 
     private boolean canExcludeNamespace(Collection<Annotation> annos) {
@@ -182,8 +187,8 @@ public class CorpusBrowserPanel extends Panel {
         return true;
     }
 
-    private void fetchAnnotationsInBackground() {
-        CorporaApi api = new CorporaApi(ServiceHelper.getClient());
+    private void fetchAnnotationsInBackground(UI ui) {
+        CorporaApi api = new CorporaApi(ServiceHelper.getClient(ui));
 
         try {
             final List<Annotation> nodeAnnos = api.corpusNodeAnnotations(corpus, true, true).stream().filter(
@@ -192,7 +197,7 @@ public class CorpusBrowserPanel extends Panel {
 
             final List<Annotation> metaAnnos = new LinkedList<>(nodeAnnos);
 
-            final Set<AnnoKey> metaAnnoKeys = ServiceHelper.getMetaAnnotationNames(corpus);
+            final Set<AnnoKey> metaAnnoKeys = ServiceHelper.getMetaAnnotationNames(corpus, ui);
             nodeAnnos.removeIf(anno -> metaAnnoKeys.contains(anno.getKey()));
             metaAnnos.removeIf(anno -> !metaAnnoKeys.contains(anno.getKey()));
 
