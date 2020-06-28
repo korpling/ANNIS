@@ -16,19 +16,7 @@
 package annis.gui;
 
 import static annis.gui.ServiceHelper.getQName;
-import annis.gui.beans.CorpusBrowserEntry;
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.Background;
-import annis.model.Query;
-import annis.service.objects.QueryLanguage;
-import com.vaadin.event.selection.SelectionEvent;
-import com.vaadin.event.selection.SelectionListener;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.VerticalLayout;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -41,18 +29,30 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import com.vaadin.event.selection.SelectionEvent;
+import com.vaadin.event.selection.SelectionListener;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.VerticalLayout;
+
 import org.corpus_tools.ApiException;
-import org.corpus_tools.annis.AnnoKey;
-import org.corpus_tools.annis.Annotation;
-import org.corpus_tools.annis.AnnotationComponentType;
-import org.corpus_tools.annis.Component;
-import org.corpus_tools.annis.CorporaApi;
-import org.corpus_tools.annis.CorpusList;
-import org.corpus_tools.annis.FindQuery;
-import org.corpus_tools.annis.FindQuery.OrderEnum;
-import org.corpus_tools.annis.SearchApi;
+import org.corpus_tools.annis.api.model.AnnoKey;
+import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.api.model.AnnotationComponentType;
+import org.corpus_tools.annis.api.model.Component;
+import org.corpus_tools.api.CorporaApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import annis.gui.beans.CorpusBrowserEntry;
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.Background;
+import annis.model.Query;
+import annis.service.objects.QueryLanguage;
 
 /**
  *
@@ -78,8 +78,6 @@ public class CorpusBrowserPanel extends Panel {
     }
 
     private static final long serialVersionUID = -1029743017413951838L;
-
-    private Logger log = LoggerFactory.getLogger(CorpusBrowserPanel.class);
 
     private String corpus;
 

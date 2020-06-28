@@ -107,7 +107,7 @@
 		<dependency>
 			<groupId>org.corpus-tools</groupId>
 			<artifactId>annis-java-client</artifactId>
-			<version>1.0.0</version>
+			<version>0</version>
 		</dependency>
 
 		<dependency>

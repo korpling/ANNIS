@@ -11,6 +11,7 @@ Method | HTTP request | Description
 [**listGroups**](AdministrationApi.md#listGroups) | **GET** /groups | Get all available user groups
 [**putGroup**](AdministrationApi.md#putGroup) | **PUT** /groups/{name} | Add or replace the user group given by its name
 
+
 <a name="deleteGroup"></a>
 # **deleteGroup**
 > deleteGroup(name)
@@ -20,22 +21,34 @@ Delete the user group given by its name
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.AdministrationApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.AdministrationApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-AdministrationApi apiInstance = new AdministrationApi();
-String name = "name_example"; // String | 
-try {
-    apiInstance.deleteGroup(name);
-} catch (ApiException e) {
-    System.err.println("Exception when calling AdministrationApi#deleteGroup");
-    e.printStackTrace();
+    AdministrationApi apiInstance = new AdministrationApi(defaultClient);
+    String name = academic; // String | 
+    try {
+      apiInstance.deleteGroup(name);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling AdministrationApi#deleteGroup");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -58,32 +71,50 @@ null (empty response body)
  - **Content-Type**: Not defined
  - **Accept**: Not defined
 
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Group was deleted successfully. |  -  |
+**403** | Access is forbidden if the requesting client does not have administrator privileges. |  -  |
+
 <a name="exportPost"></a>
 # **exportPost**
-> InlineResponse202 exportPost(body)
+> InlineResponse202 exportPost(inlineObject)
 
 Get all requested corpora as ZIP-file
 
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.AdministrationApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.AdministrationApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-AdministrationApi apiInstance = new AdministrationApi();
-Body body = new Body(); // Body | 
-try {
-    InlineResponse202 result = apiInstance.exportPost(body);
-    System.out.println(result);
-} catch (ApiException e) {
-    System.err.println("Exception when calling AdministrationApi#exportPost");
-    e.printStackTrace();
+    AdministrationApi apiInstance = new AdministrationApi(defaultClient);
+    InlineObject inlineObject = new InlineObject(); // InlineObject | 
+    try {
+      InlineResponse202 result = apiInstance.exportPost(inlineObject);
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling AdministrationApi#exportPost");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -91,7 +122,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**Body**](Body.md)|  |
+ **inlineObject** | [**InlineObject**](InlineObject.md)|  |
 
 ### Return type
 
@@ -106,6 +137,11 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/json
  - **Accept**: application/json
 
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**202** | Corpus export started. Returns a UUID for the background job which can be used with the &#x60;/jobs&#x60; endpoint |  -  |
+
 <a name="getJob"></a>
 # **getJob**
 > getJob(uuid)
@@ -115,22 +151,34 @@ Get the status of the background job with the UUID
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.AdministrationApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.AdministrationApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-AdministrationApi apiInstance = new AdministrationApi();
-String uuid = "uuid_example"; // String | 
-try {
-    apiInstance.getJob(uuid);
-} catch (ApiException e) {
-    System.err.println("Exception when calling AdministrationApi#getJob");
-    e.printStackTrace();
+    AdministrationApi apiInstance = new AdministrationApi(defaultClient);
+    String uuid = "uuid_example"; // String | 
+    try {
+      apiInstance.getJob(uuid);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling AdministrationApi#getJob");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -153,6 +201,15 @@ null (empty response body)
  - **Content-Type**: Not defined
  - **Accept**: application/json
 
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**202** | Job is still running |  -  |
+**200** | Job was finished successfully and result can be downloaded from the body |  -  |
+**303** | Job was finished successfully |  -  |
+**410** | Job failed |  -  |
+**404** | Job not found |  -  |
+
 <a name="importPost"></a>
 # **importPost**
 > InlineResponse202 importPost(body, overrideExisting)
@@ -164,24 +221,36 @@ This will search for all GraphML and relANNIS files in the uploaded ZIP file and
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.AdministrationApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.AdministrationApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-AdministrationApi apiInstance = new AdministrationApi();
-Object body = null; // Object | 
-Boolean overrideExisting = false; // Boolean | If true, existing corpora will be overwritten by the uploaded ones.
-try {
-    InlineResponse202 result = apiInstance.importPost(body, overrideExisting);
-    System.out.println(result);
-} catch (ApiException e) {
-    System.err.println("Exception when calling AdministrationApi#importPost");
-    e.printStackTrace();
+    AdministrationApi apiInstance = new AdministrationApi(defaultClient);
+    File body = new File("/path/to/file"); // File | 
+    Boolean overrideExisting = false; // Boolean | If true, existing corpora will be overwritten by the uploaded ones.
+    try {
+      InlineResponse202 result = apiInstance.importPost(body, overrideExisting);
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling AdministrationApi#importPost");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -189,7 +258,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | **Object**|  |
+ **body** | **File**|  |
  **overrideExisting** | **Boolean**| If true, existing corpora will be overwritten by the uploaded ones. | [optional] [default to false]
 
 ### Return type
@@ -205,6 +274,11 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/octet-stream
  - **Accept**: application/json
 
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**202** | Corpus import started. Returns a UUID for the background job which can be used with the &#x60;/jobs&#x60; endpoint |  -  |
+
 <a name="listGroups"></a>
 # **listGroups**
 > List&lt;Group&gt; listGroups()
@@ -214,22 +288,34 @@ Get all available user groups
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.AdministrationApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.AdministrationApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-AdministrationApi apiInstance = new AdministrationApi();
-try {
-    List<Group> result = apiInstance.listGroups();
-    System.out.println(result);
-} catch (ApiException e) {
-    System.err.println("Exception when calling AdministrationApi#listGroups");
-    e.printStackTrace();
+    AdministrationApi apiInstance = new AdministrationApi(defaultClient);
+    try {
+      List<Group> result = apiInstance.listGroups();
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling AdministrationApi#listGroups");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -249,32 +335,50 @@ This endpoint does not need any parameter.
  - **Content-Type**: Not defined
  - **Accept**: application/json
 
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | All available user groups with their name and the corpora the user is allowed to access. |  -  |
+**403** | Access is forbidden if the requesting client does not have administrator privileges. |  -  |
+
 <a name="putGroup"></a>
 # **putGroup**
-> putGroup(body, name)
+> putGroup(name, group)
 
 Add or replace the user group given by its name
 
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.AdministrationApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.AdministrationApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-AdministrationApi apiInstance = new AdministrationApi();
-Group body = new Group(); // Group | The group to add
-String name = "name_example"; // String | 
-try {
-    apiInstance.putGroup(body, name);
-} catch (ApiException e) {
-    System.err.println("Exception when calling AdministrationApi#putGroup");
-    e.printStackTrace();
+    AdministrationApi apiInstance = new AdministrationApi(defaultClient);
+    String name = academic; // String | 
+    Group group = new Group(); // Group | The group to add
+    try {
+      apiInstance.putGroup(name, group);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling AdministrationApi#putGroup");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -282,8 +386,8 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**Group**](Group.md)| The group to add |
  **name** | **String**|  |
+ **group** | [**Group**](Group.md)| The group to add |
 
 ### Return type
 
@@ -297,4 +401,10 @@ null (empty response body)
 
  - **Content-Type**: application/json
  - **Accept**: Not defined
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Group was added or replaced successfully. |  -  |
+**403** | Access is forbidden if the requesting client does not have administrator privileges. |  -  |
 

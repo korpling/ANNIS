@@ -53,7 +53,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.corpus_tools.annis.CorporaApi;
+
+import org.corpus_tools.api.CorporaApi;
 import org.slf4j.LoggerFactory;
 
 /**

@@ -1,22 +1,21 @@
 package annis.gui;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.corpus_tools.ApiException;
-import org.corpus_tools.annis.AnnoKey;
-import org.corpus_tools.annis.Annotation;
-import org.corpus_tools.annis.Component;
-import org.corpus_tools.annis.CorporaApi;
-import org.corpus_tools.annis.CorpusList;
-import org.corpus_tools.annis.FindQuery;
-import org.corpus_tools.annis.SearchApi;
-import org.corpus_tools.annis.FindQuery.OrderEnum;
+import org.corpus_tools.annis.api.model.AnnoKey;
+import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.api.model.Component;
+import org.corpus_tools.annis.api.model.FindQuery;
+import org.corpus_tools.annis.api.model.QueryLanguage;
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
+import org.corpus_tools.api.CorporaApi;
+import org.corpus_tools.api.SearchApi;
 
 public interface ServiceHelper {
 
@@ -31,10 +30,8 @@ public interface ServiceHelper {
         final Set<AnnoKey> metaAnnos = new HashSet<>();
         // Check for each annotation if its actually a meta-annotation
         for (Annotation a : nodeAnnos) {
-            CorpusList c = new CorpusList();
-            c.add(corpus);
             FindQuery q = new FindQuery();
-            q.setCorpora(c);
+            q.setCorpora(Arrays.asList(corpus));
             q.setQuery("annis:node_type=\"corpus\" _ident_ " + getQName(a.getKey()));
             // Not sorting the results is much faster, especially if we only fetch the first
             // item
@@ -43,7 +40,7 @@ public interface ServiceHelper {
             q.setLimit(1);
             q.setOffset(0);
 
-            q.setQueryLanguage(org.corpus_tools.annis.QueryLanguage.AQL);
+            q.setQueryLanguage(QueryLanguage.AQL);
             String findResult = search.find(q);
             if (findResult != null && !findResult.isEmpty()) {
                 metaAnnos.add(a.getKey());

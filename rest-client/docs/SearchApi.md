@@ -9,32 +9,45 @@ Method | HTTP request | Description
 [**frequency**](SearchApi.md#frequency) | **POST** /search/frequency | Find results for a query and return the IDs of the matched nodes.
 [**subgraphForQuery**](SearchApi.md#subgraphForQuery) | **GET** /corpora/{corpus}/subgraph-for-query | Get a subgraph of the corpus format given a list of nodes and a context.
 
+
 <a name="count"></a>
 # **count**
-> CountExtra count(body)
+> CountExtra count(countQuery)
 
 Count the number of results for a query.
 
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.SearchApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.SearchApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-SearchApi apiInstance = new SearchApi();
-CountQuery body = new CountQuery(); // CountQuery | The definition of the query to execute.
-try {
-    CountExtra result = apiInstance.count(body);
-    System.out.println(result);
-} catch (ApiException e) {
-    System.err.println("Exception when calling SearchApi#count");
-    e.printStackTrace();
+    SearchApi apiInstance = new SearchApi(defaultClient);
+    CountQuery countQuery = new CountQuery(); // CountQuery | The definition of the query to execute.
+    try {
+      CountExtra result = apiInstance.count(countQuery);
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling SearchApi#count");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -42,7 +55,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**CountQuery**](CountQuery.md)| The definition of the query to execute. |
+ **countQuery** | [**CountQuery**](CountQuery.md)| The definition of the query to execute. |
 
 ### Return type
 
@@ -57,32 +70,49 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/json
  - **Accept**: application/json
 
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | The extended count result. |  -  |
+
 <a name="find"></a>
 # **find**
-> String find(body)
+> String find(findQuery)
 
 Find results for a query and return the IDs of the matched nodes.
 
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.SearchApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.SearchApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-SearchApi apiInstance = new SearchApi();
-FindQuery body = new FindQuery(); // FindQuery | The definition of the query to execute.
-try {
-    String result = apiInstance.find(body);
-    System.out.println(result);
-} catch (ApiException e) {
-    System.err.println("Exception when calling SearchApi#find");
-    e.printStackTrace();
+    SearchApi apiInstance = new SearchApi(defaultClient);
+    FindQuery findQuery = new FindQuery(); // FindQuery | The definition of the query to execute.
+    try {
+      String result = apiInstance.find(findQuery);
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling SearchApi#find");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -90,7 +120,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**FindQuery**](FindQuery.md)| The definition of the query to execute. |
+ **findQuery** | [**FindQuery**](FindQuery.md)| The definition of the query to execute. |
 
 ### Return type
 
@@ -105,32 +135,49 @@ Name | Type | Description  | Notes
  - **Content-Type**: application/json
  - **Accept**: text/plain
 
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | The matches for the given query. |  -  |
+
 <a name="frequency"></a>
 # **frequency**
-> FrequencyTable frequency(body)
+> List&lt;FrequencyTableRow&gt; frequency(frequencyQuery)
 
 Find results for a query and return the IDs of the matched nodes.
 
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.SearchApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.SearchApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-SearchApi apiInstance = new SearchApi();
-FrequencyQuery body = new FrequencyQuery(); // FrequencyQuery | The definition of the query to execute.
-try {
-    FrequencyTable result = apiInstance.frequency(body);
-    System.out.println(result);
-} catch (ApiException e) {
-    System.err.println("Exception when calling SearchApi#frequency");
-    e.printStackTrace();
+    SearchApi apiInstance = new SearchApi(defaultClient);
+    FrequencyQuery frequencyQuery = new FrequencyQuery(); // FrequencyQuery | The definition of the query to execute.
+    try {
+      List<FrequencyTableRow> result = apiInstance.frequency(frequencyQuery);
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling SearchApi#frequency");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -138,11 +185,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**FrequencyQuery**](FrequencyQuery.md)| The definition of the query to execute. |
+ **frequencyQuery** | [**FrequencyQuery**](FrequencyQuery.md)| The definition of the query to execute. |
 
 ### Return type
 
-[**FrequencyTable**](FrequencyTable.md)
+[**List&lt;FrequencyTableRow&gt;**](FrequencyTableRow.md)
 
 ### Authorization
 
@@ -152,6 +199,11 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: application/json
  - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | Frequency of different annotation values as table |  -  |
 
 <a name="subgraphForQuery"></a>
 # **subgraphForQuery**
@@ -164,26 +216,38 @@ This only includes the nodes that are the result of the given query and no conte
 ### Example
 ```java
 // Import classes:
-//import org.corpus_tools.ApiClient;
-//import org.corpus_tools.ApiException;
-//import org.corpus_tools.Configuration;
-//import org.corpus_tools.auth.*;
-//import org.corpus_tools.annis.SearchApi;
+import org.corpus_tools.ApiClient;
+import org.corpus_tools.ApiException;
+import org.corpus_tools.Configuration;
+import org.corpus_tools.auth.*;
+import org.corpus_tools.models.*;
+import org.corpus_tools.api.SearchApi;
 
-ApiClient defaultClient = Configuration.getDefaultApiClient();
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
 
-
-SearchApi apiInstance = new SearchApi();
-String corpus = "corpus_example"; // String | The name of the corpus to get the subgraph for.
-String query = "query_example"; // String | The query which defines the nodes to include.
-QueryLanguage queryLanguage = new QueryLanguage(); // QueryLanguage | 
-AnnotationComponentType componentTypeFilter = new AnnotationComponentType(); // AnnotationComponentType | If given, restricts the included edges to components with the given type.
-try {
-    String result = apiInstance.subgraphForQuery(corpus, query, queryLanguage, componentTypeFilter);
-    System.out.println(result);
-} catch (ApiException e) {
-    System.err.println("Exception when calling SearchApi#subgraphForQuery");
-    e.printStackTrace();
+    SearchApi apiInstance = new SearchApi(defaultClient);
+    String corpus = GUM; // String | The name of the corpus to get the subgraph for.
+    String query = annis:node_type="corpus"; // String | The query which defines the nodes to include.
+    QueryLanguage queryLanguage = new QueryLanguage(); // QueryLanguage | 
+    AnnotationComponentType componentTypeFilter = new AnnotationComponentType(); // AnnotationComponentType | If given, restricts the included edges to components with the given type.
+    try {
+      String result = apiInstance.subgraphForQuery(corpus, query, queryLanguage, componentTypeFilter);
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling SearchApi#subgraphForQuery");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
 }
 ```
 
@@ -193,8 +257,8 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **corpus** | **String**| The name of the corpus to get the subgraph for. |
  **query** | **String**| The query which defines the nodes to include. |
- **queryLanguage** | [**QueryLanguage**](.md)|  | [optional]
- **componentTypeFilter** | [**AnnotationComponentType**](.md)| If given, restricts the included edges to components with the given type. | [optional]
+ **queryLanguage** | [**QueryLanguage**](.md)|  | [optional] [default to AQL] [enum: AQL, AQLQuirksV3]
+ **componentTypeFilter** | [**AnnotationComponentType**](.md)| If given, restricts the included edges to components with the given type. | [optional] [enum: Coverage, Dominance, Pointing, Ordering, LeftToken, RightToken, PartOf]
 
 ### Return type
 
@@ -208,4 +272,9 @@ Name | Type | Description  | Notes
 
  - **Content-Type**: Not defined
  - **Accept**: application/xml
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | The subgraph in the GraphML format with the graphANNIS data model. |  -  |
 
