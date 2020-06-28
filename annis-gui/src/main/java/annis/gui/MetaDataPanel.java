@@ -130,7 +130,7 @@ public class MetaDataPanel extends Panel {
         Background.runWithCallback(() -> {
             Set<AnnoKey> metaKeys = ServiceHelper.getMetaAnnotationNames(toplevelCorpusName);
             List<Annotation> result = new LinkedList<>();
-            SearchApi api = new SearchApi();
+            SearchApi api = new SearchApi(ServiceHelper.getClient());
             for (AnnoKey key : metaKeys) {
                 // get the value for this annotation using a frequency query
                 FrequencyQuery q = new FrequencyQuery();

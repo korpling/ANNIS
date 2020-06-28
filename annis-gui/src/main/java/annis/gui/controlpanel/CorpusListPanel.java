@@ -19,6 +19,7 @@ import annis.gui.AnnisUI;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.MetaDataPanel;
+import annis.gui.ServiceHelper;
 import annis.libgui.Background;
 import annis.libgui.CorpusSet;
 import annis.libgui.Helper;
@@ -79,7 +80,7 @@ public class CorpusListPanel extends VerticalLayout {
 
             try {
                 // query in background
-                CorporaApi api = new CorporaApi();
+                CorporaApi api = new CorporaApi(ServiceHelper.getClient());
 
                 List<String> corpora = api.listCorpora();
 

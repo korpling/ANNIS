@@ -183,7 +183,7 @@ public class CorpusBrowserPanel extends Panel {
     }
 
     private void fetchAnnotationsInBackground() {
-        CorporaApi api = new CorporaApi();
+        CorporaApi api = new CorporaApi(ServiceHelper.getClient());
 
         try {
             final List<Annotation> nodeAnnos = api.corpusNodeAnnotations(corpus, true, true).stream().filter(
