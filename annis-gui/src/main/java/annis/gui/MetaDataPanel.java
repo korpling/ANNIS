@@ -35,13 +35,12 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
 
-import org.corpus_tools.annis.AnnoKey;
-import org.corpus_tools.annis.Annotation;
-import org.corpus_tools.annis.CorpusList;
-import org.corpus_tools.annis.FrequencyQuery;
-import org.corpus_tools.annis.FrequencyQueryDefinition;
-import org.corpus_tools.annis.FrequencyTable;
-import org.corpus_tools.annis.SearchApi;
+import org.corpus_tools.annis.api.model.AnnoKey;
+import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.api.model.FrequencyQuery;
+import org.corpus_tools.annis.api.model.FrequencyQueryDefinition;
+import org.corpus_tools.annis.api.model.FrequencyTableRow;
+import org.corpus_tools.api.SearchApi;
 
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.Background;
@@ -135,9 +134,7 @@ public class MetaDataPanel extends Panel {
             for (AnnoKey key : metaKeys) {
                 // get the value for this annotation using a frequency query
                 FrequencyQuery q = new FrequencyQuery();
-                CorpusList c = new CorpusList();
-                c.add(toplevelCorpusName);
-                q.setCorpora(c);
+                q.setCorpora(Arrays.asList(toplevelCorpusName));
                 if (documentName.isPresent()) {
                     q.setQuery("annis:node_type=\"corpus\" _ident_ annis:doc=\"" + documentName + "\"");
                 } else {
@@ -148,7 +145,7 @@ public class MetaDataPanel extends Panel {
                 def.setNs(key.getNs());
                 def.setName(key.getName());
                 q.setDefinition(Arrays.asList(def));
-                FrequencyTable table = api.frequency(q);
+                List<FrequencyTableRow> table = api.frequency(q);
                 if (!table.isEmpty() && !table.get(0).getValues().isEmpty()) {
                     Annotation anno = new Annotation();
                     anno.setKey(key);

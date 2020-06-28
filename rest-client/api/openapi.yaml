@@ -1,0 +1,1224 @@
+openapi: 3.0.2
+info:
+  description: |
+    Access the graphANNIS corpora and execute AQL queries with this service.
+  title: graphANNIS
+  version: "0"
+servers:
+- description: Your local developer service
+  url: http://localhost:5711/v0
+security:
+- bearerAuth: []
+paths:
+  /corpora:
+    get:
+      operationId: listCorpora
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorpusList'
+          description: OK
+      summary: Get a list of all corpora the user is authorized to use.
+      tags:
+      - corpora
+      x-accepts: application/json
+  /import:
+    post:
+      description: This will search for all GraphML and relANNIS files in the uploaded
+        ZIP file and imports them.
+      parameters:
+      - description: If true, existing corpora will be overwritten by the uploaded
+          ones.
+        explode: true
+        in: query
+        name: override_existing
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              format: binary
+              type: string
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_202'
+          description: Corpus import started. Returns a UUID for the background job
+            which can be used with the `/jobs` endpoint
+          links:
+            GetJobForUUID:
+              operationId: getJob
+              parameters:
+                uuid: $response.body#/uuid
+      summary: Import all corpora which are part of the uploaded ZIP-file
+      tags:
+      - administration
+      x-contentType: application/octet-stream
+      x-accepts: application/json
+  /export:
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object'
+        content:
+          application/json:
+            schema:
+              properties:
+                corpora:
+                  description: List of corpus names/identifiers.
+                  example:
+                  - GUM
+                  - pcc2.1
+                  items:
+                    type: string
+                  type: array
+              type: object
+        required: true
+      responses:
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_202'
+          description: Corpus export started. Returns a UUID for the background job
+            which can be used with the `/jobs` endpoint
+          links:
+            GetJobForUUID:
+              operationId: getJob
+              parameters:
+                uuid: $response.body#/uuid
+      summary: Get all requested corpora as ZIP-file
+      tags:
+      - administration
+      x-contentType: application/json
+      x-accepts: application/json
+  /jobs/{uuid}:
+    get:
+      operationId: getJob
+      parameters:
+      - explode: false
+        in: path
+        name: uuid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+          description: Job is still running
+        "200":
+          description: Job was finished successfully and result can be downloaded
+            from the body
+        "303":
+          content:
+            application/json:
+              schema:
+                description: The messages produced by the background job.
+                example:
+                - started import of corpus GUM
+                - reading GraphML
+                - 'Error during import of GUM: corpus already exists'
+                items:
+                  type: string
+                type: array
+          description: Job was finished successfully
+        "410":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+          description: Job failed
+        "404":
+          description: Job not found
+      summary: Get the status of the background job with the UUID
+      tags:
+      - administration
+      x-accepts: application/json
+  /search/count:
+    post:
+      operationId: count
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountQuery'
+        description: The definition of the query to execute.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountExtra'
+          description: The extended count result.
+      summary: Count the number of results for a query.
+      tags:
+      - search
+      x-contentType: application/json
+      x-accepts: application/json
+  /search/find:
+    post:
+      operationId: find
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindQuery'
+        description: The definition of the query to execute.
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                description: A textual representation of a list of matches. Each line
+                  describes a complete match. The single match is represented by the
+                  space-separated node IDs that matched.
+                example: |
+                  GUM/GUM_whow_skittles#tok_925 GUM/GUM_whow_skittles#tok_926 GUM/GUM_whow_skittles#tok_926 GUM/GUM_whow_skittles#tok_927
+                type: string
+          description: The matches for the given query.
+      summary: Find results for a query and return the IDs of the matched nodes.
+      tags:
+      - search
+      x-contentType: application/json
+      x-accepts: text/plain
+  /search/frequency:
+    post:
+      operationId: frequency
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FrequencyQuery'
+        description: The definition of the query to execute.
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrequencyTable'
+          description: Frequency of different annotation values as table
+      summary: Find results for a query and return the IDs of the matched nodes.
+      tags:
+      - search
+      x-contentType: application/json
+      x-accepts: application/json
+  /corpora/{corpus}/subgraph:
+    post:
+      description: "This creates a subgraph for node IDs, which can e.g. generated\
+        \ by executing a `find` query. The subgraph contains \n- the given nodes,\
+        \ \n- all tokens that are covered by the given nodes,\n- all tokens left and\
+        \ right in the given context from the tokens covered by the give nodes,\n\
+        - all other nodes covering the tokens of the given context.\nThe annotation\
+        \ graph also includes all edges between the included nodes.\n"
+      operationId: subgraphForNodes
+      parameters:
+      - description: The name of the corpus to get the subgraph for.
+        example: GUM
+        explode: false
+        in: path
+        name: corpus
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubgraphWithContext'
+        description: The definition of the subgraph to extract.
+        required: true
+      responses:
+        "200":
+          content:
+            application/xml:
+              examples:
+                subgraph:
+                  $ref: '#/components/examples/Subgraph'
+              schema:
+                type: string
+          description: The subgraph in the GraphML format with the graphANNIS data
+            model.
+      summary: Get a subgraph of the corpus format given a list of nodes and a context.
+      tags:
+      - corpora
+      x-contentType: application/json
+      x-accepts: application/xml
+  /corpora/{corpus}/subgraph-for-query:
+    get:
+      description: |
+        This only includes the nodes that are the result of the given query and no context is created automatically. The annotation graph also includes all edges between the included nodes.
+      operationId: subgraphForQuery
+      parameters:
+      - description: The name of the corpus to get the subgraph for.
+        example: GUM
+        explode: false
+        in: path
+        name: corpus
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The query which defines the nodes to include.
+        examples:
+          corpusgraph:
+            summary: Extract the corpus graph
+            value: annis:node_type="corpus"
+          token:
+            summary: All tokens
+            value: tok
+        explode: true
+        in: query
+        name: query
+        required: true
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: query_language
+        required: false
+        schema:
+          $ref: '#/components/schemas/QueryLanguage'
+        style: form
+      - description: If given, restricts the included edges to components with the
+          given type.
+        explode: true
+        in: query
+        name: component_type_filter
+        required: false
+        schema:
+          $ref: '#/components/schemas/AnnotationComponentType'
+        style: form
+      responses:
+        "200":
+          content:
+            application/xml:
+              examples:
+                subgraph:
+                  $ref: '#/components/examples/Subgraph'
+              schema:
+                type: string
+          description: The subgraph in the GraphML format with the graphANNIS data
+            model.
+      summary: Get a subgraph of the corpus format given a list of nodes and a context.
+      tags:
+      - corpora
+      - search
+      x-accepts: application/xml
+  /corpora/{corpus}/configuration:
+    get:
+      description: The corpus configuration is created by the corpus authors to configure
+        how the corpus should be displayed in query engines and visualizers.
+      operationId: corpusConfiguration
+      parameters:
+      - description: The name of the corpus to get the configuration for.
+        example: GUM
+        explode: false
+        in: path
+        name: corpus
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CorpusConfiguration'
+          description: OK
+        "404":
+          description: Corpus not found or access to corpus not allowed
+      summary: Get the corpus configuration object.
+      tags:
+      - corpora
+      x-accepts: application/json
+  /corpora/{corpus}/node-annotations:
+    get:
+      operationId: corpusNodeAnnotations
+      parameters:
+      - description: The name of the corpus to get the configuration for.
+        example: GUM
+        explode: false
+        in: path
+        name: corpus
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: If true, possible values are returned.
+        explode: true
+        in: query
+        name: list_values
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      - description: If true, only the most frequent value per annotation is returned.
+        explode: true
+        in: query
+        name: only_most_frequent_values
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Annotation'
+                type: array
+          description: The list of annotations
+        "404":
+          description: Corpus not found or access to corpus not allowed
+      summary: List all node annotations of the corpus.
+      tags:
+      - corpora
+      x-accepts: application/json
+  /corpora/{corpus}/components:
+    get:
+      operationId: corpusComponents
+      parameters:
+      - description: The name of the corpus to get the components for.
+        example: GUM
+        explode: false
+        in: path
+        name: corpus
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Only return components with this type.
+        example: Dominance
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Only return components with this name.
+        example: edge
+        explode: true
+        in: query
+        name: name
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Component'
+                type: array
+          description: The list of components
+        "404":
+          description: Corpus not found or access to corpus not allowed
+      summary: List all edge components of the corpus.
+      tags:
+      - corpora
+      x-accepts: application/json
+  /corpora/{corpus}/edge-annotations/{type}/{layer}/{name}/:
+    get:
+      operationId: corpusEdgeAnnotations
+      parameters:
+      - description: The name of the corpus to get the configuration for.
+        example: GUM
+        explode: false
+        in: path
+        name: corpus
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The component type.
+        example: Dominance
+        explode: false
+        in: path
+        name: type
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The component layer.
+        example: const
+        explode: false
+        in: path
+        name: layer
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The component name.
+        example: edge
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: If true, possible values are returned.
+        explode: true
+        in: query
+        name: list_values
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      - description: If true, only the most frequent value per annotation is returned.
+        explode: true
+        in: query
+        name: only_most_frequent_values
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Annotation'
+                type: array
+          description: The list of annotations
+        "404":
+          description: Corpus not found or access to corpus not allowed
+      summary: List all annotations of the corpus for a given edge component
+      tags:
+      - corpora
+      x-accepts: application/json
+  /corpora/{corpus}/files:
+    get:
+      description: |
+        The annotation graph of a corpus can contain special nodes of the type "file",  which are connected to (sub-) corpus and document nodes with a `PartOf` relation. This endpoint allows to access the content of these file nodes. It supports [HTTP range requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests)  if you only need to access parts of the file.
+      operationId: corpusFiles
+      parameters:
+      - description: The name of the corpus to get the configuration for.
+        example: RIDGES_Herbology_Version9.0
+        explode: false
+        in: path
+        name: corpus
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: The name of the file node.
+        example: RIDGES_Herbology_Version9.0/ridges_norm.config
+        explode: true
+        in: query
+        name: name
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: Returns the content of the requested file.
+        "404":
+          description: Corpus or file not found.
+      summary: Get an associated file for the corpus.
+      tags:
+      - corpora
+      x-accepts: application/json
+  /groups:
+    get:
+      operationId: listGroups
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Group'
+                type: array
+          description: All available user groups with their name and the corpora the
+            user is allowed to access.
+        "403":
+          description: Access is forbidden if the requesting client does not have
+            administrator privileges.
+      summary: Get all available user groups
+      tags:
+      - administration
+      x-accepts: application/json
+  /groups/{name}:
+    delete:
+      operationId: deleteGroup
+      parameters:
+      - example: academic
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Group was deleted successfully.
+        "403":
+          description: Access is forbidden if the requesting client does not have
+            administrator privileges.
+      summary: Delete the user group given by its name
+      tags:
+      - administration
+      x-accepts: application/json
+    put:
+      operationId: putGroup
+      parameters:
+      - example: academic
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Group'
+        description: The group to add
+        required: true
+      responses:
+        "200":
+          description: Group was added or replaced successfully.
+        "403":
+          description: Access is forbidden if the requesting client does not have
+            administrator privileges.
+      summary: Add or replace the user group given by its name
+      tags:
+      - administration
+      x-contentType: application/json
+      x-accepts: application/json
+  /local-login:
+    post:
+      operationId: localLogin
+      requestBody:
+        $ref: '#/components/requestBodies/inline_object_1'
+        content:
+          application/json:
+            schema:
+              properties:
+                user_id:
+                  type: string
+                password:
+                  type: string
+              required:
+              - password
+              - user_id
+              type: object
+        description: Object with the user ID and password to login with
+        required: true
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                description: JSON Web Token (JWT)
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZXhwIjoiMTU5MjE0NzE5NiIsImNvcnB1c19ncm91cHMiOlsiYWNhZGVtaWMiLCJpbnRlcm5hbCJdLCJhZG1pbiI6ZmFsc2V9._eVf-gPknBlqobOOB83p2bFjf0ws9-mkqb1UkM4rMRg
+                type: string
+          description: Returns a JSON Web Token (JWT), valid until its expiration
+            time is reached.
+        "401":
+          description: Unauthorized
+      summary: Create JWT token for credentials of a locally configured account.
+      tags:
+      - authentification
+      x-contentType: application/json
+      x-accepts: text/plain
+components:
+  examples:
+    Subgraph:
+      value: |
+        <?xml version="1.0" encoding="UTF-8"?> <graphml>
+          <key id="k0" for="node" attr.name="const::cat" attr.type="string"/>
+          <key id="k1" for="node" attr.name="GUM::claws5" attr.type="string"/>
+          <key id="k2" for="node" attr.name="annis::layer" attr.type="string"/>
+          <key id="k3" for="node" attr.name="GUM::lemma" attr.type="string"/>
+          <key id="k4" for="node" attr.name="annis::node_type" attr.type="string"/>
+          <key id="k5" for="node" attr.name="GUM::penn_pos" attr.type="string"/>
+          <key id="k6" for="node" attr.name="GUM::pos" attr.type="string"/>
+          <key id="k7" for="node" attr.name="annis::tok" attr.type="string"/>
+          <key id="k8" for="node" attr.name="GUM::tok_func" attr.type="string"/>
+          <graph edgedefault="directed">
+            <node id="GUM/GUM_whow_skittles#const_1_920">
+              <data key="k4">node</data>
+              <data key="k2">const</data>
+              <data key="k0">PP</data>
+            </node>
+            <node id="GUM/GUM_whow_skittles#tok_920">
+              <data key="k4">node</data>
+              <data key="k2">default_ns</data>
+              <data key="k7">for</data>
+              <data key="k8">prep</data>
+              <data key="k6">IN</data>
+              <data key="k5">IN</data>
+              <data key="k1">PRP</data>
+              <data key="k3">for</data>
+            </node>
+            <node id="GUM/GUM_whow_skittles#tok_921">
+              <data key="k4">node</data>
+              <data key="k2">default_ns</data>
+              <data key="k7">a</data>
+              <data key="k8">det</data>
+              <data key="k6">DT</data>
+              <data key="k5">DT</data>
+              <data key="k1">AT0</data>
+              <data key="k3">a</data>
+            </node>
+            <edge id="e0" source="GUM/GUM_whow_skittles#const_1_920" target="GUM/GUM_whow_skittles#tok_920" label="Coverage/default_layer/">
+            </edge>
+            <edge id="e1" source="GUM/GUM_whow_skittles#const_1_920" target="GUM/GUM_whow_skittles#tok_921" label="Coverage/default_layer/">
+            </edge>
+            <edge id="e2" source="GUM/GUM_whow_skittles#const_1_920" target="GUM/GUM_whow_skittles#tok_920" label="Dominance/const/">
+            </edge>
+            <edge id="e3" source="GUM/GUM_whow_skittles#const_1_920" target="GUM/GUM_whow_skittles#tok_920" label="Dominance/const/edge">
+            </edge>
+            <edge id="e4" source="GUM/GUM_whow_skittles#tok_920" target="GUM/GUM_whow_skittles#tok_921" label="Ordering/annis/">
+            </edge>
+          </graph>
+        </graphml>
+  requestBodies:
+    inline_object_1:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object_1'
+      required: true
+    inline_object:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/inline_object'
+      required: true
+  schemas:
+    CorpusList:
+      description: List of corpus names/identifiers.
+      example:
+      - GUM
+      - pcc2.1
+      items:
+        type: string
+      type: array
+    QueryLanguage:
+      default: AQL
+      enum:
+      - AQL
+      - AQLQuirksV3
+      type: string
+    CountQuery:
+      description: Query definition for counting matches.
+      example:
+        query: tok
+        corpora:
+        - GUM
+        - pcc2.1
+      properties:
+        query:
+          description: The query to execute.
+          example: tok
+          type: string
+        query_language:
+          $ref: '#/components/schemas/QueryLanguage'
+        corpora:
+          description: List of corpus names/identifiers.
+          example:
+          - GUM
+          - pcc2.1
+          items:
+            type: string
+          type: array
+      type: object
+    FindQuery:
+      description: Query definition to find matches
+      example:
+        offset: 0
+        query: tok
+        limit: 10
+        corpora:
+        - GUM
+        - pcc2.1
+        order: Normal
+      properties:
+        query:
+          description: The query to execute.
+          example: tok
+          type: string
+        query_language:
+          $ref: '#/components/schemas/QueryLanguage'
+        corpora:
+          description: List of corpus names/identifiers.
+          example:
+          - GUM
+          - pcc2.1
+          items:
+            type: string
+          type: array
+        limit:
+          description: Return at most `n` matches, where `n` is the limit.  Use `null`
+            to allow unlimited result sizes.
+          example: 10
+          nullable: true
+          type: integer
+        offset:
+          default: 0
+          description: Skip the `n` first results, where `n` is the offset.
+          type: integer
+        order:
+          default: Normal
+          enum:
+          - Normal
+          - Inverted
+          - Randomized
+          - NotSorted
+          type: string
+      type: object
+    FrequencyQuery:
+      description: Query definition to find matches
+      example:
+        query: root#const:cat=/(ROOT|S)/
+        corpora:
+        - GUM
+        - pcc2.1
+        definition:
+        - node_ref: root
+          ns: const
+          name: cat
+        - node_ref: root
+          ns: const
+          name: cat
+      properties:
+        query:
+          description: The query to execute.
+          example: root#const:cat=/(ROOT|S)/
+          type: string
+        query_language:
+          $ref: '#/components/schemas/QueryLanguage'
+        corpora:
+          description: List of corpus names/identifiers.
+          example:
+          - GUM
+          - pcc2.1
+          items:
+            type: string
+          type: array
+        definition:
+          items:
+            $ref: '#/components/schemas/FrequencyQuery_definition'
+          type: array
+      type: object
+    SubgraphWithContext:
+      description: Defines a subgraph of an annotation graph using node IDs and a
+        context.
+      example:
+        left: 5
+        segmentation: "null"
+        right: 5
+        node_ids:
+        - GUM/GUM_whow_skittles#tok_925
+        - GUM/GUM_whow_skittles#tok_926
+      properties:
+        node_ids:
+          description: A list of node IDs that should be part of the subgraph.
+          example:
+          - GUM/GUM_whow_skittles#tok_925
+          - GUM/GUM_whow_skittles#tok_926
+          items:
+            type: string
+          type: array
+        segmentation:
+          default: "null"
+          description: Segmentation to use for defining the context, Set to null or
+            omit it if tokens should be used.
+          nullable: true
+          type: string
+        left:
+          default: 0
+          description: Left context size.
+          example: 5
+          type: integer
+        right:
+          default: 0
+          description: Right context size.
+          example: 5
+          type: integer
+      type: object
+    CountExtra:
+      description: Contains the extended results of the count query.
+      example:
+        match_count: 79017
+        document_count: 230
+      properties:
+        match_count:
+          description: Total number of matches.
+          example: 79017
+          type: integer
+        document_count:
+          description: Number of documents with at least one match.
+          example: 230
+          type: integer
+      type: object
+    AnnoKey:
+      description: Qualified name for annotation
+      example:
+        ns: stts
+        name: pos
+      properties:
+        name:
+          description: Name of the annotation.
+          example: pos
+          type: string
+        ns:
+          description: Namespace of the annotation.
+          example: stts
+          type: string
+      type: object
+    Annotation:
+      description: An annotation with a qualified name and a value.
+      example:
+        val: VVFIN
+        key:
+          ns: stts
+          name: pos
+      properties:
+        key:
+          $ref: '#/components/schemas/AnnoKey'
+        val:
+          description: Value of the annotation
+          example: VVFIN
+          type: string
+      type: object
+    Component:
+      description: Definition of an edge component
+      example:
+        name: dep
+        layer: conll
+      properties:
+        type:
+          $ref: '#/components/schemas/AnnotationComponentType'
+        name:
+          description: Name of the component
+          example: dep
+          type: string
+        layer:
+          description: A layer name which allows to group different components into
+            the same layer. Can be the empty string.
+          example: conll
+          type: string
+      type: object
+    AnnotationComponentType:
+      description: Type of component used for linguistic annotations.
+      enum:
+      - Coverage
+      - Dominance
+      - Pointing
+      - Ordering
+      - LeftToken
+      - RightToken
+      - PartOf
+      type: string
+    FrequencyTable:
+      description: |
+        Definition of the result of a `frequency` query. This is an array of rows, and each row is an array of columns with the different attribute values and a number of matches having this combination of attribute values.
+      items:
+        $ref: '#/components/schemas/FrequencyTableRow'
+      type: array
+    FrequencyTableRow:
+      example:
+        values:
+        - S
+        count: 5197
+      properties:
+        values:
+          example:
+          - S
+          items:
+            type: string
+          type: array
+        count:
+          example: 5197
+          type: integer
+      type: object
+    CorpusConfiguration:
+      example:
+        view:
+          base_text_segmentation: dipl
+          page_size: 10
+        example_queries:
+        - query: query
+          description: description
+        - query: query
+          description: description
+        context:
+          default: 0
+          sizes:
+          - 1
+          - 2
+          - 5
+          - 10
+          max: 25
+          segmentation: dipl
+        visualizers:
+        - mappings: '{}'
+          visibility: hidden
+          display_name: display_name
+          layer: layer
+          vis_type: vis_type
+          element: node
+        - mappings: '{}'
+          visibility: hidden
+          display_name: display_name
+          layer: layer
+          vis_type: vis_type
+          element: node
+      properties:
+        context:
+          $ref: '#/components/schemas/CorpusConfiguration_context'
+        view:
+          $ref: '#/components/schemas/CorpusConfiguration_view'
+        example_queries:
+          description: An array of example queries for the corpus with a description.
+          items:
+            $ref: '#/components/schemas/ExampleQuery'
+          type: array
+        visualizers:
+          description: An array of rules which visualizers to show for the search
+            results.
+          items:
+            $ref: '#/components/schemas/VisualizerRule'
+          type: array
+      type: object
+    ExampleQuery:
+      example:
+        query: query
+        description: description
+      properties:
+        query:
+          type: string
+        description:
+          type: string
+        query_language:
+          $ref: '#/components/schemas/QueryLanguage'
+      type: object
+    VisualizerRule:
+      description: A rule when to trigger a visualizer for a specific result.
+      example:
+        mappings: '{}'
+        visibility: hidden
+        display_name: display_name
+        layer: layer
+        vis_type: vis_type
+        element: node
+      properties:
+        element:
+          description: On which element type to trigger the visualizer on
+          enum:
+          - node
+          - edge
+          type: string
+        layer:
+          description: |
+            In which layer the element needs to be part of to trigger this visualizer.  Only relevant for edges, since only they are part of layers. If not given, elements of all layers trigger this visualization.
+          type: string
+        vis_type:
+          description: The abstract type of visualization, e.g. "tree", "discourse",
+            "grid", ...
+          type: string
+        display_name:
+          description: A text displayed to the user describing this visualization
+          type: string
+        visibility:
+          description: The default display state of the visualizer before any user
+            interaction.
+          enum:
+          - hidden
+          - visible
+          - permanent
+          - preloaded
+          - removed
+          type: string
+        mappings:
+          description: Additional configuration given as generic map of key values
+            to the visualizer.
+          type: object
+      type: object
+    Group:
+      example:
+        name: academic
+        corpora:
+        - GUM
+        - pcc2.1
+      properties:
+        name:
+          example: academic
+          type: string
+        corpora:
+          description: List of corpus names/identifiers.
+          example:
+          - GUM
+          - pcc2.1
+          items:
+            type: string
+          type: array
+      type: object
+    Job:
+      properties:
+        job_type:
+          enum:
+          - Import
+          - Export
+          type: string
+        status:
+          enum:
+          - Running
+          - Failed
+          - Finished
+          type: string
+        messages:
+          example:
+          - started import of corpus GUM
+          - reading GraphML
+          - 'Error during import of GUM: corpus already exists'
+          items:
+            type: string
+          type: array
+      type: object
+    inline_response_202:
+      description: The UUID for the background job. Status can be queried via the
+        /job endpoint and this UUID.
+      example:
+        uuid: 7dac334e-7f8f-4f1c-919e-02912527f329
+      properties:
+        uuid:
+          example: 7dac334e-7f8f-4f1c-919e-02912527f329
+          type: string
+    inline_object:
+      properties:
+        corpora:
+          description: List of corpus names/identifiers.
+          example:
+          - GUM
+          - pcc2.1
+          items:
+            type: string
+          type: array
+      type: object
+    inline_object_1:
+      properties:
+        user_id:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - user_id
+      type: object
+    FrequencyQuery_definition:
+      example:
+        node_ref: root
+        ns: const
+        name: cat
+      properties:
+        ns:
+          default: "null"
+          description: The namespace of the annotation from which the attribute value
+            is generated.
+          example: const
+          nullable: true
+          type: string
+        name:
+          description: The name of the annotation from which the attribute value is
+            generated.
+          example: cat
+          nullable: false
+          type: string
+        node_ref:
+          description: The name of the query node from which the attribute value is
+            generated.
+          example: root
+          nullable: false
+          type: string
+    CorpusConfiguration_context:
+      description: Configuration for configuring context in subgraph queries.
+      example:
+        default: 0
+        sizes:
+        - 1
+        - 2
+        - 5
+        - 10
+        max: 25
+        segmentation: dipl
+      properties:
+        default:
+          description: The default context size.
+          type: integer
+        sizes:
+          description: Available context sizes to choose from.
+          example:
+          - 1
+          - 2
+          - 5
+          - 10
+          items:
+            type: integer
+          type: array
+        max:
+          description: If set, a maximum context size which should be enforced by
+            the query system.
+          example: 25
+          type: integer
+        segmentation:
+          description: Default segmentation to use for defining the context, Set to
+            null or omit it if tokens should be used.
+          example: dipl
+          type: string
+    CorpusConfiguration_view:
+      description: Configuration how the results of a query should be shown
+      example:
+        base_text_segmentation: dipl
+        page_size: 10
+      properties:
+        base_text_segmentation:
+          description: Default segmentation to use for the displaying the text, Set
+            to null or omit it if tokens should be used.
+          example: dipl
+          type: string
+        page_size:
+          description: Default number of results to show at once for paginated queries.
+          example: 10
+          type: integer
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+
