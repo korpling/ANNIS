@@ -30,7 +30,7 @@ import java.util.List;
  * Defines a subgraph of an annotation graph using node IDs and a context.
  */
 @ApiModel(description = "Defines a subgraph of an annotation graph using node IDs and a context.")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:40:46.578+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:59:24.261+02:00[Europe/Berlin]")
 public class SubgraphWithContext {
   public static final String SERIALIZED_NAME_NODE_IDS = "node_ids";
   @SerializedName(SERIALIZED_NAME_NODE_IDS)

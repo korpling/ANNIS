@@ -79,7 +79,7 @@ import org.corpus_tools.ApiException;
 import org.corpus_tools.Configuration;
 import org.corpus_tools.auth.*;
 import org.corpus_tools.models.*;
-import org.corpus_tools.api.AdministrationApi;
+import org.corpus_tools.annis.api.AdministrationApi;
 
 public class Example {
   public static void main(String[] args) {

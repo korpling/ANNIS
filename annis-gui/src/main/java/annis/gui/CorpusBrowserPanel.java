@@ -39,14 +39,12 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
 
-import org.corpus_tools.ApiException;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
-import org.corpus_tools.api.CorporaApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.components.ExceptionDialog;

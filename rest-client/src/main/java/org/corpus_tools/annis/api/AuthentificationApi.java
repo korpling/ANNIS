@@ -11,16 +11,16 @@
  */
 
 
-package org.corpus_tools.api;
+package org.corpus_tools.annis.api;
 
-import org.corpus_tools.ApiCallback;
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.ApiResponse;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.Pair;
-import org.corpus_tools.ProgressRequestBody;
-import org.corpus_tools.ProgressResponseBody;
+import org.corpus_tools.annis.ApiCallback;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.ApiResponse;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.Pair;
+import org.corpus_tools.annis.ProgressRequestBody;
+import org.corpus_tools.annis.ProgressResponseBody;
 
 import com.google.gson.reflect.TypeToken;
 

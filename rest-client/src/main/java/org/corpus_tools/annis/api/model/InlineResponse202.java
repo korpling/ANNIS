@@ -28,7 +28,7 @@ import java.io.IOException;
  * The UUID for the background job. Status can be queried via the /job endpoint and this UUID.
  */
 @ApiModel(description = "The UUID for the background job. Status can be queried via the /job endpoint and this UUID.")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:40:46.578+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:59:24.261+02:00[Europe/Berlin]")
 public class InlineResponse202 {
   public static final String SERIALIZED_NAME_UUID = "uuid";
   @SerializedName(SERIALIZED_NAME_UUID)

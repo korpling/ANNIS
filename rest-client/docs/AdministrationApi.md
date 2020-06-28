@@ -21,12 +21,12 @@ Delete the user group given by its name
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.AdministrationApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.AdministrationApi;
 
 public class Example {
   public static void main(String[] args) {
@@ -86,12 +86,12 @@ Get all requested corpora as ZIP-file
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.AdministrationApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.AdministrationApi;
 
 public class Example {
   public static void main(String[] args) {
@@ -151,12 +151,12 @@ Get the status of the background job with the UUID
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.AdministrationApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.AdministrationApi;
 
 public class Example {
   public static void main(String[] args) {
@@ -221,12 +221,12 @@ This will search for all GraphML and relANNIS files in the uploaded ZIP file and
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.AdministrationApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.AdministrationApi;
 
 public class Example {
   public static void main(String[] args) {
@@ -288,12 +288,12 @@ Get all available user groups
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.AdministrationApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.AdministrationApi;
 
 public class Example {
   public static void main(String[] args) {
@@ -350,12 +350,12 @@ Add or replace the user group given by its name
 ### Example
 ```java
 // Import classes:
-import org.corpus_tools.ApiClient;
-import org.corpus_tools.ApiException;
-import org.corpus_tools.Configuration;
-import org.corpus_tools.auth.*;
-import org.corpus_tools.models.*;
-import org.corpus_tools.api.AdministrationApi;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.AdministrationApi;
 
 public class Example {
   public static void main(String[] args) {

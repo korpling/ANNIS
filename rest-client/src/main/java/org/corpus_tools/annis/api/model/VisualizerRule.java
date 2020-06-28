@@ -28,7 +28,7 @@ import java.io.IOException;
  * A rule when to trigger a visualizer for a specific result.
  */
 @ApiModel(description = "A rule when to trigger a visualizer for a specific result.")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:40:46.578+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:59:24.261+02:00[Europe/Berlin]")
 public class VisualizerRule {
   /**
    * On which element type to trigger the visualizer on

@@ -1,3 +1,3 @@
-<manifest package="org.corpus_tools" xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest package="org.corpus_tools.annis" xmlns:android="http://schemas.android.com/apk/res/android">
     <application />
 </manifest>
