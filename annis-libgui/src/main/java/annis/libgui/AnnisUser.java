@@ -24,60 +24,37 @@ public class AnnisUser implements Serializable {
    */
   private static final long serialVersionUID = 6391673569021316652L;
 
-  private transient Client client;
 
   private final String userName;
   /** Never store the password on the disk */
   private transient String password;
-  private final boolean remote;
+  /** Never stor the JWT token on the disk */
+  private transient String token;
 
-  public AnnisUser(String userName, String password) {
+  public AnnisUser(String userName, String password, String token) {
     this.userName = userName;
     this.password = password;
-    this.remote = false;
+    this.token = token;
   }
 
-  public AnnisUser(String userName, String password, boolean remote) {
-    this.userName = userName;
-    this.password = password;
-    this.remote = remote;
-  }
-
-
-  public Client getClient() throws LoginDataLostException {
-    if (client == null) {
-      if (remote == true) {
-        // treat as anonymous user
-        client = Helper.createRESTClient();
-      } else {
-        if (password == null) {
-          throw new LoginDataLostException();
-        }
-        client = Helper.createRESTClient(userName, password);
-      }
-    }
-    return client;
-  }
 
   public String getUserName() {
     return userName;
   }
 
-
-  /**
-   * True if the user a remote user, thus cannot e.g. logout by itself
-   * 
-   * @return whether user is remote
-   */
-  public boolean isRemote() {
-    return remote;
+  public String getToken() {
+    return token;
   }
 
+  public String getPassword() {
+    return password;
+  }
 
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     in.defaultReadObject();
 
     // explicitly set the password to "null" to make findbugs happy
     this.password = null;
+    this.token = null;
   }
 }

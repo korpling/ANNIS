@@ -33,6 +33,7 @@ import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import org.corpus_tools.annis.api.model.AnnoKey;
@@ -127,10 +128,12 @@ public class MetaDataPanel extends Panel {
     public void attach() {
         super.attach();
 
+        final UI ui = getUI();
+
         Background.runWithCallback(() -> {
-            Set<AnnoKey> metaKeys = ServiceHelper.getMetaAnnotationNames(toplevelCorpusName);
+            Set<AnnoKey> metaKeys = ServiceHelper.getMetaAnnotationNames(toplevelCorpusName, ui);
             List<Annotation> result = new LinkedList<>();
-            SearchApi api = new SearchApi(ServiceHelper.getClient());
+            SearchApi api = new SearchApi(ServiceHelper.getClient(ui));
             for (AnnoKey key : metaKeys) {
                 // get the value for this annotation using a frequency query
                 FrequencyQuery q = new FrequencyQuery();

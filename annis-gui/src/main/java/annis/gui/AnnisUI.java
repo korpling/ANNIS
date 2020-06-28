@@ -228,4 +228,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
         toolbar.reportBug(cause);
     }
 
+    public MainToolbar getToolbar() {
+        return toolbar;
+    }
+
 }

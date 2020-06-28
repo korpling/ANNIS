@@ -15,18 +15,8 @@
  */
 package annis.gui;
 
-import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
+import java.util.LinkedHashSet;
 
-import annis.gui.components.ScreenshotMaker;
-import annis.gui.components.SettingsStorage;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.AnnisUser;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.libgui.IDGenerator;
-import annis.libgui.LoginDataLostException;
-import annis.libgui.UIConfig;
-import annis.security.User;
 import com.google.common.eventbus.Subscribe;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.FontAwesome;
@@ -46,11 +36,22 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.data.validator.EmailValidator;
 import com.vaadin.v7.ui.themes.BaseTheme;
-import elemental.json.JsonArray;
-import java.util.LinkedHashSet;
+
 import org.aeonbits.owner.ConfigFactory;
 import org.json.JSONException;
 import org.slf4j.LoggerFactory;
+
+import annis.gui.components.ScreenshotMaker;
+import annis.gui.components.SettingsStorage;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.AnnisUser;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.libgui.LoginDataLostException;
+import annis.libgui.UIConfig;
+import annis.security.User;
+import elemental.json.JsonArray;
 
 /**
  * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists),
@@ -59,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class MainToolbar extends HorizontalLayout
-        implements LoginListener, ScreenshotMaker.ScreenshotCallback, SettingsStorage.LoadedListener {
+        implements ScreenshotMaker.ScreenshotCallback, SettingsStorage.LoadedListener {
 
     private static class AboutClickListener implements Button.ClickListener {
 
@@ -68,7 +69,8 @@ public class MainToolbar extends HorizontalLayout
          */
         private static final long serialVersionUID = 7147113799757433869L;
 
-        public AboutClickListener() {}
+        public AboutClickListener() {
+        }
 
         @Override
         public void buttonClick(Button.ClickEvent event) {
@@ -120,30 +122,6 @@ public class MainToolbar extends HorizontalLayout
                     });
                 }
             }
-        }
-    }
-
-    private class LoginCloseCallback implements JavaScriptFunction {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -1958169681728637045L;
-
-        @Override
-        public void call(JsonArray arguments) throws JSONException {
-            if (isLoggedIn()) {
-                for (LoginListener l : loginListeners) {
-                    try {
-                        l.onLogin();
-                    } catch (Exception ex) {
-                        log.error("exception thrown while notifying login listeners", ex);
-                    }
-                }
-
-            }
-            updateUserInformation();
-
         }
     }
 
@@ -361,8 +339,6 @@ public class MainToolbar extends HorizontalLayout
 
         screenshotExtension = new ScreenshotMaker(this);
 
-        JavaScript.getCurrent().addFunction("annis.gui.logincallback", new LoginCloseCallback());
-
         updateSidebarState();
     }
 
@@ -469,17 +445,32 @@ public class MainToolbar extends HorizontalLayout
         updateSidebarState();
     }
 
-    @Override
     public void onLogin() {
+        for (LoginListener l : loginListeners) {
+            try {
+                l.onLogin();
+            } catch (Exception ex) {
+                log.error("exception thrown while notifying login listeners", ex);
+            }
+        }
+
         updateUserInformation();
     }
 
-    @Override
     public void onLogout() {
 
         if (windowLogin != null) {
             // make sure to close the login window without triggering a search execution
             windowLogin.close(false);
+        }
+
+        for (LoginListener l : loginListeners) {
+            try {
+                l.onLogout();
+                ;
+            } catch (Exception ex) {
+                log.error("exception thrown while notifying login listeners", ex);
+            }
         }
 
         updateUserInformation();
@@ -607,12 +598,6 @@ public class MainToolbar extends HorizontalLayout
         }
 
         if (user == null) {
-            Object loginErrorOject = VaadinSession.getCurrent().getSession().getAttribute(USER_LOGIN_ERROR);
-            if (loginErrorOject != null && loginErrorOject instanceof String) {
-                Notification.show((String) loginErrorOject, Notification.Type.WARNING_MESSAGE);
-            }
-            VaadinSession.getCurrent().getSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
-
             lblUserName.setValue("not logged in");
             if (getComponentIndex(btLogout) > -1) {
                 replaceComponent(btLogout, btLogin);
@@ -630,8 +615,6 @@ public class MainToolbar extends HorizontalLayout
                 replaceComponent(btLogin, btLogout);
                 setComponentAlignment(btLogout, Alignment.MIDDLE_RIGHT);
             }
-            // do not show the logout button if the user cannot logout using ANNIS
-            btLogout.setVisible(!user.isRemote());
 
             if (navigationTarget == NavigationTarget.ADMIN) {
                 // check in background if display is necessary

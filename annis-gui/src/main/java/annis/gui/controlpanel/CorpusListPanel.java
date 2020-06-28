@@ -70,9 +70,12 @@ public class CorpusListPanel extends VerticalLayout {
 
         private final boolean scrollToSelected;
 
-        public CorpusListUpdater(boolean showLoginMessage, boolean scrollToSelected) {
+        private final UI ui;
+
+        public CorpusListUpdater(boolean showLoginMessage, boolean scrollToSelected, UI ui) {
             this.showLoginMessage = showLoginMessage;
             this.scrollToSelected = scrollToSelected;
+            this.ui = ui;
         }
 
         @Override
@@ -80,7 +83,7 @@ public class CorpusListPanel extends VerticalLayout {
 
             try {
                 // query in background
-                CorporaApi api = new CorporaApi(ServiceHelper.getClient());
+                CorporaApi api = new CorporaApi(ServiceHelper.getClient(ui));
 
                 List<String> corpora = api.listCorpora();
 
@@ -376,7 +379,7 @@ public class CorpusListPanel extends VerticalLayout {
         if (ui != null) {
             ui.clearCorpusConfigCache();
         }
-        CorpusListUpdater updater = new CorpusListUpdater(showLoginMessage, scrollToSelected);
+        CorpusListUpdater updater = new CorpusListUpdater(showLoginMessage, scrollToSelected, getUI());
         Background.run(updater);
     }
 }

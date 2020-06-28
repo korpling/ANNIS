@@ -77,22 +77,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 @Theme("annis")
 public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
 
-  private static class RemoteUserRequestHandler implements RequestHandler {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 6492558107939761446L;
-
-    @Override
-    public boolean handleRequest(VaadinSession session, VaadinRequest request,
-        VaadinResponse response) throws IOException {
-      checkIfRemoteLoggedIn(request);
-      // we never write any information in this handler
-      return false;
-    }
-  }
-
   /**
    * 
    */
@@ -105,7 +89,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisBaseUI.class);
   public final static String USER_KEY = "annis.gui.AnnisBaseUI:USER_KEY";
-  public final static String USER_LOGIN_ERROR = "annis.gui.AnnisBaseUI:USER_LOGIN_ERROR";
 
   public final static String CONTEXT_PATH = "annis.gui.AnnisBaseUI:CONTEXT_PATH";
 
@@ -119,14 +102,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
   private static final Map<String, Date> resourceAddedDate =
       Collections.synchronizedMap(new HashMap<String, Date>());
 
-  private static void checkIfRemoteLoggedIn(VaadinRequest request) {
-    // check if we are logged in using an external authentification mechanism
-    // like Schibboleth
-    String remoteUser = request.getRemoteUser();
-    if (remoteUser != null) {
-      Helper.setUser(new AnnisUser(remoteUser, null, true));
-    }
-  }
 
   /**
    * Given an configuration file name (might include directory) this function returns all locations
@@ -307,9 +282,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
     alreadyAddedCSS.clear();
 
     initPlugins();
-
-    checkIfRemoteLoggedIn(request);
-    getSession().addRequestHandler(new RemoteUserRequestHandler());
 
   }
 

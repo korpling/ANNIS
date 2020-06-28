@@ -16,31 +16,37 @@
 package annis.gui;
 
 import static annis.gui.MainToolbar.LOGIN_MAXIMIZED_KEY;
-import static annis.gui.MainToolbar.LOGIN_URL_KEY;
 
-import annis.libgui.Helper;
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.window.WindowMode;
-import com.vaadin.ui.BrowserFrame;
-import com.vaadin.ui.UI;
+import com.vaadin.ui.LoginForm;
+import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.Window;
+
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.AuthentificationApi;
+import org.corpus_tools.annis.api.model.InlineObject1;
+
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.AnnisUser;
+import annis.libgui.Helper;
 
 /**
  * A window for logging in.
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class LoginWindow extends Window {
+public class LoginWindow extends Window implements LoginForm.LoginListener {
 
     /**
      * 
      */
-    private static final long serialVersionUID = 1567905636551177877L;
-    private String loginURL;
+    private static final long serialVersionUID = 1567905636551177878L;
     private QueryController queryController;
     private boolean executeSearchAfterClose;
+
+    private final LoginForm form;
 
     public LoginWindow() {
         super("ANNIS Login");
@@ -49,31 +55,51 @@ public class LoginWindow extends Window {
 
         setWidth("400px");
         setHeight("250px");
+
+        form = new LoginForm();
     }
 
     @Override
     public void attach() {
         super.attach();
 
-        this.loginURL = (String) VaadinSession.getCurrent().getAttribute(LOGIN_URL_KEY);
-
-        Resource loginRes;
-        if (loginURL == null || loginURL.isEmpty()) {
-            loginRes = new ExternalResource(Helper.getContext(UI.getCurrent()) + "/login");
-        } else {
-            loginRes = new ExternalResource(loginURL);
-        }
-
-        BrowserFrame frame = new BrowserFrame("login", loginRes);
-        frame.setWidth("100%");
-        frame.setHeight("100%");
-
-        setContent(frame);
+        form.addLoginListener(this);
+        setContent(form);
 
         String loginMaximizedRaw = (String) getSession().getAttribute(LOGIN_MAXIMIZED_KEY);
         if (Boolean.parseBoolean(loginMaximizedRaw)) {
             setWindowMode(WindowMode.MAXIMIZED);
         }
+    }
+
+    @Override
+    public void onLogin(LoginEvent event) {
+        String password = event.getLoginParameter("password");
+        String username = event.getLoginParameter("username");
+        if (username != null && password != null) {
+            // forget any old user information
+            VaadinSession.getCurrent().getSession().removeAttribute(AnnisBaseUI.USER_KEY);
+
+            // Attempt to get a JWT bearer token for this user.
+            // Since we want to authenticate, we use an anonymous API client
+            AuthentificationApi api = new AuthentificationApi();
+            InlineObject1 credentials = new InlineObject1();
+            credentials.setUserId(username);
+            credentials.setPassword(password);
+            try {
+                String token = api.localLogin(credentials);
+                Helper.setUser(new AnnisUser(username, password, token));
+                if (getUI() instanceof AnnisUI) {
+                    AnnisUI ui = (AnnisUI) getUI();
+                    ui.getToolbar().onLogin();
+
+                }
+            } catch (ApiException ex) {
+                ExceptionDialog.show(ex, "Could not login", getUI());
+            }
+
+        } // end if login attempt
+
     }
 
     public void close(boolean loginSuccessful) {
