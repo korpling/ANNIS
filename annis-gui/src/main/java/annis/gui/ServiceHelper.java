@@ -13,15 +13,23 @@ import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
+import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 
 public interface ServiceHelper {
 
+    public static ApiClient getClient() {
+        ApiClient client = Configuration.getDefaultApiClient();
+        // TODO: set bearer token from session
+        return client;
+    }
+
     public static Set<AnnoKey> getMetaAnnotationNames(String corpus) throws ApiException {
-        CorporaApi api = new CorporaApi();
-        SearchApi search = new SearchApi();
+        CorporaApi api = new CorporaApi(getClient());
+        SearchApi search = new SearchApi(getClient());
 
         final List<Annotation> nodeAnnos = api.corpusNodeAnnotations(corpus, false, true).stream().filter(
                 a -> !Objects.equals(a.getKey().getNs(), "annis") && !Objects.equals(a.getKey().getName(), "tok"))
