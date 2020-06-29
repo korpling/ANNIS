@@ -28,7 +28,7 @@ import java.io.IOException;
  * Configuration how the results of a query should be shown
  */
 @ApiModel(description = "Configuration how the results of a query should be shown")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:59:24.261+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-29T10:18:56.988+02:00[Europe/Berlin]")
 public class CorpusConfigurationView {
   public static final String SERIALIZED_NAME_BASE_TEXT_SEGMENTATION = "base_text_segmentation";
   @SerializedName(SERIALIZED_NAME_BASE_TEXT_SEGMENTATION)

@@ -33,6 +33,8 @@ import org.corpus_tools.annis.api.model.CountQuery;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FrequencyQuery;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
+import org.corpus_tools.annis.api.model.GraphAnnisError;
+import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 
 import java.lang.reflect.Type;
@@ -70,6 +72,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The extended count result. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call countCall(CountQuery countQuery, final ApiCallback _callback) throws ApiException {
@@ -125,6 +128,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The extended count result. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public CountExtra count(CountQuery countQuery) throws ApiException {
@@ -142,6 +146,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The extended count result. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<CountExtra> countWithHttpInfo(CountQuery countQuery) throws ApiException {
@@ -161,6 +166,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The extended count result. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call countAsync(CountQuery countQuery, final ApiCallback<CountExtra> _callback) throws ApiException {
@@ -180,6 +186,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The matches for the given query. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call findCall(FindQuery findQuery, final ApiCallback _callback) throws ApiException {
@@ -194,7 +201,7 @@ public class SearchApi {
         Map<String, String> localVarCookieParams = new HashMap<String, String>();
         Map<String, Object> localVarFormParams = new HashMap<String, Object>();
         final String[] localVarAccepts = {
-            "text/plain"
+            "text/plain", "application/json"
         };
         final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
         if (localVarAccept != null) {
@@ -235,6 +242,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The matches for the given query. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public String find(FindQuery findQuery) throws ApiException {
@@ -252,6 +260,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The matches for the given query. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<String> findWithHttpInfo(FindQuery findQuery) throws ApiException {
@@ -271,6 +280,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> The matches for the given query. </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call findAsync(FindQuery findQuery, final ApiCallback<String> _callback) throws ApiException {
@@ -290,6 +300,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Frequency of different annotation values as table </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call frequencyCall(FrequencyQuery frequencyQuery, final ApiCallback _callback) throws ApiException {
@@ -345,6 +356,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Frequency of different annotation values as table </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public List<FrequencyTableRow> frequency(FrequencyQuery frequencyQuery) throws ApiException {
@@ -362,6 +374,7 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Frequency of different annotation values as table </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public ApiResponse<List<FrequencyTableRow>> frequencyWithHttpInfo(FrequencyQuery frequencyQuery) throws ApiException {
@@ -381,12 +394,134 @@ public class SearchApi {
      <table summary="Response Details" border="1">
         <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
         <tr><td> 200 </td><td> Frequency of different annotation values as table </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed or corpus does not exist </td><td>  -  </td></tr>
      </table>
      */
     public okhttp3.Call frequencyAsync(FrequencyQuery frequencyQuery, final ApiCallback<List<FrequencyTableRow>> _callback) throws ApiException {
 
         okhttp3.Call localVarCall = frequencyValidateBeforeCall(frequencyQuery, _callback);
         Type localVarReturnType = new TypeToken<List<FrequencyTableRow>>(){}.getType();
+        localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
+        return localVarCall;
+    }
+    /**
+     * Build call for nodeDescriptions
+     * @param query The query to parse (optional)
+     * @param queryLanguage  (optional, default to AQL)
+     * @param _callback Callback for upload/download progress
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     * @http.response.details
+     <table summary="Response Details" border="1">
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> List of query node descriptions </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call nodeDescriptionsCall(String query, QueryLanguage queryLanguage, final ApiCallback _callback) throws ApiException {
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/search/node-descriptions";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        if (query != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("query", query));
+        }
+
+        if (queryLanguage != null) {
+            localVarQueryParams.addAll(localVarApiClient.parameterToPair("query_language", queryLanguage));
+        }
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+        Map<String, String> localVarCookieParams = new HashMap<String, String>();
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = localVarApiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) {
+            localVarHeaderParams.put("Accept", localVarAccept);
+        }
+
+        final String[] localVarContentTypes = {
+            
+        };
+        final String localVarContentType = localVarApiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        String[] localVarAuthNames = new String[] { "bearerAuth" };
+        return localVarApiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAuthNames, _callback);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private okhttp3.Call nodeDescriptionsValidateBeforeCall(String query, QueryLanguage queryLanguage, final ApiCallback _callback) throws ApiException {
+        
+
+        okhttp3.Call localVarCall = nodeDescriptionsCall(query, queryLanguage, _callback);
+        return localVarCall;
+
+    }
+
+    /**
+     * Parses a query and returns a description for all the nodes in the query.
+     * 
+     * @param query The query to parse (optional)
+     * @param queryLanguage  (optional, default to AQL)
+     * @return QueryAttributeDescription
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table summary="Response Details" border="1">
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> List of query node descriptions </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed </td><td>  -  </td></tr>
+     </table>
+     */
+    public QueryAttributeDescription nodeDescriptions(String query, QueryLanguage queryLanguage) throws ApiException {
+        ApiResponse<QueryAttributeDescription> localVarResp = nodeDescriptionsWithHttpInfo(query, queryLanguage);
+        return localVarResp.getData();
+    }
+
+    /**
+     * Parses a query and returns a description for all the nodes in the query.
+     * 
+     * @param query The query to parse (optional)
+     * @param queryLanguage  (optional, default to AQL)
+     * @return ApiResponse&lt;QueryAttributeDescription&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     * @http.response.details
+     <table summary="Response Details" border="1">
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> List of query node descriptions </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed </td><td>  -  </td></tr>
+     </table>
+     */
+    public ApiResponse<QueryAttributeDescription> nodeDescriptionsWithHttpInfo(String query, QueryLanguage queryLanguage) throws ApiException {
+        okhttp3.Call localVarCall = nodeDescriptionsValidateBeforeCall(query, queryLanguage, null);
+        Type localVarReturnType = new TypeToken<QueryAttributeDescription>(){}.getType();
+        return localVarApiClient.execute(localVarCall, localVarReturnType);
+    }
+
+    /**
+     * Parses a query and returns a description for all the nodes in the query. (asynchronously)
+     * 
+     * @param query The query to parse (optional)
+     * @param queryLanguage  (optional, default to AQL)
+     * @param _callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     * @http.response.details
+     <table summary="Response Details" border="1">
+        <tr><td> Status Code </td><td> Description </td><td> Response Headers </td></tr>
+        <tr><td> 200 </td><td> List of query node descriptions </td><td>  -  </td></tr>
+        <tr><td> 400 </td><td> Query could not be parsed </td><td>  -  </td></tr>
+     </table>
+     */
+    public okhttp3.Call nodeDescriptionsAsync(String query, QueryLanguage queryLanguage, final ApiCallback<QueryAttributeDescription> _callback) throws ApiException {
+
+        okhttp3.Call localVarCall = nodeDescriptionsValidateBeforeCall(query, queryLanguage, _callback);
+        Type localVarReturnType = new TypeToken<QueryAttributeDescription>(){}.getType();
         localVarApiClient.executeAsync(localVarCall, localVarReturnType, _callback);
         return localVarCall;
     }

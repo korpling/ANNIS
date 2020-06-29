@@ -28,7 +28,7 @@ import java.io.IOException;
  * Contains the extended results of the count query.
  */
 @ApiModel(description = "Contains the extended results of the count query.")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-28T18:59:24.261+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-29T10:18:56.988+02:00[Europe/Berlin]")
 public class CountExtra {
   public static final String SERIALIZED_NAME_MATCH_COUNT = "match_count";
   @SerializedName(SERIALIZED_NAME_MATCH_COUNT)

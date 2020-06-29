@@ -23,38 +23,64 @@ import com.google.gson.stream.JsonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
+import org.corpus_tools.annis.api.model.LineColumn;
 
 /**
- * The UUID for the background job. Status can be queried via the /job endpoint and this UUID.
+ * LineColumnRange
  */
-@ApiModel(description = "The UUID for the background job. Status can be queried via the /job endpoint and this UUID.")
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-29T10:18:56.988+02:00[Europe/Berlin]")
-public class InlineResponse202 {
-  public static final String SERIALIZED_NAME_UUID = "uuid";
-  @SerializedName(SERIALIZED_NAME_UUID)
-  private String uuid;
+public class LineColumnRange {
+  public static final String SERIALIZED_NAME_START = "start";
+  @SerializedName(SERIALIZED_NAME_START)
+  private LineColumn start;
+
+  public static final String SERIALIZED_NAME_END = "end";
+  @SerializedName(SERIALIZED_NAME_END)
+  private LineColumn end;
 
 
-  public InlineResponse202 uuid(String uuid) {
+  public LineColumnRange start(LineColumn start) {
     
-    this.uuid = uuid;
+    this.start = start;
     return this;
   }
 
    /**
-   * Get uuid
-   * @return uuid
+   * Get start
+   * @return start
   **/
-  @javax.annotation.Nullable
-  @ApiModelProperty(example = "7dac334e-7f8f-4f1c-919e-02912527f329", value = "")
+  @ApiModelProperty(required = true, value = "")
 
-  public String getUuid() {
-    return uuid;
+  public LineColumn getStart() {
+    return start;
   }
 
 
-  public void setUuid(String uuid) {
-    this.uuid = uuid;
+  public void setStart(LineColumn start) {
+    this.start = start;
+  }
+
+
+  public LineColumnRange end(LineColumn end) {
+    
+    this.end = end;
+    return this;
+  }
+
+   /**
+   * Get end
+   * @return end
+  **/
+  @javax.annotation.Nullable
+  @ApiModelProperty(value = "")
+
+  public LineColumn getEnd() {
+    return end;
+  }
+
+
+  public void setEnd(LineColumn end) {
+    this.end = end;
   }
 
 
@@ -66,21 +92,23 @@ public class InlineResponse202 {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse202 inlineResponse202 = (InlineResponse202) o;
-    return Objects.equals(this.uuid, inlineResponse202.uuid);
+    LineColumnRange lineColumnRange = (LineColumnRange) o;
+    return Objects.equals(this.start, lineColumnRange.start) &&
+        Objects.equals(this.end, lineColumnRange.end);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(uuid);
+    return Objects.hash(start, end);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse202 {\n");
-    sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
+    sb.append("class LineColumnRange {\n");
+    sb.append("    start: ").append(toIndentedString(start)).append("\n");
+    sb.append("    end: ").append(toIndentedString(end)).append("\n");
     sb.append("}");
     return sb.toString();
   }

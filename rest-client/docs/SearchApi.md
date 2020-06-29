@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**count**](SearchApi.md#count) | **POST** /search/count | Count the number of results for a query.
 [**find**](SearchApi.md#find) | **POST** /search/find | Find results for a query and return the IDs of the matched nodes.
 [**frequency**](SearchApi.md#frequency) | **POST** /search/frequency | Find results for a query and return the IDs of the matched nodes.
+[**nodeDescriptions**](SearchApi.md#nodeDescriptions) | **GET** /search/node-descriptions | Parses a query and returns a description for all the nodes in the query.
 [**subgraphForQuery**](SearchApi.md#subgraphForQuery) | **GET** /corpora/{corpus}/subgraph-for-query | Get a subgraph of the corpus format given a list of nodes and a context.
 
 
@@ -74,6 +75,7 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | The extended count result. |  -  |
+**400** | Query could not be parsed or corpus does not exist |  -  |
 
 <a name="find"></a>
 # **find**
@@ -133,12 +135,13 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: application/json
- - **Accept**: text/plain
+ - **Accept**: text/plain, application/json
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | The matches for the given query. |  -  |
+**400** | Query could not be parsed or corpus does not exist |  -  |
 
 <a name="frequency"></a>
 # **frequency**
@@ -204,6 +207,75 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Frequency of different annotation values as table |  -  |
+**400** | Query could not be parsed or corpus does not exist |  -  |
+
+<a name="nodeDescriptions"></a>
+# **nodeDescriptions**
+> QueryAttributeDescription nodeDescriptions(query, queryLanguage)
+
+Parses a query and returns a description for all the nodes in the query.
+
+### Example
+```java
+// Import classes:
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.*;
+import org.corpus_tools.annis.models.*;
+import org.corpus_tools.annis.api.SearchApi;
+
+public class Example {
+  public static void main(String[] args) {
+    ApiClient defaultClient = Configuration.getDefaultApiClient();
+    defaultClient.setBasePath("http://localhost:5711/v0");
+    
+    // Configure HTTP bearer authorization: bearerAuth
+    HttpBearerAuth bearerAuth = (HttpBearerAuth) defaultClient.getAuthentication("bearerAuth");
+    bearerAuth.setBearerToken("BEARER TOKEN");
+
+    SearchApi apiInstance = new SearchApi(defaultClient);
+    String query = pos="NN" . second#tok; // String | The query to parse
+    QueryLanguage queryLanguage = new QueryLanguage(); // QueryLanguage | 
+    try {
+      QueryAttributeDescription result = apiInstance.nodeDescriptions(query, queryLanguage);
+      System.out.println(result);
+    } catch (ApiException e) {
+      System.err.println("Exception when calling SearchApi#nodeDescriptions");
+      System.err.println("Status code: " + e.getCode());
+      System.err.println("Reason: " + e.getResponseBody());
+      System.err.println("Response headers: " + e.getResponseHeaders());
+      e.printStackTrace();
+    }
+  }
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **query** | **String**| The query to parse | [optional]
+ **queryLanguage** | [**QueryLanguage**](.md)|  | [optional] [default to AQL] [enum: AQL, AQLQuirksV3]
+
+### Return type
+
+[**QueryAttributeDescription**](QueryAttributeDescription.md)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+**200** | List of query node descriptions |  -  |
+**400** | Query could not be parsed |  -  |
 
 <a name="subgraphForQuery"></a>
 # **subgraphForQuery**
