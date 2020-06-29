@@ -1,22 +1,22 @@
 /*
  * Copyright 2014 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui;
 
 import java.util.LinkedHashSet;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.Claim;
 import com.google.common.eventbus.Subscribe;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.FontAwesome;
@@ -54,8 +54,8 @@ import annis.security.User;
 import elemental.json.JsonArray;
 
 /**
- * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists),
- * the screenshot making and some information windows.
+ * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists), the screenshot making
+ * and some information windows.
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
@@ -69,8 +69,7 @@ public class MainToolbar extends HorizontalLayout
          */
         private static final long serialVersionUID = 7147113799757433869L;
 
-        public AboutClickListener() {
-        }
+        public AboutClickListener() {}
 
         @Override
         public void buttonClick(Button.ClickEvent event) {
@@ -85,50 +84,10 @@ public class MainToolbar extends HorizontalLayout
         }
     }
 
-    private class CheckIfUserIsAdministratorJob implements Runnable {
-
-        private final String userName;
-
-        private final UI ui;
-
-        public CheckIfUserIsAdministratorJob(String userName, UI ui) {
-            this.userName = userName;
-            this.ui = ui;
-        }
-
-        @Override
-        public void run() {
-            User user = null;
-            try {
-                user = Helper.getAnnisWebResource(ui).path("admin/users").path(userName).get(User.class);
-            } catch (UniformInterfaceException ex) {
-                // ignore
-            } finally {
-                boolean hasAdmistrationRights = false;
-                if (user != null) {
-                    for (String perm : user.getPermissions()) {
-                        if (perm.startsWith("*:") || perm.startsWith("admin:")) {
-                            // the user has at least some administration rights
-                            hasAdmistrationRights = true;
-                        }
-                    }
-                }
-                if (hasAdmistrationRights) {
-                    ui.access(() -> {
-                        // make the administration button visible
-                        btNavigate.setCaption(NavigationTarget.ADMIN.caption);
-                        btNavigate.setIcon(NavigationTarget.ADMIN.icon);
-                        btNavigate.setVisible(true);
-                    });
-                }
-            }
-        }
-    }
-
     public enum NavigationTarget {
 
-        SEARCH(SearchView.NAME, "Search interface", FontAwesome.SEARCH), ADMIN(AdminView.NAME, "Administration",
-                FontAwesome.WRENCH);
+        SEARCH(SearchView.NAME, "Search interface", FontAwesome.SEARCH), ADMIN(AdminView.NAME,
+                "Administration", FontAwesome.WRENCH);
 
         private final String caption;
 
@@ -303,35 +262,35 @@ public class MainToolbar extends HorizontalLayout
 
             // decide new state
             switch (sidebarState) {
-            case VISIBLE:
-                if (event.isCtrlKey()) {
-                    sidebarState = SidebarState.AUTO_VISIBLE;
-                } else {
-                    sidebarState = SidebarState.HIDDEN;
-                }
-                break;
-            case HIDDEN:
-                if (event.isCtrlKey()) {
-                    sidebarState = SidebarState.AUTO_HIDDEN;
-                } else {
-                    sidebarState = SidebarState.VISIBLE;
-                }
-                break;
+                case VISIBLE:
+                    if (event.isCtrlKey()) {
+                        sidebarState = SidebarState.AUTO_VISIBLE;
+                    } else {
+                        sidebarState = SidebarState.HIDDEN;
+                    }
+                    break;
+                case HIDDEN:
+                    if (event.isCtrlKey()) {
+                        sidebarState = SidebarState.AUTO_HIDDEN;
+                    } else {
+                        sidebarState = SidebarState.VISIBLE;
+                    }
+                    break;
 
-            case AUTO_VISIBLE:
-                if (event.isCtrlKey()) {
-                    sidebarState = SidebarState.VISIBLE;
-                } else {
-                    sidebarState = SidebarState.AUTO_HIDDEN;
-                }
-                break;
-            case AUTO_HIDDEN:
-                if (event.isCtrlKey()) {
-                    sidebarState = SidebarState.HIDDEN;
-                } else {
-                    sidebarState = SidebarState.AUTO_VISIBLE;
-                }
-                break;
+                case AUTO_VISIBLE:
+                    if (event.isCtrlKey()) {
+                        sidebarState = SidebarState.VISIBLE;
+                    } else {
+                        sidebarState = SidebarState.AUTO_HIDDEN;
+                    }
+                    break;
+                case AUTO_HIDDEN:
+                    if (event.isCtrlKey()) {
+                        sidebarState = SidebarState.HIDDEN;
+                    } else {
+                        sidebarState = SidebarState.AUTO_VISIBLE;
+                    }
+                    break;
             }
 
             updateSidebarState();
@@ -343,13 +302,12 @@ public class MainToolbar extends HorizontalLayout
     }
 
     /**
-     * Adds the login button + login text to the toolbar. This is only happened,
-     * when the gui is not started via the kickstarter.
+     * Adds the login button + login text to the toolbar. This is only happened, when the gui is not
+     * started via the kickstarter.
      *
      * <p>
-     * The Kickstarter overrides the "kickstarterEnvironment" context parameter and
-     * set it to "true", so the gui can detect, that is not necessary to offer a
-     * login button.
+     * The Kickstarter overrides the "kickstarterEnvironment" context parameter and set it to
+     * "true", so the gui can detect, that is not necessary to offer a login button.
      * </p>
      *
      * component.
@@ -466,8 +424,7 @@ public class MainToolbar extends HorizontalLayout
 
         for (LoginListener l : loginListeners) {
             try {
-                l.onLogout();
-                ;
+                l.onLogout();;
             } catch (Exception ex) {
                 log.error("exception thrown while notifying login listeners", ex);
             }
@@ -520,8 +477,8 @@ public class MainToolbar extends HorizontalLayout
         btBugReport.setCaption("Report Problem");
 
         if (bugEMailAddress != null) {
-            ReportBugWindow reportBugWindow = new ReportBugWindow(bugEMailAddress, imageData, mimeType,
-                    lastBugReportCause);
+            ReportBugWindow reportBugWindow =
+                    new ReportBugWindow(bugEMailAddress, imageData, mimeType, lastBugReportCause);
 
             reportBugWindow.setModal(true);
             reportBugWindow.setResizable(true);
@@ -542,9 +499,7 @@ public class MainToolbar extends HorizontalLayout
         if (target == NavigationTarget.ADMIN) {
             // check in background if display is necessary
             AnnisUser user = Helper.getUser(ui);
-            if (user != null && user.getUserName() != null) {
-                Background.run(new CheckIfUserIsAdministratorJob(user.getUserName(), UI.getCurrent()));
-            }
+            updateAdministratorButtonVisibility(user);
         } else if (target != null) {
             btNavigate.setVisible(true);
             btNavigate.setCaption(target.caption);
@@ -580,6 +535,20 @@ public class MainToolbar extends HorizontalLayout
         }
     }
 
+    private void updateAdministratorButtonVisibility(AnnisUser user) {
+        if (user != null && user.getUserName() != null) {
+            // We don't verify the provided token, this is the job of the backend.
+            // This only decides if the Administrator button is visible
+            Claim claim = JWT.decode(user.getToken()).getClaim("admin");
+            if (!claim.isNull() && claim.asBoolean().booleanValue()) {
+                // make the administration button visible
+                btNavigate.setCaption(NavigationTarget.ADMIN.caption);
+                btNavigate.setIcon(NavigationTarget.ADMIN.icon);
+                btNavigate.setVisible(true);
+            }
+        }
+    }
+
     private void updateUserInformation() {
         if (lblUserName == null) {
             return;
@@ -606,7 +575,8 @@ public class MainToolbar extends HorizontalLayout
         } else {
             // logged in
             if (user.getUserName() != null) {
-                Notification.show("Logged in as \"" + user.getUserName() + "\"", Notification.Type.TRAY_NOTIFICATION);
+                Notification.show("Logged in as \"" + user.getUserName() + "\"",
+                        Notification.Type.TRAY_NOTIFICATION);
 
                 lblUserName.setValue("logged in as \"" + user.getUserName() + "\"");
 
@@ -617,13 +587,9 @@ public class MainToolbar extends HorizontalLayout
             }
 
             if (navigationTarget == NavigationTarget.ADMIN) {
-                // check in background if display is necessary
-                if (user.getUserName() != null) {
-                    Background.run(new CheckIfUserIsAdministratorJob(user.getUserName(), UI.getCurrent()));
-                }
+                updateAdministratorButtonVisibility(user);
             }
         }
 
     }
-
 }
