@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -44,6 +45,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.JSON;
 import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.CountQuery;
 import org.corpus_tools.annis.api.model.GraphAnnisError;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.salt.common.SaltProject;
@@ -83,6 +85,7 @@ import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.QueryLanguage;
+import okhttp3.Call;
 
 /**
  * A controller to modifiy the query UI state. s
@@ -241,8 +244,8 @@ public class QueryController implements Serializable {
     }
 
     public void corpusSelectionChangedInBackground() {
-        searchView.getControlPanel().getSearchOptions().updateSearchPanelConfigurationInBackground(
-                getState().getSelectedCorpora(), ui);
+        searchView.getControlPanel().getSearchOptions()
+                .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora(), ui);
     }
 
     public void executeExport(ExportPanel panel, EventBus eventBus) {
@@ -410,13 +413,24 @@ public class QueryController implements Serializable {
                         Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")))
                 .queryParam("query-language", displayedQuery.getQueryLanguage().name());
         Future<MatchAndDocumentCount> futureCount = countRes.get(MatchAndDocumentCount.class);
-        state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 
-        Background.run(new CountCallback(newResultView, displayedQuery.getLimit(), ui));
+        SearchApi api = new SearchApi(ServiceHelper.getClient(ui));
+        CountQuery countQuery = new CountQuery();
+        countQuery.setCorpora(new LinkedList<>(displayedQuery.getCorpora()));
+        countQuery.setQuery(displayedQuery.getQuery());
+        if (displayedQuery.getQueryLanguage() == QueryLanguage.AQL_QUIRKS_V3) {
+            countQuery.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQLQUIRKSV3);
+        } else {
+            countQuery.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQL);
+        }
+        try {
+            Call call = api.countAsync(countQuery,
+                    new CountCallback(newResultView, displayedQuery.getLimit(), ui));
 
-        //
-        // end execute count
-        //
+            state.getExecutedCalls().put(QueryUIState.QueryType.COUNT, call);
+        } catch (ApiException ex) {
+            ExceptionDialog.show(ex, ui);
+        }
     }
 
     /**
@@ -537,13 +551,13 @@ public class QueryController implements Serializable {
         // only change the values if actually changed (the value change listeners should
         // not be triggered if not necessary)
         setIfNew(state.getAql(), q.getQuery());
-        if(q.getQueryLanguage() != state.getQueryLanguageLegacy()) {
+        if (q.getQueryLanguage() != state.getQueryLanguageLegacy()) {
             state.setQueryLanguageLegacy(q.getQueryLanguage());
         }
-        if(!Objects.deepEquals(state.getSelectedCorpora(), q.getCorpora())) {
+        if (!Objects.deepEquals(state.getSelectedCorpora(), q.getCorpora())) {
             state.setSelectedCorpora(q.getCorpora());
         }
- 
+
         if (q instanceof ContextualizedQuery) {
             setIfNew(state.getLeftContext(), ((ContextualizedQuery) q).getLeftContext());
             setIfNew(state.getRightContext(), ((ContextualizedQuery) q).getRightContext());

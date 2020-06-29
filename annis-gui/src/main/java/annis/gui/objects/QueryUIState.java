@@ -37,6 +37,8 @@ import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.model.Query;
 import annis.service.objects.OrderType;
+import okhttp3.Call;
+
 import org.corpus_tools.annis.api.model.QueryLanguage;
 
 /**
@@ -86,6 +88,8 @@ public class QueryUIState implements Serializable {
 
     private transient Map<QueryType, Future<?>> executedTasks;
 
+    private transient Map<QueryType, Call> executedCalls;
+
     private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition =
             new BeanContainer<>(UserGeneratedFrequencyEntry.class);
 
@@ -109,6 +113,10 @@ public class QueryUIState implements Serializable {
 
     public Map<QueryType, Future<?>> getExecutedTasks() {
         return executedTasks;
+    }
+
+    public Map<QueryType, Call> getExecutedCalls() {
+      return executedCalls;
     }
 
     public ObjectProperty<List<String>> getExportAnnotationKeys() {
@@ -193,6 +201,7 @@ public class QueryUIState implements Serializable {
 
     private void initTransients() {
         executedTasks = new EnumMap<>(QueryType.class);
+        executedCalls = new EnumMap<>(QueryType.class);
     }
 
     private void readObject(final java.io.ObjectInputStream in)
