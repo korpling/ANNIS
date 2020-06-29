@@ -29,6 +29,12 @@
                             <generatorName>java</generatorName>
                             <apiPackage>org.corpus_tools.annis.api</apiPackage>
                             <modelPackage>org.corpus_tools.annis.api.model</modelPackage>
+                            <generateSupportingFiles>true</generateSupportingFiles>
+                            <supportingFilesToGenerate>ApiResponse.java,ApiException.java,ApiCallback.java,Pair.java,ApiClient.java,Configuration.java,ProgressRequestBody.java,JSON.java,Authentication.java,StringUtil.java,ApiKeyAuth.java,HttpBasicAuth.java,ProgressResponseBody.java,HttpBearerAuth.java</supportingFilesToGenerate>
+                            <generateApiTests>false</generateApiTests>
+                            <generateApiDocumentation>false</generateApiDocumentation>
+                            <generateModelTests>false</generateModelTests>
+                            <generateModelDocs>false</generateModelDocs>
                             <configOptions>
                                 <java8>true</java8>
                                 <dateLibrary>java8</dateLibrary>
