@@ -1,17 +1,15 @@
 /*
  * Copyright 2015 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui;
 
@@ -82,7 +80,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class SearchView extends GridLayout implements View, MimeTypeErrorListener, Page.UriFragmentChangedListener,
+public class SearchView extends GridLayout
+        implements View, MimeTypeErrorListener, Page.UriFragmentChangedListener,
         TabSheet.CloseHandler, LoginListener, Sidebar, TabSheet.SelectedTabChangeListener {
 
     private static class AnnisCorpusListType extends GenericType<List<AnnisCorpus>> {
@@ -98,8 +97,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
         private static final long serialVersionUID = -5700172209282345278L;
 
         @Override
-        public boolean handleRequest(VaadinSession session, VaadinRequest request, VaadinResponse response)
-                throws IOException {
+        public boolean handleRequest(VaadinSession session, VaadinRequest request,
+                VaadinResponse response) throws IOException {
             checkCitation();
             return false;
         }
@@ -110,11 +109,13 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
         @Override
         public void run() {
             try {
-                WebResource resRelease = Helper.getAnnisWebResource(ui).path("version").path("release");
+                WebResource resRelease =
+                        Helper.getAnnisWebResource(ui).path("version").path("release");
                 final String releaseService = resRelease.get(String.class);
                 final String releaseGUI = VersionInfo.getReleaseName();
 
-                WebResource resRevision = Helper.getAnnisWebResource(ui).path("version").path("revision");
+                WebResource resRevision =
+                        Helper.getAnnisWebResource(ui).path("version").path("revision");
                 final String revisionService = resRevision.get(String.class);
                 final String revisionGUI = VersionInfo.getBuildRevision();
 
@@ -132,7 +133,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
 
                         if (!revisionService.equals(revisionGUI)) {
                             // shorten the strings
-                            String commonPrefix = Strings.commonPrefix(revisionService, revisionGUI);
+                            String commonPrefix =
+                                    Strings.commonPrefix(revisionService, revisionGUI);
                             int outputLength = Math.max(6, commonPrefix.length() + 2);
                             String revisionServiceShort = revisionService.substring(0,
                                     Math.min(revisionService.length() - 1, outputLength));
@@ -155,7 +157,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
             } catch (UniformInterfaceException ex) {
                 log.warn("Could not get the version of the service", ex);
             } catch (ClientHandlerException ex) {
-                log.warn("Could not get the version of the service because service is not running", ex);
+                log.warn("Could not get the version of the service because service is not running",
+                        ex);
             }
 
         }
@@ -316,7 +319,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
             // filter by actually avaible user corpora in order not to get any exception
             // later
             WebResource res = Helper.getAnnisWebResource(ui);
-            List<AnnisCorpus> userCorpora = res.path("query").path("corpora").get(new AnnisCorpusListType());
+            List<AnnisCorpus> userCorpora =
+                    res.path("query").path("corpora").get(new AnnisCorpusListType());
 
             LinkedList<String> userCorporaStrings = new LinkedList<>();
             for (AnnisCorpus c : userCorpora) {
@@ -335,10 +339,11 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
                 } catch (NumberFormatException ex) {
                     log.error("could not parse context value", ex);
                 }
-                ui.getQueryController()
-                        .setQuery(new PagedResultQuery(cleft, cright, 0, 10, null, aql, selectedCorpora));
+                ui.getQueryController().setQuery(
+                        new PagedResultQuery(cleft, cright, 0, 10, null, aql, selectedCorpora));
             } else {
-                ui.getQueryController().setQuery(new Query(aql, QueryLanguage.AQL_QUIRKS_V3, selectedCorpora));
+                ui.getQueryController()
+                        .setQuery(new Query(aql, QueryLanguage.AQL_QUIRKS_V3, selectedCorpora));
             }
 
             // remove all currently openend sub-windows
@@ -387,14 +392,16 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
                 if (args.containsKey("c") && args.size() == 1) {
                     // special case: we were called from outside and should only select,
                     // but not query, the selected corpora
-                    ui.getQueryState().getSelectedCorpora().getItems().clear();
-                    ui.getQueryState().getSelectedCorpora().getItems().addAll(corpora);
+                    ui.getQueryState().getSelectedCorpora().clear();
+                    ui.getQueryState().getSelectedCorpora().addAll(corpora);
                 } else if (args.get("cl") != null && args.get("cr") != null) {
                     // make sure the properties are not overwritten by the background process
                     getControlPanel().getSearchOptions().setUpdateStateFromConfig(false);
 
-                    DisplayedResultQuery query = QueryGenerator.displayed().left(Integer.parseInt(args.get("cl")))
-                            .right(Integer.parseInt(args.get("cr"))).offset(Integer.parseInt(args.get("s")))
+                    DisplayedResultQuery query = QueryGenerator.displayed()
+                            .left(Integer.parseInt(args.get("cl")))
+                            .right(Integer.parseInt(args.get("cr")))
+                            .offset(Integer.parseInt(args.get("s")))
                             .limit(Integer.parseInt(args.get("l"))).segmentation(args.get("seg"))
                             .baseText(args.get("bt")).query(args.get("q")).corpora(corpora).build();
 
@@ -409,8 +416,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
 
                     String matchSelectionRaw = args.get("m");
                     if (matchSelectionRaw != null) {
-                        for (String selectedMatchNr : Splitter.on(',').omitEmptyStrings().trimResults()
-                                .split(matchSelectionRaw)) {
+                        for (String selectedMatchNr : Splitter.on(',').omitEmptyStrings()
+                                .trimResults().split(matchSelectionRaw)) {
                             try {
                                 long nr = Long.parseLong(selectedMatchNr);
                                 query.getSelectedMatches().add(nr);
@@ -430,9 +437,12 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
 
                     if (args.get("ql") != null) {
                         try {
-                            query.setQueryLanguage(QueryLanguage.valueOf(args.get("ql").toUpperCase()));
+                            query.setQueryLanguage(
+                                    QueryLanguage.valueOf(args.get("ql").toUpperCase()));
                         } catch (IllegalArgumentException ex) {
-                            log.warn("Could not parse query fragment argument for the query language", ex);
+                            log.warn(
+                                    "Could not parse query fragment argument for the query language",
+                                    ex);
                         }
                     }
 
@@ -445,7 +455,9 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
                         try {
                             ql = QueryLanguage.valueOf(args.get("ql").toUpperCase());
                         } catch (IllegalArgumentException ex) {
-                            log.warn("Could not parse query fragment argument for the query language", ex);
+                            log.warn(
+                                    "Could not parse query fragment argument for the query language",
+                                    ex);
                         }
                     }
                     // use default context
@@ -485,9 +497,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
     }
 
     /**
-     * Takes a list of raw corpus names as given by the #c parameter and returns a
-     * list of corpus names that are known to exist. It also replaces alias names
-     * with the real corpus names.
+     * Takes a list of raw corpus names as given by the #c parameter and returns a list of corpus
+     * names that are known to exist. It also replaces alias names with the real corpus names.
      *
      * @param originalNames
      * @return
@@ -500,7 +511,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
             // get the real corpus descriptions by the name (which could be an alias)
             try {
                 List<AnnisCorpus> corporaByName = rootRes.path("query").path("corpora")
-                        .path(urlPathEscape.escape(selectedCorpusName)).get(new GenericType<List<AnnisCorpus>>() {});
+                        .path(urlPathEscape.escape(selectedCorpusName))
+                        .get(new GenericType<List<AnnisCorpus>>() {});
 
                 if (corporaByName != null && !corporaByName.isEmpty()) {
                     for (AnnisCorpus c : corporaByName) {
@@ -546,12 +558,14 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
             supportedByIE9Plugin.add("audio/ogg");
             supportedByIE9Plugin.add("video/ogg");
 
-            if (browser.isIE() && browser.getBrowserMajorVersion() >= 9 && supportedByIE9Plugin.contains(mimeType)) {
+            if (browser.isIE() && browser.getBrowserMajorVersion() >= 9
+                    && supportedByIE9Plugin.contains(mimeType)) {
                 Notification n = new Notification("Media file type unsupported by your browser",
                         "Please install the WebM plugin for Internet Explorer 9 from "
                                 + "<a target=\"_blank\" href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
                                 + " or use a browser from the following list "
-                                + "(these are known to work with WebM or OGG files)<br/>" + browserList
+                                + "(these are known to work with WebM or OGG files)<br/>"
+                                + browserList
                                 + "<br/><br /><strong>Click on this message to hide it</strong>",
                         Notification.Type.WARNING_MESSAGE, true);
                 n.setDelayMsec(15000);
@@ -560,7 +574,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
             } else {
                 Notification n = new Notification("Media file type unsupported by your browser",
                         "Please use a browser from the following list "
-                                + "(these are known to work with WebM or OGG files)<br/>" + browserList
+                                + "(these are known to work with WebM or OGG files)<br/>"
+                                + browserList
                                 + "<br/><br /><strong>Click on this message to hide it</strong>",
                         Notification.Type.WARNING_MESSAGE, true);
                 n.setDelayMsec(15000);
@@ -582,10 +597,10 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
          * Notification("Media file type \"" + mimeType +
          * "\" might be unsupported by your browser!",
          * "This means you might get errors playing this file.<br/><br /> " +
-         * "<em>If you have problems with this media file:</em><br /> Try to check your browsers "
-         * + "documentation how to enable " +
-         * "support for the media type or inform the corpus creator about this problem."
-         * , Notification.Type.TRAY_NOTIFICATION, true); notify.setDelayMsec(15000);
+         * "<em>If you have problems with this media file:</em><br /> Try to check your browsers " +
+         * "documentation how to enable " +
+         * "support for the media type or inform the corpus creator about this problem." ,
+         * Notification.Type.TRAY_NOTIFICATION, true); notify.setDelayMsec(15000);
          * showNotification(notify); warnedAboutPossibleMediaFormatProblem = true; }
          */
     }
@@ -610,7 +625,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
 
             if (!selectedTabHistory.isEmpty()) {
                 // get the last selected tab
-                Component[] asArray = selectedTabHistory.toArray(new Component[selectedTabHistory.size()]);
+                Component[] asArray =
+                        selectedTabHistory.toArray(new Component[selectedTabHistory.size()]);
                 mainTab.setSelectedTab(asArray[asArray.length - 1]);
             }
         }
@@ -647,11 +663,9 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
     }
 
     /**
-     * Adds the _c fragement to the URL in the browser adress bar when a corpus is
-     * selected.
+     * Adds the _c fragement to the URL in the browser adress bar when a corpus is selected.
      *
-     * @param corpora
-     *            A list of corpora, which are add to the fragment.
+     * @param corpora A list of corpora, which are add to the fragment.
      */
     public void updateFragementWithSelectedCorpus(Set<String> corpora) {
         if (corpora != null && !corpora.isEmpty()) {
@@ -663,14 +677,11 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
     }
 
     /**
-     * Updates the browser address bar with the current query parameters and the
-     * query itself.
+     * Updates the browser address bar with the current query parameters and the query itself.
      *
-     * This is for convenient reloading the vaadin app and easy copying citation
-     * links.
+     * This is for convenient reloading the vaadin app and easy copying citation links.
      *
-     * @param q
-     *            The query where the parameters are extracted from.
+     * @param q The query where the parameters are extracted from.
      */
     public void updateFragment(DisplayedResultQuery q) {
         // set our fragment
@@ -678,7 +689,8 @@ public class SearchView extends GridLayout implements View, MimeTypeErrorListene
         UI.getCurrent().getPage().setUriFragment(lastEvaluatedFragment, false);
 
         // reset title
-        Page.getCurrent().setTitle(ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
+        Page.getCurrent().setTitle(
+                ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
     }
 
     @Override

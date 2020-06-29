@@ -1,17 +1,15 @@
 /*
  * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui.frequency;
 
@@ -30,6 +28,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Binder;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -64,7 +63,8 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener {
+public class FrequencyQueryPanel extends VerticalLayout
+        implements Serializable, FieldEvents.TextChangeListener {
 
     public class FieldFactory extends DefaultFieldFactory {
 
@@ -76,7 +76,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         public FieldFactory() {}
 
         @Override
-        public Field<?> createField(Container container, final Object itemId, Object propertyId, Component uiContext) {
+        public Field<?> createField(Container container, final Object itemId, Object propertyId,
+                Component uiContext) {
             if ("nr".equals(propertyId) || "annotation".equals(propertyId)) {
                 TextField txt = new TextField(container.getContainerProperty(itemId, propertyId));
                 txt.setWidth("100%");
@@ -174,8 +175,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
 
         lblErrorOrMsg = new Label("No node with explicit name in OR expression found! "
                 + "When using OR expression you need to explicitly name the nodes "
-                + "you want to include in the frequency analysis with \"#\", " + "like e.g. in <br />" + "<pre>"
-                + "(n1#tok=\"fun\" | n1#tok=\"severity\")" + "</pre>");
+                + "you want to include in the frequency analysis with \"#\", "
+                + "like e.g. in <br />" + "<pre>" + "(n1#tok=\"fun\" | n1#tok=\"severity\")"
+                + "</pre>");
         lblErrorOrMsg.setContentMode(ContentMode.HTML);
         lblErrorOrMsg.addStyleName("embedded-warning");
         lblErrorOrMsg.setWidth("100%");
@@ -203,7 +205,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         queryLayout.addComponent(tblFrequencyDefinition);
 
         if (controller != null) {
-            createAutomaticEntriesForQuery(state.getAql().getValue(), state.getQueryLanguage().getValue());
+            createAutomaticEntriesForQuery(state.getAql().getValue(),
+                    state.getQueryLanguageLegacy());
             updateQueryInfo(state.getAql().getValue());
         }
 
@@ -216,8 +219,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
             if (cbAutomaticMode.getValue()) {
                 tblFrequencyDefinition.removeAllItems();
                 if (controller != null) {
-                    createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
-                            FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
+                    createAutomaticEntriesForQuery(
+                            FrequencyQueryPanel.this.state.getAql().getValue(),
+                            FrequencyQueryPanel.this.state.getQueryLanguageLegacy());
                 }
             }
         });
@@ -229,7 +233,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
             int nr = 1;
             // get the highest number of values from the existing defitions
             for (Object id1 : tblFrequencyDefinition.getItemIds()) {
-                String textNr = (String) tblFrequencyDefinition.getItem(id1).getItemProperty("nr").getValue();
+                String textNr = (String) tblFrequencyDefinition.getItem(id1).getItemProperty("nr")
+                        .getValue();
                 try {
                     nr = Math.max(nr, Integer.parseInt(textNr));
                 } catch (NumberFormatException ex) {
@@ -237,8 +242,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
                 }
             }
             if (controller != null) {
-                List<NodeDesc> nodes = parseQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
-                        FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
+                List<NodeDesc> nodes =
+                        parseQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
+                                FrequencyQueryPanel.this.state.getQueryLanguageLegacy());
                 nr = Math.min(nr, nodes.size() - 1);
                 int id2 = counter++;
                 UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
@@ -275,7 +281,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
             tblFrequencyDefinition.removeAllItems();
             if (controller != null) {
                 createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
-                        FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
+                        FrequencyQueryPanel.this.state.getQueryLanguageLegacy());
             }
         });
         // layoutButtons.addComponent(btReset);
@@ -342,7 +348,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
             }
         });
 
-        btShowQuery = new Button("New Analysis", (ClickListener) event -> showQueryDefinitionPanel());
+        btShowQuery =
+                new Button("New Analysis", (ClickListener) event -> showQueryDefinitionPanel());
         btShowQuery.setVisible(false);
 
         pbQuery.setVisible(false);
@@ -355,11 +362,13 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
 
         if (controller != null) {
-            state.getSelectedCorpora().addDataProviderListener(event -> {
+            Binder<QueryUIState> binder = new Binder<>();
+            binder.addValueChangeListener(event -> {
                 createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
-                        FrequencyQueryPanel.this.state.getQueryLanguage().getValue());
+                        FrequencyQueryPanel.this.state.getQueryLanguageLegacy());
                 updateQueryInfo(FrequencyQueryPanel.this.state.getAql().getValue());
             });
+            binder.setBean(state);
         }
     }
 
@@ -368,7 +377,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         super.attach();
 
         if (controller != null) {
-            createAutomaticEntriesForQuery(state.getAql().getValue(), state.getQueryLanguage().getValue());
+            createAutomaticEntriesForQuery(state.getAql().getValue(),
+                    state.getQueryLanguageLegacy());
             updateQueryInfo(state.getAql().getValue());
         }
     }
@@ -451,14 +461,14 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         Set<String> result = new TreeSet<>();
         WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
         // get current corpus selection
-        Collection<String> corpusSelection = state.getSelectedCorpora().getItems();
+        Collection<String> corpusSelection = state.getSelectedCorpora();
         if (service != null) {
             try {
                 List<AnnisAttribute> atts = new LinkedList<>();
 
                 for (String corpus : corpusSelection) {
-                    atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
-                            .get(new GenericType<List<AnnisAttribute>>() {}));
+                    atts.addAll(service.path("query").path("corpora").path(corpus)
+                            .path("annotations").get(new GenericType<List<AnnisAttribute>>() {}));
                 }
                 for (AnnisAttribute a : atts) {
                     if (a.getType() == AnnisAttribute.Type.meta) {
@@ -490,8 +500,10 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         }
         // let the service parse the query
         WebResource res = Helper.getAnnisWebResource(UI.getCurrent());
-        List<NodeDesc> nodes = res.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(query))
-                .queryParam("query-language", queryLanguage.name()).get(new GenericType<List<NodeDesc>>() {});
+        List<NodeDesc> nodes =
+                res.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(query))
+                        .queryParam("query-language", queryLanguage.name())
+                        .get(new GenericType<List<NodeDesc>>() {});
 
         return nodes;
     }
@@ -516,13 +528,13 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     @Override
     public void textChange(FieldEvents.TextChangeEvent event) {
         if (cbAutomaticMode.getValue()) {
-            createAutomaticEntriesForQuery(event.getText(), state.getQueryLanguage().getValue());
+            createAutomaticEntriesForQuery(event.getText(), state.getQueryLanguageLegacy());
         }
         updateQueryInfo(event.getText());
     }
 
     private void updateQueryInfo(String query) {
-        Collection<String> selectedCorpora = state.getSelectedCorpora().getItems();
+        Collection<String> selectedCorpora = state.getSelectedCorpora();
         if (selectedCorpora.isEmpty()) {
             lblCorpusList.setValue("none");
         } else {
