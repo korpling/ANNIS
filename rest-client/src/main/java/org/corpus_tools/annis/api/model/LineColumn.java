@@ -25,36 +25,62 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
 
 /**
- * The UUID for the background job. Status can be queried via the /job endpoint and this UUID.
+ * LineColumn
  */
-@ApiModel(description = "The UUID for the background job. Status can be queried via the /job endpoint and this UUID.")
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-29T10:18:56.988+02:00[Europe/Berlin]")
-public class InlineResponse202 {
-  public static final String SERIALIZED_NAME_UUID = "uuid";
-  @SerializedName(SERIALIZED_NAME_UUID)
-  private String uuid;
+public class LineColumn {
+  public static final String SERIALIZED_NAME_LINE = "line";
+  @SerializedName(SERIALIZED_NAME_LINE)
+  private Integer line;
+
+  public static final String SERIALIZED_NAME_COLUMN = "column";
+  @SerializedName(SERIALIZED_NAME_COLUMN)
+  private Integer column;
 
 
-  public InlineResponse202 uuid(String uuid) {
+  public LineColumn line(Integer line) {
     
-    this.uuid = uuid;
+    this.line = line;
     return this;
   }
 
    /**
-   * Get uuid
-   * @return uuid
+   * Get line
+   * @return line
   **/
   @javax.annotation.Nullable
-  @ApiModelProperty(example = "7dac334e-7f8f-4f1c-919e-02912527f329", value = "")
+  @ApiModelProperty(value = "")
 
-  public String getUuid() {
-    return uuid;
+  public Integer getLine() {
+    return line;
   }
 
 
-  public void setUuid(String uuid) {
-    this.uuid = uuid;
+  public void setLine(Integer line) {
+    this.line = line;
+  }
+
+
+  public LineColumn column(Integer column) {
+    
+    this.column = column;
+    return this;
+  }
+
+   /**
+   * Get column
+   * @return column
+  **/
+  @javax.annotation.Nullable
+  @ApiModelProperty(value = "")
+
+  public Integer getColumn() {
+    return column;
+  }
+
+
+  public void setColumn(Integer column) {
+    this.column = column;
   }
 
 
@@ -66,21 +92,23 @@ public class InlineResponse202 {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse202 inlineResponse202 = (InlineResponse202) o;
-    return Objects.equals(this.uuid, inlineResponse202.uuid);
+    LineColumn lineColumn = (LineColumn) o;
+    return Objects.equals(this.line, lineColumn.line) &&
+        Objects.equals(this.column, lineColumn.column);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(uuid);
+    return Objects.hash(line, column);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse202 {\n");
-    sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
+    sb.append("class LineColumn {\n");
+    sb.append("    line: ").append(toIndentedString(line)).append("\n");
+    sb.append("    column: ").append(toIndentedString(column)).append("\n");
     sb.append("}");
     return sb.toString();
   }

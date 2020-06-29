@@ -163,6 +163,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/CountExtra'
           description: The extended count result.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphAnnisError'
+          description: Query could not be parsed or corpus does not exist
       summary: Count the number of results for a query.
       tags:
       - search
@@ -190,11 +196,17 @@ paths:
                   GUM/GUM_whow_skittles#tok_925 GUM/GUM_whow_skittles#tok_926 GUM/GUM_whow_skittles#tok_926 GUM/GUM_whow_skittles#tok_927
                 type: string
           description: The matches for the given query.
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphAnnisError'
+          description: Query could not be parsed or corpus does not exist
       summary: Find results for a query and return the IDs of the matched nodes.
       tags:
       - search
       x-contentType: application/json
-      x-accepts: text/plain
+      x-accepts: application/json
   /search/frequency:
     post:
       operationId: frequency
@@ -212,10 +224,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/FrequencyTable'
           description: Frequency of different annotation values as table
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphAnnisError'
+          description: Query could not be parsed or corpus does not exist
       summary: Find results for a query and return the IDs of the matched nodes.
       tags:
       - search
       x-contentType: application/json
+      x-accepts: application/json
+  /search/node-descriptions:
+    get:
+      operationId: nodeDescriptions
+      parameters:
+      - description: The query to parse
+        example: pos="NN" . second#tok
+        explode: true
+        in: query
+        name: query
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: query_language
+        required: false
+        schema:
+          $ref: '#/components/schemas/QueryLanguage'
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+              - alternative: 0,
+                query_fragment: pos="NN"
+                variable: "1"
+                anno_name: pos
+              - alternative: 0,
+                query_fragment: tok
+                variable: second
+                anno_name: null
+              schema:
+                $ref: '#/components/schemas/QueryAttributeDescription'
+          description: List of query node descriptions
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphAnnisError'
+          description: Query could not be parsed
+      summary: Parses a query and returns a description for all the nodes in the query.
+      tags:
+      - search
       x-accepts: application/json
   /corpora/{corpus}/subgraph:
     post:
@@ -945,6 +1009,59 @@ components:
       - RightToken
       - PartOf
       type: string
+    QueryAttributeDescription:
+      description: Description of an attribute of a query.
+      example:
+        query_fragment: query_fragment
+        alternative: 0
+        variable: variable
+        anno_name: anno_name
+      properties:
+        alternative:
+          description: ID of the alternative this attribute is part of.
+          type: integer
+        query_fragment:
+          description: Textual representation of the query fragment for this attribute.
+          type: string
+        variable:
+          description: Variable name of this attribute.
+          type: string
+        anno_name:
+          description: Optional annotation name represented by this attribute.
+          nullable: true
+          type: string
+      type: object
+    LineColumn:
+      properties:
+        line:
+          type: integer
+        column:
+          type: integer
+      type: object
+    LineColumnRange:
+      properties:
+        start:
+          $ref: '#/components/schemas/LineColumn'
+        end:
+          $ref: '#/components/schemas/LineColumn'
+      required:
+      - start
+      type: object
+    GraphAnnisError:
+      properties:
+        AQLSyntaxError:
+          $ref: '#/components/schemas/GraphAnnisError_AQLSyntaxError'
+        AQLSemanticError:
+          $ref: '#/components/schemas/GraphAnnisError_AQLSyntaxError'
+        ImpossibleSearch:
+          type: string
+        LoadingGraphFailed:
+          $ref: '#/components/schemas/GraphAnnisError_LoadingGraphFailed'
+        NoSuchCorpus:
+          type: string
+        CorpusExists:
+          type: string
+      type: object
     FrequencyTable:
       description: |
         Definition of the result of a `frequency` query. This is an array of rows, and each row is an array of columns with the different attribute values and a number of matches having this combination of attribute values.
@@ -1165,6 +1282,18 @@ components:
             generated.
           example: root
           nullable: false
+          type: string
+    GraphAnnisError_AQLSyntaxError:
+      properties:
+        desc:
+          type: string
+        location:
+          $ref: '#/components/schemas/LineColumnRange'
+      required:
+      - desc
+    GraphAnnisError_LoadingGraphFailed:
+      properties:
+        name:
           type: string
     CorpusConfiguration_context:
       description: Configuration for configuring context in subgraph queries.

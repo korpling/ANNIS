@@ -23,38 +23,64 @@ import com.google.gson.stream.JsonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
+import org.corpus_tools.annis.api.model.LineColumnRange;
 
 /**
- * The UUID for the background job. Status can be queried via the /job endpoint and this UUID.
+ * GraphAnnisErrorAQLSyntaxError
  */
-@ApiModel(description = "The UUID for the background job. Status can be queried via the /job endpoint and this UUID.")
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-29T10:18:56.988+02:00[Europe/Berlin]")
-public class InlineResponse202 {
-  public static final String SERIALIZED_NAME_UUID = "uuid";
-  @SerializedName(SERIALIZED_NAME_UUID)
-  private String uuid;
+public class GraphAnnisErrorAQLSyntaxError {
+  public static final String SERIALIZED_NAME_DESC = "desc";
+  @SerializedName(SERIALIZED_NAME_DESC)
+  private String desc;
+
+  public static final String SERIALIZED_NAME_LOCATION = "location";
+  @SerializedName(SERIALIZED_NAME_LOCATION)
+  private LineColumnRange location;
 
 
-  public InlineResponse202 uuid(String uuid) {
+  public GraphAnnisErrorAQLSyntaxError desc(String desc) {
     
-    this.uuid = uuid;
+    this.desc = desc;
     return this;
   }
 
    /**
-   * Get uuid
-   * @return uuid
+   * Get desc
+   * @return desc
   **/
-  @javax.annotation.Nullable
-  @ApiModelProperty(example = "7dac334e-7f8f-4f1c-919e-02912527f329", value = "")
+  @ApiModelProperty(required = true, value = "")
 
-  public String getUuid() {
-    return uuid;
+  public String getDesc() {
+    return desc;
   }
 
 
-  public void setUuid(String uuid) {
-    this.uuid = uuid;
+  public void setDesc(String desc) {
+    this.desc = desc;
+  }
+
+
+  public GraphAnnisErrorAQLSyntaxError location(LineColumnRange location) {
+    
+    this.location = location;
+    return this;
+  }
+
+   /**
+   * Get location
+   * @return location
+  **/
+  @javax.annotation.Nullable
+  @ApiModelProperty(value = "")
+
+  public LineColumnRange getLocation() {
+    return location;
+  }
+
+
+  public void setLocation(LineColumnRange location) {
+    this.location = location;
   }
 
 
@@ -66,21 +92,23 @@ public class InlineResponse202 {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse202 inlineResponse202 = (InlineResponse202) o;
-    return Objects.equals(this.uuid, inlineResponse202.uuid);
+    GraphAnnisErrorAQLSyntaxError graphAnnisErrorAQLSyntaxError = (GraphAnnisErrorAQLSyntaxError) o;
+    return Objects.equals(this.desc, graphAnnisErrorAQLSyntaxError.desc) &&
+        Objects.equals(this.location, graphAnnisErrorAQLSyntaxError.location);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(uuid);
+    return Objects.hash(desc, location);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse202 {\n");
-    sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
+    sb.append("class GraphAnnisErrorAQLSyntaxError {\n");
+    sb.append("    desc: ").append(toIndentedString(desc)).append("\n");
+    sb.append("    location: ").append(toIndentedString(location)).append("\n");
     sb.append("}");
     return sb.toString();
   }

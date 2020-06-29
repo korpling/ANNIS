@@ -25,36 +25,35 @@ import io.swagger.annotations.ApiModelProperty;
 import java.io.IOException;
 
 /**
- * The UUID for the background job. Status can be queried via the /job endpoint and this UUID.
+ * GraphAnnisErrorLoadingGraphFailed
  */
-@ApiModel(description = "The UUID for the background job. Status can be queried via the /job endpoint and this UUID.")
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-29T10:18:56.988+02:00[Europe/Berlin]")
-public class InlineResponse202 {
-  public static final String SERIALIZED_NAME_UUID = "uuid";
-  @SerializedName(SERIALIZED_NAME_UUID)
-  private String uuid;
+public class GraphAnnisErrorLoadingGraphFailed {
+  public static final String SERIALIZED_NAME_NAME = "name";
+  @SerializedName(SERIALIZED_NAME_NAME)
+  private String name;
 
 
-  public InlineResponse202 uuid(String uuid) {
+  public GraphAnnisErrorLoadingGraphFailed name(String name) {
     
-    this.uuid = uuid;
+    this.name = name;
     return this;
   }
 
    /**
-   * Get uuid
-   * @return uuid
+   * Get name
+   * @return name
   **/
   @javax.annotation.Nullable
-  @ApiModelProperty(example = "7dac334e-7f8f-4f1c-919e-02912527f329", value = "")
+  @ApiModelProperty(value = "")
 
-  public String getUuid() {
-    return uuid;
+  public String getName() {
+    return name;
   }
 
 
-  public void setUuid(String uuid) {
-    this.uuid = uuid;
+  public void setName(String name) {
+    this.name = name;
   }
 
 
@@ -66,21 +65,21 @@ public class InlineResponse202 {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    InlineResponse202 inlineResponse202 = (InlineResponse202) o;
-    return Objects.equals(this.uuid, inlineResponse202.uuid);
+    GraphAnnisErrorLoadingGraphFailed graphAnnisErrorLoadingGraphFailed = (GraphAnnisErrorLoadingGraphFailed) o;
+    return Objects.equals(this.name, graphAnnisErrorLoadingGraphFailed.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(uuid);
+    return Objects.hash(name);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class InlineResponse202 {\n");
-    sb.append("    uuid: ").append(toIndentedString(uuid)).append("\n");
+    sb.append("class GraphAnnisErrorLoadingGraphFailed {\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
   }
