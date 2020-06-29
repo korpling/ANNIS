@@ -371,12 +371,12 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
         String corpusName = null;
         // find all covered token
         List<String> matchedIDs = new LinkedList<>();
-        for (java.net.URI id : m.getSaltIDs()) {
+        for (String id : m.getSaltIDs()) {
             if (corpusName == null) {
                 // use first node as template for the corpus name
                 corpusName = CommonHelper.getCorpusPath(id).get(0);
             }
-            matchedIDs.add(id.toASCIIString());
+            matchedIDs.add(id);
         }
         Optional<String> segmentation = Optional.empty();
         if (annoExt.getSegmentationLayer() != null && !annoExt.getSegmentationLayer().isEmpty()) {
@@ -790,8 +790,8 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
                 List<URI> certainDocumentIDs = new LinkedList<>();
                 List<URI> possibleCorpusIDs = new LinkedList<>();
 
-                for (java.net.URI rawID : m.getSaltIDs()) {
-                    URI id = URI.createURI(rawID.toASCIIString());
+                for (String rawID : m.getSaltIDs()) {
+                    URI id = URI.createURI(rawID);
                     if (id.fragment() == null) {
                         possibleCorpusIDs.add(id);
                     } else {

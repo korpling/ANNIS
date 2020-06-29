@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.salt.common.SCorpus;
 import org.slf4j.LoggerFactory;
 
@@ -106,47 +107,44 @@ public class SingleCorpusResultPanel extends CssLayout {
         for (SCorpus c : this.result) {
             matchIdx++;
 
-            try {
-                List<String> path = CommonHelper.getCorpusPath(new URI(c.getPath().toString()));
+            List<String> path = CommonHelper.getCorpusPath(c.getPath().toString());
 
-                HorizontalLayout corpusInfoLayout = new HorizontalLayout();
-                corpusPaths.addComponent(corpusInfoLayout);
+            HorizontalLayout corpusInfoLayout = new HorizontalLayout();
+            corpusPaths.addComponent(corpusInfoLayout);
 
-                // build label
-                StringBuilder sb = new StringBuilder("Path: ");
-                sb.append(StringUtils.join(path, " > "));
+            // build label
+            StringBuilder sb = new StringBuilder("Path: ");
+            sb.append(StringUtils.join(path, " > "));
 
-                Button btInfo;
-                btInfo = new Button();
-                btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
-                btInfo.setIcon(ICON_RESOURCE);
-                btInfo.setDescription("Show metadata");
-                btInfo.addClickListener(event -> {
-                    if (event.getButton() == btInfo && result != null) {
-                        Window infoWindow = new Window("Info for " + c.getId());
+            Button btInfo;
+            btInfo = new Button();
+            btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
+            btInfo.setIcon(ICON_RESOURCE);
+            btInfo.setDescription("Show metadata");
+            btInfo.addClickListener(event -> {
+                if (event.getButton() == btInfo && result != null) {
+                    Window infoWindow = new Window("Info for " + c.getId());
 
-                        infoWindow.setModal(false);
-                        MetaDataPanel meta = new MetaDataPanel(path.get(0), Optional.of(path.get(path.size() - 1)));
-                        infoWindow.setContent(meta);
-                        infoWindow.setWidth("400px");
-                        infoWindow.setHeight("400px");
+                    infoWindow.setModal(false);
+                    MetaDataPanel meta = new MetaDataPanel(path.get(0), Optional.of(path.get(path.size() - 1)));
+                    infoWindow.setContent(meta);
+                    infoWindow.setWidth("400px");
+                    infoWindow.setHeight("400px");
 
-                        UI.getCurrent().addWindow(infoWindow);
-                    }
+                    UI.getCurrent().addWindow(infoWindow);
+                }
 
-                });
-                corpusInfoLayout.addComponent(btInfo);
+            });
+            corpusInfoLayout.addComponent(btInfo);
 
-                Label lblPath = new Label(sb.toString());
-                lblPath.addStyleName("path-label");
-                // lblPath.addStyleName(MatchedNodeColors.colorClassByMatch(matchIdx));
+            Label lblPath = new Label(sb.toString());
+            lblPath.addStyleName("path-label");
+            // lblPath.addStyleName(MatchedNodeColors.colorClassByMatch(matchIdx));
 
-                lblPath.setWidth("100%");
-                lblPath.setHeight("-1px");
-                corpusInfoLayout.addComponent(lblPath);
-            } catch (URISyntaxException ex) {
-                log.error("Could not get path for (sub-) corpus", ex);
-            }
+            lblPath.setWidth("100%");
+            lblPath.setHeight("-1px");
+            corpusInfoLayout.addComponent(lblPath);
+        
 
         }
 

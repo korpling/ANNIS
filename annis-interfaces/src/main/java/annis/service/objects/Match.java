@@ -68,18 +68,16 @@ public class Match implements Serializable {
     }
 
     for (String singleMatch : splitter.split(raw)) {
-      URI uri;
-
+      
       String id = "";
       String anno = null;
-      if (singleMatch.startsWith("salt:/")) {
+      // split into the annotation namespace/name and the salt URI
+      List<String> components = annoIDSplitter.splitToList(singleMatch);
+
+      int componentsSize = components.size();
+      if (components.size() == 1) {
         id = singleMatch;
       } else {
-        // split into the annotation namespace/name and the salt URI
-        List<String> components = annoIDSplitter.splitToList(singleMatch);
-
-        int componentsSize = components.size();
-
         Preconditions.checkArgument(componentsSize == 3 || componentsSize == 2,
             "A match containing " + "annotation information always has to have the form "
                 + "ns::name::salt:/....  or name::salt:/....");
@@ -103,44 +101,24 @@ public class Match implements Serializable {
         anno = anno.replace("%20", " ").replace("%25", "%").replace("%2C", ",");
       }
 
-      try {
-
-        uri = new URI(id).normalize();
-
-        if (!"salt".equals(uri.getScheme())) {
-          throw new URISyntaxException("not a Salt id", uri.toString());
-        }
-        // check if the path ends with "/" (which was wrongly used by older ANNIS
-        // versions)
-        String path = uri.getPath();
-        if (path.endsWith("/")) {
-          path = path.substring(0, path.length() - 1);
-        }
-        // recreate the URI with the decoded path (returned by getPath())
-        uri = new URI(uri.getScheme(), uri.getHost(), path, uri.getFragment());
-
-      } catch (URISyntaxException ex) {
-        log.error("Invalid syntax for ID " + singleMatch, ex);
-        continue;
-      }
-      match.addSaltId(uri, anno);
+      match.addSaltId(id, anno);
     }
 
     return match;
   }
 
-  public static String singleMatchToString(URI uri, String anno) {
-    if (uri != null) {
-      String v = uri.toASCIIString();
+  public static String singleMatchToString(String id, String anno) {
+    if (id != null) {
+      String v = id;
       if (anno != null && !anno.isEmpty()) {
-        v = spaceEscaper.escape(anno) + "::" + uri;
+        v = spaceEscaper.escape(anno) + "::" + id;
       }
       return v;
     }
     return "";
   }
 
-  private List<URI> saltIDs;
+  private List<String> saltIDs;
 
   private List<String> annos;
 
@@ -149,7 +127,7 @@ public class Match implements Serializable {
     annos = new ArrayList<>();
   }
 
-  public Match(Collection<URI> originalIDs) {
+  public Match(Collection<String> originalIDs) {
     saltIDs = new ArrayList<>(originalIDs);
     annos = new ArrayList<>(saltIDs.size());
     for (int i = 0; i < saltIDs.size(); i++) {
@@ -157,16 +135,16 @@ public class Match implements Serializable {
     }
   }
 
-  public Match(Collection<URI> originalIDs, Collection<String> originalAnnos) {
+  public Match(Collection<String> originalIDs, Collection<String> originalAnnos) {
     saltIDs = new ArrayList<>(originalIDs);
     annos = new ArrayList<>(originalAnnos);
   }
 
-  public void addSaltId(URI id) {
+  public void addSaltId(String id) {
     addSaltId(id, null);
   }
 
-  public void addSaltId(URI id, String anno) {
+  public void addSaltId(String id, String anno) {
     if (id != null) {
       saltIDs.add(id);
       if (anno == null) {
@@ -229,7 +207,7 @@ public class Match implements Serializable {
    * @return a list of IDs as URI
    */
   @XmlElement(name = "id")
-  public List<URI> getSaltIDs() {
+  public List<String> getSaltIDs() {
     return saltIDs;
   }
 
@@ -250,7 +228,7 @@ public class Match implements Serializable {
    * @see #getSaltIDs()
    * @param saltIDs the list of IDs as URI
    */
-  public void setSaltIDs(List<URI> saltIDs) {
+  public void setSaltIDs(List<String> saltIDs) {
     this.saltIDs = saltIDs;
   }
 
@@ -262,12 +240,12 @@ public class Match implements Serializable {
   @Override
   public String toString() {
     if (saltIDs != null && annos != null) {
-      Iterator<URI> itID = saltIDs.iterator();
+      Iterator<String> itID = saltIDs.iterator();
       Iterator<String> itAnno = annos.iterator();
 
       LinkedList<String> asString = new LinkedList<>();
       while (itID.hasNext() && itAnno.hasNext()) {
-        URI u = itID.next();
+        String u = itID.next();
         String anno = itAnno.next();
         if (u != null) {
           asString.add(singleMatchToString(u, anno));

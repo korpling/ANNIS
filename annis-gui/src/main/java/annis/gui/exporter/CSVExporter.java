@@ -218,7 +218,7 @@ public class CSVExporter extends BaseMatrixExporter {
         // TODO cache the metadata
         if (!metakeys.isEmpty()) {
             // TODO is this the best way to get the corpus name?
-            String corpus_name = CommonHelper.getCorpusPath(java.net.URI.create(graph.getDocument().getId())).get(0);
+            String corpus_name = CommonHelper.getCorpusPath(graph.getDocument().getId().toString()).get(0);
             Map<String, Annotation> allMetaAnnos = Helper.getMetaData(corpus_name, graph.getDocument().getName(), ui)
                     .stream().collect(Collectors.toMap(Annotation::getName, Function.identity()));
 
