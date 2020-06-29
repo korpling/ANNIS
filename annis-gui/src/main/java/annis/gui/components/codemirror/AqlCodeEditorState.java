@@ -64,7 +64,7 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
             if (orig.getLocation() != null) {
                 if (orig.getLocation().getStart() != null) {
                     this.startLine = orig.getLocation().getStart().getLine();
-                    this.startColumn = orig.getLocation().getStart().getLine();
+                    this.startColumn = orig.getLocation().getStart().getColumn();
                 }
                 if (orig.getLocation().getEnd() != null) {
                     this.endLine = orig.getLocation().getEnd().getLine();
