@@ -64,6 +64,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -294,8 +295,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
             if (corpusGraph.getDocuments().isEmpty()) {
 
                 Set<SCorpus> matchedCorpora = new LinkedHashSet<>();
-                for (URI id : m.getSaltIDs()) {
-                    SNode n = corpusGraph.getNode(id.toASCIIString());
+                for (String id : m.getSaltIDs()) {
+                    SNode n = corpusGraph.getNode(id);
                     if (n instanceof SCorpus) {
                         matchedCorpora.add((SCorpus) n);
                     }
@@ -464,9 +465,9 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
      * @param query
      *            Represents a limited query
      */
-    public void showMatchSearchInProgress(PagedResultQuery query) {
+    public void showMatchSearchInProgress(String segmentationName) {
         resultLayout.removeAllComponents();
-        segmentationName = query.getSegmentation();
+        segmentationName = segmentationName;
     }
 
     public void showNoResult() {

@@ -183,9 +183,8 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
         VisualizerPlugin visPlugin = ps.getVisualizer(entry.getVisType());
         if (visPlugin != null && visPlugin.isUsingText()) {
             // generate a service URL that gets the whole document
-            URI firstID = match.getSaltIDs().get(0);
-            String pathAsString = firstID.getRawPath();
-            List<String> path = Splitter.on('/').omitEmptyStrings().trimResults().splitToList(pathAsString);
+            String firstID = match.getSaltIDs().get(0);
+            List<String> path = Splitter.on('/').omitEmptyStrings().trimResults().splitToList(firstID);
             String corpusName = path.get(0);
             String documentName = path.get(path.size() - 1);
             try {

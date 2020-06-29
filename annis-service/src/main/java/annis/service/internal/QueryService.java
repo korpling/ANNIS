@@ -170,7 +170,7 @@ public class QueryService {
 
         for (Match singleMatch : matches.getMatches()) {
             // collect list of used corpora
-            for (java.net.URI u : singleMatch.getSaltIDs()) {
+            for (String u : singleMatch.getSaltIDs()) {
                 corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
             }
         }

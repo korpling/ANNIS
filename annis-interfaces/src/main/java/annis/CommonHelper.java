@@ -70,9 +70,9 @@ public class CommonHelper {
   public static void addMatchToDocumentGraph(Match match, SDocument document) {
     List<String> allUrisAsString = new LinkedList<>();
     long i = 1;
-    for (URI u : match.getSaltIDs()) {
-      allUrisAsString.add(u.toASCIIString().replace(",", "%2C"));
-      SNode matchedNode = document.getDocumentGraph().getNode(u.toASCIIString());
+    for (String u : match.getSaltIDs()) {
+      allUrisAsString.add(u.replace(",", "%2C"));
+      SNode matchedNode = document.getDocumentGraph().getNode(u);
       // set the feature for this specific node
       if (matchedNode != null) {
         SFeature existing =
@@ -232,8 +232,8 @@ public class CommonHelper {
     return result;
   }
 
-  public static List<String> getCorpusPath(URI uri) {
-    String rawPath = StringUtils.strip(uri.getRawPath(), "/ \t");
+  public static List<String> getCorpusPath(String uri) {
+    String rawPath = StringUtils.strip(uri, "/ \t");
 
     // split on raw path (so "/" in corpus names are still encoded)
     String[] path = rawPath.split("/");
