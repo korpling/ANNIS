@@ -28,7 +28,7 @@ import java.io.IOException;
  * Description of an attribute of a query.
  */
 @ApiModel(description = "Description of an attribute of a query.")
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-29T10:18:56.988+02:00[Europe/Berlin]")
+@javax.annotation.processing.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2020-06-29T10:18:56.988+02:00[Europe/Berlin]")
 public class QueryAttributeDescription {
   public static final String SERIALIZED_NAME_ALTERNATIVE = "alternative";
   @SerializedName(SERIALIZED_NAME_ALTERNATIVE)
