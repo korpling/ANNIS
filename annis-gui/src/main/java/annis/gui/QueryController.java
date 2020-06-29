@@ -16,6 +16,7 @@ package annis.gui;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
@@ -110,6 +112,7 @@ public class QueryController implements Serializable {
         }
     }
 
+
     /**
      * Only changes the value of the property if it is not equals to the old one.
      * 
@@ -136,10 +139,9 @@ public class QueryController implements Serializable {
 
         this.state.getAql().addValueChangeListener(event -> validateQuery());
 
-        this.state.getSelectedCorpora().addDataProviderListener(event -> validateQuery());
-
-        this.state.getQueryLanguage().addListener((ValueChangeListener) event -> validateQuery());
-
+        Binder<QueryUIState> binder = new Binder<>();
+        binder.setBean(this.state);
+        binder.addValueChangeListener(event -> validateQuery());
     }
 
     /**
@@ -240,7 +242,7 @@ public class QueryController implements Serializable {
 
     public void corpusSelectionChangedInBackground() {
         searchView.getControlPanel().getSearchOptions().updateSearchPanelConfigurationInBackground(
-                getState().getSelectedCorpora().getItems(), ui);
+                getState().getSelectedCorpora(), ui);
     }
 
     public void executeExport(ExportPanel panel, EventBus eventBus) {
@@ -274,7 +276,7 @@ public class QueryController implements Serializable {
             Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
             panel.showQueryDefinitionPanel();
             return;
-        } else if (state.getSelectedCorpora().getItems().isEmpty()) {
+        } else if (state.getSelectedCorpora().isEmpty()) {
             Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
             panel.showQueryDefinitionPanel();
             return;
@@ -290,8 +292,8 @@ public class QueryController implements Serializable {
         }
 
         FrequencyQuery query = QueryGenerator.frequency().query(state.getAql().getValue())
-                .corpora(new LinkedHashSet<>(state.getSelectedCorpora().getItems()))
-                .queryLanguage(state.getQueryLanguage().getValue()).def(freqDefinition).build();
+                .corpora(new LinkedHashSet<>(state.getSelectedCorpora()))
+                .queryLanguage(state.getQueryLanguageLegacy()).def(freqDefinition).build();
 
         checkQuirksMode(query);
 
@@ -315,7 +317,7 @@ public class QueryController implements Serializable {
             getState().getOffset().setValue(0l);
             getState().getSelectedMatches().setValue(new TreeSet<Long>());
             // get the value for the visible segmentation from the configured context
-            Collection<String> selectedCorpora = getState().getSelectedCorpora().getItems();
+            Collection<String> selectedCorpora = getState().getSelectedCorpora();
             CorpusConfig config = new CorpusConfig();
             if (selectedCorpora != null && !selectedCorpora.isEmpty()) {
                 config = ui.getCorpusConfigWithCache(selectedCorpora.iterator().next());
@@ -424,8 +426,8 @@ public class QueryController implements Serializable {
      */
     public ExportQuery getExportQuery() {
         return new ExportQueryGenerator().query(state.getAql().getValue())
-                .corpora(new LinkedHashSet<>(state.getSelectedCorpora().getItems()))
-                .queryLanguage(state.getQueryLanguage().getValue())
+                .corpora(new LinkedHashSet<>(state.getSelectedCorpora()))
+                .queryLanguage(state.getQueryLanguageLegacy())
                 .left(state.getLeftContext().getValue()).right(state.getRightContext().getValue())
                 .segmentation(state.getVisibleBaseText().getValue())
                 .exporter(state.getExporter().getValue())
@@ -452,8 +454,8 @@ public class QueryController implements Serializable {
      */
     public DisplayedResultQuery getSearchQuery() {
         return QueryGenerator.displayed().query(state.getAql().getValue())
-                .corpora(new LinkedHashSet<>(state.getSelectedCorpora().getItems()))
-                .queryLanguage(state.getQueryLanguage().getValue())
+                .corpora(new LinkedHashSet<>(state.getSelectedCorpora()))
+                .queryLanguage(state.getQueryLanguageLegacy())
                 .left(state.getLeftContext().getValue()).right(state.getRightContext().getValue())
                 .segmentation(state.getContextSegmentation().getValue())
                 .baseText(state.getVisibleBaseText().getValue()).limit(state.getLimit().getValue())
@@ -535,9 +537,13 @@ public class QueryController implements Serializable {
         // only change the values if actually changed (the value change listeners should
         // not be triggered if not necessary)
         setIfNew(state.getAql(), q.getQuery());
-        setIfNew(state.getQueryLanguage(), q.getQueryLanguage());
-        setIfNew(state.getSelectedCorpora(), q.getCorpora());
-
+        if(q.getQueryLanguage() != state.getQueryLanguageLegacy()) {
+            state.setQueryLanguageLegacy(q.getQueryLanguage());
+        }
+        if(!Objects.deepEquals(state.getSelectedCorpora(), q.getCorpora())) {
+            state.setSelectedCorpora(q.getCorpora());
+        }
+ 
         if (q instanceof ContextualizedQuery) {
             setIfNew(state.getLeftContext(), ((ContextualizedQuery) q).getLeftContext());
             setIfNew(state.getRightContext(), ((ContextualizedQuery) q).getRightContext());
@@ -584,8 +590,8 @@ public class QueryController implements Serializable {
                     public void onSuccess(List<QueryAttributeDescription> nodes) {
                         qp.setNodes(nodes);
 
-                        if (state.getSelectedCorpora().getItems() == null
-                                || state.getSelectedCorpora().getItems().isEmpty()) {
+                        if (state.getSelectedCorpora() == null
+                                || state.getSelectedCorpora().isEmpty()) {
                             qp.setStatus(
                                     "Please select a corpus from the list below, then click on \"Search\".");
                         } else {

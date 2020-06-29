@@ -1,17 +1,15 @@
 /*
  * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui.controlpanel;
 
@@ -23,12 +21,12 @@ import annis.libgui.Helper;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.OrderType;
-import annis.service.objects.QueryLanguage;
 import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Binder;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
@@ -47,6 +45,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +64,8 @@ public class SearchOptionsPanel extends FormLayout {
         private final QueryUIState state;
         private final boolean corpusSelectionChanged;
 
-        public CorpusConfigUpdater(AnnisUI ui, Collection<String> corpora, boolean corpusSelectionChanged) {
+        public CorpusConfigUpdater(AnnisUI ui, Collection<String> corpora,
+                boolean corpusSelectionChanged) {
             this.ui = ui;
             this.state = ui.getQueryState();
             this.corpora = corpora;
@@ -125,7 +126,8 @@ public class SearchOptionsPanel extends FormLayout {
                     state.getLeftContext().setValue(defaultCtx);
                     state.getRightContext().setValue(defaultCtx);
                 }
-                updateSegmentations(segment, segmentations, updateStateFromConfig && !corpora.isEmpty());
+                updateSegmentations(segment, segmentations,
+                        updateStateFromConfig && !corpora.isEmpty());
                 if (resultsPerPage != null && updateStateFromConfig && corpusSelectionChanged) {
                     state.getLimit().setValue(resultsPerPage);
                 }
@@ -147,7 +149,8 @@ public class SearchOptionsPanel extends FormLayout {
         private final IndexedContainer container;
         private final Property<Integer> prop;
 
-        public CustomContext(AtomicInteger maxCtx, IndexedContainer container, Property<Integer> prop) {
+        public CustomContext(AtomicInteger maxCtx, IndexedContainer container,
+                Property<Integer> prop) {
             this.maxCtx = maxCtx;
             this.container = container;
             this.prop = prop;
@@ -175,7 +178,8 @@ public class SearchOptionsPanel extends FormLayout {
                 Notification.show("invalid context input", "Please enter valid numbers [0-9]",
                         Notification.Type.WARNING_MESSAGE);
             } catch (IllegalArgumentException ex) {
-                Notification.show("invalid context input", ex.getMessage(), Notification.Type.WARNING_MESSAGE);
+                Notification.show("invalid context input", ex.getMessage(),
+                        Notification.Type.WARNING_MESSAGE);
             }
 
         }
@@ -207,10 +211,11 @@ public class SearchOptionsPanel extends FormLayout {
                 container.sort(null, null);
                 prop.setValue(i);
             } catch (NumberFormatException ex) {
-                Notification.show("invalid result per page input", "Please enter valid numbers [0-9]",
-                        Notification.Type.WARNING_MESSAGE);
+                Notification.show("invalid result per page input",
+                        "Please enter valid numbers [0-9]", Notification.Type.WARNING_MESSAGE);
             } catch (IllegalArgumentException ex) {
-                Notification.show("invalid result per page input", ex.getMessage(), Notification.Type.WARNING_MESSAGE);
+                Notification.show("invalid result per page input", ex.getMessage(),
+                        Notification.Type.WARNING_MESSAGE);
             }
 
         }
@@ -232,7 +237,8 @@ public class SearchOptionsPanel extends FormLayout {
         }
 
         @Override
-        public void setSortProperties(Container.Sortable container, Object[] propertyId, boolean[] ascending) {
+        public void setSortProperties(Container.Sortable container, Object[] propertyId,
+                boolean[] ascending) {
             // does nothing
         }
 
@@ -247,7 +253,8 @@ public class SearchOptionsPanel extends FormLayout {
 
     public static final String KEY_DEFAULT_CONTEXT_SEGMENTATION = "default-context-segmentation";
 
-    public static final String KEY_DEFAULT_BASE_TEXT_SEGMENTATION = "default-base-text-segmentation";
+    public static final String KEY_DEFAULT_BASE_TEXT_SEGMENTATION =
+            "default-base-text-segmentation";
 
     public static final String KEY_MAX_CONTEXT_LEFT = "max-context-left";
 
@@ -267,7 +274,8 @@ public class SearchOptionsPanel extends FormLayout {
 
     private static final Logger log = LoggerFactory.getLogger(SearchOptionsPanel.class);
     // TODO: make this configurable
-    private static final List<Integer> PREDEFINED_PAGE_SIZES = ImmutableList.of(1, 2, 5, 10, 20, 25);
+    private static final List<Integer> PREDEFINED_PAGE_SIZES =
+            ImmutableList.of(1, 2, 5, 10, 20, 25);
 
     public static final List<Integer> PREDEFINED_CONTEXTS = ImmutableList.of(0, 1, 2, 5, 10, 20);
 
@@ -285,12 +293,15 @@ public class SearchOptionsPanel extends FormLayout {
         if (service != null) {
             for (String corpus : corpora) {
                 try {
-                    SegmentationList segList = service.path("query").path("corpora").path(Helper.encodeJersey(corpus))
-                            .path("segmentation-names").get(SegmentationList.class);
+                    SegmentationList segList =
+                            service.path("query").path("corpora").path(Helper.encodeJersey(corpus))
+                                    .path("segmentation-names").get(SegmentationList.class);
                     segNames.addAll(segList.getSegmentatioNames());
                 } catch (UniformInterfaceException ex) {
                     if (ex.getResponse().getStatus() == 403) {
-                        log.debug("Did not have access rights to query segmentation names for corpus", ex);
+                        log.debug(
+                                "Did not have access rights to query segmentation names for corpus",
+                                ex);
                     } else {
                         log.warn("Could not query segmentation names for corpus", ex);
                     }
@@ -310,11 +321,11 @@ public class SearchOptionsPanel extends FormLayout {
     private final ComboBox cbSegmentation;
     private final HelpButton<?> segmentationHelp;
     private final ComboBox cbOrder;
-    private final ComboBox cbQueryLanguage;
+    private final com.vaadin.ui.ComboBox<QueryLanguage> cbQueryLanguage;
     private final ProgressBar pbLoadConfig;
 
-    private final BeanItemContainer<OrderType> orderContainer = new BeanItemContainer<>(OrderType.class,
-            Lists.newArrayList(OrderType.values()));
+    private final BeanItemContainer<OrderType> orderContainer =
+            new BeanItemContainer<>(OrderType.class, Lists.newArrayList(OrderType.values()));
     private final IndexedContainer contextContainerLeft = new IndexedContainer();
 
     private final IndexedContainer contextContainerRight = new IndexedContainer();
@@ -322,9 +333,6 @@ public class SearchOptionsPanel extends FormLayout {
     private final IndexedContainer segmentationContainer = new IndexedContainer();
 
     private final IndexedContainer resultsPerPageContainer = new IndexedContainer();
-
-    private final BeanItemContainer<QueryLanguage> queryLanguage = new BeanItemContainer<>(QueryLanguage.class,
-            Lists.newArrayList(QueryLanguage.values()));
 
     private final AtomicInteger maxLeftContext = new AtomicInteger(Integer.MAX_VALUE);
 
@@ -386,12 +394,18 @@ public class SearchOptionsPanel extends FormLayout {
         cbOrder.setNullSelectionAllowed(false);
         cbOrder.setImmediate(true);
 
-        cbQueryLanguage = new ComboBox("Query Language", queryLanguage);
-        cbQueryLanguage.setNewItemsAllowed(false);
-        cbQueryLanguage.setNullSelectionAllowed(false);
-        cbQueryLanguage.setImmediate(true);
-        cbQueryLanguage.setItemCaption(QueryLanguage.AQL, "AQL (latest)");
-        cbQueryLanguage.setItemCaption(QueryLanguage.AQL_QUIRKS_V3, "AQL (compatibility mode)");
+        cbQueryLanguage = new com.vaadin.ui.ComboBox<>("Query Language");
+        
+        Binder<QueryUIState> binder = new Binder<>();
+        binder.forField(cbQueryLanguage).bind(QueryUIState::getQueryLanguage, QueryUIState::setQueryLanguage);
+        binder.readBean(state); 
+        cbQueryLanguage.setItemCaptionGenerator(ql -> {
+            switch (ql) {
+                case AQL: return "AQL (latest)";
+                case AQLQUIRKSV3: return "AQL (compatibility mode)";
+            }
+            return "";
+        });
 
         cbLeftContext.setVisible(false);
         cbRightContext.setVisible(false);
@@ -427,14 +441,15 @@ public class SearchOptionsPanel extends FormLayout {
 
             state = ui.getQueryState();
 
-            Background.run(
-                    new CorpusConfigUpdater(ui, new LinkedHashSet<>(state.getSelectedCorpora().getItems()), false));
+            Background.run(new CorpusConfigUpdater(ui,
+                    new LinkedHashSet<>(state.getSelectedCorpora()), false));
 
-            cbLeftContext
-                    .setNewItemHandler(new CustomContext(maxLeftContext, contextContainerLeft, state.getLeftContext()));
-            cbRightContext.setNewItemHandler(
-                    new CustomContext(maxRightContext, contextContainerRight, state.getRightContext()));
-            cbResultsPerPage.setNewItemHandler(new CustomResultSize(resultsPerPageContainer, state.getLimit()));
+            cbLeftContext.setNewItemHandler(new CustomContext(maxLeftContext, contextContainerLeft,
+                    state.getLeftContext()));
+            cbRightContext.setNewItemHandler(new CustomContext(maxRightContext,
+                    contextContainerRight, state.getRightContext()));
+            cbResultsPerPage.setNewItemHandler(
+                    new CustomResultSize(resultsPerPageContainer, state.getLimit()));
 
             cbLeftContext.setPropertyDataSource(state.getLeftContext());
             cbRightContext.setPropertyDataSource(state.getRightContext());
@@ -447,24 +462,22 @@ public class SearchOptionsPanel extends FormLayout {
             }
             cbOrder.setPropertyDataSource(state.getOrder());
 
-            cbQueryLanguage.setPropertyDataSource(state.getQueryLanguage());
 
         }
     }
 
     /**
-     * Checks, if all selected corpora have the same default segmentation layer. If
-     * not the tok layer is taken, because every corpus has this one.
+     * Checks, if all selected corpora have the same default segmentation layer. If not the tok
+     * layer is taken, because every corpus has this one.
      *
-     * @param key
-     *            the key for the segementation config, must be
-     *            {@link #KEY_DEFAULT_BASE_TEXT_SEGMENTATION} or
-     *            {@link #KEY_DEFAULT_CONTEXT_SEGMENTATION}.
-     * @param corpora
-     *            the corpora which has to be checked.
+     * @param key the key for the segementation config, must be
+     *        {@link #KEY_DEFAULT_BASE_TEXT_SEGMENTATION} or
+     *        {@link #KEY_DEFAULT_CONTEXT_SEGMENTATION}.
+     * @param corpora the corpora which has to be checked.
      * @return "tok" or a segment which is defined in all corpora.
      */
-    private String checkSegments(String key, Collection<String> corpora, CorpusConfigMap corpusConfigurations) {
+    private String checkSegments(String key, Collection<String> corpora,
+            CorpusConfigMap corpusConfigurations) {
         String segmentation = null;
         for (String corpus : corpora) {
 
@@ -515,15 +528,12 @@ public class SearchOptionsPanel extends FormLayout {
     /**
      * Builds a single config for selection of one or muliple corpora.
      *
-     * @param corpora
-     *            Specifies the combination of corpora, for which the config is
-     *            calculated.
-     * @param corpusConfigurations
-     *            A map containg the known corpus configurations.
-     * @return A new config which takes into account the segementation of all
-     *         selected corpora.
+     * @param corpora Specifies the combination of corpora, for which the config is calculated.
+     * @param corpusConfigurations A map containg the known corpus configurations.
+     * @return A new config which takes into account the segementation of all selected corpora.
      */
-    private CorpusConfig mergeConfigs(Collection<String> corpora, CorpusConfigMap corpusConfigurations) {
+    private CorpusConfig mergeConfigs(Collection<String> corpora,
+            CorpusConfigMap corpusConfigurations) {
         CorpusConfig corpusConfig = new CorpusConfig();
 
         // calculate the left and right context.
@@ -533,7 +543,8 @@ public class SearchOptionsPanel extends FormLayout {
         corpusConfig.setConfig(KEY_MAX_CONTEXT_RIGHT, rightCtx);
 
         // calculate the default-context
-        corpusConfig.setConfig(KEY_CONTEXT_STEPS, mergeConfigValue(KEY_CONTEXT_STEPS, corpora, corpusConfigurations));
+        corpusConfig.setConfig(KEY_CONTEXT_STEPS,
+                mergeConfigValue(KEY_CONTEXT_STEPS, corpora, corpusConfigurations));
         corpusConfig.setConfig(KEY_DEFAULT_CONTEXT,
                 mergeConfigValue(KEY_DEFAULT_CONTEXT, corpora, corpusConfigurations));
 
@@ -551,17 +562,15 @@ public class SearchOptionsPanel extends FormLayout {
     }
 
     /**
-     * If all values of a specific corpus property have the same value, this value
-     * is returned, otherwise the value of the default configuration is choosen.
+     * If all values of a specific corpus property have the same value, this value is returned,
+     * otherwise the value of the default configuration is choosen.
      *
-     * @param key
-     *            The property key.
-     * @param corpora
-     *            Specifies the selected corpora.
-     * @return A value defined in the copurs.properties file or in the
-     *         admin-service.properties
+     * @param key The property key.
+     * @param corpora Specifies the selected corpora.
+     * @return A value defined in the copurs.properties file or in the admin-service.properties
      */
-    private String mergeConfigValue(String key, Collection<String> corpora, CorpusConfigMap corpusConfigurations) {
+    private String mergeConfigValue(String key, Collection<String> corpora,
+            CorpusConfigMap corpusConfigurations) {
         Set<String> values = new TreeSet<>();
         for (String corpus : corpora) {
             CorpusConfig config = corpusConfigurations.get(corpus);
@@ -605,14 +614,10 @@ public class SearchOptionsPanel extends FormLayout {
     /**
      * Updates context combo boxes.
      *
-     * @param c
-     *            the container, which is updated.
-     * @param maxCtx
-     *            the larges context values until context steps are calculated.
-     * @param ctxSteps
-     *            the step range.
-     * @param keepCustomValues
-     *            If this is true all custom values are kept.
+     * @param c the container, which is updated.
+     * @param maxCtx the larges context values until context steps are calculated.
+     * @param ctxSteps the step range.
+     * @param keepCustomValues If this is true all custom values are kept.
      */
     private void updateContext(Container c, int maxCtx, int ctxSteps, boolean keepCustomValues) {
 
@@ -634,7 +639,8 @@ public class SearchOptionsPanel extends FormLayout {
 
     }
 
-    public void updateSearchPanelConfigurationInBackground(final Collection<String> corpora, final AnnisUI ui) {
+    public void updateSearchPanelConfigurationInBackground(final Collection<String> corpora,
+            final AnnisUI ui) {
         setLoadingState(true);
         // remove custom adjustments
         contextContainerLeft.removeAllItems();

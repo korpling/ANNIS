@@ -17,6 +17,7 @@
 package annis.gui.flatquerybuilder;
 
 import annis.gui.QueryController;
+import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
 import annis.model.Query;
 import annis.service.objects.AnnisAttribute;
@@ -25,6 +26,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Binder;
 import com.vaadin.data.provider.DataChangeEvent;
 import com.vaadin.data.provider.DataProviderListener;
 import com.vaadin.ui.Alignment;
@@ -54,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * @author martin klotz (martin.klotz@hu-berlin.de)
  * @author tom ruette (tom.ruette@hu-berlin.de)
  */
-public class FlatQueryBuilder extends Panel implements Button.ClickListener, DataProviderListener {
+public class FlatQueryBuilder extends Panel implements Button.ClickListener {
     private class Constraint {
         private String level;
         private String value;
@@ -397,12 +399,15 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Dat
     @Override
     public void attach() {
         super.attach();
-        cp.getState().getSelectedCorpora().addDataProviderListener(this);
+        
+        Binder<QueryUIState> binder = new Binder<>();
+        binder.addValueChangeListener(e -> {this.initialize();});
+        binder.setBean(cp.getState());
     }
 
     @Override
     public void buttonClick(Button.ClickEvent event) {
-        if (cp.getState().getSelectedCorpora().getItems().isEmpty()) {
+        if (cp.getState().getSelectedCorpora().isEmpty()) {
             Notification.show(NO_CORPORA_WARNING);
         } else {
             if (event.getButton() == btGo) {
@@ -450,12 +455,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Dat
         vnodes.clear();
         eboxes.clear();
         mboxes.clear();
-    }
-
-    @Override
-    public void detach() {
-        super.detach();
-        cp.getState().getSelectedCorpora().addDataProviderListener(this);
     }
 
     public String escapeRegexCharacters(String tok) {
@@ -574,7 +573,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Dat
         Collection<String> result = new TreeSet<>();
         WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
         // get current corpus selection
-        Collection<String> corpusSelection = cp.getState().getSelectedCorpora().getItems();
+        Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
         if (service != null) {
             try {
                 List<AnnisAttribute> atts = new LinkedList<>();
@@ -604,7 +603,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Dat
         Set<String> result = new TreeSet<>();
         WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
         // get current corpus selection
-        Collection<String> corpusSelection = cp.getState().getSelectedCorpora().getItems();
+        Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
         if (service != null) {
             try {
                 List<AnnisAttribute> atts = new LinkedList<>();
@@ -632,7 +631,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Dat
         Set<String> result = new TreeSet<>();
         WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
         // get current corpus selection
-        Collection<String> corpusSelection = cp.getState().getSelectedCorpora().getItems();
+        Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
         if (service != null) {
             try {
                 List<AnnisAttribute> atts = new LinkedList<>();
@@ -662,7 +661,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Dat
         Set<String> result = new TreeSet<>();
         WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
         // get current corpus selection
-        Collection<String> corpusSelection = cp.getState().getSelectedCorpora().getItems();
+        Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
         if (service != null) {
             try {
                 List<AnnisAttribute> atts = new LinkedList<>();
@@ -1104,11 +1103,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Dat
         }
     }
 
-    @Override
-    public void onDataChange(DataChangeEvent event) {
-        initialize();
-    }
-
     public void removeMetaBox(MetaBox v) {
         meta.removeComponent(v);
         mboxes.remove(v);
@@ -1228,7 +1222,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Dat
     public void updateQuery() {
         try {
             cp.setQuery(new Query(getAQLQuery(), QueryLanguage.AQL,
-                    new LinkedHashSet<>(cp.getState().getSelectedCorpora().getItems())));
+                    new LinkedHashSet<>(cp.getState().getSelectedCorpora())));
         } catch (java.lang.NullPointerException ex) {
             Notification.show(INCOMPLETE_QUERY_WARNING);
         }

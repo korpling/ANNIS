@@ -97,7 +97,7 @@ public class ExportPanel extends GridLayout {
                     Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
                     btExport.setEnabled(true);
                     return;
-                } else if (state.getSelectedCorpora().getItems().isEmpty()) {
+                } else if (state.getSelectedCorpora().isEmpty()) {
                     Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
                     btExport.setEnabled(true);
                     return;

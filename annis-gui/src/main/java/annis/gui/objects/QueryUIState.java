@@ -1,30 +1,18 @@
 /*
  * Copyright 2014 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui.objects;
 
-import annis.gui.exporter.CSVExporter;
-import annis.gui.frequency.UserGeneratedFrequencyEntry;
-import annis.libgui.exporter.ExporterPlugin;
-import annis.model.Query;
-import annis.service.objects.OrderType;
-import annis.service.objects.QueryLanguage;
-import com.vaadin.data.provider.ListDataProvider;
-import com.vaadin.v7.data.util.BeanContainer;
-import com.vaadin.v7.data.util.BeanItemContainer;
-import com.vaadin.v7.data.util.ObjectProperty;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -35,8 +23,21 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
+
+import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.data.util.ObjectProperty;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import annis.gui.exporter.CSVExporter;
+import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.model.Query;
+import annis.service.objects.OrderType;
+import org.corpus_tools.annis.api.model.QueryLanguage;
 
 /**
  * Helper class to bundle all query relevant state information of the UI.
@@ -57,7 +58,7 @@ public class QueryUIState implements Serializable {
     private final static Logger log = LoggerFactory.getLogger(QueryUIState.class);
 
     private final ObjectProperty<String> aql = new ObjectProperty<>("");
-    private final ListDataProvider<String> selectedCorpora = new ListDataProvider<>(new LinkedHashSet<String>());
+    private Set<String> selectedCorpora = new LinkedHashSet<String>();
 
     private final ObjectProperty<Integer> leftContext = new ObjectProperty<>(5);
     private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
@@ -65,26 +66,28 @@ public class QueryUIState implements Serializable {
     private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
     private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
     private final ObjectProperty<String> visibleBaseText = new ObjectProperty<>(null, String.class);
-    private final ObjectProperty<String> contextSegmentation = new ObjectProperty<>(null, String.class);
+    private final ObjectProperty<String> contextSegmentation =
+            new ObjectProperty<>(null, String.class);
 
     private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
 
-    private final ObjectProperty<QueryLanguage> queryLanguage = new ObjectProperty<>(QueryLanguage.AQL);
+    private QueryLanguage queryLanguage = QueryLanguage.AQL;
 
-    private final ObjectProperty<Set<Long>> selectedMatches = new ObjectProperty<Set<Long>>(new TreeSet<Long>());
+    private final ObjectProperty<Set<Long>> selectedMatches =
+            new ObjectProperty<Set<Long>>(new TreeSet<Long>());
 
-    private final ObjectProperty<Class<? extends ExporterPlugin>> exporter = new ObjectProperty<Class<? extends ExporterPlugin>>(
-            CSVExporter.class);
-    private final ObjectProperty<List<String>> exportAnnotationKeys = new ObjectProperty<List<String>>(
-            new ArrayList<String>());
+    private final ObjectProperty<Class<? extends ExporterPlugin>> exporter =
+            new ObjectProperty<Class<? extends ExporterPlugin>>(CSVExporter.class);
+    private final ObjectProperty<List<String>> exportAnnotationKeys =
+            new ObjectProperty<List<String>>(new ArrayList<String>());
     private final ObjectProperty<String> exportParameters = new ObjectProperty<>("");
 
     private final ObjectProperty<Boolean> alignmc = new ObjectProperty<Boolean>(false);
 
     private transient Map<QueryType, Future<?>> executedTasks;
 
-    private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition = new BeanContainer<>(
-            UserGeneratedFrequencyEntry.class);
+    private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition =
+            new BeanContainer<>(UserGeneratedFrequencyEntry.class);
 
     private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
 
@@ -144,16 +147,40 @@ public class QueryUIState implements Serializable {
         return order;
     }
 
-    public ObjectProperty<QueryLanguage> getQueryLanguage() {
+    public QueryLanguage getQueryLanguage() {
         return queryLanguage;
+    }
+
+    public annis.service.objects.QueryLanguage getQueryLanguageLegacy() {
+        if (queryLanguage == QueryLanguage.AQLQUIRKSV3) {
+            return annis.service.objects.QueryLanguage.AQL_QUIRKS_V3;
+        } else {
+            return annis.service.objects.QueryLanguage.AQL;
+        }
+    }
+
+    public void setQueryLanguage(QueryLanguage queryLanguage) {
+        this.queryLanguage = queryLanguage;
+    }
+
+    public void setQueryLanguageLegacy(annis.service.objects.QueryLanguage queryLanguage) {
+        if (queryLanguage == annis.service.objects.QueryLanguage.AQL_QUIRKS_V3) {
+            this.queryLanguage = QueryLanguage.AQLQUIRKSV3;
+        } else {
+            this.queryLanguage = QueryLanguage.AQL;
+        }
     }
 
     public ObjectProperty<Integer> getRightContext() {
         return rightContext;
     }
 
-    public ListDataProvider<String> getSelectedCorpora() {
+    public Set<String> getSelectedCorpora() {
         return selectedCorpora;
+    }
+
+    public void setSelectedCorpora(Set<String> selectedCorpora) {
+      this.selectedCorpora = selectedCorpora;
     }
 
     public ObjectProperty<Set<Long>> getSelectedMatches() {
@@ -168,7 +195,8 @@ public class QueryUIState implements Serializable {
         executedTasks = new EnumMap<>(QueryType.class);
     }
 
-    private void readObject(final java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    private void readObject(final java.io.ObjectInputStream in)
+            throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         initTransients();
     }
