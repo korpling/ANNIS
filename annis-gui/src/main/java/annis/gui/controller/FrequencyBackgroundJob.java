@@ -64,7 +64,8 @@ public class FrequencyBackgroundJob implements Callable<FrequencyTable> {
                     .queryParam("fields", query.getFrequencyDefinition().toString());
             result = annisResource.get(FrequencyTable.class);
         } catch (final UniformInterfaceException ex) {
-            ui.access(() -> ui.getQueryController().reportServiceException(ex, true));
+            // TODO: report error
+//            ui.access(() -> ui.getQueryController().reportServiceException(ex, true));
         } catch (ClientHandlerException ex) {
             log.error("could not execute REST call to query frequency", ex);
         }
