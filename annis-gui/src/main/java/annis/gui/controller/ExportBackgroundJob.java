@@ -23,6 +23,9 @@ import annis.libgui.exporter.ExporterPlugin;
 import annis.service.objects.CorpusConfig;
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.UniformInterfaceException;
+
+import org.corpus_tools.annis.ApiException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -80,8 +83,8 @@ public class ExportBackgroundJob implements Callable<File> {
                 if (panel != null) {
                     panel.showResult(currentTmpFile, exportError);
                 }
-                if (exportError instanceof UniformInterfaceException) {
-                    ui.getQueryController().reportServiceException((UniformInterfaceException) exportError, true);
+                if (exportError instanceof ApiException) {
+                    ui.getQueryController().reportServiceException((ApiException) exportError, true);
                 }
             });
         }

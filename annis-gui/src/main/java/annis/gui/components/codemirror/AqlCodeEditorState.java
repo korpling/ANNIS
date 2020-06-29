@@ -1,23 +1,24 @@
 /*
  * Copyright 2014 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui.components.codemirror;
 
 import annis.model.AqlParseError;
 import annis.model.ParsedEntityLocation;
 import com.vaadin.shared.ui.JavaScriptComponentState;
+
+import org.corpus_tools.annis.api.model.GraphAnnisErrorAQLSyntaxError;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -33,8 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class AqlCodeEditorState extends JavaScriptComponentState {
 
     /**
-     * Class that is suitable of transporting the parse error state via JSON to the
-     * client.
+     * Class that is suitable of transporting the parse error state via JSON to the client.
      */
     @XmlRootElement
     public static class ParseError implements Serializable {
@@ -58,6 +58,20 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
 
         public ParseError(AqlParseError orig) {
             this(orig.getLocation(), orig.getMessage());
+        }
+
+        public ParseError(GraphAnnisErrorAQLSyntaxError orig) {
+            if (orig.getLocation() != null) {
+                if (orig.getLocation().getStart() != null) {
+                    this.startLine = orig.getLocation().getStart().getLine();
+                    this.startColumn = orig.getLocation().getStart().getLine();
+                }
+                if (orig.getLocation().getEnd() != null) {
+                    this.endLine = orig.getLocation().getEnd().getLine();
+                    this.endColumn = orig.getLocation().getEnd().getColumn();
+                }
+            }
+            this.message = orig.getDesc();
         }
 
         public ParseError(ParsedEntityLocation location, String message) {
@@ -103,8 +117,8 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
     public String textareaClass;
 
     /**
-     * Everytime the server wants to set the {@link #text} variable this counter
-     * needs to be increased.
+     * Everytime the server wants to set the {@link #text} variable this counter needs to be
+     * increased.
      */
     public long serverRequestCounter = 0;
 

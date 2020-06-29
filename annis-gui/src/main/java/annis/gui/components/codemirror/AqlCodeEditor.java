@@ -1,20 +1,19 @@
 /*
  * Copyright 2014 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui.components.codemirror;
 
+import annis.gui.components.codemirror.AqlCodeEditorState.ParseError;
 import annis.model.AqlParseError;
 import annis.model.NodeDesc;
 import com.vaadin.annotations.JavaScript;
@@ -28,8 +27,13 @@ import elemental.json.JsonArray;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import org.corpus_tools.annis.api.model.GraphAnnisError;
+import org.corpus_tools.annis.api.model.GraphAnnisErrorAQLSyntaxError;
+import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +43,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@JavaScript({ "vaadin://jquery.js", "lib/codemirror.js", "mode/aql/aql.js", "lib/edit/matchbrackets.js",
-        "lib/lint/lint.js", "lib/display/placeholder.js", "AqlCodeEditor.js" })
-@StyleSheet({ "lib/codemirror.css", "lib/lint/lint.css", "AqlCodeEditor.css" })
+@JavaScript({"vaadin://jquery.js", "lib/codemirror.js", "mode/aql/aql.js",
+        "lib/edit/matchbrackets.js", "lib/lint/lint.js", "lib/display/placeholder.js",
+        "AqlCodeEditor.js"})
+@StyleSheet({"lib/codemirror.css", "lib/lint/lint.css", "AqlCodeEditor.css"})
 // basic server-side component
 public class AqlCodeEditor extends AbstractJavaScriptComponent
         implements FieldEvents.TextChangeNotifier, Property.Viewer, Property.ValueChangeListener {
@@ -96,8 +101,8 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
 
     @Override
     public void addTextChangeListener(FieldEvents.TextChangeListener listener) {
-        addListener(FieldEvents.TextChangeListener.EVENT_ID, FieldEvents.TextChangeEvent.class, listener,
-                FieldEvents.TextChangeListener.EVENT_METHOD);
+        addListener(FieldEvents.TextChangeListener.EVENT_ID, FieldEvents.TextChangeEvent.class,
+                listener, FieldEvents.TextChangeListener.EVENT_METHOD);
     }
 
     @Override
@@ -122,16 +127,16 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
         return dataSource.getValue();
     }
 
-    private TreeMap<String, Integer> mapQueryNodes(List<NodeDesc> nodes) {
+    private TreeMap<String, Integer> mapQueryNodes(List<QueryAttributeDescription> nodes) {
         TreeMap<String, Integer> result = new TreeMap<>();
-        Map<Long, TreeSet<Integer>> alternative2Nodes = new HashMap<>();
+        Map<Integer, TreeSet<Integer>> alternative2Nodes = new HashMap<>();
 
         int nodeIdx = 1;
-        for (NodeDesc n : nodes) {
-            TreeSet<Integer> orderedNodeSet = alternative2Nodes.get(n.getComponentNr());
+        for (QueryAttributeDescription n : nodes) {
+            TreeSet<Integer> orderedNodeSet = alternative2Nodes.get(n.getAlternative());
             if (orderedNodeSet == null) {
                 orderedNodeSet = new TreeSet<>();
-                alternative2Nodes.put(n.getComponentNr(), orderedNodeSet);
+                alternative2Nodes.put(n.getAlternative(), orderedNodeSet);
             }
             // the nodes list is already ordered by the occurrence of the node in the AQL
             // query stream
@@ -151,14 +156,18 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
 
     @Override
     public void removeTextChangeListener(FieldEvents.TextChangeListener listener) {
-        removeListener(FieldEvents.TextChangeListener.EVENT_ID, FieldEvents.TextChangeEvent.class, listener);
+        removeListener(FieldEvents.TextChangeListener.EVENT_ID, FieldEvents.TextChangeEvent.class,
+                listener);
     }
 
-    public void setErrors(List<AqlParseError> errors) {
+    public void setError(GraphAnnisError error) {
         getState().errors.clear();
-        if (errors != null) {
-            for (AqlParseError e : errors) {
-                getState().errors.add(new AqlCodeEditorState.ParseError(e));
+        if (error != null) {
+            if (error.getAqLSyntaxError() != null) {
+                getState().errors.add(new ParseError(error.getAqLSyntaxError()));
+            }
+            if (error.getAqLSemanticError() != null) {
+                getState().errors.add(new ParseError(error.getAqLSemanticError()));
             }
         }
         markAsDirty();
@@ -169,7 +178,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
         markAsDirty();
     }
 
-    public void setNodes(List<NodeDesc> nodes) {
+    public void setNodes(List<QueryAttributeDescription> nodes) {
         getState().nodeMappings.clear();
         if (nodes != null) {
             getState().nodeMappings.putAll(mapQueryNodes(nodes));
@@ -213,7 +222,8 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
 
     @Override
     public void valueChange(Property.ValueChangeEvent event) {
-        log.debug("valueChange \"{}\"/\"{}", event.getProperty().getValue(), this.dataSource.getValue());
+        log.debug("valueChange \"{}\"/\"{}", event.getProperty().getValue(),
+                this.dataSource.getValue());
         String oldText = getState().text;
         String newText = this.dataSource.getValue();
 

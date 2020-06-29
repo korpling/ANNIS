@@ -80,7 +80,8 @@ public class CountCallback implements Runnable {
                         }
                     }
                 } else {
-                    ui.getQueryController().reportServiceException(causeFinal, true);
+                    // TODO: report error
+                    //ui.getQueryController().reportServiceException(causeFinal, true);
                 } // end if cause != null
                 ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
             });
