@@ -11,6 +11,7 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
+	<groupId>de.hu-berlin.german.korpling.annis</groupId>
 	<artifactId>annis-gui</artifactId>
 	<version>4.0.1-beta.4-SNAPSHOT</version>
 	<name>annis-gui</name>
@@ -105,9 +106,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.corpus-tools</groupId>
-			<artifactId>annis-java-client</artifactId>
-			<version>0</version>
+			<groupId>de.hu-berlin.german.korpling.annis</groupId>
+			<artifactId>annis-rest-client</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>

@@ -268,6 +268,6 @@
 		<module>annis-widgets</module>
 		<module>annis-visualizers</module>
 		<module>annis-libgui</module>
-		<module>annis-java-client</module>
+		<module>annis-rest-client</module>
 	</modules>
 </project>
