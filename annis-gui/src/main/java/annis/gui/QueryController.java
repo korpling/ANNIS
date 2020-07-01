@@ -468,7 +468,7 @@ public class QueryController implements Serializable {
                 .left(state.getLeftContext().getValue()).right(state.getRightContext().getValue())
                 .segmentation(state.getContextSegmentation().getValue())
                 .baseText(state.getVisibleBaseText().getValue()).limit(state.getLimit().getValue())
-                .offset(state.getOffset().getValue()).order(state.getOrder().getValue())
+            .offset(state.getOffset().getValue()).order(state.getOrder())
                 .selectedMatches(state.getSelectedMatches().getValue()).build();
     }
 
@@ -561,7 +561,9 @@ public class QueryController implements Serializable {
         if (q instanceof PagedResultQuery) {
             setIfNew(state.getOffset(), ((PagedResultQuery) q).getOffset());
             setIfNew(state.getLimit(), ((PagedResultQuery) q).getLimit());
-            setIfNew(state.getOrder(), ((PagedResultQuery) q).getOrder());
+            if(!Objects.equals(state.getOrder(), ((PagedResultQuery) q).getOrder())) {
+              state.setOrder(((PagedResultQuery) q).getOrder());
+            }
         }
         if (q instanceof DisplayedResultQuery) {
             setIfNew(state.getSelectedMatches(), ((DisplayedResultQuery) q).getSelectedMatches());
