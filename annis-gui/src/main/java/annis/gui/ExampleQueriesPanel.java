@@ -13,11 +13,14 @@
  */
 package annis.gui;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
+import annis.gui.controlpanel.ControlPanel;
+import annis.gui.controlpanel.CorpusListPanel;
+import annis.gui.controlpanel.QueryPanel;
+import annis.gui.resultview.ResultViewPanel;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.model.Query;
+import annis.service.objects.QueryLanguage;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.ContentMode;
@@ -32,22 +35,16 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
-
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.ExampleQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import annis.gui.controlpanel.ControlPanel;
-import annis.gui.controlpanel.CorpusListPanel;
-import annis.gui.controlpanel.QueryPanel;
-import annis.gui.resultview.ResultViewPanel;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.model.Query;
-import annis.service.objects.QueryLanguage;
 
 /**
  * Wraps the auto generated queries.
@@ -114,7 +111,7 @@ public class ExampleQueriesPanel extends CssLayout {
     private static List<Entry> loadExamplesFromRemote(Set<String> corpusNames, UI ui) {
 
         List<Entry> result = new LinkedList<>();
-        CorporaApi api = new CorporaApi(ServiceHelper.getClient(ui));
+        CorporaApi api = new CorporaApi(Helper.getClient(ui));
         try {
             if (corpusNames != null && !corpusNames.isEmpty()) {
                 for (String c : corpusNames) {

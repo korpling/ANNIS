@@ -15,7 +15,6 @@ package annis.gui.resultfetch;
 
 import annis.CommonHelper;
 import annis.gui.AnnisUI;
-import annis.gui.ServiceHelper;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
@@ -24,28 +23,15 @@ import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.QueryLanguage;
-import annis.service.objects.SubgraphFilter;
-import okhttp3.Call;
-
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
-import javax.ws.rs.core.MediaType;
-import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
@@ -81,8 +67,8 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
     @Override
     public void run() {
 
-        SearchApi search = new SearchApi(ServiceHelper.getClient(ui));
-        CorporaApi corpora = new CorporaApi(ServiceHelper.getClient(ui));
+      SearchApi search = new SearchApi(Helper.getClient(ui));
+      CorporaApi corpora = new CorporaApi(Helper.getClient(ui));
 
         // holds the ids of the matches.
         MatchGroup result;

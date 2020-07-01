@@ -13,45 +13,6 @@
  */
 package annis.gui;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.TreeSet;
-import java.util.concurrent.Future;
-
-import com.google.common.eventbus.EventBus;
-import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.vaadin.data.Binder;
-import com.vaadin.data.provider.ListDataProvider;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.UI;
-import com.vaadin.v7.data.Property;
-import com.vaadin.v7.data.Property.ValueChangeListener;
-import com.vaadin.v7.data.util.BeanContainer;
-
-import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.JSON;
-import org.corpus_tools.annis.api.SearchApi;
-import org.corpus_tools.annis.api.model.CountQuery;
-import org.corpus_tools.annis.api.model.GraphAnnisError;
-import org.corpus_tools.annis.api.model.QueryAttributeDescription;
-import org.corpus_tools.salt.common.SaltProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import annis.QueryGenerator;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.controller.CountCallback;
@@ -85,7 +46,41 @@ import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.QueryLanguage;
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.FutureCallback;
+import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.vaadin.data.Binder;
+import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.UI;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.BeanContainer;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeSet;
+import java.util.concurrent.Future;
 import okhttp3.Call;
+import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.JSON;
+import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.CountQuery;
+import org.corpus_tools.annis.api.model.GraphAnnisError;
+import org.corpus_tools.annis.api.model.QueryAttributeDescription;
+import org.corpus_tools.salt.common.SaltProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A controller to modifiy the query UI state. s
@@ -414,7 +409,7 @@ public class QueryController implements Serializable {
                 .queryParam("query-language", displayedQuery.getQueryLanguage().name());
         Future<MatchAndDocumentCount> futureCount = countRes.get(MatchAndDocumentCount.class);
 
-        SearchApi api = new SearchApi(ServiceHelper.getClient(ui));
+        SearchApi api = new SearchApi(Helper.getClient(ui));
         CountQuery countQuery = new CountQuery();
         countQuery.setCorpora(new LinkedList<>(displayedQuery.getCorpora()));
         countQuery.setQuery(displayedQuery.getQuery());
@@ -595,7 +590,7 @@ public class QueryController implements Serializable {
             // validate query
             try {
                 Background.runWithCallback(() -> {
-                    SearchApi api = new SearchApi(ServiceHelper.getClient(ui));
+                  SearchApi api = new SearchApi(Helper.getClient(ui));
                     return api.nodeDescriptions(query,
                             org.corpus_tools.annis.api.model.QueryLanguage.AQL);
                 }, new FutureCallback<List<QueryAttributeDescription>>() {

@@ -19,7 +19,6 @@ import annis.gui.AnnisUI;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.MetaDataPanel;
-import annis.gui.ServiceHelper;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.Background;
 import annis.libgui.CorpusSet;
@@ -28,8 +27,6 @@ import annis.libgui.IDGenerator;
 import annis.libgui.InstanceConfig;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Binder;
-import com.vaadin.data.HasValue.ValueChangeEvent;
-import com.vaadin.data.HasValue.ValueChangeListener;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Resource;
@@ -57,7 +54,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 import org.corpus_tools.annis.api.CorporaApi;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +82,7 @@ public class CorpusListPanel extends VerticalLayout {
 
             try {
                 // query in background
-                CorporaApi api = new CorporaApi(ServiceHelper.getClient(ui));
+                CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
                 List<String> corpora = api.listCorpora();
 

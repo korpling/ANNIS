@@ -15,8 +15,6 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.MetaDataPanel;
-import annis.gui.ServiceHelper;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.DocumentBrowserConfig;
