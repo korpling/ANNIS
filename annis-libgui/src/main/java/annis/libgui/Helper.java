@@ -54,6 +54,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -76,6 +77,9 @@ import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Component;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.CorpusConfigurationContext;
+import org.corpus_tools.annis.api.model.CorpusConfigurationView;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
@@ -635,21 +639,22 @@ public class Helper {
    * @return A {@link CorpusConfig} object, which wraps a {@link Properties} object. This Properties
    *         object stores the corpus configuration as simple key-value pairs.
    */
-  public static CorpusConfig getCorpusConfig(String corpus, UI ui) {
+  public static CorpusConfiguration getCorpusConfig(String corpus, UI ui) {
 
     if (corpus == null || corpus.isEmpty()) {
       Notification.show("no corpus is selected",
-          "please select at leas one corpus and execute query again",
+          "please select at least one corpus and execute query again",
           Notification.Type.WARNING_MESSAGE);
       return null;
     }
 
-    CorpusConfig corpusConfig = new CorpusConfig();
+    CorpusConfiguration corpusConfig = new CorpusConfiguration();
+
+    CorporaApi api = new CorporaApi(getClient(ui));
 
     try {
-      corpusConfig = Helper.getAnnisWebResource(ui).path("query").path("corpora")
-          .path(urlPathEscape.escape(corpus)).path("config").get(CorpusConfig.class);
-    } catch (UniformInterfaceException | ClientHandlerException ex) {
+      corpusConfig = api.corpusConfiguration(corpus);
+    } catch (ApiException ex) {
       if (!AnnisBaseUI.handleCommonError(ex, "get corpus configuration")) {
         new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER, ERROR_MESSAGE_CORPUS_PROPS,
             Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
@@ -676,7 +681,7 @@ public class Helper {
       corpusConfigurations.put(corpus, getCorpusConfig(corpus, ui));
     }
 
-    corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig(ui));
+    corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
     return corpusConfigurations;
   }
 
@@ -709,24 +714,24 @@ public class Helper {
       corpusConfigurations = new CorpusConfigMap();
     }
 
-    corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig(ui));
+    corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
 
     return corpusConfigurations;
   }
 
-  public static CorpusConfig getDefaultCorpusConfig(UI ui) {
+  public static CorpusConfiguration getDefaultCorpusConfig() {
 
-    CorpusConfig defaultCorpusConfig = new CorpusConfig();
+    CorpusConfiguration defaultCorpusConfig = new CorpusConfiguration();
 
-    try {
-      defaultCorpusConfig = Helper.getAnnisWebResource(ui).path("query").path("corpora")
-          .path(DEFAULT_CONFIG).get(CorpusConfig.class);
-    } catch (UniformInterfaceException | ClientHandlerException ex) {
-      if (!AnnisBaseUI.handleCommonError(ex, "get default corpus configuration")) {
-        new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER, ERROR_MESSAGE_CORPUS_PROPS,
-            Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-      }
-    }
+    defaultCorpusConfig.setView(new CorpusConfigurationView());
+    defaultCorpusConfig.setContext(new CorpusConfigurationContext());
+    defaultCorpusConfig.setExampleQueries(new LinkedList<>());
+    defaultCorpusConfig.setVisualizers(new LinkedList<>());
+
+    defaultCorpusConfig.getView().setPageSize(10);
+    defaultCorpusConfig.getContext().setDefault(5);
+    defaultCorpusConfig.getContext().setSizes(Arrays.asList(1, 2, 5, 10));
+    defaultCorpusConfig.getContext().setMax(Integer.MAX_VALUE);
 
     return defaultCorpusConfig;
   }

@@ -57,14 +57,13 @@ public class QueryUIState implements Serializable {
   private final ObjectProperty<String> aql = new ObjectProperty<>("");
   private Set<String> selectedCorpora = new LinkedHashSet<String>();
 
-  private final ObjectProperty<Integer> leftContext = new ObjectProperty<>(5);
-  private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
+  private int leftContext = 5;
+  private int rightContext = 5;
 
-  private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
+  private int limit = 10;
   private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
   private final ObjectProperty<String> visibleBaseText = new ObjectProperty<>(null, String.class);
-  private final ObjectProperty<String> contextSegmentation =
-      new ObjectProperty<>(null, String.class);
+  private String contextSegmentation = null;
 
   private OrderEnum order = OrderEnum.NORMAL;
 
@@ -102,8 +101,12 @@ public class QueryUIState implements Serializable {
     return aql;
   }
 
-  public ObjectProperty<String> getContextSegmentation() {
+  public String getContextSegmentation() {
     return contextSegmentation;
+  }
+
+  public void setContextSegmentation(String contextSegmentation) {
+    this.contextSegmentation = contextSegmentation;
   }
 
   public Map<QueryType, Future<?>> getExecutedTasks() {
@@ -134,12 +137,20 @@ public class QueryUIState implements Serializable {
     return history;
   }
 
-  public ObjectProperty<Integer> getLeftContext() {
+  public int getLeftContext() {
     return leftContext;
   }
 
-  public ObjectProperty<Integer> getLimit() {
+  public void setLeftContext(int leftContext) {
+    this.leftContext = leftContext;
+  }
+
+  public int getLimit() {
     return limit;
+  }
+
+  public void setLimit(int limit) {
+    this.limit = limit;
   }
 
   public ObjectProperty<Long> getOffset() {
@@ -178,8 +189,12 @@ public class QueryUIState implements Serializable {
     }
   }
 
-  public ObjectProperty<Integer> getRightContext() {
+  public int getRightContext() {
     return rightContext;
+  }
+
+  public void setRightContext(int rightContext) {
+    this.rightContext = rightContext;
   }
 
   public Set<String> getSelectedCorpora() {

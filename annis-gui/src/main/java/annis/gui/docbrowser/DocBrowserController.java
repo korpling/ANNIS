@@ -22,7 +22,6 @@ import annis.libgui.PluginSystem;
 import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
-import annis.service.objects.CorpusConfig;
 import annis.service.objects.RawTextWrapper;
 import annis.service.objects.Visualizer;
 import com.google.common.base.Joiner;
@@ -238,27 +237,6 @@ public class DocBrowserController implements Serializable {
         this.initedDocBrowsers = new HashMap<>();
         this.initiatedVis = new HashMap<>();
         this.visibleVisHolder = new HashMap<>();
-    }
-
-    public boolean docsAvailable(String id) {
-        if (ui != null) {
-            CorpusConfig corpusConfig = ui.getCorpusConfigWithCache(id);
-
-            if (corpusConfig != null) {
-                if (corpusConfig.containsKey("browse-documents")) {
-                    return Boolean.parseBoolean(corpusConfig.getConfig("browse-documents"));
-                }
-
-                // get the default config
-                else {
-                    corpusConfig = ui.getCorpusConfigWithCache(Helper.DEFAULT_CONFIG);
-                    boolean browseDocuments = Boolean.parseBoolean(corpusConfig.getConfig("browse-documents", "true"));
-                    return browseDocuments;
-                }
-            }
-        }
-
-        return true;
     }
 
     public void openDocBrowser(String corpus) {

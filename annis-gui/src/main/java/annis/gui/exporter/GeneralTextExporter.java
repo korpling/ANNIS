@@ -26,7 +26,6 @@ import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.model.Annotation;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.QueryLanguage;
@@ -54,6 +53,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -149,7 +149,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
     @Override
     public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft, int contextRight,
             Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc, WebResource annisResource,
-            Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs, UI ui) {
+        Writer out, EventBus eventBus, Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
         try {
             // int count = service.getCount(corpusIdList, queryAnnisQL);
 

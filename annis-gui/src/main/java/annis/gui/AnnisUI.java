@@ -44,6 +44,7 @@ import com.vaadin.spring.annotation.SpringUI;
 import java.io.IOException;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -60,7 +61,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     private static final long serialVersionUID = 3022711576267350005L;
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisUI.class);
 
-    private transient Cache<String, CorpusConfig> corpusConfigCache;
+    private transient Cache<String, CorpusConfiguration> corpusConfigCache;
 
     private final QueryUIState queryState = new QueryUIState();
 
@@ -156,13 +157,13 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
      * @param corpus
      * @return
      */
-    public CorpusConfig getCorpusConfigWithCache(String corpus) {
-        CorpusConfig config = new CorpusConfig();
+    public CorpusConfiguration getCorpusConfigWithCache(String corpus) {
+      CorpusConfiguration config = new CorpusConfiguration();
         if (corpusConfigCache != null) {
             config = corpusConfigCache.getIfPresent(corpus);
             if (config == null) {
                 if (corpus.equals(DEFAULT_CONFIG)) {
-                    config = Helper.getDefaultCorpusConfig(AnnisUI.this);
+                  config = Helper.getDefaultCorpusConfig();
                 } else {
                     config = Helper.getCorpusConfig(corpus, AnnisUI.this);
                 }

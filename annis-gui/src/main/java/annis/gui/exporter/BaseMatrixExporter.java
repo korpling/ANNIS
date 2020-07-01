@@ -15,8 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.CommonHelper;
-import annis.TimelineReconstructor;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
@@ -24,12 +22,10 @@ import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.model.NodeDesc;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.QueryLanguage;
 import annis.service.objects.SubgraphFilter;
-import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
@@ -59,6 +55,7 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -105,47 +102,16 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     // invokes the createAdjacencyMatrix method, if nodeCount != null or outputText
     // otherwise
     private void convertSaltProject(SaltProject p, List<String> annoKeys, Map<String, String> args, boolean alignmc,
-            int offset, Map<String, CorpusConfig> corpusConfigs, Writer out, Integer nodeCount, UI ui)
+        int offset, Map<String, CorpusConfiguration> corpusConfigs, Writer out, Integer nodeCount,
+        UI ui)
             throws IOException, IllegalArgumentException {
         int recordNumber = offset;
         if (p != null && p.getCorpusGraphs() != null) {
 
-            Map<String, String> spanAnno2order = null;
-            boolean virtualTokenizationFromNamespace = false;
-
-            Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
-            if (!corpusNames.isEmpty()) {
-                CorpusConfig config = corpusConfigs.get(corpusNames.iterator().next());
-                if (config != null) {
-                    if ("true".equalsIgnoreCase(config.getConfig("virtual_tokenization_from_namespace"))) {
-                        virtualTokenizationFromNamespace = true;
-                    } else {
-                        String mappingRaw = config.getConfig("virtual_tokenization_mapping");
-                        if (mappingRaw != null) {
-                            spanAnno2order = new HashMap<>();
-                            for (String singleMapping : Splitter.on(',').split(mappingRaw)) {
-                                List<String> mappingParts = Splitter.on('=').splitToList(singleMapping);
-                                if (mappingParts.size() >= 2) {
-                                    spanAnno2order.put(mappingParts.get(0), mappingParts.get(1));
-                                }
-                            }
-                        }
-                    }
-
-                }
-            }
-
             for (SCorpusGraph corpusGraph : p.getCorpusGraphs()) {
                 if (corpusGraph.getDocuments() != null) {
                     for (SDocument doc : corpusGraph.getDocuments()) {
-                        if (virtualTokenizationFromNamespace) {
-                            TimelineReconstructor.removeVirtualTokenizationUsingNamespace(doc.getDocumentGraph());
-                        } else if (spanAnno2order != null) {
-                            // there is a definition how to map the virtual tokenization to a real one
-                            TimelineReconstructor.removeVirtualTokenization(doc.getDocumentGraph(), spanAnno2order);
-                        }
-
-                        if (nodeCount != null) {
+                      if (nodeCount != null) {
                             createAdjacencyMatrix(doc.getDocumentGraph(), args, recordNumber++, nodeCount);
                         } else {
                             outputText(doc.getDocumentGraph(), alignmc, recordNumber++, out, ui);
@@ -161,7 +127,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     @Override
     public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft, int contextRight,
             Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc, WebResource annisResource,
-            Writer out, EventBus eventBus, Map<String, CorpusConfig> corpusConfigs, UI ui) {
+        Writer out, EventBus eventBus, Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
         CacheManager cacheManager = CacheManager.create();
 
         try {
