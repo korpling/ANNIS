@@ -15,12 +15,10 @@ package annis.gui;
 
 import annis.CommonHelper;
 import annis.QueryGenerator;
-import annis.VersionInfo;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.resultview.ResultViewPanel;
-import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.libgui.media.MediaController;
@@ -34,12 +32,9 @@ import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.QueryLanguage;
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
@@ -102,67 +97,6 @@ public class SearchView extends GridLayout
             checkCitation();
             return false;
         }
-    }
-
-    private class VersionChecker implements Runnable {
-
-        @Override
-        public void run() {
-            try {
-                WebResource resRelease =
-                        Helper.getAnnisWebResource(ui).path("version").path("release");
-                final String releaseService = resRelease.get(String.class);
-                final String releaseGUI = VersionInfo.getReleaseName();
-
-                WebResource resRevision =
-                        Helper.getAnnisWebResource(ui).path("version").path("revision");
-                final String revisionService = resRevision.get(String.class);
-                final String revisionGUI = VersionInfo.getBuildRevision();
-
-                // GUI update
-                ui.access(() -> {
-                    // check if the release version differs and show a big warning
-                    if (!releaseGUI.equals(releaseService)) {
-                        Notification.show("Different service version",
-                                "The service uses version " + releaseService
-                                        + " but the user interface is using version  " + releaseGUI
-                                        + ". This can produce unwanted errors.",
-                                Notification.Type.WARNING_MESSAGE);
-                    } else {
-                        // show a smaller warning if the revisions are not the same
-
-                        if (!revisionService.equals(revisionGUI)) {
-                            // shorten the strings
-                            String commonPrefix =
-                                    Strings.commonPrefix(revisionService, revisionGUI);
-                            int outputLength = Math.max(6, commonPrefix.length() + 2);
-                            String revisionServiceShort = revisionService.substring(0,
-                                    Math.min(revisionService.length() - 1, outputLength));
-                            String revisionGUIShort = revisionGUI.substring(0,
-                                    Math.min(revisionGUI.length() - 1, outputLength));
-
-                            Notification n = new Notification("Different service revision",
-                                    "The service uses revision <code title=\"" + revisionGUI + "\">"
-                                            + revisionServiceShort
-                                            + "</code> but the user interface is using revision  <code title=\""
-                                            + revisionGUI + "\">" + revisionGUIShort + "</code>.",
-                                    Notification.Type.TRAY_NOTIFICATION);
-                            n.setHtmlContentAllowed(true);
-                            n.setDelayMsec(3000);
-                            n.show(Page.getCurrent());
-                        }
-                    }
-                });
-
-            } catch (UniformInterfaceException ex) {
-                log.warn("Could not get the version of the service", ex);
-            } catch (ClientHandlerException ex) {
-                log.warn("Could not get the version of the service because service is not running",
-                        ex);
-            }
-
-        }
-
     }
 
     /**
@@ -288,10 +222,8 @@ public class SearchView extends GridLayout
 
         getSession().setAttribute(PDFController.class, new PDFControllerImpl());
 
-        // the following shoul
         checkCitation();
         lastEvaluatedFragment = "";
-        Background.run(new VersionChecker());
         evaluateFragment(Page.getCurrent().getUriFragment());
 
         if (config.isLoginOnStart() && toolbar != null && Helper.getUser(ui) == null) {
