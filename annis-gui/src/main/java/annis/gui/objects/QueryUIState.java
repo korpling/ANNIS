@@ -43,166 +43,170 @@ import org.slf4j.LoggerFactory;
  */
 public class QueryUIState implements Serializable {
 
-    public enum QueryType {
-        COUNT, FIND, FREQUENCY, EXPORT
+  public enum QueryType {
+    COUNT, FIND, FREQUENCY, EXPORT
+  }
+
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -883486391491336806L;
+
+  private final static Logger log = LoggerFactory.getLogger(QueryUIState.class);
+
+  private final ObjectProperty<String> aql = new ObjectProperty<>("");
+  private Set<String> selectedCorpora = new LinkedHashSet<String>();
+
+  private final ObjectProperty<Integer> leftContext = new ObjectProperty<>(5);
+  private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
+
+  private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
+  private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
+  private final ObjectProperty<String> visibleBaseText = new ObjectProperty<>(null, String.class);
+  private final ObjectProperty<String> contextSegmentation =
+      new ObjectProperty<>(null, String.class);
+
+  private OrderEnum order = OrderEnum.NORMAL;
+
+  private QueryLanguage queryLanguage = QueryLanguage.AQL;
+
+  private final ObjectProperty<Set<Long>> selectedMatches =
+      new ObjectProperty<Set<Long>>(new TreeSet<Long>());
+
+  private final ObjectProperty<Class<? extends ExporterPlugin>> exporter =
+      new ObjectProperty<Class<? extends ExporterPlugin>>(CSVExporter.class);
+  private final ObjectProperty<List<String>> exportAnnotationKeys =
+      new ObjectProperty<List<String>>(new ArrayList<String>());
+  private final ObjectProperty<String> exportParameters = new ObjectProperty<>("");
+
+  private final ObjectProperty<Boolean> alignmc = new ObjectProperty<Boolean>(false);
+
+  private transient Map<QueryType, Future<?>> executedTasks;
+
+  private transient Map<QueryType, Call> executedCalls;
+
+  private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition =
+      new BeanContainer<>(UserGeneratedFrequencyEntry.class);
+
+  private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
+
+  public QueryUIState() {
+    initTransients();
+  }
+
+  public ObjectProperty<Boolean> getAlignmc() {
+    return alignmc;
+  }
+
+  public ObjectProperty<String> getAql() {
+    return aql;
+  }
+
+  public ObjectProperty<String> getContextSegmentation() {
+    return contextSegmentation;
+  }
+
+  public Map<QueryType, Future<?>> getExecutedTasks() {
+    return executedTasks;
+  }
+
+  public Map<QueryType, Call> getExecutedCalls() {
+    return executedCalls;
+  }
+
+  public ObjectProperty<List<String>> getExportAnnotationKeys() {
+    return exportAnnotationKeys;
+  }
+
+  public ObjectProperty<Class<? extends ExporterPlugin>> getExporter() {
+    return exporter;
+  }
+
+  public ObjectProperty<String> getExportParameters() {
+    return exportParameters;
+  }
+
+  public BeanContainer<Integer, UserGeneratedFrequencyEntry> getFrequencyTableDefinition() {
+    return frequencyTableDefinition;
+  }
+
+  public BeanItemContainer<Query> getHistory() {
+    return history;
+  }
+
+  public ObjectProperty<Integer> getLeftContext() {
+    return leftContext;
+  }
+
+  public ObjectProperty<Integer> getLimit() {
+    return limit;
+  }
+
+  public ObjectProperty<Long> getOffset() {
+    return offset;
+  }
+
+  public OrderEnum getOrder() {
+    return order;
+  }
+
+  public void setOrder(OrderEnum order) {
+    this.order = order;
+  }
+
+  public QueryLanguage getQueryLanguage() {
+    return queryLanguage;
+  }
+
+  public annis.service.objects.QueryLanguage getQueryLanguageLegacy() {
+    if (queryLanguage == QueryLanguage.AQLQUIRKSV3) {
+      return annis.service.objects.QueryLanguage.AQL_QUIRKS_V3;
+    } else {
+      return annis.service.objects.QueryLanguage.AQL;
     }
+  }
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -883486391491336806L;
+  public void setQueryLanguage(QueryLanguage queryLanguage) {
+    this.queryLanguage = queryLanguage;
+  }
 
-    private final static Logger log = LoggerFactory.getLogger(QueryUIState.class);
-
-    private final ObjectProperty<String> aql = new ObjectProperty<>("");
-    private Set<String> selectedCorpora = new LinkedHashSet<String>();
-
-    private final ObjectProperty<Integer> leftContext = new ObjectProperty<>(5);
-    private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
-
-    private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
-    private final ObjectProperty<Long> offset = new ObjectProperty<>(0l);
-    private final ObjectProperty<String> visibleBaseText = new ObjectProperty<>(null, String.class);
-    private final ObjectProperty<String> contextSegmentation =
-            new ObjectProperty<>(null, String.class);
-
-    private final ObjectProperty<OrderEnum> order = new ObjectProperty<>(OrderEnum.NORMAL);
-
-    private QueryLanguage queryLanguage = QueryLanguage.AQL;
-
-    private final ObjectProperty<Set<Long>> selectedMatches =
-            new ObjectProperty<Set<Long>>(new TreeSet<Long>());
-
-    private final ObjectProperty<Class<? extends ExporterPlugin>> exporter =
-            new ObjectProperty<Class<? extends ExporterPlugin>>(CSVExporter.class);
-    private final ObjectProperty<List<String>> exportAnnotationKeys =
-            new ObjectProperty<List<String>>(new ArrayList<String>());
-    private final ObjectProperty<String> exportParameters = new ObjectProperty<>("");
-
-    private final ObjectProperty<Boolean> alignmc = new ObjectProperty<Boolean>(false);
-
-    private transient Map<QueryType, Future<?>> executedTasks;
-
-    private transient Map<QueryType, Call> executedCalls;
-
-    private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition =
-            new BeanContainer<>(UserGeneratedFrequencyEntry.class);
-
-    private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
-
-    public QueryUIState() {
-        initTransients();
+  public void setQueryLanguageLegacy(annis.service.objects.QueryLanguage queryLanguage) {
+    if (queryLanguage == annis.service.objects.QueryLanguage.AQL_QUIRKS_V3) {
+      this.queryLanguage = QueryLanguage.AQLQUIRKSV3;
+    } else {
+      this.queryLanguage = QueryLanguage.AQL;
     }
+  }
 
-    public ObjectProperty<Boolean> getAlignmc() {
-        return alignmc;
-    }
+  public ObjectProperty<Integer> getRightContext() {
+    return rightContext;
+  }
 
-    public ObjectProperty<String> getAql() {
-        return aql;
-    }
+  public Set<String> getSelectedCorpora() {
+    return selectedCorpora;
+  }
 
-    public ObjectProperty<String> getContextSegmentation() {
-        return contextSegmentation;
-    }
+  public void setSelectedCorpora(Set<String> selectedCorpora) {
+    this.selectedCorpora = selectedCorpora;
+  }
 
-    public Map<QueryType, Future<?>> getExecutedTasks() {
-        return executedTasks;
-    }
+  public ObjectProperty<Set<Long>> getSelectedMatches() {
+    return selectedMatches;
+  }
 
-    public Map<QueryType, Call> getExecutedCalls() {
-      return executedCalls;
-    }
+  public ObjectProperty<String> getVisibleBaseText() {
+    return visibleBaseText;
+  }
 
-    public ObjectProperty<List<String>> getExportAnnotationKeys() {
-        return exportAnnotationKeys;
-    }
+  private void initTransients() {
+    executedTasks = new EnumMap<>(QueryType.class);
+    executedCalls = new EnumMap<>(QueryType.class);
+  }
 
-    public ObjectProperty<Class<? extends ExporterPlugin>> getExporter() {
-        return exporter;
-    }
-
-    public ObjectProperty<String> getExportParameters() {
-        return exportParameters;
-    }
-
-    public BeanContainer<Integer, UserGeneratedFrequencyEntry> getFrequencyTableDefinition() {
-        return frequencyTableDefinition;
-    }
-
-    public BeanItemContainer<Query> getHistory() {
-        return history;
-    }
-
-    public ObjectProperty<Integer> getLeftContext() {
-        return leftContext;
-    }
-
-    public ObjectProperty<Integer> getLimit() {
-        return limit;
-    }
-
-    public ObjectProperty<Long> getOffset() {
-        return offset;
-    }
-
-    public ObjectProperty<OrderEnum> getOrder() {
-        return order;
-    }
-
-    public QueryLanguage getQueryLanguage() {
-        return queryLanguage;
-    }
-
-    public annis.service.objects.QueryLanguage getQueryLanguageLegacy() {
-        if (queryLanguage == QueryLanguage.AQLQUIRKSV3) {
-            return annis.service.objects.QueryLanguage.AQL_QUIRKS_V3;
-        } else {
-            return annis.service.objects.QueryLanguage.AQL;
-        }
-    }
-
-    public void setQueryLanguage(QueryLanguage queryLanguage) {
-        this.queryLanguage = queryLanguage;
-    }
-
-    public void setQueryLanguageLegacy(annis.service.objects.QueryLanguage queryLanguage) {
-        if (queryLanguage == annis.service.objects.QueryLanguage.AQL_QUIRKS_V3) {
-            this.queryLanguage = QueryLanguage.AQLQUIRKSV3;
-        } else {
-            this.queryLanguage = QueryLanguage.AQL;
-        }
-    }
-
-    public ObjectProperty<Integer> getRightContext() {
-        return rightContext;
-    }
-
-    public Set<String> getSelectedCorpora() {
-        return selectedCorpora;
-    }
-
-    public void setSelectedCorpora(Set<String> selectedCorpora) {
-      this.selectedCorpora = selectedCorpora;
-    }
-
-    public ObjectProperty<Set<Long>> getSelectedMatches() {
-        return selectedMatches;
-    }
-
-    public ObjectProperty<String> getVisibleBaseText() {
-        return visibleBaseText;
-    }
-
-    private void initTransients() {
-        executedTasks = new EnumMap<>(QueryType.class);
-        executedCalls = new EnumMap<>(QueryType.class);
-    }
-
-    private void readObject(final java.io.ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        initTransients();
-    }
+  private void readObject(final java.io.ObjectInputStream in)
+      throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    initTransients();
+  }
 
 }

@@ -22,7 +22,6 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Binder;
@@ -32,18 +31,19 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.v7.data.Container;
 import com.vaadin.v7.data.Property;
-import com.vaadin.v7.data.util.BeanItemContainer;
 import com.vaadin.v7.data.util.IndexedContainer;
 import com.vaadin.v7.data.util.ItemSorter;
 import com.vaadin.v7.ui.AbstractSelect;
 import com.vaadin.v7.ui.ComboBox;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.slf4j.Logger;
@@ -319,12 +319,10 @@ public class SearchOptionsPanel extends FormLayout {
     private final ComboBox cbResultsPerPage;
     private final ComboBox cbSegmentation;
     private final HelpButton<?> segmentationHelp;
-    private final ComboBox cbOrder;
+    private final com.vaadin.ui.ComboBox<OrderEnum> cbOrder;
     private final com.vaadin.ui.ComboBox<QueryLanguage> cbQueryLanguage;
     private final ProgressBar pbLoadConfig;
 
-    private final BeanItemContainer<OrderEnum> orderContainer =
-            new BeanItemContainer<>(OrderEnum.class, Lists.newArrayList(OrderEnum.values()));
     private final IndexedContainer contextContainerLeft = new IndexedContainer();
 
     private final IndexedContainer contextContainerRight = new IndexedContainer();
@@ -388,10 +386,9 @@ public class SearchOptionsPanel extends FormLayout {
 
         segmentationHelp = new HelpButton<Object>(cbSegmentation);
 
-        cbOrder = new ComboBox("Order", orderContainer);
-        cbOrder.setNewItemsAllowed(false);
-        cbOrder.setNullSelectionAllowed(false);
-        cbOrder.setImmediate(true);
+        cbOrder = new com.vaadin.ui.ComboBox<FindQuery.OrderEnum>("Order",
+            Arrays.asList(OrderEnum.values()));
+        cbOrder.setEmptySelectionAllowed(false);
 
         cbQueryLanguage = new com.vaadin.ui.ComboBox<>("Query Language");
         
@@ -455,13 +452,9 @@ public class SearchOptionsPanel extends FormLayout {
             cbResultsPerPage.setPropertyDataSource(state.getLimit());
             cbSegmentation.setPropertyDataSource(state.getContextSegmentation());
 
-            orderContainer.removeAllItems();
-            for (OrderEnum t : OrderEnum.values()) {
-                orderContainer.addItem(t);
-            }
-            cbOrder.setPropertyDataSource(state.getOrder());
-
-
+            Binder<QueryUIState> binder = new Binder<QueryUIState>(QueryUIState.class);
+            binder.setBean(state);
+            binder.forField(cbOrder).bind("order");
         }
     }
 
