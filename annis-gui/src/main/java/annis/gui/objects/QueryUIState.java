@@ -13,6 +13,13 @@
  */
 package annis.gui.objects;
 
+import annis.gui.exporter.CSVExporter;
+import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.model.Query;
+import com.vaadin.v7.data.util.BeanContainer;
+import com.vaadin.v7.data.util.BeanItemContainer;
+import com.vaadin.v7.data.util.ObjectProperty;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -23,23 +30,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
-
-import com.vaadin.data.provider.ListDataProvider;
-import com.vaadin.v7.data.util.BeanContainer;
-import com.vaadin.v7.data.util.BeanItemContainer;
-import com.vaadin.v7.data.util.ObjectProperty;
-
+import okhttp3.Call;
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
+import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import annis.gui.exporter.CSVExporter;
-import annis.gui.frequency.UserGeneratedFrequencyEntry;
-import annis.libgui.exporter.ExporterPlugin;
-import annis.model.Query;
-import annis.service.objects.OrderType;
-import okhttp3.Call;
-
-import org.corpus_tools.annis.api.model.QueryLanguage;
 
 /**
  * Helper class to bundle all query relevant state information of the UI.
@@ -71,7 +66,7 @@ public class QueryUIState implements Serializable {
     private final ObjectProperty<String> contextSegmentation =
             new ObjectProperty<>(null, String.class);
 
-    private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
+    private final ObjectProperty<OrderEnum> order = new ObjectProperty<>(OrderEnum.NORMAL);
 
     private QueryLanguage queryLanguage = QueryLanguage.AQL;
 
@@ -151,7 +146,7 @@ public class QueryUIState implements Serializable {
         return offset;
     }
 
-    public ObjectProperty<OrderType> getOrder() {
+    public ObjectProperty<OrderEnum> getOrder() {
         return order;
     }
 

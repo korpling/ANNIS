@@ -20,7 +20,6 @@ import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.OrderType;
 import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -45,7 +44,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -324,8 +323,8 @@ public class SearchOptionsPanel extends FormLayout {
     private final com.vaadin.ui.ComboBox<QueryLanguage> cbQueryLanguage;
     private final ProgressBar pbLoadConfig;
 
-    private final BeanItemContainer<OrderType> orderContainer =
-            new BeanItemContainer<>(OrderType.class, Lists.newArrayList(OrderType.values()));
+    private final BeanItemContainer<OrderEnum> orderContainer =
+            new BeanItemContainer<>(OrderEnum.class, Lists.newArrayList(OrderEnum.values()));
     private final IndexedContainer contextContainerLeft = new IndexedContainer();
 
     private final IndexedContainer contextContainerRight = new IndexedContainer();
@@ -457,7 +456,7 @@ public class SearchOptionsPanel extends FormLayout {
             cbSegmentation.setPropertyDataSource(state.getContextSegmentation());
 
             orderContainer.removeAllItems();
-            for (OrderType t : OrderType.values()) {
+            for (OrderEnum t : OrderEnum.values()) {
                 orderContainer.addItem(t);
             }
             cbOrder.setPropertyDataSource(state.getOrder());

@@ -35,7 +35,6 @@ import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
-import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;
 import annis.sqlgen.AnnisAttributeHelper;
 import annis.sqlgen.ByteHelper;
@@ -104,6 +103,7 @@ import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.dbutils.handlers.ScalarHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReversedLinesFileReader;
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.graphannis.CorpusStorageManager;
 import org.corpus_tools.graphannis.CorpusStorageManager.ResultOrder;
 import org.corpus_tools.graphannis.LogLevel;
@@ -230,19 +230,19 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
 
     }
 
-    public ResultOrder convertOrder(OrderType type) {
-        switch (type) {
-        case ascending:
-            return ResultOrder.Normal;
-        case descending:
-            return ResultOrder.Inverted;
-        case random:
-            return ResultOrder.Randomized;
-        case unsorted:
-            return ResultOrder.NotSorted;
+    public ResultOrder convertOrder(OrderEnum type) {
+      switch (type) {
+        case NORMAL:
+          return ResultOrder.Normal;
+        case INVERTED:
+          return ResultOrder.Inverted;
+        case RANDOMIZED:
+          return ResultOrder.Randomized;
+        case NOTSORTED:
+          return ResultOrder.NotSorted;
         default:
-            return ResultOrder.Normal;
-        }
+          return ResultOrder.Normal;
+      }
     }
 
     @Override
