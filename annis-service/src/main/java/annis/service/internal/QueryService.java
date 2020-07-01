@@ -23,6 +23,7 @@ import annis.ServiceConfig;
 import annis.dao.QueryDao;
 import annis.dao.QueryDaoImpl;
 import annis.examplequeries.ExampleQuery;
+import annis.model.DisplayedResultQuery;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
@@ -37,7 +38,6 @@ import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
-import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;
 import annis.service.objects.RawTextWrapper;
 import annis.service.objects.SegmentationList;
@@ -84,6 +84,7 @@ import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.graphannis.model.NodeDesc;
 import org.corpus_tools.salt.common.SaltProject;
@@ -458,9 +459,9 @@ public class QueryService {
         int offset = Integer.parseInt(offsetRaw);
         int limit = Integer.parseInt(limitRaw);
 
-        OrderType order;
+        OrderEnum order;
         try {
-            order = OrderType.valueOf(orderRaw.toLowerCase());
+          order = DisplayedResultQuery.parseOrderFromCitationFragment(orderRaw);
         } catch (IllegalArgumentException ex) {
             throw new WebApplicationException(Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN)
                     .entity("parameter 'order' has the invalid value '" + orderRaw + "'. It should be one of"

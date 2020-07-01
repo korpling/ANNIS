@@ -19,11 +19,11 @@ import annis.model.FrequencyQuery;
 import annis.model.PagedResultQuery;
 import annis.model.Query;
 import annis.service.objects.FrequencyTableQuery;
-import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 
 /**
  * Helper class to construct new {@link Query} objects (or one of the child classes)
@@ -103,7 +103,7 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>> {
       return (QG) this;
     }
 
-    public QG order(OrderType order) {
+    public QG order(OrderEnum order) {
       getCurrent().setOrder(order);
       return (QG) this;
     }

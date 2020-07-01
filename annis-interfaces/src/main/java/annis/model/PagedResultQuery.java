@@ -13,11 +13,11 @@
  */
 package annis.model;
 
-import annis.service.objects.OrderType;
 import com.google.common.base.Preconditions;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 
 /**
  * Parameters for a query that shows the result to the user
@@ -31,7 +31,7 @@ public class PagedResultQuery extends ContextualizedQuery {
   private static final long serialVersionUID = -4589516338778409392L;
   private long offset;
   private int limit;
-  private OrderType order = OrderType.ascending;
+  private OrderEnum order = OrderEnum.NORMAL;
 
   public PagedResultQuery() {
 
@@ -95,7 +95,7 @@ public class PagedResultQuery extends ContextualizedQuery {
     return offset;
   }
 
-  public OrderType getOrder() {
+  public OrderEnum getOrder() {
     return order;
   }
 
@@ -114,7 +114,7 @@ public class PagedResultQuery extends ContextualizedQuery {
     this.offset = offset;
   }
 
-  public void setOrder(OrderType order) {
+  public void setOrder(OrderEnum order) {
     Preconditions.checkNotNull(order, "The order of a paged result query must never be null.");
     this.order = order;
   }

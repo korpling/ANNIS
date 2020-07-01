@@ -32,7 +32,6 @@ import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.model.Query;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.OrderType;
 import annis.service.objects.QueryLanguage;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -429,7 +428,8 @@ public class SearchView extends GridLayout
 
                     if (args.get("o") != null) {
                         try {
-                            query.setOrder(OrderType.valueOf(args.get("o").toLowerCase()));
+                          query.setOrder(
+                              DisplayedResultQuery.parseOrderFromCitationFragment(args.get("0")));
                         } catch (IllegalArgumentException ex) {
                             log.warn("Could not parse query fragment argument for order", ex);
                         }

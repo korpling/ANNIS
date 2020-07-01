@@ -13,13 +13,13 @@
  */
 package annis.model;
 
-import annis.service.objects.OrderType;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 
 /**
  * The query state of the actual displayed result query.
@@ -27,6 +27,11 @@ import java.util.TreeSet;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class DisplayedResultQuery extends PagedResultQuery {
+
+  private static final String ASCENDING = "ascending";
+  private static final String UNSORTED = "unsorted";
+  private static final String RANDOM = "random";
+  private static final String DESCENDING = "descending";
   /**
    * 
    */
@@ -77,14 +82,37 @@ public class DisplayedResultQuery extends PagedResultQuery {
     if (!Objects.equals(getBaseText(), getSegmentation())) {
       result.put("_bt", (getBaseText() == null ? "" : getBaseText()));
     }
-    if (getOrder() != OrderType.ascending && getOrder() != null) {
-      result.put("o", getOrder().toString());
+    if (getOrder() != OrderEnum.NORMAL && getOrder() != null) {
+      if (getOrder() == OrderEnum.INVERTED) {
+        result.put("o", DESCENDING);
+      } else if (getOrder() == OrderEnum.RANDOMIZED) {
+        result.put("o", RANDOM);
+      } else if (getOrder() == OrderEnum.NOTSORTED) {
+        result.put("o", UNSORTED);
+      }
+
     }
     if (getSelectedMatches() != null && !getSelectedMatches().isEmpty()) {
       result.put("m", Joiner.on(',').join(getSelectedMatches()));
     }
 
     return result;
+  }
+
+  public static OrderEnum parseOrderFromCitationFragment(String value) {
+    if (value != null) {
+      switch (value.toLowerCase()) {
+        case ASCENDING:
+          return OrderEnum.NORMAL;
+        case DESCENDING:
+          return OrderEnum.INVERTED;
+        case RANDOM:
+          return OrderEnum.RANDOMIZED;
+        case UNSORTED:
+          return OrderEnum.NOTSORTED;
+      }
+    }
+    return OrderEnum.NORMAL;
   }
 
   public Set<Long> getSelectedMatches() {

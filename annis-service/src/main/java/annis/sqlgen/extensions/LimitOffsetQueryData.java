@@ -15,8 +15,8 @@
  */
 package annis.sqlgen.extensions;
 
-import annis.service.objects.OrderType;
 import java.util.Optional;
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 
 /**
  *
@@ -26,15 +26,15 @@ public class LimitOffsetQueryData {
 
     private final long offset;
     private final long limit;
-    private final OrderType order;
+    private final OrderEnum order;
 
     public LimitOffsetQueryData(long offset, long limit) {
         this.offset = offset;
         this.limit = limit;
-        this.order = OrderType.ascending;
+        this.order = OrderEnum.NORMAL;
     }
 
-    public LimitOffsetQueryData(long offset, long limit, OrderType order) {
+    public LimitOffsetQueryData(long offset, long limit, OrderEnum order) {
         this.offset = offset;
         this.limit = limit;
         this.order = order;
@@ -52,7 +52,7 @@ public class LimitOffsetQueryData {
         return offset;
     }
 
-    public OrderType getOrder() {
+    public OrderEnum getOrder() {
         return order;
     }
 
