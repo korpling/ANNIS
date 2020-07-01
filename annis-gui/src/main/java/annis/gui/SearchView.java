@@ -69,6 +69,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
@@ -366,7 +367,7 @@ public class SearchView extends GridLayout
 
         if (args.containsKey("c")) {
             String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
-            Set<String> corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
+            Set<String> corpora = new TreeSet<String>(Arrays.asList(originalCorpusNames));
 
             if (corpora.isEmpty()) {
                 if (Helper.getUser(ui) == null && toolbar != null) {
@@ -494,38 +495,6 @@ public class SearchView extends GridLayout
 
     public MainToolbar getMainToolbar() {
         return toolbar;
-    }
-
-    /**
-     * Takes a list of raw corpus names as given by the #c parameter and returns a list of corpus
-     * names that are known to exist. It also replaces alias names with the real corpus names.
-     *
-     * @param originalNames
-     * @return
-     */
-    private Set<String> getMappedCorpora(List<String> originalNames) {
-        WebResource rootRes = Helper.getAnnisWebResource(ui);
-        Set<String> mappedNames = new HashSet<>();
-        // iterate over given corpora and map names if necessary
-        for (String selectedCorpusName : originalNames) {
-            // get the real corpus descriptions by the name (which could be an alias)
-            try {
-                List<AnnisCorpus> corporaByName = rootRes.path("query").path("corpora")
-                        .path(urlPathEscape.escape(selectedCorpusName))
-                        .get(new GenericType<List<AnnisCorpus>>() {});
-
-                if (corporaByName != null && !corporaByName.isEmpty()) {
-                    for (AnnisCorpus c : corporaByName) {
-                        mappedNames.add(c.getName());
-                    }
-                }
-            } catch (ClientHandlerException ex) {
-                String msg = "alias mapping does not work for alias: " + selectedCorpusName;
-                log.error(msg, ex);
-                Notification.show(msg, Notification.Type.TRAY_NOTIFICATION);
-            }
-        }
-        return mappedNames;
     }
 
     public TabSheet getTabSheet() {
