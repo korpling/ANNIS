@@ -15,8 +15,21 @@
  */
 package annis.gui;
 
-import static annis.gui.ServiceHelper.getQName;
-
+import annis.gui.beans.CorpusBrowserEntry;
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.model.Query;
+import annis.service.objects.QueryLanguage;
+import com.vaadin.event.selection.SelectionEvent;
+import com.vaadin.event.selection.SelectionListener;
+import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,29 +42,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
-import com.vaadin.event.selection.SelectionEvent;
-import com.vaadin.event.selection.SelectionListener;
-import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
-
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
-
-import annis.gui.beans.CorpusBrowserEntry;
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.Background;
-import annis.model.Query;
-import annis.service.objects.QueryLanguage;
 
 /**
  *
@@ -188,7 +184,7 @@ public class CorpusBrowserPanel extends Panel {
     }
 
     private void fetchAnnotationsInBackground(UI ui) {
-        CorporaApi api = new CorporaApi(ServiceHelper.getClient(ui));
+      CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
         try {
             final List<Annotation> nodeAnnos = api.corpusNodeAnnotations(corpus, true, true).stream().filter(
@@ -197,7 +193,7 @@ public class CorpusBrowserPanel extends Panel {
 
             final List<Annotation> metaAnnos = new LinkedList<>(nodeAnnos);
 
-            final Set<AnnoKey> metaAnnoKeys = ServiceHelper.getMetaAnnotationNames(corpus, ui);
+            final Set<AnnoKey> metaAnnoKeys = Helper.getMetaAnnotationNames(corpus, ui);
             nodeAnnos.removeIf(anno -> metaAnnoKeys.contains(anno.getKey()));
             metaAnnos.removeIf(anno -> !metaAnnoKeys.contains(anno.getKey()));
 
@@ -244,7 +240,7 @@ public class CorpusBrowserPanel extends Panel {
                 }
                 for (Component c : components) {
                     // check if collected edge names are unique
-                    if (!edgeNames.add(getQName(c))) {
+                if (!edgeNames.add(Helper.getQName(c))) {
                         stripEdgeName = false;
                     }
                     // check if we need to add the general dominance example edge
@@ -267,7 +263,7 @@ public class CorpusBrowserPanel extends Panel {
 
                 // fill the actual containers
                 for (Annotation a : nodeAnnos) {
-                    String name = stripNodeAnno ? a.getKey().getName() : getQName(a.getKey());
+                String name = stripNodeAnno ? a.getKey().getName() : Helper.getQName(a.getKey());
                     CorpusBrowserEntry cbe = new CorpusBrowserEntry();
                     cbe.setName(name);
                     cbe.setExample(name + "=\"" + a.getVal() + "\"");
@@ -285,7 +281,7 @@ public class CorpusBrowserPanel extends Panel {
                 }
                 for (Component c : components) {
                     CorpusBrowserEntry cbeEdgeType = new CorpusBrowserEntry();
-                    String name = stripEdgeName ? c.getName() : getQName(c);
+                String name = stripEdgeName ? c.getName() : Helper.getQName(c);
                     if ((name == null || name.isEmpty()) && c.getType() == AnnotationComponentType.DOMINANCE) {
                         cbeEdgeType.setName("(dominance)");
                     } else {
@@ -305,7 +301,8 @@ public class CorpusBrowserPanel extends Panel {
                     Component c = entry.getKey();
                     for (Annotation a : entry.getValue()) {
                         CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
-                        String edgeAnno = stripEdgeAnno ? a.getKey().getName() : getQName(a.getKey());
+                  String edgeAnno =
+                      stripEdgeAnno ? a.getKey().getName() : Helper.getQName(a.getKey());
                         cbeEdgeAnno.setName(edgeAnno);
                         cbeEdgeAnno.setCorpus(corpus);
                         if (c.getType() == AnnotationComponentType.POINTING) {
@@ -322,7 +319,7 @@ public class CorpusBrowserPanel extends Panel {
 
                 boolean stripMetaName = canExcludeNamespace(metaAnnos);
                 for (Annotation a : nodeAnnos) {
-                    String name = stripMetaName ? a.getKey().getName() : getQName(a.getKey());
+                String name = stripMetaName ? a.getKey().getName() : Helper.getQName(a.getKey());
                     CorpusBrowserEntry cbe = new CorpusBrowserEntry();
                     cbe.setName(name);
                     cbe.setExample(name + "=\"" + a.getVal() + "\"");
@@ -330,7 +327,7 @@ public class CorpusBrowserPanel extends Panel {
                     nodeAnnoItems.add(cbe);
                 }
                 for (Annotation a : metaAnnos) {
-                    String name = stripNodeAnno ? a.getKey().getName() : getQName(a.getKey());
+                String name = stripNodeAnno ? a.getKey().getName() : Helper.getQName(a.getKey());
                     CorpusBrowserEntry cbe = new CorpusBrowserEntry();
                     cbe.setName(name);
                     cbe.setExample(name + "=\"" + a.getVal() + "\"");

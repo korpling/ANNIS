@@ -15,12 +15,9 @@
  */
 package annis.gui;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.Background;
+import annis.libgui.Helper;
 import com.google.common.util.concurrent.FutureCallback;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.ListDataProvider;
@@ -35,16 +32,17 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.FrequencyQuery;
 import org.corpus_tools.annis.api.model.FrequencyQueryDefinition;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
-import org.corpus_tools.annis.api.SearchApi;
-
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.Background;
 
 /**
  * Provides all corpus annotations for a corpus or for a specific search result.
@@ -131,9 +129,9 @@ public class MetaDataPanel extends Panel {
         final UI ui = getUI();
 
         Background.runWithCallback(() -> {
-            Set<AnnoKey> metaKeys = ServiceHelper.getMetaAnnotationNames(toplevelCorpusName, ui);
+          Set<AnnoKey> metaKeys = Helper.getMetaAnnotationNames(toplevelCorpusName, ui);
             List<Annotation> result = new LinkedList<>();
-            SearchApi api = new SearchApi(ServiceHelper.getClient(ui));
+          SearchApi api = new SearchApi(Helper.getClient(ui));
             for (AnnoKey key : metaKeys) {
                 // get the value for this annotation using a frequency query
                 FrequencyQuery q = new FrequencyQuery();
@@ -191,7 +189,7 @@ public class MetaDataPanel extends Panel {
     }
 
     private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData) {
-        ValueProvider<Annotation, String> nameProvider = anno -> ServiceHelper.getQName(anno.getKey());
+      ValueProvider<Annotation, String> nameProvider = anno -> Helper.getQName(anno.getKey());
         metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
 
         Grid<Annotation> tblMeta = new Grid<>(Annotation.class);
