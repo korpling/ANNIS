@@ -30,7 +30,6 @@ import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
@@ -47,7 +46,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,8 +61,7 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
-import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.api.model.FindQuery;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -132,8 +129,6 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
     public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
     public static final String FILESYSTEM_CACHE_RESULT = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
-
-    public static final String MAPPING_HIDDEN_ANNOS = "hidden_annos";
 
     private final Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
@@ -542,12 +537,11 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
         for (String corpusName : corpusNames) {
 
-            CorpusConfig corpusConfig = Helper.getCorpusConfig(corpusName, UI.getCurrent());
+          CorpusConfiguration corpusConfig = Helper.getCorpusConfig(corpusName, UI.getCurrent());
 
-            if (corpusConfig != null && corpusConfig.containsKey(MAPPING_HIDDEN_ANNOS)) {
-                hiddenTokenAnnos = new HashSet<>(
-                        Arrays.asList(StringUtils.split(corpusConfig.getConfig(MAPPING_HIDDEN_ANNOS), ",")));
-            }
+          if (corpusConfig != null) {
+            hiddenTokenAnnos = new HashSet<>(corpusConfig.getView().getHiddenAnnos());
+          }
         }
 
         if (hiddenTokenAnnos != null) {

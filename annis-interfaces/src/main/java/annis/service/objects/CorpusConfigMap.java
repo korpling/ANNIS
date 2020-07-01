@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
 
 /**
  * Maps corpus names to corpus configurations.
@@ -30,7 +31,7 @@ public class CorpusConfigMap implements Serializable {
    * 
    */
   private static final long serialVersionUID = -7045818041525225347L;
-  private Map<String, CorpusConfig> corpusConfigs = new HashMap<String, CorpusConfig>();
+  private Map<String, CorpusConfiguration> corpusConfigs = new HashMap<>();
 
   /**
    * Checks if a corpus configuration is defined for a specific corpus name.
@@ -46,29 +47,29 @@ public class CorpusConfigMap implements Serializable {
     return false;
   }
 
-  public CorpusConfig get(String k) {
+  public CorpusConfiguration get(String k) {
     return corpusConfigs.get(k);
   }
 
   /**
    * @return the corpusConfigs
    */
-  public Map<String, CorpusConfig> getCorpusConfigs() {
-    return (corpusConfigs == null) ? new HashMap<String, CorpusConfig>() : corpusConfigs;
+  public Map<String, CorpusConfiguration> getCorpusConfigs() {
+    return (corpusConfigs == null) ? new HashMap<>() : corpusConfigs;
   }
 
   public boolean isEmpty() {
     return (corpusConfigs == null) ? true : corpusConfigs.isEmpty();
   }
 
-  public CorpusConfig put(String k, CorpusConfig corpusConfig) {
+  public CorpusConfiguration put(String k, CorpusConfiguration corpusConfig) {
     return corpusConfigs.put(k, corpusConfig);
   }
 
   /**
    * @param corpusConfigs the corpusConfigs to set
    */
-  public void setCorpusConfigs(Map<String, CorpusConfig> corpusConfigs) {
+  public void setCorpusConfigs(Map<String, CorpusConfiguration> corpusConfigs) {
     this.corpusConfigs = corpusConfigs;
   }
 }

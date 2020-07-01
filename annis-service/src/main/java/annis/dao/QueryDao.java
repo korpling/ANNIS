@@ -23,7 +23,7 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.CorpusConfig;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableQuery;
@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import org.corpus_tools.graphannis.CorpusStorageManager;
@@ -165,7 +166,7 @@ public interface QueryDao {
      *
      * @return The return value is the Key of corpus table entry.
      */
-    public CorpusConfigMap getCorpusConfigurations();
+    public Map<String, CorpusConfig> getCorpusConfigurations();
 
     /**
      * Get a specific configuration of a corpus from directory.

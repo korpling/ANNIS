@@ -31,7 +31,6 @@ import annis.service.objects.AnnisAttribute.Type;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
-import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableQuery;
@@ -58,6 +57,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
@@ -391,13 +391,13 @@ public class QueryService {
     @GET
     @Path("corpora/config")
     @Produces("application/xml")
-    public CorpusConfigMap corpusConfigs() {
-        CorpusConfigMap corpusConfigs = getQueryDao().getCorpusConfigurations();
-        CorpusConfigMap result = new CorpusConfigMap();
+    public Map<String, CorpusConfig> corpusConfigs() {
+      Map<String, CorpusConfig> corpusConfigs = getQueryDao().getCorpusConfigurations();
+      Map<String, CorpusConfig> result = new HashMap<>();
         Subject user = SecurityUtils.getSubject();
 
         if (corpusConfigs != null) {
-            for (String c : corpusConfigs.getCorpusConfigs().keySet()) {
+          for (String c : corpusConfigs.keySet()) {
                 if (user.isPermitted("query:*:" + c)) {
                     result.put(c, corpusConfigs.get(c));
                 }

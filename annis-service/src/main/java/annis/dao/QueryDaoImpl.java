@@ -28,7 +28,6 @@ import annis.service.objects.AnnisAttribute.Type;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
-import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableQuery;
@@ -621,16 +620,16 @@ public class QueryDaoImpl extends AbstractDao implements QueryDao {
     }
 
     @Override
-    public CorpusConfigMap getCorpusConfigurations() {
+    public Map<String, CorpusConfig> getCorpusConfigurations() {
         List<AnnisCorpus> annisCorpora = listCorpora();
-        CorpusConfigMap cConfigs = new CorpusConfigMap();
+      Map<String, CorpusConfig> cConfigs = new HashMap<>();
 
         if (annisCorpora != null) {
             for (AnnisCorpus c : annisCorpora) {
                 try {
                     Properties p = getCorpusConfiguration(c.getName());
                     if (p != null) {
-                        CorpusConfig corpusConfig = new CorpusConfig();
+                      CorpusConfig corpusConfig = new CorpusConfig();
                         corpusConfig.setConfig(p);
                         cConfigs.put(c.getName(), corpusConfig);
                     }
