@@ -2,11 +2,17 @@ package annis.gui.graphml;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -16,9 +22,14 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import org.apache.commons.lang3.tuple.Pair;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.core.SAnnotationContainer;
 import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.util.SaltUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maps a GraphML stream to Salt
@@ -28,6 +39,8 @@ import org.corpus_tools.salt.core.SNode;
  */
 public class GraphMLMapper {
 
+  private static final Logger log = LoggerFactory.getLogger(GraphMLMapper.class);
+
   private XMLEventReader reader;
 
   private final SDocumentGraph docGraph;
@@ -36,25 +49,67 @@ public class GraphMLMapper {
 
   private final Map<Integer, Integer> node2timelinePOT;
 
-  protected GraphMLMapper(XMLEventReader reader) {
+  private final Set<String> hasOutgoingCoverageEdge;
+  private final Set<String> hasOutgoingDominanceEdge;
+
+
+  protected GraphMLMapper(XMLEventReader reader, Set<String> hasOutgoingCoverageEdge,
+      Set<String> hasOutgoingDominanceEdge) {
     this.reader = reader;
     this.docGraph = SaltFactory.createSDocumentGraph();
     this.nodesByID = HashBiMap.create();
     this.node2timelinePOT = new HashMap<>();
+    this.hasOutgoingCoverageEdge = hasOutgoingCoverageEdge;
+    this.hasOutgoingDominanceEdge = hasOutgoingDominanceEdge;
   }
 
-  public static SDocumentGraph mapDocumentGraph(InputStream input) throws XMLStreamException {
+  public static SDocumentGraph mapDocumentGraph(InputStream input)
+      throws XMLStreamException, IOException {
     SDocumentGraph graph = SaltFactory.createSDocumentGraph();
+    
+    // Copy content of stream to a temporary file, so we can have multiple parse passes
+    Path tmpFile = Files.createTempFile("graphannis-input", ".graphml");
+    try {
+      Files.copy(input, tmpFile);
 
-    XMLInputFactory factory = XMLInputFactory.newInstance();
-    factory.setProperty(XMLInputFactory.IS_VALIDATING, false);
+      XMLInputFactory factory = XMLInputFactory.newInstance();
+      factory.setProperty(XMLInputFactory.IS_VALIDATING, false);
 
-    XMLEventReader reader = factory.createXMLEventReader(input);
+      // 1. pass, check which nodes have an outgoing edge of a certain types
+      Set<String> hasOutgoingCoverageEdge = new HashSet<>();
+      Set<String> hasOutgoingDominanceEdge = new HashSet<>();
+      {
+        FileInputStream fileInput = new FileInputStream(tmpFile.toFile());
+        XMLEventReader reader = factory.createXMLEventReader(fileInput);
+        while (reader.hasNext()) {
+          XMLEvent event = reader.nextEvent();
+          if (event.isStartDocument()) {
+            StartElement element = event.asStartElement();
+            if ("edge".equals(element.getName().getLocalPart())) {
+              Attribute source = element.getAttributeByName(new QName("source"));
+              Attribute label = element.getAttributeByName(new QName("label"));
+              if (source != null && label != null) {
+                if("Coverage".equals(label.getValue())) {
+                  hasOutgoingCoverageEdge.add(source.getValue());
+                } else if ("Dominance".equals(label.getValue())) {
+                  hasOutgoingDominanceEdge.add(source.getValue());
+                }
+              }
+            }
+          }
+        }
+        fileInput.close();
+      }
 
-    GraphMLMapper mapper = new GraphMLMapper(reader);
-    mapper.mapDocGraph();
-
-    return mapper.docGraph;
+      // 2. pass, map nodes and edges with the correct type
+      FileInputStream fileInput = new FileInputStream(tmpFile.toFile());
+      XMLEventReader reader = factory.createXMLEventReader(fileInput);
+      GraphMLMapper mapper = new GraphMLMapper(reader, hasOutgoingCoverageEdge, hasOutgoingDominanceEdge);
+      mapper.mapDocGraph();
+      return mapper.docGraph;
+    } finally {
+      Files.deleteIfExists(tmpFile);
+    }
   }
 
   private void mapDocGraph() throws XMLStreamException {
@@ -192,26 +247,43 @@ public class GraphMLMapper {
   private SNode mapNode(String nodeName, Map<String, String> labels) {
     SNode newNode = SaltFactory.createSNode();
 
-    //
-    // if (labels.containsKey("tok") && !hasCoverageEdge(node)) {
-    // newNode = SaltFactory.createSToken();
-    // } else if (hasDominanceEdge(node)) {
-    // newNode = SaltFactory.createSStructure();
-    // } else {
-    // newNode = SaltFactory.createSSpan();
-    // }
-    //
-    // if (!nodeName.startsWith("salt:/")) {
-    // nodeName = "salt:/" + nodeName;
-    // }
-    // newNode.setId(nodeName);
-    // // get the name from the ID
-    // newNode.setName(newNode.getPath().fragment());
-    //
-    // mapLabels(newNode, labels, false);
+    if (labels.containsKey("tok") && !hasOutgoingCoverageEdge.contains(nodeName)) {
+      newNode = SaltFactory.createSToken();
+    } else if (hasOutgoingDominanceEdge.contains(nodeName)) {
+      newNode = SaltFactory.createSStructure();
+    } else {
+      newNode = SaltFactory.createSSpan();
+    }
+
+    if (!nodeName.startsWith("salt:/")) {
+      nodeName = "salt:/" + nodeName;
+    }
+    newNode.setId(nodeName);
+    // get the name from the ID
+    newNode.setName(newNode.getPath().fragment());
+
+    mapLabels(newNode, labels, false);
 
     return newNode;
   }
 
-
+  private static void mapLabels(SAnnotationContainer n, Map<String, String> labels,
+      boolean isMeta) {
+    for (Map.Entry<String, String> e : labels.entrySet()) {
+      Pair<String, String> qname = SaltUtil.splitQName(e.getKey());
+      String name = qname.getRight();
+      if (name == null || name.isEmpty()) {
+        log.warn("Replacing empty label name with '_' ({}:{}={})", qname.getLeft(),
+            name, e.getValue());
+        name = "_";
+      }
+      if ("annis".equals(qname.getLeft()) && !"time".equals(name)) {
+        n.createFeature(qname.getLeft(), name, e.getValue());
+      } else if (isMeta) {
+        n.createMetaAnnotation(qname.getLeft(), name, e.getValue());
+      } else {
+        n.createAnnotation(qname.getLeft(), name, e.getValue());
+      }
+    }
+  }
 }
