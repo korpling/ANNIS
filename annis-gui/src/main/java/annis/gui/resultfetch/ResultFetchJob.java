@@ -15,6 +15,8 @@ package annis.gui.resultfetch;
 
 import annis.CommonHelper;
 import annis.gui.AnnisUI;
+import annis.gui.components.ExceptionDialog;
+import annis.gui.graphml.GraphMLMapper;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
@@ -26,19 +28,26 @@ import annis.service.objects.QueryLanguage;
 import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
+import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
 import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
+import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,11 +144,24 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
                     List<String> corpusPath = CommonHelper.getCorpusPath(m.getSaltIDs().get(0));
 
                     if (!corpusPath.isEmpty()) {
-                        String graphML = corpora.subgraphForNodes(corpusPath.get(0), arg);
-                        // TODO create Salt from GraphML
-                        final SaltProject p = SaltFactory.createSaltProject();
-                        queue.put(p);
-                        log.debug("added match {} to queue", current + 1);
+                      String graphML = corpora.subgraphForNodes(corpusPath.get(0), arg);
+                      // create Salt from GraphML
+                        try {
+                          final SaltProject p = SaltFactory.createSaltProject();
+                          SCorpusGraph cg = p.createCorpusGraph();
+                          URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
+                          SDocument doc = cg.createDocument(docURI);
+                          SDocumentGraph docGraph =
+                              GraphMLMapper.mapDocumentGraph(new StringReader(graphML));
+                          queue.put(p);
+                          doc.setDocumentGraph(docGraph);
+                          log.debug("added match {} to queue", current + 1);
+                        } catch (XMLStreamException | IOException ex) {
+                          log.error("Could not map GraphML to Salt", ex);
+                          ui.access(
+                              () -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
+                        }
+
                     }
 
                     if (current == 0) {

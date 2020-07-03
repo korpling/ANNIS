@@ -539,7 +539,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
           CorpusConfiguration corpusConfig = Helper.getCorpusConfig(corpusName, UI.getCurrent());
 
-          if (corpusConfig != null) {
+          if (corpusConfig != null && corpusConfig.getView() != null
+              && corpusConfig.getView().getHiddenAnnos() != null) {
             hiddenTokenAnnos = new HashSet<>(corpusConfig.getView().getHiddenAnnos());
           }
         }
