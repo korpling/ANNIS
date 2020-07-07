@@ -66,8 +66,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
+import javax.annotation.PostConstruct;
 import okhttp3.Call;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
@@ -94,6 +96,8 @@ public class QueryController implements Serializable {
   private static final long serialVersionUID = -5746215715915616348L;
 
   private static final Logger log = LoggerFactory.getLogger(QueryController.class);
+
+
 
   /**
    * Only changes the value of the property if it is not equals to the old one.
@@ -123,22 +127,27 @@ public class QueryController implements Serializable {
     }
   }
 
-  private final SearchView searchView;
-
   private final AnnisUI ui;
+
+  private final SearchView searchView;
 
   private final QueryUIState state;
 
-  public QueryController(SearchView searchView, AnnisUI ui) {
-    this.searchView = searchView;
+  public QueryController(AnnisUI ui, SearchView searchView, QueryUIState state) {
     this.ui = ui;
-    this.state = ui.getQueryState();
+    this.searchView = searchView;
+    this.state = state;
 
     this.state.getAql().addValueChangeListener(event -> validateQuery());
 
     Binder<QueryUIState> binder = new Binder<>();
     binder.setBean(this.state);
     binder.addValueChangeListener(event -> validateQuery());
+  }
+
+  @PostConstruct
+  private void init() {
+
   }
 
   /**
@@ -208,7 +217,8 @@ public class QueryController implements Serializable {
 
       newQuery.setOffset(offset);
 
-      Background.runWithCallback(new SingleResultFetchJob(match, newQuery, UI.getCurrent()),
+      UI ui = UI.getCurrent();
+      Background.runWithCallback(new SingleResultFetchJob(match, newQuery, ui),
           new FutureCallback<SaltProject>() {
 
             @Override
@@ -239,7 +249,7 @@ public class QueryController implements Serializable {
 
   public void corpusSelectionChangedInBackground() {
     searchView.getControlPanel().getSearchOptions()
-        .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora(), ui);
+        .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora());
   }
 
   public void executeExport(ExportPanel panel, EventBus eventBus) {
@@ -255,11 +265,16 @@ public class QueryController implements Serializable {
 
     addHistoryEntry(query);
 
-    ExporterPlugin exporterImpl = ui.getExporter(query.getExporter());
+    Optional<ExporterPlugin> exporterImpl =
+        ui.getExporterPlugins().stream().filter((e) -> e.getClass().equals(query.getExporter()))
+            .findAny();
 
-    exportFuture =
-        Background.call(new ExportBackgroundJob(query, exporterImpl, ui, eventBus, panel));
-    state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
+    UI ui = UI.getCurrent();
+    if (exporterImpl.isPresent() && ui instanceof AnnisUI) {
+      exportFuture = Background
+          .call(new ExportBackgroundJob(query, exporterImpl.get(), (AnnisUI) ui, eventBus, panel));
+      state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
+    }
   }
 
   public void executeFrequency(FrequencyQueryPanel panel) {
@@ -296,6 +311,7 @@ public class QueryController implements Serializable {
 
     addHistoryEntry(query);
 
+    UI ui = UI.getCurrent();
     FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, query, panel);
 
     freqFuture = Background.call(job);
@@ -303,124 +319,131 @@ public class QueryController implements Serializable {
   }
 
   /**
-     * Executes a query.
-     * 
-     * @param replaceOldTab
-     * @param freshQuery If true the offset and the selected matches are reset before executing the
-     *        query.
-     */
-    public void executeSearch(boolean replaceOldTab, boolean freshQuery) {
-        if (freshQuery) {
-            getState().getOffset().setValue(0l);
-            getState().getSelectedMatches().setValue(new TreeSet<Long>());
-            // get the value for the visible segmentation from the configured context
-            Collection<String> selectedCorpora = getState().getSelectedCorpora();
-            CorpusConfiguration config = new CorpusConfiguration();
-            if (selectedCorpora != null && !selectedCorpora.isEmpty()) {
-                config = ui.getCorpusConfigWithCache(selectedCorpora.iterator().next());
-            }
+   * Executes a query.
+   * 
+   * @param replaceOldTab
+   * @param freshQuery If true the offset and the selected matches are reset before executing the
+   *        query.
+   */
+  public void executeSearch(boolean replaceOldTab, boolean freshQuery) {
+    UI ui = UI.getCurrent();
+    if (freshQuery && ui instanceof AnnisUI) {
+      getState().getOffset().setValue(0l);
+      getState().getSelectedMatches().setValue(new TreeSet<Long>());
+      // get the value for the visible segmentation from the configured context
+      Collection<String> selectedCorpora = getState().getSelectedCorpora();
+      CorpusConfiguration config = new CorpusConfiguration();
+      if (selectedCorpora != null && !selectedCorpora.isEmpty()) {
+        config = ((AnnisUI) ui).getCorpusConfigWithCache(selectedCorpora.iterator().next());
+      }
 
-              String configVal = config.getView().getBaseTextSegmentation();
-              if ("".equals(configVal) || "tok".equals(configVal)) {
-                  configVal = null;
-              }
-              getState().getVisibleBaseText().setValue(configVal);
-          
+      if (config.getView() != null) {
+        String configVal = config.getView().getBaseTextSegmentation();
+        if ("".equals(configVal) || "tok".equals(configVal)) {
+          configVal = null;
         }
-        // construct a query from the current properties
-        DisplayedResultQuery displayedQuery = getSearchQuery();
+        getState().getVisibleBaseText().setValue(configVal);
+      }
 
-        searchView.getControlPanel().getQueryPanel().setStatus("Searching...");
-
-        cancelSearch();
-
-        // cleanup resources
-        VaadinSession session = VaadinSession.getCurrent();
-        session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
-        if (session.getAttribute(MediaController.class) != null) {
-            session.getAttribute(MediaController.class).clearMediaPlayers();
-        }
-
-        searchView.updateFragment(displayedQuery);
-
-        if (displayedQuery.getCorpora() == null || displayedQuery.getCorpora().isEmpty()) {
-            Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
-            return;
-        }
-        if ("".equals(displayedQuery.getQuery())) {
-            Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
-            return;
-        }
-
-        checkQuirksMode(displayedQuery);
-
-        addHistoryEntry(displayedQuery);
-
-        AsyncWebResource res = Helper.getAnnisAsyncWebResource(ui);
-
-        //
-        // begin execute match fetching
-        //
-        ResultViewPanel oldPanel = searchView.getLastSelectedResultView();
-        if (replaceOldTab) {
-            // remove old panel from view
-            searchView.closeTab(oldPanel);
-        }
-
-        ResultViewPanel newResultView =
-                new ResultViewPanel(ui, ui, ui.getInstanceConfig(), displayedQuery);
-        newResultView.getPaging().addCallback(
-                new SpecificPagingCallback(ui, searchView, newResultView, displayedQuery));
-
-        TabSheet.Tab newTab;
-
-        List<ResultViewPanel> existingResultPanels = getResultPanels();
-        String caption = existingResultPanels.isEmpty() ? "Query Result"
-                : "Query Result #" + (existingResultPanels.size() + 1);
-
-        newTab = searchView.getMainTab().addTab(newResultView, caption);
-        newTab.setClosable(true);
-        newTab.setIcon(FontAwesome.SEARCH);
-
-        searchView.getMainTab().setSelectedTab(newResultView);
-        searchView.notifiyQueryStarted();
-
-        Background.run(new ResultFetchJob(displayedQuery, newResultView, ui));
-
-        //
-        // end execute match fetching
-        //
-        //
-        // begin execute count
-        //
-        // start count query
-        searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
-
-        AsyncWebResource countRes = res.path("query").path("search").path("count")
-                .queryParam("q", Helper.encodeJersey(displayedQuery.getQuery()))
-                .queryParam("corpora",
-                        Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")))
-                .queryParam("query-language", displayedQuery.getQueryLanguage().name());
-        Future<MatchAndDocumentCount> futureCount = countRes.get(MatchAndDocumentCount.class);
-
-        SearchApi api = new SearchApi(Helper.getClient(ui));
-        CountQuery countQuery = new CountQuery();
-        countQuery.setCorpora(new LinkedList<>(displayedQuery.getCorpora()));
-        countQuery.setQuery(displayedQuery.getQuery());
-        if (displayedQuery.getQueryLanguage() == QueryLanguage.AQL_QUIRKS_V3) {
-            countQuery.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQLQUIRKSV3);
-        } else {
-            countQuery.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQL);
-        }
-        try {
-            Call call = api.countAsync(countQuery,
-                    new CountCallback(newResultView, displayedQuery.getLimit(), ui));
-
-            state.getExecutedCalls().put(QueryUIState.QueryType.COUNT, call);
-        } catch (ApiException ex) {
-            ExceptionDialog.show(ex, ui);
-        }
     }
+    // construct a query from the current properties
+    DisplayedResultQuery displayedQuery = getSearchQuery();
+
+    searchView.getControlPanel().getQueryPanel().setStatus("Searching...");
+
+    cancelSearch();
+
+    // cleanup resources
+    VaadinSession session = VaadinSession.getCurrent();
+    session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
+    if (session.getAttribute(MediaController.class) != null) {
+      session.getAttribute(MediaController.class).clearMediaPlayers();
+    }
+
+    searchView.updateFragment(displayedQuery);
+
+    if (displayedQuery.getCorpora() == null || displayedQuery.getCorpora().isEmpty()) {
+      Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
+      return;
+    }
+    if ("".equals(displayedQuery.getQuery())) {
+      Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
+      return;
+    }
+
+    checkQuirksMode(displayedQuery);
+
+    addHistoryEntry(displayedQuery);
+
+    AsyncWebResource res = Helper.getAnnisAsyncWebResource(ui);
+
+    //
+    // begin execute match fetching
+    //
+    ResultViewPanel oldPanel = searchView.getLastSelectedResultView();
+    if (replaceOldTab) {
+      // remove old panel from view
+      searchView.closeTab(oldPanel);
+    }
+
+    if (ui instanceof AnnisUI) {
+      AnnisUI annisUI = (AnnisUI) ui;
+      ResultViewPanel newResultView =
+          new ResultViewPanel(annisUI, displayedQuery);
+      newResultView.getPaging()
+          .addCallback(
+              new SpecificPagingCallback(annisUI, searchView, newResultView, displayedQuery));
+
+      TabSheet.Tab newTab;
+
+      List<ResultViewPanel> existingResultPanels = getResultPanels();
+      String caption = existingResultPanels.isEmpty() ? "Query Result"
+          : "Query Result #" + (existingResultPanels.size() + 1);
+
+      newTab = searchView.getMainTab().addTab(newResultView, caption);
+      newTab.setClosable(true);
+      newTab.setIcon(FontAwesome.SEARCH);
+
+      searchView.getMainTab().setSelectedTab(newResultView);
+      searchView.notifiyQueryStarted();
+
+      Background.run(new ResultFetchJob(displayedQuery, newResultView, annisUI));
+
+      //
+      // end execute match fetching
+      //
+      //
+      // begin execute count
+      //
+      // start count query
+      searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
+
+      AsyncWebResource countRes = res.path("query").path("search").path("count")
+          .queryParam("q", Helper.encodeJersey(displayedQuery.getQuery()))
+          .queryParam("corpora",
+              Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")))
+          .queryParam("query-language", displayedQuery.getQueryLanguage().name());
+      Future<MatchAndDocumentCount> futureCount = countRes.get(MatchAndDocumentCount.class);
+
+      SearchApi api = new SearchApi(Helper.getClient(ui));
+      CountQuery countQuery = new CountQuery();
+      countQuery.setCorpora(new LinkedList<>(displayedQuery.getCorpora()));
+      countQuery.setQuery(displayedQuery.getQuery());
+      if (displayedQuery.getQueryLanguage() == QueryLanguage.AQL_QUIRKS_V3) {
+        countQuery.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQLQUIRKSV3);
+      } else {
+        countQuery.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQL);
+      }
+      try {
+        Call call = api.countAsync(countQuery,
+            new CountCallback(newResultView, displayedQuery.getLimit(), annisUI));
+
+        state.getExecutedCalls().put(QueryUIState.QueryType.COUNT, call);
+      } catch (ApiException ex) {
+        ExceptionDialog.show(ex, ui);
+      }
+    }
+  }
 
   /**
    * Get the current query as it is defined by the UI controls.
@@ -431,8 +454,7 @@ public class QueryController implements Serializable {
     return new ExportQueryGenerator().query(state.getAql().getValue())
         .corpora(new LinkedHashSet<>(state.getSelectedCorpora()))
         .queryLanguage(state.getQueryLanguageLegacy()).left(state.getLeftContext())
-        .right(state.getRightContext())
-        .segmentation(state.getVisibleBaseText().getValue())
+        .right(state.getRightContext()).segmentation(state.getVisibleBaseText().getValue())
         .exporter(state.getExporter().getValue())
         .annotations(state.getExportAnnotationKeys().getValue())
         .param(state.getExportParameters().getValue()).alignmc(state.getAlignmc().getValue())
@@ -459,18 +481,15 @@ public class QueryController implements Serializable {
     return QueryGenerator.displayed().query(state.getAql().getValue())
         .corpora(new LinkedHashSet<>(state.getSelectedCorpora()))
         .queryLanguage(state.getQueryLanguageLegacy()).left(state.getLeftContext())
-        .right(state.getRightContext())
-        .segmentation(state.getContextSegmentation())
+        .right(state.getRightContext()).segmentation(state.getContextSegmentation())
         .baseText(state.getVisibleBaseText().getValue()).limit(state.getLimit())
         .offset(state.getOffset().getValue()).order(state.getOrder())
         .selectedMatches(state.getSelectedMatches().getValue()).build();
   }
 
   public QueryUIState getState() {
-    return ui.getQueryState();
+    return state;
   }
-
-
 
   /**
    * Show errors that occured during the execution of a query to the user.
@@ -510,7 +529,7 @@ public class QueryController implements Serializable {
           qp.setStatus(caption + ": " + description);
           break;
         case 403:
-          if (Helper.getUser(ui) == null) {
+          if (Helper.getUser(UI.getCurrent()) == null) {
             // not logged in
             qp.setStatus("You don't have the access rights to query this corpus. "
                 + "You might want to login to access more corpora.");
@@ -525,7 +544,7 @@ public class QueryController implements Serializable {
         default:
           log.error("Exception when communicating with service", ex);
           qp.setStatus("Unexpected exception:  " + ex.getMessage());
-          ExceptionDialog.show(ex, "Exception when communicating with service.", ui);
+          ExceptionDialog.show(ex, "Exception when communicating with service.", UI.getCurrent());
           break;
       }
 
@@ -548,10 +567,10 @@ public class QueryController implements Serializable {
     }
 
     if (q instanceof ContextualizedQuery) {
-      if(!Objects.equals(state.getLeftContext(), ((ContextualizedQuery) q).getLeftContext())) {
+      if (!Objects.equals(state.getLeftContext(), ((ContextualizedQuery) q).getLeftContext())) {
         state.setLeftContext(((ContextualizedQuery) q).getLeftContext());
       }
-      if(!Objects.equals(state.getRightContext(), ((ContextualizedQuery) q).getRightContext())) {
+      if (!Objects.equals(state.getRightContext(), ((ContextualizedQuery) q).getRightContext())) {
         state.setRightContext(((ContextualizedQuery) q).getRightContext());
       }
       if (!Objects.equals(state.getContextSegmentation(),
@@ -562,7 +581,7 @@ public class QueryController implements Serializable {
     if (q instanceof PagedResultQuery) {
       setIfNew(state.getOffset(), ((PagedResultQuery) q).getOffset());
       if (!Objects.equals(state.getLimit(), ((PagedResultQuery) q).getLimit())) {
-        state.setLimit( ((PagedResultQuery) q).getLimit());
+        state.setLimit(((PagedResultQuery) q).getLimit());
       }
       if (!Objects.equals(state.getOrder(), ((PagedResultQuery) q).getOrder())) {
         state.setOrder(((PagedResultQuery) q).getOrder());
@@ -594,6 +613,7 @@ public class QueryController implements Serializable {
     } else {
       // validate query
       try {
+        UI ui = UI.getCurrent();
         Background.runWithCallback(() -> {
           SearchApi api = new SearchApi(Helper.getClient(ui));
           return api.nodeDescriptions(query, org.corpus_tools.annis.api.model.QueryLanguage.AQL);
@@ -622,7 +642,7 @@ public class QueryController implements Serializable {
 
       } catch (ClientHandlerException ex) {
         log.error("Could not connect to web service", ex);
-        ExceptionDialog.show(ex, "Could not connect to web service", ui);
+        ExceptionDialog.show(ex, "Could not connect to web service", UI.getCurrent());
       }
     }
   }

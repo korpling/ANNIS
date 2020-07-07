@@ -19,7 +19,6 @@ import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.MetaDataPanel;
 import annis.libgui.IDGenerator;
-import annis.libgui.PluginSystem;
 import annis.model.DisplayedResultQuery;
 import annis.service.objects.Match;
 import com.vaadin.server.FontAwesome;
@@ -56,7 +55,6 @@ public class SingleCorpusResultPanel extends CssLayout {
 
 
     public SingleCorpusResultPanel(final Collection<SCorpus> result, Match match, long resultNumber,
-        PluginSystem ps,
             AnnisUI ui, DisplayedResultQuery query) {
         this.result = result == null ? new LinkedList<>() : result;
 

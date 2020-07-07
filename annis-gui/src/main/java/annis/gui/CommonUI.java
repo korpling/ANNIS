@@ -18,7 +18,6 @@ package annis.gui;
 import annis.gui.components.SettingsStorage;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.requesthandler.ResourceRequestHandler;
-import annis.gui.servlets.ResourceServlet;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
@@ -30,8 +29,6 @@ import com.vaadin.server.VaadinServletResponse;
 import java.util.Map;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
-import net.xeoh.plugins.base.PluginManager;
-import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +49,6 @@ public class CommonUI extends AnnisBaseUI {
 
     public CommonUI(String urlPrefix) {
         this.urlPrefix = urlPrefix;
-    }
-
-    @Override
-    protected void addCustomUIPlugins(PluginManager pluginManager) {
-        super.addCustomUIPlugins(pluginManager);
-        pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
     }
 
     private boolean checkUrlShortenerRedirect(VaadinRequest request, VaadinResponse response) {

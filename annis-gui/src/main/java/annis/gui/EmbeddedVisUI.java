@@ -25,6 +25,7 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.Match;
 import annis.visualizers.htmlvis.HTMLVis;
+import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.Client;
@@ -54,6 +55,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javax.ws.rs.core.Response;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -62,6 +64,7 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -95,6 +98,9 @@ public class EmbeddedVisUI extends CommonUI {
   public static final String KEY_MATCH = KEY_PREFIX + "match";
 
   public static final String KEY_INSTANCE = KEY_PREFIX + "instance";
+
+  @Autowired
+  private List<VisualizerPlugin<Component>> visualizers;
 
   public EmbeddedVisUI() {
     super(URL_PREFIX);
@@ -130,8 +136,9 @@ public class EmbeddedVisUI extends CommonUI {
       Map<String, String[]> args) {
     try {
       // find the matching visualizer
-      final VisualizerPlugin visPlugin = this.getVisualizer(visName);
-      if (visPlugin == null) {
+      final Optional<? extends VisualizerPlugin<Component>> visPlugin =
+          visualizers.stream().filter(vis -> Objects.equal(vis.getShortName(), visName)).findAny();
+      if (!visPlugin.isPresent()) {
         displayMessage("Unknown visualizer \"" + visName + "\"",
             "This ANNIS instance does not know the given visualizer.");
         return;
@@ -237,7 +244,7 @@ public class EmbeddedVisUI extends CommonUI {
               visInput.setUI(UI.getCurrent());
               // TODO: which other thing do we have to provide?
 
-              Component c = visPlugin.createComponent(visInput, null);
+              Component c = visPlugin.get().createComponent(visInput, null);
               // add the styles
               c.addStyleName("corpus-font");
               c.addStyleName("vis-content");

@@ -19,7 +19,6 @@ import annis.gui.QueryController;
 import annis.libgui.AnnisBaseUI;
 import com.vaadin.ui.Component;
 import java.io.Serializable;
-import net.xeoh.plugins.base.Plugin;
 
 /**
  * Every query builder must implement this interface. It' s also necessary to to
@@ -27,7 +26,7 @@ import net.xeoh.plugins.base.Plugin;
  *
  * @author Thomas Krause {@literal <b.pixeldrama@gmail.com>}
  */
-public interface QueryBuilderPlugin<I extends Component> extends Plugin, Serializable {
+public interface QueryBuilderPlugin<I extends Component> extends Serializable {
 
     /**
      * It is used by the ANNIS plugin system to generate something viewable for

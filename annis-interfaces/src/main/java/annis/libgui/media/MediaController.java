@@ -14,7 +14,6 @@
 package annis.libgui.media;
 
 import annis.libgui.VisualizationToggle;
-import net.xeoh.plugins.base.Plugin;
 
 /**
  * System wide access to multimedia player functions.
@@ -24,7 +23,7 @@ import net.xeoh.plugins.base.Plugin;
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface MediaController extends Plugin {
+public interface MediaController {
   /**
    * Register a {@link MediaPlayer} instance.
    * 

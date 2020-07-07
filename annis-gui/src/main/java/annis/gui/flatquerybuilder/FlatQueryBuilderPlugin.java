@@ -17,22 +17,22 @@ package annis.gui.flatquerybuilder;
 
 import annis.gui.QueryController;
 import annis.gui.querybuilder.QueryBuilderPlugin;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.springframework.stereotype.Component;
 
 /**
  * @author martin
  * @author tom
  */
 
-@PluginImplementation
-public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuilder> {
+@Component
+public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<com.vaadin.ui.Component> {
     /**
      * 
      */
     private static final long serialVersionUID = -5742603543433685793L;
 
     @Override
-    public FlatQueryBuilder createComponent(QueryController controlPanel) {
+    public com.vaadin.ui.Component createComponent(QueryController controlPanel) {
         FlatQueryBuilder qb = new FlatQueryBuilder(controlPanel);
         return qb;
     }

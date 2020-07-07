@@ -21,14 +21,13 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.xeoh.plugins.base.Plugin;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface ExporterPlugin extends Plugin {
+public interface ExporterPlugin {
   public Exception convertText(String query, QueryLanguage queryLanguage, int contextLeft,
       int contextRight, Set<String> corpora, List<String> keys, String args, boolean alignmc,
       WebResource annisResource, Writer out, EventBus eventBus,

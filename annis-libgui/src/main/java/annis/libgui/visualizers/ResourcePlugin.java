@@ -13,14 +13,13 @@
  */
 package annis.libgui.visualizers;
 
-import net.xeoh.plugins.base.Plugin;
 
 /**
  * Base interface for all plugins that have resources in their package
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface ResourcePlugin extends Plugin {
+public interface ResourcePlugin {
   /**
    * Get the shorted name of the linguistic type of this plugin ("partitur", "tree", etc.)
    * 

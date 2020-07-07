@@ -35,11 +35,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SNode;
+import org.springframework.stereotype.Component;
 
 /**
  * A csv-exporter that will export the text of the underlying token instead of
@@ -49,7 +49,7 @@ import org.corpus_tools.salt.core.SNode;
  *
  * @author Fabian Barteld
  */
-@PluginImplementation
+@Component
 public class CSVExporter extends BaseMatrixExporter {
     /**
      * 

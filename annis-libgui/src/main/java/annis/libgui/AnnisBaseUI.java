@@ -13,15 +13,10 @@
  */
 package annis.libgui;
 
-import annis.VersionInfo;
-import annis.libgui.exporter.ExporterPlugin;
-import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.google.common.base.Charsets;
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.MutableClassToInstanceMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
@@ -42,19 +37,11 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import net.xeoh.plugins.base.Plugin;
-import net.xeoh.plugins.base.PluginManager;
-import net.xeoh.plugins.base.impl.PluginManagerFactory;
-import net.xeoh.plugins.base.util.PluginManagerUtil;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.AnnotationIntrospector;
@@ -73,7 +60,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  * the plugin loading to this base class.
  */
 @Theme("annis")
-public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
+public class AnnisBaseUI extends UI implements Serializable {
 
   /**
    * 
@@ -93,12 +80,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
 
   public final static Resource PINGUIN_IMAGE = new ClassResource("/annis/libgui/penguins.png");
-
-  private static final Map<String, VisualizerPlugin> visualizerRegistry =
-      Collections.synchronizedMap(new HashMap<String, VisualizerPlugin>());
-
-  private static final Map<String, Date> resourceAddedDate =
-      Collections.synchronizedMap(new HashMap<String, Date>());
 
 
   /**
@@ -205,31 +186,12 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
     return false;
   }
 
-  private transient PluginManager pluginManager;
-
-  private transient ClassToInstanceMap<ExporterPlugin> exporterRegistryCache;
 
   private transient ObjectMapper jsonMapper;
 
-
-
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
 
-
-
   private transient EventBus loginDataLostBus;
-
-  /**
-   * Override this method to append additional plugins to the internal {@link PluginManager}.
-   * 
-   * The default implementation is empty (thus you don't need to call
-   * {@code super.addCustomUIPlugins(...)}).
-   * 
-   * @param pluginManager
-   */
-  protected void addCustomUIPlugins(PluginManager pluginManager) {
-    // default: do nothing
-  }
 
 
   @Override
@@ -239,26 +201,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
     alreadyAddedCSS.clear();
   }
 
-
-  @Override
-  public void close() {
-    if (pluginManager != null) {
-      pluginManager.shutdown();
-    }
-    super.close();
-  }
-
-  @Override
-  public ExporterPlugin getExporter(Class<? extends ExporterPlugin> clazz) {
-    if (exporterRegistryCache == null) {
-      exporterRegistryCache = MutableClassToInstanceMap.create();
-      PluginManagerUtil util = new PluginManagerUtil(getPluginManager());
-      for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class)) {
-        exporterRegistryCache.put(e.getClass(), e);
-      }
-    }
-    return exporterRegistryCache.get(clazz);
-  }
 
   public ObjectMapper getJsonMapper() {
     if (jsonMapper == null) {
@@ -280,18 +222,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
     return loginDataLostBus;
   }
 
-  @Override
-  public PluginManager getPluginManager() {
-    if (pluginManager == null) {
-      initPlugins();
-    }
-    return pluginManager;
-  }
-
-  @Override
-  public VisualizerPlugin getVisualizer(String shortName) {
-    return visualizerRegistry.get(shortName);
-  }
 
   @Override
   protected void init(VaadinRequest request) {
@@ -300,9 +230,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
 
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     alreadyAddedCSS.clear();
-
-    initPlugins();
-
   }
 
 
@@ -342,49 +269,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable {
 
   }
 
-  private void initPlugins() {
-
-    log.info("Adding plugins");
-    pluginManager = PluginManagerFactory.createPluginManager();
-    addCustomUIPlugins(pluginManager);
-
-    File baseDir = VaadinService.getCurrent().getBaseDirectory();
-
-    File builtin =
-        new File(baseDir, "WEB-INF/lib/annis-visualizers-" + VersionInfo.getReleaseName() + ".jar");
-    if (builtin.canRead()) {
-      pluginManager.addPluginsFrom(builtin.toURI());
-      log.info("added built-in plugins from  {}", builtin.getPath());
-    } else {
-      log.warn("could not find built-in plugin file {}", builtin.getPath());
-    }
-    File basicPlugins = new File(baseDir, "WEB-INF/plugins");
-    if (basicPlugins.isDirectory()) {
-      pluginManager.addPluginsFrom(basicPlugins.toURI());
-      log.info("added plugins from {}", basicPlugins.getPath());
-    }
-
-
-    String globalPlugins = System.getenv("ANNIS_PLUGINS");
-    if (globalPlugins != null) {
-      pluginManager.addPluginsFrom(new File(globalPlugins).toURI());
-      log.info("added plugins from {}", globalPlugins);
-    }
-
-    StringBuilder listOfPlugins = new StringBuilder();
-    listOfPlugins.append("loaded plugins:\n");
-    PluginManagerUtil util = new PluginManagerUtil(pluginManager);
-    for (Plugin p : util.getPlugins()) {
-      listOfPlugins.append(p.getClass().getName()).append("\n");
-    }
-    log.info(listOfPlugins.toString());
-
-    Collection<VisualizerPlugin> visualizers = util.getPlugins(VisualizerPlugin.class);
-    for (VisualizerPlugin vis : visualizers) {
-      visualizerRegistry.put(vis.getShortName(), vis);
-      resourceAddedDate.put(vis.getShortName(), new Date());
-    }
-  }
 
   /**
    * Inject CSS into the UI. This function will not add multiple style-elements if the exact CSS

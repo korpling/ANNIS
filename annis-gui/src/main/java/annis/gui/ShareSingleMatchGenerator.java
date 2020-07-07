@@ -16,12 +16,12 @@
 package annis.gui;
 
 import annis.libgui.Helper;
-import annis.libgui.PluginSystem;
 import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Alignment;
@@ -46,6 +46,7 @@ import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
 import org.corpus_tools.annis.api.model.VisualizerRule;
@@ -80,15 +81,17 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
     private final Match match;
     private final PagedResultQuery query;
     private final String segmentation;
-    private final PluginSystem ps;
+
+    private final List<VisualizerPlugin<com.vaadin.ui.Component>> visualizerPlugins;
+
 
     public ShareSingleMatchGenerator(List<VisualizerRule> visualizers, Match match,
         PagedResultQuery query,
-            String segmentation, PluginSystem ps) {
+        String segmentation, List<VisualizerPlugin<com.vaadin.ui.Component>> visualizerPlugins) {
         this.match = match;
         this.query = query;
         this.segmentation = segmentation;
-        this.ps = ps;
+        this.visualizerPlugins = visualizerPlugins;
 
         setResizeLazy(true);
 
@@ -182,8 +185,9 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
 
         UriBuilder serviceURL = UriBuilder.fromUri(Helper.getAnnisWebResource(UI.getCurrent()).path("query").getURI());
 
-        VisualizerPlugin visPlugin = ps.getVisualizer(entry.getVisType());
-        if (visPlugin != null && visPlugin.isUsingText()) {
+        Optional<VisualizerPlugin<com.vaadin.ui.Component>> visPlugin = visualizerPlugins.stream()
+            .filter(vis -> Objects.equal(vis.getShortName(), entry.getVisType())).findAny();
+        if (visPlugin.isPresent() && visPlugin.get().isUsingText()) {
             // generate a service URL that gets the whole document
             String firstID = match.getSaltIDs().get(0);
             List<String> path = Splitter.on('/').omitEmptyStrings().trimResults().splitToList(firstID);
@@ -198,8 +202,8 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
             }
 
             // apply any node annotation filters if possible
-            if (visPlugin instanceof FilteringVisualizerPlugin) {
-                List<String> visAnnos = ((FilteringVisualizerPlugin) visPlugin)
+            if (visPlugin.get() instanceof FilteringVisualizerPlugin) {
+              List<String> visAnnos = ((FilteringVisualizerPlugin) visPlugin.get())
                         .getFilteredNodeAnnotationNames(corpusName, documentName, entry.getMappings(), UI.getCurrent());
                 if (visAnnos != null) {
                     Set<String> annos = new HashSet<>(visAnnos);

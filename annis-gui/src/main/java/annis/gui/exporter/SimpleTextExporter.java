@@ -16,14 +16,14 @@
 package annis.gui.exporter;
 
 import annis.service.objects.SubgraphFilter;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.springframework.stereotype.Component;
 
 /**
  * Simple text exporter.
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-@PluginImplementation
+@Component
 public class SimpleTextExporter extends GeneralTextExporter {
 
     /**

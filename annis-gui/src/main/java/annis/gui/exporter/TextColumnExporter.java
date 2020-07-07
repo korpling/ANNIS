@@ -38,7 +38,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SSpanningRelation;
@@ -48,6 +47,7 @@ import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
+import org.springframework.stereotype.Component;
 
 /**
  * An exporter that will take all token nodes and exports them in a kind of
@@ -58,7 +58,7 @@ import org.corpus_tools.salt.core.SRelation;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @author irina
  */
-@PluginImplementation
+@Component
 public class TextColumnExporter extends BaseMatrixExporter {
     private class IsDominatedByMatch implements GraphTraverseHandler {
 

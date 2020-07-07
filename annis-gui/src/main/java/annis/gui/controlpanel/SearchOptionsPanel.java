@@ -401,16 +401,18 @@ public class SearchOptionsPanel extends FormLayout {
   }
 
 
-  public void updateSearchPanelConfigurationInBackground(final Collection<String> corpora,
-      final AnnisUI ui) {
+  public void updateSearchPanelConfigurationInBackground(final Collection<String> corpora) {
     setLoadingState(true);
     // remove custom adjustments
     cbLeftContext.setItems();
     cbRightContext.setItems();
     cbSegmentation.setItems();
 
-    // reload the config in the background
-    Background.run(new CorpusConfigUpdater(ui, corpora, true));
+    UI ui = getUI();
+    if (ui instanceof AnnisUI) {
+      // reload the config in the background
+      Background.run(new CorpusConfigUpdater((AnnisUI) ui, corpora, true));
+    }
   }
 
 }

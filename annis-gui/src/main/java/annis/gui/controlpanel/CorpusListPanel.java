@@ -24,7 +24,6 @@ import annis.libgui.Background;
 import annis.libgui.CorpusSet;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
-import annis.libgui.InstanceConfig;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
@@ -69,12 +68,9 @@ public class CorpusListPanel extends VerticalLayout {
 
         private final boolean scrollToSelected;
 
-        private final UI ui;
-
-        public CorpusListUpdater(boolean showLoginMessage, boolean scrollToSelected, UI ui) {
+        public CorpusListUpdater(boolean showLoginMessage, boolean scrollToSelected) {
             this.showLoginMessage = showLoginMessage;
             this.scrollToSelected = scrollToSelected;
-            this.ui = ui;
         }
 
         @Override
@@ -92,8 +88,9 @@ public class CorpusListPanel extends VerticalLayout {
                     availableCorpora.setFilter(filter);
                     tblCorpora.setDataProvider(availableCorpora);
                     List<CorpusSet> corpusSets = new LinkedList<>();
-                    if (instanceConfig != null && instanceConfig.getCorpusSets() != null) {
-                        corpusSets.addAll(instanceConfig.getCorpusSets());
+                  if (ui.getInstanceConfig() != null
+                      && ui.getInstanceConfig().getCorpusSets() != null) {
+                    corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
                     }
 
                     if (showLoginMessage) {
@@ -113,7 +110,7 @@ public class CorpusListPanel extends VerticalLayout {
             } catch (Throwable ex) {
                 log.warn("Could not get corpus list", ex);
             } finally {
-                ui.access(() -> {
+              ui.access(() -> {
                     tblCorpora.setVisible(true);
                     selectionLayout.setVisible(true);
                     pbLoadCorpora.setVisible(false);
@@ -136,8 +133,6 @@ public class CorpusListPanel extends VerticalLayout {
     // holds the panels of auto generated queries
     private final ExampleQueriesPanel autoGenQueries;
 
-    private final AnnisUI ui;
-
     private final ProgressBar pbLoadCorpora;
 
     private Grid<String> tblCorpora;
@@ -148,14 +143,13 @@ public class CorpusListPanel extends VerticalLayout {
 
     private final TextField txtFilter;
 
-    private final InstanceConfig instanceConfig;
+    private final AnnisUI ui;
 
     private final SerializablePredicate<String> filter;
 
-    public CorpusListPanel(InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries, final AnnisUI ui) {
-        this.instanceConfig = instanceConfig;
+    public CorpusListPanel(AnnisUI ui, ExampleQueriesPanel autoGenQueries) {
+      this.ui = ui;
         this.autoGenQueries = autoGenQueries;
-        this.ui = ui;
 
         setWidthFull();
         setMargin(true);
@@ -207,8 +201,8 @@ public class CorpusListPanel extends VerticalLayout {
                 CorpusSet selectedCS = null;
 
                 List<CorpusSet> corpusSets = new LinkedList<>();
-                if (instanceConfig != null && instanceConfig.getCorpusSets() != null) {
-                    corpusSets.addAll(instanceConfig.getCorpusSets());
+            if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
+              corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
                 }
 
                 for (CorpusSet cs : corpusSets) {
@@ -243,7 +237,7 @@ public class CorpusListPanel extends VerticalLayout {
             l.setIcon(INFO_ICON);
             l.setDescription("show metadata and annotations for " + corpus);
             l.addClickListener(event -> {
-                if (ui.getQueryController() != null) {
+            if (ui.getQueryController() != null) {
                     l.setEnabled(false);
                     initCorpusBrowser(corpus, l);
                 }
@@ -368,7 +362,7 @@ public class CorpusListPanel extends VerticalLayout {
         if (ui != null) {
             ui.clearCorpusConfigCache();
         }
-        CorpusListUpdater updater = new CorpusListUpdater(showLoginMessage, scrollToSelected, getUI());
+        CorpusListUpdater updater = new CorpusListUpdater(showLoginMessage, scrollToSelected);
         Background.run(updater);
     }
 }
