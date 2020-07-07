@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Component
-public class KWICVisualizer extends AbstractVisualizer<KWICInterface> {
+public class KWICVisualizer extends AbstractVisualizer {
   /**
    * 
    */
@@ -66,14 +66,18 @@ public class KWICVisualizer extends AbstractVisualizer<KWICInterface> {
   }
 
   @Override
-  public void setSegmentationLayer(KWICInterface visualizerImplementation, String segmentationName,
+  public void setSegmentationLayer(com.vaadin.ui.Component component, String segmentationName,
       Map<SNode, Long> markedAndCovered) {
-    visualizerImplementation.setSegmentationLayer(segmentationName, markedAndCovered);
+    if (component instanceof KWICInterface) {
+      ((KWICInterface) component).setSegmentationLayer(segmentationName, markedAndCovered);
+    }
   }
 
   @Override
-  public void setVisibleTokenAnnosVisible(KWICInterface component, Set<String> annos) {
-    component.setVisibleTokenAnnos(annos);
+  public void setVisibleTokenAnnosVisible(com.vaadin.ui.Component component, Set<String> annos) {
+    if (component instanceof KWICInterface) {
+      ((KWICInterface) component).setVisibleTokenAnnos(annos);
+    }
   }
 
 }

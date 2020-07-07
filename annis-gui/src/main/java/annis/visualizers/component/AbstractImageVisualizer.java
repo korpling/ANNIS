@@ -28,7 +28,7 @@ import java.util.UUID;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public abstract class AbstractImageVisualizer extends AbstractVisualizer<ImagePanel> {
+public abstract class AbstractImageVisualizer extends AbstractVisualizer {
   /**
    * 
    */
@@ -56,6 +56,5 @@ public abstract class AbstractImageVisualizer extends AbstractVisualizer<ImagePa
   public abstract String getContentType();
 
   public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
-
 
 }

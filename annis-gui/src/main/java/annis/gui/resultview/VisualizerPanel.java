@@ -204,7 +204,7 @@ public class VisualizerPanel extends CssLayout
 
   private final int visId;
 
-  private Optional<? extends VisualizerPlugin<Component>> visPlugin = Optional.empty();
+  private Optional<VisualizerPlugin> visPlugin = Optional.empty();
 
   private Set<String> visibleTokenAnnos;
 
@@ -472,7 +472,7 @@ public class VisualizerPanel extends CssLayout
     this.markedAndCovered = markedAndCovered;
 
     if (visPlugin.isPresent() && vis != null) {
-      visPlugin.get().setSegmentationLayer(vis, segmentationName, markedAndCovered);
+     visPlugin.get().setSegmentationLayer(vis, segmentationName, markedAndCovered);
     }
   }
 

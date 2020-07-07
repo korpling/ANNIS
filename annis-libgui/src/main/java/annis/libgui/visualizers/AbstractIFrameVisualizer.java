@@ -41,7 +41,8 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer
       org.slf4j.LoggerFactory.getLogger(AbstractIFrameVisualizer.class);
 
   @Override
-  public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle) {
+  public Component createComponent(final VisualizerInput vis,
+      VisualizationToggle visToggle) {
 
     VaadinSession session = vis.getUI().getSession();
 
@@ -96,4 +97,5 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer
    * @param outstream The OutputStream to be used
    */
   public abstract void writeOutput(VisualizerInput input, OutputStream outstream);
+
 }

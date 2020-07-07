@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Component
-public class GridVisualizer extends AbstractVisualizer<GridComponent> {
+public class GridVisualizer extends AbstractVisualizer {
 
   /**
    * 
@@ -81,5 +81,4 @@ public class GridVisualizer extends AbstractVisualizer<GridComponent> {
   public String getShortName() {
     return "grid";
   }
-
 }

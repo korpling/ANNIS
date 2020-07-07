@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Component
-public class RSTFull extends AbstractVisualizer<RSTPanel> {
+public class RSTFull extends AbstractVisualizer {
 
   /**
    * 
@@ -47,4 +47,5 @@ public class RSTFull extends AbstractVisualizer<RSTPanel> {
   public boolean isUsingText() {
     return true;
   }
+
 }

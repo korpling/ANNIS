@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Component
-public class VideoVisualizer extends AbstractVisualizer<MediaElementPlayer> {
+public class VideoVisualizer extends AbstractVisualizer {
 
   /**
    * 
@@ -94,4 +94,5 @@ public class VideoVisualizer extends AbstractVisualizer<MediaElementPlayer> {
   public String getShortName() {
     return "video";
   }
+
 }

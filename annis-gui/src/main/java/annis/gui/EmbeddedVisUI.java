@@ -100,7 +100,7 @@ public class EmbeddedVisUI extends CommonUI {
   public static final String KEY_INSTANCE = KEY_PREFIX + "instance";
 
   @Autowired
-  private List<VisualizerPlugin<Component>> visualizers;
+  private List<VisualizerPlugin> visualizers;
 
   public EmbeddedVisUI() {
     super(URL_PREFIX);
@@ -136,7 +136,7 @@ public class EmbeddedVisUI extends CommonUI {
       Map<String, String[]> args) {
     try {
       // find the matching visualizer
-      final Optional<? extends VisualizerPlugin<Component>> visPlugin =
+      final Optional<VisualizerPlugin> visPlugin =
           visualizers.stream().filter(vis -> Objects.equal(vis.getShortName(), visName)).findAny();
       if (!visPlugin.isPresent()) {
         displayMessage("Unknown visualizer \"" + visName + "\"",

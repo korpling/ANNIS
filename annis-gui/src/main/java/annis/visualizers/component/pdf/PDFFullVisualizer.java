@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Component
-public class PDFFullVisualizer extends AbstractVisualizer<Panel> {
+public class PDFFullVisualizer extends AbstractVisualizer {
 
   /**
    * 
@@ -51,4 +51,5 @@ public class PDFFullVisualizer extends AbstractVisualizer<Panel> {
   public String getShortName() {
     return "pdfdoc";
   }
+
 }

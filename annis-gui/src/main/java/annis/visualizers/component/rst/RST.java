@@ -58,7 +58,7 @@ import org.springframework.stereotype.Component;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Component
-public class RST extends AbstractVisualizer<RSTPanel> {
+public class RST extends AbstractVisualizer {
 
   /**
    * 
@@ -74,4 +74,5 @@ public class RST extends AbstractVisualizer<RSTPanel> {
   public String getShortName() {
     return "rst";
   }
+
 }
