@@ -14,14 +14,13 @@
 package annis.libgui.media;
 
 import java.io.Serializable;
-import net.xeoh.plugins.base.Plugin;
 
 /**
  * Offers a annis-gui wide interface for controlling pdf viewer.
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public interface PDFController extends Plugin, Serializable {
+public interface PDFController extends Serializable {
 
   /**
    * Registers a pdf viewer to the controller.

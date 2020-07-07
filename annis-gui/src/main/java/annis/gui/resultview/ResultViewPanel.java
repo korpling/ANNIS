@@ -23,8 +23,6 @@ import annis.gui.controlpanel.QueryPanel;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
-import annis.libgui.InstanceConfig;
-import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProviderImpl;
 import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
@@ -134,8 +132,6 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     private final PagingComponent paging;
 
-    private final PluginSystem ps;
-
     private final MenuItem miTokAnnos;
 
     private final MenuItem miSegmentation;
@@ -147,8 +143,6 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
     private final Set<String> segmentationLayerSet = Collections.synchronizedSet(new TreeSet<String>());
 
     private final Set<String> tokenAnnotationLevelSet = Collections.synchronizedSet(new TreeSet<String>());
-
-    private final InstanceConfig instanceConfig;
 
     private final CssLayout resultLayout;
 
@@ -167,11 +161,10 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     private final AnnisUI sui;
 
-    public ResultViewPanel(AnnisUI ui, PluginSystem ps, InstanceConfig instanceConfig,
+    public ResultViewPanel(AnnisUI ui,
             DisplayedResultQuery initialQuery) {
         this.sui = ui;
         this.tokenAnnoVisible = new TreeMap<>();
-        this.ps = ps;
         this.controller = ui.getQueryController();
         this.initialQuery = initialQuery;
 
@@ -186,8 +179,6 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
         resultPanel.setSizeFull();
         resultPanel.addStyleName(ValoTheme.PANEL_BORDERLESS);
         resultPanel.addStyleName("result-view-panel");
-
-        this.instanceConfig = instanceConfig;
 
         setSizeFull();
         setMargin(false);
@@ -298,13 +289,15 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
                     }
                 }
 
-                panel = new SingleCorpusResultPanel(matchedCorpora, m, i + globalOffset, ps, sui, initialQuery);
+                panel = new SingleCorpusResultPanel(matchedCorpora, m, i + globalOffset, sui,
+                    initialQuery);
 
             } else {
                 SDocument doc = corpusGraph.getDocuments().get(0);
 
-                panel = new SingleResultPanel(doc, m, i + globalOffset, new ResolverProviderImpl(cacheResolver), ps,
-                        sui, getVisibleTokenAnnos(), segmentationName, controller, instanceConfig, initialQuery);
+                panel = new SingleResultPanel(doc, m, i + globalOffset,
+                    new ResolverProviderImpl(cacheResolver),
+                    sui, getVisibleTokenAnnos(), segmentationName, controller, initialQuery);
 
             }
 

@@ -21,6 +21,7 @@ import annis.gui.objects.ExportQuery;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
 import com.google.common.eventbus.EventBus;
+import com.hp.gagawa.java.elements.U;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -47,7 +48,8 @@ public class ExportBackgroundJob implements Callable<File> {
 
     private Exception exportError;
 
-    public ExportBackgroundJob(ExportQuery query, ExporterPlugin exporter, AnnisUI ui, EventBus eventBus,
+    public ExportBackgroundJob(ExportQuery query, ExporterPlugin exporter, AnnisUI ui,
+        EventBus eventBus,
             ExportPanel panel) {
         this.query = query;
         this.eventBus = eventBus;

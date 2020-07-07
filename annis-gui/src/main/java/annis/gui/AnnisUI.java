@@ -18,16 +18,12 @@ package annis.gui;
 import static annis.libgui.Helper.DEFAULT_CONFIG;
 
 import annis.gui.components.ExceptionDialog;
-import annis.gui.exporter.CSVExporter;
-import annis.gui.exporter.GridExporter;
-import annis.gui.exporter.SimpleTextExporter;
-//import annis.gui.exporter.MatchWithContextExporter;
-import annis.gui.exporter.TextColumnExporter;
-import annis.gui.exporter.TokenExporter;
 import annis.gui.objects.QueryUIState;
-import annis.gui.querybuilder.TigerQueryBuilderPlugin;
+import annis.gui.querybuilder.QueryBuilderPlugin;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.CorpusConfig;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -41,11 +37,13 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.ui.Component;
 import java.io.IOException;
-import net.xeoh.plugins.base.PluginManager;
-import net.xeoh.plugins.base.util.uri.ClassURI;
+import java.util.LinkedList;
+import java.util.List;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * GUI for searching in corpora.
@@ -69,6 +67,15 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     private SearchView searchView;
 
+    @Autowired
+    private List<VisualizerPlugin<com.vaadin.ui.Component>> visualizerPlugins;
+
+
+    @Autowired
+    private List<QueryBuilderPlugin<com.vaadin.ui.Component>> queryBuilderPlugins;
+
+    private List<ExporterPlugin> exporterPlugins = new LinkedList<>();
+
     private AdminView adminView;
 
     private Navigator nav;
@@ -81,21 +88,6 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     public AnnisUI() {
         super("");
         initTransients();
-    }
-
-    @Override
-    protected void addCustomUIPlugins(PluginManager pluginManager) {
-        super.addCustomUIPlugins(pluginManager);
-        pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
-        // TODO: enable flat query builder when problems with fetching all annotation
-        // values are resolved
-        // pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
-        // toURI());
-        pluginManager.addPluginsFrom(ClassURI.PLUGIN(CSVExporter.class));
-        pluginManager.addPluginsFrom(ClassURI.PLUGIN(TokenExporter.class));
-        pluginManager.addPluginsFrom(ClassURI.PLUGIN(SimpleTextExporter.class));
-        pluginManager.addPluginsFrom(ClassURI.PLUGIN(GridExporter.class));
-        pluginManager.addPluginsFrom(ClassURI.PLUGIN(TextColumnExporter.class));
     }
 
     @Override
@@ -192,12 +184,14 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
         super.init(request);
         setErrorHandler(this);
 
-        searchView = new SearchView(AnnisUI.this);
         adminView = new AdminView(AnnisUI.this);
-        queryController = new QueryController(searchView, AnnisUI.this);
 
         toolbar = new MainToolbar();
         toolbar.setQueryController(queryController);
+
+
+        this.searchView = new SearchView(this);
+        this.queryController = new QueryController(this, searchView, queryState);
 
         toolbar.addLoginListener(searchView);
         toolbar.addLoginListener(adminView);
@@ -210,6 +204,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
         addExtension(toolbar.getScreenshotExtension());
 
         loadInstanceFonts();
+
     }
 
     private void initTransients() {
@@ -231,6 +226,18 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     public MainToolbar getToolbar() {
         return toolbar;
+    }
+
+    public List<VisualizerPlugin<com.vaadin.ui.Component>> getVisualizerPlugins() {
+      return visualizerPlugins;
+    }
+
+    public List<QueryBuilderPlugin<Component>> getQueryBuilderPlugins() {
+      return queryBuilderPlugins;
+    }
+
+    public List<ExporterPlugin> getExporterPlugins() {
+      return exporterPlugins;
     }
 
 }

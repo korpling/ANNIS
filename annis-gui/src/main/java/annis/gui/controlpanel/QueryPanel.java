@@ -23,8 +23,6 @@ import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
-import annis.model.AqlParseError;
-import annis.model.NodeDesc;
 import annis.model.Query;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
@@ -52,7 +50,6 @@ import com.vaadin.v7.data.Property.ValueChangeListener;
 import com.vaadin.v7.data.util.BeanItemContainer;
 import com.vaadin.v7.ui.ListSelect;
 import java.util.List;
-
 import org.corpus_tools.annis.api.model.GraphAnnisError;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.vaadin.hene.popupbutton.PopupButton;
@@ -78,7 +75,7 @@ public class QueryPanel extends GridLayout implements ValueChangeListener {
         @Override
         public void buttonClick(ClickEvent event) {
             if (panel == null) {
-                panel = new ExportPanel(QueryPanel.this, ui.getQueryController(), state, ui);
+              panel = new ExportPanel(ui);
             }
 
             final TabSheet tabSheet = ui.getSearchView().getMainTab();
@@ -165,7 +162,7 @@ public class QueryPanel extends GridLayout implements ValueChangeListener {
         @Override
         public void buttonClick(ClickEvent event) {
             if (queryBuilder == null) {
-                queryBuilder = new QueryBuilderChooser(ui.getQueryController(), ui, ui.getInstanceConfig());
+              queryBuilder = new QueryBuilderChooser(ui);
             }
             final TabSheet tabSheet = ui.getSearchView().getMainTab();
             Tab tab = tabSheet.getTab(queryBuilder);

@@ -25,14 +25,14 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author thomas
  */
-@PluginImplementation
-public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBuilderPlugin.TigerQueryBuilder> {
+@Component
+public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<com.vaadin.ui.Component> {
 
     public static class TigerQueryBuilder extends Panel implements Button.ClickListener {
 

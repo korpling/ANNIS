@@ -17,6 +17,7 @@ import annis.resolver.SingleResolverRequest;
 import com.vaadin.ui.UI;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +102,9 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
         // Filter the visualizer entries that match this resolver request
         if (corpusConfig != null && corpusConfig.getVisualizers() != null) {
           for (VisualizerRule visRule : corpusConfig.getVisualizers()) {
+            if (visRule.getMappings() == null) {
+              visRule.setMappings(new LinkedHashMap<>());
+            }
             if (visRule.getElement() != null && !visRule.getElement().equals(r.getType())) {
               break;
             }

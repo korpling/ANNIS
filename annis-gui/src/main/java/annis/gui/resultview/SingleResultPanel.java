@@ -22,8 +22,6 @@ import annis.gui.QueryController;
 import annis.gui.ShareSingleMatchGenerator;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
-import annis.libgui.InstanceConfig;
-import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProvider;
 import annis.libgui.UIConfig;
 import annis.model.DisplayedResultQuery;
@@ -153,7 +151,6 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
     private SDocument result;
 
     private Map<String, String> markedExactMap;
-    private final PluginSystem ps;
 
     private final AnnisUI ui;
     private List<VisualizerPanel> visualizers;
@@ -185,16 +182,14 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
     private final ComboBox rghtCtxCombo;
 
     private final Map<Integer, Boolean> visualizerState;
-    private final InstanceConfig instanceConfig;
 
     private PagedResultQuery query;
 
     private final Match match;
 
     public SingleResultPanel(final SDocument result, Match match, long resultNumber, ResolverProvider resolverProvider,
-            PluginSystem ps, AnnisUI ui, Set<String> visibleTokenAnnos, String segmentationName,
-            QueryController controller, InstanceConfig instanceConfig, DisplayedResultQuery query) {
-        this.ps = ps;
+        AnnisUI ui, Set<String> visibleTokenAnnos, String segmentationName,
+        QueryController controller, DisplayedResultQuery query) {
         this.ui = ui;
         this.result = result;
         this.segmentationName = segmentationName;
@@ -202,7 +197,6 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
         this.resultNumber = resultNumber;
         this.resolverProvider = resolverProvider;
         this.visibleTokenAnnos = visibleTokenAnnos;
-        this.instanceConfig = instanceConfig;
         this.query = query;
         this.match = match;
 
@@ -389,8 +383,7 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
               String htmlID = "resolver-" + resultNumber + "_" + i;
 
               VisualizerPanel p = new VisualizerPanel(visRule, i, result, match, visibleTokenAnnos,
-                  markedAndCovered,
-                        htmlID, resultID, this, segmentationName, ps, instanceConfig);
+                  markedAndCovered, htmlID, resultID, this, segmentationName, ui);
 
                 visualizers.add(p);
 
@@ -470,7 +463,9 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
             ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
         }
 
-        Window window = new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName, ps);
+        Window window =
+            new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName,
+                ui.getVisualizerPlugins());
         window.setWidth(790, Unit.PIXELS);
         window.setHeight(680, Unit.PIXELS);
         window.setResizable(true);

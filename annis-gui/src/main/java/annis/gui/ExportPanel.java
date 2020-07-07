@@ -14,12 +14,9 @@
 package annis.gui;
 
 import annis.gui.components.HelpButton;
-import annis.gui.controlpanel.QueryPanel;
 import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.converter.CommaSeperatedStringConverterList;
 import annis.gui.objects.QueryUIState;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.PluginSystem;
 import annis.libgui.exporter.ExporterPlugin;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
@@ -50,14 +47,15 @@ import com.vaadin.v7.ui.TextField;
 import java.io.File;
 import java.util.Optional;
 import net.sf.ehcache.CacheException;
-import net.xeoh.plugins.base.util.PluginManagerUtil;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class ExportPanel extends GridLayout {
+
 
   private class CancelButtonListener implements Button.ClickListener {
 
@@ -68,7 +66,7 @@ public class ExportPanel extends GridLayout {
 
     @Override
     public void buttonClick(ClickEvent event) {
-      controller.cancelExport();
+      ui.getQueryController().cancelExport();
     }
 
   }
@@ -90,11 +88,11 @@ public class ExportPanel extends GridLayout {
       }
       tmpOutputFile = null;
 
-      @SuppressWarnings("unchecked")
-      final ExporterPlugin exporter =
-          ps.getExporter((Class<? extends ExporterPlugin>) cbExporter.getValue());
-      if (exporter != null) {
-        if ("".equals(queryPanel.getQuery())) {
+      Optional<ExporterPlugin> exporter = ui.getExporterPlugins().stream()
+          .filter((e) -> e.getClass().getSimpleName().equals(cbExporter.getValue())).findAny();
+
+      if (exporter.isPresent()) {
+        if ("".equals(ui.getQueryState().getAql().getValue())) {
           Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
           btExport.setEnabled(true);
           return;
@@ -108,12 +106,12 @@ public class ExportPanel extends GridLayout {
         progressBar.setVisible(true);
         progressLabel.setValue("");
 
-        if (exporter.isCancelable()) {
+        if (exporter.get().isCancelable()) {
           btCancel.setEnabled(true);
           btCancel.setDisableOnClick(true);
         }
 
-        controller.executeExport(ExportPanel.this, eventBus);
+        ui.getQueryController().executeExport(ExportPanel.this, eventBus);
 
         if (exportTime == null) {
           exportTime = Stopwatch.createUnstarted();
@@ -134,23 +132,22 @@ public class ExportPanel extends GridLayout {
 
     @Override
     public void valueChange(ValueChangeEvent event) {
-      @SuppressWarnings("unchecked")
-      ExporterPlugin exporter =
-          ps.getExporter((Class<? extends ExporterPlugin>) event.getProperty().getValue());
-      if (exporter != null) {
-        btCancel.setVisible(exporter.isCancelable());
+      Optional<ExporterPlugin> exporter = ui.getExporterPlugins().stream()
+          .filter((e) -> e.getClass().getSimpleName().equals(cbExporter.getValue())).findAny();
+      if (exporter.isPresent()) {
+        btCancel.setVisible(exporter.get().isCancelable());
 
-        cbAlignmc.setVisible(exporter.isAlignable());
+        cbAlignmc.setVisible(exporter.get().isAlignable());
 
-        String helpMessage = exporter.getHelpMessage();
+        String helpMessage = exporter.get().getHelpMessage();
         if (helpMessage != null) {
           lblHelp.setValue(helpMessage);
         } else {
           lblHelp.setValue("No help available for this exporter");
         }
 
-        cbLeftContext.setVisible(exporter.needsContext());
-        cbRightContext.setVisible(exporter.needsContext());
+        cbLeftContext.setVisible(exporter.get().needsContext());
+        cbRightContext.setVisible(exporter.get().needsContext());
       } else {
         btCancel.setVisible(false);
         cbAlignmc.setVisible(false);
@@ -187,7 +184,7 @@ public class ExportPanel extends GridLayout {
 
   private final Button btCancel;
 
-  private final QueryPanel queryPanel;
+  private final AnnisUI ui;
 
   private File tmpOutputFile;
 
@@ -200,26 +197,19 @@ public class ExportPanel extends GridLayout {
   private final transient EventBus eventBus;
   private transient Stopwatch exportTime = Stopwatch.createUnstarted();
 
-  private final QueryController controller;
-  private UI ui;
 
-  private final QueryUIState state;
+  @Autowired
+  private QueryUIState state;
 
   private final FormLayout formLayout;
 
   private final Label lblHelp;
 
-  private final PluginSystem ps;
-
   private final CheckBox cbAlignmc;
 
-  public ExportPanel(QueryPanel queryPanel, QueryController controller, QueryUIState state,
-      PluginSystem ps) {
+  public ExportPanel(AnnisUI ui) {
     super(2, 3);
-    this.queryPanel = queryPanel;
-    this.controller = controller;
-    this.state = state;
-    this.ps = ps;
+    this.ui = ui;
 
     this.eventBus = new EventBus();
     this.eventBus.register(ExportPanel.this);
@@ -237,8 +227,7 @@ public class ExportPanel extends GridLayout {
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
-    cbExporter.setPropertyDataSource(controller.getState().getExporter());
-    cbExporter.setContainerDataSource(exporterClassContainer);
+
 
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
 
@@ -351,14 +340,15 @@ public class ExportPanel extends GridLayout {
   @Override
   public void attach() {
     super.attach();
-    this.ui = UI.getCurrent();
 
-    if (this.ui instanceof AnnisBaseUI) {
-      PluginManagerUtil util = new PluginManagerUtil(((AnnisBaseUI) getUI()).getPluginManager());
-      for (ExporterPlugin e : util.getPlugins(ExporterPlugin.class)) {
-        exporterClassContainer.addItem(e.getClass());
-      }
+
+    cbExporter.setPropertyDataSource(state.getExporter());
+    cbExporter.setContainerDataSource(exporterClassContainer);
+
+    for (ExporterPlugin e : ui.getExporterPlugins()) {
+      exporterClassContainer.addItem(e.getClass());
     }
+
     exporterClassContainer.sort(new Object[] {"simpleName"}, new boolean[] {true});
     cbExporter.setItemCaptionMode(ItemCaptionMode.PROPERTY);
     cbExporter.setItemCaptionPropertyId("simpleName");
@@ -381,6 +371,7 @@ public class ExportPanel extends GridLayout {
 
   @Subscribe
   public void handleExportProgress(final Integer exports) {
+    UI ui = getUI();
     if (ui != null) {
       // if we ui access() here it seems to confuse the isInterrupted() flag
       // of the parent thread and cancelling won't work any longer

@@ -18,11 +18,11 @@ import annis.QueryGenerator;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.media.MediaControllerImpl;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.libgui.media.MediaController;
-import annis.libgui.media.MediaControllerImpl;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
@@ -132,6 +132,8 @@ public class SearchView extends GridLayout
 
     private MainToolbar toolbar;
 
+    private HelpPanel helpPanel;
+
     public SearchView(AnnisUI ui) {
         super(2, 2);
         this.ui = ui;
@@ -145,7 +147,7 @@ public class SearchView extends GridLayout
         setRowExpandRatio(1, 1.0f);
         setColumnExpandRatio(1, 1.0f);
 
-        final HelpPanel help = new HelpPanel(ui);
+        helpPanel = new HelpPanel(ui);
 
         mainTab = new TabSheet();
         mainTab.setSizeFull();
@@ -153,11 +155,11 @@ public class SearchView extends GridLayout
         mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
         mainTab.addSelectedTabChangeListener(SearchView.this);
 
-        TabSheet.Tab helpTab = mainTab.addTab(help, "Help/Examples");
+        TabSheet.Tab helpTab = mainTab.addTab(helpPanel, "Help/Examples");
         helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
         helpTab.setClosable(false);
 
-        controlPanel = new ControlPanel(ui.getInstanceConfig(), help.getExamples(), ui);
+        controlPanel = new ControlPanel(ui, helpPanel);
 
         controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.Unit.PIXELS);
         controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
@@ -170,7 +172,7 @@ public class SearchView extends GridLayout
 
             @Override
             public void handleAction(Object sender, Object target) {
-                mainTab.setSelectedTab(help);
+            mainTab.setSelectedTab(helpPanel);
             }
         });
 
@@ -607,6 +609,10 @@ public class SearchView extends GridLayout
     @Override
     public void uriFragmentChanged(Page.UriFragmentChangedEvent event) {
         evaluateFragment(event.getUriFragment());
+    }
+
+    public HelpPanel getHelpPanel() {
+      return helpPanel;
     }
 
 }

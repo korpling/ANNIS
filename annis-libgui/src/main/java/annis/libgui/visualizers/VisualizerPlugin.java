@@ -18,7 +18,6 @@ import com.vaadin.ui.Component;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-import net.xeoh.plugins.base.Plugin;
 import org.corpus_tools.salt.core.SNode;
 
 /**
@@ -38,7 +37,9 @@ import org.corpus_tools.salt.core.SNode;
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public interface VisualizerPlugin<I extends Component> extends Plugin, Serializable {
+public interface VisualizerPlugin<I extends Component> extends Serializable {
+
+  public final static String DEFAULT_VISUALIZER = "grid";
 
   /**
    * It is used by the ANNIS plugin system to generate something viewable for vaadin.

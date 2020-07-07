@@ -17,7 +17,7 @@ package annis.gui.controlpanel;
 
 import annis.gui.AnnisUI;
 import annis.gui.ExampleQueriesPanel;
-import annis.libgui.InstanceConfig;
+import annis.gui.HelpPanel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -31,30 +31,34 @@ public class ControlPanel extends VerticalLayout {
 
     private static final long serialVersionUID = -2220211539424865671L;
 
-    private QueryPanel queryPanel;
-    private CorpusListPanel corpusList;
+    private final AnnisUI ui;
 
-    private SearchOptionsPanel searchOptions;
+    private final QueryPanel queryPanel;
 
-    private TabSheet optionsTab;
+    private final CorpusListPanel corpusList;
 
-    public ControlPanel(InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries, AnnisUI ui) {
+    private final SearchOptionsPanel searchOptions;
+
+    private final TabSheet optionsTab;
+
+    private final ExampleQueriesPanel autoGenQueries;
+
+    public ControlPanel(AnnisUI ui, HelpPanel helpPanel) {
+      this.ui = ui;
         setSizeFull();
         setMargin(true);
 
         setStyleName(ValoTheme.PANEL_BORDERLESS);
-
-        queryPanel = new QueryPanel(ui);
-        queryPanel.setHeight("-1px");
-        queryPanel.setWidth("100%");
 
         optionsTab = new TabSheet();
         optionsTab.setHeight("100%");
         optionsTab.setWidth("100%");
         optionsTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
-        corpusList = new CorpusListPanel(instanceConfig, autoGenQueries, ui);
-
+        queryPanel = new QueryPanel(ui);
+        autoGenQueries =
+            new ExampleQueriesPanel((AnnisUI) getUI(), helpPanel);
+        corpusList = new CorpusListPanel(ui, autoGenQueries);
         searchOptions = new SearchOptionsPanel();
 
         optionsTab.addTab(corpusList, "Corpus List", null);
@@ -63,7 +67,13 @@ public class ControlPanel extends VerticalLayout {
         addComponent(queryPanel);
         addComponent(optionsTab);
 
+
+        queryPanel.setHeight("-1px");
+        queryPanel.setWidth("100%");
+
         setExpandRatio(optionsTab, 1.0f);
+
+
     }
 
     public CorpusListPanel getCorpusList() {

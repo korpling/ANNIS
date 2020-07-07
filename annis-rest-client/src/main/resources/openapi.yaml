@@ -1023,7 +1023,7 @@ components:
         visibility:
           description: The default display state of the visualizer before any user interaction.
           type: string
-          enum: [hidden, visible, permanent, preloaded, removed]
+          enum: [hidden, visible, permanent, preloaded]
         mappings:
           description: Additional configuration given as generic map of key values to the visualizer.
           type: object

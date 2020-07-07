@@ -15,7 +15,6 @@
  */
 package annis.gui.controller;
 
-import annis.gui.AnnisUI;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.libgui.Helper;
 import annis.model.FrequencyQuery;
@@ -23,6 +22,7 @@ import annis.service.objects.FrequencyTable;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.UI;
 import java.util.concurrent.Callable;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,12 +35,12 @@ import org.slf4j.LoggerFactory;
 public class FrequencyBackgroundJob implements Callable<FrequencyTable> {
     private static final Logger log = LoggerFactory.getLogger(FrequencyBackgroundJob.class);
 
-    private final AnnisUI ui;
+    private final UI ui;
     private final FrequencyQuery query;
 
     private final FrequencyQueryPanel panel;
 
-    public FrequencyBackgroundJob(AnnisUI ui, FrequencyQuery query, FrequencyQueryPanel panel) {
+    public FrequencyBackgroundJob(UI ui, FrequencyQuery query, FrequencyQueryPanel panel) {
         this.ui = ui;
         this.query = query;
         this.panel = panel;

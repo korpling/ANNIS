@@ -16,6 +16,7 @@
 package annis.gui.servlets;
 
 import annis.libgui.visualizers.ResourcePlugin;
+import com.google.common.base.Objects;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -24,18 +25,15 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import net.xeoh.plugins.base.Plugin;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.events.PluginLoaded;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * This servlet fetches resources for e.g. visualizers.
@@ -43,12 +41,13 @@ import org.apache.commons.lang3.StringUtils;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  *
  */
-@PluginImplementation
-public class ResourceServlet extends HttpServlet implements Plugin {
+@Component
+public class ResourceServlet extends HttpServlet {
 
     private static final long serialVersionUID = -8182635617256833563L;
-    private static final Map<String, ResourcePlugin> resourceRegistry = Collections
-            .synchronizedMap(new HashMap<String, ResourcePlugin>());
+
+    // @Autowired
+    private List<ResourcePlugin> plugins;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -76,13 +75,14 @@ public class ResourceServlet extends HttpServlet implements Plugin {
         String path = StringUtils.join(Arrays.copyOfRange(pathComponents, 1, pathComponents.length), "/");
 
         // get the visualizer for this vistype
-        ResourcePlugin vis = resourceRegistry.get(vistype);
-        if (vis == null) {
+        Optional<ResourcePlugin> vis =
+            plugins.stream().filter(p -> Objects.equal(p.getShortName(), vistype)).findAny();
+        if (!vis.isPresent()) {
             response.sendError(500, "There is no resource with the short name " + vistype);
         } else if (path.endsWith(".class")) {
             response.sendError(403, "illegal class path access");
         } else {
-            URL resource = vis.getClass().getResource(path);
+          URL resource = vis.get().getClass().getResource(path);
             if (resource == null) {
                 response.sendError(404, path + " not found");
             } else {
@@ -121,10 +121,5 @@ public class ResourceServlet extends HttpServlet implements Plugin {
             }
         }
 
-    }
-
-    @PluginLoaded
-    public void newResourceAdded(ResourcePlugin vis) {
-        resourceRegistry.put(vis.getShortName(), vis);
     }
 }
