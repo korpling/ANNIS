@@ -78,13 +78,13 @@ public class AnnisGraphTools implements Serializable {
 
   public static boolean isTerminal(SNode n, VisualizerInput input) {
     String terminalName = (input == null ? null
-        : input.getMappings().getProperty(TigerTreeVisualizer.TERMINAL_NAME_KEY));
+        : input.getMappings().get(TigerTreeVisualizer.TERMINAL_NAME_KEY));
 
     if (terminalName == null) {
       return n instanceof SToken;
     } else {
       String terminalNamespace = (input == null ? null
-          : input.getMappings().getProperty(TigerTreeVisualizer.TERMINAL_NS_KEY));
+          : input.getMappings().get(TigerTreeVisualizer.TERMINAL_NS_KEY));
 
       SAnnotation anno = n.getAnnotation(terminalNamespace, terminalName);
 
@@ -137,7 +137,7 @@ public class AnnisGraphTools implements Serializable {
    * @return the name of the edge type. Is never null.
    */
   public String getPrimEdgeSubType() {
-    return input.getMappings().getProperty("edge_type", PRIMEDGE_SUBTYPE);
+    return input.getMappings().getOrDefault("edge_type", PRIMEDGE_SUBTYPE);
   }
 
   /**
@@ -146,14 +146,14 @@ public class AnnisGraphTools implements Serializable {
    * @return the name of the secedge type. Is never null.
    */
   public String getSecEdgeSubType() {
-    return input.getMappings().getProperty("secedge_type", SECEDGE_SUBTYPE);
+    return input.getMappings().getOrDefault("secedge_type", SECEDGE_SUBTYPE);
   }
 
   public List<DirectedGraph<SNode, SRelation>> getSyntaxGraphs() {
     final SDocumentGraph docGraph = input.getDocument().getDocumentGraph();
-    String namespace = input.getMappings().getProperty("node_ns", input.getNamespace());
-    String terminalName = input.getMappings().getProperty(TigerTreeVisualizer.TERMINAL_NAME_KEY);
-    String terminalNamespace = input.getMappings().getProperty(TigerTreeVisualizer.TERMINAL_NS_KEY);
+    String namespace = input.getMappings().getOrDefault("node_ns", input.getNamespace());
+    String terminalName = input.getMappings().get(TigerTreeVisualizer.TERMINAL_NAME_KEY);
+    String terminalNamespace = input.getMappings().get(TigerTreeVisualizer.TERMINAL_NS_KEY);
 
     List<DirectedGraph<SNode, SRelation>> resultGraphs = new ArrayList<>();
 
@@ -196,13 +196,12 @@ public class AnnisGraphTools implements Serializable {
 
     if (getPrimEdgeSubType().equals(edgeSubtype)) {
       edgeSubtype =
-          input.getMappings().getProperty("edge") != null ? input.getMappings().getProperty("edge")
+          input.getMappings().get("edge") != null ? input.getMappings().get("edge")
               : getPrimEdgeSubType();
     }
 
     if (getSecEdgeSubType().equals(edgeSubtype)) {
-      edgeSubtype = input.getMappings().getProperty("secedge") != null
-          ? input.getMappings().getProperty("secedge")
+      edgeSubtype = input.getMappings().get("secedge") != null ? input.getMappings().get("secedge")
           : getSecEdgeSubType();
     }
 

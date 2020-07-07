@@ -13,9 +13,9 @@
  */
 package annis.resolver;
 
-import annis.resolver.ResolverEntry.ElementType;
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.corpus_tools.annis.api.model.VisualizerRule.ElementEnum;
 
 /**
  * This represents a request to a resolver entry. A list of this type is a complete query.
@@ -31,13 +31,13 @@ public class SingleResolverRequest implements Serializable {
   private static final long serialVersionUID = 4092681220798179503L;
   private String corpusName;
   private String namespace;
-  private ResolverEntry.ElementType type;
+  private ElementEnum type;
 
   public SingleResolverRequest() {
 
   }
 
-  public SingleResolverRequest(String corpusName, String namespace, ElementType type) {
+  public SingleResolverRequest(String corpusName, String namespace, ElementEnum type) {
     this.corpusName = corpusName;
     this.namespace = namespace;
     this.type = type;
@@ -73,7 +73,7 @@ public class SingleResolverRequest implements Serializable {
     return namespace;
   }
 
-  public ElementType getType() {
+  public ElementEnum getType() {
     return type;
   }
 

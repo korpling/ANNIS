@@ -27,7 +27,6 @@ import annis.libgui.media.PDFViewer;
 import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
-import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 import annis.visualizers.LoadableVisualizer;
 import com.google.common.base.Joiner;
@@ -64,6 +63,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.corpus_tools.annis.api.model.VisualizerRule;
+import org.corpus_tools.annis.api.model.VisualizerRule.VisibilityEnum;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
@@ -85,7 +86,8 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
         private final LoadableVisualizer.Callback callback;
         private final UI ui;
 
-        public BackgroundJob(Future<Component> future, LoadableVisualizer.Callback callback, UI ui) {
+        public BackgroundJob(Future<Component> future, LoadableVisualizer.Callback callback,
+            UI ui) {
             this.future = future;
             this.callback = callback;
             this.ui = ui;
@@ -189,7 +191,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
 
     private SDocument result;
 
-    private ResolverEntry entry;
+    private VisualizerRule visRule;
 
     private Map<SNode, Long> markedAndCovered;
 
@@ -198,6 +200,8 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
     private String htmlID;
 
     private String resultID;
+
+    private final int visId;
 
     private VisualizerPlugin visPlugin;
 
@@ -224,11 +228,15 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
      * Visualizer.
      *
      */
-    public VisualizerPanel(final ResolverEntry entry, SDocument result, Match match, Set<String> visibleTokenAnnos,
-            Map<SNode, Long> markedAndCovered, String htmlID, String resultID, VisualizerContextChanger parent,
+    public VisualizerPanel(final VisualizerRule visRule, int visId, SDocument result,
+    Match match,
+        Set<String> visibleTokenAnnos,
+        Map<SNode, Long> markedAndCovered, String htmlID, String resultID,
+        VisualizerContextChanger parent,
             String segmentationName, PluginSystem ps, InstanceConfig instanceConfig) throws IOException {
         this.instanceConfig = instanceConfig;
-        this.entry = entry;
+        this.visRule = visRule;
+        this.visId = visId;
         this.ps = ps;
 
         this.visCtxChanger = parent;
@@ -260,17 +268,17 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
     public void attach() {
         super.attach();
 
-        if (entry != null && ps != null) {
-            visPlugin = ps.getVisualizer(entry.getVisType());
+        if (visRule != null && ps != null) {
+          visPlugin = ps.getVisualizer(visRule.getVisType());
             if (visPlugin == null) {
                 // fallback to default visualizer if original vis type was not found
-                entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
-                visPlugin = ps.getVisualizer(entry.getVisType());
+                visRule.setVisType(PluginSystem.DEFAULT_VISUALIZER);
+                visPlugin = ps.getVisualizer(visRule.getVisType());
             }
 
-            if (HIDDEN.equalsIgnoreCase(entry.getVisibility())) {
+            if (visRule.getVisibility() == VisibilityEnum.HIDDEN) {
                 // build button for visualizer
-                btEntry = new Button(entry.getDisplayName());
+                btEntry = new Button(visRule.getDisplayName());
                 btEntry.setIcon(ICON_EXPAND);
                 btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " " + ChameleonTheme.BUTTON_SMALL);
                 btEntry.addClickListener(this);
@@ -280,10 +288,10 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
                 addComponent(progress);
             } else {
 
-                if (ISVISIBLE.equalsIgnoreCase(entry.getVisibility())
-                        || PRELOADED.equalsIgnoreCase(entry.getVisibility())) {
+              if (visRule.getVisibility() == VisibilityEnum.VISIBLE
+                  || visRule.getVisibility() == VisibilityEnum.PRELOADED) {
                     // build button for visualizer
-                    btEntry = new Button(entry.getDisplayName());
+                btEntry = new Button(visRule.getDisplayName());
                     btEntry.setIcon(ICON_COLLAPSE);
                     btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " " + ChameleonTheme.BUTTON_SMALL);
                     btEntry.addClickListener(this);
@@ -305,7 +313,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
                     log.error("Could not create visualizer " + visPlugin.getShortName(), ex);
                 }
 
-                if (btEntry != null && PRELOADED.equalsIgnoreCase(entry.getVisibility())) {
+                if (btEntry != null && visRule.getVisibility() == VisibilityEnum.PRELOADED) {
                     btEntry.setIcon(ICON_EXPAND);
                     if (vis != null) {
                         vis.setVisible(false);
@@ -324,7 +332,7 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
 
         // register new state by the parent SingleResultPanel, so the state will be
         // still available, after a reload
-        visCtxChanger.registerVisibilityStatus(entry.getId(), isVisible);
+        visCtxChanger.registerVisibilityStatus(visId, isVisible);
 
         // start the toogle process.
         toggleVisualizer(isVisible, null);
@@ -363,10 +371,10 @@ public class VisualizerPanel extends CssLayout implements Button.ClickListener, 
             input.setFont(instanceConfig.getFont());
         }
 
-        if (entry != null) {
-            input.setMappings(entry.getMappings());
-            input.setNamespace(entry.getNamespace());
-            String template = Helper.getContext(ui) + "/Resource/" + entry.getVisType() + "/%s";
+        if (visRule != null) {
+          input.setMappings(visRule.getMappings());
+          input.setNamespace(visRule.getLayer());
+          String template = Helper.getContext(ui) + "/Resource/" + visRule.getVisType() + "/%s";
             input.setResourcePathTemplate(template);
         }
 

@@ -42,7 +42,7 @@ public class PDFFullVisualizer extends AbstractVisualizer<Panel> {
   @Override
   public Panel createComponent(VisualizerInput input, VisualizationToggle visToggle) {
     Panel p = new Panel();
-    p.setHeight(input.getMappings().getProperty("height", "-1") + "px");
+    p.setHeight(input.getMappings().getOrDefault("height", "-1") + "px");
     p.setContent(new PDFPanel(input, "-1"));
     return p;
   }

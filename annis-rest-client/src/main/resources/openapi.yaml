@@ -1027,6 +1027,8 @@ components:
         mappings:
           description: Additional configuration given as generic map of key values to the visualizer.
           type: object
+          additionalProperties:
+            type: string
 
     Group:
       type: object

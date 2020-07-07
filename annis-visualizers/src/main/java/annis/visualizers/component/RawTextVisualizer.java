@@ -68,7 +68,8 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
   public Panel createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
 
     // get config for alignment
-    boolean vertical = Boolean.parseBoolean(visInput.getMappings().getProperty("vertical", "true"));
+    boolean vertical =
+        Boolean.parseBoolean(visInput.getMappings().getOrDefault("vertical", "true"));
 
     // get the texts
     RawTextWrapper texts = visInput.getRawText();

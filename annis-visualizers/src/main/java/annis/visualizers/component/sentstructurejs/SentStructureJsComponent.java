@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -214,7 +213,7 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
   // 3rd for dominance relations
   private final List<String> configurations = new ArrayList<String>();
 
-  private Properties mappings;
+  private Map<String, String> mappings;
 
   /**
    * Creates a new {@link SentStructureJsComponent} instance.
@@ -228,7 +227,7 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
 
     // put user configurations to the configuration list
     for (Annos_Keyword kw : Annos_Keyword.values()) {
-      configurations.add(visInput.getMappings().getProperty(kw.getValue()));
+      configurations.add(visInput.getMappings().get(kw.getValue()));
       fillFilterAnnotations(visInput, kw.ordinal());
     }
 
@@ -429,13 +428,13 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
   private String getPointingRelationAnnotation(SPointingRelation rel) {
 
     if (mappings.containsKey(MAPPING_ALIGNMENT_LABEL)
-        && mappings.getProperty(MAPPING_ALIGNMENT_LABEL) != null) {
+        && mappings.get(MAPPING_ALIGNMENT_LABEL) != null) {
 
       Set<SAnnotation> annos = rel.getAnnotations();
       SAnnotation anno = null;
 
       for (SAnnotation a : annos) {
-        if (mappings.getProperty(MAPPING_ALIGNMENT_LABEL).equals(a.getName())) {
+        if (mappings.get(MAPPING_ALIGNMENT_LABEL).equals(a.getName())) {
           anno = a;
           break;
         }

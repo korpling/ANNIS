@@ -76,7 +76,7 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
 
       pdfPanel = new PDFPanel(this.input, page);
       this.setContent(pdfPanel);
-      this.setHeight(input.getMappings().getProperty("height", "-1") + "px");
+      this.setHeight(input.getMappings().getOrDefault("height", "-1") + "px");
     }
 
     @Override

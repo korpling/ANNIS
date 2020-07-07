@@ -246,7 +246,7 @@ public class VisJsComponent extends AbstractJavaScriptComponent
 
     // put user configurations to the configuration list
     for (Annos_Keyword kw : Annos_Keyword.values()) {
-      configurations.add(visInput.getMappings().getProperty(kw.getValue()));
+      configurations.add(visInput.getMappings().get(kw.getValue()));
       fillFilterAnnotations(visInput, kw.ordinal());
     }
 

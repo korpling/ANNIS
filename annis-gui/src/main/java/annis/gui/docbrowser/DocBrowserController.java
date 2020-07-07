@@ -23,7 +23,6 @@ import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.RawTextWrapper;
-import annis.service.objects.Visualizer;
 import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -44,8 +43,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SaltProject;
 
@@ -58,7 +57,7 @@ public class DocBrowserController implements Serializable {
 
     private class DocVisualizerFetcher implements Runnable {
 
-        Visualizer config;
+      VisualizerRule config;
 
         String corpus;
 
@@ -75,7 +74,7 @@ public class DocBrowserController implements Serializable {
         private VisualizerInput input;
 
         public DocVisualizerFetcher(String corpus, String doc, String canonicalTitle, String type, Panel visHolder,
-                Visualizer config, Button btn, final UI ui) {
+            VisualizerRule config, Button btn, final UI ui) {
             this.corpus = corpus;
             this.doc = doc;
             this.btn = btn;
@@ -96,7 +95,7 @@ public class DocBrowserController implements Serializable {
             List<String> nodeAnnoFilter = null;
             if (visualizer instanceof FilteringVisualizerPlugin) {
                 nodeAnnoFilter = ((FilteringVisualizerPlugin) visualizer).getFilteredNodeAnnotationNames(corpus, doc,
-                        parseMappings(config), ui);
+                    config.getMappings(), ui);
             }
 
             // check if a visualization is already initiated
@@ -164,13 +163,14 @@ public class DocBrowserController implements Serializable {
      * @return a {@link VisualizerInput} input, which is usable for rendering the
      *         whole document.
      */
-    public static VisualizerInput createInput(String corpus, String docName, Visualizer config, boolean isUsingRawText,
+    public static VisualizerInput createInput(String corpus, String docName, VisualizerRule config,
+        boolean isUsingRawText,
             List<String> nodeAnnoFilter, UI ui) {
         VisualizerInput input = new VisualizerInput();
 
         // set mappings and namespaces. some visualizer do not survive without
-        input.setMappings(parseMappings(config));
-        input.setNamespace(config.getNamespace());
+        input.setMappings(config.getMappings());
+        input.setNamespace(config.getLayer());
         input.setUI(ui);
 
         String encodedToplevelCorpus = urlPathEscape.escape(corpus);
@@ -202,23 +202,6 @@ public class DocBrowserController implements Serializable {
         return input;
     }
 
-    private static Properties parseMappings(Visualizer config) {
-        Properties mappings = new Properties();
-
-        if (config.getMappings() != null) {
-            // split the entrys
-            String[] entries = config.getMappings().split(";");
-            for (String e : entries) {
-                // split key-value
-                String[] keyvalue = e.split(":", 2);
-                if (keyvalue.length == 2) {
-                    mappings.put(keyvalue[0].trim(), keyvalue[1].trim());
-                }
-            }
-        }
-
-        return mappings;
-    }
 
     // holds the complete state of the gui
     private final AnnisUI ui;
@@ -253,7 +236,7 @@ public class DocBrowserController implements Serializable {
         ui.getSearchView().getTabSheet().setSelectedTab(tab);
     }
 
-    public void openDocVis(String corpus, String doc, Visualizer visConfig, Button btn) {
+    public void openDocVis(String corpus, String doc, VisualizerRule visConfig, Button btn) {
 
         final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + visConfig.getDisplayName();
         final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
@@ -287,7 +270,8 @@ public class DocBrowserController implements Serializable {
         // register visible visHolder
         this.visibleVisHolder.put(canonicalTitle, visHolder);
 
-        Background.run(new DocVisualizerFetcher(corpus, doc, canonicalTitle, visConfig.getType(), visHolder, visConfig,
+        Background.run(new DocVisualizerFetcher(corpus, doc, canonicalTitle, visConfig.getVisType(),
+            visHolder, visConfig,
                 btn, ui));
     }
 }

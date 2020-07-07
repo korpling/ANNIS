@@ -28,7 +28,6 @@ import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProviderImpl;
 import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
-import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
@@ -62,6 +61,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -130,7 +130,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     public static final String FILESYSTEM_CACHE_RESULT = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
 
-    private final Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
+    private final Map<HashSet<SingleResolverRequest>, List<VisualizerRule>> cacheResolver;
 
     private final PagingComponent paging;
 
@@ -175,7 +175,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
         this.controller = ui.getQueryController();
         this.initialQuery = initialQuery;
 
-        cacheResolver = Collections.synchronizedMap(new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
+        cacheResolver = Collections
+            .synchronizedMap(new HashMap<HashSet<SingleResolverRequest>, List<VisualizerRule>>());
 
         resultPanelList = Collections.synchronizedList(new LinkedList<AbstractComponent>());
 
