@@ -27,8 +27,7 @@ import org.corpus_tools.salt.core.SNode;
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public abstract class AbstractVisualizer<I extends Component>
-    implements VisualizerPlugin<I>, FilteringVisualizerPlugin {
+public abstract class AbstractVisualizer implements VisualizerPlugin, FilteringVisualizerPlugin {
 
   /**
    * 
@@ -55,11 +54,11 @@ public abstract class AbstractVisualizer<I extends Component>
   }
 
   @Override
-  public void setSegmentationLayer(I visualizerImplementation, String segmentationName,
+  public void setSegmentationLayer(Component visualizerImplementation, String segmentationName,
       Map<SNode, Long> markedAndCovered) {}
 
   @Override
-  public void setVisibleTokenAnnosVisible(I visualizerImplementation, Set<String> annos) {}
+  public void setVisibleTokenAnnosVisible(Component visualizerImplementation, Set<String> annos) {}
 
 
 }

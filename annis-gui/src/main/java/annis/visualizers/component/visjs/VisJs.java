@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class VisJs extends AbstractVisualizer<Panel> {
+public class VisJs extends AbstractVisualizer {
 
 
 
@@ -34,7 +34,5 @@ public class VisJs extends AbstractVisualizer<Panel> {
   public boolean isUsingText() {
     return false;
   }
-
-
 
 }

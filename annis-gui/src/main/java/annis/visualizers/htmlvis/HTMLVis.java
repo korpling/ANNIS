@@ -75,7 +75,7 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Component
-public class HTMLVis extends AbstractVisualizer<Panel> {
+public class HTMLVis extends AbstractVisualizer {
 
   /**
    * 

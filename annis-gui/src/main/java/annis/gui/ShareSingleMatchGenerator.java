@@ -82,12 +82,13 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
     private final PagedResultQuery query;
     private final String segmentation;
 
-    private final List<VisualizerPlugin<com.vaadin.ui.Component>> visualizerPlugins;
+    private final List<VisualizerPlugin> visualizerPlugins;
 
 
     public ShareSingleMatchGenerator(List<VisualizerRule> visualizers, Match match,
         PagedResultQuery query,
-        String segmentation, List<VisualizerPlugin<com.vaadin.ui.Component>> visualizerPlugins) {
+        String segmentation,
+        List<VisualizerPlugin> visualizerPlugins) {
         this.match = match;
         this.query = query;
         this.segmentation = segmentation;
@@ -185,7 +186,8 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
 
         UriBuilder serviceURL = UriBuilder.fromUri(Helper.getAnnisWebResource(UI.getCurrent()).path("query").getURI());
 
-        Optional<VisualizerPlugin<com.vaadin.ui.Component>> visPlugin = visualizerPlugins.stream()
+        Optional<VisualizerPlugin> visPlugin =
+            visualizerPlugins.stream()
             .filter(vis -> Objects.equal(vis.getShortName(), entry.getVisType())).findAny();
         if (visPlugin.isPresent() && visPlugin.get().isUsingText()) {
             // generate a service URL that gets the whole document

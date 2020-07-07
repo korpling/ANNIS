@@ -68,7 +68,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     private SearchView searchView;
 
     @Autowired
-    private List<VisualizerPlugin<com.vaadin.ui.Component>> visualizerPlugins;
+    private List<VisualizerPlugin> visualizerPlugins;
 
 
     @Autowired
@@ -228,7 +228,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
         return toolbar;
     }
 
-    public List<VisualizerPlugin<com.vaadin.ui.Component>> getVisualizerPlugins() {
+    public List<VisualizerPlugin> getVisualizerPlugins() {
       return visualizerPlugins;
     }
 

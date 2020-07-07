@@ -37,7 +37,7 @@ import org.corpus_tools.salt.core.SNode;
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public interface VisualizerPlugin<I extends Component> extends Serializable {
+public interface VisualizerPlugin extends Serializable {
 
   public final static String DEFAULT_VISUALIZER = "grid";
 
@@ -45,7 +45,7 @@ public interface VisualizerPlugin<I extends Component> extends Serializable {
    * It is used by the ANNIS plugin system to generate something viewable for vaadin.
    *
    */
-  public I createComponent(VisualizerInput visInput, VisualizationToggle visToggle);
+  public Component createComponent(VisualizerInput visInput, VisualizationToggle visToggle);
 
   /**
    * Get the shorted name of the linguistic type of this visualizer ("partitur", "tree", etc.)
@@ -81,7 +81,7 @@ public interface VisualizerPlugin<I extends Component> extends Serializable {
    *
    * @param segmentationName
    */
-  public void setSegmentationLayer(I visualizerImplementation, String segmentationName,
+  public void setSegmentationLayer(Component visualizerImplementation, String segmentationName,
       Map<SNode, Long> markedAndCovered);
 
   /**
@@ -89,5 +89,5 @@ public interface VisualizerPlugin<I extends Component> extends Serializable {
    *
    * @param annos Which token annotations (qualified name) to show.
    */
-  public void setVisibleTokenAnnosVisible(I visualizerImplementation, Set<String> annos);
+  public void setVisibleTokenAnnosVisible(Component visualizerImplementation, Set<String> annos);
 }

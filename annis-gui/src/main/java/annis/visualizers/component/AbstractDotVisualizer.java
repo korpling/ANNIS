@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePanel> {
+public abstract class AbstractDotVisualizer extends AbstractVisualizer {
 
   /**
    * 
@@ -125,4 +125,5 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
     }
 
   }
+
 }

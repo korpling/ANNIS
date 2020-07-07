@@ -68,7 +68,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
+public class GridTreeVisualizer extends AbstractVisualizer {
 
   private static class GridTreePanel extends Panel {
 
@@ -389,4 +389,5 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
   public String getShortName() {
     return "grid_tree";
   }
+
 }
