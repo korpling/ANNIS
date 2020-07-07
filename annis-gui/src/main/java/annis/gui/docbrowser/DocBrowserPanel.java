@@ -20,7 +20,6 @@ import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.DocumentBrowserConfig;
-import annis.service.objects.Visualizer;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.WebResource;
@@ -33,6 +32,7 @@ import com.vaadin.v7.data.util.filter.SimpleStringFilter;
 import com.vaadin.v7.ui.TextField;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
 import java.util.List;
+import org.corpus_tools.annis.api.model.VisualizerRule;
 
 /**
  *
@@ -144,7 +144,7 @@ public class DocBrowserPanel extends Panel {
         return Helper.getDocBrowserConfig(corpus, ui);
     }
 
-    public void openVis(String doc, Visualizer config, Button btn) {
+    public void openVis(String doc, VisualizerRule config, Button btn) {
         ui.getSearchView().getDocBrowserController().openDocVis(corpus, doc, config, btn);
     }
 

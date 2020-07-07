@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
@@ -47,7 +46,7 @@ public class VisualizerInput implements Serializable {
 
   private UI ui;
 
-  private Properties mappings;
+  private Map<String, String> mappings;
 
   private String resourcePathTemplate = "%s";
 
@@ -98,7 +97,7 @@ public class VisualizerInput implements Serializable {
    *
    * @return The mappings as properties.
    */
-  public Properties getMappings() {
+  public Map<String, String> getMappings() {
     return mappings;
   }
 
@@ -217,7 +216,7 @@ public class VisualizerInput implements Serializable {
    *
    * @param mappings The new mappings.
    */
-  public void setMappings(Properties mappings) {
+  public void setMappings(Map<String, String> mappings) {
     this.mappings = mappings;
   }
 

@@ -219,7 +219,7 @@ public class EventExtractor {
             : getAnnotationLevelSet(graph, input.getNamespace(), type);
     List<String> annos = new LinkedList<>(annoPool);
 
-    String annosConfiguration = input.getMappings().getProperty(MAPPING_ANNOS_KEY);
+    String annosConfiguration = input.getMappings().get(MAPPING_ANNOS_KEY);
     if (annosConfiguration != null && annosConfiguration.trim().length() > 0) {
       String[] split = annosConfiguration.split(",");
       annos.clear();
@@ -250,7 +250,7 @@ public class EventExtractor {
 
     // filter already found annotation names by regular expression
     // if this was given as mapping
-    String regexFilterRaw = input.getMappings().getProperty(MAPPING_ANNO_REGEX_KEY);
+    String regexFilterRaw = input.getMappings().get(MAPPING_ANNO_REGEX_KEY);
     if (regexFilterRaw != null) {
       try {
         Pattern regexFilter = Pattern.compile(regexFilterRaw);
@@ -286,7 +286,7 @@ public class EventExtractor {
     }
 
     String showNamespaceConfig =
-        input.getMappings().getProperty(GridComponent.MAPPING_SHOW_NAMESPACE);
+        input.getMappings().get(GridComponent.MAPPING_SHOW_NAMESPACE);
 
     if (showNamespaceConfig != null) {
 

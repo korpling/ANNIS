@@ -96,7 +96,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
       AnnotationGrid grid = new AnnotationGrid(input.getId(), getTokKey());
 
       // set config for escaping html tags
-      String escapeHTML = visInput.getMappings().getProperty("escape_html", "true");
+      String escapeHTML = visInput.getMappings().getOrDefault("escape_html", "true");
       grid.setEscapeHTML(Boolean.parseBoolean(escapeHTML));
 
       // get all roots for having a start point for the traversal
@@ -239,11 +239,11 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
     }
 
     private String getNodeKey() {
-      return input.getMappings().getProperty("node_key", "cat");
+      return input.getMappings().getOrDefault("node_key", "cat");
     }
 
     private String getTokKey() {
-      return input.getMappings().getProperty("tok_key", "tok");
+      return input.getMappings().getOrDefault("tok_key", "tok");
     }
 
     private boolean hasAnno(SNode n) {

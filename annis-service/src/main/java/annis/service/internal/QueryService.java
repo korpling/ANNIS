@@ -85,6 +85,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
+import org.corpus_tools.annis.api.model.VisualizerRule.ElementEnum;
 import org.corpus_tools.graphannis.errors.GraphANNISException;
 import org.corpus_tools.graphannis.model.NodeDesc;
 import org.corpus_tools.salt.common.SaltProject;
@@ -839,9 +840,9 @@ public class QueryService {
     @Produces("application/xml")
     public List<ResolverEntry> resolver(@PathParam("corpusName") String corpusName,
             @PathParam("namespace") String namespace, @PathParam("type") String type) {
-        ResolverEntry.ElementType enumType = ResolverEntry.ElementType.valueOf(type);
-        SingleResolverRequest r = new SingleResolverRequest(corpusName, namespace, enumType);
-        return getQueryDao().getResolverEntries(r);
+      ElementEnum enumType = ElementEnum.valueOf(type);
+      SingleResolverRequest r = new SingleResolverRequest(corpusName, namespace, enumType);
+      return getQueryDao().getResolverEntries(r);
     }
 
     @GET

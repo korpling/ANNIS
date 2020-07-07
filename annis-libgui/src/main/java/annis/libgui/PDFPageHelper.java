@@ -16,7 +16,7 @@ package annis.libgui;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import org.corpus_tools.salt.SALT_TYPE;
@@ -169,10 +169,10 @@ public class PDFPageHelper {
    */
   public String getPDFPageAnnotationName() {
 
-    Properties mappings = input.getMappings();
+    Map<String, String> mappings = input.getMappings();
 
     if (mappings != null) {
-      return mappings.getProperty(MAPPING_PAGE_KEY, DEFAULT_PAGE_NUMBER_ANNOTATION_NAME);
+      return mappings.getOrDefault(MAPPING_PAGE_KEY, DEFAULT_PAGE_NUMBER_ANNOTATION_NAME);
     }
 
     return DEFAULT_PAGE_NUMBER_ANNOTATION_NAME;

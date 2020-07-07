@@ -86,7 +86,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer {
     public String getLabel(SNode n, VisualizerInput input) {
 
       if (AnnisGraphTools.isTerminal(n, input)) {
-        String terminalName = input.getMappings().getProperty(TERMINAL_NAME_KEY);
+        String terminalName = input.getMappings().get(TERMINAL_NAME_KEY);
         if (terminalName == null) {
 
           String spannedText = ((SDocumentGraph) n.getGraph()).getText(n);
@@ -95,21 +95,21 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer {
           }
           return spannedText;
         } else {
-          String terminalNamespace = input.getMappings().getProperty(TERMINAL_NS_KEY);
+          String terminalNamespace = input.getMappings().get(TERMINAL_NS_KEY);
           return extractAnnotation(n.getAnnotations(), terminalNamespace, terminalName);
         }
       } else {
         return extractAnnotation(n.getAnnotations(),
-            input.getMappings().getProperty("node_anno_ns", input.getNamespace()),
-            input.getMappings().getProperty("node_key", "cat"));
+            input.getMappings().getOrDefault("node_anno_ns", input.getNamespace()),
+            input.getMappings().getOrDefault("node_key", "cat"));
       }
     }
 
     @Override
     public String getLabel(SRelation e, VisualizerInput input) {
       return extractAnnotation(e.getAnnotations(),
-          input.getMappings().getProperty("edge_anno_ns", input.getNamespace()),
-          input.getMappings().getProperty("edge_key", "func"));
+          input.getMappings().getOrDefault("edge_anno_ns", input.getNamespace()),
+          input.getMappings().getOrDefault("edge_key", "func"));
     }
   }
 

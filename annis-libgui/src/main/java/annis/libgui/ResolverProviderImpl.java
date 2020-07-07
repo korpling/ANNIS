@@ -13,23 +13,17 @@
  */
 package annis.libgui;
 
-import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.UI;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.VisualizerRule;
+import org.corpus_tools.annis.api.model.VisualizerRule.ElementEnum;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
@@ -43,32 +37,6 @@ import org.slf4j.LoggerFactory;
  */
 public class ResolverProviderImpl implements ResolverProvider, Serializable {
 
-  private static class ResolverEntryComparator implements Comparator<ResolverEntry>, Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -6076322830818322778L;
-
-    public ResolverEntryComparator() {}
-
-    @Override
-    public int compare(ResolverEntry o1, ResolverEntry o2) {
-      if (o1.getOrder() < o2.getOrder()) {
-        return -1;
-      } else if (o1.getOrder() > o2.getOrder()) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-  }
-
-  private static class ResolverEntryListType extends GenericType<List<ResolverEntry>> {
-
-    public ResolverEntryListType() {}
-  }
-
   /**
    * 
    */
@@ -76,18 +44,16 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
 
   private final static Logger log = LoggerFactory.getLogger(ResolverProviderImpl.class);
 
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-
-  private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
+  private Map<HashSet<SingleResolverRequest>, List<VisualizerRule>> cacheResolver;
 
   public ResolverProviderImpl(
-      Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver) {
+      Map<HashSet<SingleResolverRequest>, List<VisualizerRule>> cacheResolver) {
     this.cacheResolver = cacheResolver;
   }
 
   @Override
-  public ResolverEntry[] getResolverEntries(SDocument doc, UI ui) {
-    HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
+  public List<VisualizerRule> getResolverEntries(SDocument doc, UI ui) {
+    List<VisualizerRule> matchingRules = new LinkedList<>();
 
     // create a request for resolver entries
     HashSet<SingleResolverRequest> resolverRequests = new HashSet<SingleResolverRequest>();
@@ -116,45 +82,38 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
 
     for (String ns : nodeLayers) {
       resolverRequests.add(new SingleResolverRequest(doc.getGraph().getRoots().get(0).getName(), ns,
-          ResolverEntry.ElementType.node));
+          ElementEnum.NODE));
     }
     for (String ns : edgeLayers) {
       resolverRequests.add(new SingleResolverRequest(doc.getGraph().getRoots().get(0).getName(), ns,
-          ResolverEntry.ElementType.edge));
+          ElementEnum.EDGE));
     }
 
     // query with this resolver request and make sure it is unique
     if (cacheResolver.containsKey(resolverRequests)) {
-      visSet.addAll(cacheResolver.get(resolverRequests));
+      matchingRules.addAll(cacheResolver.get(resolverRequests));
     } else {
-      List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
-
-      WebResource resResolver = Helper.getAnnisWebResource(ui).path("query").path("resolver");
       for (SingleResolverRequest r : resolverRequests) {
-        List<ResolverEntry> tmp;
 
-        String corpusName = urlPathEscape.escape(r.getCorpusName());
-        String namespace = r.getNamespace();
-        String type = r.getType() == null ? null : r.getType().toString();
-        if (corpusName != null && namespace != null && type != null) {
-          WebResource res = resResolver.path(corpusName).path(namespace).path(type);
-          try {
-            tmp = res.get(new ResolverEntryListType());
-            resolverList.addAll(tmp);
-          } catch (UniformInterfaceException | ClientHandlerException ex) {
-            if (!AnnisBaseUI.handleCommonError(ex, "query resolver entries")) {
-              log.error("could not query resolver entries: " + res.toString(), ex);
+        // Get all rules for the selected corpora
+        CorpusConfiguration corpusConfig = Helper.getCorpusConfig(r.getCorpusName(), ui);
+
+        // Filter the visualizer entries that match this resolver request
+        if (corpusConfig != null && corpusConfig.getVisualizers() != null) {
+          for (VisualizerRule visRule : corpusConfig.getVisualizers()) {
+            if (visRule.getElement() != null && !visRule.getElement().equals(r.getType())) {
+              break;
             }
+            if (visRule.getLayer() != null && !visRule.getLayer().equals(r.getNamespace())) {
+              break;
+            }
+            matchingRules.add(visRule);
           }
+          cacheResolver.put(resolverRequests, matchingRules);
         }
-
       }
-      visSet.addAll(resolverList);
-      cacheResolver.put(resolverRequests, resolverList);
     }
-    // sort everything
-    ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[visSet.size()]);
-    Arrays.sort(visArray, new ResolverEntryComparator());
-    return visArray;
+
+    return matchingRules;
   }
 }

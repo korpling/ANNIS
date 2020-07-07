@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -79,7 +78,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer {
    */
   private final String MAPPING_NODE_KEY = "node_key";
 
-  private Properties mappings;
+  private Map<String, String> mappings;
 
 
   /**
@@ -91,13 +90,13 @@ public class VakyarthaDependencyTree extends WriterVisualizer {
    */
   private String getAnnotation(SNode node) {
 
-    if (mappings.containsKey(MAPPING_NODE_KEY) && mappings.getProperty(MAPPING_NODE_KEY) != null) {
+    if (mappings.containsKey(MAPPING_NODE_KEY) && mappings.get(MAPPING_NODE_KEY) != null) {
 
       Set<SAnnotation> annos = node.getAnnotations();
       SAnnotation anno = null;
 
       for (SAnnotation a : annos) {
-        if (mappings.getProperty(MAPPING_NODE_KEY).equals(a.getName())) {
+        if (mappings.get(MAPPING_NODE_KEY).equals(a.getName())) {
           anno = a;
           break;
         }
@@ -302,7 +301,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer {
     String annoKey = null;
 
     if (mappings.containsKey(MAPPING_NODE_KEY)) {
-      annoKey = mappings.getProperty(MAPPING_NODE_KEY);
+      annoKey = mappings.get(MAPPING_NODE_KEY);
     }
 
     /**

@@ -20,7 +20,6 @@ import annis.libgui.PluginSystem;
 import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.model.PagedResultQuery;
-import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -46,8 +45,10 @@ import java.net.URI;
 import java.net.URLDecoder;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
+import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,14 +75,15 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
     private final TextArea txtDirectURL;
     private final TextArea txtIFrameCode;
 
-    private final BeanItemContainer<ResolverEntry> visContainer;
+    private final BeanItemContainer<VisualizerRule> visContainer;
 
     private final Match match;
     private final PagedResultQuery query;
     private final String segmentation;
     private final PluginSystem ps;
 
-    public ShareSingleMatchGenerator(List<ResolverEntry> visualizers, Match match, PagedResultQuery query,
+    public ShareSingleMatchGenerator(List<VisualizerRule> visualizers, Match match,
+        PagedResultQuery query,
             String segmentation, PluginSystem ps) {
         this.match = match;
         this.query = query;
@@ -93,7 +95,7 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
         directURL = new ObjectProperty<>("");
         iframeCode = new ObjectProperty<>("");
 
-        visContainer = new BeanItemContainer<>(ResolverEntry.class);
+        visContainer = new BeanItemContainer<>(VisualizerRule.class);
         visContainer.addAll(visualizers);
 
         txtDirectURL = new TextArea(directURL);
@@ -161,13 +163,13 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
         setContent(layout);
     }
 
-    private URI generatorURLForVisualizer(ResolverEntry entry) {
+    private URI generatorURLForVisualizer(VisualizerRule entry) {
         String appContext = Helper.getContext(UI.getCurrent());
         URI appURI = UI.getCurrent().getPage().getLocation();
         UriBuilder result = UriBuilder.fromUri(appURI).replacePath(appContext).path("embeddedvis")
                 .path(Helper.encodeJersey(entry.getVisType())).fragment("");
-        if (entry.getNamespace() != null) {
-            result = result.queryParam("embedded_ns", Helper.encodeJersey(entry.getNamespace()));
+        if (entry.getLayer() != null) {
+          result = result.queryParam("embedded_ns", Helper.encodeJersey(entry.getLayer()));
         }
         // test if the request was made from a sub-instance
         String nonContextPath = appURI.getPath().substring(appContext.length());
@@ -240,10 +242,10 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
         }
 
         // add all mappings as parameter
-        for (String key : entry.getMappings().stringPropertyNames()) {
-            if (!key.startsWith(EmbeddedVisUI.KEY_PREFIX)) {
-                String value = Helper.encodeJersey(entry.getMappings().getProperty(key));
-                result = result.queryParam(key, value);
+        for (Map.Entry<String, String> e : entry.getMappings().entrySet()) {
+          if (!e.getKey().startsWith(EmbeddedVisUI.KEY_PREFIX)) {
+            String value = Helper.encodeJersey(e.getValue());
+            result = result.queryParam(e.getKey(), value);
             }
         }
 
@@ -258,7 +260,7 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
         } else {
             generatedLinks.setVisible(true);
 
-            URI url = generatorURLForVisualizer((ResolverEntry) selected.iterator().next());
+            URI url = generatorURLForVisualizer((VisualizerRule) selected.iterator().next());
             String shortURL = Helper.shortenURL(url, UI.getCurrent());
             directURL.setValue(shortURL);
             iframeCode.setValue("<iframe height=\"300px\" width=\"100%\" src=\"" + shortURL + "\"></iframe>");

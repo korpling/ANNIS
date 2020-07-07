@@ -28,7 +28,6 @@ import annis.libgui.ResolverProvider;
 import annis.libgui.UIConfig;
 import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
-import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
@@ -54,12 +53,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
@@ -159,7 +158,7 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
     private final AnnisUI ui;
     private List<VisualizerPanel> visualizers;
 
-    private List<ResolverEntry> resolverEntries;
+    private List<VisualizerRule> resolverEntries;
 
     private final Button btInfo;
 
@@ -185,7 +184,7 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
 
     private final ComboBox rghtCtxCombo;
 
-    private final Map<Long, Boolean> visualizerState;
+    private final Map<Integer, Boolean> visualizerState;
     private final InstanceConfig instanceConfig;
 
     private PagedResultQuery query;
@@ -374,10 +373,9 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
 
     private void initVisualizer() {
         try {
-            ResolverEntry[] entries = resolverProvider == null ? new ResolverEntry[0]
+          resolverEntries = resolverProvider == null ? new LinkedList<>()
                     : resolverProvider.getResolverEntries(result, UI.getCurrent());
             visualizers = new LinkedList<>();
-            resolverEntries = new LinkedList<>();
 
             List<VisualizerPanel> openVisualizers = new LinkedList<>();
 
@@ -386,29 +384,30 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
 
             String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
 
-            for (int i = 0; i < entries.length; i++) {
-                String htmlID = "resolver-" + resultNumber + "_" + i;
+            int i = 0;
+            for (VisualizerRule visRule : resolverEntries) {
+              String htmlID = "resolver-" + resultNumber + "_" + i;
 
-                VisualizerPanel p = new VisualizerPanel(entries[i], result, match, visibleTokenAnnos, markedAndCovered,
+              VisualizerPanel p = new VisualizerPanel(visRule, i, result, match, visibleTokenAnnos,
+                  markedAndCovered,
                         htmlID, resultID, this, segmentationName, ps, instanceConfig);
 
                 visualizers.add(p);
-                resolverEntries.add(entries[i]);
-
-                Properties mappings = entries[i].getMappings();
 
                 // check if there is the visibility of a visualizer changed
                 // since it the whole result panel was loaded. If not the entry of the
-                // resovler entry is used, for determine the visibility status
-                if (visualizerState.containsKey(entries[i].getId())) {
-                    if (visualizerState.get(entries[i].getId())) {
+                // resolver entry is used, for determine the visibility status
+                if (visualizerState.containsKey(i)) {
+                  if (visualizerState.get(i)) {
                         openVisualizers.add(p);
                     }
                 } else {
-                    if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false"))) {
+                  if (Boolean
+                      .parseBoolean(visRule.getMappings().getOrDefault(INITIAL_OPEN, "false"))) {
                         openVisualizers.add(p);
                     }
                 }
+                i++;
             } // for each resolver entry
 
             // attach visualizer
@@ -427,7 +426,7 @@ public class SingleResultPanel extends CssLayout implements Button.ClickListener
     }
 
     @Override
-    public void registerVisibilityStatus(long entryId, boolean status) {
+    public void registerVisibilityStatus(int entryId, boolean status) {
         visualizerState.put(entryId, status);
     }
 

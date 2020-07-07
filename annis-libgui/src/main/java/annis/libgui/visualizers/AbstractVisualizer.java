@@ -17,7 +17,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.UI;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import org.corpus_tools.salt.core.SNode;
 
@@ -38,7 +37,7 @@ public abstract class AbstractVisualizer<I extends Component>
 
   @Override
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, String documentName,
-      Properties mappings, UI ui) {
+      Map<String, String> mappings, UI ui) {
     return null;
   }
 

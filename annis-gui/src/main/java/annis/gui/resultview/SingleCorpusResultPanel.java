@@ -21,8 +21,6 @@ import annis.gui.MetaDataPanel;
 import annis.libgui.IDGenerator;
 import annis.libgui.PluginSystem;
 import annis.model.DisplayedResultQuery;
-import annis.model.PagedResultQuery;
-import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
@@ -35,17 +33,12 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.v7.ui.Label;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.salt.common.SCorpus;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -56,31 +49,16 @@ public class SingleCorpusResultPanel extends CssLayout {
 
     private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(SingleCorpusResultPanel.class);
-
     private Collection<SCorpus> result;
 
-    private final PluginSystem ps;
-
-    private final AnnisUI ui;
-
-    private List<ResolverEntry> resolverEntries;
 
     private final HorizontalLayout infoBar;
 
-    private final long resultNumber;
 
-    private PagedResultQuery query;
-    private final Match match;
-
-    public SingleCorpusResultPanel(final Collection<SCorpus> result, Match match, long resultNumber, PluginSystem ps,
+    public SingleCorpusResultPanel(final Collection<SCorpus> result, Match match, long resultNumber,
+        PluginSystem ps,
             AnnisUI ui, DisplayedResultQuery query) {
-        this.ps = ps;
-        this.ui = ui;
         this.result = result == null ? new LinkedList<>() : result;
-        this.resultNumber = resultNumber;
-        this.query = query;
-        this.match = match;
 
         setWidth("100%");
         setHeight("-1px");
@@ -103,10 +81,7 @@ public class SingleCorpusResultPanel extends CssLayout {
         infoBar.addComponent(corpusPaths);
         infoBar.setExpandRatio(corpusPaths, 1.0f);
 
-        long matchIdx = 0;
         for (SCorpus c : this.result) {
-            matchIdx++;
-
             List<String> path = CommonHelper.getCorpusPath(c.getPath().toString());
 
             HorizontalLayout corpusInfoLayout = new HorizontalLayout();

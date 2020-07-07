@@ -84,7 +84,7 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
       FileUtils.writeStringToFile(tmpInput, dotContent.toString());
 
       // execute dot
-      String dotPath = input.getMappings().getProperty("dotpath", "dot");
+      String dotPath = input.getMappings().getOrDefault("dotpath", "dot");
       ProcessBuilder pBuilder = new ProcessBuilder(dotPath, "-Tpng", tmpInput.getCanonicalPath());
 
 

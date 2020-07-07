@@ -15,7 +15,7 @@ package annis.libgui.visualizers;
 
 import com.vaadin.ui.UI;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 /**
  * A visualizer that defines a filtering for the annotations. This filtering is currently only used
@@ -33,5 +33,5 @@ public interface FilteringVisualizerPlugin {
    * @return
    */
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, String documentName,
-      Properties mappings, UI ui);
+      Map<String, String> mappings, UI ui);
 }

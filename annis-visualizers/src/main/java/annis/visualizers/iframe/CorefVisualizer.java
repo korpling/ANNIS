@@ -939,7 +939,7 @@ public class CorefVisualizer extends WriterVisualizer {
 
           if (token != null) {
             boolean validText = true;
-            if (Boolean.parseBoolean(input.getMappings().getProperty("hide_empty", "false"))) {
+            if (Boolean.parseBoolean(input.getMappings().getOrDefault("hide_empty", "false"))) {
               validText = false;
               // check if the text contains any matching annotations
               for (SToken tok : token) {

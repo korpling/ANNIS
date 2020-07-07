@@ -43,7 +43,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -110,8 +109,8 @@ public class HTMLVis extends AbstractVisualizer<Panel> {
 
     scrollPanel.addStyleName(wrapperClassName);
 
-    String visConfigName = vi.getMappings().getProperty("config");
-    String hitMarkConfig = vi.getMappings().getProperty("hitmark", "true");
+    String visConfigName = vi.getMappings().get("config");
+    String hitMarkConfig = vi.getMappings().getOrDefault("hitmark", "true");
     hitMark = Boolean.parseBoolean(hitMarkConfig);
     mc = vi.getMarkedAndCovered();
 
@@ -122,7 +121,7 @@ public class HTMLVis extends AbstractVisualizer<Panel> {
 
       lblResult.setValue(createHTML(vi.getSResult().getDocumentGraph(), definitions, vi.getUI()));
 
-      String labelClass = vi.getMappings().getProperty("class", "htmlvis");
+      String labelClass = vi.getMappings().getOrDefault("class", "htmlvis");
       lblResult.addStyleName(labelClass);
 
       injectWebFonts(visConfigName, corpusName, vi.getUI());
@@ -387,7 +386,7 @@ public class HTMLVis extends AbstractVisualizer<Panel> {
 
   @Override
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, String documentName,
-      Properties mappings, UI ui) {
+      Map<String, String> mappings, UI ui) {
     Set<String> result = null;
 
     VisualizationDefinition[] definitions = parseDefinitions(toplevelCorpusName, mappings, ui);
@@ -507,11 +506,12 @@ public class HTMLVis extends AbstractVisualizer<Panel> {
     return false;
   }
 
-  public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName, Properties mappings,
+  public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
+      Map<String, String> mappings,
       UI ui) {
     InputStream inStreamConfigRaw = null;
 
-    String visConfigName = mappings.getProperty("config");
+    String visConfigName = mappings.get("config");
 
     if (visConfigName == null) {
       inStreamConfigRaw = HTMLVis.class.getResourceAsStream("defaultvis.config");

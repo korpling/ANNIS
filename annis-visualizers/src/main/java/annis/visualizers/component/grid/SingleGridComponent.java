@@ -240,7 +240,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
     grid.addStyleName(getMainStyle());
     grid.addStyleName(Helper.CORPUS_FONT_FORCE);
     grid.setEscapeHTML(
-        Boolean.parseBoolean(input.getMappings().getProperty(MAPPING_ESCAPE_HTML, "true")));
+        Boolean.parseBoolean(input.getMappings().getOrDefault(MAPPING_ESCAPE_HTML, "true")));
     LinkedList<Class<? extends SNode>> types = new LinkedList<>();
     if (isShowingSpanAnnotations()) {
       types.add(SSpan.class);
@@ -262,7 +262,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = computeAnnotationRows(token2index);
 
     // Get Mappings
-    String gridTemplates = input.getMappings().getProperty(MAPPING_GRID_TEMPLATES, "");
+    String gridTemplates = input.getMappings().getOrDefault(MAPPING_GRID_TEMPLATES, "");
 
     // Parse Mappings
     if (!gridTemplates.equals("")) {
@@ -413,7 +413,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
   }
 
   protected boolean isHidingToken() {
-    return Boolean.parseBoolean(input.getMappings().getProperty(MAPPING_HIDE_TOK_KEY, "false"));
+    return Boolean.parseBoolean(input.getMappings().getOrDefault(MAPPING_HIDE_TOK_KEY, "false"));
 
   }
 
@@ -422,7 +422,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
   }
 
   protected boolean isShowingTokenAnnotations() {
-    return Boolean.parseBoolean(input.getMappings().getProperty(MAPPING_TOK_ANNOS_KEY));
+    return Boolean.parseBoolean(input.getMappings().get(MAPPING_TOK_ANNOS_KEY));
   }
 
   protected boolean isTokenFirst() {

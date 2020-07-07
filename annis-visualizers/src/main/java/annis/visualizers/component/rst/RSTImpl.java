@@ -31,7 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
@@ -146,7 +145,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   // contains all nodes which are marked as matches and child nodes of matches
   private final Map<SNode, Long> markedAndCovered;
 
-  private Properties mappings;
+  private Map<String, String> mappings;
 
   private String namespace;
 
@@ -473,7 +472,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   }
 
   private String getRSTType() {
-    return mappings.getProperty("edge", RST_RELATION);
+    return mappings.getOrDefault("edge", RST_RELATION);
   }
 
   /**

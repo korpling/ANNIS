@@ -57,7 +57,7 @@ public interface VisualizerContextChanger extends Serializable {
      * @param status
      *            If true the visualizer is visible.
      */
-    public void registerVisibilityStatus(long entryId, boolean status);
+    public void registerVisibilityStatus(int entryId, boolean status);
 
     /**
      * Reinitiates all registered visualizer with a new salt project.
