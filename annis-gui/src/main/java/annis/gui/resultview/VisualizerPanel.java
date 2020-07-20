@@ -15,6 +15,8 @@ package annis.gui.resultview;
 
 import annis.CommonHelper;
 import annis.gui.AnnisUI;
+import annis.gui.components.ExceptionDialog;
+import annis.gui.graphml.GraphMLMapper;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
@@ -29,11 +31,6 @@ import annis.visualizers.LoadableVisualizer;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
@@ -50,6 +47,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,11 +61,21 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import javax.xml.stream.XMLStreamException;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.api.model.VisualizerRule.VisibilityEnum;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
+import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -178,13 +187,9 @@ public class VisualizerPanel extends CssLayout
 
   public static final Resource ICON_EXPAND = FontAwesome.PLUS_SQUARE_O;
 
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
-  private String corpusName;
-
-  private String documentName;
+  private List<String> path;
 
   private Match match;
 
@@ -210,17 +215,15 @@ public class VisualizerPanel extends CssLayout
 
   private String segmentationName;
 
-  private final String ISVISIBLE = "visible";
-
-  private final String HIDDEN = "hidden";
-
-  private final String PRELOADED = "preloaded";
-
   private ProgressBar progress;
 
   private AnnisUI ui;
 
   private VisualizerContextChanger visCtxChanger;
+
+
+  private final Pattern validQNamePattern =
+      Pattern.compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin} Visualizer.
@@ -239,9 +242,9 @@ public class VisualizerPanel extends CssLayout
     this.result = result;
     this.match = match;
     if (!match.getSaltIDs().isEmpty()) {
-      List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
-      this.corpusName = corpusPath.get(0);
-      this.documentName = corpusPath.get(corpusPath.size() - 1);
+      this.path = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
+    } else {
+      this.path = new LinkedList<>();
     }
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
@@ -385,10 +388,10 @@ public class VisualizerPanel extends CssLayout
       List<String> nodeAnnoFilter = null;
       if (visPlugin.get() instanceof FilteringVisualizerPlugin) {
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin.get())
-            .getFilteredNodeAnnotationNames(corpusName, documentName, input.getMappings(), ui);
+            .getFilteredNodeAnnotationNames(path.get(0), Joiner.on('/').join(path),
+                input.getMappings(), ui);
       }
-      SaltProject p = getDocument(result.getGraph().getRoots().get(0).getName(), result.getName(),
-          nodeAnnoFilter, ui);
+      SaltProject p = getDocument(nodeAnnoFilter, ui);
 
       SDocument wholeDocument = null;
       if (p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()
@@ -407,28 +410,70 @@ public class VisualizerPanel extends CssLayout
 
     // getting the raw text, when the visualizer wants to have it
     if (visPlugin.isPresent() && visPlugin.get().isUsingRawText()) {
-      input.setRawText(Helper.getRawText(corpusName, documentName, ui));
+      input.setRawText(Helper.getRawText(path.get(0), Joiner.on('/').join(path), ui));
     }
 
     return input;
   }
 
-  private SaltProject getDocument(String toplevelCorpusName, String documentName,
-      List<String> nodeAnnoFilter, UI ui) {
-    SaltProject txt = null;
+  private SaltProject getDocument(List<String> nodeAnnoFilter, UI ui) {
+
     try {
-      toplevelCorpusName = urlPathEscape.escape(toplevelCorpusName);
-      documentName = urlPathEscape.escape(documentName);
-      WebResource res = Helper.getAnnisWebResource(ui).path("query").path("graph")
-          .path(toplevelCorpusName).path(documentName);
-      if (nodeAnnoFilter != null) {
-        res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
+      CorporaApi api = new CorporaApi(Helper.getClient(ui));
+      
+      // Build a query that includes all (possible filtered by name) node of the document
+      boolean fallbackToAll = false;
+      if (nodeAnnoFilter == null || nodeAnnoFilter.isEmpty()) {
+          fallbackToAll = true;
+        } else {
+          nodeAnnoFilter = nodeAnnoFilter.stream()
+              .map((anno_name) -> anno_name.replaceFirst("::", ":")).collect(Collectors.toList());
+          for (String nodeAnno : nodeAnnoFilter) {
+            if (!validQNamePattern.matcher(nodeAnno).matches()) {
+              // If we can't produce a valid query for this annotation name fallback
+              // to retrieve all annotations.
+              fallbackToAll = true;
+              break;
+            }
+          }
       }
-      txt = res.get(SaltProject.class);
-    } catch (ClientHandlerException | UniformInterfaceException e) {
+      
+      StringBuilder aql = new StringBuilder();
+      if (fallbackToAll) {
+        aql.append("node @* annis:node_name=/");
+        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(path)));
+        aql.append("/");
+      } else {
+        aql.append("(a#tok");
+        for (String nodeAnno : nodeAnnoFilter) {
+          aql.append(" | a#");
+          aql.append(nodeAnno);
+        }
+        aql.append(") & d#annis:node_name=/");
+        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(path)));
+        aql.append("/ & #a @* #d");
+      }
+
+
+      String graphML =
+          api.subgraphForQuery(path.get(0), aql.toString(), QueryLanguage.AQL, null);
+      try {
+        final SaltProject p = SaltFactory.createSaltProject();
+        SCorpusGraph cg = p.createCorpusGraph();
+        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(path));
+        SDocument doc = cg.createDocument(docURI);
+        SDocumentGraph docGraph = GraphMLMapper.mapDocumentGraph(new StringReader(graphML));
+        doc.setDocumentGraph(docGraph);
+
+        return p;
+      } catch (XMLStreamException | IOException ex) {
+        log.error("Could not map GraphML to Salt", ex);
+        ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
+      }
+    } catch (ApiException e) {
       log.error("General remote service exception", e);
     }
-    return txt;
+    return null;
   }
 
   public String getHtmlID() {

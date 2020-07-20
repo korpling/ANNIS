@@ -245,6 +245,13 @@ public class CommonHelper {
     ArrayList<String> result = new ArrayList<>(path.length);
     for (int i = 0; i < path.length; i++) {
       try {
+        // in the last part, try to remove any possible fragment
+        if (i == path.length - 1) {
+          int fragmentStart = path[i].lastIndexOf('#');
+          if (fragmentStart >= 0) {
+            path[i] = path[i].substring(0, fragmentStart);
+          }
+        }
         result.add(URLDecoder.decode(path[i], "UTF-8"));
       } catch (UnsupportedEncodingException ex) {
         log.error(null, ex);

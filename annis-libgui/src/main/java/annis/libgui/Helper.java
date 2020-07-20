@@ -258,6 +258,21 @@ public class Helper {
   private final static Escaper jerseyExtraEscape =
       Escapers.builder().addEscape('{', "%7B").addEscape('}', "%7D").addEscape('%', "%25").build();
 
+
+  public final static Escaper AQL_REGEX_VALUE_ESCAPER = 
+      Escapers.builder()
+          // This is used by AQL to mark the end of the regular expressions
+          .addEscape('/', "\\x2F")
+          // The next ones are meta characters for the regex-syntax crate
+          // (see its is_meta_character function)
+          .addEscape('\\', "\\\\").addEscape('.', "\\.").addEscape('+', "\\+").addEscape('*', "\\*")
+          .addEscape('?', "\\?").addEscape('(', "\\(").addEscape(')', "\\)").addEscape('|', "\\|")
+          .addEscape('[', "\\[").addEscape('[', "\\]").addEscape('{', "\\{").addEscape('}', "\\}")
+          .addEscape('^', "\\^").addEscape('$', "\\$").addEscape('#', "\\#").addEscape('&', "\\&")
+          .addEscape('-', "\\-").addEscape('~', "\\~")
+          .build();
+
+
   public static Map<SNode, Long> calculateMarkedAndCovered(SDocument doc, List<SNode> segNodes,
       String segmentationName) {
     Map<SNode, Long> initialCovered = new HashMap<>();
