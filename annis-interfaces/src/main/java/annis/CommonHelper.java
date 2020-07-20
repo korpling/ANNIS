@@ -236,6 +236,9 @@ public class CommonHelper {
   }
 
   public static List<String> getCorpusPath(String uri) {
+    if(uri.startsWith("salt:/")) {
+      uri = uri.substring("salt:/".length());
+    }
     String rawPath = StringUtils.strip(uri, "/ \t");
 
     // split on raw path (so "/" in corpus names are still encoded)

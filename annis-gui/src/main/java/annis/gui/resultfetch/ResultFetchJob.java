@@ -16,7 +16,7 @@ package annis.gui.resultfetch;
 import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.components.ExceptionDialog;
-import annis.gui.graphml.GraphMLMapper;
+import annis.gui.graphml.DocumentGraphMapper;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
@@ -150,7 +150,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
               SCorpusGraph cg = p.createCorpusGraph();
               URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
               SDocument doc = cg.createDocument(docURI);
-              SDocumentGraph docGraph = GraphMLMapper.mapDocumentGraph(new StringReader(graphML));
+              SDocumentGraph docGraph = DocumentGraphMapper.map(new StringReader(graphML));
               queue.put(p);
               doc.setDocumentGraph(docGraph);
               log.debug("added match {} to queue", current + 1);

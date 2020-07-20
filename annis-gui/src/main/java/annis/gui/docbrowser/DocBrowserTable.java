@@ -13,9 +13,9 @@
  */
 package annis.gui.docbrowser;
 
+import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.model.Annotation;
-import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MetaDataColumn;
 import annis.service.objects.OrderBy;
 import com.google.common.escape.Escaper;
@@ -45,7 +45,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.VisualizerRule;
+import org.corpus_tools.salt.common.SDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -376,7 +378,7 @@ public class DocBrowserTable extends Table {
    *
    * @param docs the list of documents, wrapped in the {@link Annotation} POJO
    */
-  void setDocNames(List<Annotation> docs) {
+  void setDocuments(List<SDocument> docs) {
 
     container = new IndexedContainer();
 
@@ -395,12 +397,12 @@ public class DocBrowserTable extends Table {
     container.addContainerProperty("info", Button.class, null);
     container.addContainerProperty("visualizer", Panel.class, null);
 
-    for (Annotation a : docs) {
-      String doc = a.getName();
+    for (SDocument d : docs) {
+      String doc = d.getName();
 
       // reverse path and delete the brackets and set a new separator:
       // corpus > ... > subcorpus > document
-      List<String> pathList = a.getAnnotationPath();
+      List<String> pathList = CommonHelper.getCorpusPath(d.getId());
       if (pathList == null) {
         pathList = new LinkedList<>();
       }
@@ -415,14 +417,14 @@ public class DocBrowserTable extends Table {
 
         // add the metadata columns.
         for (MetaDataCol metaDataCol : metaCols.visibleColumns) {
-          String value = generateCell(a.getAnnotationPath(), metaDataCol);
+          String value = generateCell(pathList, metaDataCol);
           row.getItemProperty(metaDataCol.getColName()).setValue(value);
         }
 
         for (MetaDataCol metaDataCol : metaCols.sortColumns) {
           if (!metaCols.visibleColumns.contains(metaDataCol)) {
             // corpusName() holds the corpus path
-            String value = generateCell(a.getAnnotationPath(), metaDataCol);
+            String value = generateCell(pathList, metaDataCol);
             row.getItemProperty(metaDataCol.getColName()).setValue(value);
           }
         }
