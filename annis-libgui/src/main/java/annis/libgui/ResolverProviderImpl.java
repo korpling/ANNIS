@@ -16,6 +16,7 @@ package annis.libgui;
 import annis.resolver.SingleResolverRequest;
 import com.vaadin.ui.UI;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -95,10 +96,20 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
     if (cacheResolver.containsKey(resolverRequests)) {
       matchingRules.addAll(cacheResolver.get(resolverRequests));
     } else {
-      for (SingleResolverRequest r : resolverRequests) {
 
-        // Get all rules for the selected corpora
-        CorpusConfiguration corpusConfig = Helper.getCorpusConfig(r.getCorpusName(), ui);
+      // Get all rules for the selected corpora
+      Map<String, CorpusConfiguration> corpusConfigByName = new HashMap<>();
+      for (SingleResolverRequest r : resolverRequests) {
+        if (!corpusConfigByName.containsKey(r.getCorpusName())) {
+          CorpusConfiguration corpusConfig = Helper.getCorpusConfig(r.getCorpusName(), ui);
+          if (corpusConfig != null) {
+            corpusConfigByName.put(r.getCorpusName(), corpusConfig);
+          }
+        }
+      }
+
+      for (SingleResolverRequest r : resolverRequests) {
+        CorpusConfiguration corpusConfig = corpusConfigByName.get(r.getCorpusName());
 
         // Filter the visualizer entries that match this resolver request
         if (corpusConfig != null && corpusConfig.getVisualizers() != null) {
@@ -107,10 +118,10 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
               visRule.setMappings(new LinkedHashMap<>());
             }
             if (visRule.getElement() != null && !visRule.getElement().equals(r.getType())) {
-              break;
+              continue;
             }
             if (visRule.getLayer() != null && !visRule.getLayer().equals(r.getNamespace())) {
-              break;
+              continue;
             }
             matchingRules.add(visRule);
           }
