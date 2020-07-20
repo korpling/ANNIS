@@ -226,6 +226,7 @@ public class GraphMLMapper {
                 docGraph.addNode(n);
               }
               currentNodeId = Optional.empty();
+              data.clear();
               break;
             case "edge":
               // add edge
@@ -238,6 +239,7 @@ public class GraphMLMapper {
               currentSourceId = Optional.empty();
               currentTargetId = Optional.empty();
               currentComponent = Optional.empty();
+              data.clear();
               break;
             case "data":
               currentDataKey = Optional.empty();

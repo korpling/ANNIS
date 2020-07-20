@@ -18,6 +18,7 @@ import com.vaadin.ui.UI;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -45,16 +46,16 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
 
   private final static Logger log = LoggerFactory.getLogger(ResolverProviderImpl.class);
 
-  private Map<HashSet<SingleResolverRequest>, List<VisualizerRule>> cacheResolver;
+  private Map<HashSet<SingleResolverRequest>, LinkedHashSet<VisualizerRule>> cacheResolver;
 
   public ResolverProviderImpl(
-      Map<HashSet<SingleResolverRequest>, List<VisualizerRule>> cacheResolver) {
+      Map<HashSet<SingleResolverRequest>, LinkedHashSet<VisualizerRule>> cacheResolver) {
     this.cacheResolver = cacheResolver;
   }
 
   @Override
   public List<VisualizerRule> getResolverEntries(SDocument doc, UI ui) {
-    List<VisualizerRule> matchingRules = new LinkedList<>();
+    
 
     // create a request for resolver entries
     HashSet<SingleResolverRequest> resolverRequests = new HashSet<SingleResolverRequest>();
@@ -89,7 +90,7 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
       resolverRequests.add(new SingleResolverRequest(doc.getGraph().getRoots().get(0).getName(), ns,
           ElementEnum.EDGE));
     }
-
+    LinkedHashSet<VisualizerRule> matchingRules = new LinkedHashSet<>();
     // query with this resolver request and make sure it is unique
     if (cacheResolver.containsKey(resolverRequests)) {
       matchingRules.addAll(cacheResolver.get(resolverRequests));
@@ -118,6 +119,6 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
       }
     }
 
-    return matchingRules;
+    return new LinkedList<>(matchingRules);
   }
 }
