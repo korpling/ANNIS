@@ -17,7 +17,6 @@ import annis.model.AnnisConstants;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,6 +71,9 @@ public class CommonHelper {
     long i = 1;
     for (String u : match.getSaltIDs()) {
       allUrisAsString.add(u.replace(",", "%2C"));
+      if (!u.startsWith("salt:/")) {
+        u = "salt:/" + u;
+      }
       SNode matchedNode = document.getDocumentGraph().getNode(u);
       // set the feature for this specific node
       if (matchedNode != null) {
@@ -84,6 +86,7 @@ public class CommonHelper {
           featMatchedNode.setValue(i);
           matchedNode.addFeature(featMatchedNode);
         }
+
       }
       i++;
     }
