@@ -16,7 +16,7 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.components.ExceptionDialog;
-import annis.gui.graphml.GraphMLMapper;
+import annis.gui.graphml.DocumentGraphMapper;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
@@ -462,7 +462,7 @@ public class VisualizerPanel extends CssLayout
         SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(path));
         SDocument doc = cg.createDocument(docURI);
-        SDocumentGraph docGraph = GraphMLMapper.mapDocumentGraph(new StringReader(graphML));
+        SDocumentGraph docGraph = DocumentGraphMapper.map(new StringReader(graphML));
         doc.setDocumentGraph(docGraph);
 
         return p;

@@ -21,7 +21,6 @@ import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.RawTextWrapper;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Multimap;
@@ -751,23 +750,6 @@ public class Helper {
     return defaultCorpusConfig;
   }
 
-  public static DocumentBrowserConfig getDocBrowserConfig(String corpus, UI ui) {
-    try {
-      DocumentBrowserConfig docBrowserConfig =
-          Helper.getAnnisWebResource(ui).path("query").path("corpora").path("doc_browser_config")
-              .path(urlPathEscape.escape(corpus)).get(DocumentBrowserConfig.class);
-
-      return docBrowserConfig;
-    } catch (UniformInterfaceException | ClientHandlerException ex) {
-      log.error("problems with fetching document browsing", ex);
-      if (!AnnisBaseUI.handleCommonError(ex, "get document browser configuration")) {
-        new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER, ERROR_MESSAGE_DOCUMENT_BROWSER_BODY,
-            Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-      }
-    }
-
-    return null;
-  }
 
   public static Range<Integer> getLeftRightSpan(SNode node, SDocumentGraph graph,
       Map<SToken, Integer> token2index) {

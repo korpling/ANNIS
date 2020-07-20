@@ -1,22 +1,15 @@
 package annis.gui.graphml;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,14 +17,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import org.apache.commons.lang3.tuple.Pair;
-import org.atmosphere.util.ReaderInputStream;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.salt.SALT_TYPE;
@@ -44,10 +34,8 @@ import org.corpus_tools.salt.common.STextualRelation;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SAnnotation;
-import org.corpus_tools.salt.core.SAnnotationContainer;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph;
-import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.SaltUtil;
@@ -60,90 +48,62 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  *
  */
-public class GraphMLMapper {
+public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
-  private static final Logger log = LoggerFactory.getLogger(GraphMLMapper.class);
+  static final Logger log = LoggerFactory.getLogger(DocumentGraphMapper.class);
 
-  private XMLEventReader reader;
-
-  private final SDocumentGraph docGraph;
+  private final SDocumentGraph graph;
 
   private final Set<String> hasOutgoingCoverageEdge;
   private final Set<String> hasOutgoingDominanceEdge;
   private final Set<String> hasNonEmptyIncomingDominanceEdge;
 
 
-  protected GraphMLMapper(XMLEventReader reader, Set<String> hasOutgoingCoverageEdge,
-      Set<String> hasOutgoingDominanceEdge, Set<String> hasNonEmptyIncomingDominanceEdge) {
-    this.reader = reader;
-    this.docGraph = SaltFactory.createSDocumentGraph();
-    this.hasOutgoingCoverageEdge = hasOutgoingCoverageEdge;
-    this.hasOutgoingDominanceEdge = hasOutgoingDominanceEdge;
-    this.hasNonEmptyIncomingDominanceEdge = hasNonEmptyIncomingDominanceEdge;
+  protected DocumentGraphMapper() {
+    this.graph = SaltFactory.createSDocumentGraph();
+    this.hasOutgoingCoverageEdge = new HashSet<>();
+    this.hasOutgoingDominanceEdge = new HashSet<>();
+    this.hasNonEmptyIncomingDominanceEdge = new HashSet<>();
   }
 
-  public static SDocumentGraph mapDocumentGraph(Reader input)
-      throws XMLStreamException, IOException {
-    
-    // Copy content of stream to a temporary file, so we can have multiple parse passes
-    Path tmpFile = Files.createTempFile("graphannis-input-", ".graphml");
-    try {
-      Files.copy(new ReaderInputStream(input, StandardCharsets.UTF_8), tmpFile,
-          StandardCopyOption.REPLACE_EXISTING);
+  public static SDocumentGraph map(Reader input) throws IOException, XMLStreamException {
+    DocumentGraphMapper mapper = new DocumentGraphMapper();
+    mapper.execute(input);
+    return mapper.graph;
+  }
 
-      XMLInputFactory factory = XMLInputFactory.newInstance();
-      factory.setProperty(XMLInputFactory.IS_VALIDATING, false);
-
-      // 1. pass, check which nodes have an outgoing edge of a certain types
-      Set<String> hasOutgoingCoverageEdge = new HashSet<>();
-      Set<String> hasOutgoingDominanceEdge = new HashSet<>();
-      Set<String> hasNonEmptyIncomingDominanceEdge = new HashSet<>();
-      {
-        FileInputStream fileInput = new FileInputStream(tmpFile.toFile());
-        XMLEventReader reader = factory.createXMLEventReader(fileInput);
-        while (reader.hasNext()) {
-          XMLEvent event = reader.nextEvent();
-          if (event.isStartElement()) {
-            StartElement element = event.asStartElement();
-            if ("edge".equals(element.getName().getLocalPart())) {
-              Attribute source = element.getAttributeByName(new QName("source"));
-              Attribute target = element.getAttributeByName(new QName("target"));
-              Attribute label = element.getAttributeByName(new QName("label"));
-              if (label != null) {
-                Component c = parseComponent(label.getValue());
-                if (source != null) {
-                  if (c.getType() == AnnotationComponentType.COVERAGE) {
-                    hasOutgoingCoverageEdge.add(source.getValue());
-                  } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
-                    hasOutgoingDominanceEdge.add(source.getValue());
-                  }
-                }
-                if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
-                    && !c.getName().isEmpty()) {
-                  hasNonEmptyIncomingDominanceEdge.add(target.getValue());
-                }
+  @Override
+  protected void firstPass(XMLEventReader reader) throws XMLStreamException {
+    while (reader.hasNext()) {
+      XMLEvent event = reader.nextEvent();
+      if (event.isStartElement()) {
+        StartElement element = event.asStartElement();
+        if ("edge".equals(element.getName().getLocalPart())) {
+          Attribute source = element.getAttributeByName(new QName("source"));
+          Attribute target = element.getAttributeByName(new QName("target"));
+          Attribute label = element.getAttributeByName(new QName("label"));
+          if (label != null) {
+            Component c = parseComponent(label.getValue());
+            if (source != null) {
+              if (c.getType() == AnnotationComponentType.COVERAGE) {
+                hasOutgoingCoverageEdge.add(source.getValue());
+              } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
+                hasOutgoingDominanceEdge.add(source.getValue());
               }
-
+            }
+            if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
+                && !c.getName().isEmpty()) {
+              hasNonEmptyIncomingDominanceEdge.add(target.getValue());
             }
           }
-        }
-        fileInput.close();
-      }
 
-      // 2. pass, map nodes and edges with the correct type
-      FileInputStream fileInput = new FileInputStream(tmpFile.toFile());
-      XMLEventReader reader = factory.createXMLEventReader(fileInput);
-      GraphMLMapper mapper = new GraphMLMapper(reader, hasOutgoingCoverageEdge,
-          hasOutgoingDominanceEdge, hasNonEmptyIncomingDominanceEdge);
-      mapper.mapDocGraph();
-      return mapper.docGraph;
-    } finally {
-      Files.deleteIfExists(tmpFile);
+        }
+      }
     }
   }
 
-  private void mapDocGraph() throws XMLStreamException {
-
+  @Override
+  protected void secondPass(XMLEventReader reader) throws XMLStreamException {
     // Maps an internal ID to a fully qualified annotation name
     Map<String, String> keys = new TreeMap<>();
     int level = 0;
@@ -153,7 +113,7 @@ public class GraphMLMapper {
     Optional<String> currentSourceId = Optional.empty();
     Optional<String> currentTargetId = Optional.empty();
     Optional<String> currentComponent = Optional.empty();
-    
+
     Map<String, String> data = new HashMap<>();
 
     while (reader.hasNext()) {
@@ -165,17 +125,17 @@ public class GraphMLMapper {
           // create all new nodes
           switch (startElement.getName().getLocalPart()) {
             case "graph":
-              if(level == 2) {
+              if (level == 2) {
                 inGraph = true;
               }
               break;
             case "key":
-              if(level == 2) {
+              if (level == 2) {
                 addAnnotationKey(keys, startElement);
               }
               break;
             case "node":
-              if(inGraph && level == 3) {
+              if (inGraph && level == 3) {
                 Attribute id = startElement.getAttributeByName(new QName("id"));
                 if (id != null) {
                   currentNodeId = Optional.ofNullable(id.getValue());
@@ -198,16 +158,16 @@ public class GraphMLMapper {
               break;
             case "data":
               Attribute key = startElement.getAttributeByName(new QName("key"));
-              if(key != null) {
+              if (key != null) {
                 currentDataKey = Optional.ofNullable(key.getValue());
               }
               break;
           }
           break;
         case XMLEvent.CHARACTERS:
-          if(currentDataKey.isPresent() && inGraph && level == 4) {
+          if (currentDataKey.isPresent() && inGraph && level == 4) {
             String annoKey = keys.get(currentDataKey.get());
-            if(annoKey != null) {
+            if (annoKey != null) {
               // Copy all data attributes into our own map
               data.put(annoKey, event.asCharacters().getData());
             }
@@ -215,7 +175,7 @@ public class GraphMLMapper {
           break;
         case XMLEvent.END_ELEMENT:
           EndElement endElement = event.asEndElement();
-          switch(endElement.getName().getLocalPart()) {
+          switch (endElement.getName().getLocalPart()) {
             case "graph":
               inGraph = false;
               break;
@@ -223,7 +183,7 @@ public class GraphMLMapper {
               if (currentNodeId.isPresent() && "node".equals(data.get("annis::node_type"))) {
                 // Map node and add it
                 SNode n = mapNode(currentNodeId.get(), data);
-                docGraph.addNode(n);
+                graph.addNode(n);
               }
               currentNodeId = Optional.empty();
               data.clear();
@@ -245,7 +205,7 @@ public class GraphMLMapper {
               currentDataKey = Optional.empty();
               break;
           }
-          
+
           level--;
           break;
       }
@@ -253,10 +213,10 @@ public class GraphMLMapper {
 
     // find all chains of SOrderRelations and reconstruct the texts belonging to
     // them
-    Multimap<String, SNode> orderRoots = docGraph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
-    if (orderRoots.isEmpty() && docGraph.getTokens().size() == 1) {
+    Multimap<String, SNode> orderRoots = graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
+    if (orderRoots.isEmpty() && graph.getTokens().size() == 1) {
       // if there is only one token, there won't be any order relations
-      orderRoots.put("", docGraph.getTokens().get(0));
+      orderRoots.put("", graph.getTokens().get(0));
     }
     orderRoots.keySet().forEach(name -> {
       ArrayList<SNode> roots = new ArrayList<>(orderRoots.get(name));
@@ -275,6 +235,8 @@ public class GraphMLMapper {
     addNodeLayers();
   }
 
+
+
   /**
    * Resolve the ID to a fully qualified annotation name
    * 
@@ -282,7 +244,7 @@ public class GraphMLMapper {
    * @param reader
    */
   private void addAnnotationKey(Map<String, String> keys, StartElement event) {
-    
+
     Attribute id = event.getAttributeByName(new QName("id"));
     Attribute annoKey = event.getAttributeByName(new QName("attr.name"));
 
@@ -302,51 +264,23 @@ public class GraphMLMapper {
       newNode = SaltFactory.createSSpan();
     }
 
-    if (!nodeName.startsWith("salt:/")) {
-      nodeName = "salt:/" + nodeName;
-    }
-    newNode.setId(nodeName);
-    // get the name from the ID
-    newNode.setName(newNode.getPath().fragment());
-
+    setNodeName(newNode, nodeName);
     mapLabels(newNode, labels, false);
 
     return newNode;
   }
 
-  private static Component parseComponent(String label) {
-    Component result = new Component();
-
-    if (label != null) {
-
-      List<String> splitted = Splitter.on('/').limit(3).splitToList(label);
-      result.setType(AnnotationComponentType.fromValue(splitted.get(0)));
-      if (splitted.size() >= 1) {
-        result.setLayer(splitted.get(1));
-      } else {
-        result.setLayer("");
-      }
-      if (splitted.size() >= 2) {
-        result.setName(splitted.get(2));
-      } else {
-        result.setName("");
-      }
-    }
-
-    return result;
-  }
-
   private void mapAndAddEdge(String sourceId, String targetId, String componentRaw,
       Map<String, String> labels) {
 
-    SNode source = docGraph.getNode("salt:/" + sourceId);
-    SNode target = docGraph.getNode("salt:/" + targetId);
+    SNode source = graph.getNode("salt:/" + sourceId);
+    SNode target = graph.getNode("salt:/" + targetId);
 
     // Split the component description into its parts
     Component component = parseComponent(componentRaw);
 
     if (source != null && target != null && source != target) {
-      
+
       SRelation<?, ?> rel = null;
       switch (component.getType()) {
         case DOMINANCE:
@@ -358,19 +292,19 @@ public class GraphMLMapper {
               return;
             }
           } // end mirror check
-          rel = docGraph.createRelation(source, target, SALT_TYPE.SDOMINANCE_RELATION, null);
+          rel = graph.createRelation(source, target, SALT_TYPE.SDOMINANCE_RELATION, null);
 
           break;
         case POINTING:
-          rel = docGraph.createRelation(source, target, SALT_TYPE.SPOINTING_RELATION, null);
+          rel = graph.createRelation(source, target, SALT_TYPE.SPOINTING_RELATION, null);
           break;
         case ORDERING:
-          rel = docGraph.createRelation(source, target, SALT_TYPE.SORDER_RELATION, null);
+          rel = graph.createRelation(source, target, SALT_TYPE.SORDER_RELATION, null);
           break;
         case COVERAGE:
           // only add coverage edges in salt to spans, not structures
           if (source instanceof SSpan && target instanceof SToken) {
-            rel = docGraph.createRelation(source, target, SALT_TYPE.SSPANNING_RELATION, null);
+            rel = graph.createRelation(source, target, SALT_TYPE.SSPANNING_RELATION, null);
           }
           break;
         default:
@@ -382,116 +316,86 @@ public class GraphMLMapper {
 
         // map edge labels
         mapLabels(rel, labels, false);
-
-        String layerName = component.getLayer();
-        if (layerName != null && !layerName.isEmpty()) {
-          List<SLayer> layer = docGraph.getLayerByName(layerName);
-          if (layer == null || layer.isEmpty()) {
-            SLayer newLayer = SaltFactory.createSLayer();
-            newLayer.setName(layerName);
-            docGraph.addLayer(newLayer);
-            layer = Arrays.asList(newLayer);
-          }
-          layer.get(0).addRelation(rel);
-        }
-      }
-    }
-  }
-
-  private static void mapLabels(SAnnotationContainer n, Map<String, String> labels,
-      boolean isMeta) {
-    for (Map.Entry<String, String> e : labels.entrySet()) {
-      Pair<String, String> qname = SaltUtil.splitQName(e.getKey());
-      String name = qname.getRight();
-      if (name == null || name.isEmpty()) {
-        log.warn("Replacing empty label name with '_' ({}:{}={})", qname.getLeft(),
-            name, e.getValue());
-        name = "_";
-      }
-      if ("annis".equals(qname.getLeft()) && !"time".equals(name)) {
-        n.createFeature(qname.getLeft(), name, e.getValue());
-      } else if (isMeta) {
-        n.createMetaAnnotation(qname.getLeft(), name, e.getValue());
-      } else {
-        n.createAnnotation(qname.getLeft(), name, e.getValue());
+        addEdgeLayers(component, rel);
       }
     }
   }
 
   private void recreateText(final String textName, List<SNode> rootsForText) {
 
-      final StringBuilder text = new StringBuilder();
-      final STextualDS ds = docGraph.createTextualDS("");
-      ds.setName(textName);
+    final StringBuilder text = new StringBuilder();
+    final STextualDS ds = graph.createTextualDS("");
+    ds.setName(textName);
 
-      Map<SToken, Range<Integer>> token2Range = new HashMap<>();
+    Map<SToken, Range<Integer>> token2Range = new HashMap<>();
 
-      // traverse the token chain using the order relations
-      Iterator<SNode> itRoots = rootsForText.iterator();
-      while (itRoots.hasNext()) {
-        SNode root = itRoots.next();
-        docGraph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-            "ORDERING_" + textName, new GraphTraverseHandler() {
-              @SuppressWarnings("rawtypes")
-              @Override
-              public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
-                  String traversalId, SRelation relation, SNode currNode, long order) {
-                if (relation == null) {
-                  return true;
-                } else if (relation instanceof SOrderRelation
-                    && Objects.equal(textName, relation.getType())) {
-                  return true;
-                } else {
-                  return false;
-                }
+    // traverse the token chain using the order relations
+    Iterator<SNode> itRoots = rootsForText.iterator();
+    while (itRoots.hasNext()) {
+      SNode root = itRoots.next();
+      graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+          "ORDERING_" + textName, new GraphTraverseHandler() {
+            @SuppressWarnings("rawtypes")
+            @Override
+            public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
+                String traversalId, SRelation relation, SNode currNode, long order) {
+              if (relation == null) {
+                return true;
+              } else if (relation instanceof SOrderRelation
+                  && Objects.equal(textName, relation.getType())) {
+                return true;
+              } else {
+                return false;
+              }
+            }
+
+            @Override
+            public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {}
+
+            @Override
+            public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
+              if (fromNode != null) {
+                text.append(" ");
               }
 
-              @Override
-              public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                  SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {}
-
-              @Override
-              public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                  SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-                if (fromNode != null) {
-                  text.append(" ");
-                }
-
-                SFeature featTok = currNode.getFeature("annis::tok");
-                if (featTok != null && currNode instanceof SToken) {
-                  int idxStart = text.length();
-                  text.append(featTok.getValue_STEXT());
-                  token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
-                }
+              SFeature featTok = currNode.getFeature("annis::tok");
+              if (featTok != null && currNode instanceof SToken) {
+                int idxStart = text.length();
+                text.append(featTok.getValue_STEXT());
+                token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
               }
-            });
-        if (itRoots.hasNext()) {
-          text.append(" ");
-        }
+            }
+          });
+      if (itRoots.hasNext()) {
+        text.append(" ");
       }
+    }
 
-      // update the actual text
-      ds.setText(text.toString());
+    // update the actual text
+    ds.setText(text.toString());
 
-      // add all relations
-      token2Range.forEach((t, r) -> {
-        STextualRelation rel = SaltFactory.createSTextualRelation();
-        rel.setSource(t);
-        rel.setTarget(ds);
-        rel.setStart(r.lowerEndpoint());
-        rel.setEnd(r.upperEndpoint());
-        docGraph.addRelation(rel);
-      });
+    // add all relations
+    token2Range.forEach((t, r) -> {
+      STextualRelation rel = SaltFactory.createSTextualRelation();
+      rel.setSource(t);
+      rel.setTarget(ds);
+      rel.setStart(r.lowerEndpoint());
+      rel.setEnd(r.upperEndpoint());
+      graph.addRelation(rel);
+    });
   }
 
   private void addTextToSegmentation(final String name, List<SNode> rootNodes) {
 
     // traverse the token chain using the order relations
-    docGraph.traverse(rootNodes, SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-        "ORDERING_" + name, new GraphTraverseHandler() {
+    graph.traverse(rootNodes, SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "ORDERING_" + name,
+        new GraphTraverseHandler() {
           @Override
           public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
-              String traversalId, SRelation relation, SNode currNode, long order) {
+              String traversalId, @SuppressWarnings("rawtypes") SRelation relation, SNode currNode,
+              long order) {
             if (relation == null) {
               // TODO: check if this is ever true
               return true;
@@ -525,21 +429,9 @@ public class GraphMLMapper {
         });
   }
 
-  private void addNodeLayers() {
-    List<SNode> nodeList = new LinkedList<>(docGraph.getNodes());
-    for (SNode n : nodeList) {
-      SFeature featLayer = n.getFeature("annis", "layer");
-      if (featLayer != null) {
-        String layerName = featLayer.getValue_STEXT();
-        List<SLayer> layer = docGraph.getLayerByName(layerName);
-        if (layer == null || layer.isEmpty()) {
-          SLayer newLayer = SaltFactory.createSLayer();
-          newLayer.setName(layerName);
-          docGraph.addLayer(newLayer);
-          layer = Arrays.asList(newLayer);
-        }
-        layer.get(0).addNode(n);
-      }
-    }
+  @Override
+  protected SGraph getGraph() {
+    return this.graph;
   }
+
 }
