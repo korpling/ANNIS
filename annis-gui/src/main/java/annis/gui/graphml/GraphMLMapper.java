@@ -220,7 +220,7 @@ public class GraphMLMapper {
               inGraph = false;
               break;
             case "node":
-              if (currentNodeId.isPresent()) {
+              if (currentNodeId.isPresent() && "node".equals(data.get("annis::node_type"))) {
                 // Map node and add it
                 SNode n = mapNode(currentNodeId.get(), data);
                 docGraph.addNode(n);
