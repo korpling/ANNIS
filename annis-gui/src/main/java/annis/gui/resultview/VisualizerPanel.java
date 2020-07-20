@@ -401,6 +401,7 @@ public class VisualizerPanel extends CssLayout
 
       input.setDocument(wholeDocument);
     } else {
+      CommonHelper.addMatchToDocumentGraph(match, result);
       input.setDocument(result);
     }
 
