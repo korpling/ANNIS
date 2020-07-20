@@ -29,10 +29,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -41,12 +43,13 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  *
  */
+@WebServlet(urlPatterns = "/Resource/*")
 @Component
 public class ResourceServlet extends HttpServlet {
 
     private static final long serialVersionUID = -8182635617256833563L;
 
-    // @Autowired
+    @Autowired
     private List<ResourcePlugin> plugins;
 
     @Override

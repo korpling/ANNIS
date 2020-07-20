@@ -52,7 +52,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Theme("annis")
 @Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
-@SpringUI
+@SpringUI(path = "/*")
 @Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListener {
 
