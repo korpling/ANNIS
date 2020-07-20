@@ -128,7 +128,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     public static final String FILESYSTEM_CACHE_RESULT = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
 
-    private final Map<HashSet<SingleResolverRequest>, List<VisualizerRule>> cacheResolver;
+    private final Map<HashSet<SingleResolverRequest>, LinkedHashSet<VisualizerRule>> cacheResolver;
 
     private final PagingComponent paging;
 
@@ -169,7 +169,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
         this.initialQuery = initialQuery;
 
         cacheResolver = Collections
-            .synchronizedMap(new HashMap<HashSet<SingleResolverRequest>, List<VisualizerRule>>());
+            .synchronizedMap(
+                new HashMap<HashSet<SingleResolverRequest>, LinkedHashSet<VisualizerRule>>());
 
         resultPanelList = Collections.synchronizedList(new LinkedList<AbstractComponent>());
 
