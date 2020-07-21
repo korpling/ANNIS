@@ -24,7 +24,7 @@
                         </goals>
                         <configuration>
                             <inputSpec>
-                              ${project.basedir}/src/main/resources/openapi.yaml
+                              ${project.basedir}/src/main/resources/openapi.yml
                             </inputSpec>
                             <generatorName>java</generatorName>
                             <apiPackage>org.corpus_tools.annis.api</apiPackage>

@@ -19,6 +19,7 @@ import annis.gui.graphml.CorpusGraphMapper;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.service.objects.DocumentBrowserConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.vaadin.ui.Alignment;
@@ -29,8 +30,11 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.util.filter.SimpleStringFilter;
 import com.vaadin.v7.ui.TextField;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.ApiException;
@@ -157,7 +161,32 @@ public class DocBrowserPanel extends Panel {
   }
 
   public DocumentBrowserConfig getDocBrowserConfig() {
-    return Helper.getDocBrowserConfig(corpus, ui);
+    DocumentBrowserConfig defaultConfig = new DocumentBrowserConfig();
+    VisualizerRule textVis = new VisualizerRule();
+    textVis.setDisplayName("full text");
+    textVis.setVisType("text");
+    defaultConfig.setVisualizers(Arrays.asList(textVis));
+    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+
+    try {
+      File result = api.corpusFiles(getCorpus(), "document_browser.json");
+      try(FileInputStream is = new FileInputStream(result)) {
+        ObjectMapper mapper = new ObjectMapper();
+        DocumentBrowserConfig config = mapper.readValue(is, DocumentBrowserConfig.class);
+        return config;
+      }
+    } catch (ApiException ex) {
+      if (ex.getCode() != 404) {
+      ExceptionDialog
+          .show(ex, "Could not get the document browser configuration file from the backend.", ui);
+      }
+    }
+    catch (IOException ex) {
+      ExceptionDialog.show(ex,
+          "Could not get the document browser configuration file from the backend.", ui);
+    }
+
+    return defaultConfig;
   }
 
   public void openVis(String doc, VisualizerRule config, Button btn) {

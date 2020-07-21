@@ -37,12 +37,12 @@ public class CorpusGraphMapper extends AbstractGraphMLMapper {
 
   private final SCorpusGraph graph;
 
-  private final Set<String> hasOutgoingPartOfEdge;
+  private final Set<String> hasIncomingPartOfEdge;
 
 
   protected CorpusGraphMapper() {
     this.graph = SaltFactory.createSCorpusGraph();
-    this.hasOutgoingPartOfEdge = new HashSet<>();
+    this.hasIncomingPartOfEdge = new HashSet<>();
   }
 
   public static SCorpusGraph map(Reader input) throws IOException, XMLStreamException {
@@ -58,13 +58,13 @@ public class CorpusGraphMapper extends AbstractGraphMLMapper {
       if (event.isStartElement()) {
         StartElement element = event.asStartElement();
         if ("edge".equals(element.getName().getLocalPart())) {
-          Attribute source = element.getAttributeByName(new QName("source"));
+          Attribute target = element.getAttributeByName(new QName("target"));
           Attribute label = element.getAttributeByName(new QName("label"));
           if (label != null) {
             Component c = parseComponent(label.getValue());
-            if (source != null) {
+            if (target != null) {
               if (c.getType() == AnnotationComponentType.PARTOF) {
-                hasOutgoingPartOfEdge.add(source.getValue());
+                hasIncomingPartOfEdge.add(target.getValue());
               }
             }
           }
@@ -206,7 +206,7 @@ public class CorpusGraphMapper extends AbstractGraphMLMapper {
   private SNode mapNode(String nodeName, Map<String, String> labels) {
     SNode newNode = SaltFactory.createSNode();
 
-    if (!hasOutgoingPartOfEdge.contains(nodeName)) {
+    if (!hasIncomingPartOfEdge.contains(nodeName)) {
       newNode = SaltFactory.createSDocument();
     } else {
       newNode = SaltFactory.createSCorpus();

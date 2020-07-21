@@ -557,6 +557,12 @@ paths:
       responses:
         "200":
           description: "Returns the content of the requested file."
+          content:
+            default:
+              schema:
+                type: string
+                format: binary
+            
         "404":
           description: "Corpus or file not found."
   /groups:
