@@ -16,7 +16,6 @@ package annis.service.objects;
 import java.io.Serializable;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.corpus_tools.annis.api.model.VisualizerRule;
 
 /**
  * Represents the configuration of the document browser. Every corpus may have its own
@@ -26,7 +25,6 @@ import org.corpus_tools.annis.api.model.VisualizerRule;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @XmlRootElement
-@SuppressWarnings("serial")
 public class DocumentBrowserConfig implements Serializable {
 
   /**
@@ -34,7 +32,7 @@ public class DocumentBrowserConfig implements Serializable {
    */
   private static final long serialVersionUID = -6220463004145688962L;
 
-  private List<VisualizerRule> visualizers;
+  private List<Visualizer> visualizers;
 
   private MetaDataColumn[] metaDataColumns;
 
@@ -69,13 +67,10 @@ public class DocumentBrowserConfig implements Serializable {
   /**
    * @return the visualizers
    */
-  public List<VisualizerRule> getVisualizers() {
-    if (this.visualizers != null) {
-      return this.visualizers;
-    }
-
-    return null;
+  public List<Visualizer> getVisualizers() {
+    return this.visualizers;
   }
+
 
   /**
    * @param metaDataColumns the metaDataColumns to set
@@ -103,7 +98,7 @@ public class DocumentBrowserConfig implements Serializable {
   /**
    * @param visualizers the visualizers to set
    */
-  public void setVisualizers(List<VisualizerRule> visualizers) {
+  public void setVisualizers(List<Visualizer> visualizers) {
     this.visualizers = visualizers;
   }
 }

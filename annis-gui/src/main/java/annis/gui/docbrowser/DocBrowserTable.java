@@ -21,6 +21,7 @@ import annis.model.Annotation;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MetaDataColumn;
 import annis.service.objects.OrderBy;
+import annis.service.objects.Visualizer;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -327,10 +328,11 @@ public class DocBrowserTable extends Table {
     p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
     if (docVisualizerConfig != null) {
-      List<VisualizerRule> visualizers = docVisualizerConfig.getVisualizers();
+      List<Visualizer> visualizers = docVisualizerConfig.getVisualizers();
 
       if (visualizers != null) {
-        for (VisualizerRule visualizer : visualizers) {
+        for (Visualizer rawVis : visualizers) {
+          VisualizerRule visualizer = rawVis.toVisualizerRule();
           Button openVis = new Button(visualizer.getDisplayName());
           openVis.setDescription("open visualizer with the full text of " + docName);
           openVis.addClickListener(new OpenVisualizerWindow(docName, visualizer, openVis));

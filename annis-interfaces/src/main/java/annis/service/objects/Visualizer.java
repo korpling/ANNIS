@@ -15,7 +15,12 @@
 package annis.service.objects;
 
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.corpus_tools.annis.api.model.VisualizerRule;
+import org.corpus_tools.annis.api.model.VisualizerRule.VisibilityEnum;
 
 /**
  *
@@ -38,6 +43,15 @@ public class Visualizer implements Serializable {
   private String namespace;
 
   public Visualizer() {}
+
+  public Visualizer(VisualizerRule rule) {
+
+    this.setDisplayName(rule.getDisplayName());
+    this.setMappings(fromMappings(rule.getMappings()));
+    this.setNamespace(rule.getLayer());
+    this.setType(rule.getVisType());
+  }
+
 
   /**
    * @return the displayName
@@ -93,6 +107,55 @@ public class Visualizer implements Serializable {
    */
   public void setType(String type) {
     this.type = type;
+  }
+
+  public VisualizerRule toVisualizerRule() {
+    VisualizerRule newVis = new VisualizerRule();
+    newVis.setDisplayName(this.getDisplayName());
+    newVis.setLayer(this.getNamespace());
+    newVis.setMappings(parseMappings(this.getMappings()));
+    newVis.setVisibility(VisibilityEnum.HIDDEN);
+    newVis.setVisType(this.getType());
+    return newVis;
+  }
+
+
+  private static Map<String, String> parseMappings(String mappings) {
+    Map<String, String> result = new LinkedHashMap<>();
+
+
+    if (mappings != null) {
+      // split the entrys
+      String[] entries = mappings.split(";");
+      for (String e : entries) {
+        // split key-value
+        String[] keyvalue = e.split(":", 2);
+        if (keyvalue.length == 2) {
+          result.put(keyvalue[0].trim(), keyvalue[1].trim());
+        }
+      }
+    }
+
+    return result;
+  }
+
+  private static String fromMappings(Map<String, String> mappings) {
+    if (mappings == null) {
+      return null;
+    } else {
+      StringBuilder sb = new StringBuilder();
+      Iterator<Map.Entry<String, String>> it = mappings.entrySet().iterator();
+      while (it.hasNext()) {
+        Map.Entry<String, String> e = it.next();
+        sb.append(e.getKey());
+        sb.append(":");
+        sb.append(e.getValue());
+        if (it.hasNext()) {
+          sb.append(";");
+        }
+      }
+      return sb.toString();
+    }
   }
 
 }
