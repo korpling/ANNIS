@@ -19,6 +19,8 @@ import annis.gui.graphml.CorpusGraphMapper;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.Visualizer;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -165,13 +167,15 @@ public class DocBrowserPanel extends Panel {
     VisualizerRule textVis = new VisualizerRule();
     textVis.setDisplayName("full text");
     textVis.setVisType("text");
-    defaultConfig.setVisualizers(Arrays.asList(textVis));
+    defaultConfig.setVisualizers(Arrays.asList(new Visualizer(textVis)));
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
     try {
-      File result = api.corpusFiles(getCorpus(), "document_browser.json");
+      File result = api.corpusFiles(getCorpus(),
+          urlPathEscape.escape(getCorpus()) + "/document_browser.json");
       try(FileInputStream is = new FileInputStream(result)) {
         ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         DocumentBrowserConfig config = mapper.readValue(is, DocumentBrowserConfig.class);
         return config;
       }
