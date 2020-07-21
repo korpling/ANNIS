@@ -14,6 +14,8 @@
 package annis.gui.docbrowser;
 
 import annis.CommonHelper;
+import annis.gui.components.ExceptionDialog;
+import annis.gui.graphml.CorpusGraphMapper;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.DocumentBrowserConfig;
@@ -22,7 +24,6 @@ import annis.service.objects.OrderBy;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.ContentMode;
@@ -38,16 +39,26 @@ import com.vaadin.v7.data.util.IndexedContainer;
 import com.vaadin.v7.ui.Table;
 import com.vaadin.v7.ui.themes.BaseTheme;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
+import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,7 +184,7 @@ public class DocBrowserTable extends Table {
   private DocumentBrowserConfig docVisualizerConfig;
 
   // cache for doc meta data
-  private final Map<String, Map<String, List<Annotation>>> docMetaDataCache;
+  private final Map<String, Map<String, Set<SMetaAnnotation>>> docMetaDataCache;
 
   private IndexedContainer container;
 
@@ -197,21 +208,21 @@ public class DocBrowserTable extends Table {
   }
 
   private String generateCell(List<String> path, MetaDataCol metaDatum) {
-    List<Annotation> metaData = new LinkedList<>();
+    Set<SMetaAnnotation> metaData = new LinkedHashSet<>();
     if (path != null && !path.isEmpty()) {
       metaData = getDocMetaData(path.get(path.size() - 1));
     }
 
     // lookup meta data
-    for (Annotation a : metaData) {
+    for (SMetaAnnotation a : metaData) {
       if (metaDatum.namespace != null && metaDatum.namespace.equals(a.getNamespace())
           && metaDatum.name.equals(a.getName())) {
-        return a.getValue();
+        return a.getValue_STEXT();
       }
 
       if (metaDatum.namespace == null && a.getNamespace() == null
           && metaDatum.name.equals(a.getName())) {
-        return a.getValue();
+        return a.getValue_STEXT();
       }
     }
 
@@ -225,21 +236,24 @@ public class DocBrowserTable extends Table {
     btn.addClickListener(event -> {
       try {
 
-        List<Annotation> annos = getDocMetaData(docName);
+        Set<SMetaAnnotation> annos = getDocMetaData(docName);
 
         /**
          * Transforms to a list of key value pairs. The values concates the namespace and ordinary
          * value. Namespaces "NULL" are ignored.
          */
         // create datasource and bind it to a table
-        BeanItemContainer<Annotation> metaContainer = new BeanItemContainer<>(Annotation.class);
-        metaContainer.addAll(annos);
+        BeanItemContainer<SMetaAnnotation> metaContainer =
+            new BeanItemContainer<>(SMetaAnnotation.class);
+        if (annos != null) {
+          metaContainer.addAll(annos);
+        }
         metaContainer.sort(new Object[] {"namespace", "name"}, new boolean[] {true, true});
 
         Table metaTable = new Table();
         metaTable.setContainerDataSource(metaContainer);
         metaTable.addGeneratedColumn("genname", (source, itemId, columnId) -> {
-          Annotation anno = metaContainer.getItem(itemId).getBean();
+          SMetaAnnotation anno = metaContainer.getItem(itemId).getBean();
           String qName = anno.getName();
           if (anno.getNamespace() != null) {
             qName = anno.getNamespace() + ":" + qName;
@@ -249,8 +263,8 @@ public class DocBrowserTable extends Table {
           return l;
         });
         metaTable.addGeneratedColumn("genvalue", (source, itemId, columnId) -> {
-          Annotation anno = metaContainer.getItem(itemId).getBean();
-          Label l = new Label(anno.getValue(), ContentMode.HTML);
+          SMetaAnnotation anno = metaContainer.getItem(itemId).getBean();
+          Label l = new Label(anno.getValue_STEXT(), ContentMode.HTML);
           return l;
         });
 
@@ -337,34 +351,35 @@ public class DocBrowserTable extends Table {
    * @param document The document the data are fetched for.
    * @return The a list of meta data. Can be empty but never null.
    */
-  private List<Annotation> getDocMetaData(String document) {
+  private Set<SMetaAnnotation> getDocMetaData(String document) {
     // lookup up meta data in the cache
-    if (!docMetaDataCache.containsKey(docBrowserPanel.getCorpus())) {
+    Map<String, Set<SMetaAnnotation>> cachedMetaMap =
+        docMetaDataCache.get(docBrowserPanel.getCorpus());
+
+    if (cachedMetaMap == null) {
       // get the metadata for the corpus
-      WebResource res = Helper.getAnnisWebResource(UI.getCurrent());
-      res = res.path("meta/corpus/").path(urlPathEscape.escape(docBrowserPanel.getCorpus()))
-          .path("closure");
+      SearchApi api = new SearchApi(Helper.getClient(UI.getCurrent()));
+      Map<String, Set<SMetaAnnotation>> metaDataMap = new HashMap<>();
+      
+      // Search for the document node, map it to Salt and return the attached annotations
+      try {
+        String graphML = api.subgraphForQuery(docBrowserPanel.getCorpus(),
+            "annis:doc = /" + Helper.AQL_REGEX_VALUE_ESCAPER.escape(document) + "/",
+            QueryLanguage.AQL, null);
 
-      Map<String, List<Annotation>> metaDataMap = new HashMap<>();
-
-      // create a document -> metadata map
-      for (Annotation a : res.get(new Helper.AnnotationListType())) {
-        if (a.getAnnotationPath() != null && !a.getAnnotationPath().isEmpty()
-            && a.getType().equals("DOCUMENT")) {
-          String docName = a.getAnnotationPath().get(0);
-          if (!metaDataMap.containsKey(docName)) {
-            metaDataMap.put(docName, new ArrayList<Annotation>());
-          }
-          metaDataMap.get(docName).add(a);
-        }
+      SCorpusGraph cg = CorpusGraphMapper.map(new StringReader(graphML));
+      for (SDocument doc : cg.getDocuments()) {
+        metaDataMap.put(document, Collections.unmodifiableSet(doc.getMetaAnnotations()));
       }
       docMetaDataCache.put(docBrowserPanel.getCorpus(), metaDataMap);
+      return metaDataMap.get(document);
+    } catch (ApiException | IOException | XMLStreamException e) {
+      ExceptionDialog.show(e, "Error fetching the document meta data for the documet browser",
+          UI.getCurrent());
+      return new LinkedHashSet<>();
     }
-
-    if (docMetaDataCache.get(docBrowserPanel.getCorpus()).containsKey(document)) {
-      return docMetaDataCache.get(docBrowserPanel.getCorpus()).get(document);
     } else {
-      return new ArrayList<Annotation>();
+      return cachedMetaMap.get(document);
     }
   }
 
