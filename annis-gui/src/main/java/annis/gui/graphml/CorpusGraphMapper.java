@@ -213,7 +213,7 @@ public class CorpusGraphMapper extends AbstractGraphMLMapper {
     }
 
     setNodeName(newNode, nodeName);
-    mapLabels(newNode, labels, false);
+    mapLabels(newNode, labels, true);
 
     return newNode;
   }
