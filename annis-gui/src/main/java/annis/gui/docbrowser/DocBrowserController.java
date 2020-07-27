@@ -25,8 +25,6 @@ import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.RawTextWrapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
@@ -54,6 +52,7 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.salt.SaltFactory;
@@ -121,7 +120,6 @@ public class DocBrowserController implements Serializable {
                 config.getMappings(), ui);
       } else if (visualizer.isPresent() && visualizer.get().isUsingRawText()) {
         nodeAnnoFilter = new LinkedList<>();
-        nodeAnnoFilter.add("annis:tok");
       }
 
       // check if a visualization is already initiated
@@ -130,9 +128,7 @@ public class DocBrowserController implements Serializable {
           // fetch the salt project - so long part
           input = createInput(corpus, docPath, config, nodeAnnoFilter,
               visualizer.get().isUsingRawText(), ui);
-
         }
-
       }
 
       // after initializing the visualizer update the gui
@@ -173,8 +169,6 @@ public class DocBrowserController implements Serializable {
 
   private static final Resource DOC_ICON = FontAwesome.FILE_TEXT_O;
 
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-
 
   private static final Pattern validQNamePattern =
       Pattern.compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
@@ -207,7 +201,7 @@ public class DocBrowserController implements Serializable {
 
       // Build a query that includes all (possible filtered by name) node of the document
       boolean fallbackToAll = false;
-      if (nodeAnnoFilter == null || nodeAnnoFilter.isEmpty()) {
+      if (nodeAnnoFilter == null) {
         fallbackToAll = true;
       } else {
         nodeAnnoFilter = nodeAnnoFilter.stream()
@@ -246,9 +240,15 @@ public class DocBrowserController implements Serializable {
         aql.append("/ & #a @* #doc");
       }
 
+      AnnotationComponentType componentFilter = null;
+      if (nodeAnnoFilter != null && nodeAnnoFilter.isEmpty() && useRawText) {
+        // If only the raw text is requested, limit the edges that are generated to the relevant
+        // ones
+        componentFilter = AnnotationComponentType.ORDERING;
+      }
 
       String graphML =
-          api.subgraphForQuery(docPath.get(0), aql.toString(), QueryLanguage.AQL, null);
+          api.subgraphForQuery(docPath.get(0), aql.toString(), QueryLanguage.AQL, componentFilter);
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
