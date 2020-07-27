@@ -34,6 +34,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.v7.ui.Label;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -54,6 +56,8 @@ import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SToken;
@@ -516,13 +520,18 @@ public class HTMLVis extends AbstractVisualizer {
     if (visConfigName == null) {
       inStreamConfigRaw = HTMLVis.class.getResourceAsStream("defaultvis.config");
     } else {
-      WebResource resBinary =
-          Helper.getAnnisWebResource(ui).path("query/corpora/").path(toplevelCorpusName)
-              .path(toplevelCorpusName).path("binary").path(visConfigName + ".config");
-
-      ClientResponse response = resBinary.get(ClientResponse.class);
-      if (response.getStatus() == ClientResponse.Status.OK.getStatusCode()) {
-        inStreamConfigRaw = response.getEntityInputStream();
+      
+      CorporaApi api = new CorporaApi(Helper.getClient(ui));
+      try {
+        File file = api.corpusFiles(toplevelCorpusName,
+            urlPathEscape.escape(toplevelCorpusName) + "/" + visConfigName + ".config");
+        inStreamConfigRaw = new FileInputStream(file);
+      } catch (ApiException e) {
+        if (e.getCode() != 404) {
+          log.error("Exception while getting the HTML visualizer configuration", e);
+        }
+      } catch (IOException e) {
+        log.error("Exception while getting the HTML visualizer configuration", e);
       }
     }
 

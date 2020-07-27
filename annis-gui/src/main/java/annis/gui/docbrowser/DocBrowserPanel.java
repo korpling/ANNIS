@@ -166,7 +166,7 @@ public class DocBrowserPanel extends Panel {
     DocumentBrowserConfig defaultConfig = new DocumentBrowserConfig();
     VisualizerRule textVis = new VisualizerRule();
     textVis.setDisplayName("full text");
-    textVis.setVisType("text");
+    textVis.setVisType("raw_text");
     defaultConfig.setVisualizers(Arrays.asList(new Visualizer(textVis)));
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
@@ -193,8 +193,8 @@ public class DocBrowserPanel extends Panel {
     return defaultConfig;
   }
 
-  public void openVis(String doc, VisualizerRule config, Button btn) {
-    ui.getSearchView().getDocBrowserController().openDocVis(corpus, doc, config, btn);
+  public void openVis(String docId, VisualizerRule config, Button btn) {
+    ui.getSearchView().getDocBrowserController().openDocVis(corpus, docId, config, btn);
   }
 
 }
