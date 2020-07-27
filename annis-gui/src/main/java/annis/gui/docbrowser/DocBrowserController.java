@@ -17,7 +17,6 @@ import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.graphml.DocumentGraphMapper;
-import annis.libgui.AnnisBaseUI;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.visualizers.FilteringVisualizerPlugin;
@@ -34,7 +33,6 @@ import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
@@ -56,8 +54,6 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.api.SearchApi;
-import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.salt.SaltFactory;
@@ -132,10 +128,9 @@ public class DocBrowserController implements Serializable {
       {
         if (createVis && visualizer.isPresent()) {
           // fetch the salt project - so long part
-          input = createInput(corpus, docPath, config, nodeAnnoFilter, ui);
-          if (visualizer.isPresent() && visualizer.get().isUsingRawText()) {
-            input.setRawText(getRawText(corpus, Joiner.on('/').join(docPath), ui));
-          }
+          input = createInput(corpus, docPath, config, nodeAnnoFilter,
+              visualizer.get().isUsingRawText(), ui);
+
         }
 
       }
@@ -193,10 +188,11 @@ public class DocBrowserController implements Serializable {
    * @param config the visualizer configuration
    * @param nodeAnnoFilter A list of node annotation names for filtering the nodes or null if no
    *        filtering should be applied.
+   * @param useRawText If true, only extract the original raw text
    * @return a {@link VisualizerInput} input, which is usable for rendering the whole document.
    */
   public static VisualizerInput createInput(String corpus, List<String> docPath,
-      VisualizerRule config, List<String> nodeAnnoFilter, UI ui) {
+      VisualizerRule config, List<String> nodeAnnoFilter, boolean useRawText, UI ui) {
     VisualizerInput input = new VisualizerInput();
 
     // set mappings and namespaces. some visualizer do not survive without
@@ -228,18 +224,26 @@ public class DocBrowserController implements Serializable {
 
       StringBuilder aql = new StringBuilder();
       if (fallbackToAll) {
-        aql.append("node @* annis:node_name=/");
+        aql.append("(n#node");
+        if(useRawText) {
+          aql.append(" | n#annis:ignored-tok");
+        }
+        aql.append(") & doc#annis:node_name=/");
         aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
-        aql.append("/");
+        aql.append("/ & #n @* #doc");
       } else {
         aql.append("(a#tok");
+        if (useRawText) {
+          aql.append("| a#annis:ignored-tok");
+        }
         for (String nodeAnno : nodeAnnoFilter) {
           aql.append(" | a#");
           aql.append(nodeAnno);
         }
-        aql.append(") & d#annis:node_name=/");
+
+        aql.append(") & doc#annis:node_name=/");
         aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
-        aql.append("/ & #a @* #d");
+        aql.append("/ & #a @* #doc");
       }
 
 
@@ -250,11 +254,20 @@ public class DocBrowserController implements Serializable {
         SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(docPath));
         SDocument doc = cg.createDocument(docURI);
-        SDocumentGraph docGraph = DocumentGraphMapper.map(new StringReader(graphML));
+        SDocumentGraph docGraph = DocumentGraphMapper.map(new StringReader(graphML), useRawText);
         doc.setDocumentGraph(docGraph);
 
         SDocument sDoc = p.getCorpusGraphs().get(0).getDocuments().get(0);
         input.setResult(sDoc);
+        if (useRawText) {
+          List<String> texts = new ArrayList<>();
+          for (STextualDS ds : docGraph.getTextualDSs()) {
+            texts.add(ds.getData());
+          }
+          RawTextWrapper rawText = new RawTextWrapper();
+          rawText.setTexts(texts);
+          input.setRawText(rawText);
+        }
       } catch (XMLStreamException | IOException ex) {
         log.error("Could not map GraphML to Salt", ex);
         ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
@@ -264,34 +277,6 @@ public class DocBrowserController implements Serializable {
     }
 
     return input;
-  }
-
-  private static RawTextWrapper getRawText(String corpusName, String documentName, UI ui) {
-    RawTextWrapper result = null;
-    SearchApi api = new SearchApi(Helper.getClient(ui));
-    try {
-
-      String graphML = api.subgraphForQuery(corpusName, "tok | annis:node_type=\"ignored-tok\"",
-          QueryLanguage.AQL, AnnotationComponentType.ORDERING);
-
-      SDocumentGraph graph = DocumentGraphMapper.map(new StringReader(graphML), true);
-      // Reconstruct the text from the token values
-      List<String> texts = new ArrayList<>();
-      for (STextualDS ds : graph.getTextualDSs()) {
-        texts.add(ds.getData());
-      }
-      result = new RawTextWrapper();
-      result.setTexts(texts);
-    }
-
-    catch (ApiException | XMLStreamException | IOException ex) {
-      if (!AnnisBaseUI.handleCommonError(ex, "retrieve raw text")) {
-        Notification.show("can not retrieve raw text", ex.getLocalizedMessage(),
-            Notification.Type.WARNING_MESSAGE);
-      }
-    }
-
-    return result;
   }
 
 

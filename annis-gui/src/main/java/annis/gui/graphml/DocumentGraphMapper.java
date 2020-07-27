@@ -378,6 +378,11 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               }
 
               SFeature featTok = currNode.getFeature("annis::tok");
+              if(featTok == null) {
+                // The feature might also be mapped to the ignored-tok label
+                // (so it is ignored by AQL "tok" queries)
+                featTok = currNode.getFeature("annis::ignored-tok");
+              }
               if (featTok != null && currNode instanceof SToken) {
                 int idxStart = text.length();
                 text.append(featTok.getValue_STEXT());
@@ -385,7 +390,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               }
             }
           });
-      if (itRoots.hasNext()) {
+      if (!mapIgnoredToken && itRoots.hasNext()) {
         text.append(" ");
       }
     }
