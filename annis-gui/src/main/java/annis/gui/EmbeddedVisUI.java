@@ -359,7 +359,8 @@ public class EmbeddedVisUI extends CommonUI {
       // create input
       try {
         input =
-            DocBrowserController.createInput(corpus, docPath, visConfig, null,
+            DocBrowserController.createInput(corpus, docPath, visConfig,
+                null, visualizer.isUsingRawText(),
             EmbeddedVisUI.this);
         // create components, put in a panel
         Panel viszr = visualizer.createComponent(input, null);
