@@ -25,8 +25,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
@@ -36,6 +34,7 @@ import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.v7.ui.Label;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -424,17 +423,31 @@ public class HTMLVis extends AbstractVisualizer {
   }
 
   private void injectCSS(String visConfigName, String corpusName, String wrapperClassName, UI ui) {
+    CorporaApi api = new CorporaApi(Helper.getClient(ui));
     InputStream inStreamCSSRaw = null;
     if (visConfigName == null) {
       inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
     } else {
-      WebResource resBinary = Helper.getAnnisWebResource(ui).path("query/corpora/").path(corpusName)
-          .path(corpusName).path("binary").path(visConfigName + ".css");
+      try {
+        File f = api.corpusFiles(corpusName,
+            urlPathEscape.escape(corpusName) + "/" + visConfigName + ".css");
+        f.deleteOnExit();
+        
+        inStreamCSSRaw = new FileInputStream(f);
+        
+      } catch (ApiException ex) {
+        if (ex.getCode() != 404) {
+          log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
+          ui.access(() -> {
+            Notification.show("Could not retrieve the HTML visualizer web-font configuration file",
+                ex.getMessage(), Notification.Type.ERROR_MESSAGE);
 
-      ClientResponse response = resBinary.get(ClientResponse.class);
-      if (response.getStatus() == ClientResponse.Status.OK.getStatusCode()) {
-        inStreamCSSRaw = response.getEntityInputStream();
+          });
+        }
+      } catch (FileNotFoundException ex) {
+        log.error("Just downloaded file not found", ex);
       }
+
     }
     if (inStreamCSSRaw != null) {
       try (InputStream inStreamCSS = inStreamCSSRaw) {
@@ -452,18 +465,13 @@ public class HTMLVis extends AbstractVisualizer {
   }
 
   private void injectWebFonts(String visConfigName, String corpusName, UI ui) {
-    InputStream inStreamJSONRaw = null;
-    if (visConfigName != null) {
-      WebResource resBinary = Helper.getAnnisWebResource(ui).path("query/corpora/").path(corpusName)
-          .path(corpusName).path("binary").path(visConfigName + ".fonts.json");
+    CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
-      ClientResponse response = resBinary.get(ClientResponse.class);
-      if (response.getStatus() == ClientResponse.Status.OK.getStatusCode()) {
-        inStreamJSONRaw = response.getEntityInputStream();
-      }
-    }
-    if (inStreamJSONRaw != null) {
-      try (InputStream inStreamJSON = inStreamJSONRaw) {
+    try {
+      File f = api.corpusFiles(corpusName,
+          urlPathEscape.escape(corpusName) + "/" + visConfigName + ".fonts.json");
+      f.deleteOnExit();
+      try (FileInputStream inStreamJSON = new FileInputStream(f)) {
         ObjectMapper mapper = createJsonMapper();
         WebFontList fontConfigList = mapper.readValue(inStreamJSON, WebFontList.class);
 
@@ -501,6 +509,17 @@ public class HTMLVis extends AbstractVisualizer {
         log.error("Could not parse the HTML visualizer web-font configuration file", ex);
         Notification.show("Could not parse the HTML visualizer web-font configuration file",
             ex.getMessage(), Notification.Type.ERROR_MESSAGE);
+      } finally {
+        f.delete();
+      }
+    } catch (ApiException ex) {
+      if (ex.getCode() != 404) {
+        log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
+        ui.access(() -> {
+          Notification.show("Could not retrieve the HTML visualizer web-font configuration file",
+              ex.getMessage(), Notification.Type.ERROR_MESSAGE);
+
+        });
       }
     }
   }
@@ -511,8 +530,7 @@ public class HTMLVis extends AbstractVisualizer {
   }
 
   public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
-      Map<String, String> mappings,
-      UI ui) {
+      Map<String, String> mappings, UI ui) {
     InputStream inStreamConfigRaw = null;
 
     String visConfigName = mappings.get("config");
@@ -520,7 +538,7 @@ public class HTMLVis extends AbstractVisualizer {
     if (visConfigName == null) {
       inStreamConfigRaw = HTMLVis.class.getResourceAsStream("defaultvis.config");
     } else {
-      
+
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
       try {
         File file = api.corpusFiles(toplevelCorpusName,

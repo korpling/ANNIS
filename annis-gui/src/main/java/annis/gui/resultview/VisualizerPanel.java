@@ -416,20 +416,25 @@ public class VisualizerPanel extends CssLayout
 
     // getting the raw text, when the visualizer wants to have it
     if (visPlugin.isPresent() && visPlugin.get().isUsingRawText()) {
-      input.setRawText(getRawText(path.get(0), Joiner.on('/').join(path), ui));
+      input.setRawText(getRawText(path.get(0), path, ui));
     }
 
     return input;
   }
 
 
-  private static RawTextWrapper getRawText(String corpusName, String documentName, UI ui) {
+  private static RawTextWrapper getRawText(String corpusName, List<String> docPath, UI ui) {
     RawTextWrapper result = null;
     SearchApi api = new SearchApi(Helper.getClient(ui));
     try {
 
+      StringBuilder aql = new StringBuilder();
+      aql.append("(t#tok | t#annis:ignored-tok) & doc#annis:node_name=/");
+      aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
+      aql.append("/ & #t @* doc");
+
       String graphML =
-          api.subgraphForQuery(corpusName, "tok | annis:node_type=\"ignored-tok\"",
+          api.subgraphForQuery(corpusName, aql.toString(),
               QueryLanguage.AQL, AnnotationComponentType.ORDERING);
 
       SDocumentGraph graph = DocumentGraphMapper.map(new StringReader(graphML), true);
