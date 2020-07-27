@@ -50,6 +50,8 @@ import org.slf4j.LoggerFactory;
  */
 public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
+  private static final String IGNORED_TOK = "ignored-tok";
+
   static final Logger log = LoggerFactory.getLogger(DocumentGraphMapper.class);
 
   private final SDocumentGraph graph;
@@ -57,9 +59,11 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private final Set<String> hasOutgoingCoverageEdge;
   private final Set<String> hasOutgoingDominanceEdge;
   private final Set<String> hasNonEmptyIncomingDominanceEdge;
+  private final boolean mapIgnoredToken;
 
 
-  protected DocumentGraphMapper() {
+  protected DocumentGraphMapper(boolean mapIgnoredToken) {
+    this.mapIgnoredToken = mapIgnoredToken;
     this.graph = SaltFactory.createSDocumentGraph();
     this.hasOutgoingCoverageEdge = new HashSet<>();
     this.hasOutgoingDominanceEdge = new HashSet<>();
@@ -67,7 +71,12 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   }
 
   public static SDocumentGraph map(Reader input) throws IOException, XMLStreamException {
-    DocumentGraphMapper mapper = new DocumentGraphMapper();
+    return map(input, false);
+  }
+
+  public static SDocumentGraph map(Reader input, boolean mapWhiteSpaceToken)
+      throws IOException, XMLStreamException {
+    DocumentGraphMapper mapper = new DocumentGraphMapper(mapWhiteSpaceToken);
     mapper.execute(input);
     return mapper.graph;
   }
@@ -180,10 +189,14 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               inGraph = false;
               break;
             case "node":
-              if (currentNodeId.isPresent() && "node".equals(data.get("annis::node_type"))) {
-                // Map node and add it
-                SNode n = mapNode(currentNodeId.get(), data);
-                graph.addNode(n);
+              if (currentNodeId.isPresent()) {
+                String nodeType = data.get("annis::node_type");
+                if ("node".equals(nodeType)
+                    || (this.mapIgnoredToken && IGNORED_TOK.equals(nodeType))) {
+                  // Map node and add it
+                  SNode n = mapNode(currentNodeId.get(), data);
+                  graph.addNode(n);
+                }
               }
               currentNodeId = Optional.empty();
               data.clear();
@@ -223,7 +236,10 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       if (SaltUtil.SALT_NULL_VALUE.equals(name)) {
         name = null;
       }
-      if (name == null || "".equals(name)) {
+      if (this.mapIgnoredToken && "text".equals(name)) {
+        // Use the special "text" ordering component to recreate the full text
+        recreateText("text", roots);
+      } else if (!this.mapIgnoredToken && (name == null || "".equals(name))) {
         // only re-create text if this is the default (possible virtual) tokenization
         recreateText(name, roots);
       } else {
@@ -256,7 +272,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private SNode mapNode(String nodeName, Map<String, String> labels) {
     SNode newNode = SaltFactory.createSNode();
 
-    if (labels.containsKey("annis::tok") && !hasOutgoingCoverageEdge.contains(nodeName)) {
+    if ((labels.containsKey("annis::tok") || labels.containsKey("annis::ignored-tok"))
+        && !hasOutgoingCoverageEdge.contains(nodeName)) {
       newNode = SaltFactory.createSToken();
     } else if (hasOutgoingDominanceEdge.contains(nodeName)) {
       newNode = SaltFactory.createSStructure();
@@ -356,7 +373,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
             @Override
             public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
                 SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-              if (fromNode != null) {
+              if (!mapIgnoredToken && fromNode != null) {
                 text.append(" ");
               }
 

@@ -140,21 +140,21 @@ public class DocBrowserTable extends Table {
      */
     private static final long serialVersionUID = -268464505148741358L;
 
-    private String docName;
+    private String docId;
 
     private VisualizerRule config;
 
     private final Button button;
 
-    public OpenVisualizerWindow(String docName, VisualizerRule config, Button btn) {
+    public OpenVisualizerWindow(String docId, VisualizerRule config, Button btn) {
       this.button = btn;
-      this.docName = docName;
+      this.docId = docId;
       this.config = config;
     }
 
     @Override
     public void buttonClick(Button.ClickEvent event) {
-      docBrowserPanel.openVis(docName, config, button);
+      docBrowserPanel.openVis(docId, config, button);
     }
   }
 
@@ -322,7 +322,7 @@ public class DocBrowserTable extends Table {
     return metaColumns;
   }
 
-  private Panel generateVisualizerLinks(String docName) {
+  private Panel generateVisualizerLinks(String docId) {
     Panel p = new Panel();
     VerticalLayout l = new VerticalLayout();
     p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
@@ -334,8 +334,8 @@ public class DocBrowserTable extends Table {
         for (Visualizer rawVis : visualizers) {
           VisualizerRule visualizer = rawVis.toVisualizerRule();
           Button openVis = new Button(visualizer.getDisplayName());
-          openVis.setDescription("open visualizer with the full text of " + docName);
-          openVis.addClickListener(new OpenVisualizerWindow(docName, visualizer, openVis));
+          openVis.setDescription("open visualizer for document");
+          openVis.addClickListener(new OpenVisualizerWindow(docId, visualizer, openVis));
           openVis.setStyleName(BaseTheme.BUTTON_LINK);
           openVis.setDisableOnClick(true);
           l.addComponent(openVis);
@@ -416,6 +416,7 @@ public class DocBrowserTable extends Table {
 
     for (SDocument d : docs) {
       String doc = d.getName();
+      String docId = d.getId();
 
       // reverse path and delete the brackets and set a new separator:
       // corpus > ... > subcorpus > document
@@ -447,7 +448,7 @@ public class DocBrowserTable extends Table {
         }
 
         row.getItemProperty("corpus path").setValue(path);
-        row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
+        row.getItemProperty("visualizer").setValue(generateVisualizerLinks(docId));
         row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
       }
     }

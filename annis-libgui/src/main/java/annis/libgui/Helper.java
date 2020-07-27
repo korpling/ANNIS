@@ -21,7 +21,6 @@ import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.RawTextWrapper;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
@@ -844,25 +843,6 @@ public class Helper {
       }
     }
     return "";
-  }
-
-  public static RawTextWrapper getRawText(String corpusName, String documentName, UI ui) {
-    RawTextWrapper texts = null;
-    try {
-      WebResource webResource = getAnnisWebResource(ui);
-      webResource = webResource.path("query").path("rawtext").path(corpusName).path(documentName);
-      texts = webResource.get(RawTextWrapper.class);
-    }
-
-    catch (UniformInterfaceException | ClientHandlerException ex) {
-      log.error("can not retrieve raw text");
-      if (!AnnisBaseUI.handleCommonError(ex, "retrieve raw text")) {
-        Notification.show("can not retrieve raw text", ex.getLocalizedMessage(),
-            Notification.Type.WARNING_MESSAGE);
-      }
-    }
-
-    return texts;
   }
 
   public static String getServiceURL(VaadinSession session) {

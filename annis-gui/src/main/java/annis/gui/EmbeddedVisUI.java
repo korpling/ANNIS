@@ -321,7 +321,8 @@ public class EmbeddedVisUI extends CommonUI {
     } else if (splittedPath.size() >= 3) {
       // a visualizer definition visname/corpusname/documentname
       if ("htmldoc".equals(splittedPath.get(0))) {
-        showHtmlDoc(splittedPath.get(1), splittedPath.get(2), request.getParameterMap());
+        showHtmlDoc(splittedPath.get(1), splittedPath.subList(1, splittedPath.size()),
+            request.getParameterMap());
       } else {
         displayMessage("Unknown visualizer \"" + splittedPath.get(0) + "\"",
             "Only \"htmldoc\" is supported yet.");
@@ -332,7 +333,7 @@ public class EmbeddedVisUI extends CommonUI {
     addStyleName("loaded-embedded-vis");
   }
 
-  private void showHtmlDoc(String corpus, String doc, Map<String, String[]> args) {
+  private void showHtmlDoc(String corpus, List<String> docPath, Map<String, String[]> args) {
     // do nothing for empty fragments
     if (args == null || args.isEmpty()) {
       return;
@@ -357,7 +358,8 @@ public class EmbeddedVisUI extends CommonUI {
 
       // create input
       try {
-        input = DocBrowserController.createInput(corpus, doc, visConfig, false, null,
+        input =
+            DocBrowserController.createInput(corpus, docPath, visConfig, null,
             EmbeddedVisUI.this);
         // create components, put in a panel
         Panel viszr = visualizer.createComponent(input, null);

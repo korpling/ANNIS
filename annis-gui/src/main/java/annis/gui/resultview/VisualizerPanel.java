@@ -17,6 +17,7 @@ import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.graphml.DocumentGraphMapper;
+import annis.libgui.AnnisBaseUI;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
@@ -27,6 +28,7 @@ import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.Match;
+import annis.service.objects.RawTextWrapper;
 import annis.visualizers.LoadableVisualizer;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -48,6 +50,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +69,8 @@ import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.api.model.VisualizerRule.VisibilityEnum;
@@ -73,6 +78,7 @@ import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
 import org.eclipse.emf.common.util.URI;
@@ -410,10 +416,40 @@ public class VisualizerPanel extends CssLayout
 
     // getting the raw text, when the visualizer wants to have it
     if (visPlugin.isPresent() && visPlugin.get().isUsingRawText()) {
-      input.setRawText(Helper.getRawText(path.get(0), Joiner.on('/').join(path), ui));
+      input.setRawText(getRawText(path.get(0), Joiner.on('/').join(path), ui));
     }
 
     return input;
+  }
+
+
+  private static RawTextWrapper getRawText(String corpusName, String documentName, UI ui) {
+    RawTextWrapper result = null;
+    SearchApi api = new SearchApi(Helper.getClient(ui));
+    try {
+
+      String graphML =
+          api.subgraphForQuery(corpusName, "tok | annis:node_type=\"ignored-tok\"",
+              QueryLanguage.AQL, AnnotationComponentType.ORDERING);
+
+      SDocumentGraph graph = DocumentGraphMapper.map(new StringReader(graphML), true);
+      // Reconstruct the text from the token values
+      List<String> texts = new ArrayList<>();
+      for(STextualDS ds : graph.getTextualDSs()) {
+        texts.add(ds.getData());
+      }
+      result = new RawTextWrapper();
+      result.setTexts(texts);
+    }
+
+    catch (ApiException | XMLStreamException | IOException ex) {
+      if (!AnnisBaseUI.handleCommonError(ex, "retrieve raw text")) {
+        Notification.show("can not retrieve raw text", ex.getLocalizedMessage(),
+            Notification.Type.WARNING_MESSAGE);
+      }
+    }
+
+    return result;
   }
 
   private SaltProject getDocument(List<String> nodeAnnoFilter, UI ui) {
