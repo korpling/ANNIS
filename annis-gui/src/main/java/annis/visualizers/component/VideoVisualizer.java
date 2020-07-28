@@ -29,6 +29,7 @@ import com.google.common.net.UrlEscapers;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.util.List;
+import org.apache.tika.Tika;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.springframework.stereotype.Component;
@@ -44,8 +45,9 @@ public class VideoVisualizer extends AbstractVisualizer {
    * 
    */
   private static final long serialVersionUID = -5520916972367860787L;
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   private final static Escaper urlParamEscape = UrlEscapers.urlPathSegmentEscaper();
+
+  private final Tika tika = new Tika();
 
   @Override
   public MediaElementPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle) {
@@ -53,6 +55,7 @@ public class VideoVisualizer extends AbstractVisualizer {
         CommonHelper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
     String binaryServletPath = "";
+    String mimeType = null;
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);
 
@@ -61,11 +64,12 @@ public class VideoVisualizer extends AbstractVisualizer {
       List<String> files =
           api.corpusFileList(corpusName, Joiner.on('/').join(Lists.reverse(corpusPath)));
       for (String f : files) {
-        if (f.endsWith(".webm")) {
+        String guessedMimeType = tika.detect(f);
+        if (guessedMimeType != null && guessedMimeType.startsWith("video/")) {
           binaryServletPath =
               input.getContextPath() + "/Binary?" + "file=" + urlParamEscape.escape(f)
                   + "&toplevelCorpusName=" + urlParamEscape.escape(corpusName);
-
+          mimeType = guessedMimeType;
         }
       }
     } catch (ApiException e) {
@@ -74,7 +78,7 @@ public class VideoVisualizer extends AbstractVisualizer {
 
 
     MediaElementPlayer player =
-        new MediaElementPlayer(MediaElement.video, binaryServletPath, "video/webm");
+        new MediaElementPlayer(MediaElement.video, binaryServletPath, mimeType);
 
     if (VaadinSession.getCurrent().getAttribute(MediaController.class) != null) {
       VaadinSession.getCurrent().getAttribute(MediaController.class).addMediaPlayer(player,

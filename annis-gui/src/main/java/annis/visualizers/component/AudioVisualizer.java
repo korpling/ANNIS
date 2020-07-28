@@ -14,6 +14,7 @@
 package annis.visualizers.component;
 
 import annis.CommonHelper;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.components.medialement.MediaElement;
 import annis.gui.components.medialement.MediaElementPlayer;
 import annis.libgui.Helper;
@@ -21,14 +22,16 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.service.objects.AnnisBinaryMetaData;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
+import org.apache.tika.Tika;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,8 +45,9 @@ public class AudioVisualizer extends AbstractVisualizer {
    * 
    */
   private static final long serialVersionUID = 3098842942826409015L;
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   private final static Escaper urlParamEscape = UrlEscapers.urlPathSegmentEscaper();
+
+  private final Tika tika = new Tika();
 
   @Override
   public MediaElementPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle) {
@@ -51,35 +55,27 @@ public class AudioVisualizer extends AbstractVisualizer {
         CommonHelper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
     String binaryServletPath = "";
+    String mimeType = null;
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);
-    String documentName = corpusPath.get(0);
 
-    corpusName = urlPathEscape.escape(corpusName);
-    documentName = urlPathEscape.escape(documentName);
-
-
-    WebResource resMeta = Helper.getAnnisWebResource(input.getUI()).path("meta/binary")
-        .path(corpusName).path(documentName);
-    List<AnnisBinaryMetaData> meta = resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
-
-    // if there is no document at all don't fail
-    String mimeType = meta.size() > 0 ? null : "audio/ogg";
-    for (AnnisBinaryMetaData m : meta) {
-      if (m.getMimeType().startsWith("audio/")) {
-        mimeType = m.getMimeType();
-        break;
+    CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
+    try {
+      List<String> files =
+          api.corpusFileList(corpusName, Joiner.on('/').join(Lists.reverse(corpusPath)));
+      for (String f : files) {
+        String guessedMimeType = tika.detect(f);
+        if (guessedMimeType != null && guessedMimeType.startsWith("audio/")) {
+          binaryServletPath =
+              input.getContextPath() + "/Binary?" + "file=" + urlParamEscape.escape(f)
+                  + "&toplevelCorpusName=" + urlParamEscape.escape(corpusName);
+          mimeType = guessedMimeType;
+        }
       }
+    } catch (ApiException e) {
+      ExceptionDialog.show(e, UI.getCurrent());
     }
 
-    Validate.notNull(mimeType,
-        "There must be at least one binary file for the document with a audio mime type");
-
-    String mimeTypeEncoded = mimeType;
-    mimeTypeEncoded = urlParamEscape.escape(mimeType);
-
-    binaryServletPath = input.getContextPath() + "/Binary?" + "documentName=" + documentName
-        + "&toplevelCorpusName=" + corpusName + "&mime=" + mimeTypeEncoded;
 
     MediaElementPlayer player =
         new MediaElementPlayer(MediaElement.audio, binaryServletPath, mimeType);
