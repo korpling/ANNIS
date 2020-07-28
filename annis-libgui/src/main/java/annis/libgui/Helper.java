@@ -362,6 +362,10 @@ public class Helper {
   }
 
   public static ApiClient getClient(UI ui) {
+    return getClient(ui.getSession());
+  }
+
+  public static ApiClient getClient(VaadinSession ui) {
     ApiClient client = Configuration.getDefaultApiClient();
     AnnisUser user = Helper.getUser(ui);
     if (user != null && user.getToken() != null) {
