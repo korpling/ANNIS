@@ -20,7 +20,6 @@ import annis.libgui.MatchedNodeColors;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.Annotation;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.escape.Escaper;
@@ -60,6 +59,7 @@ import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,9 +198,9 @@ public class HTMLVis extends AbstractVisualizer {
       strCorpName = corpusPath.get(corpusPath.size() - 1);
 
       // Get metadata and put in hashmap
-      List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName, strDocName, ui);
-      for (Annotation metaDatum : metaData) {
-        meta.put(metaDatum.getName(), metaDatum.getValue());
+      List<SMetaAnnotation> metaData = Helper.getMetaDataDoc(strCorpName, strDocName, ui);
+      for (SMetaAnnotation metaDatum : metaData) {
+        meta.put(metaDatum.getName(), metaDatum.getValue_STEXT());
       }
     }
 
