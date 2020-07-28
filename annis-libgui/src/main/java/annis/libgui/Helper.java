@@ -45,10 +45,12 @@ import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import elemental.json.JsonValue;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -59,6 +61,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -394,11 +397,16 @@ public class Helper {
       q.setOffset(0);
 
       q.setQueryLanguage(QueryLanguage.AQL);
-      String findResult = search.find(q);
-      if (findResult != null && !findResult.isEmpty()) {
-        metaAnnos.add(a.getKey());
-      }
-
+      File findResult = search.find(q);
+      if (findResult != null && findResult.isFile())
+        try {
+          Optional<String> anyLine = Files.lines(findResult.toPath()).findAny();
+          if (anyLine.isPresent() && !anyLine.get().isEmpty()) {
+            metaAnnos.add(a.getKey());
+          }
+        } catch (IOException ex) {
+          log.error("Error when accessing file with find results", ex);
+        }
     }
 
     return metaAnnos;

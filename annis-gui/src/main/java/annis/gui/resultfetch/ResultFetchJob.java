@@ -28,8 +28,11 @@ import annis.service.objects.QueryLanguage;
 import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,7 +83,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
     CorporaApi corpora = new CorporaApi(Helper.getClient(ui));
 
     // holds the ids of the matches.
-    MatchGroup result;
+    MatchGroup result = new MatchGroup();
 
     try {
       if (Thread.interrupted()) {
@@ -102,8 +105,11 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
       } else {
         q.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQL);
       }
-      result = MatchGroup.parseString(search.find(q));
-
+      File findResult = search.find(q);
+      Files.lines(findResult.toPath()).forEach((line) -> {
+        Match m = Match.parseFromString(line);
+        result.getMatches().add(m);
+      });
       // get the subgraph for each match, when the result is not empty
       if (result.getMatches().isEmpty()) {
 
@@ -143,14 +149,14 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
           List<String> corpusPath = CommonHelper.getCorpusPath(m.getSaltIDs().get(0));
 
           if (!corpusPath.isEmpty()) {
-            String graphML = corpora.subgraphForNodes(corpusPath.get(0), arg);
+            File graphML = corpora.subgraphForNodes(corpusPath.get(0), arg);
             // create Salt from GraphML
-            try {
+            try (FileReader graphMLReader = new FileReader(graphML)) {
               final SaltProject p = SaltFactory.createSaltProject();
               SCorpusGraph cg = p.createCorpusGraph();
               URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
               SDocument doc = cg.createDocument(docURI);
-              SDocumentGraph docGraph = DocumentGraphMapper.map(new StringReader(graphML));
+              SDocumentGraph docGraph = DocumentGraphMapper.map(new BufferedReader(graphMLReader));
               queue.put(p);
               doc.setDocumentGraph(docGraph);
               log.debug("added match {} to queue", current + 1);
@@ -174,8 +180,8 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
       } // end if no results
 
     } catch (InterruptedException ex) {
-      // just return
-    } catch (final ApiException root) {
+      Thread.currentThread().interrupt();
+    } catch (final ApiException | IOException root) {
       ui.accessSynchronously(() -> {
         if (resultPanel != null && resultPanel.getPaging() != null) {
           PagingComponent paging = resultPanel.getPaging();
