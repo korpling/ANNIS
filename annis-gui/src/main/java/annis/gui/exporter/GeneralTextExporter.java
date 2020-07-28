@@ -71,7 +71,8 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
     if (metadataCache.containsKey(toplevelCorpus + ":" + documentName)) {
       metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
     } else {
-      List<SMetaAnnotation> asList = Helper.getMetaData(toplevelCorpus, documentName, ui);
+      List<SMetaAnnotation> asList =
+          Helper.getMetaData(toplevelCorpus, Optional.ofNullable(documentName), ui);
       for (SMetaAnnotation anno : asList) {
         metaData.put(anno.getQName(), anno);
         metaData.put(anno.getName(), anno);

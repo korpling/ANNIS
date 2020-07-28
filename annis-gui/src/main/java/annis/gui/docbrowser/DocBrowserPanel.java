@@ -32,10 +32,12 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.util.filter.SimpleStringFilter;
 import com.vaadin.v7.ui.TextField;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
@@ -61,34 +63,36 @@ public class DocBrowserPanel extends Panel {
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
       try {
-        String graphML = api.subgraphForQuery(corpus, "annis:node_type=\"corpus\"",
+        File graphML = api.subgraphForQuery(corpus, "annis:node_type=\"corpus\"",
             QueryLanguage.AQL, AnnotationComponentType.PARTOF);
-        
-        SCorpusGraph graph = CorpusGraphMapper.map(new StringReader(graphML));
-        List<SDocument> docs = graph.getDocuments();
-        
-        ui.access(() -> {
-          table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
-          layout.removeComponent(progress);
+        try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
+          SCorpusGraph graph = CorpusGraphMapper.map(
+              new BufferedReader(new InputStreamReader(graphMLStream, StandardCharsets.UTF_8)));
+          List<SDocument> docs = graph.getDocuments();
 
-          TextField txtFilter = new TextField();
-          txtFilter.setWidth("100%");
-          txtFilter.setInputPrompt("Filter documents by name");
-          txtFilter.setImmediate(true);
-          txtFilter.setTextChangeTimeout(500);
-          txtFilter.addTextChangeListener(event -> {
-            if (table != null) {
-              table.setContainerFilter(new SimpleStringFilter(DocBrowserTable.PROP_DOC_NAME,
-                  event.getText(), true, false));
-            }
+          ui.access(() -> {
+            table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
+            layout.removeComponent(progress);
+
+            TextField txtFilter = new TextField();
+            txtFilter.setWidth("100%");
+            txtFilter.setInputPrompt("Filter documents by name");
+            txtFilter.setImmediate(true);
+            txtFilter.setTextChangeTimeout(500);
+            txtFilter.addTextChangeListener(event -> {
+              if (table != null) {
+                table.setContainerFilter(new SimpleStringFilter(DocBrowserTable.PROP_DOC_NAME,
+                    event.getText(), true, false));
+              }
+            });
+
+            layout.addComponent(txtFilter);
+            layout.addComponent(table);
+            layout.setExpandRatio(table, 1.0f);
+
+            table.setDocuments(docs);
           });
-
-          layout.addComponent(txtFilter);
-          layout.addComponent(table);
-          layout.setExpandRatio(table, 1.0f);
-
-          table.setDocuments(docs);
-        });
+        }
       } catch (ApiException | IOException | XMLStreamException ex) {
         ui.access(() -> {
            ExceptionDialog.show(ex, ui);
@@ -171,7 +175,8 @@ public class DocBrowserPanel extends Panel {
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
     try {
-      File result = api.corpusFiles(getCorpus(),
+      File result =
+          api.corpusFile(getCorpus(),
           urlPathEscape.escape(getCorpus()) + "/document_browser.json");
       try(FileInputStream is = new FileInputStream(result)) {
         ObjectMapper mapper = new ObjectMapper();
