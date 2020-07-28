@@ -13,10 +13,7 @@
  */
 package annis.gui;
 
-import static annis.libgui.Helper.AQL_REGEX_VALUE_ESCAPER;
-
 import annis.gui.components.ExceptionDialog;
-import annis.gui.graphml.CorpusGraphMapper;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import com.google.common.util.concurrent.FutureCallback;
@@ -33,18 +30,14 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import java.io.StringReader;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
-import org.corpus_tools.annis.api.model.AnnotationComponentType;
-import org.corpus_tools.annis.api.model.QueryLanguage;
-import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.core.SMetaAnnotation;
-import org.corpus_tools.salt.core.SNode;
 
 /**
  * Provides all corpus annotations for a corpus or for a specific search result.
@@ -134,29 +127,20 @@ public class MetaDataPanel extends Panel {
       SearchApi api = new SearchApi(Helper.getClient(ui));
 
       // Get the corpus graph and with it the meta data on the corpus/document nodes
-      String graphML;
+      Collection<SMetaAnnotation> annos;
       if (documentName.isPresent()) {
-        graphML = api.subgraphForQuery(toplevelCorpusName,
-            "annis:node_type=\"corpus\" _ident_ annis:doc=/"
-                + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get()) + "/",
-            QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+        annos = Helper.getMetaDataDoc(toplevelCorpusName, documentName.get(), ui);
       } else {
-        graphML = api.subgraphForQuery(toplevelCorpusName,
-            "annis:node_type=\"corpus\" _ident_ annis:node_name=/"
-                + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/",
-            QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+        annos = Helper.getMetaData(toplevelCorpusName, Optional.empty(), ui);
       }
-      SCorpusGraph cg = CorpusGraphMapper.map(new StringReader(graphML));
-      for (SNode n : cg.getNodes()) {
-        for (SMetaAnnotation metaAnno : n.getMetaAnnotations()) {
-          Annotation anno = new Annotation();
-          AnnoKey key = new AnnoKey();
-          key.setNs(metaAnno.getNamespace());
-          key.setName(metaAnno.getName());
-          anno.setKey(key);
-          anno.setVal(metaAnno.getValue_STEXT());
-          result.add(anno);
-        }
+      for (SMetaAnnotation metaAnno : annos) {
+        Annotation anno = new Annotation();
+        AnnoKey key = new AnnoKey();
+        key.setNs(metaAnno.getNamespace());
+        key.setName(metaAnno.getName());
+        anno.setKey(key);
+        anno.setVal(metaAnno.getValue_STEXT());
+        result.add(anno);
       }
       return result;
     }, new FutureCallback<List<Annotation>>() {

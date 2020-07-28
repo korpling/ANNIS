@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -220,7 +221,7 @@ public class CSVExporter extends BaseMatrixExporter {
             // TODO is this the best way to get the corpus name?
             String corpus_name = CommonHelper.getCorpusPath(graph.getDocument().getId().toString()).get(0);
             Map<String, SMetaAnnotation> allMetaAnnos =
-                Helper.getMetaData(corpus_name, graph.getDocument().getName(), ui)
+                Helper.getMetaData(corpus_name, Optional.of(graph.getDocument().getName()), ui)
                     .stream()
                     .collect(Collectors.toMap(SMetaAnnotation::getName, Function.identity()));
 

@@ -429,7 +429,7 @@ public class HTMLVis extends AbstractVisualizer {
       inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
     } else {
       try {
-        File f = api.corpusFiles(corpusName,
+        File f = api.corpusFile(corpusName,
             urlPathEscape.escape(corpusName) + "/" + visConfigName + ".css");
         f.deleteOnExit();
         
@@ -468,7 +468,7 @@ public class HTMLVis extends AbstractVisualizer {
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
     try {
-      File f = api.corpusFiles(corpusName,
+      File f = api.corpusFile(corpusName,
           urlPathEscape.escape(corpusName) + "/" + visConfigName + ".fonts.json");
       f.deleteOnExit();
       try (FileInputStream inStreamJSON = new FileInputStream(f)) {
@@ -541,7 +541,7 @@ public class HTMLVis extends AbstractVisualizer {
 
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
       try {
-        File file = api.corpusFiles(toplevelCorpusName,
+        File file = api.corpusFile(toplevelCorpusName,
             urlPathEscape.escape(toplevelCorpusName) + "/" + visConfigName + ".config");
         inStreamConfigRaw = new FileInputStream(file);
       } catch (ApiException e) {

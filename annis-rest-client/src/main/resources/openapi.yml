@@ -364,6 +364,7 @@ paths:
             application/xml:
               schema:
                 type: string
+                format: binary
               examples:
                 subgraph:
                   $ref: "#/components/examples/Subgraph"
@@ -533,8 +534,42 @@ paths:
     get:
       tags:
         - corpora
-      summary: Get an associated file for the corpus.
-      operationId: corpusFiles
+      summary: List the names of all associated file for the corpus.
+      operationId: corpusFileList
+      parameters:
+        - name: corpus
+          in: path
+          description: The name of the corpus to get the configuration for.
+          required: true
+          example: "RIDGES_Herbology_Version9.0"
+          schema:
+            type: string
+        - name: node
+          in: query
+          description: If given, only the files for the (sub-) corpus or document with this ID are returned.
+          required: false
+          schema:
+            type: string
+          example: "GUM/GUM_whow_skittles"
+      responses:
+        "200":
+          description: "Returns the list of files"
+          content:
+            default:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  - "RIDGES_Herbology_Version9.0/ridges_norm.config"
+                  - "RIDGES_Herbology_Version9.0/ridges_norm.css"
+
+  /corpora/{corpus}/files/{name}:
+    get:
+      tags:
+        - corpora
+      summary: Get an associated file for the corpus by its name.
+      operationId: corpusFile
       description: >
         The annotation graph of a corpus can contain special nodes of the type "file", 
         which are connected to (sub-) corpus and document nodes with a `PartOf` relation.
@@ -550,7 +585,7 @@ paths:
           schema:
             type: string
         - name: name
-          in: query
+          in: path
           description: The name of the file node.
           required: true
           example: "RIDGES_Herbology_Version9.0/ridges_norm.config"

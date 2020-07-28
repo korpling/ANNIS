@@ -14,8 +14,6 @@
 package annis.gui.docbrowser;
 
 import annis.CommonHelper;
-import annis.gui.components.ExceptionDialog;
-import annis.gui.graphml.CorpusGraphMapper;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.DocumentBrowserConfig;
@@ -40,8 +38,6 @@ import com.vaadin.v7.data.util.IndexedContainer;
 import com.vaadin.v7.ui.Table;
 import com.vaadin.v7.ui.themes.BaseTheme;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,14 +46,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.SearchApi;
-import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
-import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.slf4j.Logger;
@@ -360,26 +351,16 @@ public class DocBrowserTable extends Table {
 
     if (cachedMetaMap == null) {
       // get the metadata for the corpus
-      SearchApi api = new SearchApi(Helper.getClient(UI.getCurrent()));
       Map<String, Set<SMetaAnnotation>> metaDataMap = new HashMap<>();
       
       // Search for the document node, map it to Salt and return the attached annotations
-      try {
-        String graphML = api.subgraphForQuery(docBrowserPanel.getCorpus(),
-            "annis:doc = /" + Helper.AQL_REGEX_VALUE_ESCAPER.escape(document) + "/",
-            QueryLanguage.AQL, null);
-
-      SCorpusGraph cg = CorpusGraphMapper.map(new StringReader(graphML));
-      for (SDocument doc : cg.getDocuments()) {
-        metaDataMap.put(document, Collections.unmodifiableSet(doc.getMetaAnnotations()));
-      }
+      List<SMetaAnnotation> annos =
+          Helper.getMetaDataDoc(docBrowserPanel.getCorpus(), document, UI.getCurrent());
+      metaDataMap.put(document, Collections.unmodifiableSet(new LinkedHashSet<>(annos)));
+      
       docMetaDataCache.put(docBrowserPanel.getCorpus(), metaDataMap);
       return metaDataMap.get(document);
-    } catch (ApiException | IOException | XMLStreamException e) {
-      ExceptionDialog.show(e, "Error fetching the document meta data for the documet browser",
-          UI.getCurrent());
-      return new LinkedHashSet<>();
-    }
+
     } else {
       return cachedMetaMap.get(document);
     }

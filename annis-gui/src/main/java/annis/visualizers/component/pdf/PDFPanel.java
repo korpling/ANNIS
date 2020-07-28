@@ -17,18 +17,19 @@ import static annis.libgui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
 import static annis.libgui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
 
 import annis.CommonHelper;
+import annis.gui.components.ExceptionDialog;
 import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.service.objects.AnnisBinaryMetaData;
+import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
+import com.vaadin.ui.UI;
 import java.util.List;
 import java.util.UUID;
-import org.apache.commons.lang3.Validate;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
 
 /**
  * Inits the wrapper for the pdf visualization. Neccesary steps for this are:
@@ -47,7 +48,6 @@ public class PDFPanel extends AbstractJavaScriptComponent {
    * 
    */
   private static final long serialVersionUID = 4956567915350147892L;
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   private final static Escaper urlParamEscape = UrlEscapers.urlPathSegmentEscaper();
 
   private VisualizerInput input;
@@ -100,30 +100,24 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     String documentName = corpusPath.get(0);
-    corpusName = urlPathEscape.escape(corpusName);
-    documentName = urlPathEscape.escape(documentName);
 
-    WebResource resMeta = Helper.getAnnisWebResource(input.getUI()).path("meta/binary")
-        .path(corpusName).path(documentName);
-    List<AnnisBinaryMetaData> meta = resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
-
-    // if there is no document at all don't fail
-    String mimeType = meta.size() > 0 ? null : "application/pdf";
-    for (AnnisBinaryMetaData m : meta) {
-      if (m.getMimeType().equals("application/pdf")) {
-        mimeType = m.getMimeType();
-        break;
+    CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
+    try {
+      List<String> files = api.corpusFileList(corpusName, Joiner.on('/').join(corpusPath));
+      for (String f : files) {
+        if (f.endsWith(".pdf")) {
+          // Create an URL how to featch the PDF file
+          return input.getContextPath() + "/Binary?" + "documentName="
+              + urlParamEscape.escape(documentName) + "&toplevelCorpusName="
+              + urlParamEscape.escape(corpusName) + "&mime=" + "application/pdf";
+        }
       }
+    } catch (ApiException e) {
+      ExceptionDialog.show(e, UI.getCurrent());
     }
 
-    Validate.notNull(mimeType,
-        "There must be at least one binary file for the document with a video mime type");
+    return "";
 
-    String mimeTypeEncoded = mimeType;
-    mimeTypeEncoded = urlParamEscape.escape(mimeType);
-
-    return input.getContextPath() + "/Binary?" + "documentName=" + documentName
-        + "&toplevelCorpusName=" + corpusName + "&mime=" + mimeTypeEncoded;
   }
 
   public String getPDF_ID() {

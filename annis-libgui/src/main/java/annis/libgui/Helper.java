@@ -45,9 +45,11 @@ import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import elemental.json.JsonValue;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -788,10 +790,12 @@ public class Helper {
    * corora in the path to the document.
    *
    * @param toplevelCorpusName Specifies the the toplevel corpus
-   * @param documentName Specifies the document
+   * @param documentName Specifies the document or leave empty if only the corpus meta data should
+   *        be fetched.
    * @return Returns also the metada of the all parent corpora. There must be at least one of them.
    */
-  public static List<SMetaAnnotation> getMetaData(String toplevelCorpusName, String documentName,
+  public static List<SMetaAnnotation> getMetaData(String toplevelCorpusName,
+      Optional<String> documentName,
       UI ui) {
     List<SMetaAnnotation> result = new ArrayList<>();
     SearchApi api = new SearchApi(Helper.getClient(ui));
@@ -799,16 +803,25 @@ public class Helper {
     try {
 
       // Get the corpus graph and with it the meta data on the corpus/document nodes
-      String graphML = api.subgraphForQuery(toplevelCorpusName,
-          "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
-              + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/)" + " |"
-              + "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
-              + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/ @* annis:node_type=\"corpus\")",
-          QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+      String aql;
+      if (documentName.isPresent()) {
+        aql = "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
+            + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get()) + "/)" + " |"
+            + "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
+            + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get())
+            + "/ @* annis:node_type=\"corpus\")";
+      } else {
+        aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=/"
+            + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
+      }
+      File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL, AnnotationComponentType.PARTOF);
 
-      SCorpusGraph cg = CorpusGraphMapper.map(new StringReader(graphML));
-      for (SNode n : cg.getNodes()) {
-        result.addAll(n.getMetaAnnotations());
+      try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
+        SCorpusGraph cg = CorpusGraphMapper
+            .map(new BufferedReader(new InputStreamReader(graphMLStream, StandardCharsets.UTF_8)));
+        for (SNode n : cg.getNodes()) {
+          result.addAll(n.getMetaAnnotations());
+        }
       }
     } catch (ApiException | XMLStreamException | IOException ex) {
       log.error(null, ex);
@@ -836,14 +849,18 @@ public class Helper {
     try {
 
       // Get the corpus graph and with it the meta data on the corpus/document nodes
-      String graphML = api.subgraphForQuery(toplevelCorpusName,
+      File graphML = api.subgraphForQuery(toplevelCorpusName,
           "annis:node_type=\"corpus\" _ident_ annis:doc=/"
               + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/",
           QueryLanguage.AQL, AnnotationComponentType.PARTOF);
 
-      SCorpusGraph cg = CorpusGraphMapper.map(new StringReader(graphML));
-      for (SNode n : cg.getNodes()) {
-        result.addAll(n.getMetaAnnotations());
+      try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
+        SCorpusGraph cg = CorpusGraphMapper
+            .map(new BufferedReader(new InputStreamReader(graphMLStream, StandardCharsets.UTF_8)));
+
+        for (SNode n : cg.getNodes()) {
+          result.addAll(n.getMetaAnnotations());
+        }
       }
     } catch (ApiException | XMLStreamException | IOException ex) {
       log.error(null, ex);

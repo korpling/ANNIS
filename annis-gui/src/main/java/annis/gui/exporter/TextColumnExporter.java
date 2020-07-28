@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
@@ -714,7 +715,7 @@ public class TextColumnExporter extends BaseMatrixExporter {
                                 String corpusName = corpusPath.get(corpusPath.size() - 1);
                                 corpusName = urlPathEscape.escape(corpusName);
                                 List<SMetaAnnotation> metadata =
-                                    Helper.getMetaData(corpusName, docName, ui);
+                                    Helper.getMetaData(corpusName, Optional.of(docName), ui);
 
                                 Map<String, String> annosWithoutNamespace = new HashMap<String, String>();
                                 Map<String, Map<String, String>> annosWithNamespace = new HashMap<String, Map<String, String>>();
