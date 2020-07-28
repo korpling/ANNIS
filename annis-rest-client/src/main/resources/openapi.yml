@@ -186,6 +186,7 @@ paths:
             text/plain:
               schema:
                 type: string
+                format: binary
                 description: A textual representation of a list of matches. Each line describes a complete match. The single match is represented by the space-separated node IDs that matched.
                 example: >
                   GUM/GUM_whow_skittles#tok_925 GUM/GUM_whow_skittles#tok_926
@@ -223,7 +224,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GraphAnnisError"
-  
+
   /search/node-descriptions:
     get:
       tags:
@@ -266,7 +267,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GraphAnnisError"
-              
+
   /corpora/{corpus}/subgraph:
     post:
       tags:
@@ -308,6 +309,7 @@ paths:
             application/xml:
               schema:
                 type: string
+                format: binary
               examples:
                 subgraph:
                   $ref: "#/components/examples/Subgraph"
@@ -562,7 +564,7 @@ paths:
               schema:
                 type: string
                 format: binary
-            
+
         "404":
           description: "Corpus or file not found."
   /groups:
@@ -852,7 +854,7 @@ components:
         - LeftToken
         - RightToken
         - PartOf
-    
+
     QueryAttributeDescription:
       description: Description of an attribute of a query.
       type: object
@@ -870,22 +872,22 @@ components:
           type: string
           nullable: true
           description: Optional annotation name represented by this attribute.
-    
+
     LineColumn:
       type: object
       properties:
         line:
           type: integer
-        column: 
+        column:
           type: integer
 
     LineColumnRange:
       type: object
       properties:
-        start: 
-          $ref:  "#/components/schemas/LineColumn"
-        end: 
-          $ref:  "#/components/schemas/LineColumn"
+        start:
+          $ref: "#/components/schemas/LineColumn"
+        end:
+          $ref: "#/components/schemas/LineColumn"
       required:
         - start
 
@@ -898,7 +900,7 @@ components:
             desc:
               type: string
             location:
-              $ref:  "#/components/schemas/LineColumnRange"
+              $ref: "#/components/schemas/LineColumnRange"
           required:
             - desc
         AQLSemanticError:
@@ -907,7 +909,7 @@ components:
             desc:
               type: string
             location:
-              $ref:  "#/components/schemas/LineColumnRange"
+              $ref: "#/components/schemas/LineColumnRange"
           required:
             - desc
         ImpossibleSearch:
@@ -921,7 +923,6 @@ components:
           type: string
         CorpusExists:
           type: string
-            
 
     FrequencyTable:
       description: >
@@ -984,7 +985,7 @@ components:
               type: array
               items:
                 type: string
-              description:  A list of fully qualified annotation names that should be hidden when displayed.
+              description: A list of fully qualified annotation names that should be hidden when displayed.
         example_queries:
           type: array
           description: An array of example queries for the corpus with a description.
