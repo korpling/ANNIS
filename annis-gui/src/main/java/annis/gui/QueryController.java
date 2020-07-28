@@ -42,11 +42,9 @@ import annis.model.PagedResultQuery;
 import annis.model.Query;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
-import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.QueryLanguage;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
@@ -71,7 +69,6 @@ import java.util.TreeSet;
 import java.util.concurrent.Future;
 import javax.annotation.PostConstruct;
 import okhttp3.Call;
-import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.JSON;
 import org.corpus_tools.annis.api.SearchApi;
@@ -375,7 +372,6 @@ public class QueryController implements Serializable {
 
     addHistoryEntry(displayedQuery);
 
-    AsyncWebResource res = Helper.getAnnisAsyncWebResource(ui);
 
     //
     // begin execute match fetching
@@ -417,13 +413,6 @@ public class QueryController implements Serializable {
       //
       // start count query
       searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
-
-      AsyncWebResource countRes = res.path("query").path("search").path("count")
-          .queryParam("q", Helper.encodeJersey(displayedQuery.getQuery()))
-          .queryParam("corpora",
-              Helper.encodeJersey(StringUtils.join(displayedQuery.getCorpora(), ",")))
-          .queryParam("query-language", displayedQuery.getQueryLanguage().name());
-      Future<MatchAndDocumentCount> futureCount = countRes.get(MatchAndDocumentCount.class);
 
       SearchApi api = new SearchApi(Helper.getClient(ui));
       CountQuery countQuery = new CountQuery();
