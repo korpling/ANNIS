@@ -30,8 +30,10 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -106,7 +108,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
         q.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQL);
       }
       File findResult = search.find(q);
-      Files.lines(findResult.toPath()).forEach((line) -> {
+      Files.lines(findResult.toPath(), StandardCharsets.UTF_8).forEachOrdered((line) -> {
         Match m = Match.parseFromString(line);
         result.getMatches().add(m);
       });
@@ -151,12 +153,13 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
           if (!corpusPath.isEmpty()) {
             File graphML = corpora.subgraphForNodes(corpusPath.get(0), arg);
             // create Salt from GraphML
-            try (FileReader graphMLReader = new FileReader(graphML)) {
+            try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
               final SaltProject p = SaltFactory.createSaltProject();
               SCorpusGraph cg = p.createCorpusGraph();
               URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
               SDocument doc = cg.createDocument(docURI);
-              SDocumentGraph docGraph = DocumentGraphMapper.map(new BufferedReader(graphMLReader));
+              SDocumentGraph docGraph = DocumentGraphMapper
+                  .map(new BufferedReader(new InputStreamReader(graphMLStream, "UTF-8")));
               queue.put(p);
               doc.setDocumentGraph(docGraph);
               log.debug("added match {} to queue", current + 1);

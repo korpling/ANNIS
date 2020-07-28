@@ -18,7 +18,6 @@ package annis.gui.exporter;
 import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
-import annis.model.Annotation;
 import annis.service.objects.SubgraphFilter;
 import com.vaadin.ui.UI;
 import java.io.IOException;
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.springframework.stereotype.Component;
 
@@ -219,11 +219,13 @@ public class CSVExporter extends BaseMatrixExporter {
         if (!metakeys.isEmpty()) {
             // TODO is this the best way to get the corpus name?
             String corpus_name = CommonHelper.getCorpusPath(graph.getDocument().getId().toString()).get(0);
-            Map<String, Annotation> allMetaAnnos = Helper.getMetaData(corpus_name, graph.getDocument().getName(), ui)
-                    .stream().collect(Collectors.toMap(Annotation::getName, Function.identity()));
+            Map<String, SMetaAnnotation> allMetaAnnos =
+                Helper.getMetaData(corpus_name, graph.getDocument().getName(), ui)
+                    .stream()
+                    .collect(Collectors.toMap(SMetaAnnotation::getName, Function.identity()));
 
             for (String metaName : metakeys) {
-                Annotation anno = allMetaAnnos.get(metaName);
+              SMetaAnnotation anno = allMetaAnnos.get(metaName);
                 if (anno == null) {
                     out.append("\t");
                 } else

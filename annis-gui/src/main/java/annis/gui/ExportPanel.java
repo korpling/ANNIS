@@ -48,7 +48,6 @@ import java.io.File;
 import java.util.Optional;
 import net.sf.ehcache.CacheException;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -89,7 +88,7 @@ public class ExportPanel extends GridLayout {
       tmpOutputFile = null;
 
       Optional<ExporterPlugin> exporter = ui.getExporterPlugins().stream()
-          .filter((e) -> e.getClass().getSimpleName().equals(cbExporter.getValue())).findAny();
+          .filter((e) -> e.getClass().equals(cbExporter.getValue())).findAny();
 
       if (exporter.isPresent()) {
         if ("".equals(ui.getQueryState().getAql().getValue())) {
@@ -133,7 +132,7 @@ public class ExportPanel extends GridLayout {
     @Override
     public void valueChange(ValueChangeEvent event) {
       Optional<ExporterPlugin> exporter = ui.getExporterPlugins().stream()
-          .filter((e) -> e.getClass().getSimpleName().equals(cbExporter.getValue())).findAny();
+          .filter((e) -> e.getClass().equals(cbExporter.getValue())).findAny();
       if (exporter.isPresent()) {
         btCancel.setVisible(exporter.get().isCancelable());
 
@@ -198,8 +197,7 @@ public class ExportPanel extends GridLayout {
   private transient Stopwatch exportTime = Stopwatch.createUnstarted();
 
 
-  @Autowired
-  private QueryUIState state;
+  private final QueryUIState state;
 
   private final FormLayout formLayout;
 
@@ -210,6 +208,7 @@ public class ExportPanel extends GridLayout {
   public ExportPanel(AnnisUI ui) {
     super(2, 3);
     this.ui = ui;
+    this.state = ui.getQueryState();
 
     this.eventBus = new EventBus();
     this.eventBus.register(ExportPanel.this);
@@ -322,7 +321,7 @@ public class ExportPanel extends GridLayout {
     if (state != null) {
       Binder<QueryUIState> binder = new Binder<QueryUIState>(QueryUIState.class);
       binder.forField(cbLeftContext).bind("leftContext");
-      binder.forField(cbRightContext).bind("rightC0ontext");
+      binder.forField(cbRightContext).bind("rightContext");
 
       cbExporter.setPropertyDataSource(state.getExporter());
 

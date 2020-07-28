@@ -15,51 +15,58 @@
  */
 package annis.gui.exporter;
 
+import annis.CommonHelper;
 import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.gui.graphml.DocumentGraphMapper;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
-import annis.model.NodeDesc;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.Match;
-import annis.service.objects.MatchGroup;
-import annis.service.objects.QueryLanguage;
 import annis.service.objects.SubgraphFilter;
-import com.google.common.base.Stopwatch;
+import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.UI;
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import javax.ws.rs.core.MediaType;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.pool.sizeof.annotations.IgnoreSizeOf;
-import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.FindQuery;
+import org.corpus_tools.annis.api.model.QueryAttributeDescription;
+import org.corpus_tools.annis.api.model.QueryLanguage;
+import org.corpus_tools.annis.api.model.SubgraphWithContext;
+import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
+import org.eclipse.emf.common.util.URI;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -125,8 +132,9 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     }
 
     @Override
-    public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft, int contextRight,
-            Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc, WebResource annisResource,
+    public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft,
+        int contextRight, Set<String> corpora, List<String> keys, String argsAsString,
+        boolean alignmc,
         Writer out, EventBus eventBus, Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
         CacheManager cacheManager = CacheManager.create();
 
@@ -137,25 +145,20 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
                 // auto set
                 keys = new LinkedList<>();
                 keys.add("tok");
-                List<AnnisAttribute> attributes = new LinkedList<>();
+                List<Annotation> attributes = new LinkedList<>();
 
+                CorporaApi api = new CorporaApi(Helper.getClient(ui));
                 for (String corpus : corpora) {
-                    attributes.addAll(annisResource.path("corpora").path(urlPathEscape.escape(corpus))
-                            .path("annotations").queryParam("fetchvalues", "false")
-                            .queryParam("onlymostfrequentvalues", "false").get(new AnnisAttributeListType()));
+                  attributes.addAll(api.corpusNodeAnnotations(corpus, false, false));
                 }
 
-                for (AnnisAttribute a : attributes) {
-                    if (a.getName() != null) {
-                        String[] namespaceAndName = a.getName().split(":", 2);
-                        if (namespaceAndName.length > 1) {
-                            keys.add(namespaceAndName[1]);
-                        } else {
-                            keys.add(namespaceAndName[0]);
-                        }
-                    }
+                for (Annotation a : attributes) {
+                  if (a.getKey().getName() != null) {
+                    keys.add(a.getKey().getName());
+                  }
                 }
             }
+            final List<String> finalKeys = keys;
 
             Map<String, String> args = new HashMap<>();
             for (String s : argsAsString.split("&|;")) {
@@ -168,103 +171,82 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
                 args.put(key, val);
             }
 
-            int stepSize = 10;
+            SearchApi searchApi = new SearchApi(Helper.getClient(ui));
+            CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
 
-            int pCounter = 1;
-
-            Map<Integer, Integer> offsets = new HashMap<Integer, Integer>();
 
             // 1. Get all the matches as Salt ID
-            InputStream matchStream = annisResource.path("search/find/")
-                    .queryParam("q", Helper.encodeJersey(queryAnnisQL))
-                    .queryParam("corpora", StringUtils.join(corpora, ","))
-                    .queryParam("query-language", queryLanguage.name()).accept(MediaType.TEXT_PLAIN_TYPE)
-                    .get(InputStream.class);
+            FindQuery query = new FindQuery();
+            query.setCorpora(new LinkedList<String>(corpora));
+            query.setQueryLanguage(queryLanguage);
+            query.setQuery(queryAnnisQL);
+            File matches = searchApi.find(query);
 
-            // get node count for the query
-            WebResource resource = Helper.getAnnisWebResource(ui);
-            List<NodeDesc> nodes = resource.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(queryAnnisQL))
-                    .queryParam("query-language", queryLanguage.name()).get(new GenericType<List<NodeDesc>>() {});
-            Integer nodeCount = nodes.size();
+            // Get the node count for the query by parsing it
+            List<QueryAttributeDescription> nodeDescriptions =
+                searchApi.nodeDescriptions(queryAnnisQL, queryLanguage);
+            Integer nodeCount = nodeDescriptions.size();
 
-            try (BufferedReader inReader = new BufferedReader(new InputStreamReader(matchStream, "UTF-8"))) {
-                WebResource subgraphRes = annisResource.path("search/subgraph");
-                MatchGroup currentMatches = new MatchGroup();
-                String currentLine;
-                int offset = 1;
-                // 2. iterate over all matches and get the sub-graph for a group of matches
-                while (!Thread.currentThread().isInterrupted() && (currentLine = inReader.readLine()) != null) {
-                    Match match = Match.parseFromString(currentLine);
+            final AtomicInteger offset = new AtomicInteger();
+            final AtomicInteger pCounter = new AtomicInteger();
+            Map<Integer, Integer> offsets = new HashMap<Integer, Integer>();
 
-                    currentMatches.getMatches().add(match);
+            Optional<Exception> ex =
+                Files.lines(matches.toPath(), StandardCharsets.UTF_8).map((currentLine) -> {
+                  // 2. iterate over all matches and get the sub-graph for a group of matches
+                  Match match = Match.parseFromString(currentLine);
 
-                    if (currentMatches.getMatches().size() >= stepSize) {
-                        WebResource res = subgraphRes.queryParam("left", "" + contextLeft).queryParam("right",
-                                "" + contextRight);
+                  if (!match.getSaltIDs().isEmpty()) {
+                    List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
 
-                        if (args.containsKey("segmentation")) {
-                            res = res.queryParam("segmentation", args.get("segmentation"));
-                        }
+                    SubgraphWithContext subgraphQuery = new SubgraphWithContext();
+                    subgraphQuery.setLeft(contextLeft);
+                    subgraphQuery.setRight(contextRight);
+                    subgraphQuery.setNodeIds(match.getSaltIDs());
 
-                        SubgraphFilter filter = getSubgraphFilter();
-                        if (filter != null) {
-                            res = res.queryParam("filter", filter.name());
-                        }
-
-                        Stopwatch stopwatch = Stopwatch.createStarted();
-                        SaltProject p = res.post(SaltProject.class, currentMatches);
-
-                        stopwatch.stop();
-
-                        // dynamically adjust the number of items to fetch if single subgraph
-                        // export was fast enough
-                        if (stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500) {
-                            stepSize *= 2;
-                        }
-
-                        convertSaltProject(p, keys, args, alignmc, offset - currentMatches.getMatches().size(),
-                                corpusConfigs, out, nodeCount, ui);
-
-                        offsets.put(pCounter, offset - currentMatches.getMatches().size());
-                        cache.put(new Element(pCounter++, p));
-
-                        currentMatches.getMatches().clear();
-
-                        if (eventBus != null) {
-                            eventBus.post(offset + 1);
-                        }
-                    }
-                    offset++;
-                } // end for each line
-
-                if (Thread.interrupted()) {
-                    return new InterruptedException("Exporter job was interrupted");
-                }
-
-                // query the left over matches
-                if (!currentMatches.getMatches().isEmpty()) {
-                    WebResource res = subgraphRes.queryParam("left", "" + contextLeft).queryParam("right",
-                            "" + contextRight);
                     if (args.containsKey("segmentation")) {
-                        res = res.queryParam("segmentation", args.get("segmentation"));
+                      subgraphQuery.setSegmentation(args.get("segmentation"));
                     }
 
-                    SubgraphFilter filter = getSubgraphFilter();
-                    if (filter != null) {
-                        res = res.queryParam("filter", filter.name());
+                    final SaltProject p = SaltFactory.createSaltProject();
+                    SCorpusGraph cg = p.createCorpusGraph();
+                    URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
+                    SDocument doc = cg.createDocument(docURI);
+
+                    try {
+                      File graphML = corporaApi.subgraphForNodes(corpusPath.get(0), subgraphQuery);
+
+                      SDocumentGraph docGraph = DocumentGraphMapper.map(new FileReader(graphML));
+                      doc.setDocumentGraph(docGraph);
+                      CommonHelper.addMatchToDocumentGraph(match, doc);
+
+                      int currentOffset = offset.getAndIncrement();
+                      int currentPCounter = pCounter.getAndIncrement();
+                      convertSaltProject(p, finalKeys, args, alignmc,
+                          currentOffset, corpusConfigs, out,
+                          nodeCount, ui);
+
+                      offsets.put(currentPCounter, currentOffset);
+                      cache.put(new Element(currentPCounter, p));
+
+
+                      if (eventBus != null) {
+                        eventBus.post(currentOffset + 1);
+                      }
+
+                      if (Thread.interrupted()) {
+                        Exception result = new InterruptedException("Exporter job was interrupted");
+                        return result;
+                      }
+                    } catch (Exception e) {
+                      return e;
                     }
+                  }
+                  return null;
+                }).filter((result) -> result != null).findAny();
 
-                    SaltProject p = res.post(SaltProject.class, currentMatches);
-
-                    convertSaltProject(p, keys, args, alignmc, offset - currentMatches.getMatches().size() - 1,
-                            corpusConfigs, out, nodeCount, ui);
-
-                    offsets.put(pCounter, offset - currentMatches.getMatches().size() - 1);
-                    cache.put(new Element(pCounter++, p));
-
-                }
-                offset = 1;
-
+            if (ex.isPresent()) {
+              return ex.get();
             }
 
             // build the list of ordered match numbers (ordering by occurrence in text)
@@ -289,7 +271,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
             return null;
 
-        } catch (AnnisQLSemanticsException | AnnisQLSyntaxException | AnnisCorpusAccessException
+          } catch (ApiException | AnnisQLSyntaxException | AnnisCorpusAccessException
                 | UniformInterfaceException | IOException | CacheException | IllegalStateException
                 | ClassCastException ex) {
             return ex;

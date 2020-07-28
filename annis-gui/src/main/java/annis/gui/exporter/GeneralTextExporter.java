@@ -1,17 +1,15 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui.exporter;
 
@@ -19,280 +17,249 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
 import annis.CommonHelper;
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
+import annis.gui.graphml.DocumentGraphMapper;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
-import annis.model.Annotation;
-import annis.service.objects.AnnisAttribute;
 import annis.service.objects.Match;
-import annis.service.objects.MatchGroup;
-import annis.service.objects.QueryLanguage;
-import annis.service.objects.SubgraphFilter;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.base.Stopwatch;
-import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.UI;
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import javax.ws.rs.core.MediaType;
-import org.apache.commons.lang3.StringUtils;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.FindQuery;
+import org.corpus_tools.annis.api.model.QueryLanguage;
+import org.corpus_tools.annis.api.model.SubgraphWithContext;
+import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SMetaAnnotation;
+import org.eclipse.emf.common.util.URI;
 
 public abstract class GeneralTextExporter implements ExporterPlugin, Serializable {
-    private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>> {
 
-        public AnnisAttributeListType() {}
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1583693456515398514L;
+
+  public void appendMetaData(Writer out, List<String> metaKeys, String toplevelCorpus,
+      String documentName, Map<String, Map<String, SMetaAnnotation>> metadataCache, UI ui)
+      throws IOException {
+    Map<String, SMetaAnnotation> metaData = new HashMap<>();
+    if (metadataCache.containsKey(toplevelCorpus + ":" + documentName)) {
+      metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
+    } else {
+      List<SMetaAnnotation> asList = Helper.getMetaData(toplevelCorpus, documentName, ui);
+      for (SMetaAnnotation anno : asList) {
+        metaData.put(anno.getQName(), anno);
+        metaData.put(anno.getName(), anno);
+      }
+      metadataCache.put(toplevelCorpus + ":" + documentName, metaData);
     }
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1583693456515398514L;
+    for (String key : metaKeys) {
+      SMetaAnnotation anno = metaData.get(key);
+      if (anno != null) {
+        out.append("\tmeta::" + key + "\t" + anno.getValue()).append("\n");
+      }
+    }
+  }
 
-    private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  public void convertText(SaltProject queryResult, List<String> keys, Map<String, String> args,
+      Writer out, int offset, UI ui) throws IOException {
+    Map<String, Map<String, SMetaAnnotation>> metadataCache = new HashMap<>();
 
-    public void appendMetaData(Writer out, List<String> metaKeys, String toplevelCorpus, String documentName,
-            Map<String, Map<String, Annotation>> metadataCache, UI ui) throws IOException {
-        Map<String, Annotation> metaData = new HashMap<>();
-        if (metadataCache.containsKey(toplevelCorpus + ":" + documentName)) {
-            metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
-        } else {
-            List<Annotation> asList = Helper.getMetaData(toplevelCorpus, documentName, ui);
-            for (Annotation anno : asList) {
-                metaData.put(anno.getQualifiedName(), anno);
-                metaData.put(anno.getName(), anno);
-            }
-            metadataCache.put(toplevelCorpus + ":" + documentName, metaData);
-        }
-
-        for (String key : metaKeys) {
-            Annotation anno = metaData.get(key);
-            if (anno != null) {
-                out.append("\tmeta::" + key + "\t" + anno.getValue()).append("\n");
-            }
-        }
+    List<String> metaKeys = new LinkedList<>();
+    if (args.containsKey("metakeys")) {
+      Iterable<String> it = Splitter.on(",").trimResults().split(args.get("metakeys"));
+      for (String s : it) {
+        metaKeys.add(s);
+      }
     }
 
-    public void convertText(SaltProject queryResult, List<String> keys, Map<String, String> args, Writer out,
-            int offset, UI ui) throws IOException {
-        Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
+    int counter = 0;
 
-        List<String> metaKeys = new LinkedList<>();
-        if (args.containsKey("metakeys")) {
-            Iterable<String> it = Splitter.on(",").trimResults().split(args.get("metakeys"));
-            for (String s : it) {
-                metaKeys.add(s);
-            }
+    for (SCorpusGraph corpusGraph : queryResult.getCorpusGraphs()) {
+      for (SDocument doc : corpusGraph.getDocuments()) {
+        SDocumentGraph graph = doc.getDocumentGraph();
+
+        counter++;
+        out.append((counter + offset) + ". ");
+        List<SToken> tok = graph.getSortedTokenByText();
+
+        for (SToken annisNode : tok) {
+          SFeature featMatched = annisNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+          Long match = featMatched == null ? null : featMatched.getValue_SNUMERIC();
+
+          if (match != null) {
+            out.append("[");
+            out.append(graph.getText(annisNode));
+            out.append("]");
+          } else {
+            out.append(graph.getText(annisNode));
+          }
+
+          out.append(" ");
+
         }
+        out.append("\n");
 
-        int counter = 0;
-
-        for (SCorpusGraph corpusGraph : queryResult.getCorpusGraphs()) {
-            for (SDocument doc : corpusGraph.getDocuments()) {
-                SDocumentGraph graph = doc.getDocumentGraph();
-
-                counter++;
-                out.append((counter + offset) + ". ");
-                List<SToken> tok = graph.getSortedTokenByText();
-
-                for (SToken annisNode : tok) {
-                    SFeature featMatched = annisNode.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-                    Long match = featMatched == null ? null : featMatched.getValue_SNUMERIC();
-
-                    if (match != null) {
-                        out.append("[");
-                        out.append(graph.getText(annisNode));
-                        out.append("]");
-                    } else {
-                        out.append(graph.getText(annisNode));
-                    }
-
-                    out.append(" ");
-
-                }
-                out.append("\n");
-
-                if (!metaKeys.isEmpty()) {
-                    String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
-                    appendMetaData(out, metaKeys, path[path.length - 1], path[0], metadataCache, ui);
-                }
-                out.append("\n");
-
-            }
+        if (!metaKeys.isEmpty()) {
+          String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
+          appendMetaData(out, metaKeys, path[path.length - 1], path[0], metadataCache, ui);
         }
+        out.append("\n");
 
+      }
     }
 
-    @Override
-    public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft, int contextRight,
-            Set<String> corpora, List<String> keys, String argsAsString, boolean alignmc, WebResource annisResource,
-        Writer out, EventBus eventBus, Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
-        try {
-            // int count = service.getCount(corpusIdList, queryAnnisQL);
+  }
 
-            if (keys == null || keys.isEmpty()) {
-                // auto set
-                keys = new LinkedList<>();
-                keys.add("tok");
-                List<AnnisAttribute> attributes = new LinkedList<>();
+  @Override
+  public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft,
+      int contextRight, Set<String> corpora, List<String> keys, String argsAsString,
+      boolean alignmc, Writer out, EventBus eventBus,
+      Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
+    try {
 
-                for (String corpus : corpora) {
-                    attributes.addAll(annisResource.path("corpora").path(urlPathEscape.escape(corpus))
-                            .path("annotations").queryParam("fetchvalues", "false")
-                            .queryParam("onlymostfrequentvalues", "false").get(new AnnisAttributeListType()));
+      if (keys == null || keys.isEmpty()) {
+        // auto set
+        keys = new LinkedList<>();
+        keys.add("tok");
+        List<Annotation> attributes = new LinkedList<>();
+
+        CorporaApi api = new CorporaApi(Helper.getClient(ui));
+        for (String corpus : corpora) {
+          attributes.addAll(api.corpusNodeAnnotations(corpus, false, false));
+        }
+
+        for (Annotation a : attributes) {
+          if (a.getKey().getName() != null) {
+            keys.add(a.getKey().getName());
+          }
+        }
+      }
+
+      final List<String> finalKeys = keys;
+
+      Map<String, String> args = new HashMap<>();
+      for (String s : argsAsString.split("&|;")) {
+        String[] splitted = s.split("=", 2);
+        String key = splitted[0];
+        String val = "";
+        if (splitted.length > 1) {
+          val = splitted[1];
+        }
+        args.put(key, val);
+      }
+
+
+      // 1. Get all the matches as Salt ID
+      SearchApi searchApi = new SearchApi(Helper.getClient(ui));
+      CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
+      FindQuery query = new FindQuery();
+      query.setCorpora(new LinkedList<String>(corpora));
+      query.setQueryLanguage(queryLanguage);
+      query.setQuery(queryAnnisQL);
+
+      final AtomicInteger offset = new AtomicInteger();
+      File matches = searchApi.find(query);
+      Optional<Exception> ex =
+          Files.lines(matches.toPath(), StandardCharsets.UTF_8).map((currentLine) -> {
+            // 2. iterate over all matches and get the sub-graph for a group of matches
+            Match match = Match.parseFromString(currentLine);
+
+            if (!match.getSaltIDs().isEmpty()) {
+              List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
+
+              SubgraphWithContext subgraphQuery = new SubgraphWithContext();
+              subgraphQuery.setLeft(contextLeft);
+              subgraphQuery.setRight(contextRight);
+              subgraphQuery.setNodeIds(match.getSaltIDs());
+
+              if (args.containsKey("segmentation")) {
+                subgraphQuery.setSegmentation(args.get("segmentation"));
+              }
+
+              final SaltProject p = SaltFactory.createSaltProject();
+              SCorpusGraph cg = p.createCorpusGraph();
+              URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
+              SDocument doc = cg.createDocument(docURI);
+
+              try {
+                File graphML = corporaApi.subgraphForNodes(corpusPath.get(0), subgraphQuery);
+
+                SDocumentGraph docGraph = DocumentGraphMapper.map(new FileReader(graphML));
+                doc.setDocumentGraph(docGraph);
+                CommonHelper.addMatchToDocumentGraph(match, doc);
+
+                int currentOffset = offset.getAndIncrement();
+                convertText(p, finalKeys, args, out, currentOffset, ui);
+
+                if (eventBus != null) {
+                  eventBus.post(currentOffset + 1);
                 }
-
-                for (AnnisAttribute a : attributes) {
-                    if (a.getName() != null) {
-                        String[] namespaceAndName = a.getName().split(":", 2);
-                        if (namespaceAndName.length > 1) {
-                            keys.add(namespaceAndName[1]);
-                        } else {
-                            keys.add(namespaceAndName[0]);
-                        }
-                    }
-                }
-            }
-
-            Map<String, String> args = new HashMap<>();
-            for (String s : argsAsString.split("&|;")) {
-                String[] splitted = s.split("=", 2);
-                String key = splitted[0];
-                String val = "";
-                if (splitted.length > 1) {
-                    val = splitted[1];
-                }
-                args.put(key, val);
-            }
-
-            int stepSize = 10;
-
-            // 1. Get all the matches as Salt ID
-            InputStream matchStream = annisResource.path("search/find/")
-                    .queryParam("q", Helper.encodeJersey(queryAnnisQL))
-                    .queryParam("corpora", StringUtils.join(corpora, ","))
-                    .queryParam("query-language", queryLanguage.name()).accept(MediaType.TEXT_PLAIN_TYPE)
-                    .get(InputStream.class);
-
-            try (BufferedReader inReader = new BufferedReader(new InputStreamReader(matchStream, "UTF-8"))) {
-                WebResource subgraphRes = annisResource.path("search/subgraph");
-                MatchGroup currentMatches = new MatchGroup();
-                String currentLine;
-                int offset = 0;
-                // 2. iterate over all matches and get the sub-graph for a group of matches
-                while (!Thread.currentThread().isInterrupted() && (currentLine = inReader.readLine()) != null) {
-                    Match match = Match.parseFromString(currentLine);
-
-                    currentMatches.getMatches().add(match);
-
-                    if (currentMatches.getMatches().size() >= stepSize) {
-                        WebResource res = subgraphRes.queryParam("left", "" + contextLeft).queryParam("right",
-                                "" + contextRight);
-
-                        if (args.containsKey("segmentation")) {
-                            res = res.queryParam("segmentation", args.get("segmentation"));
-                        }
-
-                        SubgraphFilter filter = getSubgraphFilter();
-                        if (filter != null) {
-                            res = res.queryParam("filter", filter.name());
-                        }
-
-                        Stopwatch stopwatch = Stopwatch.createUnstarted();
-                        stopwatch.start();
-                        SaltProject p = res.post(SaltProject.class, currentMatches);
-                        stopwatch.stop();
-
-                        // dynamically adjust the number of items to fetch if single subgraph
-                        // export was fast enough
-                        if (stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500 && stepSize < 50) {
-                            stepSize += 10;
-                        }
-
-                        convertText(p, keys, args, out, offset - currentMatches.getMatches().size(), ui);
-
-                        currentMatches.getMatches().clear();
-
-                        if (eventBus != null) {
-                            eventBus.post(offset + 1);
-                        }
-                    }
-                    offset++;
-                } // end for each line
 
                 if (Thread.interrupted()) {
-                    return new InterruptedException("Exporter job was interrupted");
+                  Exception result = new InterruptedException("Exporter job was interrupted");
+                  return result;
                 }
-
-                // query the left over matches
-                if (!currentMatches.getMatches().isEmpty()) {
-                    WebResource res = subgraphRes.queryParam("left", "" + contextLeft).queryParam("right",
-                            "" + contextRight);
-                    if (args.containsKey("segmentation")) {
-                        res = res.queryParam("segmentation", args.get("segmentation"));
-                    }
-
-                    SubgraphFilter filter = getSubgraphFilter();
-                    if (filter != null) {
-                        res = res.queryParam("filter", filter.name());
-                    }
-
-                    SaltProject p = res.post(SaltProject.class, currentMatches);
-                    convertText(p, keys, args, out, offset - currentMatches.getMatches().size() - 1, ui);
-                }
-                offset = 0;
-
+              } catch (Exception e) {
+                return e;
+              }
             }
-
-            out.append("\n");
-            out.append("\n");
-            out.append("finished");
-
             return null;
+          }).filter((result) -> result != null).findAny();
 
-        } catch (AnnisQLSemanticsException | AnnisQLSyntaxException | AnnisCorpusAccessException
-                | UniformInterfaceException | IOException ex) {
-            return ex;
-        }
+      if (ex.isPresent()) {
+        return ex.get();
+      }
+
+      out.append("\n");
+      out.append("\n");
+      out.append("finished");
+
+      return null;
+
+    } catch (ApiException | IOException ex) {
+      return ex;
     }
+  }
 
-    @Override
-    public String getFileEnding() {
-        return "txt";
-    }
+  @Override
+  public String getFileEnding() {
+    return "txt";
+  }
 
-    public abstract SubgraphFilter getSubgraphFilter();
+  @Override
+  public boolean isCancelable() {
+    return true;
+  }
 
-    @Override
-    public boolean isCancelable() {
-        return true;
-    }
-
-    @Override
-    public boolean needsContext() {
-        return true;
-    }
+  @Override
+  public boolean needsContext() {
+    return true;
+  }
 }

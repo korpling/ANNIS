@@ -6,7 +6,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"annis.gui", "annis.visualizers"})
+@ComponentScan(basePackages = {"annis.gui", "annis.visualizers", "annis.gui.exporter"})
 @ServletComponentScan
 public class AnnisUiApplication {
 
