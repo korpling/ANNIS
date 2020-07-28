@@ -17,6 +17,7 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
 import annis.CommonHelper;
+import annis.gui.graphml.CorpusGraphMapper;
 import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
@@ -44,6 +45,8 @@ import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import elemental.json.JsonValue;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -61,6 +64,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.UriBuilder;
+import javax.xml.stream.XMLStreamException;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
@@ -74,6 +78,7 @@ import org.corpus_tools.annis.Configuration;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
+import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.CorpusConfigurationContext;
@@ -84,6 +89,7 @@ import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.auth.Authentication;
 import org.corpus_tools.annis.auth.HttpBearerAuth;
 import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
@@ -94,6 +100,7 @@ import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.DataSourceSequence;
@@ -257,18 +264,16 @@ public class Helper {
       Escapers.builder().addEscape('{', "%7B").addEscape('}', "%7D").addEscape('%', "%25").build();
 
 
-  public final static Escaper AQL_REGEX_VALUE_ESCAPER = 
-      Escapers.builder()
-          // This is used by AQL to mark the end of the regular expressions
-          .addEscape('/', "\\x2F")
-          // The next ones are meta characters for the regex-syntax crate
-          // (see its is_meta_character function)
-          .addEscape('\\', "\\\\").addEscape('.', "\\.").addEscape('+', "\\+").addEscape('*', "\\*")
-          .addEscape('?', "\\?").addEscape('(', "\\(").addEscape(')', "\\)").addEscape('|', "\\|")
-          .addEscape('[', "\\[").addEscape('[', "\\]").addEscape('{', "\\{").addEscape('}', "\\}")
-          .addEscape('^', "\\^").addEscape('$', "\\$").addEscape('#', "\\#").addEscape('&', "\\&")
-          .addEscape('-', "\\-").addEscape('~', "\\~")
-          .build();
+  public final static Escaper AQL_REGEX_VALUE_ESCAPER = Escapers.builder()
+      // This is used by AQL to mark the end of the regular expressions
+      .addEscape('/', "\\x2F")
+      // The next ones are meta characters for the regex-syntax crate
+      // (see its is_meta_character function)
+      .addEscape('\\', "\\\\").addEscape('.', "\\.").addEscape('+', "\\+").addEscape('*', "\\*")
+      .addEscape('?', "\\?").addEscape('(', "\\(").addEscape(')', "\\)").addEscape('|', "\\|")
+      .addEscape('[', "\\[").addEscape('[', "\\]").addEscape('{', "\\{").addEscape('}', "\\}")
+      .addEscape('^', "\\^").addEscape('$', "\\$").addEscape('#', "\\#").addEscape('&', "\\&")
+      .addEscape('-', "\\-").addEscape('~', "\\~").build();
 
 
   public static Map<SNode, Long> calculateMarkedAndCovered(SDocument doc, List<SNode> segNodes,
@@ -369,11 +374,11 @@ public class Helper {
     CorporaApi api = new CorporaApi(getClient(ui));
     SearchApi search = new SearchApi(getClient(ui));
 
-    final List<org.corpus_tools.annis.api.model.Annotation> nodeAnnos = api
-        .corpusNodeAnnotations(corpus, false, true).stream()
-        .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
-            && !Objects.equals(a.getKey().getName(), "tok"))
-        .collect(Collectors.toList());
+    final List<org.corpus_tools.annis.api.model.Annotation> nodeAnnos =
+        api.corpusNodeAnnotations(corpus, false, true).stream()
+            .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
+                && !Objects.equals(a.getKey().getName(), "tok"))
+            .collect(Collectors.toList());
 
     final Set<AnnoKey> metaAnnos = new HashSet<>();
     // Check for each annotation if its actually a meta-annotation
@@ -809,22 +814,31 @@ public class Helper {
    * @param documentName specifies the document.
    * @return returns only the meta data for a single document.
    */
-  public static List<Annotation> getMetaDataDoc(String toplevelCorpusName, String documentName,
+  public static List<SMetaAnnotation> getMetaDataDoc(String toplevelCorpusName, String documentName,
       UI ui) {
-    List<Annotation> result = new ArrayList<Annotation>();
-    WebResource res = Helper.getAnnisWebResource(ui);
-    try {
-      res = res.path("meta").path("doc").path(urlPathEscape.escape(toplevelCorpusName));
-      res = res.path(urlPathEscape.escape(documentName));
+    List<SMetaAnnotation> result = new ArrayList<>();
+    SearchApi api = new SearchApi(Helper.getClient(ui));
 
-      result = res.get(new GenericType<List<Annotation>>() {});
-    } catch (UniformInterfaceException | ClientHandlerException ex) {
+    try {
+
+      // Get the corpus graph and with it the meta data on the corpus/document nodes
+      String graphML = api.subgraphForQuery(toplevelCorpusName,
+          "annis:node_type=\"corpus\" _ident_ annis:doc=/"
+              + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/",
+          QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+
+      SCorpusGraph cg = CorpusGraphMapper.map(new StringReader(graphML));
+      for (SNode n : cg.getNodes()) {
+        result.addAll(n.getMetaAnnotations());
+      }
+    } catch (ApiException | XMLStreamException | IOException ex) {
       log.error(null, ex);
       if (!AnnisBaseUI.handleCommonError(ex, "retrieve metadata")) {
         Notification.show("Remote exception: " + ex.getLocalizedMessage(),
             Notification.Type.WARNING_MESSAGE);
       }
     }
+
     return result;
   }
 
