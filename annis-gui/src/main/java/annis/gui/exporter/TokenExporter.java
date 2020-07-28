@@ -19,8 +19,6 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
 import annis.CommonHelper;
-import annis.model.Annotation;
-import annis.service.objects.SubgraphFilter;
 import com.google.common.base.Splitter;
 import com.vaadin.ui.UI;
 import java.io.IOException;
@@ -36,6 +34,7 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -50,7 +49,7 @@ public class TokenExporter extends GeneralTextExporter {
     public void convertText(SaltProject queryResult, List<String> keys, Map<String, String> args, Writer out,
             int offset, UI ui) throws IOException {
 
-        Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
+      Map<String, Map<String, SMetaAnnotation>> metadataCache = new HashMap<>();
 
         List<String> metaKeys = new LinkedList<>();
         if (args.containsKey("metakeys")) {
@@ -106,11 +105,6 @@ public class TokenExporter extends GeneralTextExporter {
                 + "<strong>This exporter does not work well with dialog data "
                 + "(corpora that have more than one primary text). " + "Use the GridExporter instead.</strong>"
                 + "</p>";
-    }
-
-    @Override
-    public SubgraphFilter getSubgraphFilter() {
-        return SubgraphFilter.token;
     }
 
     @Override

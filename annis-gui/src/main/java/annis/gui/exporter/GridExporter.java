@@ -16,8 +16,6 @@
 package annis.gui.exporter;
 
 import annis.CommonHelper;
-import annis.model.Annotation;
-import annis.service.objects.SubgraphFilter;
 import com.google.common.base.Splitter;
 import com.vaadin.ui.UI;
 import java.io.IOException;
@@ -33,6 +31,7 @@ import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.springframework.stereotype.Component;
 
@@ -74,7 +73,7 @@ public class GridExporter extends GeneralTextExporter {
     public void convertText(SaltProject queryResult, List<String> keys, Map<String, String> args, Writer out,
             int offset, UI ui) throws IOException {
 
-        Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
+      Map<String, Map<String, SMetaAnnotation>> metadataCache = new HashMap<>();
 
         boolean showNumbers = true;
         if (args.containsKey("numbers")) {
@@ -183,10 +182,6 @@ public class GridExporter extends GeneralTextExporter {
                 + "<code>numbers=false</code>)";
     }
 
-    @Override
-    public SubgraphFilter getSubgraphFilter() {
-        return SubgraphFilter.all;
-    }
 
     @Override
     public boolean isAlignable() {

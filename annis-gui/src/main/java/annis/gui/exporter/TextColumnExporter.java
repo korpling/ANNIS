@@ -18,7 +18,6 @@ package annis.gui.exporter;
 import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
-import annis.model.Annotation;
 import annis.service.objects.SubgraphFilter;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -45,6 +44,7 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
+import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.springframework.stereotype.Component;
@@ -713,16 +713,17 @@ public class TextColumnExporter extends BaseMatrixExporter {
                                         graph.getDocument());
                                 String corpusName = corpusPath.get(corpusPath.size() - 1);
                                 corpusName = urlPathEscape.escape(corpusName);
-                                List<Annotation> metadata = Helper.getMetaData(corpusName, docName, ui);
+                                List<SMetaAnnotation> metadata =
+                                    Helper.getMetaData(corpusName, docName, ui);
 
                                 Map<String, String> annosWithoutNamespace = new HashMap<String, String>();
                                 Map<String, Map<String, String>> annosWithNamespace = new HashMap<String, Map<String, String>>();
 
                                 // put metadata annotations into hash maps for better access
-                                for (Annotation metaAnno : metadata) {
+                                for (SMetaAnnotation metaAnno : metadata) {
                                     String ns;
                                     Map<String, String> data = new HashMap<String, String>();
-                                    data.put(metaAnno.getName(), metaAnno.getValue());
+                                    data.put(metaAnno.getName(), metaAnno.getValue_STEXT());
 
                                     // a namespace is present
                                     if ((ns = metaAnno.getNamespace()) != null && !ns.isEmpty()) {

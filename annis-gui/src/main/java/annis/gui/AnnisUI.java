@@ -39,7 +39,6 @@ import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Component;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
@@ -74,7 +73,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     @Autowired
     private List<QueryBuilderPlugin<com.vaadin.ui.Component>> queryBuilderPlugins;
 
-    private List<ExporterPlugin> exporterPlugins = new LinkedList<>();
+    @Autowired
+    private List<ExporterPlugin> exporterPlugins;
 
     private AdminView adminView;
 

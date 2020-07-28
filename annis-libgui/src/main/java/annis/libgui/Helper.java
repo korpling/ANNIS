@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -400,7 +401,8 @@ public class Helper {
       File findResult = search.find(q);
       if (findResult != null && findResult.isFile())
         try {
-          Optional<String> anyLine = Files.lines(findResult.toPath()).findAny();
+          Optional<String> anyLine =
+              Files.lines(findResult.toPath(), StandardCharsets.UTF_8).findAny();
           if (anyLine.isPresent() && !anyLine.get().isEmpty()) {
             metaAnnos.add(a.getKey());
           }
@@ -789,29 +791,33 @@ public class Helper {
    * @param documentName Specifies the document
    * @return Returns also the metada of the all parent corpora. There must be at least one of them.
    */
-  public static List<Annotation> getMetaData(String toplevelCorpusName, String documentName,
+  public static List<SMetaAnnotation> getMetaData(String toplevelCorpusName, String documentName,
       UI ui) {
-    List<Annotation> result = new ArrayList<Annotation>();
-    WebResource res = Helper.getAnnisWebResource(ui);
+    List<SMetaAnnotation> result = new ArrayList<>();
+    SearchApi api = new SearchApi(Helper.getClient(ui));
+
     try {
-      res = res.path("meta").path("doc").path(urlPathEscape.escape(toplevelCorpusName));
 
-      if (documentName != null) {
-        res = res.path(urlPathEscape.escape(documentName));
+      // Get the corpus graph and with it the meta data on the corpus/document nodes
+      String graphML = api.subgraphForQuery(toplevelCorpusName,
+          "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
+              + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/)" + " |"
+              + "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
+              + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/ @* annis:node_type=\"corpus\")",
+          QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+
+      SCorpusGraph cg = CorpusGraphMapper.map(new StringReader(graphML));
+      for (SNode n : cg.getNodes()) {
+        result.addAll(n.getMetaAnnotations());
       }
-
-      if (documentName != null && !toplevelCorpusName.equals(documentName)) {
-        res = res.path("path");
-      }
-
-      result = res.get(new GenericType<List<Annotation>>() {});
-    } catch (UniformInterfaceException | ClientHandlerException ex) {
+    } catch (ApiException | XMLStreamException | IOException ex) {
       log.error(null, ex);
-      if (!AnnisBaseUI.handleCommonError(ex, "retrieve metada")) {
+      if (!AnnisBaseUI.handleCommonError(ex, "retrieve metadata")) {
         Notification.show("Remote exception: " + ex.getLocalizedMessage(),
             Notification.Type.WARNING_MESSAGE);
       }
     }
+
     return result;
   }
 

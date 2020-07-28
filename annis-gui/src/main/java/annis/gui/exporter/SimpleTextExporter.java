@@ -15,7 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.service.objects.SubgraphFilter;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,11 +36,6 @@ public class SimpleTextExporter extends GeneralTextExporter {
                 + "<strong>This exporter does not work well with dialog data "
                 + "(corpora that have more than one primary text). " + "Use the GridExporter instead.</strong>"
                 + "</p>";
-    }
-
-    @Override
-    public SubgraphFilter getSubgraphFilter() {
-        return SubgraphFilter.token;
     }
 
     @Override
