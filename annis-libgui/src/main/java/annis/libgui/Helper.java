@@ -45,11 +45,8 @@ import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import elemental.json.JsonValue;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -819,13 +816,9 @@ public class Helper {
             + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
       }
       File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL, AnnotationComponentType.PARTOF);
-
-      try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
-        SCorpusGraph cg = CorpusGraphMapper
-            .map(new BufferedReader(new InputStreamReader(graphMLStream, StandardCharsets.UTF_8)));
-        for (SNode n : cg.getNodes()) {
-          result.addAll(n.getMetaAnnotations());
-        }
+      SCorpusGraph cg = CorpusGraphMapper.map(graphML);
+      for (SNode n : cg.getNodes()) {
+        result.addAll(n.getMetaAnnotations());
       }
     } catch (ApiException | XMLStreamException | IOException ex) {
       log.error(null, ex);
@@ -858,14 +851,12 @@ public class Helper {
               + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/",
           QueryLanguage.AQL, AnnotationComponentType.PARTOF);
 
-      try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
-        SCorpusGraph cg = CorpusGraphMapper
-            .map(new BufferedReader(new InputStreamReader(graphMLStream, StandardCharsets.UTF_8)));
+      SCorpusGraph cg = CorpusGraphMapper.map(graphML);
 
-        for (SNode n : cg.getNodes()) {
-          result.addAll(n.getMetaAnnotations());
-        }
+      for (SNode n : cg.getNodes()) {
+        result.addAll(n.getMetaAnnotations());
       }
+
     } catch (ApiException | XMLStreamException | IOException ex) {
       log.error(null, ex);
       if (!AnnisBaseUI.handleCommonError(ex, "retrieve metadata")) {

@@ -45,15 +45,11 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -443,18 +439,15 @@ public class VisualizerPanel extends CssLayout
       File graphML =
           api.subgraphForQuery(corpusName, aql.toString(),
               QueryLanguage.AQL, AnnotationComponentType.ORDERING);
-      try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
-        SDocumentGraph graph = DocumentGraphMapper.map(
-            new BufferedReader(new InputStreamReader(graphMLStream, StandardCharsets.UTF_8)),
-            true);
-        // Reconstruct the text from the token values
-        List<String> texts = new ArrayList<>();
-        for (STextualDS ds : graph.getTextualDSs()) {
-          texts.add(ds.getData());
-        }
-
-        result.setTexts(texts);
+      SDocumentGraph graph = DocumentGraphMapper.map(graphML, true);
+      // Reconstruct the text from the token values
+      List<String> texts = new ArrayList<>();
+      for (STextualDS ds : graph.getTextualDSs()) {
+        texts.add(ds.getData());
       }
+
+      result.setTexts(texts);
+
     }
 
     catch (ApiException | XMLStreamException | IOException ex) {
@@ -508,13 +501,12 @@ public class VisualizerPanel extends CssLayout
 
       File graphML =
           api.subgraphForQuery(path.get(0), aql.toString(), QueryLanguage.AQL, null);
-      try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
+      try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(path));
         SDocument doc = cg.createDocument(docURI);
-        SDocumentGraph docGraph = DocumentGraphMapper
-            .map(new BufferedReader(new InputStreamReader(graphMLStream, StandardCharsets.UTF_8)));
+        SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
         doc.setDocumentGraph(docGraph);
 
         return p;

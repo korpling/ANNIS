@@ -37,13 +37,9 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -253,14 +249,12 @@ public class DocBrowserController implements Serializable {
 
       File graphML =
           api.subgraphForQuery(docPath.get(0), aql.toString(), QueryLanguage.AQL, componentFilter);
-      try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
+      try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(docPath));
         SDocument doc = cg.createDocument(docURI);
-        SDocumentGraph docGraph = DocumentGraphMapper.map(
-            new BufferedReader(new InputStreamReader(graphMLStream, StandardCharsets.UTF_8)),
-            useRawText);
+        SDocumentGraph docGraph = DocumentGraphMapper.map(graphML, useRawText);
         doc.setDocumentGraph(docGraph);
 
         SDocument sDoc = p.getCorpusGraphs().get(0).getDocuments().get(0);

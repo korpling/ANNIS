@@ -2,13 +2,10 @@ package annis.gui.graphml;
 
 import annis.CommonHelper;
 import com.google.common.base.Splitter;
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +14,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.tuple.Pair;
-import org.atmosphere.util.ReaderInputStream;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.salt.SaltFactory;
@@ -83,29 +79,20 @@ public abstract class AbstractGraphMLMapper {
   public AbstractGraphMLMapper() {}
 
 
-  protected void execute(Reader input) throws IOException, XMLStreamException {
-    // Copy content of stream to a temporary file, so we can have multiple parse passes
-    Path tmpFile = Files.createTempFile("graphannis-input-", ".graphml");
-    try {
-      Files.copy(new ReaderInputStream(input, StandardCharsets.UTF_8), tmpFile,
-          StandardCopyOption.REPLACE_EXISTING);
+  protected void execute(File inputFile) throws IOException, XMLStreamException {
+    XMLInputFactory factory = XMLInputFactory.newInstance();
+    factory.setProperty(XMLInputFactory.IS_VALIDATING, false);
 
-      XMLInputFactory factory = XMLInputFactory.newInstance();
-      factory.setProperty(XMLInputFactory.IS_VALIDATING, false);
-
-      // 1. pass, check which nodes have an outgoing edge of a certain types
-      FileInputStream fileInput = new FileInputStream(tmpFile.toFile());
-      XMLEventReader reader = factory.createXMLEventReader(fileInput);
+    // 1. pass, check which nodes have an outgoing edge of a certain types
+    try (FileInputStream fileInput = new FileInputStream(inputFile)) {
+      XMLEventReader reader = factory.createXMLEventReader(new BufferedInputStream(fileInput));
       firstPass(reader);
-      fileInput.close();
+    }
 
-      // 2. pass, map nodes and edges with the correct type
-      fileInput = new FileInputStream(tmpFile.toFile());
-      reader = factory.createXMLEventReader(fileInput);
+    // 2. pass, map nodes and edges with the correct type
+    try (FileInputStream fileInput = new FileInputStream(inputFile)) {
+      XMLEventReader reader = factory.createXMLEventReader(new BufferedInputStream(fileInput));
       secondPass(reader);
-      fileInput.close();
-    } finally {
-      Files.deleteIfExists(tmpFile);
     }
   }
 

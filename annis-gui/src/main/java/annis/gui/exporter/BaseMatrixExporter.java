@@ -32,7 +32,6 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.ui.UI;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
@@ -216,7 +215,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
                     try {
                       File graphML = corporaApi.subgraphForNodes(corpusPath.get(0), subgraphQuery);
 
-                      SDocumentGraph docGraph = DocumentGraphMapper.map(new FileReader(graphML));
+                      SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
                       doc.setDocumentGraph(docGraph);
                       CommonHelper.addMatchToDocumentGraph(match, doc);
 
