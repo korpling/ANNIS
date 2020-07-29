@@ -406,11 +406,8 @@ public class VisualizerPanel extends CssLayout
         wholeDocument = p.getCorpusGraphs().get(0).getDocuments().get(0);
 
       }
-      CommonHelper.addMatchToDocumentGraph(match, wholeDocument);
-
       input.setDocument(wholeDocument);
     } else {
-      CommonHelper.addMatchToDocumentGraph(match, result);
       input.setDocument(result);
     }
 
