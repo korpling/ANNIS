@@ -18,10 +18,7 @@ import annis.gui.objects.QueryUIState;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Binder;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.ComboBox.NewItemProvider;
@@ -39,6 +36,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.model.AnnotationComponentType;
+import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
@@ -89,7 +90,11 @@ public class SearchOptionsPanel extends FormLayout {
 
         CorpusConfiguration c = mergeConfigs(corpora, corpusConfigs);
 
-        maxContext.set(c.getContext().getMax());
+        if (c.getContext().getMax() == null) {
+          maxContext.set(Integer.MAX_VALUE);
+        } else {
+          maxContext.set(c.getContext().getMax());
+        }
 
         cbLeftContext.setItems(c.getContext().getSizes());
         cbRightContext.setItems(c.getContext().getSizes());
@@ -145,24 +150,25 @@ public class SearchOptionsPanel extends FormLayout {
 
   private static List<String> getSegmentationNamesFromService(Collection<String> corpora, UI ui) {
     List<String> segNames = new ArrayList<>();
-    WebResource service = Helper.getAnnisWebResource(ui);
-    if (service != null) {
-      for (String corpus : corpora) {
-        try {
-          SegmentationList segList =
-              service.path("query").path("corpora").path(Helper.encodeJersey(corpus))
-                  .path("segmentation-names").get(SegmentationList.class);
-          segNames.addAll(segList.getSegmentatioNames());
-        } catch (UniformInterfaceException ex) {
-          if (ex.getResponse().getStatus() == 403) {
-            log.debug("Did not have access rights to query segmentation names for corpus", ex);
-          } else {
-            log.warn("Could not query segmentation names for corpus", ex);
+    CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
+    for (String corpus : corpora) {
+      try {
+        // Get all ordering components
+        for(Component c : corporaApi.components(corpus, AnnotationComponentType.ORDERING.getValue(), null)) {
+          if (!c.getName().isEmpty() && !"annis".equals(c.getLayer())) {
+            segNames.add(c.getName());
           }
         }
+      } catch (ApiException ex) {
+        if (ex.getCode() == 403) {
+          log.debug("Did not have access rights to query segmentation names for corpus", ex);
+        } else {
+          log.warn("Could not query segmentation names for corpus", ex);
+        }
       }
-
     }
+
+
 
     return segNames;
   }
@@ -278,6 +284,7 @@ public class SearchOptionsPanel extends FormLayout {
 
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
+    addComponent(cbSegmentation);
 
     addComponent(cbResultsPerPage);
     addComponent(cbOrder);
@@ -348,7 +355,8 @@ public class SearchOptionsPanel extends FormLayout {
     }
 
     Optional<Integer> mergedMaxCtx = selectedConfigs.stream()
-        .map(config -> config.getContext().getMax()).min(Comparator.naturalOrder());
+        .map(config -> config.getContext().getMax()).filter(maxCtx -> maxCtx != null)
+        .min(Comparator.naturalOrder());
     if (mergedMaxCtx.isPresent()) {
       corpusConfig.getContext().setMax(mergedMaxCtx.get());
     }
@@ -393,6 +401,7 @@ public class SearchOptionsPanel extends FormLayout {
     cbLeftContext.setVisible(!isLoading);
     cbRightContext.setVisible(!isLoading);
     cbResultsPerPage.setVisible(!isLoading);
+    cbSegmentation.setVisible(!isLoading);
     cbOrder.setVisible(!isLoading);
   }
 
@@ -414,5 +423,6 @@ public class SearchOptionsPanel extends FormLayout {
       Background.run(new CorpusConfigUpdater((AnnisUI) ui, corpora, true));
     }
   }
+
 
 }
