@@ -49,7 +49,7 @@ public class MetaBox extends Panel implements Button.ClickListener {
         btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
         // metabox values for ebene
         Collection<String> annonames = new TreeSet<>();
-        for (String a : sq.getAvailableMetaLevels(level)) {
+        for (String a : sq.getAvailableAnnotationLevels(level)) {
             annonames.add(a);
         }
         OptionGroup l = new OptionGroup(level);
