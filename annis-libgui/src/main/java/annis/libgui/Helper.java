@@ -382,7 +382,7 @@ public class Helper {
     SearchApi search = new SearchApi(getClient(ui));
 
     final List<org.corpus_tools.annis.api.model.Annotation> nodeAnnos =
-        api.corpusNodeAnnotations(corpus, false, true).stream()
+        api.nodeAnnotations(corpus, false, true).stream()
             .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
                 && !Objects.equals(a.getKey().getName(), "tok"))
             .collect(Collectors.toList());

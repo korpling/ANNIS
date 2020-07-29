@@ -171,7 +171,7 @@ public class DocBrowserPanel extends Panel {
 
     try {
       File result =
-          api.corpusFile(getCorpus(),
+          api.getFile(getCorpus(),
           urlPathEscape.escape(getCorpus()) + "/document_browser.json");
       try(FileInputStream is = new FileInputStream(result)) {
         ObjectMapper mapper = new ObjectMapper();

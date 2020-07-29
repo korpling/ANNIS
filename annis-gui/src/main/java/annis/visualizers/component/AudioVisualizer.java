@@ -62,7 +62,7 @@ public class AudioVisualizer extends AbstractVisualizer {
     CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
     try {
       List<String> files =
-          api.corpusFileList(corpusName, Joiner.on('/').join(Lists.reverse(corpusPath)));
+          api.listFiles(corpusName, Joiner.on('/').join(Lists.reverse(corpusPath)));
       for (String f : files) {
         String guessedMimeType = tika.detect(f);
         if (guessedMimeType != null && guessedMimeType.startsWith("audio/")) {

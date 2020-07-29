@@ -103,7 +103,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
     CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
     try {
-      List<String> files = api.corpusFileList(corpusName, Joiner.on('/').join(corpusPath));
+      List<String> files = api.listFiles(corpusName, Joiner.on('/').join(corpusPath));
       for (String f : files) {
         if (f.endsWith(".pdf")) {
           // Create an URL how to featch the PDF file

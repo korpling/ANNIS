@@ -323,7 +323,7 @@ public class TigerQueryBuilderCanvas extends Panel {
       try {
         for (String corpus : corpusSelection) {
           try {
-            for (Annotation anno : api.corpusNodeAnnotations(corpus, false, true)) {
+            for (Annotation anno : api.nodeAnnotations(corpus, false, true)) {
               result.add(anno.getKey().getName());
             }
           } catch (ApiException ex) {

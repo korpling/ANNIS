@@ -152,7 +152,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
         CorporaApi api = new CorporaApi(Helper.getClient(ui));
         for (String corpus : corpora) {
-          attributes.addAll(api.corpusNodeAnnotations(corpus, false, false));
+          attributes.addAll(api.nodeAnnotations(corpus, false, false));
         }
 
         for (Annotation a : attributes) {
