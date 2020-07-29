@@ -50,7 +50,6 @@ paths:
           description: Corpus import started. Returns a UUID for the background job which can be used with the `/jobs` endpoint
           links:
             GetJobForUUID:
-              operationId: getJob
               parameters:
                 uuid: "$response.body#/uuid"
           content:
@@ -81,7 +80,6 @@ paths:
           description: Corpus export started. Returns a UUID for the background job which can be used with the `/jobs` endpoint
           links:
             GetJobForUUID:
-              operationId: getJob
               parameters:
                 uuid: "$response.body#/uuid"
           content:
@@ -399,7 +397,7 @@ paths:
       tags:
         - corpora
       summary: List all node annotations of the corpus.
-      operationId: corpusNodeAnnotations
+      operationId: nodeAnnotations
       parameters:
         - name: corpus
           in: path
@@ -437,7 +435,7 @@ paths:
       tags:
         - corpora
       summary: List all edge components of the corpus.
-      operationId: corpusComponents
+      operationId: components
       parameters:
         - name: corpus
           in: path
@@ -475,7 +473,7 @@ paths:
       tags:
         - corpora
       summary: List all annotations of the corpus for a given edge component
-      operationId: corpusEdgeAnnotations
+      operationId: edgeAnnotations
       parameters:
         - name: corpus
           in: path
@@ -535,7 +533,7 @@ paths:
       tags:
         - corpora
       summary: List the names of all associated file for the corpus.
-      operationId: corpusFileList
+      operationId: listFiles
       parameters:
         - name: corpus
           in: path
@@ -569,7 +567,7 @@ paths:
       tags:
         - corpora
       summary: Get an associated file for the corpus by its name.
-      operationId: corpusFile
+      operationId: getFile
       description: >
         The annotation graph of a corpus can contain special nodes of the type "file", 
         which are connected to (sub-) corpus and document nodes with a `PartOf` relation.
