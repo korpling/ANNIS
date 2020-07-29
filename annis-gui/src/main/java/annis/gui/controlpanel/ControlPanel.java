@@ -63,8 +63,8 @@ public class ControlPanel extends VerticalLayout {
         addComponent(optionsTab);
 
 
-        queryPanel.setHeight("-1px");
-        queryPanel.setWidth("100%");
+        queryPanel.setHeightUndefined();
+        queryPanel.setWidthFull();
 
         setExpandRatio(optionsTab, 1.0f);
 

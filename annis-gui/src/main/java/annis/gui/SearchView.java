@@ -110,7 +110,7 @@ public class SearchView extends GridLayout
 
     private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
-    public final static int CONTROL_PANEL_WIDTH = 360;
+    public final static int CONTROL_PANEL_WIDTH = 400;
 
     // regular expression matching, CLEFT and CRIGHT are optional
     // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
