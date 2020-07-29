@@ -245,6 +245,8 @@ public class QueryController implements Serializable {
   }
 
   public void corpusSelectionChangedInBackground() {
+    searchView.getControlPanel()
+        .getCorpusList().selectedCorpusChanged(true);
     searchView.getControlPanel().getSearchOptions()
         .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora());
   }
@@ -549,6 +551,7 @@ public class QueryController implements Serializable {
     }
     if (!Objects.deepEquals(state.getSelectedCorpora(), q.getCorpora())) {
       state.setSelectedCorpora(q.getCorpora());
+      corpusSelectionChangedInBackground();
     }
 
     if (q instanceof ContextualizedQuery) {
