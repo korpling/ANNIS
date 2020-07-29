@@ -16,7 +16,6 @@
 package annis.gui.controlpanel;
 
 import annis.gui.AnnisUI;
-import annis.gui.ExampleQueriesPanel;
 import annis.gui.HelpPanel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
@@ -41,8 +40,6 @@ public class ControlPanel extends VerticalLayout {
 
     private final TabSheet optionsTab;
 
-    private final ExampleQueriesPanel autoGenQueries;
-
     public ControlPanel(AnnisUI ui, HelpPanel helpPanel) {
       this.ui = ui;
         setSizeFull();
@@ -56,9 +53,7 @@ public class ControlPanel extends VerticalLayout {
         optionsTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
         queryPanel = new QueryPanel(ui);
-        autoGenQueries =
-            new ExampleQueriesPanel((AnnisUI) getUI(), helpPanel);
-        corpusList = new CorpusListPanel(ui, autoGenQueries);
+        corpusList = new CorpusListPanel(ui, helpPanel.getExamples());
         searchOptions = new SearchOptionsPanel();
 
         optionsTab.addTab(corpusList, "Corpus List", null);

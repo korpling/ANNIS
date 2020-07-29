@@ -17,6 +17,7 @@ import annis.gui.AnnisUI;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.MetaDataPanel;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.Background;
 import annis.libgui.CorpusSet;
@@ -40,7 +41,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MultiSelect;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -51,6 +51,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +111,6 @@ public class CorpusListPanel extends VerticalLayout {
         ui.access(() -> {
           tblCorpora.setVisible(true);
           selectionLayout.setVisible(true);
-          pbLoadCorpora.setVisible(false);
         });
       }
 
@@ -130,7 +130,6 @@ public class CorpusListPanel extends VerticalLayout {
   // holds the panels of auto generated queries
   private final ExampleQueriesPanel autoGenQueries;
 
-  private final ProgressBar pbLoadCorpora;
 
   private Grid<String> tblCorpora;
 
@@ -217,11 +216,6 @@ public class CorpusListPanel extends VerticalLayout {
       return true;
     };
 
-    pbLoadCorpora = new ProgressBar();
-    pbLoadCorpora.setCaption("Loading corpus list...");
-    pbLoadCorpora.setIndeterminate(true);
-    addComponent(pbLoadCorpora);
-
     tblCorpora = new Grid<>();
     tblCorpora.setWidthFull();
 
@@ -279,6 +273,34 @@ public class CorpusListPanel extends VerticalLayout {
   public void attach() {
     super.attach();
 
+
+
+    // Get the initial corpus list, this must become before the binder is set,
+    // to make sure any selected value is also an item.
+    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+
+    try {
+      List<String> corpora = api.listCorpora();
+      ListDataProvider<String> availableCorpora = new ListDataProvider<>(corpora);
+      availableCorpora.setFilter(filter);
+      tblCorpora.setDataProvider(availableCorpora);
+      List<CorpusSet> corpusSets = new LinkedList<>();
+      if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
+        corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
+      }
+
+      if (corpora.isEmpty() && Helper.getUser(getUI()) == null) {
+        Notification.show(
+            "No corpora found. Please login "
+                + "(use button at upper right corner) to see more corpora.",
+            Notification.Type.HUMANIZED_MESSAGE);
+      }
+
+
+    } catch (ApiException e) {
+      ExceptionDialog.show(e, "Coould not get corpus list", getUI());
+    }
+
     Binder<QueryUIState> binder = new Binder<>();
     MultiSelect<String> corpusSelection = tblCorpora.asMultiSelect();
     binder.forField(corpusSelection).bind(QueryUIState::getSelectedCorpora,
@@ -291,7 +313,7 @@ public class CorpusListPanel extends VerticalLayout {
       ui.getQueryController().corpusSelectionChangedInBackground();
     });
 
-    updateCorpusSetList(true, true);
+
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
   }
 
@@ -353,6 +375,13 @@ public class CorpusListPanel extends VerticalLayout {
    */
   public void setCorpusSet(String corpusSet) {
     cbSelection.setValue(corpusSet);
+  }
+
+  public void selectedCorpusChanged(boolean scrollToSelected) {
+    tblCorpora.asMultiSelect().setValue(ui.getQueryController().getState().getSelectedCorpora());
+    if (scrollToSelected) {
+      scrollToSelectedCorpus();
+    }
   }
 
   public void updateCorpusSetList(boolean scrollToSelected) {
