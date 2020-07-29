@@ -28,11 +28,8 @@ import annis.service.objects.QueryLanguage;
 import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -153,13 +150,12 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
           if (!corpusPath.isEmpty()) {
             File graphML = corpora.subgraphForNodes(corpusPath.get(0), arg);
             // create Salt from GraphML
-            try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
+            try {
               final SaltProject p = SaltFactory.createSaltProject();
               SCorpusGraph cg = p.createCorpusGraph();
               URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
               SDocument doc = cg.createDocument(docURI);
-              SDocumentGraph docGraph = DocumentGraphMapper
-                  .map(new BufferedReader(new InputStreamReader(graphMLStream, "UTF-8")));
+              SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
               queue.put(p);
               doc.setDocumentGraph(docGraph);
               log.debug("added match {} to queue", current + 1);

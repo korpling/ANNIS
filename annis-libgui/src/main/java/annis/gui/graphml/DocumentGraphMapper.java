@@ -3,8 +3,8 @@ package annis.gui.graphml;
 import com.google.common.base.Objects;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,14 +70,14 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     this.hasNonEmptyIncomingDominanceEdge = new HashSet<>();
   }
 
-  public static SDocumentGraph map(Reader input) throws IOException, XMLStreamException {
-    return map(input, false);
+  public static SDocumentGraph map(File inputFile) throws IOException, XMLStreamException {
+    return map(inputFile, false);
   }
 
-  public static SDocumentGraph map(Reader input, boolean mapWhiteSpaceToken)
+  public static SDocumentGraph map(File inputFile, boolean mapWhiteSpaceToken)
       throws IOException, XMLStreamException {
     DocumentGraphMapper mapper = new DocumentGraphMapper(mapWhiteSpaceToken);
-    mapper.execute(input);
+    mapper.execute(inputFile);
     return mapper.graph;
   }
 

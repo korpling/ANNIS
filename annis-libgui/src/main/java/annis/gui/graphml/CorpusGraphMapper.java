@@ -1,7 +1,7 @@
 package annis.gui.graphml;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,9 +45,9 @@ public class CorpusGraphMapper extends AbstractGraphMLMapper {
     this.hasIncomingPartOfEdge = new HashSet<>();
   }
 
-  public static SCorpusGraph map(Reader input) throws IOException, XMLStreamException {
+  public static SCorpusGraph map(File inputFile) throws IOException, XMLStreamException {
     CorpusGraphMapper mapper = new CorpusGraphMapper();
-    mapper.execute(input);
+    mapper.execute(inputFile);
     return mapper.graph;
   }
 

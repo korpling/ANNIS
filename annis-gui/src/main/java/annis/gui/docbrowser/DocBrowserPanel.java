@@ -32,12 +32,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.util.filter.SimpleStringFilter;
 import com.vaadin.v7.ui.TextField;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
@@ -65,34 +62,32 @@ public class DocBrowserPanel extends Panel {
       try {
         File graphML = api.subgraphForQuery(corpus, "annis:node_type=\"corpus\"",
             QueryLanguage.AQL, AnnotationComponentType.PARTOF);
-        try (FileInputStream graphMLStream = new FileInputStream(graphML)) {
-          SCorpusGraph graph = CorpusGraphMapper.map(
-              new BufferedReader(new InputStreamReader(graphMLStream, StandardCharsets.UTF_8)));
-          List<SDocument> docs = graph.getDocuments();
+        SCorpusGraph graph = CorpusGraphMapper.map(graphML);
+        List<SDocument> docs = graph.getDocuments();
 
-          ui.access(() -> {
-            table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
-            layout.removeComponent(progress);
+        ui.access(() -> {
+          table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
+          layout.removeComponent(progress);
 
-            TextField txtFilter = new TextField();
-            txtFilter.setWidth("100%");
-            txtFilter.setInputPrompt("Filter documents by name");
-            txtFilter.setImmediate(true);
-            txtFilter.setTextChangeTimeout(500);
-            txtFilter.addTextChangeListener(event -> {
-              if (table != null) {
-                table.setContainerFilter(new SimpleStringFilter(DocBrowserTable.PROP_DOC_NAME,
-                    event.getText(), true, false));
-              }
-            });
-
-            layout.addComponent(txtFilter);
-            layout.addComponent(table);
-            layout.setExpandRatio(table, 1.0f);
-
-            table.setDocuments(docs);
+          TextField txtFilter = new TextField();
+          txtFilter.setWidth("100%");
+          txtFilter.setInputPrompt("Filter documents by name");
+          txtFilter.setImmediate(true);
+          txtFilter.setTextChangeTimeout(500);
+          txtFilter.addTextChangeListener(event -> {
+            if (table != null) {
+              table.setContainerFilter(new SimpleStringFilter(DocBrowserTable.PROP_DOC_NAME,
+                  event.getText(), true, false));
+            }
           });
-        }
+
+          layout.addComponent(txtFilter);
+          layout.addComponent(table);
+          layout.setExpandRatio(table, 1.0f);
+
+          table.setDocuments(docs);
+        });
+
       } catch (ApiException | IOException | XMLStreamException ex) {
         ui.access(() -> {
            ExceptionDialog.show(ex, ui);
