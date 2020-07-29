@@ -107,11 +107,6 @@ public class CorpusListPanel extends VerticalLayout {
         });
       } catch (Throwable ex) {
         log.warn("Could not get corpus list", ex);
-      } finally {
-        ui.access(() -> {
-          tblCorpora.setVisible(true);
-          selectionLayout.setVisible(true);
-        });
       }
 
     }
@@ -148,12 +143,12 @@ public class CorpusListPanel extends VerticalLayout {
     this.autoGenQueries = autoGenQueries;
 
     setWidthFull();
+    setHeightFull();
     setMargin(true);
 
     selectionLayout = new HorizontalLayout();
     selectionLayout.setWidthFull();
     selectionLayout.setHeightUndefined();
-    selectionLayout.setVisible(false);
 
     Label lblVisible = new Label("Visible: ");
     lblVisible.setSizeUndefined();
@@ -173,6 +168,18 @@ public class CorpusListPanel extends VerticalLayout {
     selectionLayout.setSpacing(true);
     selectionLayout.setComponentAlignment(cbSelection, Alignment.MIDDLE_RIGHT);
     selectionLayout.setComponentAlignment(lblVisible, Alignment.MIDDLE_LEFT);
+
+    Button btReload = new Button();
+    btReload.addClickListener(event -> {
+      updateCorpusSetList(false, false);
+      Notification.show("Reloaded corpus list", Notification.Type.HUMANIZED_MESSAGE);
+    });
+    btReload.setIcon(VaadinIcons.REFRESH);
+    btReload.setDescription("Reload corpus list");
+    btReload.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+
+    selectionLayout.addComponent(btReload);
+    selectionLayout.setComponentAlignment(btReload, Alignment.MIDDLE_RIGHT);
 
     addComponent(selectionLayout);
 
@@ -218,11 +225,12 @@ public class CorpusListPanel extends VerticalLayout {
 
     tblCorpora = new Grid<>();
     tblCorpora.setWidthFull();
+    tblCorpora.setHeightFull();
 
     tblCorpora.setSelectionMode(SelectionMode.MULTI);
     Column<String, String> nameColumn = tblCorpora.addColumn(corpus -> corpus);
     nameColumn.setCaption("Corpus");
-    nameColumn.setExpandRatio(1);
+    nameColumn.setExpandRatio(10);
 
     Column<?, ?> infoColumn = tblCorpora.addComponentColumn(corpus -> {
       final Button l = new Button();
@@ -237,7 +245,7 @@ public class CorpusListPanel extends VerticalLayout {
       l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY);
       return l;
     });
-    infoColumn.setCaption("Info");
+    infoColumn.setExpandRatio(0);
 
     Column<?, ?> docColumn = tblCorpora.addComponentColumn(corpus -> {
       final Button l = new Button();
@@ -249,21 +257,11 @@ public class CorpusListPanel extends VerticalLayout {
       l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY);
       return l;
     });
-    docColumn.setCaption("Doc");
+    infoColumn.setExpandRatio(0);
 
     addComponent(tblCorpora);
 
-    Button btReload = new Button();
-    btReload.addClickListener(event -> {
-      updateCorpusSetList(false, false);
-      Notification.show("Reloaded corpus list", Notification.Type.HUMANIZED_MESSAGE);
-    });
-    btReload.setIcon(VaadinIcons.REFRESH);
-    btReload.setDescription("Reload corpus list");
-    btReload.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
-    selectionLayout.addComponent(btReload);
-    selectionLayout.setComponentAlignment(btReload, Alignment.MIDDLE_RIGHT);
 
     setExpandRatio(tblCorpora, 1.0f);
 
