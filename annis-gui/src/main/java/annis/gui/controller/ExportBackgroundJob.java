@@ -19,7 +19,6 @@ import annis.gui.AnnisUI;
 import annis.gui.ExportPanel;
 import annis.gui.objects.ExportQuery;
 import annis.libgui.exporter.ExporterPlugin;
-import annis.service.objects.QueryLanguage;
 import com.google.common.eventbus.EventBus;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -73,12 +72,7 @@ public class ExportBackgroundJob implements Callable<File> {
             int leftCtx = exporter.needsContext() ? query.getLeftContext() : 0;
             int rightCtx = exporter.needsContext() ? query.getRightContext() : 0;
             
-            org.corpus_tools.annis.api.model.QueryLanguage ql;
-            if (query.getQueryLanguage() == QueryLanguage.AQL_QUIRKS_V3) {
-              ql = org.corpus_tools.annis.api.model.QueryLanguage.AQLQUIRKSV3;
-            } else {
-              ql = org.corpus_tools.annis.api.model.QueryLanguage.AQL;
-            }
+            org.corpus_tools.annis.api.model.QueryLanguage ql = query.getApiQueryLanguage();
             
             exportError = exporter.convertText(query.getQuery(), ql, leftCtx, rightCtx,
                     query.getCorpora(), query.getAnnotationKeys(), query.getParameters(), query.getAlignmc(),

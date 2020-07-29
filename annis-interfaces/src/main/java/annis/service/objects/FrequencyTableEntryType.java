@@ -18,6 +18,6 @@ package annis.service.objects;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public enum FrequencyTableEntryType {
-  span, annotation, meta
+  span, annotation
 
 }

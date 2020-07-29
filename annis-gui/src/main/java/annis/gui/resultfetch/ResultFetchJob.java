@@ -24,7 +24,6 @@ import annis.model.AqlParseError;
 import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
-import annis.service.objects.QueryLanguage;
 import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -99,11 +98,7 @@ public class ResultFetchJob implements Runnable {
       q.setQuery(query.getQuery());
       q.setOffset((int) query.getOffset());
       q.setLimit(query.getLimit());
-      if (query.getQueryLanguage() == QueryLanguage.AQL_QUIRKS_V3) {
-        q.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQLQUIRKSV3);
-      } else {
-        q.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQL);
-      }
+      q.setQueryLanguage(query.getApiQueryLanguage());
       File findResult = search.find(q);
       Files.lines(findResult.toPath(), StandardCharsets.UTF_8).forEachOrdered((line) -> {
         Match m = Match.parseFromString(line);

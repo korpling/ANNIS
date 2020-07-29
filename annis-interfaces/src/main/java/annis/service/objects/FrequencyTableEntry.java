@@ -42,19 +42,14 @@ public class FrequencyTableEntry implements Serializable {
     if (splitted.size() == 2) {
       FrequencyTableEntry entry = new FrequencyTableEntry();
 
-      if ("meta".equals(splitted.get(0))) {
-        entry.setReferencedNode(null);
-        entry.setType(FrequencyTableEntryType.meta);
-        entry.setKey(splitted.get(1));
+      entry.setReferencedNode(splitted.get(0));
+      if ("tok".equals(splitted.get(1))) {
+        entry.setType(FrequencyTableEntryType.span);
       } else {
-        entry.setReferencedNode(splitted.get(0));
-        if ("tok".equals(splitted.get(1))) {
-          entry.setType(FrequencyTableEntryType.span);
-        } else {
-          entry.setType(FrequencyTableEntryType.annotation);
-          entry.setKey(splitted.get(1));
-        }
+        entry.setType(FrequencyTableEntryType.annotation);
+        entry.setKey(splitted.get(1));
       }
+
       return entry;
     }
     return null;
@@ -102,8 +97,6 @@ public class FrequencyTableEntry implements Serializable {
         return referencedNode + ":tok";
       case annotation:
         return referencedNode + ":" + key;
-      case meta:
-        return "meta:" + key;
     }
     return super.toString();
   }
