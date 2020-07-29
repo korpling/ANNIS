@@ -102,6 +102,14 @@ public class Query implements Serializable, Cloneable {
     return queryLanguage;
   }
 
+  public org.corpus_tools.annis.api.model.QueryLanguage getApiQueryLanguage() {
+    if (this.queryLanguage == QueryLanguage.AQL_QUIRKS_V3) {
+      return org.corpus_tools.annis.api.model.QueryLanguage.AQLQUIRKSV3;
+    } else {
+      return org.corpus_tools.annis.api.model.QueryLanguage.AQL;
+    }
+  }
+
   @Override
   public int hashCode() {
     return Objects.hash(corpora, query, queryLanguage);

@@ -309,7 +309,7 @@ public class QueryController implements Serializable {
     addHistoryEntry(query);
 
     UI ui = UI.getCurrent();
-    FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, query, panel);
+    FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, this, query, panel);
 
     freqFuture = Background.call(job);
     state.getExecutedTasks().put(QueryUIState.QueryType.FREQUENCY, freqFuture);
@@ -418,11 +418,7 @@ public class QueryController implements Serializable {
       CountQuery countQuery = new CountQuery();
       countQuery.setCorpora(new LinkedList<>(displayedQuery.getCorpora()));
       countQuery.setQuery(displayedQuery.getQuery());
-      if (displayedQuery.getQueryLanguage() == QueryLanguage.AQL_QUIRKS_V3) {
-        countQuery.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQLQUIRKSV3);
-      } else {
-        countQuery.setQueryLanguage(org.corpus_tools.annis.api.model.QueryLanguage.AQL);
-      }
+      countQuery.setQueryLanguage(displayedQuery.getApiQueryLanguage());
       try {
         Call call = api.countAsync(countQuery,
             new CountCallback(newResultView, displayedQuery.getLimit(), annisUI));

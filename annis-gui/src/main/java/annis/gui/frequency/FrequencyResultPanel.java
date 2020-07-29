@@ -18,7 +18,6 @@ package annis.gui.frequency;
 import annis.gui.components.FrequencyChart;
 import annis.libgui.Helper;
 import annis.model.FrequencyQuery;
-import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Charsets;
@@ -48,10 +47,10 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import org.corpus_tools.annis.api.model.FrequencyTableRow;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -64,10 +63,10 @@ public class FrequencyResultPanel extends VerticalLayout {
          * 
          */
         private static final long serialVersionUID = 1793539045259913954L;
-        private final FrequencyTable data;
+        private final List<FrequencyTableRow> data;
         private final List<FrequencyTableEntry> freqDefinition;
 
-        public CSVResource(FrequencyTable data, List<FrequencyTableEntry> freqDefinition) {
+        public CSVResource(List<FrequencyTableRow> data, List<FrequencyTableEntry> freqDefinition) {
             this.data = data;
             this.freqDefinition = freqDefinition;
         }
@@ -82,8 +81,8 @@ public class FrequencyResultPanel extends VerticalLayout {
 
                     // write headers
                     ArrayList<String> header = new ArrayList<>();
-                    if (data.getEntries().size() > 0) {
-                        for (int i = 0; i < data.getEntries().iterator().next().getTupel().length; i++) {
+                    if (!data.isEmpty()) {
+                      for (int i = 0; i < data.iterator().next().getValues().size(); i++) {
                             FrequencyTableEntry e = freqDefinition.get(i);
                             header.add(getCaption(e));
                         }
@@ -93,9 +92,9 @@ public class FrequencyResultPanel extends VerticalLayout {
                     csv.writeNext(header.toArray(new String[0]));
 
                     // write entries
-                    for (FrequencyTable.Entry e : data.getEntries()) {
+                    for (FrequencyTableRow e : data) {
                         ArrayList<String> d = new ArrayList<>();
-                        d.addAll(Arrays.asList(e.getTupel()));
+                        d.addAll(e.getValues());
                         d.add("" + e.getCount());
                         csv.writeNext(d.toArray(new String[0]));
                     }
@@ -149,9 +148,6 @@ public class FrequencyResultPanel extends VerticalLayout {
         case span:
             caption = "#" + e.getReferencedNode() + "|spanned text";
             break;
-        case meta:
-            caption = "meta|" + e.getKey();
-            break;
         default:
             caption = "<unknown>";
         }
@@ -167,7 +163,8 @@ public class FrequencyResultPanel extends VerticalLayout {
 
     private final FrequencyQuery query;
 
-    public FrequencyResultPanel(FrequencyTable table, FrequencyQuery query, FrequencyQueryPanel queryPanel) {
+    public FrequencyResultPanel(List<FrequencyTableRow> table, FrequencyQuery query,
+        FrequencyQueryPanel queryPanel) {
         this.query = query;
         this.queryPanel = queryPanel;
 
@@ -201,7 +198,7 @@ public class FrequencyResultPanel extends VerticalLayout {
         }
     }
 
-    private void recreateTable(FrequencyTable table) {
+    private void recreateTable(List<FrequencyTableRow> table) {
 
         if (tblResult != null) {
             removeComponent(tblResult);
@@ -210,16 +207,18 @@ public class FrequencyResultPanel extends VerticalLayout {
         tblResult = new Table();
         tblResult.setSizeFull();
 
-        tblResult.setCaption(table.getEntries().size() + " items with a total sum of " + table.getSum() + " (query on "
+        tblResult.setCaption(table.size() + " items with a total sum of "
+            + table.stream().map(row -> row.getCount()).reduce(0, Integer::sum)
+            + " (query on "
                 + Joiner.on(", ").join(query.getCorpora()) + ")");
 
         tblResult.setSelectable(true);
         tblResult.setMultiSelect(false);
         tblResult.addStyleName(Helper.CORPUS_FONT_FORCE);
 
-        if (!table.getEntries().isEmpty()) {
-            FrequencyTable.Entry firstEntry = table.getEntries().iterator().next();
-            int tupelCount = firstEntry.getTupel().length;
+        if (!table.isEmpty()) {
+          FrequencyTableRow firstEntry = table.iterator().next();
+          int tupelCount = firstEntry.getValues().size();
 
             tblResult.addContainerProperty("rank", Integer.class, -1);
             for (int i = 1; i <= tupelCount; i++) {
@@ -229,13 +228,13 @@ public class FrequencyResultPanel extends VerticalLayout {
                 tblResult.setColumnHeader("tupel-" + i, getCaption(e));
             }
 
-            tblResult.addContainerProperty("count", Long.class, -1l);
+            tblResult.addContainerProperty("count", Integer.class, -1l);
 
             int line = 0;
-            for (FrequencyTable.Entry e : table.getEntries()) {
+            for (FrequencyTableRow e : table) {
                 Object[] cells = new Object[tupelCount + 2];
 
-                System.arraycopy(e.getTupel(), 0, cells, 1, tupelCount);
+                System.arraycopy(e.getValues().toArray(), 0, cells, 1, tupelCount);
 
                 cells[0] = line + 1;
                 cells[cells.length - 1] = e.getCount();
@@ -255,7 +254,7 @@ public class FrequencyResultPanel extends VerticalLayout {
         tblResult.setCurrentPageFirstItemId("entry-" + i);
     }
 
-    private void showResult(FrequencyTable table) {
+    private void showResult(List<FrequencyTableRow> table) {
         if (queryPanel != null) {
             queryPanel.notifiyQueryFinished();
         }
@@ -267,13 +266,9 @@ public class FrequencyResultPanel extends VerticalLayout {
         downloader.extend(btDownloadCSV);
 
         chart.setVisible(true);
-        FrequencyTable clippedTable = table;
-        if (clippedTable.getEntries().size() > MAX_NUMBER_OF_CHART_ITEMS) {
-            List<FrequencyTable.Entry> entries = new ArrayList<>(clippedTable.getEntries());
-
-            clippedTable = new FrequencyTable();
-            clippedTable.setEntries(entries.subList(0, MAX_NUMBER_OF_CHART_ITEMS));
-            clippedTable.setSum(table.getSum());
+        List<FrequencyTableRow> clippedTable = table;
+        if (clippedTable.size() > MAX_NUMBER_OF_CHART_ITEMS) {
+            clippedTable = new ArrayList<>(table.subList(0, MAX_NUMBER_OF_CHART_ITEMS));
             chart.setCaption("Showing historgram of top " + MAX_NUMBER_OF_CHART_ITEMS
                     + " results, see table below for complete dataset.");
         }

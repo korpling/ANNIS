@@ -18,13 +18,13 @@ package annis.gui.components;
 import static annis.libgui.Helper.encodeGeneric;
 
 import annis.gui.frequency.FrequencyResultPanel;
-import annis.service.objects.FrequencyTable;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.api.model.FrequencyTableRow;
 
 /**
  *
@@ -52,7 +52,7 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
     public static final int ADDTIONAL_PIXEL_WIDTH = 100;
 
     private List<String> labels;
-    private List<Long> values;
+    private List<Integer> values;
     private Scale lastScale;
     private String lastFont;
     private float lastFontSize = 10.0f;
@@ -87,12 +87,13 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
         return true;
     }
 
-    public void setFrequencyData(FrequencyTable table, Scale scale, String font, float fontSize) {
+    public void setFrequencyData(List<FrequencyTableRow> table, Scale scale, String font,
+        float fontSize) {
         labels = new LinkedList<>();
         values = new LinkedList<>();
 
-        for (FrequencyTable.Entry e : table.getEntries()) {
-            labels.add(StringUtils.join(e.getTupel(), "/") + " (" + e.getCount() + ")");
+        for (FrequencyTableRow e : table) {
+          labels.add(StringUtils.join(e.getValues(), "/") + " (" + e.getCount() + ")");
             values.add(e.getCount());
         }
         setWidth(ADDTIONAL_PIXEL_WIDTH + (PIXEL_PER_VALUE * values.size()), Unit.PIXELS);

@@ -19,11 +19,12 @@ import annis.gui.AnnisUI;
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
-import annis.service.objects.FrequencyTable;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.ui.OptionGroup;
+import java.util.List;
+import org.corpus_tools.annis.api.model.FrequencyTableRow;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -63,7 +64,7 @@ public class FrequencyChart extends VerticalLayout {
     private FrequencyWhiteboard whiteboard;
     private final OptionGroup options;
 
-    private FrequencyTable lastTable;
+    private List<FrequencyTableRow> lastTable;
 
     public FrequencyChart(FrequencyResultPanel freqPanel) {
         setSizeFull();
@@ -94,7 +95,7 @@ public class FrequencyChart extends VerticalLayout {
 
     }
 
-    public void setFrequencyData(FrequencyTable table) {
+    public void setFrequencyData(List<FrequencyTableRow> table) {
         String font = "sans-serif";
         float fontSize = 7.0f; // in pixel
         UI ui = UI.getCurrent();
