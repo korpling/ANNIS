@@ -35,7 +35,6 @@ import com.google.common.base.Splitter;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -60,7 +59,6 @@ import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,6 +66,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -252,16 +252,13 @@ public class SearchView extends GridLayout
 
             // filter by actually avaible user corpora in order not to get any exception
             // later
-            WebResource res = Helper.getAnnisWebResource(ui);
-            List<AnnisCorpus> userCorpora =
-                    res.path("query").path("corpora").get(new AnnisCorpusListType());
-
-            LinkedList<String> userCorporaStrings = new LinkedList<>();
-            for (AnnisCorpus c : userCorpora) {
-                userCorporaStrings.add(c.getName());
+            CorporaApi api = new CorporaApi(Helper.getClient(ui));
+            try {
+              List<String> userCorpora = api.listCorpora();
+              selectedCorpora.retainAll(userCorpora);
+            } catch (ApiException ex) {
+              log.error("Could not get list of corpora", ex);
             }
-
-            selectedCorpora.retainAll(userCorporaStrings);
 
             // CLEFT and CRIGHT
             if (m.group(4) != null && m.group(6) != null) {
