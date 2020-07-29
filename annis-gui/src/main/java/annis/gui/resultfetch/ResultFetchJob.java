@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
+public class ResultFetchJob implements Runnable {
 
   protected static final Logger log = LoggerFactory.getLogger(ResultFetchJob.class);
 
@@ -158,6 +158,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable {
               SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
               queue.put(p);
               doc.setDocumentGraph(docGraph);
+              CommonHelper.addMatchToDocumentGraph(m, doc);
               log.debug("added match {} to queue", current + 1);
             } catch (XMLStreamException | IOException ex) {
               log.error("Could not map GraphML to Salt", ex);
