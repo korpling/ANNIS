@@ -22,13 +22,7 @@ import annis.libgui.Helper;
 import annis.model.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.QueryLanguage;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Binder;
-import com.vaadin.data.provider.DataChangeEvent;
-import com.vaadin.data.provider.DataProviderListener;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -49,6 +43,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.model.AnnoKey;
+import org.corpus_tools.annis.api.model.Annotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -571,117 +569,60 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
 
     public Collection<String> getAvailableAnnotationLevels(String meta) {
         Collection<String> result = new TreeSet<>();
-        WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
+        CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
         // get current corpus selection
         Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
-        if (service != null) {
-            try {
-                List<AnnisAttribute> atts = new LinkedList<>();
-                for (String corpus : corpusSelection) {
-                    atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
-                            .queryParam("fetchvalues", "true").queryParam("onlymostfrequentvalues", "false")
-                            .get(new GenericType<List<AnnisAttribute>>() {}));
-                }
-                for (AnnisAttribute a : atts) {
-                    if (a.getType() == AnnisAttribute.Type.node) {
-                        String aa = killNamespace(a.getName());
-                        if (aa.equals(meta)) {
-                            result.addAll(a.getValueSet());
-                        }
-                    }
-                }
-            } catch (ClientHandlerException ex) {
-                log.error(null, ex);
-            } catch (UniformInterfaceException ex) {
-                log.error(null, ex);
+        try {
+          List<Annotation> atts = new LinkedList<>();
+          for (String corpus : corpusSelection) {
+            atts.addAll(api.nodeAnnotations(corpus, true, false));
+          }
+          for (Annotation a : atts) {
+            if (a.getKey().getName().equals(meta)) {
+              result.add(a.getVal());
             }
+          }
+        } catch (ApiException ex) {
+          log.error(null, ex);
         }
+
         return result;
     }
 
     public Set<String> getAvailableAnnotationNames() {
         Set<String> result = new TreeSet<>();
-        WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
         // get current corpus selection
         Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
-        if (service != null) {
-            try {
-                List<AnnisAttribute> atts = new LinkedList<>();
-                for (String corpus : corpusSelection) {
-                    atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
-                            .queryParam("fetchvalues", "false").queryParam("onlymostfrequentvalues", "false")
-                            .get(new GenericType<List<AnnisAttribute>>() {}));
-                }
-                for (AnnisAttribute a : atts) {
-                    if (a.getType() == AnnisAttribute.Type.node) {
-                        result.add(killNamespace(a.getName()));
-                    }
-                }
-            } catch (ClientHandlerException ex) {
-                log.error(null, ex);
-            } catch (UniformInterfaceException ex) {
-                log.error(null, ex);
+        CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
+        try {
+          List<AnnisAttribute> atts = new LinkedList<>();
+          for (String corpus : corpusSelection) {
+            for (Annotation a : api.nodeAnnotations(corpus, false, false)) {
+              result.add(a.getKey().getName());
             }
+          }
+        } catch (ApiException ex) {
+          log.error(null, ex);
         }
         result.add("tok");
         return result;
     }
 
-    public Set<String> getAvailableMetaLevels(String meta) {
-        Set<String> result = new TreeSet<>();
-        WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
-        // get current corpus selection
-        Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
-        if (service != null) {
-            try {
-                List<AnnisAttribute> atts = new LinkedList<>();
-                for (String corpus : corpusSelection) {
-                    atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
-                            .queryParam("fetchvalues", "true").queryParam("onlymostfrequentvalues", "false")
-                            .get(new GenericType<List<AnnisAttribute>>() {}));
-                }
-                for (AnnisAttribute a : atts) {
-                    if (a.getType() == AnnisAttribute.Type.meta) {
-                        String aa = killNamespace(a.getName());
-                        if (aa.equals(meta)) {
-                            result.addAll(a.getValueSet());
-                        }
-                    }
-                }
-            } catch (ClientHandlerException ex) {
-                log.error(null, ex);
-            } catch (UniformInterfaceException ex) {
-                log.error(null, ex);
-            }
-        }
-        return result;
-    }
-
     public Set<String> getAvailableMetaNames() {
         Set<String> result = new TreeSet<>();
-        WebResource service = Helper.getAnnisWebResource(UI.getCurrent());
         // get current corpus selection
         Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
-        if (service != null) {
-            try {
-                List<AnnisAttribute> atts = new LinkedList<>();
-
-                for (String corpus : corpusSelection) {
-                    atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
-                            .get(new GenericType<List<AnnisAttribute>>() {}));
-                }
-                for (AnnisAttribute a : atts) {
-                    if (a.getType() == AnnisAttribute.Type.meta) {
-                        String aa = killNamespace(a.getName());
-                        result.add(aa);
-                    }
-                }
-            } catch (ClientHandlerException ex) {
-                log.error(null, ex);
-            } catch (UniformInterfaceException ex) {
-                log.error(null, ex);
+        try {
+          for (String corpus : corpusSelection) {
+            for(AnnoKey key : Helper.getMetaAnnotationNames(corpus, UI.getCurrent())) {
+              result.add(key.getName());
             }
+          }
+
+        } catch (ApiException ex) {
+          log.error(null, ex);
         }
+
         return result;
     }
 
