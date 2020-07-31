@@ -300,19 +300,21 @@ public class SearchOptionsPanel extends FormLayout {
     cbLeftContext.setItems(PREDEFINED_CONTEXTS);
     cbRightContext.setItems(PREDEFINED_CONTEXTS);
 
-    // Bind to UI state
-    Binder<QueryUIState> binder = new Binder<>(QueryUIState.class);
-    binder.setBean(state);
-    
-    binder.forField(cbLeftContext).bind("leftContext");
-    binder.forField(cbRightContext).bind("rightContext");
-    binder.forField(cbSegmentation).bind("contextSegmentation");
-    binder.forField(cbResultsPerPage).bind("limit");
-    binder.forField(cbOrder).bind("order");
 
     if (getUI() instanceof AnnisUI) {
       AnnisUI ui = (AnnisUI) getUI();
       state = ui.getQueryState();
+
+      // Bind to UI state
+      Binder<QueryUIState> binder = new Binder<>(QueryUIState.class);
+      binder.setBean(state);
+
+      binder.forField(cbLeftContext).bind("leftContext");
+      binder.forField(cbRightContext).bind("rightContext");
+      binder.forField(cbSegmentation).bind("contextSegmentation");
+      binder.forField(cbResultsPerPage).bind("limit");
+      binder.forField(cbOrder).bind("order");
+
 
       Background
           .run(new CorpusConfigUpdater(ui, new LinkedHashSet<>(state.getSelectedCorpora()), false));
