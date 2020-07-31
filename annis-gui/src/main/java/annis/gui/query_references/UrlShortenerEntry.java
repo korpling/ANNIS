@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity
 public class UrlShortenerEntry {
@@ -22,8 +23,10 @@ public class UrlShortenerEntry {
   private Date created;
 
   @Column(nullable = false, unique = true)
+  @Lob
   private URI url;
   @Column
+  @Lob
   private URI temporaryUrl;
 
   public UUID getId() {
