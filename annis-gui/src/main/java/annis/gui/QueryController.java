@@ -67,7 +67,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
-import javax.annotation.PostConstruct;
 import okhttp3.Call;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.JSON;
@@ -130,21 +129,24 @@ public class QueryController implements Serializable {
 
   private final QueryUIState state;
 
+  private final Binder<QueryUIState> binder;
+
+
   public QueryController(AnnisUI ui, SearchView searchView, QueryUIState state) {
     this.ui = ui;
     this.searchView = searchView;
     this.state = state;
 
+    this.binder = new Binder<>(QueryUIState.class);
+    this.binder.setBean(state);
+
     this.state.getAql().addValueChangeListener(event -> validateQuery());
 
-    Binder<QueryUIState> binder = new Binder<>();
-    binder.setBean(this.state);
-    binder.addValueChangeListener(event -> validateQuery());
+    this.binder.addValueChangeListener(event -> validateQuery());
   }
 
-  @PostConstruct
-  private void init() {
-
+  public Binder<QueryUIState> getBinder() {
+    return binder;
   }
 
   /**
@@ -543,8 +545,7 @@ public class QueryController implements Serializable {
   }
 
   public void setQuery(Query q) {
-    // only change the values if actually changed (the value change listeners should
-    // not be triggered if not necessary)
+    // Create a new object that can be saved using the binder
     setIfNew(state.getAql(), q.getQuery());
     if (q.getQueryLanguage() != state.getQueryLanguageLegacy()) {
       state.setQueryLanguageLegacy(q.getQueryLanguage());
@@ -585,6 +586,10 @@ public class QueryController implements Serializable {
       setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
       setIfNew(state.getAlignmc(), ((ExportQuery) q).getAlignmc());
     }
+
+
+    // Update the binder
+    binder.setBean(state);
   }
 
   public void validateQuery() {

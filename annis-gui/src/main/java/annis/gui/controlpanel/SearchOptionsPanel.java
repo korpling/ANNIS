@@ -59,12 +59,15 @@ public class SearchOptionsPanel extends FormLayout {
     private final AnnisUI ui;
     private final Collection<String> corpora;
     private final boolean corpusSelectionChanged;
+    private final boolean setValues;
 
     public CorpusConfigUpdater(AnnisUI ui, Collection<String> corpora,
         boolean corpusSelectionChanged) {
       this.ui = ui;
       this.corpora = corpora;
       this.corpusSelectionChanged = corpusSelectionChanged;
+      
+      this.setValues = corpusSelectionChanged && isUpdateStateFromConfig();
     }
 
     @Override
@@ -99,15 +102,17 @@ public class SearchOptionsPanel extends FormLayout {
         cbLeftContext.setItems(c.getContext().getSizes());
         cbRightContext.setItems(c.getContext().getSizes());
         cbSegmentation.setItems(segmentations);
-        cbLeftContext.setValue(c.getContext().getDefault());
-        cbRightContext.setValue(c.getContext().getDefault());
-        cbSegmentation.setValue(c.getContext().getSegmentation());
-        cbResultsPerPage.setValue(c.getView().getPageSize());
 
+        if (setValues) {
+          cbLeftContext.setValue(c.getContext().getDefault());
+          cbRightContext.setValue(c.getContext().getDefault());
+          cbSegmentation.setValue(c.getContext().getSegmentation());
+          cbResultsPerPage.setValue(c.getView().getPageSize());
+        }
 
         // reset if corpus selection has changed
         if (corpusSelectionChanged) {
-          updateStateFromConfig = true;
+          setUpdateStateFromConfig(true);
         }
       });
     }
@@ -260,10 +265,6 @@ public class SearchOptionsPanel extends FormLayout {
 
     cbQueryLanguage = new com.vaadin.ui.ComboBox<>("Query Language");
 
-    Binder<QueryUIState> binder = new Binder<>();
-    binder.forField(cbQueryLanguage).bind(QueryUIState::getQueryLanguage,
-        QueryUIState::setQueryLanguage);
-    binder.readBean(state);
     cbQueryLanguage.setItemCaptionGenerator(ql -> {
       switch (ql) {
         case AQL:
@@ -306,15 +307,15 @@ public class SearchOptionsPanel extends FormLayout {
       state = ui.getQueryState();
 
       // Bind to UI state
-      Binder<QueryUIState> binder = new Binder<>(QueryUIState.class);
-      binder.setBean(state);
+      Binder<QueryUIState> binder = ui.getQueryController().getBinder();
 
       binder.forField(cbLeftContext).bind("leftContext");
       binder.forField(cbRightContext).bind("rightContext");
       binder.forField(cbSegmentation).bind("contextSegmentation");
       binder.forField(cbResultsPerPage).bind("limit");
       binder.forField(cbOrder).bind("order");
-
+      binder.forField(cbQueryLanguage).bind(QueryUIState::getQueryLanguage,
+          QueryUIState::setQueryLanguage);
 
       Background
           .run(new CorpusConfigUpdater(ui, new LinkedHashSet<>(state.getSelectedCorpora()), false));
