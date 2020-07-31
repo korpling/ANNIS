@@ -50,8 +50,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
-  private static final String IGNORED_TOK = "ignored-tok";
-
   static final Logger log = LoggerFactory.getLogger(DocumentGraphMapper.class);
 
   private final SDocumentGraph graph;
@@ -59,24 +57,18 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private final Set<String> hasOutgoingCoverageEdge;
   private final Set<String> hasOutgoingDominanceEdge;
   private final Set<String> hasNonEmptyIncomingDominanceEdge;
-  private final boolean mapIgnoredToken;
 
 
-  protected DocumentGraphMapper(boolean mapIgnoredToken) {
-    this.mapIgnoredToken = mapIgnoredToken;
+  protected DocumentGraphMapper() {
     this.graph = SaltFactory.createSDocumentGraph();
     this.hasOutgoingCoverageEdge = new HashSet<>();
     this.hasOutgoingDominanceEdge = new HashSet<>();
     this.hasNonEmptyIncomingDominanceEdge = new HashSet<>();
   }
 
-  public static SDocumentGraph map(File inputFile) throws IOException, XMLStreamException {
-    return map(inputFile, false);
-  }
 
-  public static SDocumentGraph map(File inputFile, boolean mapWhiteSpaceToken)
-      throws IOException, XMLStreamException {
-    DocumentGraphMapper mapper = new DocumentGraphMapper(mapWhiteSpaceToken);
+  public static SDocumentGraph map(File inputFile) throws IOException, XMLStreamException {
+    DocumentGraphMapper mapper = new DocumentGraphMapper();
     mapper.execute(inputFile);
     return mapper.graph;
   }
@@ -190,13 +182,10 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               break;
             case "node":
               if (currentNodeId.isPresent()) {
-                String nodeType = data.get("annis::node_type");
-                if ("node".equals(nodeType)
-                    || (this.mapIgnoredToken && IGNORED_TOK.equals(nodeType))) {
-                  // Map node and add it
-                  SNode n = mapNode(currentNodeId.get(), data);
-                  graph.addNode(n);
-                }
+                // Map node and add it
+                SNode n = mapNode(currentNodeId.get(), data);
+                graph.addNode(n);
+
               }
               currentNodeId = Optional.empty();
               data.clear();
@@ -236,11 +225,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       if (SaltUtil.SALT_NULL_VALUE.equals(name)) {
         name = null;
       }
-      if (this.mapIgnoredToken && "text".equals(name)) {
-        // Use the special "text" ordering component to recreate the full text
-        recreateText("text", roots);
-      } else if (!this.mapIgnoredToken && (name == null || "".equals(name))) {
-        // only re-create text if this is the default (possible virtual) tokenization
+      if (name == null || "".equals(name)) {
+        // re-create text if this is the default (possible virtual) tokenization
         recreateText(name, roots);
       } else {
         // add the text as label to the spans
@@ -272,7 +258,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private SNode mapNode(String nodeName, Map<String, String> labels) {
     SNode newNode = SaltFactory.createSNode();
 
-    if ((labels.containsKey("annis::tok") || labels.containsKey("annis::ignored-tok"))
+    if ((labels.containsKey("annis::tok"))
         && !hasOutgoingCoverageEdge.contains(nodeName)) {
       newNode = SaltFactory.createSToken();
     } else if (hasOutgoingDominanceEdge.contains(nodeName)) {
@@ -301,7 +287,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       SRelation<?, ?> rel = null;
       switch (component.getType()) {
         case DOMINANCE:
-          if (component.getLayer() == null || component.getLayer().isEmpty()) {
+          if (component.getName() == null || component.getName().isEmpty()) {
             // We don't include edges that have no type if there is an edge
             // between the same nodes which has a type.
             if (hasNonEmptyIncomingDominanceEdge.contains(sourceId)) {
@@ -373,26 +359,30 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
             @Override
             public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
                 SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-              if (!mapIgnoredToken && fromNode != null) {
-                text.append(" ");
+
+              if (currNode instanceof SToken) {
+                SFeature featTokWhitespaceBefore =
+                    currNode.getFeature("annis::tok-whitespace-before");
+                if (featTokWhitespaceBefore != null) {
+                  text.append(featTokWhitespaceBefore.getValue().toString());
+                }
+
+                SFeature featTok = currNode.getFeature("annis::tok");
+                if (featTok != null) {
+                  int idxStart = text.length();
+                  text.append(featTok.getValue_STEXT());
+                  token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
+                }
+
+                SFeature featTokWhitespaceAfter =
+                    currNode.getFeature("annis::tok-whitespace-after");
+                if (featTokWhitespaceAfter != null) {
+                  text.append(featTokWhitespaceAfter.getValue().toString());
+                }
               }
 
-              SFeature featTok = currNode.getFeature("annis::tok");
-              if(featTok == null) {
-                // The feature might also be mapped to the ignored-tok label
-                // (so it is ignored by AQL "tok" queries)
-                featTok = currNode.getFeature("annis::ignored-tok");
-              }
-              if (featTok != null && currNode instanceof SToken) {
-                int idxStart = text.length();
-                text.append(featTok.getValue_STEXT());
-                token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
-              }
             }
           });
-      if (!mapIgnoredToken && itRoots.hasNext()) {
-        text.append(" ");
-      }
     }
 
     // update the actual text

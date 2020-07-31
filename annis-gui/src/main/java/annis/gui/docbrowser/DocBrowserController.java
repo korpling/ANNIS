@@ -254,7 +254,7 @@ public class DocBrowserController implements Serializable {
         SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(docPath));
         SDocument doc = cg.createDocument(docURI);
-        SDocumentGraph docGraph = DocumentGraphMapper.map(graphML, useRawText);
+        SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
         doc.setDocumentGraph(docGraph);
 
         SDocument sDoc = p.getCorpusGraphs().get(0).getDocuments().get(0);

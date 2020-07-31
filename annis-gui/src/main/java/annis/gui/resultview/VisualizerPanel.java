@@ -436,7 +436,7 @@ public class VisualizerPanel extends CssLayout
       File graphML =
           api.subgraphForQuery(corpusName, aql.toString(),
               QueryLanguage.AQL, AnnotationComponentType.ORDERING);
-      SDocumentGraph graph = DocumentGraphMapper.map(graphML, true);
+      SDocumentGraph graph = DocumentGraphMapper.map(graphML);
       // Reconstruct the text from the token values
       List<String> texts = new ArrayList<>();
       for (STextualDS ds : graph.getTextualDSs()) {
