@@ -182,9 +182,12 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               break;
             case "node":
               if (currentNodeId.isPresent()) {
-                // Map node and add it
-                SNode n = mapNode(currentNodeId.get(), data);
-                graph.addNode(n);
+                String nodeType = data.get("annis::node_type");
+                if ("node".equals(nodeType)) {
+                  // Map node and add it
+                  SNode n = mapNode(currentNodeId.get(), data);
+                  graph.addNode(n);
+                }
 
               }
               currentNodeId = Optional.empty();
