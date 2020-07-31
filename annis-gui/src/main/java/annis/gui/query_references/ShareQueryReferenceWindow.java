@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui;
+package annis.gui.query_references;
 
+import annis.gui.AnnisUI;
 import annis.gui.components.ExceptionDialog;
-import annis.libgui.Helper;
 import annis.model.DisplayedResultQuery;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -100,7 +100,9 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
         super.attach();
 
         String shortURL = "ERROR";
-        if (query != null) {
+        UI ui = UI.getCurrent();
+        if (query != null && ui instanceof AnnisUI) {
+          AnnisUI annisUI = (AnnisUI) ui;
             URI appURI = UI.getCurrent().getPage().getLocation();
             String fragment;
             try {
@@ -109,7 +111,7 @@ public class ShareQueryReferenceWindow extends Window implements Button.ClickLis
                         fragment);
 
                 if (shorten) {
-                    shortURL = Helper.shortenURL(url, UI.getCurrent());
+                  shortURL = annisUI.getUrlShortener().shortenURL(url, annisUI);
                 } else {
                     shortURL = url.toASCIIString();
                 }

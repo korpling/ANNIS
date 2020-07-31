@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.QueryGenerator;
 import annis.gui.beans.CitationProvider;
+import annis.gui.query_references.ShareQueryReferenceWindow;
 import annis.libgui.Helper;
 import annis.model.ContextualizedQuery;
 import annis.model.DisplayedResultQuery;

@@ -66,9 +66,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.UriBuilder;
 import javax.xml.stream.XMLStreamException;
-import org.aeonbits.owner.ConfigFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -230,8 +228,6 @@ public class Helper {
 
     }
   }
-
-  private final static UIConfig cfg = ConfigFactory.create(UIConfig.class);
 
   public final static String DEFAULT_CONFIG = "default-config";
 
@@ -893,7 +889,7 @@ public class Helper {
         return overriddenByInit;
       }
     }
-    return cfg.webserviceURL();
+    return "http://localhost:5711/";
 
   }
 
@@ -933,15 +929,6 @@ public class Helper {
     }
   }
 
-  /**
-   * Returns true if the right-to-left heuristic should be disabled.
-   *
-   * @return True if RTL is disabled
-   */
-  public static boolean isRTLDisabled(UI ui) {
-    String disableRtl = (String) ui.getSession().getAttribute("disable-rtl");
-    return "true".equalsIgnoreCase(disableRtl);
-  }
 
   public static void setUser(AnnisUser user) {
     if (user == null) {
@@ -949,30 +936,6 @@ public class Helper {
     } else {
       VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY, user);
     }
-  }
-
-  public static String shortenURL(URI original, UI ui) {
-    WebResource res = Helper.getAnnisWebResource(ui).path("shortener");
-    String appContext = Helper.getContext(ui);
-
-    String path = original.getRawPath();
-    if (path.startsWith(appContext)) {
-      path = path.substring(appContext.length());
-    }
-
-    String localURL = path;
-    if (original.getRawQuery() != null) {
-      localURL = localURL + "?" + original.getRawQuery();
-    }
-    if (original.getRawFragment() != null) {
-      localURL = localURL + "#" + original.getRawFragment();
-    }
-
-    String shortID = res.post(String.class, localURL);
-
-    return UriBuilder.fromUri(original).replacePath(appContext + "/").replaceQuery("").fragment("")
-        .queryParam("id", shortID).build().toASCIIString();
-
   }
 
 }

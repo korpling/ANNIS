@@ -17,6 +17,7 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
 import annis.CommonHelper;
+import annis.gui.AnnisUI;
 import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
@@ -29,7 +30,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
@@ -127,9 +127,12 @@ public class SingleGridComponent extends Panel implements GridComponent {
       this.segmentationName = forceToken ? null : input.getSegmentationName();
 
       List<STextualDS> texts = input.getDocument().getDocumentGraph().getTextualDSs();
-      if (texts != null && texts.size() > 0 && !Helper.isRTLDisabled(UI.getCurrent())) {
-        if (CommonHelper.containsRTLText(texts.get(0).getText())) {
-          addStyleName("rtl");
+      if (input.getUI() instanceof AnnisUI) {
+        if (texts != null && texts.size() > 0
+            && !((AnnisUI) input.getUI()).getConfig().isDisableRTL()) {
+          if (CommonHelper.containsRTLText(texts.get(0).getText())) {
+            addStyleName("rtl");
+          }
         }
       }
 

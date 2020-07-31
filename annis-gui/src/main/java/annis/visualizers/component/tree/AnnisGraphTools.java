@@ -14,7 +14,7 @@
 package annis.visualizers.component.tree;
 
 import annis.CommonHelper;
-import annis.libgui.Helper;
+import annis.gui.AnnisUI;
 import annis.libgui.visualizers.VisualizerInput;
 import com.vaadin.ui.UI;
 import edu.uci.ics.jung.graph.DirectedGraph;
@@ -44,7 +44,7 @@ public class AnnisGraphTools implements Serializable {
   private static final String SECEDGE_SUBTYPE = "secedge";
 
   public static HorizontalOrientation detectLayoutDirection(SDocumentGraph docGraph, UI ui) {
-    if (Helper.isRTLDisabled(ui)) {
+    if (ui instanceof AnnisUI && ((AnnisUI) ui).getConfig().isDisableRTL()) {
       return HorizontalOrientation.LEFT_TO_RIGHT;
     }
 
