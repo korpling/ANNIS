@@ -1,16 +1,14 @@
 /*
  * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the Licsense is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * Licsense is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package annis.gui;
@@ -19,6 +17,8 @@ import static annis.libgui.Helper.DEFAULT_CONFIG;
 
 import annis.gui.components.ExceptionDialog;
 import annis.gui.objects.QueryUIState;
+import annis.gui.query_references.UrlShortenerEntry;
+import annis.gui.query_references.UrlShortenerRepository;
 import annis.gui.querybuilder.QueryBuilderPlugin;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
@@ -33,13 +33,22 @@ import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinServletResponse;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Component;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,189 +64,241 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
 public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListener {
 
-    private static final long serialVersionUID = 3022711576267350005L;
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisUI.class);
+  private static final long serialVersionUID = 3022711576267350005L;
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisUI.class);
 
-    private transient Cache<String, CorpusConfiguration> corpusConfigCache;
+  private transient Cache<String, CorpusConfiguration> corpusConfigCache;
 
-    private final QueryUIState queryState = new QueryUIState();
+  private final QueryUIState queryState = new QueryUIState();
 
-    private QueryController queryController;
+  private QueryController queryController;
 
-    private SearchView searchView;
+  private SearchView searchView;
 
-    @Autowired
-    private List<VisualizerPlugin> visualizerPlugins;
+  @Autowired
+  private List<VisualizerPlugin> visualizerPlugins;
 
 
-    @Autowired
-    private List<QueryBuilderPlugin<com.vaadin.ui.Component>> queryBuilderPlugins;
+  @Autowired
+  private List<QueryBuilderPlugin<com.vaadin.ui.Component>> queryBuilderPlugins;
 
-    @Autowired
-    private List<ExporterPlugin> exporterPlugins;
+  @Autowired
+  private List<ExporterPlugin> exporterPlugins;
 
-    private AdminView adminView;
+  @Autowired
+  private UrlShortenerRepository urlShortener;
 
-    private Navigator nav;
+  @Autowired
+  private UIConfig config;
 
-    /**
-     * A re-usable toolbar for different views.
-     */
-    private MainToolbar toolbar;
+  private AdminView adminView;
 
-    public AnnisUI() {
-        super("");
-        initTransients();
+  private Navigator nav;
+
+  /**
+   * A re-usable toolbar for different views.
+   */
+  private MainToolbar toolbar;
+
+  public AnnisUI() {
+    super("");
+    initTransients();
+  }
+
+  @Override
+  public void afterViewChange(ViewChangeEvent event) {
+
+  }
+
+  @Override
+  public boolean beforeViewChange(ViewChangeEvent event) {
+    // make sure the toolbar is removed from the old view
+    searchView.setToolbar(null);
+    adminView.setToolbar(null);
+    toolbar.setSidebar(null);
+
+    if (event.getNewView() == searchView) {
+      searchView.setToolbar(toolbar);
+      toolbar.setSidebar(searchView);
+      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN, AnnisUI.this);
+    } else if (event.getNewView() == adminView) {
+      adminView.setToolbar(toolbar);
+      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.SEARCH, AnnisUI.this);
+    } else {
+      toolbar.setNavigationTarget(null, AnnisUI.this);
     }
 
-    @Override
-    public void afterViewChange(ViewChangeEvent event) {
+    return true;
+  }
 
+  public boolean canReportBugs() {
+    if (toolbar != null) {
+      return toolbar.canReportBugs();
     }
+    return false;
+  }
 
-    @Override
-    public boolean beforeViewChange(ViewChangeEvent event) {
-        // make sure the toolbar is removed from the old view
-        searchView.setToolbar(null);
-        adminView.setToolbar(null);
-        toolbar.setSidebar(null);
+  public void clearCorpusConfigCache() {
+    if (corpusConfigCache != null) {
+      corpusConfigCache.invalidateAll();
+    }
+  }
 
-        if (event.getNewView() == searchView) {
-            searchView.setToolbar(toolbar);
-            toolbar.setSidebar(searchView);
-            toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN, AnnisUI.this);
-        } else if (event.getNewView() == adminView) {
-            adminView.setToolbar(toolbar);
-            toolbar.setNavigationTarget(MainToolbar.NavigationTarget.SEARCH, AnnisUI.this);
+  @Override
+  public void error(com.vaadin.server.ErrorEvent event) {
+    log.error("Unknown error in some component: " + event.getThrowable().getLocalizedMessage(),
+        event.getThrowable());
+    // get the source throwable (thus the one that triggered the error)
+    Throwable source = event.getThrowable();
+    if (!AnnisBaseUI.handleCommonError(source, null) && source != null) {
+      while (source.getCause() != null) {
+        source = source.getCause();
+      }
+      ExceptionDialog.show(source, this);
+    }
+  }
+
+  /**
+   * Get a cached version of the {@link CorpusConfig} for a corpus.
+   *
+   * @param corpus
+   * @return
+   */
+  public CorpusConfiguration getCorpusConfigWithCache(String corpus) {
+    CorpusConfiguration config = new CorpusConfiguration();
+    if (corpusConfigCache != null) {
+      config = corpusConfigCache.getIfPresent(corpus);
+      if (config == null) {
+        if (corpus.equals(DEFAULT_CONFIG)) {
+          config = Helper.getDefaultCorpusConfig();
         } else {
-            toolbar.setNavigationTarget(null, AnnisUI.this);
+          config = Helper.getCorpusConfig(corpus, AnnisUI.this);
         }
 
+        corpusConfigCache.put(corpus, config);
+      }
+    }
+
+    return config;
+  }
+
+  public QueryController getQueryController() {
+    return queryController;
+  }
+
+  public QueryUIState getQueryState() {
+    return queryState;
+  }
+
+  public SearchView getSearchView() {
+    return searchView;
+  }
+
+  @Override
+  protected void init(VaadinRequest request) {
+
+    // checkUrlShortenerRedirect(request, VaadinService.getCurrentResponse());
+
+    super.init(request);
+    setErrorHandler(this);
+
+    VaadinSession.getCurrent().addRequestHandler(new RequestHandler() {
+
+      @Override
+      public boolean handleRequest(VaadinSession session, VaadinRequest request,
+          VaadinResponse response) throws IOException {
+        return checkUrlShortenerRedirect(request, response);
+      }
+    });
+
+    adminView = new AdminView(AnnisUI.this);
+
+    toolbar = new MainToolbar();
+    toolbar.setQueryController(queryController);
+
+
+    this.searchView = new SearchView(this);
+    this.queryController = new QueryController(this, searchView, queryState);
+
+    toolbar.addLoginListener(searchView);
+    toolbar.addLoginListener(adminView);
+
+    nav = new Navigator(AnnisUI.this, AnnisUI.this);
+    nav.addView(SearchView.NAME, searchView);
+    nav.addView(AdminView.NAME, adminView);
+    nav.addViewChangeListener(AnnisUI.this);
+
+    addExtension(toolbar.getScreenshotExtension());
+
+    loadInstanceFonts();
+
+  }
+
+
+  private boolean checkUrlShortenerRedirect(VaadinRequest request, VaadinResponse response) {
+
+    String id = request.getParameter("id");
+    if (id == null) {
+      return false;
+    }
+    Optional<UrlShortenerEntry> entry = urlShortener.findById(UUID.fromString(id));
+    // redirects only work in http servlets
+    if (entry.isPresent() && response instanceof VaadinServletResponse) {
+      ServletResponse servletResponse = ((VaadinServletResponse) response).getResponse();
+      if (servletResponse instanceof HttpServletResponse) {
+        HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
+        URI uri = entry.get().getUrl();
+        if (entry.get().getTemporaryUrl() != null) {
+          uri = entry.get().getTemporaryUrl();
+        }
+        httpResponse.setHeader("Location", request.getContextPath() + uri.toASCIIString());
+        httpResponse.setStatus(307); // temporary redirect
         return true;
+      }
     }
 
-    public boolean canReportBugs() {
-        if (toolbar != null) {
-            return toolbar.canReportBugs();
-        }
-        return false;
-    }
+    return false;
+  }
 
-    public void clearCorpusConfigCache() {
-        if (corpusConfigCache != null) {
-            corpusConfigCache.invalidateAll();
-        }
-    }
+  public UIConfig getConfig() {
+    return config;
+  }
 
-    @Override
-    public void error(com.vaadin.server.ErrorEvent event) {
-        log.error("Unknown error in some component: " + event.getThrowable().getLocalizedMessage(),
-                event.getThrowable());
-        // get the source throwable (thus the one that triggered the error)
-        Throwable source = event.getThrowable();
-        if (!AnnisBaseUI.handleCommonError(source, null) && source != null) {
-            while (source.getCause() != null) {
-                source = source.getCause();
-            }
-            ExceptionDialog.show(source, this);
-        }
-    }
+  private void initTransients() {
+    corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
+  }
 
-    /**
-     * Get a cached version of the {@link CorpusConfig} for a corpus.
-     *
-     * @param corpus
-     * @return
-     */
-    public CorpusConfiguration getCorpusConfigWithCache(String corpus) {
-      CorpusConfiguration config = new CorpusConfiguration();
-        if (corpusConfigCache != null) {
-            config = corpusConfigCache.getIfPresent(corpus);
-            if (config == null) {
-                if (corpus.equals(DEFAULT_CONFIG)) {
-                  config = Helper.getDefaultCorpusConfig();
-                } else {
-                    config = Helper.getCorpusConfig(corpus, AnnisUI.this);
-                }
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    initTransients();
+  }
 
-                corpusConfigCache.put(corpus, config);
-            }
-        }
+  public void reportBug() {
+    toolbar.reportBug();
+  }
 
-        return config;
-    }
+  public void reportBug(Throwable cause) {
+    toolbar.reportBug(cause);
+  }
 
-    public QueryController getQueryController() {
-        return queryController;
-    }
+  public MainToolbar getToolbar() {
+    return toolbar;
+  }
 
-    public QueryUIState getQueryState() {
-        return queryState;
-    }
+  public List<VisualizerPlugin> getVisualizerPlugins() {
+    return visualizerPlugins;
+  }
 
-    public SearchView getSearchView() {
-        return searchView;
-    }
+  public List<QueryBuilderPlugin<Component>> getQueryBuilderPlugins() {
+    return queryBuilderPlugins;
+  }
 
-    @Override
-    protected void init(VaadinRequest request) {
-        super.init(request);
-        setErrorHandler(this);
+  public List<ExporterPlugin> getExporterPlugins() {
+    return exporterPlugins;
+  }
 
-        adminView = new AdminView(AnnisUI.this);
-
-        toolbar = new MainToolbar();
-        toolbar.setQueryController(queryController);
-
-
-        this.searchView = new SearchView(this);
-        this.queryController = new QueryController(this, searchView, queryState);
-
-        toolbar.addLoginListener(searchView);
-        toolbar.addLoginListener(adminView);
-
-        nav = new Navigator(AnnisUI.this, AnnisUI.this);
-        nav.addView(SearchView.NAME, searchView);
-        nav.addView(AdminView.NAME, adminView);
-        nav.addViewChangeListener(AnnisUI.this);
-
-        addExtension(toolbar.getScreenshotExtension());
-
-        loadInstanceFonts();
-
-    }
-
-    private void initTransients() {
-        corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        initTransients();
-    }
-
-    public void reportBug() {
-        toolbar.reportBug();
-    }
-
-    public void reportBug(Throwable cause) {
-        toolbar.reportBug(cause);
-    }
-
-    public MainToolbar getToolbar() {
-        return toolbar;
-    }
-
-    public List<VisualizerPlugin> getVisualizerPlugins() {
-      return visualizerPlugins;
-    }
-
-    public List<QueryBuilderPlugin<Component>> getQueryBuilderPlugins() {
-      return queryBuilderPlugins;
-    }
-
-    public List<ExporterPlugin> getExporterPlugins() {
-      return exporterPlugins;
-    }
+  public UrlShortenerRepository getUrlShortener() {
+    return urlShortener;
+  }
 
 }
