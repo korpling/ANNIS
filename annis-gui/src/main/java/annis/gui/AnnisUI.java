@@ -17,8 +17,7 @@ import static annis.libgui.Helper.DEFAULT_CONFIG;
 
 import annis.gui.components.ExceptionDialog;
 import annis.gui.objects.QueryUIState;
-import annis.gui.query_references.UrlShortenerEntry;
-import annis.gui.query_references.UrlShortenerRepository;
+import annis.gui.query_references.UrlShortener;
 import annis.gui.querybuilder.QueryBuilderPlugin;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
@@ -33,10 +32,8 @@ import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinResponse;
-import com.vaadin.server.VaadinServletResponse;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
@@ -46,8 +43,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +80,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   private List<ExporterPlugin> exporterPlugins;
 
   @Autowired
-  private UrlShortenerRepository urlShortener;
+  private UrlShortener urlShortener;
 
   @Autowired
   private UIConfig config;
@@ -196,13 +191,20 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Override
   protected void init(VaadinRequest request) {
 
-    // checkUrlShortenerRedirect(request, VaadinService.getCurrentResponse());
-
     super.init(request);
+
+    String id = request.getParameter("id");
+    if (id != null) {
+      // Check if this is a valid URL shortener ID
+      Optional<URI> uri = urlShortener.unshorten(UUID.fromString(id));
+      if(uri.isPresent()) {
+        Page.getCurrent().setLocation(uri.get());
+        return;
+      }
+    }
+
     setErrorHandler(this);
 
-    VaadinSession.getCurrent().addRequestHandler(
-        (session, request1, response) -> checkUrlShortenerRedirect(request1, response));
 
     adminView = new AdminView(AnnisUI.this);
 
@@ -225,32 +227,6 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     loadInstanceFonts();
 
-  }
-
-
-  private boolean checkUrlShortenerRedirect(VaadinRequest request, VaadinResponse response) {
-
-    String id = request.getParameter("id");
-    if (id == null) {
-      return false;
-    }
-    Optional<UrlShortenerEntry> entry = urlShortener.findById(UUID.fromString(id));
-    // redirects only work in http servlets
-    if (entry.isPresent() && response instanceof VaadinServletResponse) {
-      ServletResponse servletResponse = ((VaadinServletResponse) response).getResponse();
-      if (servletResponse instanceof HttpServletResponse) {
-        HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
-        URI uri = entry.get().getUrl();
-        if (entry.get().getTemporaryUrl() != null) {
-          uri = entry.get().getTemporaryUrl();
-        }
-        httpResponse.setHeader("Location", request.getContextPath() + uri.toASCIIString());
-        httpResponse.setStatus(307); // temporary redirect
-        return true;
-      }
-    }
-
-    return false;
   }
 
   public UIConfig getConfig() {
@@ -290,7 +266,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     return exporterPlugins;
   }
 
-  public UrlShortenerRepository getUrlShortener() {
+  public UrlShortener getUrlShortener() {
     return urlShortener;
   }
 

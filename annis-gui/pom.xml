@@ -135,11 +135,10 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.derby</groupId>
-			<artifactId>derby</artifactId>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-
 
 		<dependency>
 			<groupId>de.hu-berlin.german.korpling.annis</groupId>
