@@ -16,7 +16,6 @@ package annis.libgui;
 import annis.resolver.SingleResolverRequest;
 import com.vaadin.ui.UI;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -56,10 +55,10 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
 
   @Override
   public List<VisualizerRule> getResolverEntries(SDocument doc, UI ui) {
-    
+
 
     // create a request for resolver entries
-    HashSet<SingleResolverRequest> resolverRequests = new HashSet<SingleResolverRequest>();
+    HashSet<SingleResolverRequest> resolverRequests = new HashSet<>();
 
     Set<String> nodeLayers = new HashSet<String>();
     Set<String> edgeLayers = new HashSet<String>();
@@ -83,13 +82,13 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
 
     }
 
+    String corpusName = doc.getGraph().getRoots().get(0).getName();
+
     for (String ns : nodeLayers) {
-      resolverRequests.add(new SingleResolverRequest(doc.getGraph().getRoots().get(0).getName(), ns,
-          ElementEnum.NODE));
+      resolverRequests.add(new SingleResolverRequest(corpusName, ns, ElementEnum.NODE));
     }
     for (String ns : edgeLayers) {
-      resolverRequests.add(new SingleResolverRequest(doc.getGraph().getRoots().get(0).getName(), ns,
-          ElementEnum.EDGE));
+      resolverRequests.add(new SingleResolverRequest(corpusName, ns, ElementEnum.EDGE));
     }
     LinkedHashSet<VisualizerRule> matchingRules = new LinkedHashSet<>();
     // query with this resolver request and make sure it is unique
@@ -97,23 +96,12 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
       matchingRules.addAll(cacheResolver.get(resolverRequests));
     } else {
 
-      // Get all rules for the selected corpora
-      Map<String, CorpusConfiguration> corpusConfigByName = new HashMap<>();
-      for (SingleResolverRequest r : resolverRequests) {
-        if (!corpusConfigByName.containsKey(r.getCorpusName())) {
-          CorpusConfiguration corpusConfig = Helper.getCorpusConfig(r.getCorpusName(), ui);
-          if (corpusConfig != null) {
-            corpusConfigByName.put(r.getCorpusName(), corpusConfig);
-          }
-        }
-      }
+      // Get all rules for the corpus in the corpus graph
+      CorpusConfiguration corpusConfig = Helper.getCorpusConfig(corpusName, ui);;
 
-      for (SingleResolverRequest r : resolverRequests) {
-        CorpusConfiguration corpusConfig = corpusConfigByName.get(r.getCorpusName());
-
-        // Filter the visualizer entries that match this resolver request
-        if (corpusConfig != null && corpusConfig.getVisualizers() != null) {
-          for (VisualizerRule visRule : corpusConfig.getVisualizers()) {
+      if (corpusConfig != null && corpusConfig.getVisualizers() != null) {
+        for (VisualizerRule visRule : corpusConfig.getVisualizers()) {
+          for (SingleResolverRequest r : resolverRequests) {
             if (visRule.getMappings() == null) {
               visRule.setMappings(new LinkedHashMap<>());
             }
