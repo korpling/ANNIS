@@ -5,11 +5,14 @@ import annis.libgui.Helper;
 import com.vaadin.ui.UI;
 import java.net.URI;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.UriBuilder;
 import org.springframework.data.repository.CrudRepository;
 
 public interface UrlShortenerRepository extends CrudRepository<UrlShortenerEntry, UUID> {
+
+  public List<UrlShortenerEntry> findByUrl(URI url);
 
   public default String shortenURL(URI original, UI ui) {
     String appContext = Helper.getContext(ui);
@@ -19,28 +22,36 @@ public interface UrlShortenerRepository extends CrudRepository<UrlShortenerEntry
       path = path.substring(appContext.length());
     }
 
-    String localURL = path;
+    String localURLRaw = path;
     if (original.getRawQuery() != null) {
-      localURL = localURL + "?" + original.getRawQuery();
+      localURLRaw = localURLRaw + "?" + original.getRawQuery();
     }
     if (original.getRawFragment() != null) {
-      localURL = localURL + "#" + original.getRawFragment();
+      localURLRaw = localURLRaw + "#" + original.getRawFragment();
     }
 
-    UrlShortenerEntry entry = new UrlShortenerEntry();
-    entry.setUrl(URI.create(localURL));
-    AnnisUser user = Helper.getUser(ui);
-    if (user == null) {
-      entry.setOwner("anonymous");
+    URI localURL = URI.create(localURLRaw);
+    UUID shortID;
+    // Check if this URI has already been shortened
+    List<UrlShortenerEntry> existingEntry = this.findByUrl(localURL);
+    if(existingEntry.isEmpty()) {
+      
+      UrlShortenerEntry entry = new UrlShortenerEntry();
+      entry.setUrl(localURL);
+      AnnisUser user = Helper.getUser(ui);
+      if (user == null) {
+        entry.setOwner("anonymous");
+      } else {
+        entry.setOwner(user.getUserName());
+      }
+      entry.setCreated(new Date());
+      
+      UrlShortenerEntry savedEntry = this.save(entry);
+      // The UUID should be generated when the entry is save
+      shortID = savedEntry.getId();
     } else {
-      entry.setOwner(user.getUserName());
+      shortID = existingEntry.get(0).getId();
     }
-    entry.setCreated(new Date());
-    
-    UrlShortenerEntry savedEntry = this.save(entry);
-    // The UUID should be generated when the entry is save
-    UUID shortID = savedEntry.getId();
-
     return UriBuilder.fromUri(original).replacePath(appContext + "/").replaceQuery("").fragment("")
         .queryParam("id", shortID.toString()).build().toASCIIString();
   }

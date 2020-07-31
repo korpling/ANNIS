@@ -33,7 +33,6 @@ import com.vaadin.annotations.Widgetset;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ErrorHandler;
-import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServletResponse;
@@ -202,14 +201,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     super.init(request);
     setErrorHandler(this);
 
-    VaadinSession.getCurrent().addRequestHandler(new RequestHandler() {
-
-      @Override
-      public boolean handleRequest(VaadinSession session, VaadinRequest request,
-          VaadinResponse response) throws IOException {
-        return checkUrlShortenerRedirect(request, response);
-      }
-    });
+    VaadinSession.getCurrent().addRequestHandler(
+        (session, request1, response) -> checkUrlShortenerRedirect(request1, response));
 
     adminView = new AdminView(AnnisUI.this);
 
