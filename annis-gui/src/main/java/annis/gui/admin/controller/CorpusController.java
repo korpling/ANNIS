@@ -21,7 +21,6 @@ import annis.gui.ServiceQueryException;
 import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.view.CorpusListView;
 import annis.gui.admin.view.UIView;
-import annis.service.objects.AnnisCorpus;
 import com.google.common.base.Joiner;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -79,10 +78,10 @@ public class CorpusController implements CorpusListView.Listener, UIView.Listene
             view.setAvailableCorpora(model.getCorpora());
         } catch (CriticalServiceQueryException ex) {
             uiView.showWarning("Cannot get the corpus list", null);
-            view.setAvailableCorpora(new LinkedList<AnnisCorpus>());
+            view.setAvailableCorpora(new LinkedList<>());
         } catch (ServiceQueryException ex) {
             uiView.showInfo("Cannot get the corpus list", null);
-            view.setAvailableCorpora(new LinkedList<AnnisCorpus>());
+            view.setAvailableCorpora(new LinkedList<>());
         }
     }
 

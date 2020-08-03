@@ -82,6 +82,7 @@ public class AdminView extends VerticalLayout
         GroupManagement groupManagement = new GroupManagement();
         groupManagement.setWebResourceProvider(AdminView.this);
         CorpusManagement corpusManagement = new CorpusManagement();
+        corpusManagement.setClientProvider(AdminView.this);
 
         boolean isLoggedIn = Helper.getUser(ui) != null;
 

@@ -16,7 +16,6 @@
 
 package annis.gui.admin.view;
 
-import annis.service.objects.AnnisCorpus;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
@@ -33,5 +32,5 @@ public interface CorpusListView extends Serializable {
 
     public void addListener(Listener listener);
 
-    public void setAvailableCorpora(Collection<AnnisCorpus> corpora);
+    public void setAvailableCorpora(Collection<String> corpora);
 }
