@@ -17,7 +17,6 @@ package annis.gui.admin;
 
 import annis.gui.admin.view.GroupListView;
 import annis.gui.converter.CommaSeperatedStringConverterSet;
-import annis.security.Group;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
@@ -47,6 +46,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import org.corpus_tools.annis.api.model.Group;
 
 /**
  *
@@ -222,7 +222,7 @@ public class GroupManagementPanel extends Panel implements GroupListView {
         }));
 
         Grid.Column corporaColumn = groupsGrid.getColumn("corpora");
-        ;
+
         corporaColumn.setConverter(new CommaSeperatedStringConverterSet());
 
         txtGroupName = new TextField();

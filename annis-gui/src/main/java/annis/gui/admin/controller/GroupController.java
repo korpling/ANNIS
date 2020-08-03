@@ -19,12 +19,12 @@ import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.view.GroupListView;
 import annis.gui.admin.view.UIView;
-import annis.security.Group;
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FutureCallback;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
+import org.corpus_tools.annis.api.model.Group;
 
 /**
  *
@@ -65,7 +65,9 @@ public class GroupController implements GroupListView.Listener, UIView.Listener 
     } else if (model.getGroup(groupName) != null) {
       uiView.showError("Group already exists", null);
     } else {
-      Group g = new Group(groupName);
+      Group g = new Group();
+      g.setName(groupName);
+      g.setCorpora(new LinkedList<>());
       model.createOrUpdateGroup(g);
       view.setGroupList(model.getGroups());
       view.emptyNewGroupNameTextField();

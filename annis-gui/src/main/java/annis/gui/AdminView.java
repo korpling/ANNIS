@@ -23,7 +23,6 @@ import annis.gui.admin.controller.GroupController;
 import annis.gui.admin.model.ApiClientProvider;
 import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.model.GroupManagement;
-import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
 import annis.libgui.Background;
 import annis.libgui.Helper;
@@ -77,8 +76,6 @@ public class AdminView extends VerticalLayout
         this.ui = ui;
         Page.getCurrent().setTitle("ANNIS Adminstration");
 
-        UserManagement userManagement = new UserManagement();
-        userManagement.setWebResourceProvider(AdminView.this);
         GroupManagement groupManagement = new GroupManagement();
         groupManagement.setWebResourceProvider(AdminView.this);
         CorpusManagement corpusManagement = new CorpusManagement();
