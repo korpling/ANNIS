@@ -43,7 +43,7 @@ public class CorpusManagement implements Serializable {
 
     private final Map<String, AnnisCorpus> corpora = new TreeMap<>();
 
-    private WebResourceProvider webResourceProvider;
+    private ApiClientProvider clientProvider;
 
     private final Logger log = LoggerFactory.getLogger(CorpusManagement.class);
 
@@ -52,9 +52,9 @@ public class CorpusManagement implements Serializable {
     }
 
     public void delete(String corpusName) throws CriticalServiceQueryException, ServiceQueryException {
-        if (webResourceProvider != null) {
+      if (clientProvider != null) {
             try {
-                WebResource rootRes = webResourceProvider.getWebResource();
+          WebResource rootRes = clientProvider.getWebResource();
                 rootRes.path("admin").path("corpora").path(corpusName).delete();
                 corpora.remove(corpusName);
             } catch (ClientHandlerException ex) {
@@ -75,11 +75,11 @@ public class CorpusManagement implements Serializable {
     }
 
     public void fetchFromService() throws CriticalServiceQueryException, ServiceQueryException {
-        if (webResourceProvider != null) {
+      if (clientProvider != null) {
             corpora.clear();
 
             try {
-                WebResource rootRes = webResourceProvider.getWebResource();
+              WebResource rootRes = clientProvider.getWebResource();
                 List<AnnisCorpus> corporaList = rootRes.path("query").path("corpora")
                         .get(new GenericType<List<AnnisCorpus>>() {});
 
@@ -109,12 +109,11 @@ public class CorpusManagement implements Serializable {
         return ImmutableSet.copyOf(corpora.keySet());
     }
 
-    public WebResourceProvider getWebResourceProvider() {
-        return webResourceProvider;
+    public ApiClientProvider getClientProvider() {
+      return clientProvider;
     }
 
-    public void setWebResourceProvider(WebResourceProvider webResourceProvider) {
-        this.webResourceProvider = webResourceProvider;
+    public void setClientProvider(ApiClientProvider clientProvider) {
+      this.clientProvider = clientProvider;
     }
-
 }

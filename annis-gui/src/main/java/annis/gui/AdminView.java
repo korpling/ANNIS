@@ -20,10 +20,10 @@ import annis.gui.admin.GroupManagementPanel;
 import annis.gui.admin.ImportPanel;
 import annis.gui.admin.controller.CorpusController;
 import annis.gui.admin.controller.GroupController;
+import annis.gui.admin.model.ApiClientProvider;
 import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
-import annis.gui.admin.model.WebResourceProvider;
 import annis.gui.admin.view.UIView;
 import annis.libgui.Background;
 import annis.libgui.Helper;
@@ -42,13 +42,14 @@ import com.vaadin.ui.themes.ValoTheme;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import org.corpus_tools.annis.ApiClient;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class AdminView extends VerticalLayout
-        implements View, UIView, LoginListener, TabSheet.SelectedTabChangeListener, WebResourceProvider {
+        implements View, UIView, LoginListener, TabSheet.SelectedTabChangeListener, ApiClientProvider {
 
     private static final long serialVersionUID = -5142632455076589645L;
 
@@ -81,7 +82,6 @@ public class AdminView extends VerticalLayout
         GroupManagement groupManagement = new GroupManagement();
         groupManagement.setWebResourceProvider(AdminView.this);
         CorpusManagement corpusManagement = new CorpusManagement();
-        corpusManagement.setWebResourceProvider(AdminView.this);
 
         boolean isLoggedIn = Helper.getUser(ui) != null;
 
@@ -278,6 +278,11 @@ public class AdminView extends VerticalLayout
     @Override
     public void showWarning(String error, String description) {
         Notification.show(error, description, Notification.Type.WARNING_MESSAGE);
+    }
+
+    @Override
+    public ApiClient getClient() {
+      return Helper.getClient(this.ui);
     }
 
 }

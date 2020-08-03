@@ -43,15 +43,15 @@ public class GroupManagement implements Serializable {
 
     private final Map<String, Group> groups = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
 
-    private WebResourceProvider webResourceProvider;
+    private ApiClientProvider apiClientProvider;
 
     public void clear() {
         groups.clear();
     }
 
     public void createOrUpdateGroup(Group newGroup) {
-        if (webResourceProvider != null) {
-            WebResource res = webResourceProvider.getWebResource().path("admin/groups").path(newGroup.getName());
+        if (apiClientProvider != null) {
+            WebResource res = apiClientProvider.getWebResource().path("admin/groups").path(newGroup.getName());
             try {
                 res.put(newGroup);
                 groups.put(newGroup.getName(), newGroup);
@@ -63,16 +63,16 @@ public class GroupManagement implements Serializable {
     }
 
     public void deleteGroup(String groupName) {
-        if (webResourceProvider != null) {
-            WebResource res = webResourceProvider.getWebResource().path("admin/groups").path(groupName);
+        if (apiClientProvider != null) {
+            WebResource res = apiClientProvider.getWebResource().path("admin/groups").path(groupName);
             res.delete();
             groups.remove(groupName);
         }
     }
 
     public boolean fetchFromService() {
-        if (webResourceProvider != null) {
-            WebResource res = webResourceProvider.getWebResource().path("admin/groups");
+        if (apiClientProvider != null) {
+            WebResource res = apiClientProvider.getWebResource().path("admin/groups");
             groups.clear();
             try {
                 List<Group> list = res.get(new GenericType<List<Group>>() {});
@@ -99,11 +99,11 @@ public class GroupManagement implements Serializable {
         return groups.values();
     }
 
-    public WebResourceProvider getWebResourceProvider() {
-        return webResourceProvider;
+    public ApiClientProvider getWebResourceProvider() {
+        return apiClientProvider;
     }
 
-    public void setWebResourceProvider(WebResourceProvider webResourceProvider) {
-        this.webResourceProvider = webResourceProvider;
+    public void setWebResourceProvider(ApiClientProvider apiClientProvider) {
+        this.apiClientProvider = apiClientProvider;
     }
 }
