@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 public class UserManagement implements Serializable {
     private static final long serialVersionUID = 9003127192150738183L;
 
-    private WebResourceProvider webResourceProvider;
+    private ApiClientProvider apiClientProvider;
 
     private final Map<String, User> users = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
     private final TreeSet<String> usedGroupNames = new TreeSet<>();
@@ -53,8 +53,8 @@ public class UserManagement implements Serializable {
     }
 
     public boolean createOrUpdateUser(User newUser) {
-        if (webResourceProvider != null) {
-            WebResource res = webResourceProvider.getWebResource().path("admin/users").path(newUser.getName());
+        if (apiClientProvider != null) {
+            WebResource res = apiClientProvider.getWebResource().path("admin/users").path(newUser.getName());
             try {
                 res.put(newUser);
                 users.put(newUser.getName(), newUser);
@@ -69,8 +69,8 @@ public class UserManagement implements Serializable {
     }
 
     public void deleteUser(String userName) {
-        if (webResourceProvider != null) {
-            WebResource res = webResourceProvider.getWebResource().path("admin/users").path(userName);
+        if (apiClientProvider != null) {
+            WebResource res = apiClientProvider.getWebResource().path("admin/users").path(userName);
             res.delete();
             users.remove(userName);
             updateUsedGroupNamesAndPermissions();
@@ -78,8 +78,8 @@ public class UserManagement implements Serializable {
     }
 
     public boolean fetchFromService() {
-        if (webResourceProvider != null) {
-            WebResource res = webResourceProvider.getWebResource().path("admin/users");
+        if (apiClientProvider != null) {
+            WebResource res = apiClientProvider.getWebResource().path("admin/users");
             users.clear();
             usedGroupNames.clear();
             usedPermissions.clear();
@@ -114,15 +114,15 @@ public class UserManagement implements Serializable {
         return users.values();
     }
 
-    public WebResourceProvider getWebResourceProvider() {
-        return webResourceProvider;
+    public ApiClientProvider getWebResourceProvider() {
+        return apiClientProvider;
     }
 
     public User setPassword(String userName, String newPassword) {
         User newUser = null;
 
-        if (webResourceProvider != null) {
-            WebResource res = webResourceProvider.getWebResource().path("admin/users").path(userName).path("password");
+        if (apiClientProvider != null) {
+            WebResource res = apiClientProvider.getWebResource().path("admin/users").path(userName).path("password");
             newUser = res.post(User.class, newPassword);
             if (newUser != null) {
                 users.put(newUser.getName(), newUser);
@@ -132,8 +132,8 @@ public class UserManagement implements Serializable {
 
     }
 
-    public void setWebResourceProvider(WebResourceProvider webResourceProvider) {
-        this.webResourceProvider = webResourceProvider;
+    public void setWebResourceProvider(ApiClientProvider apiClientProvider) {
+        this.apiClientProvider = apiClientProvider;
     }
 
     private void updateUsedGroupNamesAndPermissions() {

@@ -18,6 +18,7 @@ package annis.gui.admin.model;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.WebResource;
 import java.io.Serializable;
+import org.corpus_tools.annis.ApiClient;
 
 /**
  * Defines a way to get a {@link WebResource} needed to make REST calls.
@@ -27,16 +28,27 @@ import java.io.Serializable;
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public interface WebResourceProvider extends Serializable {
+public interface ApiClientProvider extends Serializable {
+
+
+    /**
+     * Returns a (possible cached) {@link ApiClient}.
+     * 
+     * If the the user is authenticated this includes the authentication information.
+     * 
+     * @return The {@link ApiClient} but never {@code null}.
+     */
+    public ApiClient getClient();
+
 
     /**
      * Returns a (possible cached) {@link AsyncWebResource}.
      * 
-     * If the the user is authentifaced this includes the authentifaction
-     * information.
+     * If the the user is authentifaced this includes the authentifaction information.
      * 
      * @return The {@link AsyncWebResource} but never {@code null}.
      */
+    @Deprecated
     public AsyncWebResource getAsyncWebResource();
 
     /**
@@ -47,6 +59,7 @@ public interface WebResourceProvider extends Serializable {
      * 
      * @return The {@link WebResource} but never {@code null}.
      */
+    @Deprecated
     public WebResource getWebResource();
 
     /**

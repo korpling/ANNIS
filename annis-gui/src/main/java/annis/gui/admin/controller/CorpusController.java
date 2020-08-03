@@ -97,8 +97,8 @@ public class CorpusController implements CorpusListView.Listener, UIView.Listene
     @Override
     public void loginChanged(boolean isLoggedIn) {
         this.isLoggedIn = isLoggedIn;
-        if (model.getWebResourceProvider() != null) {
-            model.getWebResourceProvider().invalidateWebResource();
+        if (model.getClientProvider() != null) {
+          model.getClientProvider().invalidateWebResource();
         }
         if (isLoggedIn && viewIsActive) {
             fetchFromService();
