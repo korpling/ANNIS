@@ -24,6 +24,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CorpusList"
+  /corpora/{corpus}:
+    delete:
+      tags:
+        - corpora
+      summary: Delete the given corpus.
+      operationId: deleteCorpus
+      parameters:
+        - name: corpus
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Deletion successful"
+        "404":
+          description: "Corpus was not found"
 
   /import:
     post:

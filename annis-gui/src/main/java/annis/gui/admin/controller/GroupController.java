@@ -129,7 +129,7 @@ public class GroupController implements GroupListView.Listener, UIView.Listener 
           view.setGroupList(new LinkedList<Group>());
         }
 
-        view.addAvailableCorpusNames(corpusModel.getCorpusNames());
+        view.addAvailableCorpusNames(corpusModel.getCorpora());
 
         updateUserUI();
       }
