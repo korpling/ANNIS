@@ -13,10 +13,9 @@
  */
 package annis.gui;
 
-import annis.CommonHelper;
 import annis.gui.docbrowser.DocBrowserController;
+import annis.gui.graphml.DocumentGraphMapper;
 import annis.gui.util.ANNISFontIcon;
-import annis.libgui.AnnisUser;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
@@ -28,10 +27,8 @@ import annis.visualizers.htmlvis.HTMLVis;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
@@ -48,6 +45,9 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.v7.ui.Label;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -56,15 +56,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.ws.rs.core.Response;
+import javax.xml.stream.XMLStreamException;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.apache.commons.io.IOUtils;
+import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.model.VisualizerRule;
-import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
-import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 /**
  *
@@ -146,20 +151,16 @@ public class EmbeddedVisUI extends CommonUI {
 
       URI uri = new URI(rawUri);
       // fetch content of the URI
-      Client client = null;
-      AnnisUser user = Helper.getUser(EmbeddedVisUI.this);
-      if (client == null) {
-        client = Helper.createRESTClient();
-      }
-      final WebResource saltRes = client.resource(uri);
+      ApiClient client = Helper.getClient(this);
 
       displayLoadingIndicator();
 
       // copy the arguments for using them later in the callback
       final Map<String, String[]> argsCopy = new LinkedHashMap<>(args);
+      Request request = new okhttp3.Request.Builder().url(uri.toASCIIString()).build();
 
-      Background.runWithCallback(() -> saltRes.get(SaltProject.class),
-          new FutureCallback<SaltProject>() {
+      Background.runWithCallback(() -> client.getHttpClient().newCall(request).execute(),
+          new FutureCallback<Response>() {
             @Override
             public void onFailure(Throwable t) {
               log.error("Could not query Salt graph for embedded visualization.", t);
@@ -167,23 +168,17 @@ public class EmbeddedVisUI extends CommonUI {
             }
 
             @Override
-            public void onSuccess(SaltProject p) {
-              // TODO: allow to display several visualizers when there is more than one
-              // document
-              SCorpusGraph firstCorpusGraph = null;
-              SDocument doc = null;
-              if (p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()) {
-                firstCorpusGraph = p.getCorpusGraphs().get(0);
-                if (firstCorpusGraph.getDocuments() != null
-                    && !firstCorpusGraph.getDocuments().isEmpty()) {
-                  doc = firstCorpusGraph.getDocuments().get(0);
-                }
+            public void onSuccess(Response response) {
+              try {
+              File tmpFile = File.createTempFile("embeddded-vis-fetched-result-", ".graphml");
+              try (FileOutputStream out = new FileOutputStream(tmpFile)) {
+                IOUtils.copy(response.body().byteStream(), out);
+              } catch (IOException ex) {
+                log.error("Could not copy fetched GraphML file:", ex);
               }
-              if (doc == null) {
-                displayMessage("No documents found in provided URL.", "");
-                return;
-              }
-
+              SDocumentGraph docGraph = DocumentGraphMapper.map(tmpFile);
+              SDocument doc = SaltFactory.createSDocument();
+              doc.setDocumentGraph(docGraph);
               if (argsCopy.containsKey(KEY_INSTANCE)) {
                 Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
                 InstanceConfig newConfig = allConfigs.get(argsCopy.get(KEY_INSTANCE)[0]);
@@ -227,12 +222,12 @@ public class EmbeddedVisUI extends CommonUI {
                 if (rawMatch.length > 0) {
                   // enhance the graph with match information from the arguments
                   Match match = Match.parseFromString(rawMatch[0]);
-                  CommonHelper.addMatchToDocumentGraph(match, doc);
+                  Helper.addMatchToDocumentGraph(match, doc);
                 }
               }
 
               List<SNode> segNodes =
-                  CommonHelper.getSortedSegmentationNodes(baseText, doc.getDocumentGraph());
+                  Helper.getSortedSegmentationNodes(baseText, doc.getDocumentGraph());
 
               Map<SNode, Long> markedAndCovered =
                   Helper.calculateMarkedAndCovered(doc, segNodes, baseText);
@@ -270,6 +265,10 @@ public class EmbeddedVisUI extends CommonUI {
               setContent(layout);
 
               IDGenerator.assignID(link);
+              } catch (IOException | XMLStreamException ex) {
+                log.error("Could not parse GraphML", ex);
+                displayMessage("Could not parse GraphML", ex.toString());
+              }
             }
 
           });
@@ -277,7 +276,7 @@ public class EmbeddedVisUI extends CommonUI {
     } catch (URISyntaxException ex) {
       displayMessage("Invalid URL", "The provided URL is malformed:<br />" + ex.getMessage());
     } catch (UniformInterfaceException ex) {
-      if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode()) {
+      if (ex.getResponse().getStatus() == HttpStatus.FORBIDDEN.value()) {
         displayMessage("Corpus access forbidden",
             "You are not allowed to access this corpus. "
                 + "Please login at the <a target=\"_blank\" href=\""
@@ -358,10 +357,8 @@ public class EmbeddedVisUI extends CommonUI {
 
       // create input
       try {
-        input =
-            DocBrowserController.createInput(corpus, docPath, visConfig,
-                null, visualizer.isUsingRawText(),
-            EmbeddedVisUI.this);
+        input = DocBrowserController.createInput(corpus, docPath, visConfig, null,
+            visualizer.isUsingRawText(), EmbeddedVisUI.this);
         // create components, put in a panel
         Panel viszr = visualizer.createComponent(input, null);
 

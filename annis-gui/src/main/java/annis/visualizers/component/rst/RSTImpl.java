@@ -13,10 +13,10 @@
  */
 package annis.visualizers.component.rst;
 
-import annis.CommonHelper;
 import annis.gui.components.CssRenderInfo;
 import annis.gui.widgets.JITWrapper;
 import annis.gui.widgets.gwt.client.ui.VJITWrapper;
+import annis.libgui.Helper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import com.vaadin.ui.Panel;
@@ -288,7 +288,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     // token data structures are not needed
     if (currNode instanceof SToken) {
       return false;
-    } else if (CommonHelper.checkSLayer(namespace, currNode)) {
+    } else if (Helper.checkSLayer(namespace, currNode)) {
       return true;
     }
 
@@ -681,7 +681,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     List<SNode> rstRoots = new ArrayList<SNode>();
 
     for (SNode sNode : rootSNodes) {
-      if (CommonHelper.checkSLayer(namespace, sNode) && !isSignalNode(sNode)) {
+      if (Helper.checkSLayer(namespace, sNode) && !isSignalNode(sNode)) {
         rstRoots.add(sNode);
       }
     }

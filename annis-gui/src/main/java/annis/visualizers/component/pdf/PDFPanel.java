@@ -16,7 +16,6 @@ package annis.visualizers.component.pdf;
 import static annis.libgui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
 import static annis.libgui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
 
-import annis.CommonHelper;
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
@@ -96,7 +95,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
   private String getBinaryPath() {
     List<String> corpusPath =
-        CommonHelper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
+        Helper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     String documentName = corpusPath.get(0);

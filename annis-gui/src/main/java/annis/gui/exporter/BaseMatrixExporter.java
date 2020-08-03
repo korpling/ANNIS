@@ -15,21 +15,15 @@
  */
 package annis.gui.exporter;
 
-import annis.CommonHelper;
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.graphml.DocumentGraphMapper;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
-import annis.service.objects.AnnisAttribute;
 import annis.service.objects.Match;
 import annis.service.objects.SubgraphFilter;
 import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.ui.UI;
 import java.io.File;
 import java.io.IOException;
@@ -77,11 +71,6 @@ import org.slf4j.LoggerFactory;
 
 @IgnoreSizeOf
 public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable {
-
-    private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>> {
-
-        public AnnisAttributeListType() {}
-    }
 
     /**
      * 
@@ -196,7 +185,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
                   Match match = Match.parseFromString(currentLine);
 
                   if (!match.getSaltIDs().isEmpty()) {
-                    List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
+                    List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
 
                     SubgraphWithContext subgraphQuery = new SubgraphWithContext();
                     subgraphQuery.setLeft(contextLeft);
@@ -217,7 +206,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
                       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
                       doc.setDocumentGraph(docGraph);
-                      CommonHelper.addMatchToDocumentGraph(match, doc);
+                      Helper.addMatchToDocumentGraph(match, doc);
 
                       int currentOffset = offset.getAndIncrement();
                       int currentPCounter = pCounter.getAndIncrement();
@@ -270,8 +259,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
             return null;
 
-          } catch (ApiException | AnnisQLSyntaxException | AnnisCorpusAccessException
-                | UniformInterfaceException | IOException | CacheException | IllegalStateException
+          } catch (ApiException | IOException | CacheException | IllegalStateException
                 | ClassCastException ex) {
             return ex;
         } finally {

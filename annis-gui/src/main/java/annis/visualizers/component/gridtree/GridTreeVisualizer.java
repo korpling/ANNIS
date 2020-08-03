@@ -13,7 +13,6 @@
  */
 package annis.visualizers.component.gridtree;
 
-import static annis.CommonHelper.getSpannedText;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
@@ -203,7 +202,7 @@ public class GridTreeVisualizer extends AbstractVisualizer {
 
         for (SToken t : graph.getSortedTokenByText()) {
           int idx = token2index.get(t);
-          baseRow.addEvent(new GridEvent(t.getId(), idx, idx, getSpannedText(t)));
+          baseRow.addEvent(new GridEvent(t.getId(), idx, idx, Helper.getSpannedText(t)));
         }
       } else {
 

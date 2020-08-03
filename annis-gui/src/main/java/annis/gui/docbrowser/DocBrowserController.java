@@ -13,7 +13,6 @@
  */
 package annis.gui.docbrowser;
 
-import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.graphml.DocumentGraphMapper;
@@ -316,7 +315,7 @@ public class DocBrowserController implements Serializable {
 
   public void openDocVis(String corpus, String docId, VisualizerRule visConfig, Button btn) {
 
-    List<String> path = CommonHelper.getCorpusPath(docId);
+    List<String> path = Helper.getCorpusPath(docId);
     
     final String canonicalTitle =
         Joiner.on(" > ").join(path) + " - " + "Visualizer: " + visConfig.getDisplayName();

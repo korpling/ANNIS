@@ -156,10 +156,10 @@ public class GroupController implements GroupListView.Listener, UIView.Listener 
   public void loginChanged(boolean isLoggedIn) {
     this.isLoggedIn = isLoggedIn;
     if (model.getWebResourceProvider() != null) {
-      model.getWebResourceProvider().invalidateWebResource();
+      model.getWebResourceProvider().invalidateClient();
     }
     if (corpusModel.getClientProvider() != null) {
-      corpusModel.getClientProvider().invalidateWebResource();
+      corpusModel.getClientProvider().invalidateClient();
     }
     if (isLoggedIn && viewIsActive) {
       fetchDataFromService();

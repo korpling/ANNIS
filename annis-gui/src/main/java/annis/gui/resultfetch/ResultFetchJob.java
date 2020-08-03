@@ -13,20 +13,17 @@
  */
 package annis.gui.resultfetch;
 
-import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.components.ExceptionDialog;
+import annis.gui.components.codemirror.AqlCodeEditorState.ParseError;
 import annis.gui.graphml.DocumentGraphMapper;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
-import annis.model.AqlParseError;
 import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import com.google.common.base.Joiner;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,9 +36,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.JSON;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.FindQuery;
+import org.corpus_tools.annis.api.model.GraphAnnisError;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -140,7 +139,7 @@ public class ResultFetchJob implements Runnable {
           arg.setSegmentation(query.getSegmentation());
           arg.setNodeIds(
               m.getSaltIDs().stream().map(id -> id.toString()).collect(Collectors.toList()));
-          List<String> corpusPath = CommonHelper.getCorpusPath(m.getSaltIDs().get(0));
+          List<String> corpusPath = Helper.getCorpusPath(m.getSaltIDs().get(0));
 
           if (!corpusPath.isEmpty()) {
             File graphML = corpora.subgraphForNodes(corpusPath.get(0), arg);
@@ -153,7 +152,7 @@ public class ResultFetchJob implements Runnable {
               SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
               queue.put(p);
               doc.setDocumentGraph(docGraph);
-              CommonHelper.addMatchToDocumentGraph(m, doc);
+              Helper.addMatchToDocumentGraph(m, doc);
               log.debug("added match {} to queue", current + 1);
             } catch (XMLStreamException | IOException ex) {
               log.error("Could not map GraphML to Salt", ex);
@@ -182,17 +181,24 @@ public class ResultFetchJob implements Runnable {
           PagingComponent paging = resultPanel.getPaging();
           Throwable cause = root.getCause();
 
-          if (cause instanceof UniformInterfaceException) {
-            UniformInterfaceException ex = (UniformInterfaceException) cause;
-            if (ex.getResponse().getStatus() == 400) {
-              List<AqlParseError> errors =
-                  ex.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
-              String errMsg = Joiner.on(" | ").join(errors);
+          if (cause instanceof ApiException) {
+            ApiException ex = (ApiException) cause;
+            if (ex.getCode() == 400) {
+              JSON json = new JSON();
+              GraphAnnisError error = json.deserialize(ex.getResponseBody(), GraphAnnisError.class);
 
-              paging.setInfo("parsing error: " + errMsg);
-            } else if (ex.getResponse().getStatus() == 504) {
+              String errMsg = "";
+              if (error.getAqLSyntaxError() != null) {
+                errMsg = new ParseError(error.getAqLSyntaxError()).message;
+              }
+              if (error.getAqLSemanticError() != null) {
+                errMsg = new ParseError(error.getAqLSemanticError()).message;
+              }
+
+              paging.setInfo("parsing error: " + errMsg.toString());
+            } else if (ex.getCode() == 504) {
               paging.setInfo("Timeout: query execution took too long");
-            } else if (ex.getResponse().getStatus() == 403) {
+            } else if (ex.getCode() == 403) {
               paging.setInfo("Not authorized to query this corpus.");
             } else {
               paging.setInfo("unknown error: " + ex);

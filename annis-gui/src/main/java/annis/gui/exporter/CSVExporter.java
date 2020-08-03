@@ -15,7 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
 import annis.service.objects.SubgraphFilter;
@@ -219,7 +218,8 @@ public class CSVExporter extends BaseMatrixExporter {
         // TODO cache the metadata
         if (!metakeys.isEmpty()) {
             // TODO is this the best way to get the corpus name?
-            String corpus_name = CommonHelper.getCorpusPath(graph.getDocument().getId().toString()).get(0);
+            String corpus_name =
+                Helper.getCorpusPath(graph.getDocument().getId().toString()).get(0);
             Map<String, SMetaAnnotation> allMetaAnnos =
                 Helper.getMetaData(corpus_name, Optional.of(graph.getDocument().getName()), ui)
                     .stream()

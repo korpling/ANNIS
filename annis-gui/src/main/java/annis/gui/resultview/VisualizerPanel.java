@@ -13,7 +13,6 @@
  */
 package annis.gui.resultview;
 
-import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.graphml.DocumentGraphMapper;
@@ -248,7 +247,7 @@ public class VisualizerPanel extends CssLayout
     this.result = result;
     this.match = match;
     if (!match.getSaltIDs().isEmpty()) {
-      this.path = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
+      this.path = Helper.getCorpusPath(match.getSaltIDs().get(0));
     } else {
       this.path = new LinkedList<>();
     }

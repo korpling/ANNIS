@@ -16,7 +16,6 @@ package annis.gui.exporter;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
-import annis.CommonHelper;
 import annis.gui.graphml.DocumentGraphMapper;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
@@ -127,7 +126,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
         out.append("\n");
 
         if (!metaKeys.isEmpty()) {
-          String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
+          String[] path = Helper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
           appendMetaData(out, metaKeys, path[path.length - 1], path[0], metadataCache, ui);
         }
         out.append("\n");
@@ -192,7 +191,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
             Match match = Match.parseFromString(currentLine);
 
             if (!match.getSaltIDs().isEmpty()) {
-              List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
+              List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
 
               SubgraphWithContext subgraphQuery = new SubgraphWithContext();
               subgraphQuery.setLeft(contextLeft);
@@ -213,7 +212,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
                 SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
                 doc.setDocumentGraph(docGraph);
-                CommonHelper.addMatchToDocumentGraph(match, doc);
+                Helper.addMatchToDocumentGraph(match, doc);
 
                 int currentOffset = offset.getAndIncrement();
                 convertText(p, finalKeys, args, out, currentOffset, ui);

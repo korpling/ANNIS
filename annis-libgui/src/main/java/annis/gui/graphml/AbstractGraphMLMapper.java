@@ -1,6 +1,6 @@
 package annis.gui.graphml;
 
-import annis.CommonHelper;
+import annis.libgui.Helper;
 import com.google.common.base.Splitter;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -108,7 +108,7 @@ public abstract class AbstractGraphMLMapper {
     // get the name from the ID
     if (newNode.getPath().fragment() == null) {
 
-      List<String> corpusPath = CommonHelper.getCorpusPath(nodeName);
+      List<String> corpusPath = Helper.getCorpusPath(nodeName);
       newNode.setName(corpusPath.get(corpusPath.size() - 1));
     } else {
       newNode.setName(newNode.getPath().fragment());

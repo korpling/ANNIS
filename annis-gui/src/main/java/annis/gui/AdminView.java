@@ -152,13 +152,6 @@ public class AdminView extends VerticalLayout
 
     }
 
-    @Override
-    public AsyncWebResource getAsyncWebResource() {
-        if (asyncWebResource == null) {
-            asyncWebResource = Helper.getAnnisAsyncWebResource(ui);
-        }
-        return asyncWebResource;
-    }
 
     private Component getComponentForFragment(String fragment) {
         if (fragment != null) {
@@ -187,16 +180,9 @@ public class AdminView extends VerticalLayout
         return "";
     }
 
-    @Override
-    public WebResource getWebResource() {
-        if (webResource == null) {
-            webResource = Helper.getAnnisWebResource(ui);
-        }
-        return webResource;
-    }
 
     @Override
-    public void invalidateWebResource() {
+    public void invalidateClient() {
         asyncWebResource = null;
         webResource = null;
     }

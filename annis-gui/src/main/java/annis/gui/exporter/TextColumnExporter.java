@@ -15,7 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
 import annis.service.objects.SubgraphFilter;
@@ -362,7 +361,7 @@ public class TextColumnExporter extends BaseMatrixExporter {
 
                     String name;
 
-                    if ((name = CommonHelper.getTextualDSForNode(token, graph).getName()) == null) {
+                    if ((name = Helper.getTextualDSForNode(token, graph).getName()) == null) {
                         name = "";
                     }
                     speakerName = (recordNumber + 1) + "_" + name;
@@ -630,7 +629,7 @@ public class TextColumnExporter extends BaseMatrixExporter {
                     counterGlobal++;
                     // get current speaker name
                     String name;
-                    if ((name = CommonHelper.getTextualDSForNode(tok, graph).getName()) == null) {
+                    if ((name = Helper.getTextualDSForNode(tok, graph).getName()) == null) {
                         name = "";
                     }
 
@@ -710,7 +709,8 @@ public class TextColumnExporter extends BaseMatrixExporter {
                             if (!listOfMetakeys.isEmpty()) {
                                 // get metadata
                                 String docName = graph.getDocument().getName();
-                                List<String> corpusPath = CommonHelper.getCorpusPath(graph.getDocument().getGraph(),
+                                List<String> corpusPath = Helper.getCorpusPath(
+                                    graph.getDocument().getGraph(),
                                         graph.getDocument());
                                 String corpusName = corpusPath.get(corpusPath.size() - 1);
                                 corpusName = urlPathEscape.escape(corpusName);

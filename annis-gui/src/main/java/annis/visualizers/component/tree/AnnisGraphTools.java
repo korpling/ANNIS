@@ -13,8 +13,8 @@
  */
 package annis.visualizers.component.tree;
 
-import annis.CommonHelper;
 import annis.gui.AnnisUI;
+import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
 import com.vaadin.ui.UI;
 import edu.uci.ics.jung.graph.DirectedGraph;
@@ -50,7 +50,7 @@ public class AnnisGraphTools implements Serializable {
 
     int withhRTL = 0;
     for (SToken token : docGraph.getTokens()) {
-      if (CommonHelper.containsRTLText(docGraph.getText(token))) {
+      if (Helper.containsRTLText(docGraph.getText(token))) {
         withhRTL += 1;
       }
     }
@@ -159,7 +159,7 @@ public class AnnisGraphTools implements Serializable {
 
     List<SNode> rootNodes = new LinkedList<>();
     for (SNode n : docGraph.getRootsByRelation(SALT_TYPE.SDOMINANCE_RELATION)) {
-      if (CommonHelper.checkSLayer(namespace, n)) {
+      if (Helper.checkSLayer(namespace, n)) {
         rootNodes.add(n);
       }
     }

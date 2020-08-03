@@ -13,7 +13,6 @@
  */
 package annis.visualizers.component;
 
-import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
@@ -124,7 +123,7 @@ public class RawTextVisualizer extends AbstractVisualizer {
 
         if (visInput.getUI() instanceof AnnisUI) {
           if (!((AnnisUI) visInput.getUI()).getConfig().isDisableRTL()
-              && CommonHelper.containsRTLText(s)) {
+              && Helper.containsRTLText(s)) {
             lblText.addStyleName("rtl");
           }
         }
@@ -147,7 +146,7 @@ public class RawTextVisualizer extends AbstractVisualizer {
 
       if (visInput.getUI() instanceof AnnisUI) {
         if (!((AnnisUI) visInput.getUI()).getConfig().isDisableRTL()
-            && CommonHelper.containsRTLText(texts.getFirstText())) {
+            && Helper.containsRTLText(texts.getFirstText())) {
           lblText.addStyleName("rtl");
         }
       }
