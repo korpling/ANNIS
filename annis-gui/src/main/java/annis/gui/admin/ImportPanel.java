@@ -35,11 +35,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.ApiResponse;
+import org.corpus_tools.annis.JSON;
 import org.corpus_tools.annis.api.AdministrationApi;
 import org.corpus_tools.annis.api.model.ImportResult;
 import org.corpus_tools.annis.api.model.Job;
@@ -78,10 +77,12 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
     private final String uuid;
 
     private int currentMessageIndex = 0;
+    private JSON json;
 
     public WaitForFinishRunner(String uuid, UI ui) {
       this.ui = ui;
       this.uuid = uuid;
+      this.json = new JSON();
     }
 
     private void appendFromBackground(List<String> message) {
@@ -114,31 +115,29 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
       try {
         do {
           job = null;
-          ApiResponse<Object> response = api.getApiClient().execute(api.getJobCall(uuid, null));
+          ApiResponse<String> response =
+              api.getApiClient().execute(api.getJobCall(uuid, null), String.class);
+
 
           // If the response type returns an object of type Job, get it here
-          switch (response.getStatusCode()) {
-            case 202 | 410:
-              if (response.getData() instanceof Job) {
-                job = (Job) response.getData();
-                outputNewMessages(job.getMessages());
-              }
-              break;
-            case 303:
-              if (response.getData() instanceof Collection<?>) {
-                List<String> finishMessages = new LinkedList<String>();
-                for (Object m : (Collection<?>) response.getData()) {
-                  if (m instanceof String) {
-                    finishMessages.add((String) m);
-                  }
-                }
-                appendFromBackground(finishMessages);
-              }
+          int statusCode = response.getStatusCode();
+          if (statusCode == HttpStatus.ACCEPTED.value()) {
+            job = json.deserialize(response.getData(), Job.class);
+            outputNewMessages(job.getMessages());
+          } else if (statusCode == HttpStatus.OK.value()) {
+            // The last messages are given as array of strings
+            String[] finishMessages = json.deserialize(response.getData(), String[].class);
+            for (int i = 0; i < finishMessages.length; i++) {
+              appendFromBackground(finishMessages[i]);
+            }
+          } else {
+            appendFromBackground("Unknown status code " + response.getStatusCode());
           }
+
           Thread.sleep(500);
         } while (job != null && job.getStatus() == StatusEnum.RUNNING);
 
-        if(job == null) {
+        if (job == null) {
           appendFromBackground("Finished.");
         }
         if (job != null) {
@@ -157,8 +156,16 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
       } catch (InterruptedException ex) {
         log.error(null, ex);
         Thread.currentThread().interrupt();
-      } catch(ApiException ex) {
-        appendFromBackground("Exception while getting status: " + ex.getMessage());
+      } catch (ApiException ex) {
+        if (ex.getCode() == HttpStatus.GONE.value()) {
+          // Decode the Job object with its included error messages
+          job = json.deserialize(ex.getResponseBody(), Job.class);
+          outputNewMessages(job.getMessages());
+        } else {
+          appendFromBackground(
+              "Exception while polling for import status: " + ex.getMessage() + "\n"
+                  + ex.getResponseBody());
+        }
         ui.access(() -> {
           progress.setVisible(false);
           upload.setEnabled(true);
