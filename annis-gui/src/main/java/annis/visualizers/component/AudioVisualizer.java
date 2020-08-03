@@ -13,7 +13,6 @@
  */
 package annis.visualizers.component;
 
-import annis.CommonHelper;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.medialement.MediaElement;
 import annis.gui.components.medialement.MediaElementPlayer;
@@ -52,7 +51,7 @@ public class AudioVisualizer extends AbstractVisualizer {
   @Override
   public MediaElementPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle) {
     List<String> corpusPath =
-        CommonHelper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
+        Helper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
     String binaryServletPath = "";
     String mimeType = null;

@@ -13,7 +13,7 @@
  */
 package annis.visualizers.iframe;
 
-import annis.CommonHelper;
+import annis.libgui.Helper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import com.hp.gagawa.java.DocumentType;
@@ -49,7 +49,6 @@ import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.DataSourceSequence;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Component;
 
 /**
@@ -574,7 +573,7 @@ public class CorefVisualizer extends WriterVisualizer {
                 tdTok.setAttribute("annis:pr_left", left2);
                 tdTok.setAttribute("annis:pr_right", right2);
 
-                Text textTok = new Text("&nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp;");
+                Text textTok = new Text("&nbsp;" + Helper.getSpannedText(tok) + "&nbsp;");
                 tdTok.appendChild(textTok);
               } else {// easier
                 tooltip = "&lt;b&gt;Component&lt;/b&gt;: " + (currentPositionComponent + 1)
@@ -592,7 +591,7 @@ public class CorefVisualizer extends WriterVisualizer {
                 tdTok.setAttribute("annis:pr_left", left);
                 tdTok.setAttribute("annis:pr_right", right);
 
-                Text textTok = new Text("&nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp;");
+                Text textTok = new Text("&nbsp;" + Helper.getSpannedText(tok) + "&nbsp;");
                 tdTok.appendChild(textTok);
 
               }
@@ -686,7 +685,7 @@ public class CorefVisualizer extends WriterVisualizer {
         tdTok.setId("tok_" + prepareID(tok.getId()));
         tdTok.setStyle(style);
 
-        Text textTok = new Text("&nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp;");
+        Text textTok = new Text("&nbsp;" + Helper.getSpannedText(tok) + "&nbsp;");
         tdTok.appendChild(textTok);
 
         if (maxlinkcount > 0) {

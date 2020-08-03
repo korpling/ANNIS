@@ -13,7 +13,6 @@
  */
 package annis.visualizers.htmlvis;
 
-import annis.CommonHelper;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.MatchedNodeColors;
@@ -103,7 +102,7 @@ public class HTMLVis extends AbstractVisualizer {
     lblResult.setSizeUndefined();
 
     List<String> corpusPath =
-        CommonHelper.getCorpusPath(vi.getDocument().getGraph(), vi.getDocument());
+        Helper.getCorpusPath(vi.getDocument().getGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     corpusName = urlPathEscape.escape(corpusName);
 
@@ -194,7 +193,7 @@ public class HTMLVis extends AbstractVisualizer {
       String strCorpName = "";
       strDocName = graph.getDocument().getName();
       List<String> corpusPath =
-          CommonHelper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
+          Helper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
       strCorpName = corpusPath.get(corpusPath.size() - 1);
 
       // Get metadata and put in hashmap

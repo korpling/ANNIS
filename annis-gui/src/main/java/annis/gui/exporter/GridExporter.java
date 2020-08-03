@@ -15,7 +15,7 @@
  */
 package annis.gui.exporter;
 
-import annis.CommonHelper;
+import annis.libgui.Helper;
 import com.google.common.base.Splitter;
 import com.vaadin.ui.UI;
 import java.io.IOException;
@@ -159,7 +159,7 @@ public class GridExporter extends GeneralTextExporter {
                 }
 
                 if (!metaKeys.isEmpty()) {
-                    String[] path = CommonHelper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
+                  String[] path = Helper.getCorpusPath(corpusGraph, doc).toArray(new String[0]);
                     super.appendMetaData(out, metaKeys, path[path.length - 1], path[0], metadataCache, ui);
                 }
                 out.append("\n\n");

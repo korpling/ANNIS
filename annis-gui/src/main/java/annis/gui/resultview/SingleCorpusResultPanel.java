@@ -15,9 +15,9 @@
  */
 package annis.gui.resultview;
 
-import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.MetaDataPanel;
+import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import annis.model.DisplayedResultQuery;
 import annis.service.objects.Match;
@@ -80,7 +80,7 @@ public class SingleCorpusResultPanel extends CssLayout {
         infoBar.setExpandRatio(corpusPaths, 1.0f);
 
         for (SCorpus c : this.result) {
-            List<String> path = CommonHelper.getCorpusPath(c.getPath().toString());
+          List<String> path = Helper.getCorpusPath(c.getPath().toString());
 
             HorizontalLayout corpusInfoLayout = new HorizontalLayout();
             corpusPaths.addComponent(corpusInfoLayout);

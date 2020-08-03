@@ -13,7 +13,6 @@
  */
 package annis.gui.resultfetch;
 
-import annis.CommonHelper;
 import annis.gui.graphml.DocumentGraphMapper;
 import annis.libgui.Helper;
 import annis.model.PagedResultQuery;
@@ -72,7 +71,7 @@ public class SingleResultFetchJob implements Callable<SaltProject>
     subgraphQuery.setRight(query.getRightContext());
     subgraphQuery.setSegmentation(query.getSegmentation());
 
-    List<String> corpusPath = CommonHelper.getCorpusPath(match.getSaltIDs().get(0));
+    List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
     final SaltProject p = SaltFactory.createSaltProject();
     SCorpusGraph cg = p.createCorpusGraph();
 
@@ -82,7 +81,7 @@ public class SingleResultFetchJob implements Callable<SaltProject>
       SDocument doc = cg.createDocument(docURI);
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
       doc.setDocumentGraph(docGraph);
-      CommonHelper.addMatchToDocumentGraph(match, doc);
+      Helper.addMatchToDocumentGraph(match, doc);
     }
 
     return p;

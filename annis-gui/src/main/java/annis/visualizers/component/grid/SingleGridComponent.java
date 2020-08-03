@@ -16,7 +16,6 @@ package annis.visualizers.component.grid;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
-import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
@@ -72,7 +71,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
 
   private static String extractTextForToken(SNode t, String segmentation) {
     if (t instanceof SToken) {
-      return CommonHelper.getSpannedText((SToken) t);
+      return Helper.getSpannedText((SToken) t);
     } else if (segmentation != null) {
       for (SAnnotation anno : t.getAnnotations()) {
         if (anno.getName().equals(segmentation)) {
@@ -130,7 +129,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
       if (input.getUI() instanceof AnnisUI) {
         if (texts != null && texts.size() > 0
             && !((AnnisUI) input.getUI()).getConfig().isDisableRTL()) {
-          if (CommonHelper.containsRTLText(texts.get(0).getText())) {
+          if (Helper.containsRTLText(texts.get(0).getText())) {
             addStyleName("rtl");
           }
         }
@@ -214,7 +213,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
     Row tokenRow = new Row();
     for (SNode t : tokens) {
       // get the Salt ID of the STextualDS of this token
-      STextualDS tokenText = CommonHelper.getTextualDSForNode(t, graph);
+      STextualDS tokenText = Helper.getTextualDSForNode(t, graph);
 
       // only add token if text ID matches the valid one
       if (tokenText != null && validTextIDs.contains(tokenText.getId())
@@ -257,7 +256,7 @@ public class SingleGridComponent extends Panel implements GridComponent {
     SDocumentGraph graph = input.getDocument().getDocumentGraph();
 
     List<SNode> sortedSegmentationNodes =
-        CommonHelper.getSortedSegmentationNodes(this.segmentationName, graph);
+        Helper.getSortedSegmentationNodes(this.segmentationName, graph);
 
     Map<SToken, Integer> token2index = Helper.createToken2IndexMap(graph, this.enforcedText);
     Preconditions.checkArgument(!token2index.isEmpty(), "Token list must be non-empty");

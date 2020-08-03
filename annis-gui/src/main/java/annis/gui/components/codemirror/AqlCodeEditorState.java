@@ -13,18 +13,15 @@
  */
 package annis.gui.components.codemirror;
 
-import annis.model.AqlParseError;
 import annis.model.ParsedEntityLocation;
 import com.vaadin.shared.ui.JavaScriptComponentState;
-
-import org.corpus_tools.annis.api.model.GraphAnnisErrorAQLSyntaxError;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.corpus_tools.annis.api.model.GraphAnnisErrorAQLSyntaxError;
 
 /**
  *
@@ -50,15 +47,6 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
         public int endColumn;
 
         public String message;
-
-        public ParseError() {
-            // use the same defaults as the original class
-            this(new AqlParseError());
-        }
-
-        public ParseError(AqlParseError orig) {
-            this(orig.getLocation(), orig.getMessage());
-        }
 
         public ParseError(GraphAnnisErrorAQLSyntaxError orig) {
             if (orig.getLocation() != null) {

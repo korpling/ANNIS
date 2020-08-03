@@ -13,7 +13,6 @@
  */
 package annis.gui.resultview;
 
-import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
@@ -231,7 +230,7 @@ public class SingleResultPanel extends CssLayout
     /**
      * Extract the top level corpus name and the document name of this single result.
      */
-    path = CommonHelper.getCorpusPath(result.getGraph(), result);
+    path = Helper.getCorpusPath(result.getGraph(), result);
     Collections.reverse(path);
 
     // build label
@@ -368,7 +367,7 @@ public class SingleResultPanel extends CssLayout
       List<VisualizerPanel> openVisualizers = new LinkedList<>();
 
       List<SNode> segNodes =
-          CommonHelper.getSortedSegmentationNodes(segmentationName, result.getDocumentGraph());
+          Helper.getSortedSegmentationNodes(segmentationName, result.getDocumentGraph());
       Map<SNode, Long> markedAndCovered =
           Helper.calculateMarkedAndCovered(result, segNodes, segmentationName);
 
@@ -423,7 +422,7 @@ public class SingleResultPanel extends CssLayout
 
     if (result != null) {
       List<SNode> segNodes =
-          CommonHelper.getSortedSegmentationNodes(segmentationName, result.getDocumentGraph());
+          Helper.getSortedSegmentationNodes(segmentationName, result.getDocumentGraph());
       Map<SNode, Long> markedAndCovered =
           Helper.calculateMarkedAndCovered(result, segNodes, segmentationName);
       for (VisualizerPanel p : visualizers) {

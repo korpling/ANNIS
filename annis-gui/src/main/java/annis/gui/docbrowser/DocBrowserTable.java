@@ -13,9 +13,7 @@
  */
 package annis.gui.docbrowser;
 
-import annis.CommonHelper;
 import annis.libgui.Helper;
-import annis.model.Annotation;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MetaDataColumn;
 import annis.service.objects.OrderBy;
@@ -401,7 +399,7 @@ public class DocBrowserTable extends Table {
 
       // reverse path and delete the brackets and set a new separator:
       // corpus > ... > subcorpus > document
-      List<String> pathList = CommonHelper.getCorpusPath(d.getId());
+      List<String> pathList = Helper.getCorpusPath(d.getId());
       if (pathList == null) {
         pathList = new LinkedList<>();
       }

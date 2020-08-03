@@ -15,7 +15,6 @@
  */
 package annis.gui.resultview;
 
-import annis.CommonHelper;
 import annis.gui.AnnisUI;
 import annis.gui.QueryController;
 import annis.gui.components.OnLoadCallbackExtension;
@@ -525,10 +524,10 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     private void updateVariables(SaltProject p) {
         segmentationLayerSet.addAll(getSegmentationNames(p));
-        tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
+        tokenAnnotationLevelSet.addAll(Helper.getTokenAnnotationLevelSet(p));
         Set<String> hiddenTokenAnnos = null;
 
-        Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
+        Set<String> corpusNames = Helper.getToplevelCorpusNames(p);
 
         for (String corpusName : corpusNames) {
 

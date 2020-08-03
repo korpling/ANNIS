@@ -14,8 +14,6 @@
 package annis.gui.components.codemirror;
 
 import annis.gui.components.codemirror.AqlCodeEditorState.ParseError;
-import annis.model.AqlParseError;
-import annis.model.NodeDesc;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
@@ -27,12 +25,9 @@ import elemental.json.JsonArray;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.TreeSet;
-
 import org.corpus_tools.annis.api.model.GraphAnnisError;
-import org.corpus_tools.annis.api.model.GraphAnnisErrorAQLSyntaxError;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.json.JSONException;
 import org.slf4j.Logger;

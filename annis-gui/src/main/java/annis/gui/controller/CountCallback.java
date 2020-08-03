@@ -16,14 +16,8 @@ package annis.gui.controller;
 import annis.gui.AnnisUI;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
-import annis.service.objects.MatchAndDocumentCount;
-import com.sun.jersey.api.client.UniformInterfaceException;
-
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
 import org.corpus_tools.annis.ApiCallback;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.model.CountExtra;

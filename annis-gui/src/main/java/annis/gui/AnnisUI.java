@@ -23,7 +23,6 @@ import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
-import annis.service.objects.CorpusConfig;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
@@ -153,7 +152,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   }
 
   /**
-   * Get a cached version of the {@link CorpusConfig} for a corpus.
+   * Get a cached version of the {@link CorpusConfiguration} for a corpus.
    *
    * @param corpus
    * @return

@@ -136,16 +136,23 @@
 		</dependency>
 
 		<dependency>
-			<groupId>de.hu-berlin.german.korpling.annis</groupId>
-			<artifactId>annis-interfaces</artifactId>
-			<version>${project.version}</version>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.9</version>
 			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.9</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3.2</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20140107</version>
 			<scope>compile</scope>
 		</dependency>
 

@@ -19,7 +19,6 @@ import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
 
-import annis.CommonHelper;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.libgui.Helper;
@@ -135,7 +134,7 @@ public class EventExtractor {
                 event.getCoveredIDs().add(tok.getId());
 
                 // get the STextualDS of this token and add it to the event
-                String textID = CommonHelper.getTextualDSForNode(tok, graph).getId();
+                String textID = Helper.getTextualDSForNode(tok, graph).getId();
                 if (textID != null) {
                   event.setTextID(textID);
                 }
@@ -145,7 +144,7 @@ public class EventExtractor {
         } else if (node instanceof SToken) {
           event.getCoveredIDs().add(node.getId());
           // get the STextualDS of this token and add it to the event
-          String textID = CommonHelper.getTextualDSForNode(node, graph).getId();
+          String textID = Helper.getTextualDSForNode(node, graph).getId();
           if (textID != null) {
             event.setTextID(textID);
           }
@@ -459,7 +458,7 @@ public class EventExtractor {
 
     if (showSpanAnnos) {
       for (SSpan span : graph.getSpans()) {
-        if (text == null || text == CommonHelper.getTextualDSForNode(span, graph)) {
+        if (text == null || text == Helper.getTextualDSForNode(span, graph)) {
           addAnnotationsForNode(span, graph, token2index, pdfController, pageNumberHelper,
               eventCounter, rowsByAnnotation, true, mediaLayer, replaceValueWithMediaIcon);
         }
@@ -468,7 +467,7 @@ public class EventExtractor {
 
     if (showTokenAnnos) {
       for (SToken tok : graph.getTokens()) {
-        if (text == null || text == CommonHelper.getTextualDSForNode(tok, graph)) {
+        if (text == null || text == Helper.getTextualDSForNode(tok, graph)) {
           addAnnotationsForNode(tok, graph, token2index, pdfController, pageNumberHelper,
               eventCounter, rowsByAnnotation, false, mediaLayer, replaceValueWithMediaIcon);
         }
@@ -720,7 +719,7 @@ public class EventExtractor {
     ListIterator<SToken> itToken = sortedTokenList.listIterator();
     while (itToken.hasNext()) {
       SToken t = itToken.next();
-      if (text == null || text == CommonHelper.getTextualDSForNode(t, graph)) {
+      if (text == null || text == Helper.getTextualDSForNode(t, graph)) {
         int tokenIndex = token2index.get(t);
         tokenCoverage.set(tokenIndex);
       }

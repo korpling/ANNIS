@@ -15,7 +15,6 @@
  */
 package annis.gui.admin.model;
 
-import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.WebResource;
 import java.io.Serializable;
 import org.corpus_tools.annis.ApiClient;
@@ -40,32 +39,9 @@ public interface ApiClientProvider extends Serializable {
      */
     public ApiClient getClient();
 
-
     /**
-     * Returns a (possible cached) {@link AsyncWebResource}.
-     * 
-     * If the the user is authentifaced this includes the authentifaction information.
-     * 
-     * @return The {@link AsyncWebResource} but never {@code null}.
+     * Called when the client got invalid. E.g. the login might have changed and the cached resource
+     * can't be used any longer. Will force the provider to update the client.
      */
-    @Deprecated
-    public AsyncWebResource getAsyncWebResource();
-
-    /**
-     * Returns a (possible cached) {@link WebResource}.
-     * 
-     * If the the user is authentifaced this includes the authentifaction
-     * information.
-     * 
-     * @return The {@link WebResource} but never {@code null}.
-     */
-    @Deprecated
-    public WebResource getWebResource();
-
-    /**
-     * Called when the web resource got invalid. E.g. the login might have changed
-     * and the cached resource can't be used any longer. Will force the provider to
-     * update the resources.
-     */
-    public void invalidateWebResource();
+    public void invalidateClient();
 }

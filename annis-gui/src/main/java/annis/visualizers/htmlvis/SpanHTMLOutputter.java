@@ -14,7 +14,7 @@
 package annis.visualizers.htmlvis;
 
 
-import annis.CommonHelper;
+import annis.libgui.Helper;
 import com.google.common.escape.Escaper;
 import com.google.common.html.HtmlEscapers;
 import java.util.ArrayList;
@@ -240,10 +240,10 @@ public class SpanHTMLOutputter {
         value = constant;
         break;
       case VALUE:
-        value = CommonHelper.getSpannedText(tok);
+        value = Helper.getSpannedText(tok);
         break;
       case ESCAPED_VALUE:
-        value = htmlEscaper.escape(CommonHelper.getSpannedText(tok));
+        value = htmlEscaper.escape(Helper.getSpannedText(tok));
         break;
       case ANNO_NAME:
         value = "tok";

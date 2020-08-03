@@ -13,7 +13,6 @@
  */
 package annis.gui;
 
-import annis.CommonHelper;
 import annis.QueryGenerator;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
@@ -29,12 +28,10 @@ import annis.libgui.media.PDFControllerImpl;
 import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.model.Query;
-import annis.service.objects.AnnisCorpus;
 import annis.service.objects.QueryLanguage;
 import com.google.common.base.Splitter;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.GenericType;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -78,11 +75,6 @@ import org.slf4j.LoggerFactory;
 public class SearchView extends GridLayout
         implements View, MimeTypeErrorListener, Page.UriFragmentChangedListener,
         TabSheet.CloseHandler, LoginListener, Sidebar, TabSheet.SelectedTabChangeListener {
-
-    private static class AnnisCorpusListType extends GenericType<List<AnnisCorpus>> {
-
-        public AnnisCorpusListType() {}
-    }
 
     private class CitationRequestHandler implements RequestHandler {
 
@@ -294,7 +286,7 @@ public class SearchView extends GridLayout
             return;
         }
 
-        Map<String, String> args = CommonHelper.parseFragment(fragment);
+        Map<String, String> args = Helper.parseFragment(fragment);
 
         if (args.containsKey("c")) {
             String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
@@ -569,7 +561,7 @@ public class SearchView extends GridLayout
      */
     public void updateFragementWithSelectedCorpus(Set<String> corpora) {
         if (corpora != null && !corpora.isEmpty()) {
-            String fragment = "_c=" + CommonHelper.encodeBase64URL(StringUtils.join(corpora, ","));
+          String fragment = "_c=" + Helper.encodeBase64URL(StringUtils.join(corpora, ","));
             UI.getCurrent().getPage().setUriFragment(fragment);
         } else {
             UI.getCurrent().getPage().setUriFragment("");

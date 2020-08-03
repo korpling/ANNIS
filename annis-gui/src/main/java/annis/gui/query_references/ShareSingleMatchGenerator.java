@@ -84,13 +84,13 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
 
   private final List<VisualizerPlugin> visualizerPlugins;
 
-
   public ShareSingleMatchGenerator(List<VisualizerRule> visualizers, Match match,
       PagedResultQuery query, String segmentation, List<VisualizerPlugin> visualizerPlugins) {
     this.match = match;
     this.query = query;
     this.segmentation = segmentation;
     this.visualizerPlugins = visualizerPlugins;
+
 
     setResizeLazy(true);
 
@@ -182,77 +182,81 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
       result = result.queryParam(EmbeddedVisUI.KEY_INSTANCE, nonContextPath);
     }
 
-    UriBuilder serviceURL =
-        UriBuilder.fromUri(Helper.getAnnisWebResource(UI.getCurrent()).path("query").getURI());
+    if (UI.getCurrent() instanceof AnnisUI) {
+      AnnisUI ui = (AnnisUI) UI.getCurrent();
+      UriBuilder serviceURL = UriBuilder.fromUri(ui.getConfig().getWebserviceURL()).path("query");
 
-    Optional<VisualizerPlugin> visPlugin = visualizerPlugins.stream()
-        .filter(vis -> Objects.equal(vis.getShortName(), entry.getVisType())).findAny();
-    if (visPlugin.isPresent() && visPlugin.get().isUsingText()) {
-      // generate a service URL that gets the whole document
-      String firstID = match.getSaltIDs().get(0);
-      List<String> path = Splitter.on('/').omitEmptyStrings().trimResults().splitToList(firstID);
-      String corpusName = path.get(0);
-      String documentName = path.get(path.size() - 1);
-      try {
-        corpusName = URLDecoder.decode(corpusName, "UTF-8");
-        documentName = URLDecoder.decode(documentName, "UTF-8");;
-      } catch (UnsupportedEncodingException ex) {
-        log.warn("Could not decode URL", ex);
+      Optional<VisualizerPlugin> visPlugin = visualizerPlugins.stream()
+          .filter(vis -> Objects.equal(vis.getShortName(), entry.getVisType())).findAny();
+      if (visPlugin.isPresent() && visPlugin.get().isUsingText()) {
+        // generate a service URL that gets the whole document
+        String firstID = match.getSaltIDs().get(0);
+        List<String> path = Splitter.on('/').omitEmptyStrings().trimResults().splitToList(firstID);
+        String corpusName = path.get(0);
+        String documentName = path.get(path.size() - 1);
+        try {
+          corpusName = URLDecoder.decode(corpusName, "UTF-8");
+          documentName = URLDecoder.decode(documentName, "UTF-8");;
+        } catch (UnsupportedEncodingException ex) {
+          log.warn("Could not decode URL", ex);
+        }
+
+        // apply any node annotation filters if possible
+        if (visPlugin.get() instanceof FilteringVisualizerPlugin) {
+          List<String> visAnnos =
+              ((FilteringVisualizerPlugin) visPlugin.get()).getFilteredNodeAnnotationNames(
+                  corpusName, documentName, entry.getMappings(), UI.getCurrent());
+          if (visAnnos != null) {
+            Set<String> annos = new HashSet<>(visAnnos);
+            // always add the matched node annotation as well
+            for (String matchedAnno : match.getAnnos()) {
+              if (!matchedAnno.isEmpty()) {
+                annos.add(matchedAnno);
+              }
+            }
+            serviceURL = serviceURL.queryParam("filternodeanno", Joiner.on(",").join(annos));
+          }
+        }
+
+        serviceURL = serviceURL.path("graph").path(Helper.encodePath(corpusName))
+            .path(Helper.encodePath(documentName));
+
+        // add the original match so the embedded visualizer can add it
+        // (since we use the graph query it will not be included in the Salt XMI itself)
+        result = result.queryParam(EmbeddedVisUI.KEY_MATCH, Helper.encodeJersey(match.toString()));
+
+      } else {
+        // default to the subgraph URL for this specific match
+        serviceURL = serviceURL.path("search").path("subgraph")
+            .queryParam("match", Helper.encodeJersey(match.toString()))
+            .queryParam("left", query.getLeftContext())
+            .queryParam("right", query.getRightContext());
+
+        if (query.getSegmentation() != null) {
+          serviceURL = serviceURL.queryParam("segmentation", query.getSegmentation());
+        }
+
+      }
+      // add the URL where to fetch the graph from
+      result = result.queryParam(EmbeddedVisUI.KEY_SALT,
+          Helper.encodeQueryParam(serviceURL.build().toASCIIString()));
+
+      // add the current view as "return back" parameter
+      result = result.queryParam(EmbeddedVisUI.KEY_SEARCH_INTERFACE, appURI.toASCIIString());
+
+      if (segmentation != null) {
+        result = result.queryParam(EmbeddedVisUI.KEY_BASE_TEXT, segmentation);
       }
 
-      // apply any node annotation filters if possible
-      if (visPlugin.get() instanceof FilteringVisualizerPlugin) {
-        List<String> visAnnos =
-            ((FilteringVisualizerPlugin) visPlugin.get()).getFilteredNodeAnnotationNames(corpusName,
-                documentName, entry.getMappings(), UI.getCurrent());
-        if (visAnnos != null) {
-          Set<String> annos = new HashSet<>(visAnnos);
-          // always add the matched node annotation as well
-          for (String matchedAnno : match.getAnnos()) {
-            if (!matchedAnno.isEmpty()) {
-              annos.add(matchedAnno);
-            }
-          }
-          serviceURL = serviceURL.queryParam("filternodeanno", Joiner.on(",").join(annos));
+      // add all mappings as parameter
+      for (Map.Entry<String, String> e : entry.getMappings().entrySet()) {
+        if (!e.getKey().startsWith(EmbeddedVisUI.KEY_PREFIX)) {
+          String value = Helper.encodeJersey(e.getValue());
+          result = result.queryParam(e.getKey(), value);
         }
       }
-
-      serviceURL = serviceURL.path("graph").path(Helper.encodePath(corpusName))
-          .path(Helper.encodePath(documentName));
-
-      // add the original match so the embedded visualizer can add it
-      // (since we use the graph query it will not be included in the Salt XMI itself)
-      result = result.queryParam(EmbeddedVisUI.KEY_MATCH, Helper.encodeJersey(match.toString()));
-
-    } else {
-      // default to the subgraph URL for this specific match
-      serviceURL = serviceURL.path("search").path("subgraph")
-          .queryParam("match", Helper.encodeJersey(match.toString()))
-          .queryParam("left", query.getLeftContext()).queryParam("right", query.getRightContext());
-
-      if (query.getSegmentation() != null) {
-        serviceURL = serviceURL.queryParam("segmentation", query.getSegmentation());
-      }
-
-    }
-    // add the URL where to fetch the graph from
-    result = result.queryParam(EmbeddedVisUI.KEY_SALT,
-        Helper.encodeQueryParam(serviceURL.build().toASCIIString()));
-
-    // add the current view as "return back" parameter
-    result = result.queryParam(EmbeddedVisUI.KEY_SEARCH_INTERFACE, appURI.toASCIIString());
-
-    if (segmentation != null) {
-      result = result.queryParam(EmbeddedVisUI.KEY_BASE_TEXT, segmentation);
     }
 
-    // add all mappings as parameter
-    for (Map.Entry<String, String> e : entry.getMappings().entrySet()) {
-      if (!e.getKey().startsWith(EmbeddedVisUI.KEY_PREFIX)) {
-        String value = Helper.encodeJersey(e.getValue());
-        result = result.queryParam(e.getKey(), value);
-      }
-    }
 
     return result.build();
   }
