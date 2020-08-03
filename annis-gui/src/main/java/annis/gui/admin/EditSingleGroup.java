@@ -25,6 +25,12 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.declarative.Design;
 import com.vaadin.v7.data.fieldgroup.FieldGroup;
 import com.vaadin.v7.data.util.IndexedContainer;
+import com.vaadin.v7.data.util.converter.Converter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * UI to edit the properties of a single user.
@@ -48,6 +54,30 @@ public class EditSingleGroup extends Panel {
         Design.read(EditSingleGroup.this);
 
         corporaSelector.setSelectableContainer(corporaContainer);
+        corporaSelector.setConverter(new Converter<Set, List>() {
+
+          @Override
+          public List convertToModel(Set value, Class<? extends List> targetType, Locale locale)
+              throws ConversionException {
+            return new ArrayList(value);
+          }
+
+          @Override
+          public Set convertToPresentation(List value, Class<? extends Set> targetType,
+              Locale locale) throws ConversionException {
+            return new TreeSet(value);
+          }
+
+          @Override
+          public Class<List> getModelType() {
+            return List.class;
+          }
+
+          @Override
+          public Class<Set> getPresentationType() {
+            return Set.class;
+          }
+        });
 
         lblGroup.setValue((String) fields.getItemDataSource().getItemProperty("name").getValue());
 

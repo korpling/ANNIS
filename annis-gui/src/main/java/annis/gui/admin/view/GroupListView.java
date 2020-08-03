@@ -16,9 +16,9 @@
 
 package annis.gui.admin.view;
 
-import annis.security.Group;
 import java.util.Collection;
 import java.util.Set;
+import org.corpus_tools.annis.api.model.Group;
 
 /**
  *
