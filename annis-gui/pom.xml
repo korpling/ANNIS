@@ -33,6 +33,7 @@
 		<annis.service-url>http://localhost:5711/annis/</annis.service-url>
 		<java.version>1.8</java.version>
 		<vaadin.version>8.11.0</vaadin.version>
+		<start-class>annis.gui.AnnisUiApplication</start-class>
 	</properties>
 
 	<build>
@@ -49,22 +50,6 @@
 		</resources>
 
 		<plugins>
-
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<mainClass>annis.gui.AnnisUiApplication</mainClass>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<plugin>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
@@ -151,7 +136,18 @@
 					<groupId>commons-logging</groupId>
 					<artifactId>commons-logging</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava-gwt</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>20.0</version>
+			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -206,16 +202,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4</artifactId>
-			<version>4.2.2</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-java</artifactId>
-			<version>2.49.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -235,13 +223,6 @@
 			<groupId>org.aeonbits.owner</groupId>
 			<artifactId>owner</artifactId>
 			<version>1.0.10</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.antlr</groupId>
-			<artifactId>antlr4</artifactId>
-			<version>4.2.2</version>
-			<scope>compile</scope>
 		</dependency>
 
 		<dependency>
@@ -274,7 +255,6 @@
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.6.0</version>
 						<executions>
 							<execution>
 								<id>compile-online-help</id>
@@ -298,7 +278,6 @@
 					<!-- the online help directory should be cleaned as well -->
 					<plugin>
 						<artifactId>maven-clean-plugin</artifactId>
-						<version>3.1.0</version>
 						<configuration>
 							<filesets>
 								<fileset>
