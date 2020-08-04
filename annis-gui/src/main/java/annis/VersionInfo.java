@@ -37,7 +37,7 @@ public class VersionInfo {
   static {
     try (InputStream is = VersionInfo.class.getResourceAsStream("version.properties")) {
       versionProperties.load(is);
-    } catch (IOException ex) {
+    } catch (IOException | NullPointerException ex) {
       log.warn("Could not load the version information", ex);
     }
   }
