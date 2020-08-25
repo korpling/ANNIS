@@ -41,6 +41,10 @@
 				<filtering>true</filtering>
 			</resource>
 			<resource>
+				<directory>src/main/binaries</directory>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
 				<directory>${basedir}/target/extra-resources</directory>
 				<filtering>true</filtering>
 			</resource>
