@@ -11,8 +11,9 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package annis.libgui;
+package annis.gui.resultview;
 
+import annis.libgui.Helper;
 import annis.resolver.SingleResolverRequest;
 import com.vaadin.ui.UI;
 import java.io.Serializable;

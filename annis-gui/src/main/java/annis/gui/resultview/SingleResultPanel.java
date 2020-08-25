@@ -19,7 +19,6 @@ import annis.gui.QueryController;
 import annis.gui.query_references.ShareSingleMatchGenerator;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
-import annis.libgui.ResolverProvider;
 import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.service.objects.Match;

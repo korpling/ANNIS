@@ -25,7 +25,12 @@ import org.corpus_tools.salt.core.SNode;
  * hand in {@link annis.gui.AnnisBaseUI#initPlugins()}
  *
  * If you wish to implement an iframe visualizer you should extend the
- * {@link AbstractIFrameVisualizer} class, because this class already has implemented the
+ * 
+ * <pre>
+ * AbstractIFrameVisualizer
+ * </pre>
+ * 
+ * class, because this class already has implemented the
  * {@link VisualizerPlugin#createComponent(annis.gui.visualizers.VisualizerInput)} method.
  *
  * For the case of using Vaadin Component directly its recommended to extend the
