@@ -16,6 +16,8 @@ package annis.libgui;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
+import annis.gui.AnnisUI;
+import annis.gui.UIConfig;
 import annis.gui.graphml.CorpusGraphMapper;
 import annis.model.AnnisConstants;
 import annis.service.objects.Match;
@@ -407,11 +409,19 @@ public class Helper {
   }
 
   public static ApiClient getClient(UI ui) {
-    return getClient(ui.getSession());
+    UIConfig config = null;
+    if (ui instanceof AnnisUI) {
+      config = ((AnnisUI) ui).getConfig();
+    }
+    return getClient(ui.getSession(), config);
   }
 
-  public static ApiClient getClient(VaadinSession ui) {
+  public static ApiClient getClient(VaadinSession ui, UIConfig config) {
     ApiClient client = Configuration.getDefaultApiClient();
+    if (config != null) {
+      // Use the configuration to allow changing the path to the web-service
+      client.setBasePath(config.getWebserviceURL());
+    }
     AnnisUser user = Helper.getUser(ui);
     if (user != null && user.getToken() != null) {
       Authentication auth = client.getAuthentication("bearerAuth");
