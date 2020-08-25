@@ -1,17 +1,15 @@
 /*
  * Copyright 2015 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui;
 
@@ -75,7 +73,8 @@ public class CommonUI extends AnnisBaseUI {
             return allConfigs.get("default");
         } else if (allConfigs.size() > 0) {
             // just return any existing config as a fallback
-            log.warn("Instance config {} not found or null and default config is not available.", instance);
+            log.warn("Instance config {} not found or null and default config is not available.",
+                    instance);
             return allConfigs.values().iterator().next();
         }
 
@@ -102,7 +101,6 @@ public class CommonUI extends AnnisBaseUI {
         super.init(request);
 
         getSession().addRequestHandler(new ResourceRequestHandler(urlPrefix));
-        getSession().addRequestHandler(new BinaryRequestHandler(urlPrefix));
 
         settings = new SettingsStorage(this);
 
@@ -112,36 +110,48 @@ public class CommonUI extends AnnisBaseUI {
     protected void loadInstanceFonts() {
         if (getInstanceConfig() != null && getInstanceConfig().getFont() != null) {
             FontConfig cfg = getInstanceConfig().getFont();
-            String url = cfg.getUrl() == null || cfg.getUrl().isEmpty() ? "" : "@import url(" + cfg.getUrl() + ");\n";
+            String url = cfg.getUrl() == null || cfg.getUrl().isEmpty() ? ""
+                    : "@import url(" + cfg.getUrl() + ");\n";
             if (cfg.getSize() == null || cfg.getSize().isEmpty()) {
                 injectUniqueCSS( // this one is for the virtual keyboard
                         url + "." + Helper.CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName()
-                                + "', monospace !important; }\n" + "." + Helper.CORPUS_FONT + " {font-family: '"
-                                + cfg.getName() + "', monospace; }\n" + "div." + Helper.CORPUS_FONT
-                                + " .CodeMirror pre {font-family: '" + cfg.getName() + "', monospace; }\n"
-                                + "#keyboardInputMaster tbody tr td table tbody tr td {\n" + "  font-family: '"
-                                + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; " + "}");
+                                + "', monospace !important; }\n" + "." + Helper.CORPUS_FONT
+                                + " {font-family: '" + cfg.getName() + "', monospace; }\n" + "div."
+                                + Helper.CORPUS_FONT + " .CodeMirror pre {font-family: '"
+                                + cfg.getName() + "', monospace; }\n"
+                                + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+                                + "  font-family: '" + cfg.getName()
+                                + "', 'Lucida Console','Arial Unicode MS',monospace; " + "}");
             } else {
                 injectUniqueCSS( // this one is for the virtual keyboard
-                        url + "." + Helper.CORPUS_FONT_FORCE + " {\n" + "  font-family: '" + cfg.getName()
-                                + "', monospace !important;\n" + "  font-size: " + cfg.getSize() + " !important;\n"
-                                + "}\n" + "." + Helper.CORPUS_FONT + " {\n" + "  font-family: '" + cfg.getName()
-                                + "', monospace;\n" + "  font-size: " + cfg.getSize() + ";\n" + "}\n" + "div."
-                                + Helper.CORPUS_FONT + " .CodeMirror pre" + " {\n" + "  font-family: '" + cfg.getName()
-                                + "', monospace;\n" + "  font-size: " + cfg.getSize() + ";\n" + "}\n" + "."
-                                + Helper.CORPUS_FONT + " .v-table-table {\n" + "    font-size: " + cfg.getSize() + ";\n"
-                                + "}\n" + "#keyboardInputMaster tbody tr td table tbody tr td {\n" + "  font-family: '"
-                                + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; " + "}");
+                        url + "." + Helper.CORPUS_FONT_FORCE + " {\n" + "  font-family: '"
+                                + cfg.getName() + "', monospace !important;\n" + "  font-size: "
+                                + cfg.getSize() + " !important;\n" + "}\n" + "."
+                                + Helper.CORPUS_FONT + " {\n" + "  font-family: '" + cfg.getName()
+                                + "', monospace;\n" + "  font-size: " + cfg.getSize() + ";\n"
+                                + "}\n" + "div." + Helper.CORPUS_FONT + " .CodeMirror pre" + " {\n"
+                                + "  font-family: '" + cfg.getName() + "', monospace;\n"
+                                + "  font-size: " + cfg.getSize() + ";\n" + "}\n" + "."
+                                + Helper.CORPUS_FONT + " .v-table-table {\n" + "    font-size: "
+                                + cfg.getSize() + ";\n" + "}\n"
+                                + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+                                + "  font-family: '" + cfg.getName()
+                                + "', 'Lucida Console','Arial Unicode MS',monospace; " + "}");
             }
         } else {
             injectUniqueCSS( // use original font definition from keyboard.css if no font given
                     "#keyboardInputMaster tbody tr td table tbody tr td {\n"
-                            + "  font-family: 'Lucida Console','Arial Unicode MS',monospace;" + "}");
+                            + "  font-family: 'Lucida Console','Arial Unicode MS',monospace;"
+                            + "}");
         }
     }
 
     public void setInstanceConfig(InstanceConfig instanceConfig) {
         this.instanceConfig = instanceConfig;
+    }
+
+    public String getUrlPrefix() {
+        return urlPrefix;
     }
 
 }

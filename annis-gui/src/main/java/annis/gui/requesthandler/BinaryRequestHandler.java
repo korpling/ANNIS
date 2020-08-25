@@ -14,6 +14,7 @@
 
 package annis.gui.requesthandler;
 
+import annis.gui.UIConfig;
 import annis.libgui.Helper;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.RequestHandler;
@@ -57,9 +58,11 @@ public class BinaryRequestHandler implements RequestHandler {
 
 
   private final String prefix;
+  private final UIConfig config;
 
-  public BinaryRequestHandler(String urlPrefix) {
+  public BinaryRequestHandler(String urlPrefix, UIConfig config) {
     this.prefix = urlPrefix + "/Binary";
+    this.config = config;
   }
 
   @Override
@@ -96,7 +99,7 @@ public class BinaryRequestHandler implements RequestHandler {
     // Proxy the whole request, including any HTTP headers (e.g. used for range requests) to the
     // REST endpoint.
 
-    CorporaApi api = new CorporaApi(Helper.getClient(session));
+    CorporaApi api = new CorporaApi(Helper.getClient(session, config));
     ApiClient client = api.getApiClient();
     // create path and map variables
     String localVarPath = "/corpora/{corpus}/files/{name}"

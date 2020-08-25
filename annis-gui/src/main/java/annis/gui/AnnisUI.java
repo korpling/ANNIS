@@ -19,6 +19,7 @@ import annis.gui.components.ExceptionDialog;
 import annis.gui.objects.QueryUIState;
 import annis.gui.query_references.UrlShortener;
 import annis.gui.querybuilder.QueryBuilderPlugin;
+import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
@@ -192,11 +193,13 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     super.init(request);
 
+    getSession().addRequestHandler(new BinaryRequestHandler(getUrlPrefix(), getConfig()));
+
     String id = request.getParameter("id");
     if (id != null) {
       // Check if this is a valid URL shortener ID
       Optional<URI> uri = urlShortener.unshorten(UUID.fromString(id));
-      if(uri.isPresent()) {
+      if (uri.isPresent()) {
         Page.getCurrent().setLocation(uri.get());
         return;
       }
