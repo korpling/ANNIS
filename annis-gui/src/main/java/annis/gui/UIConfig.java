@@ -14,6 +14,7 @@ public class UIConfig {
   private String loginURL;
 
   private String webserviceURL;
+  private String webserviceConfig;
 
   private boolean shortenReferenceLinks;
 
@@ -28,7 +29,7 @@ public class UIConfig {
   public boolean isLoginWindowMaxmized() {
     return loginWindowMaxmized;
   }
-  
+
   public void setLoginWindowMaxmized(boolean loginWindowMaxmized) {
     this.loginWindowMaxmized = loginWindowMaxmized;
   }
@@ -63,6 +64,14 @@ public class UIConfig {
 
   public void setDisableRTL(boolean disableRTL) {
     this.disableRTL = disableRTL;
+  }
+
+  public String getWebserviceConfig() {
+    return webserviceConfig;
+  }
+
+  public void setWebserviceConfig(String webserviceConfig) {
+    this.webserviceConfig = webserviceConfig;
   }
 
 }
