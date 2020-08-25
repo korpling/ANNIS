@@ -13,7 +13,6 @@
  */
 package annis.visualizers.iframe;
 
-import annis.libgui.visualizers.AbstractIFrameVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -11,11 +11,17 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package annis.libgui.visualizers;
+package annis.visualizers.iframe;
 
 import annis.gui.widgets.AutoHeightIFrame;
 import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.IFrameResource;
+import annis.libgui.visualizers.IFrameResourceMap;
+import annis.libgui.visualizers.ResourcePlugin;
+import annis.libgui.visualizers.VisualizerInput;
+
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import java.io.ByteArrayOutputStream;
@@ -41,8 +47,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer
       org.slf4j.LoggerFactory.getLogger(AbstractIFrameVisualizer.class);
 
   @Override
-  public Component createComponent(final VisualizerInput vis,
-      VisualizationToggle visToggle) {
+  public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle) {
 
     VaadinSession session = vis.getUI().getSession();
 

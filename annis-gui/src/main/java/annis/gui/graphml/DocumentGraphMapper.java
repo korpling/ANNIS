@@ -261,8 +261,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private SNode mapNode(String nodeName, Map<String, String> labels) {
     SNode newNode = SaltFactory.createSNode();
 
-    if ((labels.containsKey("annis::tok"))
-        && !hasOutgoingCoverageEdge.contains(nodeName)) {
+    if ((labels.containsKey("annis::tok")) && !hasOutgoingCoverageEdge.contains(nodeName)) {
       newNode = SaltFactory.createSToken();
     } else if (hasOutgoingDominanceEdge.contains(nodeName)) {
       newNode = SaltFactory.createSStructure();

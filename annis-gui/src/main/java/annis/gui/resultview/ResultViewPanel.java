@@ -1,17 +1,15 @@
 /*
  * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui.resultview;
 
@@ -22,7 +20,6 @@ import annis.gui.controlpanel.QueryPanel;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
-import annis.libgui.ResolverProviderImpl;
 import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.resolver.SingleResolverRequest;
@@ -139,9 +136,11 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     private final QueryController controller;
 
-    private final Set<String> segmentationLayerSet = Collections.synchronizedSet(new TreeSet<String>());
+    private final Set<String> segmentationLayerSet =
+            Collections.synchronizedSet(new TreeSet<String>());
 
-    private final Set<String> tokenAnnotationLevelSet = Collections.synchronizedSet(new TreeSet<String>());
+    private final Set<String> tokenAnnotationLevelSet =
+            Collections.synchronizedSet(new TreeSet<String>());
 
     private final CssLayout resultLayout;
 
@@ -160,15 +159,13 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     private final AnnisUI sui;
 
-    public ResultViewPanel(AnnisUI ui,
-            DisplayedResultQuery initialQuery) {
+    public ResultViewPanel(AnnisUI ui, DisplayedResultQuery initialQuery) {
         this.sui = ui;
         this.tokenAnnoVisible = new TreeMap<>();
         this.controller = ui.getQueryController();
         this.initialQuery = initialQuery;
 
-        cacheResolver = Collections
-            .synchronizedMap(
+        cacheResolver = Collections.synchronizedMap(
                 new HashMap<HashSet<SingleResolverRequest>, LinkedHashSet<VisualizerRule>>());
 
         resultPanelList = Collections.synchronizedList(new LinkedList<AbstractComponent>());
@@ -222,8 +219,10 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
                     String strResults = numberOfResults > 1 ? "results" : "result";
                     sui.getSearchView().getControlPanel().getQueryPanel().setStatus(
-                            sui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus(),
-                            " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");
+                            sui.getSearchView().getControlPanel().getQueryPanel()
+                                    .getLastPublicStatus(),
+                            " (showing " + currentResults + "/" + numberOfResults + " " + strResults
+                                    + ")");
 
                     if (currentResults == numberOfResults) {
                         resetQueryResultQueue();
@@ -233,8 +232,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
                         resultPanelList.add(panel);
                         resultLayout.addComponent(panel);
                         if (panel instanceof SingleResultPanel) {
-                            ((SingleResultPanel) panel)
-                                    .setSegmentationLayer(sui.getQueryState().getVisibleBaseText().getValue());
+                            ((SingleResultPanel) panel).setSegmentationLayer(
+                                    sui.getQueryState().getVisibleBaseText().getValue());
                         }
                     }
                 }
@@ -248,7 +247,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
                     }
                 }
 
-                if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults) {
+                if (projectQueue != null && !newPanels.isEmpty()
+                        && currentResults < numberOfResults) {
                     log.debug("adding callback for result " + currentResults);
                     // add a callback so we can load the next single result
                     OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 250);
@@ -268,7 +268,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
         IDGenerator.assignIDForEachField(paging);
     }
 
-    private List<AbstractComponent> createPanels(SaltProject p, int localMatchIndex, long globalOffset) {
+    private List<AbstractComponent> createPanels(SaltProject p, int localMatchIndex,
+            long globalOffset) {
         List<AbstractComponent> resultPanels = new LinkedList<>();
 
         int i = 0;
@@ -290,14 +291,14 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
                 }
 
                 panel = new SingleCorpusResultPanel(matchedCorpora, m, i + globalOffset, sui,
-                    initialQuery);
+                        initialQuery);
 
             } else {
                 SDocument doc = corpusGraph.getDocuments().get(0);
 
                 panel = new SingleResultPanel(doc, m, i + globalOffset,
-                    new ResolverProviderImpl(cacheResolver),
-                    sui, getVisibleTokenAnnos(), segmentationName, controller, initialQuery);
+                        new ResolverProviderImpl(cacheResolver), sui, getVisibleTokenAnnos(),
+                        segmentationName, controller, initialQuery);
 
             }
 
@@ -393,14 +394,12 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
     /**
      * Set a new querys in result panel.
      *
-     * @param queue
-     *            holds the salt graph
-     * @param q
-     *            holds the ordinary query
-     * @param allMatches
-     *            All matches.
+     * @param queue holds the salt graph
+     * @param q holds the ordinary query
+     * @param allMatches All matches.
      */
-    public void setQueryResultQueue(BlockingQueue<SaltProject> queue, PagedResultQuery q, ArrayList<Match> allMatches) {
+    public void setQueryResultQueue(BlockingQueue<SaltProject> queue, PagedResultQuery q,
+            ArrayList<Match> allMatches) {
         this.projectQueue = queue;
         this.currentQuery = q;
         this.numberOfResults = allMatches.size();
@@ -439,8 +438,10 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
         // Search complete, stop progress bar control
         if (sui.getSearchView().getControlPanel().getQueryPanel().getPiCount() != null) {
             if (sui.getSearchView().getControlPanel().getQueryPanel().getPiCount().isVisible()) {
-                sui.getSearchView().getControlPanel().getQueryPanel().getPiCount().setVisible(false);
-                sui.getSearchView().getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
+                sui.getSearchView().getControlPanel().getQueryPanel().getPiCount()
+                        .setVisible(false);
+                sui.getSearchView().getControlPanel().getQueryPanel().getPiCount()
+                        .setEnabled(false);
             }
         }
         // also remove the info how many results have been fetched
@@ -451,8 +452,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
     /**
      * Informs the user about the searching process.
      *
-     * @param query
-     *            Represents a limited query
+     * @param query Represents a limited query
      */
     public void showMatchSearchInProgress(String segmentationName) {
         resultLayout.removeAllComponents();
@@ -495,13 +495,14 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
             MenuItem miSingleSegLayer;
 
             /**
-             * TODO maybe it would be better, to mark the default text level corresponding
-             * to the corpus.properties.
+             * TODO maybe it would be better, to mark the default text level corresponding to the
+             * corpus.properties.
              *
              * There exists always a default text level.
              */
             if (s == null || "".equals(s)) {
-                miSingleSegLayer = miSegmentation.addItem(NULL_SEGMENTATION_VALUE, new MenuBaseTextCommand());
+                miSingleSegLayer =
+                        miSegmentation.addItem(NULL_SEGMENTATION_VALUE, new MenuBaseTextCommand());
             } else {
                 miSingleSegLayer = miSegmentation.addItem(s, new MenuBaseTextCommand());
             }
@@ -510,11 +511,13 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
             miSingleSegLayer.setCheckable(true);
 
             /**
-             * Check if a segmentation item must set checked. If no segmentation layer is
-             * selected, set the default layer as selected.
+             * Check if a segmentation item must set checked. If no segmentation layer is selected,
+             * set the default layer as selected.
              */
-            final String selectedSegmentationLayer = sui.getQueryState().getVisibleBaseText().getValue();
-            if ((selectedSegmentationLayer == null && "".equals(s)) || s.equals(selectedSegmentationLayer)) {
+            final String selectedSegmentationLayer =
+                    sui.getQueryState().getVisibleBaseText().getValue();
+            if ((selectedSegmentationLayer == null && "".equals(s))
+                    || s.equals(selectedSegmentationLayer)) {
                 miSingleSegLayer.setChecked(true);
             } else {
                 miSingleSegLayer.setChecked(false);
@@ -531,12 +534,12 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
         for (String corpusName : corpusNames) {
 
-          CorpusConfiguration corpusConfig = Helper.getCorpusConfig(corpusName, UI.getCurrent());
+            CorpusConfiguration corpusConfig = Helper.getCorpusConfig(corpusName, UI.getCurrent());
 
-          if (corpusConfig != null && corpusConfig.getView() != null
-              && corpusConfig.getView().getHiddenAnnos() != null) {
-            hiddenTokenAnnos = new HashSet<>(corpusConfig.getView().getHiddenAnnos());
-          }
+            if (corpusConfig != null && corpusConfig.getView() != null
+                    && corpusConfig.getView().getHiddenAnnos() != null) {
+                hiddenTokenAnnos = new HashSet<>(corpusConfig.getView().getHiddenAnnos());
+            }
         }
 
         if (hiddenTokenAnnos != null) {
@@ -572,16 +575,17 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
         if (tokenAnnotationLevelSet != null) {
             for (final String a : tokenAnnotationLevelSet) {
-                MenuItem miSingleTokAnno = miTokAnnos.addItem(a.replaceFirst("::", ":"), selectedItem -> {
+                MenuItem miSingleTokAnno =
+                        miTokAnnos.addItem(a.replaceFirst("::", ":"), selectedItem -> {
 
-                    if (selectedItem.isChecked()) {
-                        tokenAnnoVisible.put(a, Boolean.TRUE);
-                    } else {
-                        tokenAnnoVisible.put(a, Boolean.FALSE);
-                    }
+                            if (selectedItem.isChecked()) {
+                                tokenAnnoVisible.put(a, Boolean.TRUE);
+                            } else {
+                                tokenAnnoVisible.put(a, Boolean.FALSE);
+                            }
 
-                    setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
-                });
+                            setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
+                        });
 
                 miSingleTokAnno.setCheckable(true);
                 miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
