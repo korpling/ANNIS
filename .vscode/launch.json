@@ -1,31 +1,22 @@
 {
-    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
-    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
-    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "java",
-            "name": "Debug ANNIS UI",
-            "request": "launch",
-            "projectName": "annis-gui",
-            "mainClass": "annis.gui.AnnisUiApplication",
-            "cwd": "${workspaceFolder}/annis-gui",
-        },
-        {
-            "type": "java",
-            "name": "Debug (Launch) - Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "Debug ANNIS Service (no security)",
-            "request": "launch",
-            "mainClass": "annis.service.internal.AnnisServiceRunner",
-            "projectName": "annis-service",
-            "vmArgs": "-Dannis.home=${workspaceFolder}/annis-service/src/main/distribution -Dannis.nosecurity=true",
-            "cwd": "${workspaceFolder}/annis-service/src/main/distribution"
-        }
-    ]
+  // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+  // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+  // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug ANNIS UI",
+      "request": "launch",
+      "projectName": "annis-gui",
+      "mainClass": "annis.gui.AnnisUiApplication",
+      "cwd": "${workspaceFolder}/annis-gui"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch) - Current File",
+      "request": "launch",
+      "mainClass": "${file}"
+    }
+  ]
 }
