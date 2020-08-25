@@ -672,8 +672,7 @@ public class Helper {
    * @return Returns also the metada of the all parent corpora. There must be at least one of them.
    */
   public static List<SMetaAnnotation> getMetaData(String toplevelCorpusName,
-      Optional<String> documentName,
-      UI ui) {
+      Optional<String> documentName, UI ui) {
     List<SMetaAnnotation> result = new ArrayList<>();
     SearchApi api = new SearchApi(Helper.getClient(ui));
 
@@ -691,7 +690,8 @@ public class Helper {
         aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=/"
             + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
       }
-      File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+      File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL,
+          AnnotationComponentType.PARTOF);
       SCorpusGraph cg = CorpusGraphMapper.map(graphML);
       for (SNode n : cg.getNodes()) {
         result.addAll(n.getMetaAnnotations());
@@ -761,17 +761,6 @@ public class Helper {
     return "";
   }
 
-  public static String getServiceURL(VaadinSession session) {
-    if (session != null) {
-      String overriddenByInit =
-          session.getConfiguration().getInitParameters().getProperty("AnnisWebService.URL");;
-      if (overriddenByInit != null) {
-        return overriddenByInit;
-      }
-    }
-    return "http://localhost:5711/";
-
-  }
 
   public static AnnisUser getUser(UI ui) {
 
