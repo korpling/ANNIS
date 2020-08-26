@@ -265,7 +265,14 @@
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr4</artifactId>
-			<version>4.2.2</version>
+			<version>4.7.2</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>4.7.2</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -305,6 +312,11 @@
 			<version>2.10.6</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.tomlj</groupId>
+			<artifactId>tomlj</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 
 	</dependencies>
 

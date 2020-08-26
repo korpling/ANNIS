@@ -33,6 +33,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
+import org.tomlj.Toml;
+import org.tomlj.TomlParseResult;
 
 @Component
 public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent>, DisposableBean {
@@ -89,11 +91,12 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                         final BufferedReader outputStream = new BufferedReader(
                                 new InputStreamReader(backgroundProcess.getInputStream(),
                                         StandardCharsets.UTF_8));
+
                         final BufferedReader errorStream = new BufferedReader(new InputStreamReader(
                                 backgroundProcess.getErrorStream(), StandardCharsets.UTF_8));
 
                         Thread tReaderOut = new Thread(() -> {
-                            while (!this.abortThread.get()) {
+                            while (!this.abortThread.get() && backgroundProcess.isAlive()) {
                                 String line;
                                 try {
                                     line = outputStream.readLine();
@@ -102,12 +105,13 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                                     }
                                 } catch (IOException ex) {
                                     log.error("Could not read service output", ex);
+                                    break;
                                 }
                             }
                         });
                         tReaderOut.start();
                         Thread tReaderErr = new Thread(() -> {
-                            while (!this.abortThread.get()) {
+                            while (!this.abortThread.get() && backgroundProcess.isAlive()) {
                                 String line;
                                 try {
                                     line = errorStream.readLine();
@@ -116,12 +120,18 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                                     }
                                 } catch (IOException ex) {
                                     log.error("Could not read service error output", ex);
+                                    break;
                                 }
                             }
                         });
                         tReaderErr.start();
 
-                        config.setWebserviceURL("http://localhost:5711/v0");
+                        // Use the provided service configuration to get the correct port
+                        TomlParseResult parsedServiceConfig =
+                                Toml.parse(serviceConfigFile.toPath());
+                        long port = parsedServiceConfig.getLong("bind.port", () -> 5711);
+
+                        config.setWebserviceURL("http://localhost:" + port + "/v0");
                     }
                 }
             } catch (final IOException ex) {
