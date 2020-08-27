@@ -119,18 +119,16 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>repackage-desktop</id>
+						<id>repackage</id>
 						<goals>
-						  <goal>repackage</goal>
+							<goal>repackage</goal>
 						</goals>
 						<configuration>
-						  <classifier>desktop</classifier>
-						  <profiles>
-							  <profile>desktop</profile>
-						  </profiles>
+							<classifier>${default-builtin-profile}</classifier>
+							<executable>true</executable>
 						</configuration>
-					  </execution>
-				  </executions>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.googlecode.maven-download-plugin</groupId>
@@ -344,6 +342,21 @@
 	</dependencies>
 
 	<profiles>
+		<profile>
+			<id>server</id>
+			<activation>
+				<property><name>!default-builtin-profile</name></property>
+			</activation>
+			<properties>
+				<default-builtin-profile>server</default-builtin-profile>
+			</properties>
+		</profile>
+		<profile>
+			<id>desktop</id>
+			<properties>
+				<default-builtin-profile>desktop</default-builtin-profile>
+			</properties>
+		</profile>
 		<profile>
 			<id>mdbook</id>
 			<activation>
