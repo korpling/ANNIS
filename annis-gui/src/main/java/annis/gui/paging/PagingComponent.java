@@ -121,7 +121,7 @@ public class PagingComponent extends Panel implements Button.ClickListener {
     public void buttonClick(ClickEvent event) {
       ShareQueryReferenceWindow w =
           new ShareQueryReferenceWindow(ui.getQueryController().getSearchQuery(),
-              ui.getConfig().isShortenReferenceLinks() && !Helper.isKickstarter(getSession()));
+              ui.getConfig().isShortenReferenceLinks() && !this.ui.getConfig().isDesktopMode());
       getUI().addWindow(w);
       w.center();
     }

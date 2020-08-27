@@ -189,8 +189,6 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
 
   private File temporaryCorpusFile;
 
-  private boolean kickstarterMode;
-
   public ImportPanel() {
 
     setSizeFull();
@@ -277,16 +275,12 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
 
   @Override
   public void onLogin() {
-    if (!kickstarterMode) {
-      upload.setEnabled(true);
-    }
+    upload.setEnabled(true);
   }
 
   @Override
   public void onLogout() {
-    if (!kickstarterMode) {
-      upload.setEnabled(false);
-    }
+    upload.setEnabled(false);
   }
 
   @Override
@@ -344,13 +338,8 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
 
   }
 
-  public void updateMode(boolean kickstarterMode, boolean isLoggedIn) {
-    this.kickstarterMode = kickstarterMode;
-    if (kickstarterMode) {
-      upload.setEnabled(true);
-    } else {
-      upload.setEnabled(isLoggedIn);
-    }
+  public void updateMode(boolean isLoggedIn) {
+    upload.setEnabled(isLoggedIn);
   }
 
   @Override
