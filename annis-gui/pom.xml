@@ -38,6 +38,7 @@
 		<start-class>annis.gui.AnnisUiApplication</start-class>
 		<graphannis.version>0.29.2</graphannis.version>
 		<antlr4.version>4.7.2</antlr4.version>
+		<spring.profiles.active>server</spring.profiles.active>
 	</properties>
 
 	<build>
@@ -124,7 +125,7 @@
 							<goal>repackage</goal>
 						</goals>
 						<configuration>
-							<classifier>${default-builtin-profile}</classifier>
+							<classifier>${spring.profiles.active}</classifier>
 							<executable>true</executable>
 						</configuration>
 					</execution>
@@ -343,18 +344,9 @@
 
 	<profiles>
 		<profile>
-			<id>server</id>
-			<activation>
-				<property><name>!default-builtin-profile</name></property>
-			</activation>
-			<properties>
-				<default-builtin-profile>server</default-builtin-profile>
-			</properties>
-		</profile>
-		<profile>
 			<id>desktop</id>
 			<properties>
-				<default-builtin-profile>desktop</default-builtin-profile>
+				<spring.profiles.active>desktop</spring.profiles.active>
 			</properties>
 		</profile>
 		<profile>
