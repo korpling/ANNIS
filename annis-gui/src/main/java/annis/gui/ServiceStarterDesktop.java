@@ -1,7 +1,10 @@
 package annis.gui;
 
+import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,7 +12,6 @@ import java.util.Optional;
 
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
-import com.vaadin.ui.UI;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.corpus_tools.annis.ApiClient;
@@ -18,15 +20,14 @@ import org.corpus_tools.annis.api.AuthentificationApi;
 import org.corpus_tools.annis.api.model.InlineObject1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import annis.libgui.AnnisUser;
-import annis.libgui.Helper;
 
 @Component
 @Profile("desktop")
@@ -38,6 +39,9 @@ public class ServiceStarterDesktop extends ServiceStarter {
     private String basePath;
     private Optional<AnnisUser> desktopUserCredentials = Optional.empty();
 
+
+    @Value("${server.port}")
+    private String serverPort;
 
     /**
      * Overwrite the existing configuration file and add a temporary user for the desktop.
@@ -79,7 +83,7 @@ public class ServiceStarterDesktop extends ServiceStarter {
         ApiClient client = new ApiClient();
         client.setBasePath(this.basePath);
         AuthentificationApi api = new AuthentificationApi(client);
-        
+
         InlineObject1 credentials = new InlineObject1();
         credentials.setUserId(USER_NAME);
         credentials.setPassword(password);
@@ -91,11 +95,27 @@ public class ServiceStarterDesktop extends ServiceStarter {
             // Since this error is unrecoverable, we stop the application
             SpringApplication.exit(event.getApplicationContext(), () -> 401);
         }
+
+        // Open the application in the browser
+        String webURL = "http://localhost:" + serverPort;
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop == null) {
+            log.warn(
+                    "ANNIS is running in desktop mode, but no desktop has been detected. You can open {} manually.",
+                    webURL);
+        } else {
+            log.info("Opening {} in browser", webURL);
+            try {
+                Desktop.getDesktop().browse(new URI(webURL));
+            } catch (IOException | URISyntaxException ex) {
+                log.error("Could not open " + webURL + " in browser.", ex);
+            }
+        }
     }
 
     @Override
     public Optional<AnnisUser> getDesktopUserCredentials() {
-      return desktopUserCredentials;
+        return desktopUserCredentials;
     }
 
 }
