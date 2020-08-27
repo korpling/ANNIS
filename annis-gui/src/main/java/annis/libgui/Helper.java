@@ -799,15 +799,6 @@ public class Helper {
     return null;
   }
 
-  public static boolean isKickstarter(VaadinSession session) {
-    if (session != null) {
-      return Boolean.parseBoolean(session.getConfiguration().getInitParameters()
-          .getProperty("kickstarterEnvironment", "false"));
-    } else {
-      return false;
-    }
-  }
-
 
   public static void setUser(AnnisUser user) {
     if (user == null) {

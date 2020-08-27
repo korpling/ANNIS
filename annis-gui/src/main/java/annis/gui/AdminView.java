@@ -128,12 +128,11 @@ public class AdminView extends VerticalLayout
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
 
-        boolean kickstarter = Helper.isKickstarter(getSession());
 
-        importPanel.updateMode(kickstarter, Helper.getUser(ui) != null);
+        importPanel.updateMode(Helper.getUser(ui) != null);
 
-        // group and user management are not applicable in kickstarter
-        tabSheet.getTab(groupManagementPanel).setVisible(!kickstarter);
+        // group and user management are always visible when there is no security (in desktop mode)
+        tabSheet.getTab(groupManagementPanel).setVisible(ui.getConfig().isDesktopMode());
 
         Component selectedTab = getComponentForFragment(event.getParameters());
         if (selectedTab != null && selectedTab != tabSheet.getSelectedTab()) {

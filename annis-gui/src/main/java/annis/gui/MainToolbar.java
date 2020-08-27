@@ -26,7 +26,6 @@ import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -292,28 +291,31 @@ public class MainToolbar extends HorizontalLayout
 
   /**
    * Adds the login button + login text to the toolbar. This is only happened, when the gui is not
-   * started via the kickstarter.
+   * started in desktop mode.
    *
    * <p>
-   * The Kickstarter overrides the "kickstarterEnvironment" context parameter and set it to "true",
+   * The Kickstarter overrides the "desktopMode" application parameter and set it to "true",
    * so the gui can detect, that is not necessary to offer a login button.
    * </p>
    *
    * component.
    */
   private void addLoginButton() {
-    VaadinSession session = VaadinSession.getCurrent();
-    if (session != null) {
-      boolean kickstarter = Helper.isKickstarter(session);
-
-      if (!kickstarter) {
-        addComponent(lblUserName);
-        setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
-        addComponent(btLogin);
-        setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
-
-      }
+    
+    boolean desktopMode = false;
+    UI ui = UI.getCurrent();
+    if(ui instanceof AnnisUI) {
+      desktopMode = ((AnnisUI) ui).getConfig().isDesktopMode();
     }
+
+    if (!desktopMode) {
+      addComponent(lblUserName);
+      setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
+      addComponent(btLogin);
+      setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
+
+    }
+  
   }
 
   public void addLoginListener(LoginListener listener) {

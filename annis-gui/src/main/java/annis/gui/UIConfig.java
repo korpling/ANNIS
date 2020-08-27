@@ -18,6 +18,8 @@ public class UIConfig {
 
   private boolean shortenReferenceLinks;
 
+  private boolean desktopMode;
+
   public String getBugEmail() {
     return bugEMail;
   }
@@ -72,6 +74,14 @@ public class UIConfig {
 
   public void setWebserviceConfig(String webserviceConfig) {
     this.webserviceConfig = webserviceConfig;
+  }
+
+  public boolean isDesktopMode() {
+    return desktopMode;
+  }
+
+  public void setDesktopMode(boolean desktopMode) {
+    this.desktopMode = desktopMode;
   }
 
 }
