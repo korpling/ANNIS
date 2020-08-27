@@ -119,15 +119,6 @@
 				</configuration>
 				<executions>
 					<execution>
-					  <id>repackage-server</id>
-					  <goals>
-						<goal>repackage</goal>
-					  </goals>
-					  <configuration>
-						<classifier>server</classifier>
-					  </configuration>
-					</execution>
-					<execution>
 						<id>repackage-desktop</id>
 						<goals>
 						  <goal>repackage</goal>
