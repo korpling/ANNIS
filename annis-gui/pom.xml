@@ -41,7 +41,6 @@
 	</properties>
 
 	<build>
-		<finalName>annis-gui</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -120,14 +119,27 @@
 				</configuration>
 				<executions>
 					<execution>
-					  <id>repackage</id>
+					  <id>repackage-server</id>
 					  <goals>
 						<goal>repackage</goal>
 					  </goals>
 					  <configuration>
 						<classifier>server</classifier>
+						<layout>WAR</layout>
 					  </configuration>
 					</execution>
+					<execution>
+						<id>repackage-desktop</id>
+						<goals>
+						  <goal>repackage</goal>
+						</goals>
+						<configuration>
+						  <classifier>desktop</classifier>
+						  <profiles>
+							  <profile>desktop</profile>
+						  </profiles>
+						</configuration>
+					  </execution>
 				  </executions>
 			</plugin>
 			<plugin>

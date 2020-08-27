@@ -305,7 +305,7 @@ public class MainToolbar extends HorizontalLayout
     boolean desktopMode = false;
     UI ui = UI.getCurrent();
     if(ui instanceof AnnisUI) {
-      desktopMode = ((AnnisUI) ui).getConfig().isDesktopMode();
+      desktopMode = ((AnnisUI) ui).isDesktopMode();
     }
 
     if (!desktopMode) {

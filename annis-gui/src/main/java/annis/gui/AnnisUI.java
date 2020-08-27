@@ -46,6 +46,8 @@ import java.util.UUID;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 
 /**
  * GUI for searching in corpora.
@@ -88,6 +90,9 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   private AdminView adminView;
 
   private Navigator nav;
+
+  @Autowired
+  private Environment environment;
 
   /**
    * A re-usable toolbar for different views.
@@ -233,6 +238,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   public UIConfig getConfig() {
     return config;
+  }
+
+  public boolean isDesktopMode() {
+    return environment.acceptsProfiles(Profiles.of("desktop"));
   }
 
   private void initTransients() {

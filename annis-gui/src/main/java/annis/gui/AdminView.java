@@ -132,7 +132,7 @@ public class AdminView extends VerticalLayout
         importPanel.updateMode(Helper.getUser(ui) != null);
 
         // group and user management are always visible when there is no security (in desktop mode)
-        tabSheet.getTab(groupManagementPanel).setVisible(ui.getConfig().isDesktopMode());
+        tabSheet.getTab(groupManagementPanel).setVisible(ui.isDesktopMode());
 
         Component selectedTab = getComponentForFragment(event.getParameters());
         if (selectedTab != null && selectedTab != tabSheet.getSelectedTab()) {

@@ -98,7 +98,7 @@ public class CitationLinkGenerator implements Table.ColumnGenerator, Button.Clic
             UI ui = UI.getCurrent();
             boolean desktopMode = false;
             if (ui instanceof AnnisUI) {
-                desktopMode = ((AnnisUI) ui).getConfig().isDesktopMode();
+                desktopMode = ((AnnisUI) ui).isDesktopMode();
             }
 
             if (query != null) {
