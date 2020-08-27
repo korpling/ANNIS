@@ -21,7 +21,9 @@ import com.vaadin.ui.LoginForm;
 import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.Window;
 
+import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.Configuration;
 import org.corpus_tools.annis.api.AuthentificationApi;
 import org.corpus_tools.annis.api.model.InlineObject1;
 
@@ -80,17 +82,22 @@ public class LoginWindow extends Window implements LoginForm.LoginListener {
 
             // Attempt to get a JWT bearer token for this user.
             // Since we want to authenticate, we use an anonymous API client
-            AuthentificationApi api = new AuthentificationApi();
+            final ApiClient client = Configuration.getDefaultApiClient();
+            AnnisUI ui = null;
+            if (getUI() instanceof AnnisUI) {
+                ui = (AnnisUI) getUI();
+                client.setBasePath(ui.getConfig().getWebserviceURL());
+            }
+            AuthentificationApi api = new AuthentificationApi(client);
+            
             InlineObject1 credentials = new InlineObject1();
             credentials.setUserId(username);
             credentials.setPassword(password);
             try {
                 String token = api.localLogin(credentials);
                 Helper.setUser(new AnnisUser(username, password, token));
-                if (getUI() instanceof AnnisUI) {
-                    AnnisUI ui = (AnnisUI) getUI();
+                if (ui != null) {
                     ui.getToolbar().onLogin();
-
                 }
             } catch (ApiException ex) {
                 ExceptionDialog.show(ex, "Could not login", getUI());

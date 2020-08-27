@@ -13,7 +13,6 @@
  */
 package annis.libgui;
 
-import com.sun.jersey.api.client.Client;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;

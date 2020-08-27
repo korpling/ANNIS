@@ -21,6 +21,7 @@ import annis.gui.query_references.UrlShortener;
 import annis.gui.querybuilder.QueryBuilderPlugin;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.libgui.AnnisBaseUI;
+import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
@@ -93,6 +94,9 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   @Autowired
   private Environment environment;
+
+  @Autowired
+  private ServiceStarter serviceStarter;
 
   /**
    * A re-usable toolbar for different views.
@@ -233,6 +237,13 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     addExtension(toolbar.getScreenshotExtension());
 
     loadInstanceFonts();
+
+    Optional<AnnisUser> desktopUser = serviceStarter.getDesktopUserCredentials();
+    if(desktopUser.isPresent()) {
+      // Login the provided desktop user
+      Helper.setUser(desktopUser.get());
+      getToolbar().onLogin();
+    }
 
   }
 
