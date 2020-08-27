@@ -125,7 +125,6 @@
 					  </goals>
 					  <configuration>
 						<classifier>server</classifier>
-						<layout>WAR</layout>
 					  </configuration>
 					</execution>
 					<execution>
