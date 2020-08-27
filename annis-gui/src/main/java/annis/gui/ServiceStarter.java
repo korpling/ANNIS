@@ -21,8 +21,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.moandjiezana.toml.Toml;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.logging.log4j.message.ReusableMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -30,13 +33,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-import org.tomlj.Toml;
-import org.tomlj.TomlParseResult;
+
+import annis.libgui.AnnisUser;
 
 @Component
+@Profile("!desktop")
 public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent>, DisposableBean {
 
     private final static Logger log = LoggerFactory.getLogger(ServiceStarter.class);
@@ -79,10 +84,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                         tmpExec.setExecutable(true);
 
                         // If the configuration does not exist, create an empty file
-                        File serviceConfigFile = new File(config.getWebserviceConfig());
-                        if (!serviceConfigFile.exists()) {
-                            serviceConfigFile.createNewFile();
-                        }
+                        File serviceConfigFile = getServiceConfig();
 
                         // Start the process and read output/error stream in background threads
                         log.info("Starting the bundled graphANNIS service");
@@ -127,11 +129,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                         tReaderErr.start();
 
                         // Use the provided service configuration to get the correct port
-                        TomlParseResult parsedServiceConfig =
-                                Toml.parse(serviceConfigFile.toPath());
-                        long port = parsedServiceConfig.getLong("bind.port", () -> 5711);
-
-                        config.setWebserviceURL("http://localhost:" + port + "/v0");
+                        Toml parsedServiceConfig = new Toml().read(serviceConfigFile);
+                        config.setWebserviceURL(getServiceURL(parsedServiceConfig));
                     }
                 }
             } catch (final IOException ex) {
@@ -142,6 +141,27 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         }
     }
 
+    private long getServicePort(Toml config) {
+        long port = 5711l;
+        Toml bindTable = config.getTable("bind");
+        if(bindTable != null) {
+            port = bindTable.getLong("port", 5711l);
+        }
+        return port;
+    }
+
+    protected String getServiceURL(Toml config) {
+        return "http://localhost:" + getServicePort(config) + "/v0";
+    }
+
+    protected File getServiceConfig() throws IOException {
+        File result = new File(config.getWebserviceConfig());
+        if (!result.exists()) {
+            result.createNewFile();
+        }
+        return result;
+    }
+
     @Override
     public void destroy() throws Exception {
         this.abortThread.set(true);
@@ -149,4 +169,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
             this.backgroundProcess.destroy();
         }
     }
+
+    public Optional<AnnisUser> getDesktopUserCredentials() {
+        return Optional.empty();
+      }
 }
