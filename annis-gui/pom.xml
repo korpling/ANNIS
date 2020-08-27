@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.1.RELEASE</version>
+		<version>2.3.3.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -13,7 +13,11 @@
 	<artifactId>annis-gui</artifactId>
 	<version>4.0.1-beta.4-SNAPSHOT</version>
 	<name>annis-gui</name>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
+	<scm>
+		<connection>scm:git:https://github.com/korpling/ANNIS.git</connection>
+		<developerConnection>scm:git:git@github.com:korpling/ANNIS.git</developerConnection>
+	</scm>
 
 
 	<organization>
@@ -114,6 +118,17 @@
 				<configuration>
 					<mainClass>${start-class}</mainClass>
 				</configuration>
+				<executions>
+					<execution>
+					  <id>repackage</id>
+					  <goals>
+						<goal>repackage</goal>
+					  </goals>
+					  <configuration>
+						<classifier>server</classifier>
+					  </configuration>
+					</execution>
+				  </executions>
 			</plugin>
 			<plugin>
 				<groupId>com.googlecode.maven-download-plugin</groupId>
