@@ -32,7 +32,7 @@ ALL : 'annis:ALL';
 QUOTE : '"';
 NEWLINE : '\n';
 COMMENT : '#' ~('\n')+ -> skip;
-ID: [a-zA-Z0-9\_\-*?]+;
+ID: [a-zA-Z0-9_\-*?]+;
 TXT : (.)+?;
 TEMPVALUE :'%%value%%';
 TEMPANNO: '%%anno%%';
