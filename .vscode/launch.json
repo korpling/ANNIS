@@ -6,7 +6,7 @@
   "configurations": [
     {
       "type": "java",
-      "name": "Debug ANNIS UI",
+      "name": "Debug Server",
       "request": "launch",
       "projectName": "annis-gui",
       "mainClass": "annis.gui.AnnisUiApplication",
@@ -14,11 +14,14 @@
     },
     {
       "type": "java",
-      "name": "Debug ANNIS Kickstarter",
+      "name": "Debug Desktop",
       "request": "launch",
-      "projectName": "annis-kickstarter",
+      "projectName": "annis-gui",
       "mainClass": "annis.gui.AnnisUiApplication",
-      "cwd": "${workspaceFolder}/annis-gui"
+      "cwd": "${workspaceFolder}/annis-gui",
+      "env": {
+        "spring_profiles_active": "desktop"
+      }
     },
     {
       "type": "java",

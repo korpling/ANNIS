@@ -318,7 +318,7 @@ public class SingleResultPanel extends CssLayout
     super.attach();
 
     initVisualizer();
-    if (ui.getConfig().isShortenReferenceLinks() && !ui.getConfig().isDesktopMode()) {
+    if (ui.getConfig().isShortenReferenceLinks() && !ui.isDesktopMode()) {
       btLink.setVisible(true);
     } else {
       btLink.setVisible(false);

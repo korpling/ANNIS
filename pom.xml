@@ -247,6 +247,5 @@
 		<module>annis-widgets</module>
 		<module>annis-libgui</module>
 		<module>annis-rest-client</module>
-		<module>annis-kickstarter</module>
 	</modules>
 </project>
