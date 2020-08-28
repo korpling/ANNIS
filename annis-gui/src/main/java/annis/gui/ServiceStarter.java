@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -176,10 +177,10 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
             databaseConfig = databaseTable.toMap();
         }
         // Add the graphannis data and sqlite location of not existing yet
-        Object previousDatabase = databaseConfig.putIfAbsent("graphannis", Path
-                .of(System.getProperty("user.home"), ".annis", "v4").toAbsolutePath().toString());
+        Object previousDatabase = databaseConfig.putIfAbsent("graphannis", Paths
+                .get(System.getProperty("user.home"), ".annis", "v4").toAbsolutePath().toString());
         Object previousSqlite = databaseConfig.putIfAbsent("sqlite",
-                Path.of(System.getProperty("user.home"), ".annis", "v4", "service_data.sqlite3")
+                Paths.get(System.getProperty("user.home"), ".annis", "v4", "service_data.sqlite3")
                         .toAbsolutePath().toString());
 
         if (previousDatabase == null || previousSqlite == null) {
