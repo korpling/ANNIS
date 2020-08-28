@@ -204,11 +204,13 @@
       "id": "d37c4155-f782-4a21-8ae5-1881fd97f210",
       "comment": "",
       "command": "click",
-      "target": "css=.v-selected > .v-table-cell-content:nth-child(1) > .v-table-cell-wrapper",
+      "target": "xpath=//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']/div[3]/table/tbody/tr/td/span/input",
       "targets": [
-        ["css=.v-selected > .v-table-cell-content:nth-child(1) > .v-table-cell-wrapper", "css:finder"],
-        ["xpath=//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']/div[2]/div/table/tbody/tr/td/div", "xpath:idRelative"],
-        ["xpath=//div[2]/div/table/tbody/tr/td/div", "xpath:position"]
+        ["id=gwt-uid-6", "id"],
+        ["css=#gwt-uid-6", "css:finder"],
+        ["xpath=//input[@id='gwt-uid-6']", "xpath:attributes"],
+        ["xpath=//div[@id='SearchView:ControlPanel:TabSheet:CorpusListPanel:tblCorpora']/div[3]/table/tbody/tr/td/span/input", "xpath:idRelative"],
+        ["xpath=//td/span/input", "xpath:position"]
       ],
       "value": ""
     }, {
