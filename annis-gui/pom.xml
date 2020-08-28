@@ -348,6 +348,21 @@
 			<properties>
 				<spring.profiles.active>desktop</spring.profiles.active>
 			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<splashscreen-image>BOOT-INF/classes/splashscreen.gif</splashscreen-image>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 		<profile>
 			<id>mdbook</id>
