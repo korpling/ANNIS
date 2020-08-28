@@ -5,7 +5,6 @@ jdk:
 env:
   global:
     - MOZ_HEADLESS=1
-    - TOMCAT_VERSION=8.5.49
   addons:
     firefox: latest
   
@@ -22,9 +21,6 @@ before_script:
   # Install Selenium Runner with geckodriver
   - npm install selenium-side-runner
   - npm install geckodriver
-  # download and unzip Tomcat
-  - wget https://archive.apache.org/dist/tomcat/tomcat-8/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
-  - tar xvzf apache-tomcat-$TOMCAT_VERSION.tar.gz
   # download pcc2 corpus and import it using the CLI
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
   - annis --data $HOME/.annis/v4/ -c "import pcc2_relANNIS.zip"
@@ -43,7 +39,7 @@ script:
   - java -jar annis-gui/target/annis-gui-*-desktop.jar &
   # execute integration tests
   - selenium-side-runner --base-url http://localhost:8080/ -c "browserName=firefox" misc/annis_integration_tests.side
-    
+
 deploy:
   - provider: script
     script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
