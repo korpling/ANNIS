@@ -17,18 +17,18 @@ before_script:
   - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
   - mkdir -p $HOME/.cargo/bin
   - export PATH=$HOME/.cargo/bin:$TRAVIS_BUILD_DIR/node_modules/.bin/:$PATH
-  - misc/download-mdbook.sh 0.3.5
+  - misc/download-mdbook.sh 0.4.2
+  - misc/download-annis-cli.sh 0.29.2
   # Install Selenium Runner with geckodriver
   - npm install selenium-side-runner
   - npm install geckodriver
   # download and unzip Tomcat
   - wget https://archive.apache.org/dist/tomcat/tomcat-8/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
   - tar xvzf apache-tomcat-$TOMCAT_VERSION.tar.gz
-  # download pcc2 corpus
+  # download pcc2 corpus and import it using the CLI
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
-  - unzip pcc2_relANNIS.zip
-
-
+  - annis --data $HOME/.annis/v4/ -c "import pcc2_relANNIS.zip"
+  
   
 script:
   # execute Maven Tests
@@ -37,21 +37,13 @@ script:
   - mdbook build docs/user-guide/
   - mdbook build docs/developer-guide/
   - mdbook build docs/online-help/
-  # import corpora needed for integration tests
-  - cd annis-service/target/annis-service-*-distribution/annis-service-*/
-  - source bin/setup.sh
-  - annis-admin.sh import $TRAVIS_BUILD_DIR/pcc2_v6_relANNIS
-  # start needed (web-) services
-  - annis-service-no-security.sh start
-  - cp $TRAVIS_BUILD_DIR/annis-gui/target/annis-gui.war $TRAVIS_BUILD_DIR/apache-tomcat-$TOMCAT_VERSION/webapps
-  - $TRAVIS_BUILD_DIR/apache-tomcat-$TOMCAT_VERSION/bin/startup.sh
+  # Compile in desktop mode
+  - mvn -Pdesktop package
+  # Start in ANNIS in background and in desktop mode, so there is no authentication
+  - java -jar annis-gui/target/annis-gui-*-desktop.jar &
   # execute integration tests
-  - cd $TRAVIS_BUILD_DIR/
   - selenium-side-runner --base-url http://localhost:8080/ -c "browserName=firefox" misc/annis_integration_tests.side
-  # stop services
-  - annis-service-no-security.sh stop
-  - $TRAVIS_BUILD_DIR/apache-tomcat-$TOMCAT_VERSION/bin/shutdown.sh
-  
+    
 deploy:
   - provider: script
     script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
