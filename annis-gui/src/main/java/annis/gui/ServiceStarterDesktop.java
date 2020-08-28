@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.SplashScreen; 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -150,8 +151,7 @@ public class ServiceStarterDesktop extends ServiceStarter {
     }
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
-       
+    public void onApplicationEvent(ApplicationReadyEvent event) { 
         super.onApplicationEvent(event);
 
         // Get a JWT token for the logged in user from the started service
