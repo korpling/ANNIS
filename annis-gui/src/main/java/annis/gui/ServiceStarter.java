@@ -18,10 +18,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -144,7 +148,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     private long getServicePort(Toml config) {
         long port = 5711l;
         Toml bindTable = config.getTable("bind");
-        if(bindTable != null) {
+        if (bindTable != null) {
             port = bindTable.getLong("port", 5711l);
         }
         return port;
@@ -159,6 +163,31 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         if (!result.exists()) {
             result.createNewFile();
         }
+        // Set to a default data folder and SQLite file
+        Toml configToml = new Toml().read(result);
+        Map<String, Object> config = configToml.toMap();
+        Toml databaseTable = configToml.getTable("database");
+        Map<String, Object> databaseConfig;
+        if (databaseTable == null) {
+            // Create a new map instead of re-using the existing one
+            databaseConfig = new LinkedHashMap<>();
+            config.put("database", databaseConfig);
+        } else {
+            databaseConfig = databaseTable.toMap();
+        }
+        // Add the graphannis data and sqlite location of not existing yet
+        Object previousDatabase = databaseConfig.putIfAbsent("graphannis", Path
+                .of(System.getProperty("user.home"), ".annis", "v4").toAbsolutePath().toString());
+        Object previousSqlite = databaseConfig.putIfAbsent("sqlite",
+                Path.of(System.getProperty("user.home"), ".annis", "v4", "service_data.sqlite3")
+                        .toAbsolutePath().toString());
+
+        if (previousDatabase == null || previousSqlite == null) {
+            // Write updated configuration to file
+            TomlWriter writer = new TomlWriter();
+            writer.write(config, result);
+        }
+
         return result;
     }
 
@@ -172,5 +201,5 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
 
     public Optional<AnnisUser> getDesktopUserCredentials() {
         return Optional.empty();
-      }
+    }
 }
