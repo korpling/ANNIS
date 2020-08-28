@@ -2,7 +2,7 @@
   "id": "3b30cc20-f4fb-4383-b96f-37d2a9690d2c",
   "version": "2.0",
   "name": "annis_integration_tests",
-  "url": "http://localhost:5712/annis-gui/",
+  "url": "http://localhost:5712/",
   "tests": [{
     "id": "bae08028-13be-4a4e-8383-9b6091d1be6d",
     "name": "About Window",
