@@ -23,6 +23,7 @@ before_script:
   - npm install geckodriver
   # download pcc2 corpus and import it using the CLI
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
+  - mkdir -p  $HOME/.annis/v4/
   - annis -c "import pcc2_relANNIS.zip"  $HOME/.annis/v4/
   
   
