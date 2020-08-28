@@ -8,7 +8,7 @@ if [[ -x $HOME/.cargo/bin/annis ]]; then
     echo "Checking for graphANNIS version ${GRAPHANNIS_VERSION}"
     EXISTING_GRAPHANNIS_VERSION=`$HOME/.cargo/bin/annis --version`
     echo "Existing: ${EXISTING_GRAPHANNIS_VERSION}"
-    if [ "annis v${GRAPHANNIS_VERSION}" != "${EXISTING_GRAPHANNIS_VERSION}" ]; then
+    if [ "graphANNIS CLI ${GRAPHANNIS_VERSION}" != "${EXISTING_GRAPHANNIS_VERSION}" ]; then
         install_mdbook=true
     else
         echo "Using cached ${EXISTING_GRAPHANNIS_VERSION}"
