@@ -77,7 +77,7 @@ import org.springframework.http.HttpStatus;
  */
 @Theme("annis_embeddedvis")
 @Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
-@SpringUI(path = "/embeddedvis")
+@SpringUI(path = "/embeddedvis/*")
 @Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
 public class EmbeddedVisUI extends CommonUI {
 
