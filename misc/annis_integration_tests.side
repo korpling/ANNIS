@@ -10,7 +10,7 @@
       "id": "9e1b5654-8722-4469-a9ee-7fd6bc701cde",
       "comment": "",
       "command": "open",
-      "target": "/annis-gui/",
+      "target": "/",
       "targets": [],
       "value": ""
     }, {
@@ -74,7 +74,7 @@
       "id": "a51f0734-016b-4c1d-a1ae-8895d10d1668",
       "comment": "",
       "command": "open",
-      "target": "/annis-gui/",
+      "target": "/",
       "targets": [],
       "value": ""
     }, {
@@ -138,7 +138,7 @@
       "id": "5685a4d9-59eb-420d-bc8d-d1e4befe5557",
       "comment": "",
       "command": "open",
-      "target": "/annis-gui/",
+      "target": "/",
       "targets": [],
       "value": ""
     }, {
@@ -337,7 +337,7 @@
       "id": "abf43714-d9ad-4231-a869-fc54c1426807",
       "comment": "",
       "command": "open",
-      "target": "/annis-gui/embeddedvis/grid?embedded_ns=exmaralda&embedded_instance=&embedded_salt=http%3A%2F%2Flocalhost%3A5711%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dsalt%3A%2Fpcc2%2F11299%2F%2523tok_1%26left%3D5%26right%3D5&embedded_interface=http://localhost:8080/annis-gui/%23_q%3DdG9r%26_c%3DcGNjMg%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26m%3D0",
+      "target": "/embeddedvis/grid?embedded_ns=exmaralda&embedded_instance=&embedded_match=pcc2/11299%23tok_1&embedded_left=5&embedded_right=5&embedded_interface=http://localhost:5712/%23_q%3DdG9r%26ql%3Daql%26_c%3DcGNjMg%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26m%3D0",
       "targets": [],
       "value": ""
     }, {
@@ -369,6 +369,6 @@
     "timeout": 300,
     "tests": ["98ed0d3f-a077-4e29-a42c-e8c3f64b7855"]
   }],
-  "urls": ["http://localhost:8080/", "http://localhost:8080/annis-gui", "http://localhost:8080/annis-gui/", "http://localhost:5712/annis-gui/"],
+  "urls": ["http://localhost:8080/", "http://localhost:8080/annis-gui", "http://localhost:8080/annis-gui/", "http://localhost:5712/annis-gui/", "http://localhost:5712/"],
   "plugins": []
 }
