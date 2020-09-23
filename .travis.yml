@@ -40,6 +40,8 @@ script:
   - cd annis-gui/
   - java -jar target/annis-gui-*-desktop.jar --ci &
   - cd ..
+  # Wait some time to allow the service to start
+  - sleep 10
   # execute integration tests
   - selenium-side-runner --base-url http://localhost:5712/ -c "browserName=firefox" misc/annis_integration_tests.side
 
