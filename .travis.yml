@@ -37,7 +37,9 @@ script:
   # Compile in desktop mode
   - mvn -Pdesktop package
   # Start in ANNIS in background and in desktop mode, so there is no authentication
-  - java -jar annis-gui/target/annis-gui-*-desktop.jar --ci &
+  - cd annis-gui/
+  - java -jar target/annis-gui-*-desktop.jar --ci &
+  - cd ..
   # execute integration tests
   - selenium-side-runner --base-url http://localhost:5712/ -c "browserName=firefox" misc/annis_integration_tests.side
 
