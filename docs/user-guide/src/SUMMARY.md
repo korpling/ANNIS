@@ -31,7 +31,6 @@
     - [Document Browser](./import-and-config/documentbrowser.md)
     - [Right-to-Left Visualizations](./import-and-config/rtl.md)
 - [Advanced Topics](./advanced/README.md)
-    - [Provide your own login-system](./advanced/custom-login.md)
     - [Links to queries](./advanced/links-to-queries.md)
     - [Embed ANNIS visualizations](./advanced/embed-vis.md)
     - [Install backend and front-end on different servers](advanced/backend-frontend-separation.md)
