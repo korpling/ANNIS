@@ -8,18 +8,11 @@ You should not be forced to have an ANNIS frontend and service installation for
 each of this groups. Instead the administrator can define so called instances.
 
 An instance is defined by a JSON file inside the instances sub-folder in one of
-the *front-end configuration locations*, e.g. the home folder of the user running the ANNIS front-end
- (on a server often the Tomcat user, or under Windows Kickstarter, in
-`C:\Users\username\.annis` , or under Mac OSX under `/Users/username/.annis/`,
+the *configuration locations*, e.g. the home folder of the user running the ANNIS service
+ (under Windows, in `C:\Users\username\.annis` , or under Mac OSX under `/Users/username/.annis/`,
 which is a hidden folder; to view hidden folders you may need to reconfigure your
 Finder application).
-In ANNIS server scenarios where it is not possible to deploy the
-home directory of the user running the front-end (e.g. no home folder for Tomcat), you
-may prefer to manually set the configuration path parameter `ANNIS_CFG` for ANNIS,
-by adding something like the following to the shell script starting ANNIS
-~~~bash
-export ANNIS_CFG=/etc/my_annis_cfg_path/
-~~~
+
 Instances can then be specified under this folder.
 The name of the file also defines the instance name.
 Thus the file `instances/falko.json` defines the instance named "falko".
@@ -119,7 +112,7 @@ just add a `frequency-font` entry. It has the same structure as `font`.
 It is possible to group corpora into groups, which are selected above the corpus list in
 the search form:
 
-![corpus group selection](images/corpus-group.png)
+![corpus group selection](corpus-group.png)
 
 While any user can group corpora into corpus sets for their own use, you can define
 corpus sets for the whole instance using the "corpus-sets" in the JSON file described
