@@ -6,7 +6,7 @@ This is achieved by a special sub website of ANNIS which has the URL
 ~~~
 <annis-base-url>/embeddedvis/<visualizer-short-name>
 ~~~
-The possible values for the short name are the same as the ones listed in the ["Configuring Visualizations" chapter](visualizations.md) chapter.
+The possible values for the short name are the same as the ones listed in the ["Configuring Visualizations" chapter](../visualizations.md) chapter.
 Additional parameters are used to configure how the visualization should be displayed.
 
 ## Parameters
@@ -38,11 +38,11 @@ salt:/pcc2/11299/#tok_1 tiger::pos::salt:/pcc2/11299/#tok_2
 ### embedded_instance
 
 Name of an ANNIS sub-instance that should be used.
-See the ["Multiple Instances of the Interface" chapter](import-and-config-instances.md) for more information.
+See the ["Multiple Instances of the Interface" chapter](../import-and-config-instances.md) for more information.
 
 ### embedded_ns
 
-Namespace which is "triggering" the visualization (see the ["Configuring Visualizations" chapter](visualizations.md))
+Namespace which is "triggering" the visualization (see the ["Configuring Visualizations" chapter](../visualizations.md))
 
 ### embedded_base
 
@@ -64,7 +64,7 @@ embedded_interface=https://korpling.german.hu-berlin.de/annis3-snapshot/%23_q%3D
 ~~~
 
 the following web page is [shown](https://korpling.german.hu-berlin.de/annis3-snapshot/embeddedvis/grid?embedded_ns=tei&embedded_instance=&embedded_salt=http%3A%2F%2Flocalhost%3A5713%2Fannis%2Fquery%2Fsearch%2Fsubgraph%3Fmatch%3Dtei%3A%3Asic%3A%3Asalt%3A%2FGUM%2FGUM_whow_languages%2F%2523sic_487%26left%3D5%26right%3D5&embedded_interface=https://korpling.german.hu-berlin.de/annis3-snapshot/%23_q%3Dc2lj%26_c%3DR1VN%26cl%3D5%26cr%3D5%26s%3D10%26l%3D10%26m%3D12):
-![Embed example 1](images/embed_example1.png)
+![Embed example 1](embed_example1.png)
 
 The namespace is "tei", the instance is the default one (empty name).
 There is a dynamic URL to the REST web service running at `localhost` (the service must be reachable by the web server, not the client)
@@ -85,4 +85,4 @@ config=dipl
 
 `embedded_salt` refers to the graph function `annis.service.QueryService.graph(...)` and this example uses the configuration from the "scriptorium2" instance.
 The additional parameter `config` is a mapping parameter of the `htmldoc` visualizer.
-![Embed example 2](images/embed_example2.png)
+![Embed example 2](embed_example2.png)

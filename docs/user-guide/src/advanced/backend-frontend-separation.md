@@ -12,7 +12,7 @@ ProxyPass /annis3-service http://localhost:5711
 ~~~ 
 If you your server is `example.com` this configuration would result in the service URL `https://example.com/annis3-service/v0/`
 
-The service is responsible for the authentication and authorization (see [the user configuration](import-and-config-user.md) for more information), thus the corpora are only accessible by the 
+The service is responsible for the authentication and authorization (see [the user configuration](../configuration/user.md) for more information), thus the corpora are only accessible by the 
 service if the user can provide the appropriate credentials.
 User names and passwords will be sent as clear text over the network.
 **Thus you should always make sure to enforce encrypted SSL (HTTPS) connections for the public accessible service.**
