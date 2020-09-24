@@ -12,7 +12,7 @@ representation of each document.
 ## Custom visualizer and sorting
 
 It is also possible to use a custom visualizer for browsing a whole
-document. The configuration is in JSON-Syntax file named
+document. The configuration is in [JSON](http://www.json.org/)-Syntax file named
 `document_browser.json`, which can be add to the ExtData directory of
 each corpus.
 
