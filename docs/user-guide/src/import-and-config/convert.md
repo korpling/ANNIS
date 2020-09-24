@@ -1,7 +1,10 @@
 # Converting Corpora for ANNIS using Pepper
 
-ANNIS uses a relational database format called relANNIS. 
-Before a corpus can be imported into ANNIS, it has to be converted into this format.
+ANNIS supports two types of formats to import:
+- the legacy relANNIS format based on the previous relational database implementation, and
+- a new GraphML based native format which can be exported from ANNIS and exchanged with other tools which support GraphML (like e.g. Neo4j). 
+
+Before a corpus can be imported into ANNIS, it has to be converted into a supported format.
 The Pepper converter framework allows users to convert data from various formats including PAULA XML,
 EXMARaLDA XML, TigerXML, CoNLL, RSTTool, generic XML and TreeTagger
 directly into relANNIS. 

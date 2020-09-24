@@ -12,7 +12,9 @@
     "ltex.workspaceFolderDictionary": {
         "en-US": [
             "graphANNIS",
-            "GraphANNIS"
+            "GraphANNIS",
+            "GraphML",
+            "relANNIS"
         ]
     }
 }
