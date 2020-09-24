@@ -28,7 +28,7 @@
     - [Configuring Settings for a Corpus](./import-and-config/corpus-config.md)
     - [Configuring Visualizations](./import-and-config/visualizations.md)
     - [List of Visualizations](./import-and-config/visualizations-list.md)
-    - [Document Browser](./visualizations-documentbrowser.md)
+    - [Document Browser](./import-and-config/documentbrowser.md)
     - [Right-to-Left Visualizations](./visualizations-rtl.md)
     - [Maximal Context Size, Context Steps and Result Page Sizes](./visualizations-context.md)
 - [Advanced Topics](./advanced/README.md)
