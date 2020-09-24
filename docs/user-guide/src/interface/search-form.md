@@ -1,6 +1,6 @@
 # Search Form
 
-![ANNIS search form](images/searchform.png)
+![ANNIS search form](searchform.png)
 
 The Search Form can be found on the left of the interface window. It\'s
 bottom part shows the list of currently available corpora. By clicking
@@ -21,7 +21,7 @@ retrieve the number of matching positions and documents in the selected
 corpora in the Status box and open the Result tab to display the first
 set of matches.
 
-![ANNIS search options](images/searchoptions.png)
+![ANNIS search options](searchoptions.png)
 
 In order to get more control over the search you can click on "Search
 Options" to unfold more detailed search options. The context
@@ -36,5 +36,5 @@ Entire texts can also be viewed using special document visualizations or
 by clicking on the document icon next to each corpus name, if available.
 
 The "Query Language" option allows to switch between the default AQL dialect 
-and an [compatibility mode](aql-compatibility-mode.md) emulating the behavior of the older ANNIS3.
+and an [compatibility mode](../aql-compatibility-mode.md) emulating the behavior of the older ANNIS3.
 Make sure to use the latest version for all new queries.
