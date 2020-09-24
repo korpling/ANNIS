@@ -6,7 +6,7 @@ information on converting corpora from other formats into relANNIS, see the
 
 ## Importing a relANNIS corpus using the administration interface
 
-When you are logged in as an administrator (automatically in desktop version), you can change to the [administration interface](../configuration/admin-web.md) and use the “Import Corpus“ tab.
+When you are logged in as an administrator (automatically in desktop version), you can change to the [administration interface](../interface/admin-web.md) and use the “Import Corpus“ tab.
 On a server installation, importing a corpus will not interrupt querying other corpora that are already imported.
 
 ## Importing a corpus using the command line

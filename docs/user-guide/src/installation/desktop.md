@@ -25,5 +25,5 @@ To install ANNIS follow these steps:
 4. Once import is complete, click on the “Search interface” to get back to the search interface and test the corpus (click
 on one of the example queries displayed on the screen, or try selecting the
 GUM corpus, typing `pos="NN"` in the AQL box at the top left and clicking
-“Show Result”. See the sections [“Using the ANNIS interface”](interface.md)and [“ANNIS Query Language (AQL)”](aql.md) in this guide for some more example queries, or press the Tutorial button in the
+“Show Result”. See the sections [“Using the ANNIS interface”](../interface)and [“ANNIS Query Language (AQL)”](../aql.md) in this guide for some more example queries, or press the Tutorial button in the
 Help/Examples tab of the interface for more information).
