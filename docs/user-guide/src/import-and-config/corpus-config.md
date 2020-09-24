@@ -13,10 +13,22 @@ E.g. the following configuration file has the tables/sections `[context]` and `[
 default = 5
 # Available context sizes
 sizes = [1, 2, 5, 10]
+# Maximal context size in tokens
+max = 50
 
 [view]
 page_size = 10
 ```
+
+## Maximal Context Size, Context Steps and Result Page Sizes
+
+The maximal context size of ±n tokens from each search result (for the KWIC view,
+but also for other visualizations) can be set for a corpus using the `max` key in the `[context]` table.
+To configure which steps are actually shown in the front-end (up to the maximum
+allowed) add the key `sizes` and use an [array](https://toml.io/en/v1.0.0-rc.2#array) as value. 
+By default, the context steps 1, 2, 5 or 10 tokens are available. 
+The default context selected when the corpus is queried, can be set with the `default` key.
+
 
 ## Setting Default Context and Segmentations
 

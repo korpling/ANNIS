@@ -7,6 +7,6 @@ not desired (e.g. a left-to-right corpus with only a few incidental uses of such
 characters), this behavior can be switched off for the entire ANNIS instance by setting:
 
 ~~~
-disable-rtl=true
+annis.disable-rtl=true
 ~~~
-in the file `annis-gui.properties` in one of the front-end configuration locations.
+in the file `application.properties` in one of the configuration locations.
