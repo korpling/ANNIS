@@ -106,7 +106,7 @@ User names and passwords will be sent as clear text over the network.
 After you made the service available for other servers you have to configure the front-end to use this non-default service URL.
 Change the file `application.properties` and set the `annis.webservice-url` to the right value:
 ~~~properties
-annis.webservice-url=http://localhost:5711/v0
+annis.webservice-url=https://example.com/annis3-service/v0
 ~~~
 
 If you want to secure your service even further you might want to setup a firewall in a way that only the server running the front-end is allowed to access the HTTP(S) port on the server running the backend service.
