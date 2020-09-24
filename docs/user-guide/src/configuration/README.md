@@ -1,13 +1,22 @@
 # Configuration of ANNIS
 
-For the desktop version of ANNIS, you most probably don't need to change any of the default configuration.
+For the desktop version of ANNIS, you most probably don't need to change any of the default configuration and you can skip this section.
 If you are installing ANNIS on a server however, you might want to tweak the settings.
 
-ANNIS will search in the following locations for configuration files in the [Java Property file format](https://en.wikipedia.org/wiki/.properties):
+ANNIS will search in different folders for its configuration.
 
-- `$HOME/.annis/annis-gui.properties`,
-- `$ANNIS_CFG/annis-gui.properties`, and
-- `/etc/annis/annis-gui.properties`.
+Folder | Description
+------ | -----------
+`$ANNIS_CFG` or `/etc/annis/` | The global configuration folder defined by the environment variable `ANNIS_CFG` or a default path if not set.
+`~/.annis/` | User-specific configuration inside the `.annis` sub-folder inside the home folder of the user who is running the frontend.
+
+Configuration files can be either in the [Java Properties](http://en.wikipedia.org/w/index.php?title=.properties&oldid=521500688)
+or [JSON](http://www.json.org/) format. Configuration files from the user directory can
+overwrite the global configuration and the global configuration overwrites the
+default configuration.
+The main configuration file is called `annis-gui.properties` and must be located in one of previously listed folders.
+
+
 
 The following is an example configuration with all possible configuration values
 ```properties
