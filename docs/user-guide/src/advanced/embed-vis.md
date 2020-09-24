@@ -6,19 +6,13 @@ This is achieved by a special sub website of ANNIS which has the URL
 ~~~
 <annis-base-url>/embeddedvis/<visualizer-short-name>
 ~~~
-The possible values for the short name are the same as the ones listed in the ["Configuring Visualizations" chapter](../visualizations.md) chapter.
+The possible values for the short name are the same as the ones listed in the ["List of Visualizations" chapter](../import-and-config/visualizations-list.md) chapter.
 Additional parameters are used to configure how the visualization should be displayed.
 
 ## Parameters
 
 These are URL query parameters which define the visualizer configuration.
 Any parameter which is not mentioned here will be treated as visualizer mapping.
-
-### embedded_salt
-
-An URL from where to fetch to content from.
-The content must be in the Salt XMI intermediate format.
-This can be a dynamic query (like a REST call to the subgraph-function `annis.service.QueryService#subgraph(...)` of the service) or a link to a static file.
 
 ### embedded_interface
 
