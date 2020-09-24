@@ -39,15 +39,15 @@ main developers currently recommend Eclipse or Visual Studio Code for devlopment
 
 The `annis-gui` project contains two build artifacts: 
 
-- `annis-gui-<VERSION>-server.jar` and
-- `annis-gui-<VERSION>-desktop.jar`
+- `annis-gui-<version>-server.jar` and
+- `annis-gui-<version>-desktop.jar`
 
 
 You can execute both JAR-files to run the front-end and the embedded REST service.
 
 ```bash
 cd <unzipped source>/annis-gui/
-java -jar target/annis-gui-<VERSION>-server.jar
+java -jar target/annis-gui-<version>-server.jar
 ```
 The desktop variant will open a simple window with a link to the URL on which the service is listening.
 
