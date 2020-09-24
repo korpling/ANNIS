@@ -32,11 +32,11 @@ salt:/pcc2/11299/#tok_1 tiger::pos::salt:/pcc2/11299/#tok_2
 ### embedded_instance
 
 Name of an ANNIS sub-instance that should be used.
-See the ["Multiple Instances of the Interface" chapter](../import-and-config-instances.md) for more information.
+See the ["Multiple Instances of the Interface" chapter](../configuration/instances.md) for more information.
 
 ### embedded_ns
 
-Namespace which is "triggering" the visualization (see the ["Configuring Visualizations" chapter](../visualizations.md))
+Namespace which is "triggering" the visualization (see the ["Configuring Visualizations" chapter](../visualizations))
 
 ### embedded_base
 
