@@ -5,7 +5,7 @@
     - [Installing an ANNIS Server](./installation/server.md)
     - [Migrating from ANNIS 3](./installation/migrate-annis3.md)
 - [Configuration of ANNIS](./configuration/README.md)
-    - [User Configuration](./configuration/user.md)
+    - [User Configuration on Server](./configuration/user.md)
     - [The administration web interface](./configuration/admin-web.md)
 - [Using the ANNIS interface](./interface.md)
     - [Search Form](./interface-search-form.md)

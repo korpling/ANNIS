@@ -2,9 +2,8 @@
 
 The administration web interface allows you to import and delete corpora, as well as to
 define users from the ANNIS web application directly. To log into the administration
-interface, use the URL of you ANNIS webapp and add /admin or from ANNIS 3.4.X
-and above, press the Administration button next to ‘About ANNIS’ (this button is only
-shown if you are a logged in administrator). You should see the screen below:
+interface, use the URL of you ANNIS web application and add /admin or press the Administration button next to ‘About ANNIS’ (this button is only
+shown if you are a logged in administrator or when using the desktop version). You should see the screen below:
 
 ![import in web-adminstration interface](web-admin-import.png)
 
