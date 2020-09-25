@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 
+import org.apache.catalina.User;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.message.ReusableMessage;
@@ -42,8 +43,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
-
-import annis.libgui.AnnisUser;
 
 @Component
 @Profile("!desktop")
@@ -200,7 +199,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         }
     }
 
-    public Optional<AnnisUser> getDesktopUserCredentials() {
+    public Optional<ProvidedCredentials> getDesktopUserToken() {
         return Optional.empty();
     }
 }

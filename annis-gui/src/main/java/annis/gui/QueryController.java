@@ -518,7 +518,7 @@ public class QueryController implements Serializable {
           qp.setStatus(caption + ": " + description);
           break;
         case 403:
-          if (Helper.getUser(UI.getCurrent()) == null) {
+          if (!Helper.isUserLoggedIn()) {
             // not logged in
             qp.setStatus("You don't have the access rights to query this corpus. "
                 + "You might want to login to access more corpora.");

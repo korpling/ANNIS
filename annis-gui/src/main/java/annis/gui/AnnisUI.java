@@ -21,7 +21,6 @@ import annis.gui.query_references.UrlShortener;
 import annis.gui.querybuilder.QueryBuilderPlugin;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.libgui.AnnisBaseUI;
-import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
@@ -44,11 +43,18 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import javax.print.attribute.standard.Destination;
+
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * GUI for searching in corpora.
@@ -97,6 +103,9 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   @Autowired
   private ServiceStarter serviceStarter;
+
+  @Autowired
+  private AuthenticationManager authenticationManager;
 
   /**
    * A re-usable toolbar for different views.
@@ -238,10 +247,14 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     loadInstanceFonts();
 
-    Optional<AnnisUser> desktopUser = serviceStarter.getDesktopUserCredentials();
+    Optional<ProvidedCredentials> desktopUser = serviceStarter.getDesktopUserToken();
     if(desktopUser.isPresent()) {
       // Login the provided desktop user
-      Helper.setUser(desktopUser.get());
+      UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
+          desktopUser.get().getName(), desktopUser.get().getPassword());
+      Authentication auth = authenticationManager.authenticate(token);
+      SecurityContextHolder.getContext().setAuthentication(auth);
+
       getToolbar().onLogin();
     }
 

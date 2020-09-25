@@ -16,7 +16,6 @@ package annis.gui;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.components.SettingsStorage;
 import annis.libgui.AnnisBaseUI;
-import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import annis.libgui.LoginDataLostException;
@@ -133,8 +132,6 @@ public class MainToolbar extends HorizontalLayout
 
   private final String bugEMailAddress;
 
-  private final LoginWindow windowLogin = new LoginWindow();
-
   private SidebarState sidebarState = SidebarState.VISIBLE;
 
   private final LinkedHashSet<LoginListener> loginListeners = new LinkedHashSet<>();
@@ -209,7 +206,7 @@ public class MainToolbar extends HorizontalLayout
       // logout
       Page.getCurrent().setLocation("sso/logout");
       UI.getCurrent().getSession().close();
-     
+
       for (LoginListener l : loginListeners) {
         l.onLogout();
       }
@@ -307,17 +304,17 @@ public class MainToolbar extends HorizontalLayout
    * started in desktop mode.
    *
    * <p>
-   * The Kickstarter overrides the "desktopMode" application parameter and set it to "true",
-   * so the gui can detect, that is not necessary to offer a login button.
+   * The Kickstarter overrides the "desktopMode" application parameter and set it to "true", so the
+   * gui can detect, that is not necessary to offer a login button.
    * </p>
    *
    * component.
    */
   private void addLoginButton() {
-    
+
     boolean desktopMode = false;
     UI ui = UI.getCurrent();
-    if(ui instanceof AnnisUI) {
+    if (ui instanceof AnnisUI) {
       desktopMode = ((AnnisUI) ui).isDesktopMode();
     }
 
@@ -328,7 +325,7 @@ public class MainToolbar extends HorizontalLayout
       setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
 
     }
-  
+
   }
 
   public void addLoginListener(LoginListener listener) {
@@ -396,7 +393,7 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public boolean isLoggedIn() {
-    return Helper.getUser(UI.getCurrent()) != null;
+    return Helper.isUserLoggedIn();
   }
 
   public void notifiyQueryStarted() {
@@ -420,11 +417,6 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public void onLogout() {
-
-    if (windowLogin != null) {
-      // make sure to close the login window without triggering a search execution
-      windowLogin.close(false);
-    }
 
     for (LoginListener l : loginListeners) {
       try {
@@ -514,7 +506,6 @@ public class MainToolbar extends HorizontalLayout
 
   public void setQueryController(QueryController queryController) {
     this.queryController = queryController;
-    windowLogin.setQueryController(queryController);
   }
 
   public void setSidebar(Sidebar sidebar) {
@@ -524,12 +515,8 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public void showLoginWindow(boolean executeQueryAfterLogin) {
-    windowLogin.setExecuteSearchAfterClose(executeQueryAfterLogin);
-    if (windowLogin.isAttached()) {
-      windowLogin.close();
-    }
-    UI.getCurrent().addWindow(windowLogin);
-
+    Page.getCurrent().setLocation("sso/login");
+    // TODO: handle the case we need to execute a query after login
   }
 
   private void updateSidebarState() {
@@ -543,7 +530,7 @@ public class MainToolbar extends HorizontalLayout
     if (Helper.isUserLoggedIn(user)) {
       // We don't verify the provided token, this is the job of the backend.
       // This only decides if the Administrator button is visible
-      Claim claim = Helper.getClaim("roles");
+      Claim claim = Helper.getClaim(Helper.getToken(), "roles");
       if (!claim.isNull() && claim.asList(String.class).contains("admin")) {
         // make the administration button visible
         btNavigate.setCaption(NavigationTarget.ADMIN.caption);

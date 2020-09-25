@@ -37,8 +37,6 @@ import com.sun.jersey.api.client.Client;
 import com.vaadin.server.JsonCodec;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import elemental.json.JsonValue;
@@ -785,33 +783,6 @@ public class Helper {
   }
 
 
-  public static AnnisUser getUser(final UI ui) {
-
-    if (ui != null) {
-      final VaadinSession vSession = ui.getSession();
-      return getUser(vSession);
-    }
-    return null;
-  }
-
-  public static AnnisUser getUser(final VaadinSession vSession) {
-
-    WrappedSession wrappedSession = null;
-
-    if (vSession != null) {
-      wrappedSession = vSession.getSession();
-    }
-
-    if (wrappedSession != null) {
-
-      final Object o = wrappedSession.getAttribute(AnnisBaseUI.USER_KEY);
-      if (o != null && o instanceof AnnisUser) {
-        return (AnnisUser) o;
-      }
-    }
-    return null;
-  }
-
   public static boolean isUserLoggedIn() {
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -836,22 +807,25 @@ public class Helper {
     return null;
   }
 
-  public static Claim getClaim(final String claim) {
-    DecodedJWT token = getToken();
+  public static Claim getClaim(DecodedJWT token, String claim) {
     if (token != null) {
       return token.getClaim(claim);
     }
     return new NullClaim();
   }
 
-
-  public static void setUser(final AnnisUser user) {
-    if (user == null) {
-      VaadinSession.getCurrent().getSession().removeAttribute(AnnisBaseUI.USER_KEY);
-    } else {
-      VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY, user);
+  public static Optional<String> getUserName(DecodedJWT token) {
+    Claim preferredName = getClaim(token, "preferred_username");
+    if (!preferredName.isNull()) {
+      return Optional.of(preferredName.asString());
     }
+    Claim sub = getClaim(token, "sub");
+    if (!sub.isNull()) {
+      return Optional.of(sub.asString());
+    }
+    return Optional.empty();
   }
+
 
   public static void addMatchToDocumentGraph(final Match match, final SDocument document) {
     final List<String> allUrisAsString = new LinkedList<>();

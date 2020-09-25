@@ -1,6 +1,5 @@
 package annis.gui.query_references;
 
-import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
 import com.vaadin.ui.UI;
 import java.net.URI;
@@ -44,11 +43,11 @@ public class UrlShortener {
 
       UrlShortenerEntry entry = new UrlShortenerEntry();
       entry.setUrl(localURL);
-      AnnisUser user = Helper.getUser(ui);
-      if (user == null) {
-        entry.setOwner("anonymous");
+      Optional<String> userName = Helper.getUserName(Helper.getToken());
+      if (userName.isPresent()) {
+        entry.setOwner(userName.get());
       } else {
-        entry.setOwner(user.getUserName());
+        entry.setOwner("anonymous");
       }
       entry.setCreated(new Date());
 

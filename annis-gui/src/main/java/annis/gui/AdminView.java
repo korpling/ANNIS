@@ -129,7 +129,7 @@ public class AdminView extends VerticalLayout
     public void enter(ViewChangeListener.ViewChangeEvent event) {
 
 
-        importPanel.updateMode(Helper.getUser(ui) != null);
+        importPanel.updateMode(Helper.isUserLoggedIn());
 
         // group  management are not visible when there is no security (in desktop mode)
         tabSheet.getTab(groupManagementPanel).setVisible(!ui.isDesktopMode());
