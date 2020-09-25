@@ -15,7 +15,6 @@ package annis.gui;
 
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.components.SettingsStorage;
-import annis.gui.security.SecurityUtils;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
@@ -541,10 +540,10 @@ public class MainToolbar extends HorizontalLayout
   }
 
   private void updateAdministratorButtonVisibility(Authentication user) {
-    if (SecurityUtils.isUserLoggedIn(user)) {
+    if (Helper.isUserLoggedIn(user)) {
       // We don't verify the provided token, this is the job of the backend.
       // This only decides if the Administrator button is visible
-      Claim claim = SecurityUtils.getClaim("roles");
+      Claim claim = Helper.getClaim("roles");
       if (!claim.isNull() && claim.asList(String.class).contains("admin")) {
         // make the administration button visible
         btNavigate.setCaption(NavigationTarget.ADMIN.caption);
@@ -564,7 +563,7 @@ public class MainToolbar extends HorizontalLayout
       btNavigate.setVisible(false);
     }
 
-    if (!SecurityUtils.isUserLoggedIn()) {
+    if (!Helper.isUserLoggedIn()) {
       lblUserName.setValue("not logged in");
       if (getComponentIndex(btLogout) > -1) {
         replaceComponent(btLogout, btLogin);
