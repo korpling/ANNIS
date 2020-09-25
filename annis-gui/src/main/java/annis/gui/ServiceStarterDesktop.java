@@ -41,8 +41,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import annis.libgui.AnnisUser;
-
 @Component
 @Profile("desktop")
 public class ServiceStarterDesktop extends ServiceStarter {
@@ -50,8 +48,7 @@ public class ServiceStarterDesktop extends ServiceStarter {
     private static final String USER_NAME = "desktop";
     private static final Logger log = LoggerFactory.getLogger(ServiceStarterDesktop.class);
     private String password;
-    private String basePath;
-    private Optional<AnnisUser> desktopUserCredentials = Optional.empty();
+    private Optional<ProvidedCredentials> desktopUserCredentials = Optional.empty();
 
 
     @Value("${server.port}")
@@ -64,8 +61,6 @@ public class ServiceStarterDesktop extends ServiceStarter {
     protected File getServiceConfig() throws IOException {
         Toml tomlConfig = new Toml().read(super.getServiceConfig());
         Map<String, Object> config = tomlConfig.toMap();
-
-        this.basePath = getServiceURL(tomlConfig);
 
         // Generate a random password
         this.password = RandomStringUtils.random(50);
@@ -152,24 +147,7 @@ public class ServiceStarterDesktop extends ServiceStarter {
     public void onApplicationEvent(ApplicationReadyEvent event) { 
         super.onApplicationEvent(event);
 
-        // Get a JWT token for the logged in user from the started service
-        // Since we want to authenticate, we use an anonymous API client
-        ApiClient client = new ApiClient();
-        client.setBasePath(this.basePath);
-        AuthentificationApi api = new AuthentificationApi(client);
-
-        InlineObject1 credentials = new InlineObject1();
-        credentials.setUserId(USER_NAME);
-        credentials.setPassword(password);
-        try {
-            String token = api.localLogin(credentials);
-            this.desktopUserCredentials = Optional.of(new AnnisUser(USER_NAME, password, token));
-        } catch (ApiException ex) {
-            log.error("Could not login with temporary desktop user", ex);
-            // Since this error is unrecoverable, we stop the application
-            SpringApplication.exit(event.getApplicationContext(), () -> 401);
-        }
-
+        this.desktopUserCredentials = Optional.of(new ProvidedCredentials(USER_NAME, password));
 
         // Open the application in the browser
         String webURL = "http://localhost:" + serverPort;
@@ -190,7 +168,7 @@ public class ServiceStarterDesktop extends ServiceStarter {
     }
 
     @Override
-    public Optional<AnnisUser> getDesktopUserCredentials() {
+    public Optional<ProvidedCredentials> getDesktopUserToken() {
         return desktopUserCredentials;
     }
 

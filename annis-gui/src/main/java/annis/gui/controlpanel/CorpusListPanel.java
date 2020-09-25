@@ -287,7 +287,7 @@ public class CorpusListPanel extends VerticalLayout {
         corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
       }
 
-      if (corpora.isEmpty() && Helper.getUser(getUI()) == null) {
+      if (corpora.isEmpty() && Helper.isUserLoggedIn()) {
         Notification.show(
             "No corpora found. Please login "
                 + "(use button at upper right corner) to see more corpora.",
