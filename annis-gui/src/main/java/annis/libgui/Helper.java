@@ -69,6 +69,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiClient;
@@ -432,13 +433,13 @@ public class Helper {
       // Use the configuration to allow changing the path to the web-service
       client.setBasePath(config.getWebserviceURL());
     }
-    final AnnisUser user = Helper.getUser(ui);
-    if (user != null && user.getToken() != null) {
+    final DecodedJWT token = Helper.getToken();
+    if (token != null) {
       final org.corpus_tools.annis.auth.Authentication auth =
           client.getAuthentication("bearerAuth");
       if (auth instanceof HttpBearerAuth) {
         final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
-        bearerAuth.setBearerToken(user.getToken());
+        bearerAuth.setBearerToken(token.getToken());
 
         // TODO: get a new token if expired
       }
@@ -822,15 +823,23 @@ public class Helper {
         && authentication.isAuthenticated();
   }
 
-  public static Claim getClaim(final String claim) {
+  public static DecodedJWT getToken() {
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null) {
       final Object credentials = authentication.getCredentials();
       if (credentials instanceof KeycloakSecurityContext) {
         final KeycloakSecurityContext context = (KeycloakSecurityContext) credentials;
         final DecodedJWT token = JWT.decode(context.getTokenString());
-        return token.getClaim(claim);
+        return token;
       }
+    }
+    return null;
+  }
+
+  public static Claim getClaim(final String claim) {
+    DecodedJWT token = getToken();
+    if (token != null) {
+      return token.getClaim(claim);
     }
     return new NullClaim();
   }
