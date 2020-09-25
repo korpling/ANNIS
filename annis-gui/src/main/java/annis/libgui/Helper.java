@@ -21,6 +21,11 @@ import annis.gui.UIConfig;
 import annis.gui.graphml.CorpusGraphMapper;
 import annis.model.AnnisConstants;
 import annis.service.objects.Match;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.impl.NullClaim;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Multimap;
@@ -80,7 +85,6 @@ import org.corpus_tools.annis.api.model.CorpusConfigurationView;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
-import org.corpus_tools.annis.auth.Authentication;
 import org.corpus_tools.annis.auth.HttpBearerAuth;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
@@ -106,7 +110,11 @@ import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.graph.Label;
 import org.corpus_tools.salt.util.DataSourceSequence;
+import org.keycloak.KeycloakSecurityContext;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  *
@@ -114,28 +122,29 @@ import org.slf4j.LoggerFactory;
  */
 public class Helper {
 
-  public static List<String> getCorpusPath(SCorpusGraph corpusGraph, SDocument doc) {
+  public static List<String> getCorpusPath(final SCorpusGraph corpusGraph, final SDocument doc) {
     final List<String> result = new LinkedList<String>();
 
     result.add(doc.getName());
-    SCorpus c = corpusGraph.getCorpus(doc);
-    List<SNode> cAsList = new ArrayList<>();
+    final SCorpus c = corpusGraph.getCorpus(doc);
+    final List<SNode> cAsList = new ArrayList<>();
     cAsList.add(c);
     corpusGraph.traverse(cAsList, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST, "getRootCorpora",
         new GraphTraverseHandler() {
           @Override
-          public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-              SRelation edge, SNode currNode, long order) {
+          public boolean checkConstraint(final GRAPH_TRAVERSE_TYPE traversalType,
+              final String traversalId, final SRelation edge, final SNode currNode,
+              final long order) {
             return true;
           }
 
           @Override
-          public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-              SNode currNode, SRelation edge, SNode fromNode, long order) {}
+          public void nodeLeft(final GRAPH_TRAVERSE_TYPE traversalType, final String traversalId,
+              final SNode currNode, final SRelation edge, final SNode fromNode, final long order) {}
 
           @Override
-          public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-              SNode currNode, SRelation edge, SNode fromNode, long order) {
+          public void nodeReached(final GRAPH_TRAVERSE_TYPE traversalType, final String traversalId,
+              final SNode currNode, final SRelation edge, final SNode fromNode, final long order) {
             result.add(currNode.getName());
           }
         });
@@ -146,24 +155,24 @@ public class Helper {
     if (uri.startsWith("salt:/")) {
       uri = uri.substring("salt:/".length());
     }
-    String rawPath = StringUtils.strip(uri, "/ \t");
+    final String rawPath = StringUtils.strip(uri, "/ \t");
 
     // split on raw path (so "/" in corpus names are still encoded)
-    String[] path = rawPath.split("/");
+    final String[] path = rawPath.split("/");
 
     // decode every single part by itself
-    ArrayList<String> result = new ArrayList<>(path.length);
+    final ArrayList<String> result = new ArrayList<>(path.length);
     for (int i = 0; i < path.length; i++) {
       try {
         // in the last part, try to remove any possible fragment
         if (i == path.length - 1) {
-          int fragmentStart = path[i].lastIndexOf('#');
+          final int fragmentStart = path[i].lastIndexOf('#');
           if (fragmentStart >= 0) {
             path[i] = path[i].substring(0, fragmentStart);
           }
         }
         result.add(URLDecoder.decode(path[i], "UTF-8"));
-      } catch (UnsupportedEncodingException ex) {
+      } catch (final UnsupportedEncodingException ex) {
         log.error(null, ex);
         // fallback
         result.add(path[i]);
@@ -229,16 +238,16 @@ public class Helper {
       }
     };
 
-    public CoveredMatchesCalculator(SDocumentGraph graph, Map<SNode, Long> initialMatches,
-        Map<SToken, Integer> token2index) {
+    public CoveredMatchesCalculator(final SDocumentGraph graph,
+        final Map<SNode, Long> initialMatches, final Map<SToken, Integer> token2index) {
       this.graph = graph;
       this.matchedAndCovered = initialMatches;
       this.token2index = token2index;
 
-      Map<SNode, Long> sortedMatchedNodes = new TreeMap<>(comp);
+      final Map<SNode, Long> sortedMatchedNodes = new TreeMap<>(comp);
 
-      for (Map.Entry<SNode, Long> entry : initialMatches.entrySet()) {
-        SNode n = entry.getKey();
+      for (final Map.Entry<SNode, Long> entry : initialMatches.entrySet()) {
+        final SNode n = entry.getKey();
         sortedMatchedNodes.put(n, entry.getValue());
       }
 
@@ -249,8 +258,8 @@ public class Helper {
     }
 
     @Override
-    public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-        SRelation edge, SNode currNode, long order) {
+    public boolean checkConstraint(final GRAPH_TRAVERSE_TYPE traversalType,
+        final String traversalId, final SRelation edge, final SNode currNode, final long order) {
       if (edge == null || edge instanceof SDominanceRelation || edge instanceof SSpanningRelation) {
         return true;
       } else {
@@ -263,18 +272,19 @@ public class Helper {
     }
 
     @Override
-    public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
-        SRelation edge, SNode fromNode, long order) {}
+    public void nodeLeft(final GRAPH_TRAVERSE_TYPE traversalType, final String traversalId,
+        final SNode currNode, final SRelation edge, final SNode fromNode, final long order) {}
 
     @Override
-    public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
-        @SuppressWarnings("rawtypes") SRelation edge, SNode fromNode, long order) {
+    public void nodeReached(final GRAPH_TRAVERSE_TYPE traversalType, final String traversalId,
+        final SNode currNode, @SuppressWarnings("rawtypes") final SRelation edge,
+        final SNode fromNode, final long order) {
       if (fromNode != null && matchedAndCovered.containsKey(fromNode) && currNode != null) {
-        long currentMatchPos = matchedAndCovered.get(fromNode);
+        final long currentMatchPos = matchedAndCovered.get(fromNode);
 
         // only update the map when there is no entry yet or if the new index/position
         // is smaller
-        Long oldMatchPos = matchedAndCovered.get(currNode);
+        final Long oldMatchPos = matchedAndCovered.get(currNode);
         if (oldMatchPos == null) {
           matchedAndCovered.put(currNode, currentMatchPos);
         }
@@ -329,14 +339,14 @@ public class Helper {
       .addEscape('-', "\\-").addEscape('~', "\\~").build();
 
 
-  public static Map<SNode, Long> calculateMarkedAndCovered(SDocument doc, List<SNode> segNodes,
-      String segmentationName) {
-    Map<SNode, Long> initialCovered = new HashMap<>();
+  public static Map<SNode, Long> calculateMarkedAndCovered(final SDocument doc,
+      final List<SNode> segNodes, final String segmentationName) {
+    final Map<SNode, Long> initialCovered = new HashMap<>();
 
     // add all covered nodes
-    for (SNode n : doc.getDocumentGraph().getNodes()) {
-      SFeature featMatched = n.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-      Long match = featMatched == null ? null : featMatched.getValue_SNUMERIC();
+    for (final SNode n : doc.getDocumentGraph().getNodes()) {
+      final SFeature featMatched = n.getFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+      final Long match = featMatched == null ? null : featMatched.getValue_SNUMERIC();
 
       if (match != null) {
         initialCovered.put(n, match);
@@ -346,33 +356,33 @@ public class Helper {
         Helper.createToken2IndexMap(doc.getDocumentGraph(), null);
 
     // calculate covered nodes
-    CoveredMatchesCalculator cmc =
+    final CoveredMatchesCalculator cmc =
         new CoveredMatchesCalculator(doc.getDocumentGraph(), initialCovered, token2index);
-    Map<SNode, Long> covered = cmc.getMatchedAndCovered();
+    final Map<SNode, Long> covered = cmc.getMatchedAndCovered();
 
     if (segmentationName != null) {
       // filter token
-      Map<SToken, Long> coveredToken = new HashMap<>();
-      for (Map.Entry<SNode, Long> e : covered.entrySet()) {
-        SNode n = e.getKey();
+      final Map<SToken, Long> coveredToken = new HashMap<>();
+      for (final Map.Entry<SNode, Long> e : covered.entrySet()) {
+        final SNode n = e.getKey();
         if (n instanceof SToken) {
           coveredToken.put((SToken) n, e.getValue());
         }
       }
 
-      for (SNode segNode : segNodes) {
+      for (final SNode segNode : segNodes) {
         if (!covered.containsKey(segNode)) {
 
-          Range<Integer> segRange =
+          final Range<Integer> segRange =
               Helper.getLeftRightSpan(segNode, doc.getDocumentGraph(), token2index);
-          int leftTok = segRange.lowerEndpoint();
-          int rightTok = segRange.upperEndpoint();
+          final int leftTok = segRange.lowerEndpoint();
+          final int rightTok = segRange.upperEndpoint();
 
           // check for each covered token if this segment is covering it
-          for (Map.Entry<SToken, Long> e : coveredToken.entrySet()) {
-            Range<Integer> tokRange =
+          for (final Map.Entry<SToken, Long> e : coveredToken.entrySet()) {
+            final Range<Integer> tokRange =
                 Helper.getLeftRightSpan(e.getKey(), doc.getDocumentGraph(), token2index);
-            long entryTokenIndex = tokRange.lowerEndpoint();
+            final long entryTokenIndex = tokRange.lowerEndpoint();
             if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok) {
               // add this segmentation node to the covered set
               covered.put(segNode, e.getValue());
@@ -393,13 +403,13 @@ public class Helper {
    * @param ex Exception
    * @return message
    */
-  public static String convertExceptionToMessage(Throwable ex) {
-    StringBuilder sb = new StringBuilder();
+  public static String convertExceptionToMessage(final Throwable ex) {
+    final StringBuilder sb = new StringBuilder();
     if (ex != null) {
       sb.append("Exception type: ").append(ex.getClass().getName()).append("\n");
       sb.append("Message: ").append(ex.getLocalizedMessage()).append("\n");
       sb.append("Stacktrace: \n");
-      StackTraceElement[] st = ex.getStackTrace();
+      final StackTraceElement[] st = ex.getStackTrace();
       for (int i = 0; i < st.length; i++) {
         sb.append(st[i].toString());
         sb.append("\n");
@@ -408,7 +418,7 @@ public class Helper {
     return sb.toString();
   }
 
-  public static ApiClient getClient(UI ui) {
+  public static ApiClient getClient(final UI ui) {
     UIConfig config = null;
     if (ui instanceof AnnisUI) {
       config = ((AnnisUI) ui).getConfig();
@@ -416,17 +426,18 @@ public class Helper {
     return getClient(ui.getSession(), config);
   }
 
-  public static ApiClient getClient(VaadinSession ui, UIConfig config) {
-    ApiClient client = Configuration.getDefaultApiClient();
+  public static ApiClient getClient(final VaadinSession ui, final UIConfig config) {
+    final ApiClient client = Configuration.getDefaultApiClient();
     if (config != null) {
       // Use the configuration to allow changing the path to the web-service
       client.setBasePath(config.getWebserviceURL());
     }
-    AnnisUser user = Helper.getUser(ui);
+    final AnnisUser user = Helper.getUser(ui);
     if (user != null && user.getToken() != null) {
-      Authentication auth = client.getAuthentication("bearerAuth");
+      final org.corpus_tools.annis.auth.Authentication auth =
+          client.getAuthentication("bearerAuth");
       if (auth instanceof HttpBearerAuth) {
-        HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
+        final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
         bearerAuth.setBearerToken(user.getToken());
 
         // TODO: get a new token if expired
@@ -435,9 +446,10 @@ public class Helper {
     return client;
   }
 
-  public static Set<AnnoKey> getMetaAnnotationNames(String corpus, UI ui) throws ApiException {
-    CorporaApi api = new CorporaApi(getClient(ui));
-    SearchApi search = new SearchApi(getClient(ui));
+  public static Set<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui)
+      throws ApiException {
+    final CorporaApi api = new CorporaApi(getClient(ui));
+    final SearchApi search = new SearchApi(getClient(ui));
 
     final List<org.corpus_tools.annis.api.model.Annotation> nodeAnnos =
         api.nodeAnnotations(corpus, false, true).stream()
@@ -447,8 +459,8 @@ public class Helper {
 
     final Set<AnnoKey> metaAnnos = new HashSet<>();
     // Check for each annotation if its actually a meta-annotation
-    for (org.corpus_tools.annis.api.model.Annotation a : nodeAnnos) {
-      FindQuery q = new FindQuery();
+    for (final org.corpus_tools.annis.api.model.Annotation a : nodeAnnos) {
+      final FindQuery q = new FindQuery();
       q.setCorpora(Arrays.asList(corpus));
       q.setQuery("annis:node_type=\"corpus\" _ident_ " + getQName(a.getKey()));
       // Not sorting the results is much faster, especially if we only fetch the first
@@ -459,15 +471,15 @@ public class Helper {
       q.setOffset(0);
 
       q.setQueryLanguage(QueryLanguage.AQL);
-      File findResult = search.find(q);
+      final File findResult = search.find(q);
       if (findResult != null && findResult.isFile())
         try {
-          Optional<String> anyLine =
+          final Optional<String> anyLine =
               Files.lines(findResult.toPath(), StandardCharsets.UTF_8).findAny();
           if (anyLine.isPresent() && !anyLine.get().isEmpty()) {
             metaAnnos.add(a.getKey());
           }
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
           log.error("Error when accessing file with find results", ex);
         }
     }
@@ -476,7 +488,7 @@ public class Helper {
   }
 
 
-  public static String getQName(AnnoKey key) {
+  public static String getQName(final AnnoKey key) {
     if (key.getNs() == null || key.getNs().isEmpty()) {
       return key.getName();
     } else {
@@ -484,7 +496,7 @@ public class Helper {
     }
   }
 
-  public static String getQName(Component c) {
+  public static String getQName(final Component c) {
     if (c.getLayer() == null || c.getLayer().isEmpty()) {
       return c.getName();
     } else {
@@ -502,9 +514,9 @@ public class Helper {
       return token2index;
     }
 
-    Multimap<String, SNode> orderRootsByType =
+    final Multimap<String, SNode> orderRootsByType =
         graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
-    Set<SNode> orderRoots = new HashSet<>(orderRootsByType.get(""));
+    final Set<SNode> orderRoots = new HashSet<>(orderRootsByType.get(""));
     List<SToken> sortedTokens;
 
     if (textualDS == null) {
@@ -532,7 +544,7 @@ public class Helper {
     return token2index;
   }
 
-  public static <T> JsonValue encodeGeneric(Object v) {
+  public static <T> JsonValue encodeGeneric(final Object v) {
     return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).getEncodedValue();
   }
 
@@ -544,8 +556,8 @@ public class Helper {
    * @param v the value
    * @return encoded value
    */
-  public static String encodeJersey(String v) {
-    String encoded = jerseyExtraEscape.escape(v);
+  public static String encodeJersey(final String v) {
+    final String encoded = jerseyExtraEscape.escape(v);
     return encoded;
   }
 
@@ -555,8 +567,8 @@ public class Helper {
    * @param v value
    * @return encoded value
    */
-  public static String encodePath(String v) {
-    String encoded = urlPathEscape.escape(v);
+  public static String encodePath(final String v) {
+    final String encoded = urlPathEscape.escape(v);
     return encoded;
   }
 
@@ -566,35 +578,35 @@ public class Helper {
    * @param v value
    * @return encoded value
    */
-  public static String encodeQueryParam(String v) {
-    String encoded = UrlEscapers.urlFormParameterEscaper().escape(v);
+  public static String encodeQueryParam(final String v) {
+    final String encoded = UrlEscapers.urlFormParameterEscaper().escape(v);
     return encoded;
   }
 
-  public static String encodeBase64URL(String val) {
+  public static String encodeBase64URL(final String val) {
     try {
       return Base64.encodeBase64URLSafeString(val.getBytes("UTF-8"));
-    } catch (UnsupportedEncodingException ex) {
+    } catch (final UnsupportedEncodingException ex) {
       log.error("Java Virtual Maschine can't handle UTF-8: I'm utterly confused", ex);
     }
     return "";
   }
 
-  public static String generateCorpusLink(Set<String> corpora) {
+  public static String generateCorpusLink(final Set<String> corpora) {
     try {
-      URI appURI = UI.getCurrent().getPage().getLocation();
+      final URI appURI = UI.getCurrent().getPage().getLocation();
 
-      String fragment = "_c=" + encodeBase64URL(StringUtils.join(corpora, ","));
+      final String fragment = "_c=" + encodeBase64URL(StringUtils.join(corpora, ","));
 
       return new URI(appURI.getScheme(), null, appURI.getHost(), appURI.getPort(), appURI.getPath(),
           null, fragment).toASCIIString();
-    } catch (URISyntaxException ex) {
+    } catch (final URISyntaxException ex) {
       log.error(null, ex);
     }
     return "ERROR";
   }
 
-  public static String getContext(UI ui) {
+  public static String getContext(final UI ui) {
     if (VaadinService.getCurrentRequest() != null) {
       return VaadinService.getCurrentRequest().getContextPath();
     } else {
@@ -610,7 +622,7 @@ public class Helper {
    * @return A {@link CorpusConfig} object, which wraps a {@link Properties} object. This Properties
    *         object stores the corpus configuration as simple key-value pairs.
    */
-  public static CorpusConfiguration getCorpusConfig(String corpus, UI ui) {
+  public static CorpusConfiguration getCorpusConfig(final String corpus, final UI ui) {
 
     if (corpus == null || corpus.isEmpty()) {
       Notification.show("no corpus is selected",
@@ -621,11 +633,11 @@ public class Helper {
 
     CorpusConfiguration corpusConfig = new CorpusConfiguration();
 
-    CorporaApi api = new CorporaApi(getClient(ui));
+    final CorporaApi api = new CorporaApi(getClient(ui));
 
     try {
       corpusConfig = api.corpusConfiguration(corpus);
-    } catch (ApiException ex) {
+    } catch (final ApiException ex) {
       if (!AnnisBaseUI.handleCommonError(ex, "get corpus configuration")) {
         new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER, ERROR_MESSAGE_CORPUS_PROPS,
             Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
@@ -638,7 +650,7 @@ public class Helper {
 
   public static CorpusConfiguration getDefaultCorpusConfig() {
 
-    CorpusConfiguration defaultCorpusConfig = new CorpusConfiguration();
+    final CorpusConfiguration defaultCorpusConfig = new CorpusConfiguration();
 
     defaultCorpusConfig.setView(new CorpusConfigurationView());
     defaultCorpusConfig.setContext(new CorpusConfigurationContext());
@@ -654,16 +666,16 @@ public class Helper {
   }
 
 
-  public static Range<Integer> getLeftRightSpan(SNode node, SDocumentGraph graph,
-      Map<SToken, Integer> token2index) {
+  public static Range<Integer> getLeftRightSpan(final SNode node, final SDocumentGraph graph,
+      final Map<SToken, Integer> token2index) {
     int left = Integer.MAX_VALUE;
     int right = Integer.MIN_VALUE;
     if (node instanceof SToken) {
       left = Math.min(left, token2index.get(node));
       right = Math.max(right, token2index.get(node));
     } else {
-      List<SToken> overlappedToken = graph.getOverlappedTokens(node);
-      for (SToken t : overlappedToken) {
+      final List<SToken> overlappedToken = graph.getOverlappedTokens(node);
+      for (final SToken t : overlappedToken) {
         left = Math.min(left, token2index.get(t));
         right = Math.max(right, token2index.get(t));
       }
@@ -681,10 +693,10 @@ public class Helper {
    *        be fetched.
    * @return Returns also the metada of the all parent corpora. There must be at least one of them.
    */
-  public static List<SMetaAnnotation> getMetaData(String toplevelCorpusName,
-      Optional<String> documentName, UI ui) {
-    List<SMetaAnnotation> result = new ArrayList<>();
-    SearchApi api = new SearchApi(Helper.getClient(ui));
+  public static List<SMetaAnnotation> getMetaData(final String toplevelCorpusName,
+      final Optional<String> documentName, final UI ui) {
+    final List<SMetaAnnotation> result = new ArrayList<>();
+    final SearchApi api = new SearchApi(Helper.getClient(ui));
 
     try {
 
@@ -700,10 +712,10 @@ public class Helper {
         aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=/"
             + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
       }
-      File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL,
+      final File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL,
           AnnotationComponentType.PARTOF);
-      SCorpusGraph cg = CorpusGraphMapper.map(graphML);
-      for (SNode n : cg.getNodes()) {
+      final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
+      for (final SNode n : cg.getNodes()) {
         result.addAll(n.getMetaAnnotations());
       }
     } catch (ApiException | XMLStreamException | IOException ex) {
@@ -724,22 +736,22 @@ public class Helper {
    * @param documentName specifies the document.
    * @return returns only the meta data for a single document.
    */
-  public static List<SMetaAnnotation> getMetaDataDoc(String toplevelCorpusName, String documentName,
-      UI ui) {
-    List<SMetaAnnotation> result = new ArrayList<>();
-    SearchApi api = new SearchApi(Helper.getClient(ui));
+  public static List<SMetaAnnotation> getMetaDataDoc(final String toplevelCorpusName,
+      final String documentName, final UI ui) {
+    final List<SMetaAnnotation> result = new ArrayList<>();
+    final SearchApi api = new SearchApi(Helper.getClient(ui));
 
     try {
 
       // Get the corpus graph and with it the meta data on the corpus/document nodes
-      File graphML = api.subgraphForQuery(toplevelCorpusName,
+      final File graphML = api.subgraphForQuery(toplevelCorpusName,
           "annis:node_type=\"corpus\" _ident_ annis:doc=/"
               + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/",
           QueryLanguage.AQL, AnnotationComponentType.PARTOF);
 
-      SCorpusGraph cg = CorpusGraphMapper.map(graphML);
+      final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
 
-      for (SNode n : cg.getNodes()) {
+      for (final SNode n : cg.getNodes()) {
         result.addAll(n.getMetaAnnotations());
       }
 
@@ -760,7 +772,7 @@ public class Helper {
    * @param anno annotation
    * @return qualified name
    */
-  public static String getQualifiedName(SAnnotation anno) {
+  public static String getQualifiedName(final SAnnotation anno) {
     if (anno != null) {
       if (anno.getNamespace() == null || anno.getNamespace().isEmpty()) {
         return anno.getName();
@@ -772,16 +784,16 @@ public class Helper {
   }
 
 
-  public static AnnisUser getUser(UI ui) {
+  public static AnnisUser getUser(final UI ui) {
 
     if (ui != null) {
-      VaadinSession vSession = ui.getSession();
+      final VaadinSession vSession = ui.getSession();
       return getUser(vSession);
     }
     return null;
   }
 
-  public static AnnisUser getUser(VaadinSession vSession) {
+  public static AnnisUser getUser(final VaadinSession vSession) {
 
     WrappedSession wrappedSession = null;
 
@@ -791,7 +803,7 @@ public class Helper {
 
     if (wrappedSession != null) {
 
-      Object o = wrappedSession.getAttribute(AnnisBaseUI.USER_KEY);
+      final Object o = wrappedSession.getAttribute(AnnisBaseUI.USER_KEY);
       if (o != null && o instanceof AnnisUser) {
         return (AnnisUser) o;
       }
@@ -799,8 +811,32 @@ public class Helper {
     return null;
   }
 
+  public static boolean isUserLoggedIn() {
+    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-  public static void setUser(AnnisUser user) {
+    return isUserLoggedIn(authentication);
+  }
+
+  public static boolean isUserLoggedIn(final Authentication authentication) {
+    return authentication != null && !(authentication instanceof AnonymousAuthenticationToken)
+        && authentication.isAuthenticated();
+  }
+
+  public static Claim getClaim(final String claim) {
+    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication != null) {
+      final Object credentials = authentication.getCredentials();
+      if (credentials instanceof KeycloakSecurityContext) {
+        final KeycloakSecurityContext context = (KeycloakSecurityContext) credentials;
+        final DecodedJWT token = JWT.decode(context.getTokenString());
+        return token.getClaim(claim);
+      }
+    }
+    return new NullClaim();
+  }
+
+
+  public static void setUser(final AnnisUser user) {
     if (user == null) {
       VaadinSession.getCurrent().getSession().removeAttribute(AnnisBaseUI.USER_KEY);
     } else {
@@ -808,21 +844,21 @@ public class Helper {
     }
   }
 
-  public static void addMatchToDocumentGraph(Match match, SDocument document) {
-    List<String> allUrisAsString = new LinkedList<>();
+  public static void addMatchToDocumentGraph(final Match match, final SDocument document) {
+    final List<String> allUrisAsString = new LinkedList<>();
     long i = 1;
     for (String u : match.getSaltIDs()) {
       allUrisAsString.add(u.replace(",", "%2C"));
       if (!u.startsWith("salt:/")) {
         u = "salt:/" + u;
       }
-      SNode matchedNode = document.getDocumentGraph().getNode(u);
+      final SNode matchedNode = document.getDocumentGraph().getNode(u);
       // set the feature for this specific node
       if (matchedNode != null) {
-        SFeature existing =
+        final SFeature existing =
             matchedNode.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE);
         if (existing == null) {
-          SFeature featMatchedNode = SaltFactory.createSFeature();
+          final SFeature featMatchedNode = SaltFactory.createSFeature();
           featMatchedNode.setNamespace(AnnisConstants.ANNIS_NS);
           featMatchedNode.setName(AnnisConstants.FEAT_MATCHEDNODE);
           featMatchedNode.setValue(i);
@@ -832,20 +868,20 @@ public class Helper {
       }
       i++;
     }
-    SFeature existingFeatIDs =
+    final SFeature existingFeatIDs =
         document.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
     if (existingFeatIDs == null) {
-      SFeature featIDs = SaltFactory.createSFeature();
+      final SFeature featIDs = SaltFactory.createSFeature();
       featIDs.setNamespace(AnnisConstants.ANNIS_NS);
       featIDs.setName(AnnisConstants.FEAT_MATCHEDIDS);
       featIDs.setValue(Joiner.on(",").join(allUrisAsString));
       document.addFeature(featIDs);
     }
 
-    SFeature existingFeatAnnos =
+    final SFeature existingFeatAnnos =
         document.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDANNOS);
     if (existingFeatAnnos == null) {
-      SFeature featAnnos = SaltFactory.createSFeature();
+      final SFeature featAnnos = SaltFactory.createSFeature();
       featAnnos.setNamespace(AnnisConstants.ANNIS_NS);
       featAnnos.setName(AnnisConstants.FEAT_MATCHEDANNOS);
       featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
@@ -865,24 +901,25 @@ public class Helper {
    *
    * @return Returns a List of {@link SNode}, which is sorted by the {@link SOrderRelation}.
    */
-  public static List<SNode> getSortedSegmentationNodes(String segName, SDocumentGraph graph) {
-    List<SNode> token = new ArrayList<SNode>();
+  public static List<SNode> getSortedSegmentationNodes(final String segName,
+      final SDocumentGraph graph) {
+    final List<SNode> token = new ArrayList<SNode>();
 
     if (segName == null) {
       // if no segmentation is given just return the sorted token list
-      List<SToken> unsortedToken = graph.getSortedTokenByText();
+      final List<SToken> unsortedToken = graph.getSortedTokenByText();
       if (unsortedToken != null) {
         token.addAll(unsortedToken);
       }
     } else {
       // get the very first node of the order relation chain
-      Set<SNode> startNodes = new LinkedHashSet<SNode>();
+      final Set<SNode> startNodes = new LinkedHashSet<SNode>();
       if (graph != null) {
-        List<SNode> orderRoots = graph.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
+        final List<SNode> orderRoots = graph.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
         if (orderRoots != null) {
           // collect the start nodes of a segmentation chain of length 1
-          for (SNode n : orderRoots) {
-            for (SRelation<?, ?> rel : n.getOutRelations()) {
+          for (final SNode n : orderRoots) {
+            for (final SRelation<?, ?> rel : n.getOutRelations()) {
               if (rel instanceof SOrderRelation) {
                 // the type is the name of the relation
                 if (segName.equals(rel.getType())) {
@@ -895,17 +932,17 @@ public class Helper {
         }
       }
 
-      Set<String> alreadyAdded = new HashSet<String>();
+      final Set<String> alreadyAdded = new HashSet<String>();
 
       // add all nodes on the order relation chain beginning from the start node
-      for (SNode s : startNodes) {
+      for (final SNode s : startNodes) {
         SNode current = s;
         while (current != null) {
           token.add(current);
-          List<SRelation<SNode, SNode>> out = graph.getOutRelations(current.getId());
+          final List<SRelation<SNode, SNode>> out = graph.getOutRelations(current.getId());
           current = null;
           if (out != null) {
-            for (SRelation<? extends SNode, ? extends SNode> e : out) {
+            for (final SRelation<? extends SNode, ? extends SNode> e : out) {
               if (e instanceof SOrderRelation) {
                 current = ((SOrderRelation) e).getTarget();
                 if (alreadyAdded.contains(current.getId())) {
@@ -938,10 +975,10 @@ public class Helper {
    * @param str The string to be checked.
    * @return returns true, if arabic characters are detected.
    */
-  public static boolean containsRTLText(String str) {
+  public static boolean containsRTLText(final String str) {
     if (str != null) {
       for (int i = 0; i < str.length(); i++) {
-        char cc = str.charAt(i);
+        final char cc = str.charAt(i);
         // hebrew extended and basic, arabic basic and extendend
         if (cc >= 1425 && cc <= 1785) {
           return true;
@@ -968,13 +1005,13 @@ public class Helper {
    * @param tok The {@link SToken} which is overlapping the text sequence.
    * @return An empty {@link String} object, if there is no {@link STextualRelation}
    */
-  public static String getSpannedText(SToken tok) {
-    SGraph graph = tok.getGraph();
+  public static String getSpannedText(final SToken tok) {
+    final SGraph graph = tok.getGraph();
 
-    List<SRelation<SNode, SNode>> edges = graph.getOutRelations(tok.getId());
-    for (SRelation<? extends SNode, ? extends SNode> e : edges) {
+    final List<SRelation<SNode, SNode>> edges = graph.getOutRelations(tok.getId());
+    for (final SRelation<? extends SNode, ? extends SNode> e : edges) {
       if (e instanceof STextualRelation) {
-        STextualRelation textRel = (STextualRelation) e;
+        final STextualRelation textRel = (STextualRelation) e;
         return textRel.getTarget().getText().substring(textRel.getStart(), textRel.getEnd());
       }
     }
@@ -989,12 +1026,12 @@ public class Helper {
    * @param graph document graph
    * @return textual datasource or null if not connected to one
    */
-  public static STextualDS getTextualDSForNode(SNode node, SDocumentGraph graph) {
+  public static STextualDS getTextualDSForNode(final SNode node, final SDocumentGraph graph) {
     if (node != null) {
-      List<DataSourceSequence> dataSources =
+      final List<DataSourceSequence> dataSources =
           graph.getOverlappedDataSourceSequence(node, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
       if (dataSources != null) {
-        for (DataSourceSequence seq : dataSources) {
+        for (final DataSourceSequence seq : dataSources) {
           if (seq.getDataSource() instanceof STextualDS) {
             return (STextualDS) seq.getDataSource();
           }
@@ -1004,12 +1041,12 @@ public class Helper {
     return null;
   }
 
-  public static Set<String> getTokenAnnotationLevelSet(SaltProject p) {
-    Set<String> result = new TreeSet<String>();
+  public static Set<String> getTokenAnnotationLevelSet(final SaltProject p) {
+    final Set<String> result = new TreeSet<String>();
 
-    for (SCorpusGraph corpusGraphs : p.getCorpusGraphs()) {
-      for (SDocument doc : corpusGraphs.getDocuments()) {
-        SDocumentGraph g = doc.getDocumentGraph();
+    for (final SCorpusGraph corpusGraphs : p.getCorpusGraphs()) {
+      for (final SDocument doc : corpusGraphs.getDocuments()) {
+        final SDocumentGraph g = doc.getDocumentGraph();
         result.addAll(getTokenAnnotationLevelSet(g));
       }
     }
@@ -1017,12 +1054,12 @@ public class Helper {
     return result;
   }
 
-  public static Set<String> getTokenAnnotationLevelSet(SDocumentGraph graph) {
-    Set<String> result = new TreeSet<String>();
+  public static Set<String> getTokenAnnotationLevelSet(final SDocumentGraph graph) {
+    final Set<String> result = new TreeSet<String>();
 
     if (graph != null) {
-      for (SToken n : graph.getTokens()) {
-        for (SAnnotation anno : n.getAnnotations()) {
+      for (final SToken n : graph.getTokens()) {
+        for (final SAnnotation anno : n.getAnnotations()) {
           result.add(anno.getQName());
         }
       }
@@ -1040,18 +1077,18 @@ public class Helper {
    * @return true - it is true when the name of layername corresponds to the name of any label of
    *         the SNode.
    */
-  public static boolean checkSLayer(String layerName, SNode node) {
+  public static boolean checkSLayer(final String layerName, final SNode node) {
     // robustness
     if (layerName == null || node == null) {
       return false;
     }
 
-    Set<SLayer> sLayers = node.getLayers();
+    final Set<SLayer> sLayers = node.getLayers();
     if (sLayers != null) {
-      for (SLayer l : sLayers) {
-        Collection<Label> labels = l.getLabels();
+      for (final SLayer l : sLayers) {
+        final Collection<Label> labels = l.getLabels();
         if (labels != null) {
-          for (Label label : labels) {
+          for (final Label label : labels) {
             if (layerName.equals(label.getValue())) {
               return true;
             }
@@ -1069,13 +1106,13 @@ public class Helper {
    * @param p Salt project
    * @return returns an empty list if project is empty or null.
    */
-  public static Set<String> getToplevelCorpusNames(SaltProject p) {
-    Set<String> names = new HashSet<>();
+  public static Set<String> getToplevelCorpusNames(final SaltProject p) {
+    final Set<String> names = new HashSet<>();
 
     if (p != null && p.getCorpusGraphs() != null) {
-      for (SCorpusGraph g : p.getCorpusGraphs()) {
+      for (final SCorpusGraph g : p.getCorpusGraphs()) {
         if (g.getRoots() != null) {
-          for (SNode c : g.getRoots()) {
+          for (final SNode c : g.getRoots()) {
             names.add(c.getName());
           }
         }
@@ -1094,14 +1131,14 @@ public class Helper {
    * @return a map with the keys and values of the fragment
    */
   public static LinkedHashMap<String, String> parseFragment(String fragment) {
-    LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
+    final LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
 
     fragment = StringUtils.removeStart(fragment, "!");
 
-    String[] split = StringUtils.split(fragment, "&");
+    final String[] split = StringUtils.split(fragment, "&");
     if (split != null) {
-      for (String s : split) {
-        String[] parts = s.split("=", 2);
+      for (final String s : split) {
+        final String[] parts = s.split("=", 2);
         String name = parts[0].trim();
         String value = "";
         if (parts.length == 2) {
@@ -1112,7 +1149,7 @@ public class Helper {
             } else {
               value = URLDecoder.decode(parts[1], "UTF-8");
             }
-          } catch (UnsupportedEncodingException ex) {
+          } catch (final UnsupportedEncodingException ex) {
             log.error(ex.getMessage(), ex);
           }
         }
