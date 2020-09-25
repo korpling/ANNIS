@@ -424,10 +424,10 @@ public class Helper {
     if (ui instanceof AnnisUI) {
       config = ((AnnisUI) ui).getConfig();
     }
-    return getClient(ui.getSession(), config);
+    return getClient(config);
   }
 
-  public static ApiClient getClient(final VaadinSession ui, final UIConfig config) {
+  public static ApiClient getClient(final UIConfig config) {
     final ApiClient client = Configuration.getDefaultApiClient();
     if (config != null) {
       // Use the configuration to allow changing the path to the web-service

@@ -99,7 +99,7 @@ public class BinaryRequestHandler implements RequestHandler {
     // Proxy the whole request, including any HTTP headers (e.g. used for range requests) to the
     // REST endpoint.
 
-    CorporaApi api = new CorporaApi(Helper.getClient(session, config));
+    CorporaApi api = new CorporaApi(Helper.getClient(config));
     ApiClient client = api.getApiClient();
     // create path and map variables
     String localVarPath = "/corpora/{corpus}/files/{name}"
