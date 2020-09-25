@@ -15,6 +15,7 @@ package annis.gui;
 
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.components.SettingsStorage;
+import annis.gui.security.SecurityUtils;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
@@ -24,8 +25,12 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.Claim;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -38,7 +43,13 @@ import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.data.validator.EmailValidator;
 import com.vaadin.v7.ui.themes.BaseTheme;
 import java.util.LinkedHashSet;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists), the screenshot making
@@ -197,7 +208,9 @@ public class MainToolbar extends HorizontalLayout
 
     btLogout = new Button("Logout", (ClickListener) event -> {
       // logout
-      Helper.setUser(null);
+      Page.getCurrent().setLocation("sso/logout");
+      UI.getCurrent().getSession().close();
+     
       for (LoginListener l : loginListeners) {
         l.onLogout();
       }
@@ -282,6 +295,7 @@ public class MainToolbar extends HorizontalLayout
       }
 
       updateSidebarState();
+      updateUserInformation();
     });
 
     screenshotExtension = new ScreenshotMaker(this);
@@ -489,7 +503,7 @@ public class MainToolbar extends HorizontalLayout
 
     if (target == NavigationTarget.ADMIN) {
       // check in background if display is necessary
-      AnnisUser user = Helper.getUser(ui);
+      Authentication user = SecurityContextHolder.getContext().getAuthentication();
       updateAdministratorButtonVisibility(user);
     } else if (target != null) {
       btNavigate.setVisible(true);
@@ -526,12 +540,12 @@ public class MainToolbar extends HorizontalLayout
     }
   }
 
-  private void updateAdministratorButtonVisibility(AnnisUser user) {
-    if (user != null && user.getUserName() != null) {
+  private void updateAdministratorButtonVisibility(Authentication user) {
+    if (SecurityUtils.isUserLoggedIn(user)) {
       // We don't verify the provided token, this is the job of the backend.
       // This only decides if the Administrator button is visible
-      Claim claim = JWT.decode(user.getToken()).getClaim("admin");
-      if (!claim.isNull() && claim.asBoolean().booleanValue()) {
+      Claim claim = SecurityUtils.getClaim("roles");
+      if (!claim.isNull() && claim.asList(String.class).contains("admin")) {
         // make the administration button visible
         btNavigate.setCaption(NavigationTarget.ADMIN.caption);
         btNavigate.setIcon(NavigationTarget.ADMIN.icon);
@@ -550,14 +564,7 @@ public class MainToolbar extends HorizontalLayout
       btNavigate.setVisible(false);
     }
 
-    AnnisUser user = Helper.getUser(UI.getCurrent());
-
-    // always close the window
-    if (windowLogin != null) {
-      windowLogin.close(user != null);
-    }
-
-    if (user == null) {
+    if (!SecurityUtils.isUserLoggedIn()) {
       lblUserName.setValue("not logged in");
       if (getComponentIndex(btLogout) > -1) {
         replaceComponent(btLogout, btLogin);
@@ -565,11 +572,12 @@ public class MainToolbar extends HorizontalLayout
       }
     } else {
       // logged in
-      if (user.getUserName() != null) {
-        Notification.show("Logged in as \"" + user.getUserName() + "\"",
+      Authentication user = SecurityContextHolder.getContext().getAuthentication();
+      if (user.getPrincipal() != null) {
+        Notification.show("Logged in as \"" + user.getPrincipal() + "\"",
             Notification.Type.TRAY_NOTIFICATION);
 
-        lblUserName.setValue("logged in as \"" + user.getUserName() + "\"");
+        lblUserName.setValue("logged in as \"" + user.getPrincipal() + "\"");
 
       }
       if (getComponentIndex(btLogin) > -1) {
