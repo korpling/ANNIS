@@ -81,7 +81,7 @@ public class AdminView extends VerticalLayout
         CorpusManagement corpusManagement = new CorpusManagement();
         corpusManagement.setClientProvider(AdminView.this);
 
-        boolean isLoggedIn = Helper.getUser(ui) != null;
+        boolean isLoggedIn = Helper.isUserLoggedIn();
 
         corpusAdminPanel = new CorpusAdminPanel();
         new CorpusController(corpusManagement, corpusAdminPanel, this, isLoggedIn);
