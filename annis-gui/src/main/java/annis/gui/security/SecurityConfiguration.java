@@ -17,7 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    public static final String LOGIN_URL = "/oauth2/authorization/default";
     private static final String LOGOUT_URL = "/logout";
     private static final String LOGOUT_SUCCESS_URL = "/";
 
@@ -42,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
 
                 // Configure the login page.
-                .and().oauth2Login().loginPage(LOGIN_URL).permitAll();
+                .and().oauth2Login();
 
     }
 
