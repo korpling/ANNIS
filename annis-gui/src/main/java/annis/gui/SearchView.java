@@ -220,7 +220,7 @@ public class SearchView extends GridLayout
         lastEvaluatedFragment = "";
         evaluateFragment(Page.getCurrent().getUriFragment());
 
-        if (config.isLoginOnStart() && toolbar != null && !Helper.isUserLoggedIn()) {
+        if (config.isLoginOnStart() && toolbar != null && !Helper.getUser().isPresent()) {
             toolbar.showLoginWindow(false);
         }
 
@@ -293,7 +293,7 @@ public class SearchView extends GridLayout
             Set<String> corpora = new TreeSet<String>(Arrays.asList(originalCorpusNames));
 
             if (corpora.isEmpty()) {
-                if (!Helper.isUserLoggedIn() && toolbar != null) {
+                if (!Helper.getUser().isPresent() && toolbar != null) {
                     // not logged in, show login window
                     boolean onlyCorpusSelected = args.containsKey("c") && args.size() == 1;
                     toolbar.showLoginWindow(!onlyCorpusSelected);

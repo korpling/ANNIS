@@ -81,7 +81,7 @@ public class AdminView extends VerticalLayout
         CorpusManagement corpusManagement = new CorpusManagement();
         corpusManagement.setClientProvider(AdminView.this);
 
-        boolean isLoggedIn = Helper.isUserLoggedIn();
+        boolean isLoggedIn = Helper.getUser().isPresent();
 
         corpusAdminPanel = new CorpusAdminPanel();
         new CorpusController(corpusManagement, corpusAdminPanel, this, isLoggedIn);
@@ -129,7 +129,7 @@ public class AdminView extends VerticalLayout
     public void enter(ViewChangeListener.ViewChangeEvent event) {
 
 
-        importPanel.updateMode(Helper.isUserLoggedIn());
+        importPanel.updateMode(Helper.getUser().isPresent());
 
         // group  management are not visible when there is no security (in desktop mode)
         tabSheet.getTab(groupManagementPanel).setVisible(!ui.isDesktopMode());

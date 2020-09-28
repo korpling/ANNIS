@@ -9,7 +9,10 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.UriBuilder;
+
+import org.ietf.jgss.Oid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,9 +46,9 @@ public class UrlShortener {
 
       UrlShortenerEntry entry = new UrlShortenerEntry();
       entry.setUrl(localURL);
-      Optional<String> userName = Helper.getUserName(Helper.getToken());
-      if (userName.isPresent()) {
-        entry.setOwner(userName.get());
+      Optional<OidcUser> user = Helper.getUser();
+      if (user.isPresent()) {
+        entry.setOwner(Helper.getDisplayName(user.get()));
       } else {
         entry.setOwner("anonymous");
       }
