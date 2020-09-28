@@ -41,6 +41,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.data.validator.EmailValidator;
 import com.vaadin.v7.ui.themes.BaseTheme;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 /**
  * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists), the screenshot making
@@ -204,7 +206,7 @@ public class MainToolbar extends HorizontalLayout
 
     btLogout = new Button("Logout", (ClickListener) event -> {
       // logout
-      Page.getCurrent().setLocation("sso/logout");
+      Page.getCurrent().setLocation("logout");
       UI.getCurrent().getSession().close();
 
       for (LoginListener l : loginListeners) {
@@ -393,7 +395,7 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public boolean isLoggedIn() {
-    return Helper.isUserLoggedIn();
+    return Helper.getUser().isPresent();
   }
 
   public void notifiyQueryStarted() {
@@ -494,8 +496,7 @@ public class MainToolbar extends HorizontalLayout
 
     if (target == NavigationTarget.ADMIN) {
       // check in background if display is necessary
-      Authentication user = SecurityContextHolder.getContext().getAuthentication();
-      updateAdministratorButtonVisibility(user);
+      updateAdministratorButtonVisibility(Helper.getUser());
     } else if (target != null) {
       btNavigate.setVisible(true);
       btNavigate.setCaption(target.caption);
@@ -515,7 +516,7 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public void showLoginWindow(boolean executeQueryAfterLogin) {
-    Page.getCurrent().setLocation("sso/login");
+    Page.getCurrent().setLocation("login");
     // TODO: handle the case we need to execute a query after login
   }
 
@@ -526,18 +527,17 @@ public class MainToolbar extends HorizontalLayout
     }
   }
 
-  private void updateAdministratorButtonVisibility(Authentication user) {
-    if (Helper.isUserLoggedIn(user)) {
-      // We don't verify the provided token, this is the job of the backend.
-      // This only decides if the Administrator button is visible
-      Claim claim = Helper.getClaim(Helper.getToken(), "roles");
-      if (!claim.isNull() && claim.asList(String.class).contains("admin")) {
-        // make the administration button visible
-        btNavigate.setCaption(NavigationTarget.ADMIN.caption);
-        btNavigate.setIcon(NavigationTarget.ADMIN.icon);
-        btNavigate.setVisible(true);
-      }
+  private void updateAdministratorButtonVisibility(Optional<OidcUser> user) {
+    // We don't verify the provided token, this is the job of the backend.
+    // This only decides if the Administrator button is visible
+    if (user.isPresent() && user.get().containsClaim("roles")
+        && user.get().getClaimAsStringList("roles").contains("admin")) {
+      // make the administration button visible
+      btNavigate.setCaption(NavigationTarget.ADMIN.caption);
+      btNavigate.setIcon(NavigationTarget.ADMIN.icon);
+      btNavigate.setVisible(true);
     }
+
   }
 
   private void updateUserInformation() {
@@ -550,22 +550,16 @@ public class MainToolbar extends HorizontalLayout
       btNavigate.setVisible(false);
     }
 
-    if (!Helper.isUserLoggedIn()) {
-      lblUserName.setValue("not logged in");
-      if (getComponentIndex(btLogout) > -1) {
-        replaceComponent(btLogout, btLogin);
-        setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
-      }
-    } else {
+    Optional<OidcUser> user = Helper.getUser();
+    if (user.isPresent()) {
       // logged in
-      Authentication user = SecurityContextHolder.getContext().getAuthentication();
-      if (user.getPrincipal() != null) {
-        Notification.show("Logged in as \"" + user.getPrincipal() + "\"",
-            Notification.Type.TRAY_NOTIFICATION);
+      String displayName = Helper.getDisplayName(user.get());
+      Notification.show("Logged in as \"" + displayName + "\"",
+          Notification.Type.TRAY_NOTIFICATION);
 
-        lblUserName.setValue("logged in as \"" + user.getPrincipal() + "\"");
+      lblUserName.setValue("logged in as \"" + displayName + "\"");
 
-      }
+
       if (getComponentIndex(btLogin) > -1) {
         replaceComponent(btLogin, btLogout);
         setComponentAlignment(btLogout, Alignment.MIDDLE_RIGHT);
@@ -573,6 +567,13 @@ public class MainToolbar extends HorizontalLayout
 
       if (navigationTarget == NavigationTarget.ADMIN) {
         updateAdministratorButtonVisibility(user);
+      }
+
+    } else {
+      lblUserName.setValue("not logged in");
+      if (getComponentIndex(btLogout) > -1) {
+        replaceComponent(btLogout, btLogin);
+        setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
       }
     }
 

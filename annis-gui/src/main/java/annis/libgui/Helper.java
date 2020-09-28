@@ -107,6 +107,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import annis.gui.AnnisUI;
 import annis.gui.UIConfig;
@@ -431,15 +432,13 @@ public class Helper {
       // Use the configuration to allow changing the path to the web-service
       client.setBasePath(config.getWebserviceURL());
     }
-    final DecodedJWT token = Helper.getToken();
-    if (token != null) {
+    final Optional<OidcUser> user = Helper.getUser();
+    if (user.isPresent()) {
       final org.corpus_tools.annis.auth.Authentication auth =
           client.getAuthentication("bearerAuth");
       if (auth instanceof HttpBearerAuth) {
         final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
-        bearerAuth.setBearerToken(token.getToken());
-
-        // TODO: get a new token if expired
+        bearerAuth.setBearerToken(user.get().getIdToken().getTokenValue());
       }
     }
     return client;
@@ -782,47 +781,26 @@ public class Helper {
     return "";
   }
 
-
-  public static boolean isUserLoggedIn() {
-    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-    return isUserLoggedIn(authentication);
-  }
-
-  public static boolean isUserLoggedIn(final Authentication authentication) {
-    return authentication != null && !(authentication instanceof AnonymousAuthenticationToken)
-        && authentication.isAuthenticated();
-  }
-
-  public static DecodedJWT getToken() {
-    final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    if (authentication != null) {
-      final Object credentials = authentication.getCredentials();
-      // TODO: get the actual token object
-      return null;
-    }
-    return null;
-  }
-
-  public static Claim getClaim(DecodedJWT token, String claim) {
-    if (token != null) {
-      return token.getClaim(claim);
-    }
-    return new NullClaim();
-  }
-
-  public static Optional<String> getUserName(DecodedJWT token) {
-    Claim preferredName = getClaim(token, "preferred_username");
-    if (!preferredName.isNull()) {
-      return Optional.of(preferredName.asString());
-    }
-    Claim sub = getClaim(token, "sub");
-    if (!sub.isNull()) {
-      return Optional.of(sub.asString());
+  public static Optional<OidcUser> getUser() {
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && auth.isAuthenticated()) {
+      Object principalRaw = auth.getPrincipal();
+      if (principalRaw instanceof OidcUser) {
+        return Optional.of((OidcUser) principalRaw);
+      }
     }
     return Optional.empty();
   }
 
+  public static String getDisplayName(OidcUser user) {
+    if(user.getPreferredUsername() != null) {
+      return user.getPreferredUsername();
+    } else if(user.getEmail() != null) {
+      return user.getEmail();
+    } else {
+      return user.getSubject();
+    }
+  }
 
   public static void addMatchToDocumentGraph(final Match match, final SDocument document) {
     final List<String> allUrisAsString = new LinkedList<>();
