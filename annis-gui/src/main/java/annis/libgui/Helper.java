@@ -433,14 +433,16 @@ public class Helper {
       client.setBasePath(config.getWebserviceUrl());
     }
     final Optional<OidcUser> user = Helper.getUser();
+    String bearerToken = null;
     if (user.isPresent()) {
-      final org.corpus_tools.annis.auth.Authentication auth =
+      bearerToken = user.get().getIdToken().getTokenValue();
+    }
+    final org.corpus_tools.annis.auth.Authentication auth =
           client.getAuthentication("bearerAuth");
       if (auth instanceof HttpBearerAuth) {
         final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
-        bearerAuth.setBearerToken(user.get().getIdToken().getTokenValue());
+        bearerAuth.setBearerToken(bearerToken);
       }
-    }
     return client;
   }
 
