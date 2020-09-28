@@ -430,7 +430,7 @@ public class Helper {
     final ApiClient client = Configuration.getDefaultApiClient();
     if (config != null) {
       // Use the configuration to allow changing the path to the web-service
-      client.setBasePath(config.getWebserviceURL());
+      client.setBasePath(config.getWebserviceUrl());
     }
     final Optional<OidcUser> user = Helper.getUser();
     if (user.isPresent()) {

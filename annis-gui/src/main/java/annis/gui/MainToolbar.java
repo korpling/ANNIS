@@ -13,23 +13,14 @@
  */
 package annis.gui;
 
-import annis.gui.components.ScreenshotMaker;
-import annis.gui.components.SettingsStorage;
-import annis.gui.security.SecurityConfiguration;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import annis.libgui.IDGenerator;
-import annis.libgui.LoginDataLostException;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.Claim;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinService;
-import com.vaadin.server.VaadinServletRequest;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -41,16 +32,16 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.data.validator.EmailValidator;
 import com.vaadin.v7.ui.themes.BaseTheme;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+
+import annis.gui.components.ScreenshotMaker;
+import annis.gui.components.SettingsStorage;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.libgui.LoginDataLostException;
 
 /**
  * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists), the screenshot making
@@ -147,8 +138,10 @@ public class MainToolbar extends HorizontalLayout
 
   private QueryController queryController;
 
-  public MainToolbar() {
+  private final UIConfig config;
 
+  public MainToolbar(UIConfig config) {
+    this.config = config;
     String bugmail = null;
     if (UI.getCurrent() instanceof AnnisUI) {
       bugmail = ((AnnisUI) UI.getCurrent()).getConfig().getBugEmail();
@@ -531,8 +524,8 @@ public class MainToolbar extends HorizontalLayout
   private void updateAdministratorButtonVisibility(Optional<OidcUser> user) {
     // We don't verify the provided token, this is the job of the backend.
     // This only decides if the Administrator button is visible
-    if (user.isPresent() && user.get().containsClaim("roles")
-        && user.get().getClaimAsStringList("roles").contains("admin")) {
+    if (user.isPresent() && user.get().containsClaim(config.getRoleClaim())
+        && user.get().getClaimAsStringList(config.getRoleClaim()).contains("admin")) {
       // make the administration button visible
       btNavigate.setCaption(NavigationTarget.ADMIN.caption);
       btNavigate.setIcon(NavigationTarget.ADMIN.icon);

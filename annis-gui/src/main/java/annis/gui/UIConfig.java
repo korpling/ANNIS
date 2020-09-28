@@ -13,10 +13,12 @@ public class UIConfig {
 
   private String loginURL;
 
-  private String webserviceURL;
+  private String webserviceUrl;
   private String webserviceConfig;
 
   private boolean shortenReferenceLinks;
+
+  private String roleClaim;
   
   public String getBugEmail() {
     return bugEMail;
@@ -42,12 +44,12 @@ public class UIConfig {
     this.loginURL = loginURL;
   }
 
-  public String getWebserviceURL() {
-    return webserviceURL;
+  public String getWebserviceUrl() {
+    return webserviceUrl;
   }
 
-  public void setWebserviceURL(String webserviceURL) {
-    this.webserviceURL = webserviceURL;
+  public void setWebserviceUrl(String webserviceUrl) {
+    this.webserviceUrl = webserviceUrl;
   }
 
   public boolean isShortenReferenceLinks() {
@@ -73,4 +75,14 @@ public class UIConfig {
   public void setWebserviceConfig(String webserviceConfig) {
     this.webserviceConfig = webserviceConfig;
   }
+
+  public String getRoleClaim() {
+    return roleClaim;
+  }
+
+  public void setRoleClaim(String roleClaim) {
+    this.roleClaim = roleClaim;
+  }
+
+  
 }

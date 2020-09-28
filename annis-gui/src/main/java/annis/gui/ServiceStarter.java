@@ -61,7 +61,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
 
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
-        if (config.getWebserviceURL() == null || config.getWebserviceURL().isEmpty()) {
+        if (config.getWebserviceUrl() == null || config.getWebserviceUrl().isEmpty()) {
             // start the bundled web service
             try {
                 // Extract the bundled resource to a temporary file
@@ -134,7 +134,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
 
                         // Use the provided service configuration to get the correct port
                         Toml parsedServiceConfig = new Toml().read(serviceConfigFile);
-                        config.setWebserviceURL(getServiceURL(parsedServiceConfig));
+                        config.setWebserviceUrl(getServiceURL(parsedServiceConfig));
                     }
                 }
             } catch (final IOException ex) {
