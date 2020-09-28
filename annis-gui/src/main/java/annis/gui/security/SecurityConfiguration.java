@@ -1,91 +1,66 @@
 package annis.gui.security;
 
+import java.util.stream.Stream;
+
 import javax.servlet.http.HttpServletRequest;
 
-import org.keycloak.adapters.KeycloakConfigResolver;
-import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
-import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
-import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
-import org.keycloak.adapters.springsecurity.filter.KeycloakPreAuthActionsFilter;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
+import com.vaadin.shared.ApplicationConstants;
+
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.session.SessionRegistryImpl;
-import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
-public class SecurityConfiguration extends KeycloakWebSecurityConfigurerAdapter {
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(keycloakAuthenticationProvider());
-    }
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    private static final String LOGIN_URL = "/oauth2/authorization/auth0";
+    private static final String LOGOUT_URL = "/logout";
+    private static final String LOGOUT_SUCCESS_URL = "/";
+
+    /**
+     * Registers our UserDetailsService and the password encoder to be used on login attempts.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic().disable();
-        http.formLogin().disable();
-        http.anonymous().disable();
-        http.csrf().disable();
-        // http.csrf().requireCsrfProtectionMatcher(keycloakCsrfRequestMatcher());
-        http.authorizeRequests().antMatchers("/vaadinServlet/UIDL/**").permitAll()
-                .antMatchers("/vaadinServlet/HEARTBEAT/**").permitAll().anyRequest()
-                .authenticated();
-        http.logout().addLogoutHandler(keycloakLogoutHandler()).logoutUrl("/sso/logout").permitAll()
-                .logoutSuccessUrl("/");
-        http.addFilterBefore(keycloakPreAuthActionsFilter(), LogoutFilter.class).addFilterBefore(
-                keycloakAuthenticationProcessingFilter(), BasicAuthenticationFilter.class);
-        http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint());
-        http.sessionManagement().sessionAuthenticationStrategy(sessionAuthenticationStrategy());
+        http
+
+            // Allow all internal Vaadin requests.
+            .authorizeRequests().antMatchers("/PUSH/**").permitAll().antMatchers("/UIDL/**").permitAll().antMatchers("/HEARTBEAT/**").permitAll()
+
+            // Restrict access to our application.
+            .and().authorizeRequests().anyRequest().authenticated()
+
+            // Not using Spring CSRF here to be able to use plain HTML for the login page
+            .and().csrf().disable()
+
+            // Configure logout
+            .logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
+
+            // Configure the login page.
+            .and().oauth2Login().loginPage(LOGIN_URL).permitAll();
+
     }
 
+    /**
+     * Allows access to static resources, bypassing Spring Security.
+     */
     @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/VAADIN/**");
-    }
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers(
+                // client-side JS code
+                "/VAADIN/**",
 
-    @Bean
-    public KeycloakConfigResolver KeycloakConfigResolver() {
-        return new KeycloakSpringBootConfigResolver();
-    }
+                // the standard favicon URI
+                "/favicon.ico",
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+                // web application manifest
+                "/manifest.webmanifest", "/sw.js", "/offline-page.html",
 
-    @Bean
-    @Override
-    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
+                // icons and images
+                "/icons/**", "/images/**");
     }
-
-    @Bean
-    public FilterRegistrationBean keycloakAuthenticationProcessingFilterRegistrationBean(
-            KeycloakAuthenticationProcessingFilter filter) {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
-        registrationBean.setEnabled(false);
-        return registrationBean;
-    }
-
-    @Bean
-    public FilterRegistrationBean keycloakPreAuthActionsFilterRegistrationBean(
-            KeycloakPreAuthActionsFilter filter) {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
-        registrationBean.setEnabled(false);
-        return registrationBean;
-    }
-
 }

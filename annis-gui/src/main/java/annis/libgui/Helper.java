@@ -16,30 +16,6 @@ package annis.libgui;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
-import annis.gui.AnnisUI;
-import annis.gui.UIConfig;
-import annis.gui.graphml.CorpusGraphMapper;
-import annis.model.AnnisConstants;
-import annis.service.objects.Match;
-
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.impl.NullClaim;
-import com.auth0.jwt.interfaces.Claim;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.google.common.base.Joiner;
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Range;
-import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
-import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.Client;
-import com.vaadin.server.JsonCodec;
-import com.vaadin.server.Page;
-import com.vaadin.server.VaadinService;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
-import elemental.json.JsonValue;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -66,7 +42,25 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+
 import javax.xml.stream.XMLStreamException;
+
+import com.auth0.jwt.impl.NullClaim;
+import com.auth0.jwt.interfaces.Claim;
+import com.auth0.jwt.interfaces.DecodedJWT;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Range;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.Client;
+import com.vaadin.server.JsonCodec;
+import com.vaadin.server.Page;
+import com.vaadin.server.VaadinService;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -109,11 +103,17 @@ import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.graph.Label;
 import org.corpus_tools.salt.util.DataSourceSequence;
-import org.keycloak.KeycloakSecurityContext;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import annis.gui.AnnisUI;
+import annis.gui.UIConfig;
+import annis.gui.graphml.CorpusGraphMapper;
+import annis.model.AnnisConstants;
+import annis.service.objects.Match;
+import elemental.json.JsonValue;
 
 /**
  *
@@ -798,11 +798,8 @@ public class Helper {
     final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     if (authentication != null) {
       final Object credentials = authentication.getCredentials();
-      if (credentials instanceof KeycloakSecurityContext) {
-        final KeycloakSecurityContext context = (KeycloakSecurityContext) credentials;
-        final DecodedJWT token = JWT.decode(context.getTokenString());
-        return token;
-      }
+      // TODO: get the actual token object
+      return null;
     }
     return null;
   }
