@@ -795,6 +795,8 @@ public class Helper {
   public static String getDisplayName(OidcUser user) {
     if(user.getPreferredUsername() != null) {
       return user.getPreferredUsername();
+    } else if(user.getNickName() != null) {
+      return user.getNickName();
     } else if(user.getEmail() != null) {
       return user.getEmail();
     } else {
