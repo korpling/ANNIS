@@ -517,7 +517,7 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public void showLoginWindow(boolean executeQueryAfterLogin) {
-    Page.getCurrent().setLocation(SecurityConfiguration.LOGIN_URL);
+    Page.getCurrent().setLocation("login");
     // TODO: handle the case we need to execute a query after login
   }
 
