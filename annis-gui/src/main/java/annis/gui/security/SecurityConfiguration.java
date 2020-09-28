@@ -17,7 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static final String LOGIN_URL = "/oauth2/authorization/auth0";
+    public static final String LOGIN_URL = "/oauth2/authorization/default";
     private static final String LOGOUT_URL = "/logout";
     private static final String LOGOUT_SUCCESS_URL = "/";
 
@@ -28,20 +28,21 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
 
-            // Allow all internal Vaadin requests.
-            .authorizeRequests().antMatchers("/PUSH/**").permitAll().antMatchers("/UIDL/**").permitAll().antMatchers("/HEARTBEAT/**").permitAll()
+                // Allow all internal Vaadin requests.
+                .authorizeRequests().antMatchers("/PUSH/**").permitAll().antMatchers("/UIDL/**")
+                .permitAll().antMatchers("/HEARTBEAT/**").permitAll().antMatchers("/**").permitAll()
 
-            // Restrict access to our application.
-            .and().authorizeRequests().anyRequest().authenticated()
+                // Restrict access to our application.
+                .and().authorizeRequests().anyRequest().authenticated()
 
-            // Not using Spring CSRF here to be able to use plain HTML for the login page
-            .and().csrf().disable()
+                // Not using Spring CSRF here to be able to use plain HTML for the login page
+                .and().csrf().disable()
 
-            // Configure logout
-            .logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
+                // Configure logout
+                .logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
 
-            // Configure the login page.
-            .and().oauth2Login().loginPage(LOGIN_URL).permitAll();
+                // Configure the login page.
+                .and().oauth2Login().loginPage(LOGIN_URL).permitAll();
 
     }
 

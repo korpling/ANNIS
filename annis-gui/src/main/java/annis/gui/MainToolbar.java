@@ -15,6 +15,7 @@ package annis.gui;
 
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.components.SettingsStorage;
+import annis.gui.security.SecurityConfiguration;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
@@ -516,7 +517,7 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public void showLoginWindow(boolean executeQueryAfterLogin) {
-    Page.getCurrent().setLocation("login");
+    Page.getCurrent().setLocation(SecurityConfiguration.LOGIN_URL);
     // TODO: handle the case we need to execute a query after login
   }
 
