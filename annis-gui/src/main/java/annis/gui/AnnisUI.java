@@ -227,7 +227,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     adminView = new AdminView(AnnisUI.this);
 
-    toolbar = new MainToolbar();
+    toolbar = new MainToolbar(getConfig());
     toolbar.setQueryController(queryController);
 
 
