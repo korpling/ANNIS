@@ -15,15 +15,12 @@ package annis.gui;
 
 import static annis.libgui.Helper.DEFAULT_CONFIG;
 
-import annis.gui.components.ExceptionDialog;
-import annis.gui.objects.QueryUIState;
-import annis.gui.query_references.UrlShortener;
-import annis.gui.querybuilder.QueryBuilderPlugin;
-import annis.gui.requesthandler.BinaryRequestHandler;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import annis.libgui.exporter.ExporterPlugin;
-import annis.libgui.visualizers.VisualizerPlugin;
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
@@ -38,13 +35,6 @@ import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Component;
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import javax.print.attribute.standard.Destination;
 
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
@@ -55,6 +45,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import annis.gui.components.ExceptionDialog;
+import annis.gui.objects.QueryUIState;
+import annis.gui.query_references.UrlShortener;
+import annis.gui.querybuilder.QueryBuilderPlugin;
+import annis.gui.requesthandler.BinaryRequestHandler;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.libgui.visualizers.VisualizerPlugin;
 
 /**
  * GUI for searching in corpora.
@@ -104,7 +104,6 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired
   private ServiceStarter serviceStarter;
 
-  @Autowired
   private AuthenticationManager authenticationManager;
 
   /**
@@ -248,7 +247,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     loadInstanceFonts();
 
     Optional<ProvidedCredentials> desktopUser = serviceStarter.getDesktopUserToken();
-    if(desktopUser.isPresent()) {
+    if(desktopUser.isPresent() && authenticationManager != null) {
       // Login the provided desktop user
       UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
           desktopUser.get().getName(), desktopUser.get().getPassword());
