@@ -127,7 +127,7 @@ public class MainToolbar extends HorizontalLayout
 
   private final Label lblUserName;
 
-  private String bugEMailAddress;
+  private final String bugEMailAddress;
 
   private SidebarState sidebarState = SidebarState.VISIBLE;
 
@@ -141,13 +141,25 @@ public class MainToolbar extends HorizontalLayout
 
   private QueryController queryController;
 
-  private final UIConfig config;
-
   private final OAuth2ClientProperties oauth2Clients;
 
+
   public MainToolbar(UIConfig config, OAuth2ClientProperties oauth2Clients) {
-    this.config = config;
     this.oauth2Clients = oauth2Clients;
+    
+    String bugmail = config.getBugEmail();
+    
+    if (bugmail != null && !bugmail.isEmpty() && !bugmail.startsWith("${")
+        && new EmailValidator("").isValid(bugmail)) {
+      this.bugEMailAddress = bugmail;
+    } else {
+      this.bugEMailAddress = null;
+    }
+
+    UI ui = UI.getCurrent();
+    if (ui instanceof CommonUI) {
+      ((CommonUI) ui).getSettings().addedLoadedListener(MainToolbar.this);
+    }
 
     setWidth("100%");
     setHeight("-1px");
@@ -171,7 +183,7 @@ public class MainToolbar extends HorizontalLayout
     btBugReport.setDisableOnClick(true);
     btBugReport.setIcon(FontAwesome.ENVELOPE_O);
     btBugReport.addClickListener(event -> reportBug());
-
+    btBugReport.setVisible(this.bugEMailAddress != null);
 
     btNavigate = new Button();
     btNavigate.setVisible(false);
@@ -238,6 +250,8 @@ public class MainToolbar extends HorizontalLayout
 
     setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
     setExpandRatio(btOpenSource, 1.0f);
+
+    addLoginButton();
 
     btSidebar.addClickListener(event -> {
       btSidebar.setEnabled(true);
@@ -322,24 +336,6 @@ public class MainToolbar extends HorizontalLayout
     super.attach();
 
     UI ui = UI.getCurrent();
-
-
-    addLoginButton();
-
-    String bugmail = null;
-    bugmail = config.getBugEmail();
-
-    if (bugmail != null && !bugmail.isEmpty() && !bugmail.startsWith("${")
-        && new EmailValidator("").isValid(bugmail)) {
-      this.bugEMailAddress = bugmail;
-    } else {
-      this.bugEMailAddress = null;
-    }
-    btBugReport.setVisible(this.bugEMailAddress != null);
-
-    if (ui instanceof CommonUI) {
-      ((CommonUI) ui).getSettings().addedLoadedListener(MainToolbar.this);
-    }
 
     MainToolbar.this.updateUserInformation();
 
