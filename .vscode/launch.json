@@ -21,7 +21,8 @@
       "cwd": "${workspaceFolder}/annis-gui",
       "env": {
         "spring_profiles_active": "desktop"
-      }
+      },
+      "preLaunchTask": "install",
     },
     {
       "type": "java",

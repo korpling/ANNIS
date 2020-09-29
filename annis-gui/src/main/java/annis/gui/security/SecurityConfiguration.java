@@ -14,6 +14,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String LOGOUT_URL = "/logout";
     private static final String LOGOUT_SUCCESS_URL = "/";
 
+    public static final String ROLES_CLAIM = "https://corpus-tools.org/annis/roles";
+
     /**
      * Registers our UserDetailsService and the password encoder to be used on login attempts.
      */

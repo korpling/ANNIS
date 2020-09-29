@@ -1,12 +1,19 @@
 package annis.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -14,9 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import java.awt.BorderLayout;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,22 +28,25 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.AuthentificationApi;
-import org.corpus_tools.annis.api.model.InlineObject1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.stereotype.Component;
+
+import annis.gui.security.SecurityConfiguration;
 
 @Component
 @Profile("desktop")
@@ -47,8 +54,8 @@ public class ServiceStarterDesktop extends ServiceStarter {
 
     private static final String USER_NAME = "desktop";
     private static final Logger log = LoggerFactory.getLogger(ServiceStarterDesktop.class);
-    private String password;
-    private Optional<ProvidedCredentials> desktopUserCredentials = Optional.empty();
+    private String secret;
+    private Optional<UsernamePasswordAuthenticationToken> desktopUserCredentials = Optional.empty();
 
 
     @Value("${server.port}")
@@ -62,19 +69,17 @@ public class ServiceStarterDesktop extends ServiceStarter {
         Toml tomlConfig = new Toml().read(super.getServiceConfig());
         Map<String, Object> config = tomlConfig.toMap();
 
-        // Generate a random password
-        this.password = RandomStringUtils.random(50);
-        // Hash the password with bcrypt and add it to the configuration
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        Map<String, Object> desktopUser = new LinkedHashMap<>();
-        desktopUser.put("password", passwordEncoder.encode(this.password));
-        // The generated user is an adminstrator
-        desktopUser.put("admin", true);
+        // Generate a random secret used to sign the JWT token
+        this.secret = RandomStringUtils.randomAlphanumeric(50);
+        // Add it to the configuration
+        Map<String, Object> tokenVerification = new LinkedHashMap<>();
+        tokenVerification.put("type", "HS256");
+        tokenVerification.put("secret", secret);
 
-        // Add the temporary user to the configuration (removing all existing users)
-        Map<String, Object> users = new HashMap<>();
-        users.put(USER_NAME, desktopUser);
-        config.put("users", users);
+        // Add the new auth configuration (removing all existing settings in [auth])
+        Map<String, Object> auth = new HashMap<>();
+        auth.put("token_verification", tokenVerification);
+        config.put("auth", auth);
 
 
         File temporaryFile = File.createTempFile("annis-service-config-desktop-", ".toml");
@@ -86,13 +91,13 @@ public class ServiceStarterDesktop extends ServiceStarter {
     private void showApplicationWindow(Desktop desktop) {
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
-        } catch(UnsupportedLookAndFeelException ex) {
+        } catch (UnsupportedLookAndFeelException ex) {
             log.warn("Look and feel not supported", ex);
         }
 
-        
-         // Create a window where log messages and a link to the UI can be shown
-        // This also allows to exit the application when no terminal is shown. 
+
+        // Create a window where log messages and a link to the UI can be shown
+        // This also allows to exit the application when no terminal is shown.
         JFrame mainFrame = new JFrame("ANNIS Desktop");
         BorderLayout mainLayout = new BorderLayout();
         mainFrame.getContentPane().setLayout(mainLayout);
@@ -127,12 +132,13 @@ public class ServiceStarterDesktop extends ServiceStarter {
         mainFrame.pack();
 
         // Set icon for window
-        Integer[] sizes = new Integer[] { 192, 128, 64, 48, 32, 16, 14 };
+        Integer[] sizes = new Integer[] {192, 128, 64, 48, 32, 16, 14};
         List<Image> allImages = new LinkedList<Image>();
 
         for (int s : sizes) {
             try {
-                BufferedImage imgIcon = ImageIO.read(ServiceStarterDesktop.class.getResource("logo/annis_" + s + ".png"));
+                BufferedImage imgIcon = ImageIO
+                        .read(ServiceStarterDesktop.class.getResource("logo/annis_" + s + ".png"));
                 allImages.add(imgIcon);
             } catch (IOException ex) {
                 log.error(null, ex);
@@ -144,10 +150,31 @@ public class ServiceStarterDesktop extends ServiceStarter {
     }
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) { 
+    public void onApplicationEvent(ApplicationReadyEvent event) {
         super.onApplicationEvent(event);
 
-        this.desktopUserCredentials = Optional.of(new ProvidedCredentials(USER_NAME, password));
+        List<String> roles = Arrays.asList("admin");
+        Instant issuedAt = Instant.now();
+        Instant expiresAt = Instant.now().plus(7l, ChronoUnit.DAYS);
+        
+        // Use the secret to sign a new JWT token with admin rights
+        String signedToken = JWT.create().withSubject(USER_NAME)
+                .withClaim(SecurityConfiguration.ROLES_CLAIM, roles)
+                .withExpiresAt(Date.from(expiresAt))
+                .withIssuedAt(Date.from(issuedAt))
+                .sign(Algorithm.HMAC256(this.secret));
+
+        // Create the needed information for to represent this token as OIDC token in Spring
+        // security
+        List<? extends GrantedAuthority> grantedAuthorities =
+                Arrays.asList(new SimpleGrantedAuthority("admin"));
+        LinkedHashMap<String, Object> claims = new LinkedHashMap<>();
+        claims.put(SecurityConfiguration.ROLES_CLAIM, roles);
+        claims.put("sub", USER_NAME);
+        OidcIdToken token = new OidcIdToken(signedToken, issuedAt, expiresAt, claims);
+        DefaultOidcUser user = new DefaultOidcUser(grantedAuthorities, token);
+        this.desktopUserCredentials = Optional
+                .of(new UsernamePasswordAuthenticationToken(user, signedToken, grantedAuthorities));
 
         // Open the application in the browser
         String webURL = "http://localhost:" + serverPort;
@@ -168,7 +195,7 @@ public class ServiceStarterDesktop extends ServiceStarter {
     }
 
     @Override
-    public Optional<ProvidedCredentials> getDesktopUserToken() {
+    public Optional<UsernamePasswordAuthenticationToken> getDesktopUserToken() {
         return desktopUserCredentials;
     }
 
