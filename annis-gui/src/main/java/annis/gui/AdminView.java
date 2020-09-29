@@ -15,17 +15,10 @@
  */
 package annis.gui;
 
-import annis.gui.admin.CorpusAdminPanel;
-import annis.gui.admin.GroupManagementPanel;
-import annis.gui.admin.ImportPanel;
-import annis.gui.admin.controller.CorpusController;
-import annis.gui.admin.controller.GroupController;
-import annis.gui.admin.model.ApiClientProvider;
-import annis.gui.admin.model.CorpusManagement;
-import annis.gui.admin.model.GroupManagement;
-import annis.gui.admin.view.UIView;
-import annis.libgui.Background;
-import annis.libgui.Helper;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.WebResource;
@@ -38,10 +31,22 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
+
 import org.corpus_tools.annis.ApiClient;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import annis.gui.admin.CorpusAdminPanel;
+import annis.gui.admin.GroupManagementPanel;
+import annis.gui.admin.ImportPanel;
+import annis.gui.admin.controller.CorpusController;
+import annis.gui.admin.controller.GroupController;
+import annis.gui.admin.model.ApiClientProvider;
+import annis.gui.admin.model.CorpusManagement;
+import annis.gui.admin.model.GroupManagement;
+import annis.gui.admin.view.UIView;
+import annis.libgui.Background;
+import annis.libgui.Helper;
 
 /**
  *
@@ -72,8 +77,11 @@ public class AdminView extends VerticalLayout
 
     private final AnnisUI ui;
 
+    private final SecurityContext securityContext;
+
     public AdminView(AnnisUI ui) {
         this.ui = ui;
+        securityContext = SecurityContextHolder.getContext();
         Page.getCurrent().setTitle("ANNIS Adminstration");
 
         GroupManagement groupManagement = new GroupManagement();
@@ -81,7 +89,7 @@ public class AdminView extends VerticalLayout
         CorpusManagement corpusManagement = new CorpusManagement();
         corpusManagement.setClientProvider(AdminView.this);
 
-        boolean isLoggedIn = Helper.getUser().isPresent();
+        boolean isLoggedIn = Helper.getUser(securityContext).isPresent();
 
         corpusAdminPanel = new CorpusAdminPanel();
         new CorpusController(corpusManagement, corpusAdminPanel, this, isLoggedIn);
@@ -111,6 +119,12 @@ public class AdminView extends VerticalLayout
     }
 
     @Override
+    public void attach() {
+    // TODO Auto-generated method stub
+    super.attach();
+    }
+
+    @Override
     public void addListener(UIView.Listener listener) {
         listeners.add(listener);
     }
@@ -129,7 +143,7 @@ public class AdminView extends VerticalLayout
     public void enter(ViewChangeListener.ViewChangeEvent event) {
 
 
-        importPanel.updateMode(Helper.getUser().isPresent());
+        importPanel.updateMode(Helper.getUser(securityContext).isPresent());
 
         // group  management are not visible when there is no security (in desktop mode)
         tabSheet.getTab(groupManagementPanel).setVisible(!ui.isDesktopMode());
@@ -265,7 +279,7 @@ public class AdminView extends VerticalLayout
 
     @Override
     public ApiClient getClient() {
-      return Helper.getClient(this.ui);
+      return Helper.getClient(ui.getConfig(), ui.getSecurityContext());
     }
 
 }

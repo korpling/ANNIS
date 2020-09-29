@@ -43,6 +43,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import annis.gui.components.ExceptionDialog;
@@ -106,6 +107,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired(required = false)
   private OAuth2ClientProperties oauth2Clients;
 
+  private final SecurityContext securityContext;
+
   /**
    * A re-usable toolbar for different views.
    */
@@ -114,6 +117,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   public AnnisUI() {
     super("");
     initTransients();
+    this.securityContext = SecurityContextHolder.getContext();
   }
 
   @Override
@@ -210,7 +214,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     super.init(request);
 
-    getSession().addRequestHandler(new BinaryRequestHandler(getUrlPrefix(), getConfig()));
+    getSession().addRequestHandler(new BinaryRequestHandler(getUrlPrefix(), getConfig(), getSecurityContext()));
 
     String id = request.getParameter("id");
     if (id != null) {
@@ -300,6 +304,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   public UrlShortener getUrlShortener() {
     return urlShortener;
+  }
+
+  public SecurityContext getSecurityContext() {
+    return securityContext;
   }
 
 }
