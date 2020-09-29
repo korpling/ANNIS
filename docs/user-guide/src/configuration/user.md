@@ -2,7 +2,7 @@
 
 ANNIS has an authorization system based on [OAuth2](https://www.oauth.com/) which allows handling multiple users on a server installation using an external identity provider service.
 A user will see different corpora depending on which groups the user is part of.
-For the desktop version of ANNIS, a single administrator user is automatically created and logged in.
+**For the desktop version of ANNIS, a single administrator user is automatically created and logged in.**
 
 When using an identity provider, the backend graphANNIS service and the ANNIS frontend needs to be configured to use this service.
 Per default, ANNIS uses an embedded graphANNIS service with the configuration located in the home directory of the user running the ANNIS service: `~/.annis/service.toml`.
