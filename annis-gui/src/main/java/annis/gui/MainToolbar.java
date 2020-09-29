@@ -22,6 +22,8 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -148,7 +150,7 @@ public class MainToolbar extends HorizontalLayout
     this.oauth2Clients = oauth2Clients;
 
     String bugmail = config.getBugEmail();
-    
+
     if (bugmail != null && !bugmail.isEmpty() && !bugmail.startsWith("${")
         && new EmailValidator("").isValid(bugmail)) {
       this.bugEMailAddress = bugmail;
@@ -199,7 +201,7 @@ public class MainToolbar extends HorizontalLayout
     lblUserName.setHeight("-1px");
     lblUserName.addStyleName("right-aligned-text");
 
-    btLogin = new Button("Login", (ClickListener) event -> showLoginWindow(false));
+    btLogin = new Button("Login", (ClickListener) event -> showLoginWindow());
 
     btLogout = new Button("Logout", (ClickListener) event -> {
       // logout
@@ -512,19 +514,26 @@ public class MainToolbar extends HorizontalLayout
     updateSidebarState();
   }
 
-  public void showLoginWindow(boolean executeQueryAfterLogin) {
+  public void showLoginWindow() {
     if (oauth2Clients != null) {
+
+      // Store the current fragment so it can be restored after login was successful
+      String oldFragment = Page.getCurrent().getUriFragment();
+      VaadinSession.getCurrent().setAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE, oldFragment);
+
+      final String contextPath = VaadinRequest.getCurrent().getContextPath();
+      
       // Determine if there is only one or several clients
       Collection<String> providers = oauth2Clients.getProvider().keySet();
       if (providers.size() == 1) {
         // Directly login with the single provider
-        Page.getCurrent().setLocation("oauth2/authorization/" + providers.iterator().next());
+        Page.getCurrent()
+            .setLocation(contextPath + "/oauth2/authorization/" + providers.iterator().next());
       } else {
         // Show general login selection page
-        Page.getCurrent().setLocation("login");
+        Page.getCurrent().setLocation(contextPath + "/login");
       }
     }
-    // TODO: handle the case we need to execute a query after login
   }
 
   private void updateSidebarState() {
