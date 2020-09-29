@@ -14,6 +14,7 @@
             "graphANNIS",
             "GraphANNIS",
             "GraphML",
+            "Keycloak",
             "relANNIS"
         ]
     }
