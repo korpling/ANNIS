@@ -41,9 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import annis.gui.components.ExceptionDialog;
@@ -103,8 +101,6 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   @Autowired
   private ServiceStarter serviceStarter;
-
-  private AuthenticationManager authenticationManager;
 
   /**
    * A re-usable toolbar for different views.
@@ -246,13 +242,11 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     loadInstanceFonts();
 
-    Optional<ProvidedCredentials> desktopUser = serviceStarter.getDesktopUserToken();
-    if(desktopUser.isPresent() && authenticationManager != null) {
+    Optional<UsernamePasswordAuthenticationToken> desktopUser = serviceStarter.getDesktopUserToken();
+    if(desktopUser.isPresent()) {
       // Login the provided desktop user
-      UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-          desktopUser.get().getName(), desktopUser.get().getPassword());
-      Authentication auth = authenticationManager.authenticate(token);
-      SecurityContextHolder.getContext().setAuthentication(auth);
+      UsernamePasswordAuthenticationToken token = desktopUser.get();
+      SecurityContextHolder.getContext().setAuthentication(token);
 
       getToolbar().onLogin();
     }

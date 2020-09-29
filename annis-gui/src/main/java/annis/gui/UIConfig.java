@@ -17,8 +17,6 @@ public class UIConfig {
   private String webserviceConfig;
 
   private boolean shortenReferenceLinks;
-
-  private String roleClaim;
   
   public String getBugEmail() {
     return bugEMail;
@@ -74,15 +72,5 @@ public class UIConfig {
 
   public void setWebserviceConfig(String webserviceConfig) {
     this.webserviceConfig = webserviceConfig;
-  }
-
-  public String getRoleClaim() {
-    return roleClaim;
-  }
-
-  public void setRoleClaim(String roleClaim) {
-    this.roleClaim = roleClaim;
-  }
-
-  
+  }  
 }

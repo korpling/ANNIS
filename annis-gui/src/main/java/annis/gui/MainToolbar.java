@@ -38,6 +38,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.components.SettingsStorage;
+import annis.gui.security.SecurityConfiguration;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
@@ -524,8 +525,8 @@ public class MainToolbar extends HorizontalLayout
   private void updateAdministratorButtonVisibility(Optional<OidcUser> user) {
     // We don't verify the provided token, this is the job of the backend.
     // This only decides if the Administrator button is visible
-    if (user.isPresent() && user.get().containsClaim(config.getRoleClaim())
-        && user.get().getClaimAsStringList(config.getRoleClaim()).contains("admin")) {
+    if (user.isPresent() && user.get().containsClaim(SecurityConfiguration.ROLES_CLAIM)
+        && user.get().getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM).contains("admin")) {
       // make the administration button visible
       btNavigate.setCaption(NavigationTarget.ADMIN.caption);
       btNavigate.setIcon(NavigationTarget.ADMIN.icon);
