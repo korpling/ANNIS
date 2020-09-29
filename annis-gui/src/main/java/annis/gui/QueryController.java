@@ -525,7 +525,7 @@ public class QueryController implements Serializable {
             // not logged in
             qp.setStatus("You don't have the access rights to query this corpus. "
                 + "You might want to login to access more corpora.");
-            searchView.getMainToolbar().showLoginWindow(true);
+            searchView.getMainToolbar().showLoginWindow();
           } else {
             // logged in but wrong user
             caption = "You don't have the access rights to query this corpus. "

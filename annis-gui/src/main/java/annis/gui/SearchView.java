@@ -54,6 +54,7 @@ import org.corpus_tools.annis.api.CorporaApi;
 import org.slf4j.LoggerFactory;
 
 import annis.QueryGenerator;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -224,7 +225,7 @@ public class SearchView extends GridLayout
         evaluateFragment(Page.getCurrent().getUriFragment());
 
         if (config.isLoginOnStart() && toolbar != null && !Helper.getUser(ui.getSecurityContext()).isPresent()) {
-            toolbar.showLoginWindow(false);
+            toolbar.showLoginWindow();
         }
 
     }
@@ -294,12 +295,19 @@ public class SearchView extends GridLayout
         if (args.containsKey("c")) {
             String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
             Set<String> corpora = new TreeSet<String>(Arrays.asList(originalCorpusNames));
+            // Remove all corpora we don't have the access right to
+            try {
+                CorporaApi api = new CorporaApi(Helper.getClient(ui));
+                Set<String> availableCorpora = new HashSet<>(api.listCorpora());
+                corpora.removeIf(c -> !availableCorpora.contains(c));
+            } catch (ApiException e) {
+                ExceptionDialog.show(e, "Could not get corpus list", ui);
+            }
 
             if (corpora.isEmpty()) {
                 if (!Helper.getUser(ui.getSecurityContext()).isPresent() && toolbar != null) {
                     // not logged in, show login window
-                    boolean onlyCorpusSelected = args.containsKey("c") && args.size() == 1;
-                    toolbar.showLoginWindow(!onlyCorpusSelected);
+                    toolbar.showLoginWindow();
                 } else {
                     // already logged in or no login system available, just display a message
                     new Notification("Linked corpus does not exist",

@@ -18,6 +18,8 @@ public class SecurityConfiguration {
 
     public static final String ROLES_CLAIM = "https://corpus-tools.org/annis/roles";
 
+    public static final String FRAGMENT_TO_RESTORE = "ANNIS_FRAGENT_TO_RESTORE";
+
 
     public static class NoClientsConfiguredCondition extends NoneNestedConditions {
         NoClientsConfiguredCondition() {

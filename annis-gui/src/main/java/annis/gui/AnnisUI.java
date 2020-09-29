@@ -31,6 +31,7 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
@@ -51,6 +52,7 @@ import annis.gui.objects.QueryUIState;
 import annis.gui.query_references.UrlShortener;
 import annis.gui.querybuilder.QueryBuilderPlugin;
 import annis.gui.requesthandler.BinaryRequestHandler;
+import annis.gui.security.SecurityConfiguration;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
@@ -214,6 +216,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     super.init(request);
 
+
     getSession().addRequestHandler(new BinaryRequestHandler(getUrlPrefix(), getConfig(), getSecurityContext()));
 
     String id = request.getParameter("id");
@@ -257,6 +260,13 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
       SecurityContextHolder.getContext().setAuthentication(token);
 
       getToolbar().onLogin();
+    }
+
+
+    Object fragmentToRestore = VaadinSession.getCurrent().getAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE);
+    if(fragmentToRestore instanceof String) {
+      request.getWrappedSession().setAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE, null);
+      Page.getCurrent().setUriFragment((String) fragmentToRestore);
     }
 
   }
