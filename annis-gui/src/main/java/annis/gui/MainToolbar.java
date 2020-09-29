@@ -146,7 +146,7 @@ public class MainToolbar extends HorizontalLayout
 
   public MainToolbar(UIConfig config, OAuth2ClientProperties oauth2Clients) {
     this.oauth2Clients = oauth2Clients;
-    
+
     String bugmail = config.getBugEmail();
     
     if (bugmail != null && !bugmail.isEmpty() && !bugmail.startsWith("${")
@@ -392,7 +392,7 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public boolean isLoggedIn() {
-    return Helper.getUser().isPresent();
+    return Helper.getUser(UI.getCurrent()).isPresent();
   }
 
   public void notifiyQueryStarted() {
@@ -493,7 +493,7 @@ public class MainToolbar extends HorizontalLayout
 
     if (target == NavigationTarget.ADMIN) {
       // check in background if display is necessary
-      updateAdministratorButtonVisibility(Helper.getUser());
+      updateAdministratorButtonVisibility(Helper.getUser(ui));
     } else if (target != null) {
       btNavigate.setVisible(true);
       btNavigate.setCaption(target.caption);
@@ -557,7 +557,7 @@ public class MainToolbar extends HorizontalLayout
       btNavigate.setVisible(false);
     }
 
-    Optional<OidcUser> user = Helper.getUser();
+    Optional<OidcUser> user = Helper.getUser(UI.getCurrent());
     if (user.isPresent()) {
       // logged in
       String displayName = Helper.getDisplayName(user.get());

@@ -45,9 +45,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLStreamException;
 
-import com.auth0.jwt.impl.NullClaim;
-import com.auth0.jwt.interfaces.Claim;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Multimap;
@@ -106,6 +103,7 @@ import org.corpus_tools.salt.util.DataSourceSequence;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
@@ -419,20 +417,21 @@ public class Helper {
   }
 
   public static ApiClient getClient(final UI ui) {
-    UIConfig config = null;
-    if (ui instanceof AnnisUI) {
-      config = ((AnnisUI) ui).getConfig();
+    if(ui instanceof AnnisUI) { 
+      AnnisUI annisUI = (AnnisUI) ui;
+      return getClient(annisUI.getConfig(), annisUI.getSecurityContext());
+    } else {
+      return getClient(null, SecurityContextHolder.getContext());
     }
-    return getClient(config);
   }
 
-  public static ApiClient getClient(final UIConfig config) {
+  public static ApiClient getClient(final UIConfig config, SecurityContext context) {
     final ApiClient client = Configuration.getDefaultApiClient();
     if (config != null) {
       // Use the configuration to allow changing the path to the web-service
       client.setBasePath(config.getWebserviceUrl());
     }
-    final Optional<OidcUser> user = Helper.getUser();
+    final Optional<OidcUser> user = Helper.getUser(context);
     String bearerToken = null;
     if (user.isPresent()) {
       bearerToken = user.get().getIdToken().getTokenValue();
@@ -783,8 +782,16 @@ public class Helper {
     return "";
   }
 
-  public static Optional<OidcUser> getUser() {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+  public static Optional<OidcUser> getUser(UI ui) {
+    if(ui instanceof AnnisUI) {
+      return Helper.getUser(((AnnisUI) ui).getSecurityContext());
+    } else {
+      return Helper.getUser(SecurityContextHolder.getContext());
+    }
+  }
+
+  public static Optional<OidcUser> getUser(SecurityContext context) {
+    Authentication auth = context.getAuthentication();
     if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && auth.isAuthenticated()) {
       Object principalRaw = auth.getPrincipal();
       if (principalRaw instanceof OidcUser) {

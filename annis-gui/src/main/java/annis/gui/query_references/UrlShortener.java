@@ -1,19 +1,21 @@
 package annis.gui.query_references;
 
-import annis.libgui.Helper;
-import com.vaadin.ui.UI;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 import javax.transaction.Transactional;
 import javax.ws.rs.core.UriBuilder;
 
-import org.ietf.jgss.Oid;
+import com.vaadin.ui.UI;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
+
+import annis.libgui.Helper;
 
 @Service
 public class UrlShortener {
@@ -46,7 +48,7 @@ public class UrlShortener {
 
       UrlShortenerEntry entry = new UrlShortenerEntry();
       entry.setUrl(localURL);
-      Optional<OidcUser> user = Helper.getUser();
+      Optional<OidcUser> user = Helper.getUser(ui);
       if (user.isPresent()) {
         entry.setOwner(Helper.getDisplayName(user.get()));
       } else {
