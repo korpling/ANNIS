@@ -14,7 +14,6 @@ You can choose from various OAuth2 compatible identity providers, but in the fol
 ### Install and run Keycloak
 
 Follow the ["Getting Started with Keycloak"](https://www.keycloak.org/getting-started) guide to install and run the service.
-Create at least one administrator user, in our example this user will have the user ID `admin`.
 
 ### Configure Keycloak for ANNIS
 
