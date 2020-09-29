@@ -1,11 +1,5 @@
 package annis.gui.security;
 
-import java.util.stream.Stream;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.vaadin.shared.ApplicationConstants;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
