@@ -15,19 +15,22 @@
  */
 package annis.gui.controller;
 
-import annis.gui.AnnisUI;
-import annis.gui.ExportPanel;
-import annis.gui.objects.ExportQuery;
-import annis.libgui.exporter.ExporterPlugin;
-import com.google.common.eventbus.EventBus;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import com.google.common.eventbus.EventBus;
+
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
+
+import annis.gui.AnnisUI;
+import annis.gui.ExportPanel;
+import annis.gui.objects.ExportQuery;
+import annis.libgui.exporter.ExporterPlugin;
 
 /**
  *
