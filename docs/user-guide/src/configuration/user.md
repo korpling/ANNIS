@@ -86,7 +86,7 @@ Replace the `http://localhost:5712/` in the `redirect-uri-template` with the pub
 Also replace the `http://localhost:8080/` part of the `issuer-uri` with the public URL of your Keycloak server (if you are testing this on your local computer, you can leave the values as they are).
 
 ANNIS uses the Spring Security framework for OAuth2 internally.
-An overview of the configuration parameters is part of the [Spring documentation](https://docs.spring.io/spring-boot/docs/2.1.9.RELEASE/reference/html/boot-features-security.html#boot-features-security-oauth2-client).
+An overview of the configuration parameters is part of the [Spring documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-security-oauth2).
 
 ### Start the ANNIS service and test the login
 
