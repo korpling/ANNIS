@@ -139,10 +139,8 @@ public class MainToolbar extends HorizontalLayout
 
   private QueryController queryController;
 
-  private final UIConfig config;
 
-  public MainToolbar(UIConfig config) {
-    this.config = config;
+  public MainToolbar() {
     String bugmail = null;
     if (UI.getCurrent() instanceof AnnisUI) {
       bugmail = ((AnnisUI) UI.getCurrent()).getConfig().getBugEmail();
