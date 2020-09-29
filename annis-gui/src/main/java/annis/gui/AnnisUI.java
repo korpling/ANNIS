@@ -39,6 +39,7 @@ import com.vaadin.ui.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -101,6 +102,9 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   @Autowired
   private ServiceStarter serviceStarter;
+
+  @Autowired(required = false)
+  private OAuth2ClientProperties oauth2Clients;
 
   /**
    * A re-usable toolbar for different views.
@@ -223,7 +227,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     adminView = new AdminView(AnnisUI.this);
 
-    toolbar = new MainToolbar();
+    toolbar = new MainToolbar(getConfig(), oauth2Clients);
     toolbar.setQueryController(queryController);
 
 

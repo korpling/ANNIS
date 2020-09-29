@@ -13,6 +13,7 @@
  */
 package annis.gui;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 
@@ -34,6 +35,7 @@ import com.vaadin.v7.data.validator.EmailValidator;
 import com.vaadin.v7.ui.themes.BaseTheme;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 import annis.gui.components.ScreenshotMaker;
@@ -125,7 +127,7 @@ public class MainToolbar extends HorizontalLayout
 
   private final Label lblUserName;
 
-  private final String bugEMailAddress;
+  private String bugEMailAddress;
 
   private SidebarState sidebarState = SidebarState.VISIBLE;
 
@@ -139,23 +141,13 @@ public class MainToolbar extends HorizontalLayout
 
   private QueryController queryController;
 
+  private final UIConfig config;
 
-  public MainToolbar() {
-    String bugmail = null;
-    if (UI.getCurrent() instanceof AnnisUI) {
-      bugmail = ((AnnisUI) UI.getCurrent()).getConfig().getBugEmail();
-    }
-    if (bugmail != null && !bugmail.isEmpty() && !bugmail.startsWith("${")
-        && new EmailValidator("").isValid(bugmail)) {
-      this.bugEMailAddress = bugmail;
-    } else {
-      this.bugEMailAddress = null;
-    }
+  private final OAuth2ClientProperties oauth2Clients;
 
-    UI ui = UI.getCurrent();
-    if (ui instanceof CommonUI) {
-      ((CommonUI) ui).getSettings().addedLoadedListener(MainToolbar.this);
-    }
+  public MainToolbar(UIConfig config, OAuth2ClientProperties oauth2Clients) {
+    this.config = config;
+    this.oauth2Clients = oauth2Clients;
 
     setWidth("100%");
     setHeight("-1px");
@@ -179,7 +171,7 @@ public class MainToolbar extends HorizontalLayout
     btBugReport.setDisableOnClick(true);
     btBugReport.setIcon(FontAwesome.ENVELOPE_O);
     btBugReport.addClickListener(event -> reportBug());
-    btBugReport.setVisible(this.bugEMailAddress != null);
+
 
     btNavigate = new Button();
     btNavigate.setVisible(false);
@@ -247,8 +239,6 @@ public class MainToolbar extends HorizontalLayout
     setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
     setExpandRatio(btOpenSource, 1.0f);
 
-    addLoginButton();
-
     btSidebar.addClickListener(event -> {
       btSidebar.setEnabled(true);
 
@@ -313,7 +303,7 @@ public class MainToolbar extends HorizontalLayout
       desktopMode = ((AnnisUI) ui).isDesktopMode();
     }
 
-    if (!desktopMode) {
+    if (!desktopMode && oauth2Clients != null) {
       addComponent(lblUserName);
       setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
       addComponent(btLogin);
@@ -332,6 +322,24 @@ public class MainToolbar extends HorizontalLayout
     super.attach();
 
     UI ui = UI.getCurrent();
+
+
+    addLoginButton();
+
+    String bugmail = null;
+    bugmail = config.getBugEmail();
+
+    if (bugmail != null && !bugmail.isEmpty() && !bugmail.startsWith("${")
+        && new EmailValidator("").isValid(bugmail)) {
+      this.bugEMailAddress = bugmail;
+    } else {
+      this.bugEMailAddress = null;
+    }
+    btBugReport.setVisible(this.bugEMailAddress != null);
+
+    if (ui instanceof CommonUI) {
+      ((CommonUI) ui).getSettings().addedLoadedListener(MainToolbar.this);
+    }
 
     MainToolbar.this.updateUserInformation();
 
@@ -509,7 +517,17 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public void showLoginWindow(boolean executeQueryAfterLogin) {
-    Page.getCurrent().setLocation("login");
+    if (oauth2Clients != null) {
+      // Determine if there is only one or several clients
+      Collection<String> providers = oauth2Clients.getProvider().keySet();
+      if (providers.size() == 1) {
+        // Directly login with the single provider
+        Page.getCurrent().setLocation("oauth2/authorization/" + providers.iterator().next());
+      } else {
+        // Show general login selection page
+        Page.getCurrent().setLocation("login");
+      }
+    }
     // TODO: handle the case we need to execute a query after login
   }
 

@@ -10,7 +10,8 @@
       "request": "launch",
       "projectName": "annis-gui",
       "mainClass": "annis.gui.AnnisUiApplication",
-      "cwd": "${workspaceFolder}/annis-gui"
+      "cwd": "${workspaceFolder}/annis-gui",
+      "preLaunchTask": "install",
     },
     {
       "type": "java",
