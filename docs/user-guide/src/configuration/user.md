@@ -66,7 +66,7 @@ Then add the `admin` role to this user by switching to the “Role Mappings“ t
 
 ![Screenshot the role mappings tab](add-role.png)
 
-The Keycloak server needs to know which URIs are valid client URIs, got to “Configure -> Clients“, select the “annis” client and replace the `http://localhost:5712` part of the “Valid Redirect URIs“ with the public URI of the ANNIS frontend.
+The Keycloak server needs to know which URIs are valid client URIs. Go to “Configure -> Clients“, select the “annis” client and replace the `http://localhost:5712` part of the “Valid Redirect URIs“ with the public URI of the ANNIS frontend.
 
 ![Screenshot the valid redirection URI setting](replace-redirect-uri.png)
 
