@@ -88,7 +88,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                         File serviceConfigFile = getServiceConfig();
 
                         // Start the process and read output/error stream in background threads
-                        log.info("Starting the bundled graphANNIS service");
+                        log.info("Starting the bundled graphANNIS service with configuration file {}", serviceConfigFile.getAbsolutePath());
                         backgroundProcess = new ProcessBuilder(tmpExec.getAbsolutePath(),
                                 "--config", serviceConfigFile.getAbsolutePath()).start();
                         final BufferedReader outputStream = new BufferedReader(
