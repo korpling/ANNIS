@@ -30,7 +30,7 @@ public class AnnisUiApplication {
     public static void main(String[] args) {
         SpringApplicationBuilder builder = new SpringApplicationBuilder(AnnisUiApplication.class);
         if(args.length == 1 && "--ci".equals(args[0])) {
-            // use headless mode when running in continous integration
+            // use headless mode when running in continuous integration
             builder.headless(true);
         } else {
             builder.headless(false);
