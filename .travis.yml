@@ -17,7 +17,7 @@ before_script:
   - mkdir -p $HOME/.cargo/bin
   - export PATH=$HOME/.cargo/bin:$TRAVIS_BUILD_DIR/node_modules/.bin/:$PATH
   - misc/download-mdbook.sh 0.4.2
-  - misc/download-annis-cli.sh 0.29.2
+  - misc/download-annis-cli.sh 0.30.0
   # Install Selenium Runner with geckodriver
   - npm install selenium-side-runner
   - npm install geckodriver

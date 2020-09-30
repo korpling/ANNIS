@@ -28,7 +28,7 @@ server.port=5712
 server.address=127.0.0.1
 
 # A configuration file for the embedded REST Service. 
-# See https://korpling.github.io/graphANNIS/docs/v0.29/rest.html 
+# See https://korpling.github.io/graphANNIS/docs/v0.30/rest.html 
 # for more information on how to configure the graphANNIS service.
 annis.webservice-config=${user.home}/.annis/service.toml
 
