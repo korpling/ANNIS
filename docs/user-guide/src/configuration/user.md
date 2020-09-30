@@ -6,7 +6,7 @@ A user will see different corpora depending on which groups the user is part of.
 
 When using an identity provider, the backend graphANNIS service and the ANNIS frontend needs to be configured to use this service.
 Per default, ANNIS uses an embedded graphANNIS service with the configuration located in the home directory of the user running the ANNIS service: `~/.annis/service.toml`.
-See the [graphANNIS documentation on authentication and authorization](https://korpling.github.io/graphANNIS/docs/v0.29/rest.html#authentication-and-authorization) for how to use this configuration file to configure the backend.
+See the [graphANNIS documentation on authentication and authorization](https://korpling.github.io/graphANNIS/docs/v0.30/rest.html#authentication-and-authorization) for how to use this configuration file to configure the backend.
 You can choose from various OAuth2 compatible identity providers, but in the following example we will use a self-hosted [Keycloak](https://www.keycloak.org/) server.
 
 ## Configure Login with a self-hosted Keycloak server

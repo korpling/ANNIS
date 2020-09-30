@@ -21,7 +21,7 @@ Therefore, stop the running ANNIS service (e.g. with `systemctl stop annis` on a
 annis ~/.annis/v4/
 ```
 
-For a list of all available commands see the [graphANNIS documentation](https://korpling.github.io/graphANNIS/docs/v0.29/cli.html).
+For a list of all available commands see the [graphANNIS documentation](https://korpling.github.io/graphANNIS/docs/v0.30/cli.html).
 To import a corpus, just execute the `import` command followed by a path to the corpus to import, e.g.:
 ```
 import /home/thomas/korpora/pcc2/
