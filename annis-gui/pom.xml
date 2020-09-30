@@ -48,6 +48,9 @@
 				<filtering>true</filtering>
 			</resource>
 			<resource>
+				<directory>src/main/webapp</directory>
+			</resource>
+			<resource>
 				<directory>${project.build.directory}/native/</directory>
 			</resource>
 			<resource>
