@@ -13,17 +13,19 @@
  */
 package annis.gui;
 
-import annis.gui.docbrowser.DocBrowserController;
-import annis.gui.graphml.DocumentGraphMapper;
-import annis.gui.util.ANNISFontIcon;
-import annis.libgui.Background;
-import annis.libgui.Helper;
-import annis.libgui.IDGenerator;
-import annis.libgui.InstanceConfig;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.libgui.visualizers.VisualizerPlugin;
-import annis.service.objects.Match;
-import annis.visualizers.htmlvis.HTMLVis;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.xml.stream.XMLStreamException;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -47,20 +49,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.v7.ui.Label;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import javax.xml.stream.XMLStreamException;
-import okhttp3.Request;
-import okhttp3.Response;
+
 import org.apache.commons.io.IOUtils;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.CorporaApi;
@@ -73,11 +62,26 @@ import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
-import org.corpus_tools.salt.util.internal.persistence.SaltXML10Handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import annis.gui.docbrowser.DocBrowserController;
+import annis.gui.graphml.DocumentGraphMapper;
+import annis.gui.util.ANNISFontIcon;
+import annis.libgui.Background;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.libgui.InstanceConfig;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerPlugin;
+import annis.service.objects.Match;
+import annis.visualizers.htmlvis.HTMLVis;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  *
@@ -160,6 +164,9 @@ public class EmbeddedVisUI extends CommonUI {
   @Autowired
   private List<VisualizerPlugin> visualizers;
 
+  @Autowired
+  private ServiceStarter serviceStarter;
+
   public EmbeddedVisUI() {
     super(URL_PREFIX);
   }
@@ -201,7 +208,7 @@ public class EmbeddedVisUI extends CommonUI {
       return;
     }
 
-    ApiClient client = Helper.getClient(this);
+    ApiClient client = Helper.getClient(null, SecurityContextHolder.getContext());
 
     displayLoadingIndicator();
 
@@ -402,6 +409,13 @@ public class EmbeddedVisUI extends CommonUI {
   @Override
   protected void init(VaadinRequest request) {
     super.init(request);
+
+    Optional<UsernamePasswordAuthenticationToken> desktopUser = serviceStarter.getDesktopUserToken();
+    if(desktopUser.isPresent()) {
+      // Login the provided desktop user
+      UsernamePasswordAuthenticationToken token = desktopUser.get();
+      SecurityContextHolder.getContext().setAuthentication(token);
+    }
 
     String rawPath = request.getPathInfo();
     List<String> splittedPath = new LinkedList<>();
