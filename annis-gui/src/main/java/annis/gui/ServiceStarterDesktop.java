@@ -54,7 +54,7 @@ public class ServiceStarterDesktop extends ServiceStarter {
 
     private static final String USER_NAME = "desktop";
     private static final Logger log = LoggerFactory.getLogger(ServiceStarterDesktop.class);
-    private String secret;
+    private final String secret = RandomStringUtils.randomAlphanumeric(50);
     private Optional<UsernamePasswordAuthenticationToken> desktopUserCredentials = Optional.empty();
 
 
@@ -69,12 +69,10 @@ public class ServiceStarterDesktop extends ServiceStarter {
         Toml tomlConfig = new Toml().read(super.getServiceConfig());
         Map<String, Object> config = tomlConfig.toMap();
 
-        // Generate a random secret used to sign the JWT token
-        this.secret = RandomStringUtils.randomAlphanumeric(50);
         // Add it to the configuration
         Map<String, Object> tokenVerification = new LinkedHashMap<>();
         tokenVerification.put("type", "HS256");
-        tokenVerification.put("secret", secret);
+        tokenVerification.put("secret", this.secret);
 
         // Add the new auth configuration (removing all existing settings in [auth])
         Map<String, Object> auth = new HashMap<>();
