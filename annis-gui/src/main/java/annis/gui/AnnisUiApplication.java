@@ -1,8 +1,10 @@
 package annis.gui;
 
+import javax.ws.rs.core.Application;
+
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,14 +30,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class AnnisUiApplication {
 
     public static void main(String[] args) {
-        SpringApplicationBuilder builder = new SpringApplicationBuilder(AnnisUiApplication.class);
-        if(args.length == 1 && "--ci".equals(args[0])) {
-            // use headless mode when running in continuous integration
-            builder.headless(true);
-        } else {
-            builder.headless(false);
-        }
-        builder.run(args);
+        SpringApplication.run(AnnisUiApplication.class, args);
     }
 
 }

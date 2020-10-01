@@ -36,9 +36,11 @@ import com.moandjiezana.toml.TomlWriter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -60,6 +62,9 @@ public class ServiceStarterDesktop extends ServiceStarter {
 
     @Value("${server.port}")
     private String serverPort;
+
+    @Autowired
+    private Environment env;
 
     /**
      * Overwrite the existing configuration file and add a temporary user for the desktop.
@@ -154,12 +159,11 @@ public class ServiceStarterDesktop extends ServiceStarter {
         List<String> roles = Arrays.asList("admin");
         Instant issuedAt = Instant.now();
         Instant expiresAt = Instant.now().plus(7l, ChronoUnit.DAYS);
-        
+
         // Use the secret to sign a new JWT token with admin rights
         String signedToken = JWT.create().withSubject(USER_NAME)
                 .withClaim(SecurityConfiguration.ROLES_CLAIM, roles)
-                .withExpiresAt(Date.from(expiresAt))
-                .withIssuedAt(Date.from(issuedAt))
+                .withExpiresAt(Date.from(expiresAt)).withIssuedAt(Date.from(issuedAt))
                 .sign(Algorithm.HMAC256(this.secret));
 
         // Create the needed information for to represent this token as OIDC token in Spring
@@ -181,7 +185,8 @@ public class ServiceStarterDesktop extends ServiceStarter {
             log.warn(
                     "ANNIS is running in desktop mode, but no desktop has been detected. You can open {} manually.",
                     webURL);
-        } else {
+        } else if (Arrays.stream(env.getActiveProfiles())
+                .noneMatch(profile -> "ci".equals(profile))) {
             showApplicationWindow(desktop);
             log.info("Opening {} in browser", webURL);
             try {

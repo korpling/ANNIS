@@ -18,8 +18,7 @@ before_script:
   - export PATH=$HOME/.cargo/bin:$TRAVIS_BUILD_DIR/node_modules/.bin/:$PATH
   - misc/download-mdbook.sh 0.4.2
   - misc/download-annis-cli.sh 0.30.0
-  # Install Selenium Runner with geckodriver
-  - npm install selenium-side-runner
+  # Install geckodriver
   - npm install geckodriver
   # download pcc2 corpus and import it using the CLI
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
@@ -28,22 +27,12 @@ before_script:
   
   
 script:
-  # execute Maven Tests
-  - mvn test -B
+  # execute Maven Tests (including integration tests)
+  - mvn verify -B
    # generate the documentation for possible deploy
   - mdbook build docs/user-guide/
   - mdbook build docs/developer-guide/
   - mdbook build docs/online-help/
-  # Compile in desktop mode
-  - mvn -Pdesktop package
-  # Start in ANNIS in background and in desktop mode, so there is no authentication
-  - cd annis-gui/
-  - java -jar target/annis-gui-*-desktop.jar --ci &
-  - cd ..
-  # Wait some time to allow the service to start
-  - sleep 10
-  # execute integration tests
-  - selenium-side-runner --base-url http://localhost:5712/ -c "browserName=firefox" misc/annis_integration_tests.side
 
 deploy:
   - provider: script

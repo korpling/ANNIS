@@ -151,11 +151,11 @@
 							<goal>start</goal>
 						</goals>
 						<configuration>
-							<profiles>desktop</profiles>
+							<profiles>
+								<profile>desktop</profile>
+								<profile>ci</profile>
+							</profiles>
 							<fork>true</fork>
-							<arguments>
-								<argument>--ci</argument>
-							</arguments>
 						</configuration>
 					</execution>
 					<execution>
