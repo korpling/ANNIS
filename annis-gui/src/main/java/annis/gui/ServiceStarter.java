@@ -114,7 +114,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                                         log.info(line);
                                     }
                                 } catch (IOException ex) {
-                                    log.error("Could not read service output", ex);
+                                    if (!this.abortThread.get()) {
+                                        log.error("Could not read service output", ex);
+                                    }
                                     break;
                                 }
                                 Thread.yield();
@@ -130,7 +132,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                                         log.error(line);
                                     }
                                 } catch (IOException ex) {
-                                    log.error("Could not read service error output", ex);
+                                    if (!this.abortThread.get()) {
+                                        log.error("Could not read service error output", ex);
+                                    }
                                     break;
                                 }
                                 Thread.yield();
@@ -201,11 +205,11 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     public void destroy() throws Exception {
         this.abortThread.set(true);
 
-        if(this.tReaderOut != null) {
+        if (this.tReaderOut != null) {
             this.tReaderOut.interrupt();
         }
 
-        if(this.tReaderErr != null) {
+        if (this.tReaderErr != null) {
             this.tReaderErr.interrupt();
         }
 
