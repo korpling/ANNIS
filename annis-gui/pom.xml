@@ -279,13 +279,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>20.0</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>com.github.vaadin4qbanos</groupId>
 			<artifactId>jsclipboard</artifactId>
 			<version>1.0.12</version>
