@@ -150,12 +150,20 @@
 						<goals>
 							<goal>start</goal>
 						</goals>
+						<configuration>
+							<profiles>desktop</profiles>
+							<fork>true</fork>
+							<arguments><argument>--ci</argument></arguments>
+						</configuration>
 					</execution>
 					<execution>
 						<id>post-integration-test</id>
 						<goals>
 							<goal>stop</goal>
 						</goals>
+						<configuration>
+							<fork>true</fork>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
