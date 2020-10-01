@@ -155,7 +155,7 @@
 								<profile>desktop</profile>
 								<profile>headless</profile>
 							</profiles>
-							<fork>true</fork>
+							<fork>false</fork>
 						</configuration>
 					</execution>
 					<execution>
@@ -164,7 +164,7 @@
 							<goal>stop</goal>
 						</goals>
 						<configuration>
-							<fork>true</fork>
+							<fork>false</fork>
 						</configuration>
 					</execution>
 				</executions>
