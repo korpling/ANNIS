@@ -14,6 +14,16 @@
             "problemMatcher": []
         },
         {
+            "label": "build",
+            "type": "shell",
+            "command": "mvn -B -DskipTests package",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "verify",
             "type": "shell",
             "command": "mvn -B verify",

@@ -11,7 +11,7 @@
       "projectName": "annis-gui",
       "mainClass": "annis.gui.AnnisUiApplication",
       "cwd": "${workspaceFolder}/annis-gui",
-      "preLaunchTask": "install",
+      "preLaunchTask": "build",
     },
     {
       "type": "java",
@@ -23,7 +23,7 @@
       "env": {
         "spring_profiles_active": "desktop"
       },
-      "preLaunchTask": "install",
+      "preLaunchTask": "build",
     },
     {
       "type": "java",
