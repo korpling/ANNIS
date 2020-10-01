@@ -153,7 +153,7 @@
 						<configuration>
 							<profiles>
 								<profile>desktop</profile>
-								<profile>ci</profile>
+								<profile>headless</profile>
 							</profiles>
 							<fork>true</fork>
 						</configuration>
