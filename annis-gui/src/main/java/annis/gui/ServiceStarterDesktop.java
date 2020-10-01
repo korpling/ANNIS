@@ -180,10 +180,10 @@ public class ServiceStarterDesktop extends ServiceStarter {
 
         // Open the application in the browser
         String webURL = "http://localhost:" + serverPort;
-        boolean isRunninHeadless = Arrays.stream(env.getActiveProfiles())
-                .noneMatch(profile -> "headless".equals(profile));
+        boolean isRunningHeadless = Arrays.stream(env.getActiveProfiles())
+                .anyMatch(profile -> "headless".equals(profile));
         Desktop desktop =
-                isRunninHeadless && Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+                !isRunningHeadless && Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
         if (desktop == null) {
             log.warn(
                     "ANNIS is running in desktop mode, but no desktop has been detected. You can open {} manually.",
