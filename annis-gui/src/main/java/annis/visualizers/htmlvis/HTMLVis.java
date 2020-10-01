@@ -101,8 +101,7 @@ public class HTMLVis extends AbstractVisualizer {
     Label lblResult = new Label("ERROR", ContentMode.HTML);
     lblResult.setSizeUndefined();
 
-    List<String> corpusPath =
-        Helper.getCorpusPath(vi.getDocument().getGraph(), vi.getDocument());
+    List<String> corpusPath = Helper.getCorpusPath(vi.getDocument().getGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     corpusName = urlPathEscape.escape(corpusName);
 
@@ -212,7 +211,7 @@ public class HTMLVis extends AbstractVisualizer {
         String matched = vis.getMatcher().matchedAnnotation(t);
         if (matched != null) {
           vis.getOutputter().outputHTML(t, matched, outputStartTags, outputEndTags, tokenColor,
-              Objects.firstNonNull(instruction_priorities.get(vis), 0), token2index);
+              instruction_priorities.getOrDefault(vis, 0), token2index);
         }
       }
     }
@@ -229,7 +228,7 @@ public class HTMLVis extends AbstractVisualizer {
           String matched = vis.getMatcher().matchedAnnotation(span);
           if (matched != null) {
             vis.getOutputter().outputHTML(span, matched, outputStartTags, outputEndTags, tokenColor,
-                Objects.firstNonNull(instruction_priorities.get(vis), 0), token2index);
+                instruction_priorities.getOrDefault(vis, 0), token2index);
           }
         }
       }
@@ -284,20 +283,19 @@ public class HTMLVis extends AbstractVisualizer {
               } else {
                 vis.getOutputter().outputAny(positionStart, positionEnd,
                     ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), strMetaVal,
-                    outputStartTags, outputEndTags,
-                    Objects.firstNonNull(instruction_priorities.get(vis), 0));
+                    outputStartTags, outputEndTags, instruction_priorities.getOrDefault(vis, 0));
               }
               break;
             case CONSTANT:
               vis.getOutputter().outputAny(positionStart, positionEnd,
                   ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
                   vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
-                  Objects.firstNonNull(instruction_priorities.get(vis), 0));
+                  instruction_priorities.getOrDefault(vis, 0));
               break;
             case EMPTY:
               vis.getOutputter().outputAny(positionStart, positionEnd,
                   ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), "", outputStartTags,
-                  outputEndTags, Objects.firstNonNull(instruction_priorities.get(vis), 0));
+                  outputEndTags, instruction_priorities.getOrDefault(vis, 0));
               break;
             case ANNO_NAME:
               break; // this shouldn't happen, since the BEGIN/END instruction has no triggering
@@ -431,9 +429,9 @@ public class HTMLVis extends AbstractVisualizer {
         File f = api.getFile(corpusName,
             urlPathEscape.escape(corpusName) + "/" + visConfigName + ".css");
         f.deleteOnExit();
-        
+
         inStreamCSSRaw = new FileInputStream(f);
-        
+
       } catch (ApiException ex) {
         if (ex.getCode() != 404) {
           log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
