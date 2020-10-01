@@ -22,6 +22,7 @@ import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.moandjiezana.toml.Toml;
@@ -56,6 +57,10 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
 
     private Process backgroundProcess;
 
+    private Thread tReaderOut;
+
+    private Thread tReaderErr;
+
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
         if (config.getWebserviceUrl() == null || config.getWebserviceUrl().isEmpty()) {
@@ -88,7 +93,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                         File serviceConfigFile = getServiceConfig();
 
                         // Start the process and read output/error stream in background threads
-                        log.info("Starting the bundled graphANNIS service with configuration file {}", serviceConfigFile.getAbsolutePath());
+                        log.info(
+                                "Starting the bundled graphANNIS service with configuration file {}",
+                                serviceConfigFile.getAbsolutePath());
                         backgroundProcess = new ProcessBuilder(tmpExec.getAbsolutePath(),
                                 "--config", serviceConfigFile.getAbsolutePath()).start();
                         final BufferedReader outputStream = new BufferedReader(
@@ -98,7 +105,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                         final BufferedReader errorStream = new BufferedReader(new InputStreamReader(
                                 backgroundProcess.getErrorStream(), StandardCharsets.UTF_8));
 
-                        Thread tReaderOut = new Thread(() -> {
+                        tReaderOut = new Thread(() -> {
                             while (!this.abortThread.get() && backgroundProcess.isAlive()) {
                                 String line;
                                 try {
@@ -110,10 +117,11 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                                     log.error("Could not read service output", ex);
                                     break;
                                 }
+                                Thread.yield();
                             }
                         });
                         tReaderOut.start();
-                        Thread tReaderErr = new Thread(() -> {
+                        tReaderErr = new Thread(() -> {
                             while (!this.abortThread.get() && backgroundProcess.isAlive()) {
                                 String line;
                                 try {
@@ -125,6 +133,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                                     log.error("Could not read service error output", ex);
                                     break;
                                 }
+                                Thread.yield();
                             }
                         });
                         tReaderErr.start();
@@ -191,8 +200,27 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     @Override
     public void destroy() throws Exception {
         this.abortThread.set(true);
+
+        if(this.tReaderOut != null) {
+            this.tReaderOut.interrupt();
+        }
+
+        if(this.tReaderErr != null) {
+            this.tReaderErr.interrupt();
+        }
+
         if (this.backgroundProcess != null) {
+            long pid = this.backgroundProcess.pid();
             this.backgroundProcess.destroy();
+            if (this.backgroundProcess.waitFor(5, TimeUnit.SECONDS)) {
+                // Destroy the process by force after 5 seconds
+                log.warn(
+                        "GraphANNIS process (PID {}) did not stop after 5 seconds, stopping it forcefully",
+                        pid);
+                this.backgroundProcess.destroyForcibly();
+            } else {
+                log.info("Stopped graphANNIS process");
+            }
         }
     }
 
