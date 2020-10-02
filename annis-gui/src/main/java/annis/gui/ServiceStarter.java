@@ -171,8 +171,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     protected File getServiceConfig() throws IOException {
         File result = new File(config.getWebserviceConfig());
         if (!result.exists()) {
-            if (!result.mkdirs()) {
-                log.error("Could not create directory", result.getParentFile().getAbsolutePath());
+            File parentDir = result.getParentFile();
+            if (!parentDir.mkdirs()) {
+                log.error("Could not create directory", parentDir.getAbsolutePath());
             }
             result.createNewFile();
         }
