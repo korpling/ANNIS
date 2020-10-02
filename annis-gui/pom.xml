@@ -257,6 +257,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <forkedProcessExitTimeoutInSeconds>1</forkedProcessExitTimeoutInSeconds>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

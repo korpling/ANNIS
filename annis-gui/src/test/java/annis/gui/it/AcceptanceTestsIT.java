@@ -2,11 +2,11 @@ package annis.gui.it;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -19,13 +19,10 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
   public void aboutWindow() {
     driver.get("http://localhost:5712/");
     waitForUserInterfaceLoaded();
-    driver.manage().window().setSize(new Dimension(1024, 768));
-    js.executeScript("window.scrollTo(0,0)");
     driver.findElement(By.id("SearchView:MainToolbar:btAboutAnnis")).click();
-    {
-      List<WebElement> elements = driver.findElements(By.id("AboutWindow:VerticalLayout:btClose"));
-      assert (elements.size() > 0);
-    }
+    List<WebElement> elements = driver.findElements(By.id("AboutWindow:VerticalLayout:btClose"));
+    assertTrue(elements.size() > 0);
+
     driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).click();
   }
 
@@ -33,13 +30,11 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
   public void openSourceWindow() {
     driver.get("http://localhost:5712/");
     waitForUserInterfaceLoaded();
-    driver.manage().window().setSize(new Dimension(1024, 768));
     driver.findElement(By.id("SearchView:MainToolbar:btOpenSource")).click();
-    js.executeScript("window.scrollTo(0,0)");
-    {
-      List<WebElement> elements = driver.findElements(By.id("HelpUsWindow:VerticalLayout:btClose"));
-      assert (elements.size() > 0);
-    }
+
+    List<WebElement> elements = driver.findElements(By.id("HelpUsWindow:VerticalLayout:btClose"));
+    assertTrue(elements.size() > 0);
+
     driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).click();
   }
 
@@ -47,9 +42,6 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
   public void tokenSearchPcc2() {
     driver.get("http://localhost:5712/");
     waitForUserInterfaceLoaded();
-    driver.manage().window().setSize(new Dimension(1024, 768));
-    js.executeScript("window.scrollTo(0,0)");
-
 
     // Filter for the corpus name in case the corpus list has too many entries and does not show the
     // pcc2 corpus yet
@@ -68,8 +60,7 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
 
 
     driver.findElement(By.id("SearchView:ControlPanel:QueryPanel:btShowResult")).click();
-    js.executeScript("window.scrollTo(0,0)");
-
+    
     // Wait for second result to appear
     wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(CELL_FEIGENBLATT)));
 

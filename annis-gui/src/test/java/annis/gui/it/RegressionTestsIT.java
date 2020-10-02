@@ -12,9 +12,6 @@ public class RegressionTestsIT extends BaseIntegrationTest {
 
   @Test
   public void regression509() {
-
-    driver.manage().window().setSize(new Dimension(1024, 768));
-
     driver.get(
         "http://localhost:5712/embeddedvis/grid?embedded_ns=exmaralda&embedded_instance=&embedded_match=pcc2/11299%23tok_1&embedded_left=5&embedded_right=5&embedded_interface=http://localhost:5712/%23_q%3DdG9r%26ql%3Daql%26_c%3DcGNjMg%26cl%3D5%26cr%3D5%26s%3D0%26l%3D10%26m%3D0");
 
