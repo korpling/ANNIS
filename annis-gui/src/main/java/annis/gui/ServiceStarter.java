@@ -171,6 +171,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     protected File getServiceConfig() throws IOException {
         File result = new File(config.getWebserviceConfig());
         if (!result.exists()) {
+            if (!result.mkdirs()) {
+                log.error("Could not create directory", result.getParentFile().getAbsolutePath());
+            }
             result.createNewFile();
         }
         // Set to a default data folder and SQLite file
