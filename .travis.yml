@@ -7,6 +7,10 @@ env:
     - MOZ_HEADLESS=1
 addons:
   firefox: latest
+  sonarcloud:
+    organization: "korpling"
+    token:
+      secure: "RhDfvqFaw1Uyml2r0rtZeE6WiyiQ6jqU7PVgotmbDG3dNTU5ds3DO6bZNIBrO8Qly2LIkOwi+1DWFWLCyo4KbUVn7jlZqfItk8cg9T1pg6FctEX0SehS8fReo6xI6gXYc+hvzhaztsTpJYpPUB7O3m+9NfG3ts8BeJ8ZqXfrVEo="
   
 cache:
   directories:
@@ -27,8 +31,8 @@ before_script:
   
   
 script:
-  # execute Maven Tests (including integration tests)
-  - mvn verify -B
+  # execute Maven Tests (including integration tests) with enabled code coverage and upload results to SonarCloud
+  - mvn -B verify sonar:sonar -Dsonar.projectKey=korpling_ANNIS
    # generate the documentation for possible deploy
   - mdbook build docs/user-guide/
   - mdbook build docs/developer-guide/
