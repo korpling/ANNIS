@@ -141,6 +141,45 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <mainClass>${start-class}</mainClass>
+                        <jvmArguments>${jacoco.agent.it.arg}</jvmArguments>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>repackage</id>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                            <configuration>
+                                <classifier>${spring.profiles.active}</classifier>
+                                <executable>true</executable>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>pre-integration-test</id>
+                            <goals>
+                                <goal>start</goal>
+                            </goals>
+                            <configuration>
+
+                                <profiles>
+                                    <profile>desktop</profile>
+                                    <profile>headless</profile>
+                                </profiles>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>post-integration-test</id>
+                            <goals>
+                                <goal>stop</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -220,53 +259,8 @@
                 </executions>
             </plugin>
             <plugin>
-                <!-- 
-                    It is important that the Jacoco plugin is listed before the Maven Spring boot plugin. 
-                    Both are bound to the pre-integration-test phase, but the Jacoco plugin needs
-                    to set the agent ${jacoco.agent.it.arg} property before Spring uses it in its
-                    jvmArguments configuration.
-                -->
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <mainClass>${start-class}</mainClass>
-                    <jvmArguments>${jacoco.agent.it.arg}</jvmArguments>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>repackage</id>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>${spring.profiles.active}</classifier>
-                            <executable>true</executable>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>pre-integration-test</id>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                        <configuration>
-
-                            <profiles>
-                                <profile>desktop</profile>
-                                <profile>headless</profile>
-                            </profiles>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>post-integration-test</id>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -506,6 +500,27 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <!-- 
+                            It is important that the Jacoco plugin is listed before the Maven Spring boot plugin. 
+                            Both are bound to the pre-integration-test phase, but the Jacoco plugin needs
+                            to set the agent ${jacoco.agent.it.arg} property before Spring uses it in its
+                            jvmArguments configuration.
+                         -->
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>desktop</id>
             <properties>

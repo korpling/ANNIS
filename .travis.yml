@@ -35,7 +35,7 @@ before_script:
   
 script:
   # execute Maven Tests (including integration tests) with enabled code coverage and upload results to SonarCloud
-  - mvn -B verify sonar:sonar -Dsonar.projectKey=korpling_ANNIS
+  - mvn -B -Pcoverage verify sonar:sonar -Dsonar.projectKey=korpling_ANNIS
    # generate the documentation for possible deploy
   - mdbook build docs/user-guide/
   - mdbook build docs/developer-guide/
