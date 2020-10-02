@@ -6,6 +6,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.databind.JsonSerializable.Base;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,25 +20,12 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class AcceptanceTestsIT {
-  private WebDriver driver;
-  JavascriptExecutor js;
-
-  @BeforeEach
-  public void setUp() {
-    driver = new FirefoxDriver();
-    js = (JavascriptExecutor) driver;
-    driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    driver.quit();
-  }
+public class AcceptanceTestsIT extends BaseIntegrationTest {
 
   @Test
   public void aboutWindow() {
     driver.get("http://localhost:5712/");
+    waitForUserInterfaceLoaded();
     driver.manage().window().setSize(new Dimension(1024, 768));
     js.executeScript("window.scrollTo(0,0)");
     driver.findElement(By.id("SearchView:MainToolbar:btAboutAnnis")).click();
@@ -47,7 +36,7 @@ public class AcceptanceTestsIT {
     driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).click();
   }
 
-  @Test
+  // @Test
   public void openSourceWindow() {
     driver.get("http://localhost:5712/");
     driver.manage().window().setSize(new Dimension(1024, 768));
@@ -60,7 +49,7 @@ public class AcceptanceTestsIT {
     driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).click();
   }
 
-  @Test
+  // @Test
   public void tokenSearchPcc2() {
     driver.get("http://localhost:5712/");
     driver.manage().window().setSize(new Dimension(1024, 768));
