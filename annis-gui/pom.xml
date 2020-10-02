@@ -136,6 +136,7 @@
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
                     <argLine>${itArgLine}</argLine>
+                    <forkCount>0</forkCount>
                 </configuration>
             </plugin>
             <plugin>
