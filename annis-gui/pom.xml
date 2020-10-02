@@ -259,6 +259,7 @@
                 </executions>
                 <configuration>
                     <forkedProcessExitTimeoutInSeconds>1</forkedProcessExitTimeoutInSeconds>
+                    <reuseForks>false</reuseForks>
                 </configuration>
             </plugin>
             <plugin>
@@ -352,11 +353,6 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <dependency>
