@@ -74,6 +74,7 @@
                             <configuration>
                                 <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
                                 <propertyName>jacoco.agent.ut.arg</propertyName>
+                                <append>true</append>
                             </configuration>
                         </execution>
                         <execution>
@@ -84,8 +85,6 @@
                             <configuration>
                                 <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
                                 <propertyName>jacoco.agent.it.arg</propertyName>
-                                <jmx>true</jmx>
-                                <dumpOnExit>true</dumpOnExit>
                                 <append>true</append>
                             </configuration>
                         </execution>
