@@ -214,13 +214,11 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         }
 
         if (this.backgroundProcess != null) {
-            long pid = this.backgroundProcess.pid();
             this.backgroundProcess.destroy();
             if (!this.backgroundProcess.waitFor(5, TimeUnit.SECONDS)) {
                 // Destroy the process by force after 5 seconds
                 log.warn(
-                        "GraphANNIS process (PID {}) did not stop after 5 seconds, stopping it forcefully",
-                        pid);
+                        "GraphANNIS process did not stop after 5 seconds, stopping it forcefully");
                 this.backgroundProcess.destroyForcibly();
             } else {
                 log.info("Stopped graphANNIS process");
