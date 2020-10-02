@@ -1,7 +1,3 @@
-language: java
-jdk:
-  - openjdk8
-
 env:
   global:
     - MOZ_HEADLESS=1
@@ -16,9 +12,7 @@ cache:
   directories:
   - $HOME/.m2
 
-git:
-  depth: false
-    
+
 before_script:
   - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
   - mkdir -p $HOME/.cargo/bin
@@ -33,27 +27,40 @@ before_script:
   - annis -c "import pcc2_relANNIS.zip"  $HOME/.annis/v4/
   
   
-script:
-  # execute Maven Tests (including integration tests) with enabled code coverage and upload results to SonarCloud
-  - mvn -B -Pcoverage verify sonar:sonar -Dsonar.projectKey=korpling_ANNIS
-   # generate the documentation for possible deploy
-  - mdbook build docs/user-guide/
-  - mdbook build docs/developer-guide/
-  - mdbook build docs/online-help/
 
-deploy:
-  - provider: script
-    script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
-    on:
-      repo: korpling/ANNIS
-      branch: master
-      tags: true
-      condition: $TRAVIS_OS_NAME = linux
-    skip-cleanup: true
-  - provider: script
-    script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
-    on:
-      repo: korpling/ANNIS
-      branch: feature/travis-deploy-docs
-      condition: $TRAVIS_OS_NAME = linux
-    skip-cleanup: true
+jobs:
+  include:
+    - language: java
+      jdk: openjdk11
+      name: OpenJDK 11 + SonarCloud code analysis
+      git:
+        depth: false
+      script:
+         # execute Maven Tests (including integration tests) with enabled code coverage and upload results to SonarCloud
+        - mvn -B -Pcoverage verify sonar:sonar -Dsonar.projectKey=korpling_ANNIS
+    - language: java
+      jdk: openjdk8
+      name: OpenJDK 8
+      script:
+        # execute Maven Tests
+        - mvn -B verify
+        # generate the documentation for possible deploy
+        - mdbook build docs/user-guide/
+        - mdbook build docs/developer-guide/
+        - mdbook build docs/online-help/
+      deploy:
+        - provider: script
+          script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
+          on:
+            repo: korpling/ANNIS
+            branch: master
+            tags: true
+            condition: $TRAVIS_OS_NAME = linux
+          skip-cleanup: true
+        - provider: script
+          script: bash $TRAVIS_BUILD_DIR/misc/deploy-docs.sh
+          on:
+            repo: korpling/ANNIS
+            branch: feature/travis-deploy-docs
+            condition: $TRAVIS_OS_NAME = linux
+          skip-cleanup: true
