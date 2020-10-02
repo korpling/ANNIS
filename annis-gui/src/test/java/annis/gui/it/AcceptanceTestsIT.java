@@ -4,19 +4,10 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.fasterxml.jackson.databind.JsonSerializable.Base;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -36,9 +27,10 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
     driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).click();
   }
 
-  // @Test
+  @Test
   public void openSourceWindow() {
     driver.get("http://localhost:5712/");
+    waitForUserInterfaceLoaded();
     driver.manage().window().setSize(new Dimension(1024, 768));
     driver.findElement(By.id("SearchView:MainToolbar:btOpenSource")).click();
     js.executeScript("window.scrollTo(0,0)");
@@ -49,9 +41,10 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
     driver.findElement(By.id("HelpUsWindow:VerticalLayout:btClose")).click();
   }
 
-  // @Test
+  @Test
   public void tokenSearchPcc2() {
     driver.get("http://localhost:5712/");
+    waitForUserInterfaceLoaded();
     driver.manage().window().setSize(new Dimension(1024, 768));
     js.executeScript("window.scrollTo(0,0)");
     driver.findElement(By.cssSelector(".CodeMirror-line")).click();
