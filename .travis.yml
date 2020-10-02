@@ -15,7 +15,10 @@ addons:
 cache:
   directories:
   - $HOME/.m2
-  
+
+git:
+  depth: false
+    
 before_script:
   - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
   - mkdir -p $HOME/.cargo/bin
