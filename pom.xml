@@ -164,54 +164,7 @@
 					<stagingProgressTimeoutMinutes>120</stagingProgressTimeoutMinutes>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.6</version>
-				<executions>
-					<execution>
-						<id>aggregate-jacoco-results</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>merge</goal>
-						</goals>
-						<configuration>
-							<fileSets>
-								<fileSet>
-									<directory>annis-gui/target/coverage-reports</directory>
-									<includes>
-										<include>*.exec</include>
-									</includes>
-								</fileSet>
-								<fileSet>
-									<directory>annis-libgui/target/coverage-reports</directory>
-									<includes>
-										<include>*.exec</include>
-									</includes>
-								</fileSet>
-								<fileSet>
-									<directory>annis-widgets/target/coverage-reports</directory>
-									<includes>
-										<include>*.exec</include>
-									</includes>
-								</fileSet>
-							</fileSets>
-						</configuration>
-					</execution>
-					<execution>
-						<id>post-merge-report</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
-
-
 		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>

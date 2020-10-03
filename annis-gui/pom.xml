@@ -89,26 +89,28 @@
                             </configuration>
                         </execution>
                         <execution>
-                            <id>post-integration-test</id>
-                            <phase>post-integration-test</phase>
+                            <id>merge-jacoco-data</id>
                             <goals>
-                                <goal>report</goal>
+                                <goal>merge</goal>
                             </goals>
+                            <phase>post-integration-test</phase>
                             <configuration>
-                                <dataFile>${project.build.directory}/coverage-reports/jacoco-it.exec</dataFile>
-                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-it</outputDirectory>
+                                <fileSets>
+                                    <fileSet>
+                                      <directory>${project.build.directory}/coverage-reports/</directory>
+                                      <includes>
+                                        <include>*.exec</include>
+                                      </includes>
+                                    </fileSet>
+                                  </fileSets>                                  
                             </configuration>
                         </execution>
                         <execution>
-                            <id>post-unit-test</id>
-                            <phase>prepare-package</phase>
+                            <id>report</id>
+                            <phase>verify</phase>
                             <goals>
                                 <goal>report</goal>
                             </goals>
-                            <configuration>
-                                <dataFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</dataFile>
-                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-ut</outputDirectory>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
