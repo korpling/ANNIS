@@ -197,7 +197,7 @@
                     <style>OBF</style>
                 </configuration>
             </plugin>
-
+            
             <plugin>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-maven-plugin</artifactId>
@@ -365,6 +365,12 @@
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-push</artifactId>
+            <version>${vaadin.version}</version>
         </dependency>
 
         <dependency>
