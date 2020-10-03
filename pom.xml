@@ -179,7 +179,7 @@
 						<configuration>
 							<fileSets>
 								<fileSet>
-									<directory>${project.build.directory}/annis-gui/coverage-reports</directory>
+									<directory>annis-gui/target/coverage-reports</directory>
 									<includes>
 										<include>*.exec</include>
 									</includes>
@@ -187,7 +187,7 @@
 							</fileSets>
 							<fileSets>
 								<fileSet>
-									<directory>${project.build.directory}/annis-libgui/coverage-reports</directory>
+									<directory>annis-libgui/target/coverage-reports</directory>
 									<includes>
 										<include>*.exec</include>
 									</includes>
@@ -195,7 +195,7 @@
 							</fileSets>
 							<fileSets>
 								<fileSet>
-									<directory>${project.build.directory}/annis-widgets/coverage-reports</directory>
+									<directory>annis-widgets/target/coverage-reports</directory>
 									<includes>
 										<include>*.exec</include>
 									</includes>
