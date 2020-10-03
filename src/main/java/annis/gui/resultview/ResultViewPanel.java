@@ -413,7 +413,9 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
         // get the first query result
         SaltProject first = queue.poll();
-        Preconditions.checkState(first != null, "There must be already an element in the queue");
+        if (first == null) {
+            throw new IllegalStateException("There must be already an element in the queue");
+        }
 
         addQueryResult(q, Arrays.asList(first));
     }

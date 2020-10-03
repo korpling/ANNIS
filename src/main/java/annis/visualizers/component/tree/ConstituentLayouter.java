@@ -326,7 +326,9 @@ public class ConstituentLayouter<T extends GraphicsItem> {
     boolean first = true;
 
     List<SNode> leaves = getTokens(options);
-    Preconditions.checkState(leaves.isEmpty() == false, "No terminal nodes found");
+    if (leaves.isEmpty()) {
+      throw new IllegalStateException("No terminal nodes found");
+    }
     GraphicsBackend.Font tokenFont = styler.getFont(leaves.get(0), input);
 
     for (SNode token : leaves) {
