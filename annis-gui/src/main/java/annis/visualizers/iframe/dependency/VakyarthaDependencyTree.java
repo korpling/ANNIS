@@ -308,11 +308,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer {
      * Default behaviour, when mapping is not set correctly or is not set at all.
      */
     if (annoKey == null) {
-      if (n instanceof SToken) {
-        return true;
-      } else {
-        return false;
-      }
+      return n instanceof SToken;
     }
 
 

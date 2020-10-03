@@ -116,10 +116,7 @@ public class VAnnotationGrid extends Composite implements Paintable {
       if (this.column != other.column) {
         return false;
       }
-      if (this.row != other.row) {
-        return false;
-      }
-      return true;
+      return this.row == other.row;
     }
 
     public int getColumn() {

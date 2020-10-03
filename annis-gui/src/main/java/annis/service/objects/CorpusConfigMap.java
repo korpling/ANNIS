@@ -59,7 +59,7 @@ public class CorpusConfigMap implements Serializable {
   }
 
   public boolean isEmpty() {
-    return (corpusConfigs == null) ? true : corpusConfigs.isEmpty();
+    return corpusConfigs == null || corpusConfigs.isEmpty();
   }
 
   public CorpusConfiguration put(String k, CorpusConfiguration corpusConfig) {
