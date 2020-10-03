@@ -17,7 +17,6 @@ public class BaseIntegrationTest {
     @BeforeAll
     public static void setUpClass() {
         driver = new FirefoxDriver();
-        wait = new WebDriverWait(driver, 10);
         driver.manage().window().setSize(new Dimension(1024, 768));
     }
 

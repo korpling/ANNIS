@@ -17,8 +17,6 @@ import annis.gui.QueryController;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
 import annis.libgui.Helper;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
 import com.vaadin.event.dd.acceptcriteria.AcceptAll;
@@ -320,18 +318,14 @@ public class TigerQueryBuilderCanvas extends Panel {
     Collection<String> corpusSelection = controller.getState().getSelectedCorpora();
 
     if (corpusSelection != null) {
-      try {
-        for (String corpus : corpusSelection) {
-          try {
-            for (Annotation anno : api.nodeAnnotations(corpus, false, true)) {
-              result.add(anno.getKey().getName());
-            }
-          } catch (ApiException ex) {
-            log.error("Could not get node annotations for corpus " + corpus, ex);
+      for (String corpus : corpusSelection) {
+        try {
+          for (Annotation anno : api.nodeAnnotations(corpus, false, true)) {
+            result.add(anno.getKey().getName());
           }
+        } catch (ApiException ex) {
+          log.error("Could not get node annotations for corpus " + corpus, ex);
         }
-      } catch (UniformInterfaceException | ClientHandlerException ex) {
-        log.error(null, ex);
       }
     }
     return result;

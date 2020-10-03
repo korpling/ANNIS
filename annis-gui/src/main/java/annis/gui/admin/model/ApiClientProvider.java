@@ -15,7 +15,6 @@
  */
 package annis.gui.admin.model;
 
-import com.sun.jersey.api.client.WebResource;
 import java.io.Serializable;
 import org.corpus_tools.annis.ApiClient;
 

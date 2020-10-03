@@ -20,7 +20,6 @@ import annis.service.objects.OrderBy;
 import annis.service.objects.Visualizer;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.ContentMode;
@@ -224,61 +223,58 @@ public class DocBrowserTable extends Table {
     btn.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
     btn.setIcon(INFO_ICON);
     btn.addClickListener(event -> {
-      try {
 
-        Set<SMetaAnnotation> annos = getDocMetaData(docName);
+      Set<SMetaAnnotation> annos = getDocMetaData(docName);
 
-        /**
-         * Transforms to a list of key value pairs. The values concates the namespace and ordinary
-         * value. Namespaces "NULL" are ignored.
-         */
-        // create datasource and bind it to a table
-        BeanItemContainer<SMetaAnnotation> metaContainer =
-            new BeanItemContainer<>(SMetaAnnotation.class);
-        if (annos != null) {
-          metaContainer.addAll(annos);
-        }
-        metaContainer.sort(new Object[] {"namespace", "name"}, new boolean[] {true, true});
-
-        Table metaTable = new Table();
-        metaTable.setContainerDataSource(metaContainer);
-        metaTable.addGeneratedColumn("genname", (source, itemId, columnId) -> {
-          SMetaAnnotation anno = metaContainer.getItem(itemId).getBean();
-          String qName = anno.getName();
-          if (anno.getNamespace() != null) {
-            qName = anno.getNamespace() + ":" + qName;
-          }
-          Label l = new Label(qName);
-          l.setSizeUndefined();
-          return l;
-        });
-        metaTable.addGeneratedColumn("genvalue", (source, itemId, columnId) -> {
-          SMetaAnnotation anno = metaContainer.getItem(itemId).getBean();
-          Label l = new Label(anno.getValue_STEXT(), ContentMode.HTML);
-          return l;
-        });
-
-        metaTable.setVisibleColumns("genname", "genvalue");
-
-        metaTable.setColumnHeaders(new String[] {"Name", "Value"});
-        metaTable.setSizeFull();
-        metaTable.setColumnWidth("genname", -1);
-        metaTable.setColumnExpandRatio("genvalue", 1.0f);
-        metaTable.addStyleName(ChameleonTheme.TABLE_STRIPED);
-
-        // create and style the extra window for the metadata table
-        Window metaWin = new Window();
-        metaWin.setContent(metaTable);
-        metaWin.setCaption("metadata doc " + docName);
-        metaWin.center();
-        metaWin.setWidth(400, Unit.PIXELS);
-        metaWin.setHeight(400, Unit.PIXELS);
-
-        // paint the window
-        docBrowserPanel.getUI().addWindow(metaWin);
-      } catch (UniformInterfaceException ex) {
-        log.error("can not retrieve metadata for document " + docName, ex);
+      /**
+       * Transforms to a list of key value pairs. The values concates the namespace and ordinary
+       * value. Namespaces "NULL" are ignored.
+       */
+      // create datasource and bind it to a table
+      BeanItemContainer<SMetaAnnotation> metaContainer =
+          new BeanItemContainer<>(SMetaAnnotation.class);
+      if (annos != null) {
+        metaContainer.addAll(annos);
       }
+      metaContainer.sort(new Object[] {"namespace", "name"}, new boolean[] {true, true});
+
+      Table metaTable = new Table();
+      metaTable.setContainerDataSource(metaContainer);
+      metaTable.addGeneratedColumn("genname", (source, itemId, columnId) -> {
+        SMetaAnnotation anno = metaContainer.getItem(itemId).getBean();
+        String qName = anno.getName();
+        if (anno.getNamespace() != null) {
+          qName = anno.getNamespace() + ":" + qName;
+        }
+        Label l = new Label(qName);
+        l.setSizeUndefined();
+        return l;
+      });
+      metaTable.addGeneratedColumn("genvalue", (source, itemId, columnId) -> {
+        SMetaAnnotation anno = metaContainer.getItem(itemId).getBean();
+        Label l = new Label(anno.getValue_STEXT(), ContentMode.HTML);
+        return l;
+      });
+
+      metaTable.setVisibleColumns("genname", "genvalue");
+
+      metaTable.setColumnHeaders(new String[] {"Name", "Value"});
+      metaTable.setSizeFull();
+      metaTable.setColumnWidth("genname", -1);
+      metaTable.setColumnExpandRatio("genvalue", 1.0f);
+      metaTable.addStyleName(ChameleonTheme.TABLE_STRIPED);
+
+      // create and style the extra window for the metadata table
+      Window metaWin = new Window();
+      metaWin.setContent(metaTable);
+      metaWin.setCaption("metadata doc " + docName);
+      metaWin.center();
+      metaWin.setWidth(400, Unit.PIXELS);
+      metaWin.setHeight(400, Unit.PIXELS);
+
+      // paint the window
+      docBrowserPanel.getUI().addWindow(metaWin);
+
 
     });
     return btn;
@@ -350,12 +346,12 @@ public class DocBrowserTable extends Table {
     if (cachedMetaMap == null) {
       // get the metadata for the corpus
       Map<String, Set<SMetaAnnotation>> metaDataMap = new HashMap<>();
-      
+
       // Search for the document node, map it to Salt and return the attached annotations
       List<SMetaAnnotation> annos =
           Helper.getMetaDataDoc(docBrowserPanel.getCorpus(), document, UI.getCurrent());
       metaDataMap.put(document, Collections.unmodifiableSet(new LinkedHashSet<>(annos)));
-      
+
       docMetaDataCache.put(docBrowserPanel.getCorpus(), metaDataMap);
       return metaDataMap.get(document);
 

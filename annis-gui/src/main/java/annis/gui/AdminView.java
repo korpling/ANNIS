@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -71,10 +69,6 @@ public class AdminView extends VerticalLayout
 
     private MainToolbar toolbar;
 
-    private transient WebResource webResource;
-
-    private transient AsyncWebResource asyncWebResource;
-
     private final AnnisUI ui;
 
     private final SecurityContext securityContext;
@@ -118,11 +112,6 @@ public class AdminView extends VerticalLayout
 
     }
 
-    @Override
-    public void attach() {
-    // TODO Auto-generated method stub
-    super.attach();
-    }
 
     @Override
     public void addListener(UIView.Listener listener) {
@@ -196,8 +185,7 @@ public class AdminView extends VerticalLayout
 
     @Override
     public void invalidateClient() {
-        asyncWebResource = null;
-        webResource = null;
+        ui.getSecurityContext().setAuthentication(null);
     }
 
     @Override
