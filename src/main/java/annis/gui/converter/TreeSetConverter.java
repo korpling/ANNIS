@@ -44,8 +44,10 @@ public class TreeSetConverter implements Converter<Object, TreeSet> {
                     result.add((String) item);
                 }
             }
-            Preconditions.checkState(result.size() == ((Collection) value).size(),
-                    "Collection which was used with the TreeSetConverter had duplicate entries.");
+            if(result.size() != ((Collection) value).size()) {
+                throw new IllegalStateException(
+                        "Collection which was used with the TreeSetConverter had duplicate entries.");
+            }
         } else if (value instanceof String) {
             result.add((String) value);
         } else {
