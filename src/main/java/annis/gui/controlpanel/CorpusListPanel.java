@@ -274,8 +274,6 @@ public class CorpusListPanel extends VerticalLayout {
   public void attach() {
     super.attach();
 
-
-
     // Get the initial corpus list, this must become before the binder is set,
     // to make sure any selected value is also an item.
     CorporaApi api = new CorporaApi(Helper.getClient(ui));

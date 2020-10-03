@@ -185,7 +185,7 @@ public class AdminView extends VerticalLayout
 
     @Override
     public void invalidateClient() {
-        ui.getSecurityContext().setAuthentication(null);
+
     }
 
     @Override
