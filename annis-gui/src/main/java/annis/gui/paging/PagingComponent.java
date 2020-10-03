@@ -95,11 +95,7 @@ public class PagingComponent extends Panel implements Button.ClickListener {
     protected boolean isValidValue(String value) {
       try {
         int v = Integer.parseInt(value);
-        if (v > 0) {
-          return true;
-        } else {
-          return false;
-        }
+        return v > 0;
       } catch (Exception ex) {
         return false;
       }
