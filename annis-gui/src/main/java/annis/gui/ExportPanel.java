@@ -394,8 +394,8 @@ public class ExportPanel extends GridLayout {
     // when not longer needed
     tmpOutputFile = currentTmpFile;
     //
-    if (exportError instanceof CacheException | exportError instanceof IllegalStateException
-        | exportError instanceof ClassCastException) {
+    if (exportError instanceof CacheException || exportError instanceof IllegalStateException
+        || exportError instanceof ClassCastException) {
       Notification.show(exportError.getMessage(), Notification.Type.ERROR_MESSAGE);
     } else if (tmpOutputFile == null) {
       Notification.show("Could not create the Exporter",
