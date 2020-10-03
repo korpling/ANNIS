@@ -127,13 +127,6 @@
                                 </fileSets>
                             </configuration>
                         </execution>
-                        <execution>
-                            <id>post-merge-report</id>
-                            <phase>verify</phase>
-                            <goals>
-                                <goal>report</goal>
-                            </goals>
-                        </execution>
                     </executions>
                 </plugin>
                 <plugin>
