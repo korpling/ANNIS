@@ -62,7 +62,7 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
     driver.findElement(By.id("SearchView:ControlPanel:QueryPanel:btShowResult")).click();
     
     // Wait for second result to appear
-    wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(CELL_FEIGENBLATT)));
+    wait.until(driver -> driver.findElement(By.xpath(CELL_FEIGENBLATT)).isDisplayed());
 
     // Test that the cell values have the correct token value
     assertThat(driver.findElement(By.xpath(CELL_FEIGENBLATT)).getText(), is("Feigenblatt"));

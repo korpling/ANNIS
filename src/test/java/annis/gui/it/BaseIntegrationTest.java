@@ -26,6 +26,6 @@ public class BaseIntegrationTest {
     }
 
     protected void waitForUserInterfaceLoaded() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".v-ui")));
+        wait.until(driver -> driver.findElement(By.cssSelector(".v-ui")).isDisplayed());
     }
 }
