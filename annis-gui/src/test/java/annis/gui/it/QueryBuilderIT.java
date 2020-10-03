@@ -4,11 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebElement;
 
 class QueryBuilderIT extends BaseIntegrationTest {
 
     @Test
-    void flatQueryBuilder() {
+    void flatQueryBuilder() throws InterruptedException {
         selectCorpus("pcc2");
 
         driver.findElement(By.cssSelector("#SearchView-ControlPanel-QueryPanel-btShowQueryBuilder"))
@@ -37,16 +39,21 @@ class QueryBuilderIT extends BaseIntegrationTest {
         driver.findElement(lingSequenceLayout).findElement(By.cssSelector(".v-menubar")).click();
         driver.findElements(By.cssSelector(".popupContent .v-menubar-menuitem")).get(5).click();
 
-        driver.findElement(By.cssSelector(
-                "#SearchView-TabSheet-QueryBuilderChooser-VerticalLayout-FlatQueryBuilder-VerticalLayout-language input.v-filterselect-input"))
-                .sendKeys("something");
+        // Insert annotation value
+        WebElement annoValueInput = driver.findElement(By.cssSelector(
+                        "#SearchView-TabSheet-QueryBuilderChooser-VerticalLayout-FlatQueryBuilder-VerticalLayout-language input.v-filterselect-input"));
+        annoValueInput.click();
+        annoValueInput.sendKeys("PP");
+        annoValueInput.click();
+        annoValueInput.sendKeys(Keys.RETURN);
+
 
         driver.findElement(By.cssSelector(
                 "#SearchView-TabSheet-QueryBuilderChooser-VerticalLayout-FlatQueryBuilder-VerticalLayout-HorizontalLayout-btGo"))
                 .click();;
 
         // The query should have been updated
-        assertEquals("PP=/something/",
+        assertEquals("PP=/PP/",
                 driver.findElement(By.cssSelector(".CodeMirror-code pre")).getText());
     }
 }
