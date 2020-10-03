@@ -96,7 +96,7 @@ public class UserGeneratedFrequencyEntry implements Serializable {
 
         result.setReferencedNode(nr);
 
-        if (annotation != null && "tok".equals(annotation)) {
+        if ("tok".equals(annotation)) {
             result.setType(FrequencyTableEntryType.span);
         } else {
             result.setType(FrequencyTableEntryType.annotation);
