@@ -233,6 +233,7 @@ public class CorpusListPanel extends VerticalLayout {
     tblCorpora.setSelectionMode(SelectionMode.MULTI);
     Column<String, String> nameColumn = tblCorpora.addColumn(corpus -> corpus);
     nameColumn.setCaption("Corpus");
+    nameColumn.setId("corpus");
     nameColumn.setExpandRatio(10);
 
     Column<?, ?> infoColumn = tblCorpora.addComponentColumn(corpus -> {
