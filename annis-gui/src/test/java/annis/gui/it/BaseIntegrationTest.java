@@ -2,6 +2,7 @@ package annis.gui.it;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -24,6 +25,12 @@ public class BaseIntegrationTest {
     @AfterAll
     public static void tearDownClass() {
         driver.quit();
+    }
+
+    @BeforeEach
+    public void setUp() {
+        driver.get("http://localhost:5712/");
+        waitForUserInterfaceLoaded();
     }
 
     protected void waitForUserInterfaceLoaded() {

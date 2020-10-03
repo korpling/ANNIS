@@ -17,6 +17,7 @@ package annis.gui.flatquerybuilder;
 import annis.gui.QueryController;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
 import annis.model.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.QueryLanguage;
@@ -404,6 +405,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         Binder<QueryUIState> binder = new Binder<>();
         binder.addValueChangeListener(e -> this.initialize());
         binder.setBean(cp.getState());
+
+        IDGenerator.assignIDForFields(this, language, btInitLanguage, btGo);
     }
 
     @Override

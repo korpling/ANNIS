@@ -15,9 +15,7 @@ public class ExporterIT extends BaseIntegrationTest {
      */
     @Test
     public void exportDownloadButtonEnabled() {
-        driver.get("http://localhost:5712/");
-        waitForUserInterfaceLoaded();
-
+        
         // Prepare query
         selectCorpus("pcc2");
         driver.findElement(By.cssSelector(".CodeMirror-line")).click();

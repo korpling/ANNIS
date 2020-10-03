@@ -17,8 +17,6 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
 
   @Test
   public void aboutWindow() {
-    driver.get("http://localhost:5712/");
-    waitForUserInterfaceLoaded();
     driver.findElement(By.id("SearchView-MainToolbar-btAboutAnnis")).click();
     List<WebElement> elements = driver.findElements(By.id("AboutWindow-VerticalLayout-btClose"));
     assertTrue(elements.size() > 0);
@@ -28,8 +26,6 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
 
   @Test
   public void openSourceWindow() {
-    driver.get("http://localhost:5712/");
-    waitForUserInterfaceLoaded();
     driver.findElement(By.id("SearchView-MainToolbar-btOpenSource")).click();
 
     List<WebElement> elements = driver.findElements(By.id("HelpUsWindow-VerticalLayout-btClose"));
@@ -40,9 +36,6 @@ public class AcceptanceTestsIT extends BaseIntegrationTest {
 
   @Test
   public void tokenSearchPcc2() {
-    driver.get("http://localhost:5712/");
-    waitForUserInterfaceLoaded();
-
     selectCorpus("pcc2");
 
     driver.findElement(By.cssSelector(".CodeMirror-line")).click();

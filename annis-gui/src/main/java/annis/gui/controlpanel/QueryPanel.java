@@ -230,6 +230,7 @@ public class QueryPanel extends GridLayout implements ValueChangeListener {
     private final AnnisUI ui;
 
     private final BeanItemContainer<Query> historyContainer = new BeanItemContainer<>(Query.class);
+    private Button btShowQueryBuilder = new Button("Query<br />Builder");
 
     public QueryPanel(final AnnisUI ui) {
         super(4, 5);
@@ -360,7 +361,6 @@ public class QueryPanel extends GridLayout implements ValueChangeListener {
 
         clipboard.addSuccessListener(() -> Notification.show("Copied AQL to clipboard"));
 
-        Button btShowQueryBuilder = new Button("Query<br />Builder");
         btShowQueryBuilder.setHtmlContentAllowed(true);
         btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_SMALL);
         btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP);
@@ -439,7 +439,8 @@ public class QueryPanel extends GridLayout implements ValueChangeListener {
     @Override
     public void attach() {
         super.attach();
-        IDGenerator.assignIDForFields(QueryPanel.this, btShowResult, btMoreActions);
+        IDGenerator.assignIDForFields(QueryPanel.this, btShowResult, btMoreActions,
+                btShowQueryBuilder);
 
     }
 
