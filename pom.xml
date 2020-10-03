@@ -184,16 +184,12 @@
 										<include>*.exec</include>
 									</includes>
 								</fileSet>
-							</fileSets>
-							<fileSets>
 								<fileSet>
 									<directory>annis-libgui/target/coverage-reports</directory>
 									<includes>
 										<include>*.exec</include>
 									</includes>
 								</fileSet>
-							</fileSets>
-							<fileSets>
 								<fileSet>
 									<directory>annis-widgets/target/coverage-reports</directory>
 									<includes>
