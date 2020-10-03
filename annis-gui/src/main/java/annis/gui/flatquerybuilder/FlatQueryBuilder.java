@@ -402,9 +402,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         super.attach();
 
         Binder<QueryUIState> binder = new Binder<>();
-        binder.addValueChangeListener(e -> {
-            this.initialize();
-        });
+        binder.addValueChangeListener(e -> this.initialize());
         binder.setBean(cp.getState());
     }
 
