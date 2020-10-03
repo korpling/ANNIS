@@ -596,7 +596,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava-gwt</artifactId>
-            <version>21.0</version>
+            <version>19.0</version>
         </dependency>
 
         <dependency>
