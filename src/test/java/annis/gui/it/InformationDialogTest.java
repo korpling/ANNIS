@@ -1,5 +1,11 @@
 package annis.gui.it;
 
+import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
+import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
+import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
@@ -13,11 +19,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
-
-import static com.github.mvysny.kaributesting.v8.LocatorJ.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
@@ -51,7 +52,6 @@ public class InformationDialogTest {
 
         // Close the window again
         Button btClose = _get(Button.class, spec -> spec.withCaption("Close"));
-
         assertNotNull(btClose);
         _click(btClose);
 
@@ -59,4 +59,22 @@ public class InformationDialogTest {
         assertEquals(0, _find(Window.class, spec -> spec.withCaption("About ANNIS")).size());
     }
 
+    @Test
+    public void openSourceWindow() {
+        UI.getCurrent().getNavigator().navigateTo("");
+
+        _click(_get(Button.class, spec -> spec.withCaption("Help us make ANNIS better!")));
+
+        // Check that the windows has opened
+        assertNotNull(_get(Window.class, spec -> spec.withCaption("Help us make ANNIS better!")));
+
+        // Close the window again
+        Button btClose = _get(Button.class, spec -> spec.withCaption("Close"));
+        assertNotNull(btClose);
+        _click(btClose);
+
+        // Window should be closed
+        assertEquals(0,
+                _find(Window.class, spec -> spec.withCaption("Help us make ANNIS better!")).size());
+    }
 }
