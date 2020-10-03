@@ -402,6 +402,10 @@ public class EmbeddedVisUI extends CommonUI {
     }
 
     String rawPath = request.getPathInfo();
+    attachToPath(rawPath, request);
+  }
+
+  protected void attachToPath(String rawPath, VaadinRequest request) {
     List<String> splittedPath = new LinkedList<>();
     if (rawPath != null) {
       rawPath = rawPath.substring(URL_PREFIX.length());
