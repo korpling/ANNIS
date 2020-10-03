@@ -125,7 +125,6 @@
                                         </includes>
                                     </fileSet>
                                 </fileSets>
-                                <destFile>${project.build.directory}/coverage-reports/aggregate.exec</destFile>
                             </configuration>
                         </execution>
                         <execution>
@@ -134,10 +133,6 @@
                             <goals>
                                 <goal>report</goal>
                             </goals>
-                            <configuration>
-                                <dataFile>${project.build.directory}/coverage-reports/aggregate.exec</dataFile>
-                                <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregate</outputDirectory>
-                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
