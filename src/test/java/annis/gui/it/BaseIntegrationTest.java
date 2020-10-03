@@ -6,7 +6,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class BaseIntegrationTest {
@@ -18,6 +17,7 @@ public class BaseIntegrationTest {
     public static void setUpClass() {
         driver = new FirefoxDriver();
         driver.manage().window().setSize(new Dimension(1024, 768));
+        wait = new WebDriverWait(driver, 30);
     }
 
     @AfterAll
