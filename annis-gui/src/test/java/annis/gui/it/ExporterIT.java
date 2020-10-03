@@ -1,20 +1,18 @@
 package annis.gui.it;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
-public class ExporterIT extends BaseIntegrationTest {
+class ExporterIT extends BaseIntegrationTest {
 
     /**
      * Execute an example export and check that the download button gets visible at the end of the
      * process.
      */
     @Test
-    public void exportDownloadButtonEnabled() {
+    void exportDownloadButtonEnabled() {
         
         // Prepare query
         selectCorpus("pcc2");

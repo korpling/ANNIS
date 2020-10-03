@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 
-public class QueryBuilderIT extends BaseIntegrationTest {
+class QueryBuilderIT extends BaseIntegrationTest {
 
     @Test
-    public void flatQueryBuilder() {
+    void flatQueryBuilder() {
         selectCorpus("pcc2");
 
         driver.findElement(By.cssSelector("#SearchView-ControlPanel-QueryPanel-btShowQueryBuilder"))
