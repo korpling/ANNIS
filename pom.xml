@@ -99,39 +99,9 @@
                                 <goal>prepare-agent</goal>
                             </goals>
                             <configuration>
-                                <destFile>${project.build.directory}/coverage-reports/jacoco-ut.exec</destFile>
-                                <propertyName>jacoco.agent.ut.arg</propertyName>
-                                <append>true</append>
+                                <propertyName>jacoco.agent.arg</propertyName>
                             </configuration>
-                        </execution>
-                        <execution>
-                            <id>pre-integration-test</id>
-                            <goals>
-                                <goal>prepare-agent-integration</goal>
-                            </goals>
-                            <configuration>
-                                <destFile>${project.build.directory}/coverage-reports/jacoco-it.exec</destFile>
-                                <propertyName>jacoco.agent.it.arg</propertyName>
-                                <append>true</append>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>merge-jacoco-data</id>
-                            <goals>
-                                <goal>merge</goal>
-                            </goals>
-                            <phase>post-integration-test</phase>
-                            <configuration>
-                                <fileSets>
-                                    <fileSet>
-                                        <directory>${project.build.directory}/coverage-reports/</directory>
-                                        <includes>
-                                            <include>*.exec</include>
-                                        </includes>
-                                    </fileSet>
-                                </fileSets>
-                            </configuration>
-                        </execution>
+                        </execution>                        
                         <execution>
                             <id>report</id>
                             <phase>verify</phase>
@@ -146,7 +116,6 @@
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <configuration>
                         <mainClass>${start-class}</mainClass>
-                        <jvmArguments>${jacoco.agent.it.arg}</jvmArguments>
                     </configuration>
                     <executions>
                         <execution>
@@ -158,25 +127,6 @@
                                 <classifier>${spring.profiles.active}</classifier>
                                 <executable>true</executable>
                             </configuration>
-                        </execution>
-                        <execution>
-                            <id>pre-integration-test</id>
-                            <goals>
-                                <goal>start</goal>
-                            </goals>
-                            <configuration>
-
-                                <profiles>
-                                    <profile>desktop</profile>
-                                    <profile>headless</profile>
-                                </profiles>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>post-integration-test</id>
-                            <goals>
-                                <goal>stop</goal>
-                            </goals>
                         </execution>
                     </executions>
                 </plugin>
@@ -243,23 +193,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                    <argLine>${jacoco.agent.ut.arg}</argLine>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <forkedProcessExitTimeoutInSeconds>1</forkedProcessExitTimeoutInSeconds>
-                    <reuseForks>false</reuseForks>
+                    <argLine>${jacoco.agent.arg}</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -654,18 +588,8 @@
             <build>
                 <plugins>
                     <plugin>
-                        <!-- 
-                            It is important that the Jacoco plugin is listed before the Maven Spring boot plugin. 
-                            Both are bound to the pre-integration-test phase, but the Jacoco plugin needs
-                            to set the agent ${jacoco.agent.it.arg} property before Spring uses it in its
-                            jvmArguments configuration.
-                         -->
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.springframework.boot</groupId>
-                        <artifactId>spring-boot-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
