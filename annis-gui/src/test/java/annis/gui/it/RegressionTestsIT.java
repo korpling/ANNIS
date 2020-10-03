@@ -18,7 +18,7 @@ public class RegressionTestsIT extends BaseIntegrationTest {
     waitForUserInterfaceLoaded();
 
     assertThat(
-        driver.findElement(By.xpath("//div[@id=\'VerticalLayout:Link\']/a/span[2]")).getText(),
+        driver.findElement(By.xpath("//div[@id=\'VerticalLayout-Link\']/a/span[2]")).getText(),
         is("Show in ANNIS search interface"));
   }
 }

@@ -29,4 +29,18 @@ public class BaseIntegrationTest {
     protected void waitForUserInterfaceLoaded() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".v-ui")));
     }
+
+    protected void selectCorpus(String corpusName) {
+        // Filter for the corpus name in case the corpus list has too many entries and does not it
+        // show yet
+        driver.findElement(By.id("SearchView-ControlPanel-TabSheet-CorpusListPanel-txtFilter"))
+                .click();
+        driver.findElement(By.id("SearchView-ControlPanel-TabSheet-CorpusListPanel-txtFilter"))
+                .sendKeys(corpusName);
+
+        // Explicitly select the corpus by clicking it in the list
+        driver.findElement(By.xpath(
+                "//div[@id=\'SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora\']/div[3]/table/tbody/tr/td/span/input"))
+                .click();
+    }
 }
