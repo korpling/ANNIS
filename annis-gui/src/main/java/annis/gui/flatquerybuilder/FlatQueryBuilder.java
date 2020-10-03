@@ -2,17 +2,15 @@
 /*
  * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui.flatquerybuilder;
 
@@ -52,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 /*
  * @author martin klotz (martin.klotz@hu-berlin.de)
+ * 
  * @author tom ruette (tom.ruette@hu-berlin.de)
  */
 public class FlatQueryBuilder extends Panel implements Button.ClickListener {
@@ -196,8 +195,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
 
     private class Relation
     /*
-     * Problems: if an operator is used, which is not in the EdgeBoxe's list the
-     * programm will crash. Right now. I'm gonna fix this.
+     * Problems: if an operator is used, which is not in the EdgeBoxe's list the programm will
+     * crash. Right now. I'm gonna fix this.
      * 
      */
     {
@@ -216,7 +215,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
             char c = in.charAt(1);
             in = in.replace(" ", "");
 
-            while ((c != '.') & (c != '>') & (c != '_') & (c != '#') & (c != '-') & (c != '$') & (c != '=')) {
+            while ((c != '.') && (c != '>') && (c != '_') && (c != '#') && (c != '-') && (c != '$')
+                    && (c != '=')) {
                 o1str.append(c);
                 i++;
                 c = in.charAt(i);
@@ -254,7 +254,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         }
 
         public boolean contains(int a) {
-            return ((o1 == a) | (o2 == a));
+            return ((o1 == a) || (o2 == a));
         }
 
         public int getFirst() {
@@ -306,11 +306,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
     private static final long serialVersionUID = -1659782316940380300L;
     private static final Logger log = LoggerFactory.getLogger(FlatQueryBuilder.class);
 
-    private static final String[] REGEX_CHARACTERS = { "\\", "+", ".", "[", "*", "^", "$", "|", "?", "(", ")" };
+    private static final String[] REGEX_CHARACTERS =
+            {"\\", "+", ".", "[", "*", "^", "$", "|", "?", "(", ")"};
     private static final String BUTTON_GO_LABEL = "Create AQL Query";
     private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
     private static final String BUTTON_INV_LABEL = "Refresh Query Builder";
-    private static final String NO_CORPORA_WARNING = "No corpora selected, please select " + "at least one corpus.";
+    private static final String NO_CORPORA_WARNING =
+            "No corpora selected, please select " + "at least one corpus.";
     private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
     private static final String ADD_LING_PARAM = "Add";
     private static final String ADD_SPAN_PARAM = "Add";
@@ -319,9 +321,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
     private static final String INFO_INIT_LANG = "In this part of the Query Builder, "
             + "blocks of the linguistic query can be constructed from left to right.";
     private static final String INFO_INIT_SPAN = "This part of the Query Builder "
-            + "allows you to define a span annotation within which the above query blocks " + "are confined.";
-    private static final String INFO_INIT_META = "Here, you can constrain the linguistic "
-            + "query by selecting meta levels.";
+            + "allows you to define a span annotation within which the above query blocks "
+            + "are confined.";
+    private static final String INFO_INIT_META =
+            "Here, you can constrain the linguistic " + "query by selecting meta levels.";
     private static final String INFO_FILTER = "When searching in the fields, the "
             + "hits are sorted and filtered according to different mechanisms. Please "
             + "choose a filtering mechanism here.";
@@ -397,9 +400,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
     @Override
     public void attach() {
         super.attach();
-        
+
         Binder<QueryUIState> binder = new Binder<>();
-        binder.addValueChangeListener(e -> {this.initialize();});
+        binder.addValueChangeListener(e -> {
+            this.initialize();
+        });
         binder.setBean(cp.getState());
     }
 
@@ -541,7 +546,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                 addQuery = "\n& " + spb.getAttribute() + " = \"" + spb.getValue() + "\"";
             }
             if (spb.isRegEx()) {
-                addQuery = "\n& " + spb.getAttribute() + " = /" + spb.getValue().replace("/", "\\x2F") + "/";
+                addQuery = "\n& " + spb.getAttribute() + " = /"
+                        + spb.getValue().replace("/", "\\x2F") + "/";
             }
             if (spb.getValue().isEmpty()) {
                 addQuery = "\n&" + spb.getAttribute();
@@ -558,7 +564,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         while (itMetaBoxes.hasNext()) {
             metaQuery.append(getMetaQueryFragment(itMetaBoxes.next()));
         }
-        String fullQuery = (ql.toString() + edgeQuery.toString() + sentenceQuery.toString() + metaQuery.toString());
+        String fullQuery = (ql.toString() + edgeQuery.toString() + sentenceQuery.toString()
+                + metaQuery.toString());
         if (fullQuery.length() < 3) {
             return "";
         }
@@ -573,17 +580,17 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         // get current corpus selection
         Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
         try {
-          List<Annotation> atts = new LinkedList<>();
-          for (String corpus : corpusSelection) {
-            atts.addAll(api.nodeAnnotations(corpus, true, false));
-          }
-          for (Annotation a : atts) {
-            if (a.getKey().getName().equals(meta)) {
-              result.add(a.getVal());
+            List<Annotation> atts = new LinkedList<>();
+            for (String corpus : corpusSelection) {
+                atts.addAll(api.nodeAnnotations(corpus, true, false));
             }
-          }
+            for (Annotation a : atts) {
+                if (a.getKey().getName().equals(meta)) {
+                    result.add(a.getVal());
+                }
+            }
         } catch (ApiException ex) {
-          log.error(null, ex);
+            log.error(null, ex);
         }
 
         return result;
@@ -595,14 +602,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
         CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
         try {
-          List<AnnisAttribute> atts = new LinkedList<>();
-          for (String corpus : corpusSelection) {
-            for (Annotation a : api.nodeAnnotations(corpus, false, false)) {
-              result.add(a.getKey().getName());
+            List<AnnisAttribute> atts = new LinkedList<>();
+            for (String corpus : corpusSelection) {
+                for (Annotation a : api.nodeAnnotations(corpus, false, false)) {
+                    result.add(a.getKey().getName());
+                }
             }
-          }
         } catch (ApiException ex) {
-          log.error(null, ex);
+            log.error(null, ex);
         }
         result.add("tok");
         return result;
@@ -613,14 +620,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         // get current corpus selection
         Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
         try {
-          for (String corpus : corpusSelection) {
-            for(AnnoKey key : Helper.getMetaAnnotationNames(corpus, UI.getCurrent())) {
-              result.add(key.getName());
+            for (String corpus : corpusSelection) {
+                for (AnnoKey key : Helper.getMetaAnnotationNames(corpus, UI.getCurrent())) {
+                    result.add(key.getName());
+                }
             }
-          }
 
         } catch (ApiException ex) {
-          log.error(null, ex);
+            log.error(null, ex);
         }
 
         return result;
@@ -821,19 +828,18 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         getContent().setHeight("-1px");
     }
 
-    public void loadQuery() throws UnknownLevelException, EqualityConstraintException, MultipleAssignmentException,
-            InvalidCharacterSequenceException, EmptyReferenceException
+    public void loadQuery() throws UnknownLevelException, EqualityConstraintException,
+            MultipleAssignmentException, InvalidCharacterSequenceException, EmptyReferenceException
     /*
-     * this method is called by btInverse When the query has changed in the
-     * textfield, the query represented by the query builder is not equal to the one
-     * delivered by the text field
+     * this method is called by btInverse When the query has changed in the textfield, the query
+     * represented by the query builder is not equal to the one delivered by the text field
      */
     {
         /* get clean query from control panel text field */
         String tq = cp.getState().getAql().getValue().replace("\n", " ").replace("\r", "");
         // TODO VALIDATE QUERY: (NOT SUFFICIENT YET)
         boolean valid = (!tq.equals(""));
-        if (!(query.equals(tq)) & valid) {
+        if (!(query.equals(tq)) && valid) {
             // PROBLEM: LINE BREAKS (simple without anything else)
             try {
 
@@ -857,8 +863,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                 for (int i = 0; i < tq.length(); i++) {
                     // improve this Algorithm (compare to constraint)
                     char c = tq.charAt(i);
-                    if ((c != '&') & (i != tq.length() - 1)) {
-                        if (!((tempCon.length() == 0) & (c == ' '))) // avoids, that a constraint starts with a space
+                    if ((c != '&') && (i != tq.length() - 1)) {
+                        if (!((tempCon.length() == 0) && (c == ' '))) // avoids, that a constraint
+                                                                      // starts with a space
                         {
                             tempCon += c;
                         }
@@ -875,7 +882,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                                 eRelations.add(r);
                             } else if (r.getType() == RelationType.PRECEDENCE) {
                                 pRelations.add(r);
-                            } else if ((r.getType() == RelationType.INCLUSION) & (!inclusionCheck)) {
+                            } else if ((r.getType() == RelationType.INCLUSION)
+                                    && (!inclusionCheck)) {
                                 inclusion = r;
                                 if (constraints.containsKey(r.getFirst())) {
                                     conInclusion = constraints.get(r.getFirst());
@@ -883,7 +891,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                                 }
                                 inclusionCheck = true;
                             }
-                            int newMax = (r.getFirst() > r.getSecond()) ? r.getFirst() : r.getSecond();
+                            int newMax =
+                                    (r.getFirst() > r.getSecond()) ? r.getFirst() : r.getSecond();
                             maxId = (maxId < newMax) ? newMax : maxId;
                         } else {
                             constraints.put(count++, new Constraint(tempCon));
@@ -905,7 +914,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                     Constraint con1 = constraints.get(rel.getFirst());
                     Constraint con2 = constraints.get(rel.getSecond());
                     if (con1.getLevel().equals(con2.getLevel())) {
-                        throw new MultipleAssignmentException(con1.toString() + " <-> " + con2.toString());
+                        throw new MultipleAssignmentException(
+                                con1.toString() + " <-> " + con2.toString());
                     }
                 }
 
@@ -920,11 +930,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                         // is that a good idea? YES
                     }
                     if (!indexedVnodes.containsKey(e.getKey())) {
-                        vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(), con.isNegative());
+                        vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(),
+                                con.isNegative());
                         if (con.isRegEx()) {
                             SearchBox sb = vn.getSearchBoxes().iterator().next();
                             /* CHECK FIRST IF WE REALLY HAVE A MULTIPLE VALUE EXPRESSION */
-                            Collection<String> mvalue = splitMultipleValueExpression(con.getValue());
+                            Collection<String> mvalue =
+                                    splitMultipleValueExpression(con.getValue());
                             if (mvalue.size() == 1) {
                                 sb.setValue(mvalue.iterator().next());
                             } else {
@@ -940,9 +952,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                             if (!indexedVnodes.containsKey(b)) {
                                 indexedVnodes.put(b, null);
                                 Constraint bcon = constraints.get(b);
-                                SearchBox sb = new SearchBox(bcon.getLevel(), this, vn, bcon.isRegEx(),
-                                        bcon.isNegative());
-                                Collection<String> values = splitMultipleValueExpression(bcon.getValue());
+                                SearchBox sb = new SearchBox(bcon.getLevel(), this, vn,
+                                        bcon.isRegEx(), bcon.isNegative());
+                                Collection<String> values =
+                                        splitMultipleValueExpression(bcon.getValue());
                                 if (values.size() > 1) {
                                     sb.setValue(values);
                                 } else {
@@ -981,7 +994,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                     if (!indexedVnodes.isEmpty()) {
                         first = indexedVnodes.values().iterator().next();
                     }
-                } else if ((smP != 0) & (smE != 0)) {
+                } else if ((smP != 0) && (smE != 0)) {
                     first = indexedVnodes.get(Math.min(smE, smP));
                 } else {
                     // one value is zero
@@ -1013,7 +1026,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                 // build MetaBoxes
                 for (Constraint mc : metaConstraints) {
                     if (mc.isRegEx()) {
-                        Collection<String> values = splitMultipleValueExpression(unescape(unescapeSlQ(mc.getValue())));
+                        Collection<String> values =
+                                splitMultipleValueExpression(unescape(unescapeSlQ(mc.getValue())));
                         MetaBox mb = new MetaBox(mc.getLevel(), this);
                         mb.setValue(values);
                         mboxes.add(mb);
@@ -1050,7 +1064,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         List<MenuBar.MenuItem> items = addMenuMeta.getItems().get(0).getChildren();
         boolean found = false;
         String metalevel = v.getMetaDatum();
-        for (int i = 0; (i < items.size()) & !found; i++) {
+        for (int i = 0; (i < items.size()) && !found; i++) {
             MenuBar.MenuItem itm = items.get(i);
             if (itm.getText().equals(metalevel)) {
                 itm.setVisible(true);
@@ -1084,7 +1098,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
             eb = itEboxes.next();
         }
 
-        if ((eb == null) & (itEboxes.hasNext())) {
+        if ((eb == null) && (itEboxes.hasNext())) {
             eb = itEboxes.next();
         }
 
@@ -1124,7 +1138,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                     }
                     i++;
                 }
-                values.add(unescapeSlQ(s.substring(1, i - 1))); // in respect to removal of parentheses
+                values.add(unescapeSlQ(s.substring(1, i - 1))); // in respect to removal of
+                                                                // parentheses
                 s = s.substring(i);
             }
         }
@@ -1143,7 +1158,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
             char c0 = s.charAt(i - 1);
             char c1 = s.charAt(i);
             for (int j = 0; j < REGEX_CHARACTERS.length; j++) {
-                if ((c1 == REGEX_CHARACTERS[j].charAt(0)) & (c0 == '\\')) {
+                if ((c1 == REGEX_CHARACTERS[j].charAt(0)) && (c0 == '\\')) {
                     s = s.substring(0, i - 1) + s.substring(i);
                     break;
                 }
