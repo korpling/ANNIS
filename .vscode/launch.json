@@ -10,7 +10,7 @@
       "request": "launch",
       "projectName": "annis-gui",
       "mainClass": "annis.gui.AnnisUiApplication",
-      "cwd": "${workspaceFolder}/annis-gui",
+      "cwd": "${workspaceFolder}",
       "preLaunchTask": "build",
     },
     {
@@ -19,7 +19,7 @@
       "request": "launch",
       "projectName": "annis-gui",
       "mainClass": "annis.gui.AnnisUiApplication",
-      "cwd": "${workspaceFolder}/annis-gui",
+      "cwd": "${workspaceFolder}",
       "env": {
         "spring_profiles_active": "desktop"
       },
