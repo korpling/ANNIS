@@ -52,7 +52,6 @@ import com.google.common.collect.Range;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
-import com.sun.jersey.api.client.Client;
 import com.vaadin.server.JsonCodec;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
@@ -300,8 +299,6 @@ public class Helper {
   public final static String CORPUS_FONT = "corpus-font";
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(Helper.class);
-
-  private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<>();
 
   private static final String ERROR_MESSAGE_CORPUS_PROPS_HEADER =
       "Corpus properties does not exist";

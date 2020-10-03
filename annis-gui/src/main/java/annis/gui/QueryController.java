@@ -27,7 +27,6 @@ import java.util.concurrent.Future;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.FontAwesome;
@@ -608,38 +607,34 @@ public class QueryController implements Serializable {
 
     } else {
       // validate query
-      try {
-        UI ui = UI.getCurrent();
-        Background.runWithCallback(() -> {
-          SearchApi api = new SearchApi(Helper.getClient(ui));
-          return api.nodeDescriptions(query, org.corpus_tools.annis.api.model.QueryLanguage.AQL);
-        }, new FutureCallback<List<QueryAttributeDescription>>() {
+      UI ui = UI.getCurrent();
+      Background.runWithCallback(() -> {
+        SearchApi api = new SearchApi(Helper.getClient(ui));
+        return api.nodeDescriptions(query, org.corpus_tools.annis.api.model.QueryLanguage.AQL);
+      }, new FutureCallback<List<QueryAttributeDescription>>() {
 
-          @Override
-          public void onSuccess(List<QueryAttributeDescription> nodes) {
-            qp.setNodes(nodes);
+        @Override
+        public void onSuccess(List<QueryAttributeDescription> nodes) {
+          qp.setNodes(nodes);
 
-            if (state.getSelectedCorpora() == null || state.getSelectedCorpora().isEmpty()) {
-              qp.setStatus("Please select a corpus from the list below, then click on \"Search\".");
-            } else {
-              qp.setStatus("Valid query, click on \"Search\" to start searching.");
-            }
-
+          if (state.getSelectedCorpora() == null || state.getSelectedCorpora().isEmpty()) {
+            qp.setStatus("Please select a corpus from the list below, then click on \"Search\".");
+          } else {
+            qp.setStatus("Valid query, click on \"Search\" to start searching.");
           }
 
-          @Override
-          public void onFailure(Throwable t) {
-            if (t instanceof ApiException) {
-              reportServiceException((ApiException) t, false);
-            }
+        }
+
+        @Override
+        public void onFailure(Throwable t) {
+          if (t instanceof ApiException) {
+            reportServiceException((ApiException) t, false);
           }
+        }
 
-        });
+      });
 
-      } catch (ClientHandlerException ex) {
-        log.error("Could not connect to web service", ex);
-        ExceptionDialog.show(ex, "Could not connect to web service", UI.getCurrent());
-      }
+
     }
   }
 

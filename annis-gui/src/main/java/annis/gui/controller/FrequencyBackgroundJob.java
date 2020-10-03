@@ -17,7 +17,6 @@ import annis.gui.QueryController;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.libgui.Helper;
 import annis.service.objects.FrequencyTableEntry;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.vaadin.ui.UI;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -95,8 +94,6 @@ public class FrequencyBackgroundJob implements Callable<List<FrequencyTableRow>>
       result = api.frequency(frequencyQuery);
     } catch (final ApiException ex) {
       ui.access(() -> queryController.reportServiceException(ex, true));
-    } catch (ClientHandlerException ex) {
-      log.error("could not execute REST call to query frequency", ex);
     }
     return result;
   }

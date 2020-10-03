@@ -31,8 +31,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
@@ -384,20 +382,6 @@ public class EmbeddedVisUI extends CommonUI {
 
     } catch (URISyntaxException ex) {
       displayMessage("Invalid URL", "The provided URL is malformed:<br />" + ex.getMessage());
-    } catch (UniformInterfaceException ex) {
-      if (ex.getResponse().getStatus() == HttpStatus.FORBIDDEN.value()) {
-        displayMessage("Corpus access forbidden",
-            "You are not allowed to access this corpus. "
-                + "Please login at the <a target=\"_blank\" href=\""
-                + Helper.getContext(UI.getCurrent())
-                + "\">main application</a> first and then reload this page.");
-      } else {
-        displayMessage("Service error", ex.getMessage());
-      }
-    } catch (ClientHandlerException ex) {
-      displayMessage(
-          "Could not generate the visualization because the ANNIS service reported an error.",
-          ex.getMessage());
     } catch (Throwable ex) {
       displayMessage("Could not generate the visualization.",
           ex.getMessage() == null
@@ -476,19 +460,14 @@ public class EmbeddedVisUI extends CommonUI {
       visConfig.setVisType("htmldoc");
 
       // create input
-      try {
-        input = DocBrowserController.createInput(corpus, docPath, visConfig, null,
-            visualizer.isUsingRawText(), EmbeddedVisUI.this);
-        // create components, put in a panel
-        Panel viszr = visualizer.createComponent(input, null);
+      input = DocBrowserController.createInput(corpus, docPath, visConfig, null,
+          visualizer.isUsingRawText(), EmbeddedVisUI.this);
+      // create components, put in a panel
+      Panel viszr = visualizer.createComponent(input, null);
 
-        // Set the panel as the content of the UI
-        setContent(viszr);
-      } catch (UniformInterfaceException ex) {
-        displayMessage("Could not query document", "error was \"" + ex.getMessage()
-            + "\" (detailed error is available in the server log-files)");
-        log.error("Could not get document for embedded visualizer", ex);
-      }
+      // Set the panel as the content of the UI
+      setContent(viszr);
+
 
     } else {
       displayMessage("Missing required argument for visualizer \"htmldoc\"",
