@@ -664,9 +664,15 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
     private void initialize() {
         // try to remove all existing menus
         try {
+          if (addMenu != null) {
             language.removeComponent(addMenu);
+          }
+          if (addMenuSpan != null) {
             span.removeComponent(addMenuSpan);
+          }
+          if (addMenuMeta != null) {
             meta.removeComponent(addMenuMeta);
+          }
         } catch (Exception e) {
             log.error(null, e);
         }
