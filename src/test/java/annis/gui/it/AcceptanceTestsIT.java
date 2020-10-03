@@ -8,24 +8,13 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class AcceptanceTestsIT extends BaseIntegrationTest {
 
   private static final String CELL_FEIGENBLATT =
       "//div[@id=\'SearchView:TabSheet:ResultViewPanel:Panel:resultLayout:SingleResultPanel.1']/div[2]/div/div[2]/div/div/table/tbody/tr/td[1]";
 
-  @Test
-  public void aboutWindow() {
-    driver.get("http://localhost:5712/");
-    waitForUserInterfaceLoaded();
-    driver.findElement(By.id("SearchView:MainToolbar:btAboutAnnis")).click();
-    List<WebElement> elements = driver.findElements(By.id("AboutWindow:VerticalLayout:btClose"));
-    assertTrue(elements.size() > 0);
-
-    driver.findElement(By.id("AboutWindow:VerticalLayout:btClose")).click();
-  }
-
+  
   @Test
   public void openSourceWindow() {
     driver.get("http://localhost:5712/");
