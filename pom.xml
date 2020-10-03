@@ -428,6 +428,13 @@
             <groupId>org.corpus-tools</groupId>
             <artifactId>salt-api</artifactId>
             <version>3.4.2</version>
+            <exclusions>
+                <!-- Salt uses non-GWT version of Guava, which will fail with our widgetset -->
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -596,7 +603,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava-gwt</artifactId>
-            <version>19.0</version>
+            <version>20.0</version>
         </dependency>
 
         <dependency>
