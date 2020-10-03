@@ -17,7 +17,7 @@
     <set-configuration-property name="devModeRedirectEnabled" value="true" />
         
 
-    <inherits name="com.vaadin.v7.Vaadin7WidgetSet" />
+    
 
     <inherits name="com.vaadin.DefaultWidgetSet" />
 </module>
