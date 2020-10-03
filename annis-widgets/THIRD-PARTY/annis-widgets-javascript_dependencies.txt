@@ -1,3 +1,0 @@
-(MIT License) jQuery (http://jquery.com)
-(MIT License) html2canvas 0.4.0 (http://html2canvas.hertzen.com)
-(MIT License) MediaElement.js (http://mediaelementjs.com/)

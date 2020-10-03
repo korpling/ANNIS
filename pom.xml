@@ -242,8 +242,6 @@
 	</profiles>
 	<modules>
 		<module>annis-gui</module>
-		<module>annis-widgets</module>
-		<module>annis-libgui</module>
 		<module>annis-rest-client</module>
 	</modules>
 </project>
