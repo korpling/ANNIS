@@ -66,7 +66,7 @@ import annis.libgui.visualizers.VisualizerPlugin;
 @Theme("annis")
 @Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
 @SpringUI(path = "/*")
-@Push(value = PushMode.AUTOMATIC, transport = Transport.WEBSOCKET_XHR)
+@Push(value = PushMode.AUTOMATIC)
 public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListener {
 
   private static final long serialVersionUID = 3022711576267350005L;
@@ -109,7 +109,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired(required = false)
   private OAuth2ClientProperties oauth2Clients;
 
-  private final SecurityContext securityContext;
+  private SecurityContext securityContext;
 
   /**
    * A re-usable toolbar for different views.
@@ -119,7 +119,6 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   public AnnisUI() {
     super("");
     initTransients();
-    this.securityContext = SecurityContextHolder.getContext();
   }
 
   @Override
@@ -257,7 +256,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     if(desktopUser.isPresent()) {
       // Login the provided desktop user
       UsernamePasswordAuthenticationToken token = desktopUser.get();
-      SecurityContextHolder.getContext().setAuthentication(token);
+      getSecurityContext().setAuthentication(token);
 
       getToolbar().onLogin();
     }
@@ -317,6 +316,9 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   }
 
   public SecurityContext getSecurityContext() {
+    if (this.securityContext == null) {
+      this.securityContext = SecurityContextHolder.getContext();
+    }
     return securityContext;
   }
 
