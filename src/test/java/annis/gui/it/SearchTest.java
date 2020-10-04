@@ -68,8 +68,7 @@ class SearchTest {
         _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
         _click(_get(Button.class, spec -> spec.withCaption("Search")));
 
-        awaitCondition(30, () -> !_find(SingleResultPanel.class).isEmpty());
-
+        awaitCondition(60, () -> !_find(SingleResultPanel.class).isEmpty());
 
         // Test that the cell values have the correct token value
         SingleResultPanel secondResult = _find(SingleResultPanel.class).get(0);

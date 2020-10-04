@@ -62,7 +62,7 @@ class ExportPanelTest {
     // Click on "Perform Export" button, wait until export is finished and download button is
     // enabled
     _click(_get(panel, Button.class, spec -> spec.withCaption("Perform Export")));
-    TestHelper.awaitCondition(60, downloadButton::isEnabled);
+    TestHelper.awaitCondition(30, downloadButton::isEnabled);
 
   }
 
