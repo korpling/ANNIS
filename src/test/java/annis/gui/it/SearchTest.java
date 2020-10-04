@@ -74,7 +74,7 @@ public class SearchTest {
         // Wait for the first result to appear
         int tries = 0;
         while (tries++ < 20 && _find(SingleResultPanel.class).isEmpty()) {
-            Thread.sleep(250);
+            Thread.sleep(500);
             MockVaadin.INSTANCE.runUIQueue(true);
         }
 
