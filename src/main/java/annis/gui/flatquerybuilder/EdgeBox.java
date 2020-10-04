@@ -65,7 +65,7 @@ public class EdgeBox extends Panel {
                 String value = edge.getValue().toString(); // <--- CATCH NullPointerException HERE!
                 if (!value.equals("")) {
                     boolean valid = validOperator(value);
-                    if (!EO.containsKey(value) & valid) {
+                    if (!EO.containsKey(value) && valid) {
                         String caption = value + UD_EO_DESCRIPTION;
                         EO.put(value, caption);
                         edge.setItemCaption(value, caption);
@@ -86,7 +86,8 @@ public class EdgeBox extends Panel {
     }
 
     public String getValue() {
-        return edge.getValue().toString();
+      Object value = edge.getValue();
+      return value == null ? null : value.toString();
     }
 
     private void initEOs() {
@@ -98,7 +99,7 @@ public class EdgeBox extends Panel {
 
     public void setValue(String value) {
         boolean valid = validOperator(value);
-        if (!EO.containsKey(value) & valid) {
+        if (!EO.containsKey(value) && valid) {
             String caption = value + UD_EO_DESCRIPTION;
             EO.put(value, caption);
             edge.addItem(value);

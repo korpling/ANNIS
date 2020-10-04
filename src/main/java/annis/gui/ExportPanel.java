@@ -17,6 +17,7 @@ import annis.gui.components.HelpButton;
 import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.converter.CommaSeperatedStringConverterList;
 import annis.gui.objects.QueryUIState;
+import annis.libgui.IDGenerator;
 import annis.libgui.exporter.ExporterPlugin;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
@@ -356,6 +357,7 @@ public class ExportPanel extends GridLayout {
       cbExporter.setValue(exporterClassContainer.getIdByIndex(0));
     }
 
+    IDGenerator.assignIDForFields(this, cbExporter, btDownload, btExport, txtAnnotationKeys,txtParameters);
   }
 
   @Override
@@ -394,8 +396,8 @@ public class ExportPanel extends GridLayout {
     // when not longer needed
     tmpOutputFile = currentTmpFile;
     //
-    if (exportError instanceof CacheException | exportError instanceof IllegalStateException
-        | exportError instanceof ClassCastException) {
+    if (exportError instanceof CacheException || exportError instanceof IllegalStateException
+        || exportError instanceof ClassCastException) {
       Notification.show(exportError.getMessage(), Notification.Type.ERROR_MESSAGE);
     } else if (tmpOutputFile == null) {
       Notification.show("Could not create the Exporter",

@@ -15,6 +15,7 @@ package annis.gui.querybuilder;
 
 import annis.gui.AnnisUI;
 import annis.gui.QueryController;
+import annis.libgui.IDGenerator;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
@@ -79,6 +80,12 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     if (ui.getInstanceConfig().getDefaultQueryBuilder() != null) {
       cbChooseBuilder.setValue(short2caption.get(ui.getInstanceConfig().getDefaultQueryBuilder()));
     }
+  }
+
+  @Override
+  public void attach() {
+    super.attach();
+    IDGenerator.assignIDForFields(this, cbChooseBuilder);
   }
 
   public Component getQueryBuilder() {

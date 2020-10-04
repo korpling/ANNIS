@@ -1,23 +1,18 @@
 package annis.gui;
 
+import static annis.gui.TestHelper.awaitCondition;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.*;
-
+import annis.SingletonBeanStoreRetrievalStrategy;
 import com.github.mvysny.kaributesting.mockhttp.MockRequest;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.github.mvysny.kaributesting.v8.MockVaadinKt;
 import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
-
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
-
-import annis.SingletonBeanStoreRetrievalStrategy;
 
 @SpringBootTest
 @ActiveProfiles("desktop")
@@ -62,15 +55,9 @@ class EmbeddedVisTest {
                 "http://localhost:5712/#_q=dG9r&ql=aql&_c=cGNjMg&cl=5&cr=5&s=0&l=10&m=0");
         ui.attachToPath("/embeddedvis/grid", VaadinRequest.getCurrent());
 
-        Awaitility.pollInSameThread();
-        await().atMost(30, TimeUnit.SECONDS).until(() -> {
-            MockVaadin.INSTANCE.runUIQueue(true);
-            return !_find(Link.class, spec -> spec.withCaption("Show in ANNIS search interface"))
-                    .isEmpty();
-
-        });
-        MockVaadin.INSTANCE.runUIQueue(true);
-
+        awaitCondition(30,
+            () -> !_find(Link.class, spec -> spec.withCaption("Show in ANNIS search interface"))
+                .isEmpty());
         Link link = _get(Link.class, spec -> spec.withCaption("Show in ANNIS search interface"));
         assertEquals("dontprint", link.getStyleName());
     }

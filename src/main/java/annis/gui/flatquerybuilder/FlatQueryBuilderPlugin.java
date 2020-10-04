@@ -15,6 +15,8 @@
  */
 package annis.gui.flatquerybuilder;
 
+import org.springframework.stereotype.Component;
+
 import annis.gui.QueryController;
 import annis.gui.querybuilder.QueryBuilderPlugin;
 
@@ -22,6 +24,7 @@ import annis.gui.querybuilder.QueryBuilderPlugin;
  * @author martin
  * @author tom
  */
+@Component
 public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<com.vaadin.ui.Component> {
     /**
      * 

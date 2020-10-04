@@ -1,24 +1,24 @@
 /*
  * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui.flatquerybuilder;
 
 import com.vaadin.server.ClassResource;
 import com.vaadin.ui.Notification;
 import java.io.IOException;
+import java.text.Normalizer;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,6 +36,9 @@ public class ReducingStringComparator {
     private static String MAPPING_FILE = "mapfile.fqb";
     private HashMap<String, HashMap<Character, Character>> ALLOGRAPHS;
 
+    public static final Pattern DIACRITICS =
+        Pattern.compile("[\\p{InCombiningDiacriticalMarks}\\p{IsLm}\\p{IsSk}]+");
+
     public ReducingStringComparator() {
         readMappings();
     }
@@ -46,9 +49,9 @@ public class ReducingStringComparator {
      * 
      * <0: a<b =0: a=b >0: a>b
      * 
-     * compare() is split in 2 methods to make contains() more comfortable
-     * (contains() could use compare2(), so that a multiple application of
-     * removeCombiningCharacters() on the same string is avoided)
+     * compare() is split in 2 methods to make contains() more comfortable (contains() could use
+     * compare2(), so that a multiple application of removeCombiningCharacters() on the same string
+     * is avoided)
      * 
      */
     {
@@ -155,25 +158,9 @@ public class ReducingStringComparator {
     }
 
     private String removeCombiningCharacters(String s) {
-        String t = "";
-
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            int cp = c;
-            if (!(((cp > 767) & (cp < 880)) | ((cp > 1154) & (cp < 1162)) | (cp == 1619) | ((cp > 2026) & (cp < 2036))
-                    | (cp == 4352) | ((cp > 4956) & (cp < 4960)) | (cp == 6783) | ((cp > 7018) & (cp < 7028))
-                    | ((cp > 7615) & (cp < 7655)) | ((cp > 7675) & (cp < 7680)) | ((cp > 8399) & (cp < 8433))
-                    | ((cp > 11502) & (cp < 11506)) | ((cp > 11743) & (cp < 11776)) | ((cp > 12440) & (cp < 12443))
-                    | ((cp > 42606) & (cp < 42611)) | ((cp > 42611) & (cp < 42622)) | ((cp > 42654) & (cp < 42738))
-                    | ((cp > 43231) & (cp < 43250)) | ((cp > 65055) & (cp < 65063)) | (cp == 66045)
-                    | ((cp > 119140) & (cp < 119146)) | ((cp > 119148) & (cp < 119155))
-                    | ((cp > 119162) & (cp < 119171)) | ((cp > 119172) & (cp < 119180))
-                    | ((cp > 119209) & (cp < 119214)) | ((cp > 119361) & (cp < 119365)))) {
-                t = t + c;
-            }
-        }
-
-        return t;
+      s = Normalizer.normalize(s, Normalizer.Form.NFD);
+      s = DIACRITICS.matcher(s).replaceAll("");
+      return s;
     }
 
     public boolean startsWith(String fullSequence, String subSequence, String mapname) {

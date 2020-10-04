@@ -54,7 +54,7 @@ public class AddMenu extends Panel {
     public void reActivateItem(final String level) {
         List<MenuItem> items = addMenu.getItems().get(0).getChildren();
         boolean found = false;
-        for (int i = 0; (i < items.size()) & !found; i++) {
+        for (int i = 0; (i < items.size()) && !found; i++) {
             MenuItem itm = items.get(i);
             if (itm.getText().equals(level)) {
                 itm.setVisible(true);

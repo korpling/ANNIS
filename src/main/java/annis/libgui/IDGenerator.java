@@ -59,7 +59,7 @@ public class IDGenerator {
           if (parentID == null) {
             parentID = assignID(parent);
           }
-          String idBase = parentID + ":" + fieldName;
+          String idBase = parentID + "-" + fieldName;
           // check that no other child has the same ID
           int counter = 1;
           id = idBase;
