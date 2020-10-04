@@ -25,7 +25,7 @@ import annis.gui.AnnisUI;
 
 @SpringBootTest
 @WebAppConfiguration
-public class InformationDialogTest {
+class InformationDialogTest {
 
     @Autowired
     private BeanFactory beanFactory;
@@ -42,7 +42,7 @@ public class InformationDialogTest {
     }
 
     @Test
-    public void aboutWindow() throws InterruptedException {
+    void aboutWindow() throws InterruptedException {
         UI.getCurrent().getNavigator().navigateTo("");
 
         _click(_get(Button.class, spec -> spec.withCaption("About ANNIS")));
@@ -60,7 +60,7 @@ public class InformationDialogTest {
     }
 
     @Test
-    public void openSourceWindow() {
+    void openSourceWindow() {
         UI.getCurrent().getNavigator().navigateTo("");
 
         _click(_get(Button.class, spec -> spec.withCaption("Help us make ANNIS better!")));
