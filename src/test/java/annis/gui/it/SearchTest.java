@@ -1,21 +1,26 @@
 package annis.gui.it;
 
-import static com.github.mvysny.kaributesting.v8.GridKt.*;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._setValue;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
+import javax.mail.Session;
 
 import com.github.mvysny.kaributesting.v8.MockVaadin;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +41,7 @@ import annis.visualizers.component.kwic.KWICComponent;
 @SpringBootTest
 @ActiveProfiles("desktop")
 @WebAppConfiguration
-public class SearchTest {
+class SearchTest {
 
     @Autowired
     private BeanFactory beanFactory;
@@ -53,7 +58,7 @@ public class SearchTest {
     }
 
     @Test
-    public void tokenSearchPcc2() throws InterruptedException {
+    void tokenSearchPcc2() throws InterruptedException {
         UI.getCurrent().getNavigator().navigateTo("");
 
         // Filter for the corpus name in case the corpus list has too many entries and does not show
@@ -71,12 +76,15 @@ public class SearchTest {
         _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
         _click(_get(Button.class, spec -> spec.withCaption("Search")));
 
+        MockVaadin.INSTANCE.runUIQueue(true);
         // Wait for the first result to appear
-        int tries = 0;
-        while (tries++ < 20 && _find(SingleResultPanel.class).isEmpty()) {
-            Thread.sleep(500);
+        Awaitility.pollInSameThread();
+        await().atMost(30, TimeUnit.SECONDS).until(() -> {
             MockVaadin.INSTANCE.runUIQueue(true);
-        }
+            return !_find(SingleResultPanel.class).isEmpty();
+        });
+        MockVaadin.INSTANCE.runUIQueue(true);
+
 
         // Test that the cell values have the correct token value
         SingleResultPanel secondResult = _find(SingleResultPanel.class).get(0);
