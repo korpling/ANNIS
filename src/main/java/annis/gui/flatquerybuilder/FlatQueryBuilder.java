@@ -25,6 +25,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
@@ -118,8 +119,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
 
     private SpanBox spbox;
 
-    private String query;
-
     private MenuBar.MenuItem spanMenu;
 
     private ReducingStringComparator rsc;
@@ -158,6 +157,18 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         span.addComponent(spbox);
         span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
         spanMenu.setText(CHANGE_SPAN_PARAM);
+    }
+
+    public void addMetaBox(String annoname) {
+      MetaBox mb = new MetaBox(annoname, this);
+      meta.addComponent(mb);
+      mboxes.add(mb);
+      addMenuMeta.setAutoOpen(false);
+      for(MenuItem item : addMenuMeta.getItems()) {
+        if (annoname.equals(item.getText())) {
+          item.setVisible(false);
+        }
+      }
     }
 
     @Override
@@ -319,7 +330,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
             return "";
         }
         fullQuery = fullQuery.substring(3);// deletes leading " & "
-        this.query = fullQuery;
         return fullQuery;
     }
 
@@ -463,12 +473,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
         for (final String annoname : metanames) {
             addMeta.addItem(annoname, selectedItem -> {
-                MetaBox mb = new MetaBox(annoname, sq);
-                meta.addComponent(mb);
-                mboxes.add(mb);
-                addMenuMeta.setAutoOpen(false);
-                // addMeta.removeChild(selectedItem);
-                selectedItem.setVisible(false);
+              addMetaBox(annoname);
             });
         }
         meta.removeComponent(btInitMeta);
@@ -487,7 +492,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
     private void launch(QueryController cp) {
         this.cp = cp;
         rsc = new ReducingStringComparator();
-        this.query = "";
         mainLayout = new VerticalLayout();
         // tracking lists for vertical nodes, edgeboxes and metaboxes
         vnodes = new ArrayList<>();

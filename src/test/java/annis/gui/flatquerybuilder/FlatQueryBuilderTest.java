@@ -4,6 +4,7 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
@@ -128,5 +129,29 @@ class FlatQueryBuilderTest {
 
     assertEquals("tok=/Feigenblatt/\n& Sent = /.*/\n& #2_i_#1",
         ui.getQueryState().getAql().getValue());
+  }
+
+  @Test
+  void removeBoxes() {
+    initQueryBuilder(0);
+    // Add a token and a meta data box
+    queryBuilder.addLinguisticSequenceBox("tok");
+    queryBuilder.addMetaBox("Titel");
+
+    List<VerticalNode> verticalBoxes = _find(VerticalNode.class);
+    assertEquals(1, verticalBoxes.size());
+
+    List<MetaBox> metaBoxes = _find(MetaBox.class);
+    assertEquals(1, metaBoxes.size());
+
+    // Remove these boxes again using the "X" button
+    _click(_get(metaBoxes.get(0), Button.class, spec -> spec.withCaption("X")));
+    List<Button> closeButtons =
+        _find(verticalBoxes.get(0), Button.class, spec -> spec.withCaption("X"));
+    assertFalse(closeButtons.isEmpty());
+    _click(closeButtons.get(0));
+
+    assertEquals(0, _find(VerticalNode.class).size());
+    assertEquals(0, _find(MetaBox.class).size());
   }
 }
