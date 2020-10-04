@@ -12,6 +12,12 @@ cache:
   directories:
   - $HOME/.m2
 
+branches:
+    only:
+    - master
+    - develop
+    - /release/.*/
+    - /^v\d+.\d+(.\d+)?(-\S*)?$/
 
 before_script:
   - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
