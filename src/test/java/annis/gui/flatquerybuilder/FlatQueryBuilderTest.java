@@ -4,7 +4,6 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
@@ -129,35 +128,5 @@ class FlatQueryBuilderTest {
 
     assertEquals("tok=/Feigenblatt/\n& Sent = /.*/\n& #2_i_#1",
         ui.getQueryState().getAql().getValue());
-  }
-
-  @Test
-  void loadQuery() {
-    initQueryBuilder(0);
-
-    // Set to an example query
-    ui.getQueryState().getAql().setValue(
-        "tok=/Feigenblatt/ & tok=/Die/ & Sent = /s/ & #1 . #2 & #3 _i_ #1 & #3 _i_ #1");
-
-    // Load the query into the query builder
-    _click(_get(queryBuilder, Button.class, spec -> spec.withCaption("Refresh Query Builder")));
-
-    // Check that the necessary nodes have been created
-    List<SearchBox> searchBoxes = _find(queryBuilder, SearchBox.class);
-    assertEquals(2, searchBoxes.size());
-
-    assertEquals("tok", searchBoxes.get(0).getAttribute());
-    assertEquals("Feigenblatt", searchBoxes.get(0).getValue());
-    assertTrue(searchBoxes.get(0).isRegEx());
-
-    assertEquals("tok", searchBoxes.get(1).getAttribute());
-    assertEquals("Die", searchBoxes.get(1).getValue());
-    assertTrue(searchBoxes.get(1).isRegEx());
-
-    List<SpanBox> spanBoxes = _find(queryBuilder, SpanBox.class);
-    assertEquals(1, spanBoxes.size());
-    assertEquals("Sent", spanBoxes.get(0).getAttribute());
-    assertEquals("s", spanBoxes.get(0).getValue());
-    assertTrue(spanBoxes.get(0).isRegEx());
   }
 }
