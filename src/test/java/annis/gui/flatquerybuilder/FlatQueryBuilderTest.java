@@ -70,11 +70,15 @@ class FlatQueryBuilderTest {
     List<MenuBar> addButtons = _find(queryBuilder, MenuBar.class);
     assertEquals(3, addButtons.size());
 
-    // Add a single token by clicking on the first "Add" menu entry
+    // Add a two tokens
+    queryBuilder.addLinguisticSequenceBox("tok");
     queryBuilder.addLinguisticSequenceBox("tok");
 
-    SearchBox searchBox = _get(queryBuilder, SearchBox.class);
-    _get(searchBox, ComboBox.class).setValue("Feigenblatt");
+    List<SearchBox> searchBoxes = _find(queryBuilder, SearchBox.class);
+    assertEquals(2, searchBoxes.size());
+
+    _get(searchBoxes.get(0), ComboBox.class).setValue("Feigenblatt");
+    _get(searchBoxes.get(1), ComboBox.class).setValue("Die");
 
     // Add a scope
     queryBuilder.addSpanBox("Sent");
@@ -84,7 +88,8 @@ class FlatQueryBuilderTest {
     // Create the AQL query
     _click(_get(queryBuilder, Button.class, spec -> spec.withCaption("Create AQL Query")));
 
-    assertEquals("tok=/Feigenblatt/\n& Sent = \"s\"\n& #2_i_#1",
+    assertEquals("tok=/Feigenblatt/ & tok=/Die/\n& Sent = \"s\"\n& #1 . #2\n"
+        + "& #3_i_#1\n" + "& #3_i_#2",
         ui.getQueryState().getAql().getValue());
   }
 }
