@@ -68,10 +68,7 @@ class SearchTest {
         _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
         _click(_get(Button.class, spec -> spec.withCaption("Search")));
 
-        awaitCondition(30, () -> {
-            MockVaadin.INSTANCE.runUIQueue(true);
-            return !_find(SingleResultPanel.class).isEmpty();
-        });
+        awaitCondition(30, () -> !_find(SingleResultPanel.class).isEmpty());
 
 
         // Test that the cell values have the correct token value
