@@ -1019,10 +1019,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                         eb.setValue(rel.getOperator());
                         eboxes.add(eb);
                         VerticalNode v = indexedVnodes.get(rel.getSecond());
-                        vnodes.add(v);
-                        languagenodes.addComponent(eb);
-                        languagenodes.addComponent(v);
-
+                        if (v != null) {
+                          vnodes.add(v);
+                          languagenodes.addComponent(eb);
+                          languagenodes.addComponent(v);
+                        }
                     }
                 }
 
