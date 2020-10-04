@@ -154,4 +154,9 @@ class FlatQueryBuilderTest {
     assertEquals(0, _find(VerticalNode.class).size());
     assertEquals(0, _find(MetaBox.class).size());
   }
+
+  @Test
+  void unescape() {
+    assertEquals("/.**/", queryBuilder.unescape("\\x2F.*\\*\\x2F"));
+  }
 }
