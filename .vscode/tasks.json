@@ -27,7 +27,8 @@
             "label": "verify",
             "type": "shell",
             "command": "mvn -B verify",
-            "group": "build"
+            "group": "build",
+            "problemMatcher": []
         },
         {
             "label": "test",

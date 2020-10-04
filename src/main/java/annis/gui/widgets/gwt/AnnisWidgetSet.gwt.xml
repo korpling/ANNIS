@@ -1,0 +1,27 @@
+<module>
+
+  <inherits name="com.google.common.collect.Collect" />
+  <inherits name="com.google.gwt.json.JSON" />
+  
+
+
+	<!-- Widgetset default theme -->
+	<!-- This is relative to widgetset_directory/public -->
+	<stylesheet src="anniswidget/styles.css"/>
+
+   
+   <!-- enable SuperDevMode -->
+   <add-linker name="xsiframe" />
+
+       
+    <set-configuration-property name="devModeRedirectEnabled" value="true" />
+        
+
+    
+
+    <inherits name="com.vaadin.DefaultWidgetSet" />
+
+    <inherits name="com.vaadin.v7.Vaadin7WidgetSet" />
+
+    <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
+</module>
