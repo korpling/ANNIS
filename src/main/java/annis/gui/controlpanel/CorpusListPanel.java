@@ -218,9 +218,7 @@ public class CorpusListPanel extends VerticalLayout {
           }
         }
 
-        if (selectedCS != null && !selectedCS.getCorpora().contains(corpus)) {
-          return false;
-        }
+        return selectedCS == null || selectedCS.getCorpora().contains(corpus);
 
       }
       return true;

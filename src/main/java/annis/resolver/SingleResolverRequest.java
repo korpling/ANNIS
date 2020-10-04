@@ -59,10 +59,7 @@ public class SingleResolverRequest implements Serializable {
         : !this.namespace.equals(other.namespace)) {
       return false;
     }
-    if (this.type != other.type) {
-      return false;
-    }
-    return true;
+    return this.type == other.type;
   }
 
   public String getCorpusName() {

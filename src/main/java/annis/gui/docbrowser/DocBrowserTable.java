@@ -101,10 +101,7 @@ public class DocBrowserTable extends Table {
           : !this.namespace.equals(other.namespace)) {
         return false;
       }
-      if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name)) {
-        return false;
-      }
-      return true;
+      return (this.name == null) ? (other.name == null) : this.name.equals(other.name);
     }
 
     String getColName() {

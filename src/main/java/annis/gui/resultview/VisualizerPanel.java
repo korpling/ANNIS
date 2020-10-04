@@ -630,10 +630,7 @@ public class VisualizerPanel extends CssLayout
 
   @Override
   public boolean visualizerIsVisible() {
-    if (vis == null || !vis.isVisible()) {
-      return false;
-    }
-    return true;
+    return vis != null && vis.isVisible();
   }
 
 }

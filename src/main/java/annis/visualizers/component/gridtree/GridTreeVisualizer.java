@@ -299,11 +299,7 @@ public class GridTreeVisualizer extends AbstractVisualizer {
     @Override
     public boolean checkConstraint(GRAPH_TRAVERSE_TYPE g, String string, SRelation sr, SNode snode,
         long l) {
-      if (sr == null || sr instanceof SDominanceRelation) {
-        return true;
-      } else {
-        return false;
-      }
+      return sr == null || sr instanceof SDominanceRelation;
     }
 
     private SAnnotation getAnno(SNode n) {
