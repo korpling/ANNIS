@@ -71,14 +71,20 @@ class FlatQueryBuilderTest {
     assertEquals(3, addButtons.size());
 
     // Add a single token by clicking on the first "Add" menu entry
-    queryBuilder.addLinguisticSequenceBox("PP");
+    queryBuilder.addLinguisticSequenceBox("tok");
 
     SearchBox searchBox = _get(queryBuilder, SearchBox.class);
-    _get(searchBox, ComboBox.class).select("PP");
+    _get(searchBox, ComboBox.class).setValue("Feigenblatt");
+
+    // Add a scope
+    queryBuilder.addSpanBox("Sent");
+    SpanBox spanBox = _get(queryBuilder, SpanBox.class);
+    _get(spanBox, ComboBox.class).setValue("s");;
 
     // Create the AQL query
     _click(_get(queryBuilder, Button.class, spec -> spec.withCaption("Create AQL Query")));
 
-    assertEquals("PP=/PP/", ui.getQueryState().getAql().getValue());
+    assertEquals("tok=/Feigenblatt/\n& Sent = \"s\"\n& #2_i_#1",
+        ui.getQueryState().getAql().getValue());
   }
 }

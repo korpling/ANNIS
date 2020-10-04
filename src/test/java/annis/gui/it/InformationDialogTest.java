@@ -6,24 +6,24 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import annis.SingletonBeanStoreRetrievalStrategy;
+import annis.gui.AnnisUI;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import annis.SingletonBeanStoreRetrievalStrategy;
-import annis.gui.AnnisUI;
-
 @SpringBootTest
+@ActiveProfiles("desktop")
 @WebAppConfiguration
 class InformationDialogTest {
 
