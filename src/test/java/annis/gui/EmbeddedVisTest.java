@@ -1,24 +1,23 @@
 package annis.gui;
 
-import static com.github.mvysny.kaributesting.v8.GridKt.*;
-import static com.github.mvysny.kaributesting.v8.LocatorJ.*;
+import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
+import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.*;
 
 import com.github.mvysny.kaributesting.mockhttp.MockRequest;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.github.mvysny.kaributesting.v8.MockVaadinKt;
-import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.internal.UIScopeImpl;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Grid;
 import com.vaadin.ui.Link;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.v7.ui.Label;
 
+import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,18 +28,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
-import annis.gui.AnnisUI;
-import annis.gui.EmbeddedVisUI;
-import annis.gui.components.codemirror.AqlCodeEditor;
-import annis.gui.resultview.SingleResultPanel;
-import annis.gui.widgets.grid.AnnotationGrid;
-import annis.gui.widgets.grid.Row;
-import annis.visualizers.component.kwic.KWICComponent;
 
 @SpringBootTest
 @ActiveProfiles("desktop")
 @WebAppConfiguration
-public class EmbeddedVisTest {
+class EmbeddedVisTest {
 
     @Autowired
     private BeanFactory beanFactory;
@@ -58,7 +50,7 @@ public class EmbeddedVisTest {
     }
 
     @Test
-    public void regression509() throws InterruptedException {
+    void regression509() throws InterruptedException {
         EmbeddedVisUI ui = (EmbeddedVisUI) UI.getCurrent();
         MockRequest request = MockVaadinKt.getMock(VaadinRequest.getCurrent());
         request.setParameter("embedded_ns", "exmaralda");
@@ -69,13 +61,16 @@ public class EmbeddedVisTest {
         request.setParameter("embedded_interface",
                 "http://localhost:5712/#_q=dG9r&ql=aql&_c=cGNjMg&cl=5&cr=5&s=0&l=10&m=0");
         ui.attachToPath("/embeddedvis/grid", VaadinRequest.getCurrent());
-        int tries = 0;
-        while (tries++ < 20
-                && _find(Link.class, spec -> spec.withCaption("Show in ANNIS search interface"))
-                        .isEmpty()) {
-            Thread.sleep(250);
+
+        Awaitility.pollInSameThread();
+        await().atMost(30, TimeUnit.SECONDS).until(() -> {
             MockVaadin.INSTANCE.runUIQueue(true);
-        }
+            return !_find(Link.class, spec -> spec.withCaption("Show in ANNIS search interface"))
+                    .isEmpty();
+
+        });
+        MockVaadin.INSTANCE.runUIQueue(true);
+
         Link link = _get(Link.class, spec -> spec.withCaption("Show in ANNIS search interface"));
         assertEquals("dontprint", link.getStyleName());
     }
