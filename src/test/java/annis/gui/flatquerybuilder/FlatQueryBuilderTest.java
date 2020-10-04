@@ -4,6 +4,7 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
@@ -161,5 +162,25 @@ class FlatQueryBuilderTest {
   @Test
   void unescape() {
     assertEquals("/.**/", queryBuilder.unescape("\\x2F.*\\*\\x2F"));
+  }
+
+  @Test
+  void addInvalidEdgeOperator() {
+
+    initQueryBuilder(0);
+
+    // Add a two tokens
+    queryBuilder.addLinguisticSequenceBox("tok");
+    queryBuilder.addLinguisticSequenceBox("tok");
+
+    // This should have generated and edge box between them
+    EdgeBox box = _get(EdgeBox.class);
+    // Set to valid and known operator
+    box.setValue(".");
+    assertEquals(".", box.getValue());
+
+    // Set to invalid, the operator should be set to null
+    box.setValue("&SF");
+    assertNull(box.getValue());
   }
 }

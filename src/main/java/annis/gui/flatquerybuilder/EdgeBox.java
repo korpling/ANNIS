@@ -86,7 +86,8 @@ public class EdgeBox extends Panel {
     }
 
     public String getValue() {
-        return edge.getValue().toString();
+      Object value = edge.getValue();
+      return value == null ? null : value.toString();
     }
 
     private void initEOs() {
