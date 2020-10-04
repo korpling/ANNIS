@@ -182,5 +182,9 @@ class FlatQueryBuilderTest {
     // Set to invalid, the operator should be set to null
     box.setValue("&SF");
     assertNull(box.getValue());
+
+    // Add a valid, but unknown operator
+    box.setValue(".30");
+    assertEquals(".30", box.getValue());
   }
 }
