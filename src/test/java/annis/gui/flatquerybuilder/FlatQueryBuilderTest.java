@@ -4,7 +4,6 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
@@ -134,21 +133,25 @@ class FlatQueryBuilderTest {
   @Test
   void removeBoxes() {
     initQueryBuilder(0);
-    // Add a token and a meta data box
+    // Add a token and two meta data boxes
     queryBuilder.addLinguisticSequenceBox("tok");
     queryBuilder.addMetaBox("Titel");
+    queryBuilder.addMetaBox("Genre");
 
     List<VerticalNode> verticalBoxes = _find(VerticalNode.class);
     assertEquals(1, verticalBoxes.size());
 
     List<MetaBox> metaBoxes = _find(MetaBox.class);
-    assertEquals(1, metaBoxes.size());
+    assertEquals(2, metaBoxes.size());
 
     // Remove these boxes again using the "X" button
     _click(_get(metaBoxes.get(0), Button.class, spec -> spec.withCaption("X")));
+    _click(_get(metaBoxes.get(1), Button.class, spec -> spec.withCaption("X")));
     List<Button> closeButtons =
         _find(verticalBoxes.get(0), Button.class, spec -> spec.withCaption("X"));
-    assertFalse(closeButtons.isEmpty());
+    // There are two buttons, one for the inner search box and one for the enclosing vertical box
+    assertEquals(2, closeButtons.size());
+    _click(closeButtons.get(1));
     _click(closeButtons.get(0));
 
     assertEquals(0, _find(VerticalNode.class).size());

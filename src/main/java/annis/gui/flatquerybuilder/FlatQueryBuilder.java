@@ -472,9 +472,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         addMenuMeta.setAutoOpen(false);
         final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
         for (final String annoname : metanames) {
-            addMeta.addItem(annoname, selectedItem -> {
-              addMetaBox(annoname);
-            });
+          addMeta.addItem(annoname, selectedItem -> addMetaBox(annoname));
         }
         meta.removeComponent(btInitMeta);
         meta.addComponent(addMenuMeta);
