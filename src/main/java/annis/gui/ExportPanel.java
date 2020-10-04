@@ -374,7 +374,9 @@ public class ExportPanel extends GridLayout {
   public void handleExportProgress(final Integer exports) {
     UI ui = getUI();
     if (ui != null) {
-      ui.access(() -> {
+      // if we ui access() here it seems to confuse the isInterrupted() flag
+      // of the parent thread and cancelling won't work any longer
+      ui.accessSynchronously(() -> {
         if (exportTime != null && exportTime.isRunning()) {
           progressLabel.setValue("exported " + exports + " items in " + exportTime.toString());
         } else {

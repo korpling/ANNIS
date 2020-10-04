@@ -218,7 +218,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
                       cache.put(new Element(currentPCounter, p));
 
 
-                      if (eventBus != null) {
+                      if (eventBus != null && (currentOffset + 1) % 100 == 0) {
                         eventBus.post(currentOffset + 1);
                       }
 
