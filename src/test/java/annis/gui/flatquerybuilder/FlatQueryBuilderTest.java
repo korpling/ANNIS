@@ -4,7 +4,9 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
@@ -13,6 +15,7 @@ import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.v7.ui.CheckBox;
 import com.vaadin.v7.ui.ComboBox;
 import java.util.List;
@@ -144,6 +147,19 @@ class FlatQueryBuilderTest {
 
     List<MetaBox> metaBoxes = _find(MetaBox.class);
     assertEquals(2, metaBoxes.size());
+
+    // Check that the added meta data values have been made invisible in the menu
+    List<MenuBar> menus = _find(queryBuilder, MenuBar.class);
+    assertEquals(4, menus.size());
+    assertEquals(1, menus.get(3).getItems().size());
+    assertEquals("Add", menus.get(3).getItems().get(0).getText());
+    for (MenuItem item : menus.get(3).getItems().get(0).getChildren()) {
+      if ("Titel".equals(item.getText()) || "Genre".equals(item.getText())) {
+        assertFalse(item.isVisible());
+      } else {
+        assertTrue(item.isVisible());
+      }
+    }
 
     // Remove these boxes again using the "X" button
     _click(_get(metaBoxes.get(0), Button.class, spec -> spec.withCaption("X")));

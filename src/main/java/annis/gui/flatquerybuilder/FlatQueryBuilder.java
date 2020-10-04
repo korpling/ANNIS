@@ -164,9 +164,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
       meta.addComponent(mb);
       mboxes.add(mb);
       addMenuMeta.setAutoOpen(false);
-      for(MenuItem item : addMenuMeta.getItems()) {
-        if (annoname.equals(item.getText())) {
-          item.setVisible(false);
+      for(MenuItem textItem : addMenuMeta.getItems()) {
+        if ("Add".equals(textItem.getText())) {
+          for (MenuItem item : textItem.getChildren()) {
+            if (annoname.equals(item.getText())) {
+              item.setVisible(false);
+            }
+          }
         }
       }
     }
