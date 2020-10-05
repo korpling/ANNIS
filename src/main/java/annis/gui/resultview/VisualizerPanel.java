@@ -196,8 +196,6 @@ public class VisualizerPanel extends CssLayout
 
   private List<String> path;
 
-  private Match match;
-
   private Component vis;
 
   private SDocument result;
@@ -245,7 +243,6 @@ public class VisualizerPanel extends CssLayout
     this.visCtxChanger = parent;
 
     this.result = result;
-    this.match = match;
     if (!match.getSaltIDs().isEmpty()) {
       this.path = Helper.getCorpusPath(match.getSaltIDs().get(0));
     } else {
@@ -368,7 +365,7 @@ public class VisualizerPanel extends CssLayout
   private VisualizerInput createInput() {
     VisualizerInput input = new VisualizerInput();
     input.setUI(ui);
-    input.setContextPath(Helper.getContext(ui));
+    input.setContextPath(ui.getServletContext().getContextPath());
     input.setId(resultID);
 
     input.setMarkedAndCovered(markedAndCovered);
@@ -383,7 +380,8 @@ public class VisualizerPanel extends CssLayout
     if (visRule != null) {
       input.setMappings(visRule.getMappings());
       input.setNamespace(visRule.getLayer());
-      String template = Helper.getContext(ui) + "/Resource/" + visRule.getVisType() + "/%s";
+      String template =
+          ui.getServletContext().getContextPath() + "/Resource/" + visRule.getVisType() + "/%s";
       input.setResourcePathTemplate(template);
     }
 

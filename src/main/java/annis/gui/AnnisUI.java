@@ -15,12 +15,16 @@ package annis.gui;
 
 import static annis.libgui.Helper.DEFAULT_CONFIG;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+import annis.gui.components.ExceptionDialog;
+import annis.gui.objects.QueryUIState;
+import annis.gui.query_references.UrlShortener;
+import annis.gui.querybuilder.QueryBuilderPlugin;
+import annis.gui.requesthandler.BinaryRequestHandler;
+import annis.gui.security.SecurityConfiguration;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
+import annis.libgui.exporter.ExporterPlugin;
+import annis.libgui.visualizers.VisualizerPlugin;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
@@ -33,10 +37,14 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.communication.PushMode;
-import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Component;
-
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import javax.servlet.ServletContext;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,17 +54,6 @@ import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import annis.gui.components.ExceptionDialog;
-import annis.gui.objects.QueryUIState;
-import annis.gui.query_references.UrlShortener;
-import annis.gui.querybuilder.QueryBuilderPlugin;
-import annis.gui.requesthandler.BinaryRequestHandler;
-import annis.gui.security.SecurityConfiguration;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import annis.libgui.exporter.ExporterPlugin;
-import annis.libgui.visualizers.VisualizerPlugin;
 
 /**
  * GUI for searching in corpora.
@@ -108,6 +105,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   @Autowired(required = false)
   private OAuth2ClientProperties oauth2Clients;
+
+
+  @Autowired
+  private ServletContext servletContext;
 
   private SecurityContext securityContext;
 
@@ -320,6 +321,11 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
       this.securityContext = SecurityContextHolder.getContext();
     }
     return securityContext;
+  }
+
+  @Override
+  public ServletContext getServletContext() {
+    return servletContext;
   }
 
 }

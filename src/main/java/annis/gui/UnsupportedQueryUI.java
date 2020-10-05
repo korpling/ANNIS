@@ -15,21 +15,21 @@
  */
 package annis.gui;
 
-import annis.libgui.Helper;
 import com.vaadin.annotations.Widgetset;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.declarative.Design;
+import javax.servlet.ServletContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringUI(path = "/unsupported-query")
 @Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
 public class UnsupportedQueryUI extends CommonUI {
 
-    public static class UnsupportedQueryPanel extends Panel {
+  public class UnsupportedQueryPanel extends Panel {
 
         /**
          * 
@@ -47,7 +47,7 @@ public class UnsupportedQueryUI extends CommonUI {
 
             btExecute.addClickListener(event -> {
                 if (url != null) {
-                    getUI().getPage().setLocation(Helper.getContext(UI.getCurrent()) + url);
+                getUI().getPage().setLocation(servletContext.getContextPath() + url);
                 }
             });
         }
@@ -58,6 +58,9 @@ public class UnsupportedQueryUI extends CommonUI {
 
     public static final String URL_PREFIX = "/unsupported-query";
 
+    @Autowired
+    private ServletContext servletContext;
+
     public UnsupportedQueryUI() {
         super(URL_PREFIX);
 
@@ -67,5 +70,10 @@ public class UnsupportedQueryUI extends CommonUI {
     protected void init(VaadinRequest request) {
         UnsupportedQueryPanel panel = new UnsupportedQueryPanel(request.getParameter("url"));
         setContent(panel);
+    }
+
+    @Override
+    public ServletContext getServletContext() {
+      return servletContext;
     }
 }

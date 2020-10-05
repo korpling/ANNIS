@@ -14,15 +14,13 @@
 package annis.gui.query_references;
 
 import annis.gui.AnnisUI;
+import annis.gui.CommonUI;
 import annis.gui.EmbeddedVisUI;
 import annis.libgui.Helper;
-import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
-import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.base.Splitter;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
@@ -40,10 +38,7 @@ import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.v7.ui.Grid;
 import com.vaadin.v7.ui.Label;
 import com.vaadin.v7.ui.TextArea;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,8 +79,11 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
 
   private final List<VisualizerPlugin> visualizerPlugins;
 
-  public ShareSingleMatchGenerator(List<VisualizerRule> visualizers, Match match,
+  private final CommonUI ui;
+
+  public ShareSingleMatchGenerator(CommonUI ui, List<VisualizerRule> visualizers, Match match,
       PagedResultQuery query, String baseText, List<VisualizerPlugin> visualizerPlugins) {
+    this.ui = ui;
     this.match = match;
     this.query = query;
     this.baseText = baseText;
@@ -166,8 +164,8 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
   }
 
   private URI generatorURLForVisualizer(VisualizerRule entry) {
-    String appContext = Helper.getContext(UI.getCurrent());
-    URI appURI = UI.getCurrent().getPage().getLocation();
+    String appContext = ui.getServletContext().getContextPath();
+    URI appURI = ui.getPage().getLocation();
     UriBuilder result = UriBuilder.fromUri(appURI).replacePath(appContext).path("embeddedvis")
         .path(Helper.encodeJersey(entry.getVisType())).fragment("");
     if (entry.getLayer() != null) {

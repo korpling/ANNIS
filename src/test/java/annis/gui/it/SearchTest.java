@@ -9,8 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
+import annis.gui.TestHelper;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.resultview.SingleResultPanel;
+import annis.gui.resultview.VisualizerPanel;
+import annis.gui.widgets.AutoHeightIFrame;
 import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.Row;
 import annis.visualizers.component.kwic.KWICComponent;
@@ -21,6 +24,7 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,8 +75,8 @@ class SearchTest {
         awaitCondition(60, () -> !_find(SingleResultPanel.class).isEmpty());
 
         // Test that the cell values have the correct token value
-        SingleResultPanel secondResult = _find(SingleResultPanel.class).get(0);
-        KWICComponent kwicVis = _get(secondResult, KWICComponent.class);
+        SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
+        KWICComponent kwicVis = _get(resultPanel, KWICComponent.class);
         AnnotationGrid kwicGrid = _get(kwicVis, AnnotationGrid.class);
         ArrayList<Row> tokens = kwicGrid.getRowsByAnnotation().get("tok");
         assertEquals(1, tokens.size());
@@ -83,6 +87,15 @@ class SearchTest {
         assertEquals("in", tokens.get(0).getEvents().get(3).getValue());
         assertEquals("Zossen", tokens.get(0).getEvents().get(4).getValue());
         assertEquals("wollen", tokens.get(0).getEvents().get(5).getValue());
+
+        // Open the "dependencies (arches)" visualizer, which should fetch some resources
+        List<VisualizerPanel> visualizers = _find(resultPanel, VisualizerPanel.class);
+        assertEquals(7, visualizers.size());
+        _click(_get(resultPanel, Button.class, spec -> spec.withCaption("dependencies (arches)")));
+        // wait for the visualizer to appear
+        TestHelper.awaitCondition(30,
+            () -> !_find(visualizers.get(0), AutoHeightIFrame.class).isEmpty());
+        AutoHeightIFrame depVisComponent = _get(visualizers.get(0), AutoHeightIFrame.class);
     }
 
 }

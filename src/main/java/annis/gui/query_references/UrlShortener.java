@@ -1,21 +1,17 @@
 package annis.gui.query_references;
 
+import annis.gui.CommonUI;
+import annis.libgui.Helper;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import javax.transaction.Transactional;
 import javax.ws.rs.core.UriBuilder;
-
-import com.vaadin.ui.UI;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
-
-import annis.libgui.Helper;
 
 @Service
 public class UrlShortener {
@@ -24,8 +20,8 @@ public class UrlShortener {
   private UrlShortenerRepository repo;
 
   @Transactional
-  public String shortenURL(URI original, UI ui) {
-    String appContext = Helper.getContext(ui);
+  public String shortenURL(URI original, CommonUI ui) {
+    String appContext = ui.getServletContext().getContextPath();
 
     String path = original.getRawPath();
     if (path.startsWith(appContext)) {

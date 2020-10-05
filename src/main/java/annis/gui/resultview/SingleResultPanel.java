@@ -457,7 +457,8 @@ public class SingleResultPanel extends CssLayout
       ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
     }
 
-    Window window = new ShareSingleMatchGenerator(resolverEntries, match, query, segmentationName,
+    Window window = new ShareSingleMatchGenerator(ui, resolverEntries, match, query,
+        segmentationName,
         ui.getVisualizerPlugins());
     window.setWidth(790, Unit.PIXELS);
     window.setHeight(680, Unit.PIXELS);

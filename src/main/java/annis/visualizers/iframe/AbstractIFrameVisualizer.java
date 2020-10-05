@@ -14,14 +14,12 @@
 package annis.visualizers.iframe;
 
 import annis.gui.widgets.AutoHeightIFrame;
-import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.IFrameResource;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.libgui.visualizers.ResourcePlugin;
 import annis.libgui.visualizers.VisualizerInput;
-
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import java.io.ByteArrayOutputStream;
@@ -63,7 +61,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer
 
     URI base;
     try {
-      String ctx = Helper.getContext(vis.getUI());
+      String ctx = vis.getUI().getServletContext().getContextPath();
       if (!ctx.endsWith("/")) {
         ctx = ctx + "/";
       }

@@ -15,10 +15,9 @@
  */
 package annis.gui.components;
 
-import annis.libgui.Helper;
+import annis.gui.CommonUI;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractJavaScriptExtension;
-import com.vaadin.ui.UI;
 import elemental.json.JsonObject;
 import elemental.json.JsonType;
 import elemental.json.JsonValue;
@@ -54,9 +53,9 @@ public class SettingsStorage extends AbstractJavaScriptExtension {
 
     private final List<LoadedListener> loadedListeners = new LinkedList<>();
 
-    private final UI ui;
+    private final CommonUI ui;
 
-    public SettingsStorage(UI ui) {
+    public SettingsStorage(CommonUI ui) {
         this.ui = ui;
         if (ui != null) {
             extend(ui);
@@ -91,6 +90,6 @@ public class SettingsStorage extends AbstractJavaScriptExtension {
 
     public void set(String name, String value, int lifetimeInDays) {
         storage.put(name, value);
-        callFunction("set", name, value, Helper.getContext(ui), lifetimeInDays);
+        callFunction("set", name, value, ui.getServletContext().getContextPath(), lifetimeInDays);
     }
 }

@@ -16,6 +16,23 @@ package annis.libgui;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
+import annis.gui.AnnisUI;
+import annis.gui.UIConfig;
+import annis.gui.graphml.CorpusGraphMapper;
+import annis.model.AnnisConstants;
+import annis.service.objects.Match;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Range;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
+import com.google.common.net.UrlEscapers;
+import com.vaadin.server.JsonCodec;
+import com.vaadin.server.Page;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
+import elemental.json.JsonValue;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -42,22 +59,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-
 import javax.xml.stream.XMLStreamException;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Range;
-import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
-import com.google.common.net.UrlEscapers;
-import com.vaadin.server.JsonCodec;
-import com.vaadin.server.Page;
-import com.vaadin.server.VaadinService;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiClient;
@@ -105,13 +107,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-
-import annis.gui.AnnisUI;
-import annis.gui.UIConfig;
-import annis.gui.graphml.CorpusGraphMapper;
-import annis.model.AnnisConstants;
-import annis.service.objects.Match;
-import elemental.json.JsonValue;
 
 /**
  *
@@ -600,15 +595,6 @@ public class Helper {
       log.error(null, ex);
     }
     return "ERROR";
-  }
-
-  public static String getContext(final UI ui) {
-    if (VaadinService.getCurrentRequest() != null) {
-      return VaadinService.getCurrentRequest().getContextPath();
-    } else {
-      return (String) ui.getSession().getAttribute(AnnisBaseUI.CONTEXT_PATH);
-    }
-
   }
 
   /**

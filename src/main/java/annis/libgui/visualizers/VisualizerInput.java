@@ -13,10 +13,10 @@
  */
 package annis.libgui.visualizers;
 
+import annis.gui.CommonUI;
 import annis.gui.FontConfig;
 import annis.libgui.MatchedNodeColors;
 import annis.service.objects.RawTextWrapper;
-import com.vaadin.ui.UI;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ public class VisualizerInput implements Serializable {
 
   private String contextPath;
 
-  private UI ui;
+  private CommonUI ui;
 
   private Map<String, String> mappings;
 
@@ -172,7 +172,7 @@ public class VisualizerInput implements Serializable {
     return getDocument();
   }
 
-  public UI getUI() {
+  public CommonUI getUI() {
     return ui;
   }
 
@@ -267,12 +267,7 @@ public class VisualizerInput implements Serializable {
     this.segmentationName = segmentationName;
   }
 
-  /**
-   * Set the URL which is configured for the Annis installation.
-   *
-   * @param annisRemoteServiceURL
-   */
-  public void setUI(UI ui) {
+  public void setUI(CommonUI ui) {
     this.ui = ui;
   }
 
