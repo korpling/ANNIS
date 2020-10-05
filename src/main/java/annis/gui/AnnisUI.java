@@ -108,7 +108,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
 
   @Autowired
-  private ServletContext servletContext;
+  private transient ServletContext servletContext;
 
   private SecurityContext securityContext;
 

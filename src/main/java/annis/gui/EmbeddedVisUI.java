@@ -161,7 +161,7 @@ public class EmbeddedVisUI extends CommonUI {
   private ServiceStarter serviceStarter;
 
   @Autowired
-  private ServletContext servletContext;
+  private transient ServletContext servletContext;
 
 
   public EmbeddedVisUI() {

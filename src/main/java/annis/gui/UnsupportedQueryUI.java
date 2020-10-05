@@ -59,7 +59,7 @@ public class UnsupportedQueryUI extends CommonUI {
     public static final String URL_PREFIX = "/unsupported-query";
 
     @Autowired
-    private ServletContext servletContext;
+    private transient ServletContext servletContext;
 
     public UnsupportedQueryUI() {
         super(URL_PREFIX);
