@@ -33,7 +33,7 @@ class CitationRedirectionServletTest {
     ResponseEntity<String> response = restTemplate
         .getForEntity("http://localhost:" + port + "/Cite/" + ORIGINAL_URL, String.class);
     assertEquals(HttpStatus.FOUND, response.getStatusCode());
-    assertEquals("/", response.getHeaders().get("Location"));
+    assertEquals("http://localhost:" + port + "/", response.getHeaders().get("Location").get(0));
   }
 
 }
