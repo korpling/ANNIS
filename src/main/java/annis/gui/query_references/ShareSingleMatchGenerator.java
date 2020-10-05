@@ -26,7 +26,6 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
@@ -219,7 +218,6 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
   @Override
   public void select(SelectionEvent event) {
     Set<Object> selected = event.getSelected();
-    UI ui = UI.getCurrent();
     if (ui instanceof AnnisUI && !selected.isEmpty()) {
       AnnisUI annisUI = (AnnisUI) ui;
       generatedLinks.setVisible(true);
