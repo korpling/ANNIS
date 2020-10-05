@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.JSON;
@@ -99,10 +100,13 @@ public class ResultFetchJob implements Runnable {
       q.setLimit(query.getLimit());
       q.setQueryLanguage(query.getApiQueryLanguage());
       File findResult = search.find(q);
-      Files.lines(findResult.toPath(), StandardCharsets.UTF_8).forEachOrdered((line) -> {
-        Match m = Match.parseFromString(line);
-        result.getMatches().add(m);
-      });
+      try (Stream<String> findResultLines =
+          Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
+        findResultLines.forEachOrdered(line -> {
+          Match m = Match.parseFromString(line);
+          result.getMatches().add(m);
+        });
+      }
       // get the subgraph for each match, when the result is not empty
       if (result.getMatches().isEmpty()) {
 
@@ -137,29 +141,9 @@ public class ResultFetchJob implements Runnable {
           arg.setLeft(query.getLeftContext());
           arg.setRight(query.getRightContext());
           arg.setSegmentation(query.getSegmentation());
-          arg.setNodeIds(
-              m.getSaltIDs().stream().map(id -> id.toString()).collect(Collectors.toList()));
-          List<String> corpusPath = Helper.getCorpusPath(m.getSaltIDs().get(0));
+          arg.setNodeIds(m.getSaltIDs().stream().collect(Collectors.toList()));
 
-          if (!corpusPath.isEmpty()) {
-            File graphML = corpora.subgraphForNodes(corpusPath.get(0), arg);
-            // create Salt from GraphML
-            try {
-              final SaltProject p = SaltFactory.createSaltProject();
-              SCorpusGraph cg = p.createCorpusGraph();
-              URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
-              SDocument doc = cg.createDocument(docURI);
-              SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-              queue.put(p);
-              doc.setDocumentGraph(docGraph);
-              Helper.addMatchToDocumentGraph(m, doc);
-              log.debug("added match {} to queue", current + 1);
-            } catch (XMLStreamException | IOException ex) {
-              log.error("Could not map GraphML to Salt", ex);
-              ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
-            }
-
-          }
+          createSaltFromMatch(m, arg, current, corpora, queue);
 
           if (current == 0) {
             ui.access(() -> resultPanel.setQueryResultQueue(queue, query, matchList));
@@ -195,7 +179,7 @@ public class ResultFetchJob implements Runnable {
                 errMsg = new ParseError(error.getAqLSemanticError()).message;
               }
 
-              paging.setInfo("parsing error: " + errMsg.toString());
+              paging.setInfo("parsing error: " + errMsg);
             } else if (ex.getCode() == 504) {
               paging.setInfo("Timeout: query execution took too long");
             } else if (ex.getCode() == 403) {
@@ -212,5 +196,28 @@ public class ResultFetchJob implements Runnable {
         }
       });
     } // end catch
+  }
+
+  private void createSaltFromMatch(Match m, SubgraphWithContext arg, int currentMatchNumber,
+      CorporaApi api, BlockingQueue<SaltProject> queue) throws InterruptedException, ApiException {
+    List<String> corpusPath = Helper.getCorpusPath(m.getSaltIDs().get(0));
+
+    if (!corpusPath.isEmpty()) {
+      File graphML = api.subgraphForNodes(corpusPath.get(0), arg);
+      try {
+        final SaltProject p = SaltFactory.createSaltProject();
+        SCorpusGraph cg = p.createCorpusGraph();
+        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
+        SDocument doc = cg.createDocument(docURI);
+        SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+        queue.put(p);
+        doc.setDocumentGraph(docGraph);
+        Helper.addMatchToDocumentGraph(m, doc);
+        log.debug("added match {} to queue", currentMatchNumber + 1);
+      } catch (XMLStreamException | IOException ex) {
+        log.error("Could not map GraphML to Salt", ex);
+        ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
+      }
+    }
   }
 }

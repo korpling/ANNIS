@@ -59,6 +59,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -305,19 +306,14 @@ public class Helper {
           + "<p>Please ask the responsible admin or consult the ANNIS "
           + "<a href=\"http://korpling.github.io/ANNIS/doc/\">Documentation</a>.</p></div>";
 
-  private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER =
-      "Problems with parsing the document browser configuration.";
 
-  private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_BODY =
-      "<div><p>Maybe there is a syntax error in the json file.</p></div>";
+  private static final Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-
-  private final static Escaper jerseyExtraEscape =
+  private static final Escaper jerseyExtraEscape =
       Escapers.builder().addEscape('{', "%7B").addEscape('}', "%7D").addEscape('%', "%25").build();
 
 
-  public final static Escaper AQL_REGEX_VALUE_ESCAPER = Escapers.builder()
+  public static final Escaper AQL_REGEX_VALUE_ESCAPER = Escapers.builder()
       // This is used by AQL to mark the end of the regular expressions
       .addEscape('/', "\\x2F")
       // The next ones are meta characters for the regex-syntax crate
@@ -465,10 +461,11 @@ public class Helper {
       final File findResult = search.find(q);
       if (findResult != null && findResult.isFile())
         try {
-          final Optional<String> anyLine =
-              Files.lines(findResult.toPath(), StandardCharsets.UTF_8).findAny();
-          if (anyLine.isPresent() && !anyLine.get().isEmpty()) {
-            metaAnnos.add(a.getKey());
+          try (Stream<String> lines = Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
+            Optional<String> anyLine = lines.findAny();
+            if (anyLine.isPresent() && !anyLine.get().isEmpty()) {
+              metaAnnos.add(a.getKey());
+            }
           }
         } catch (final IOException ex) {
           log.error("Error when accessing file with find results", ex);
@@ -535,7 +532,7 @@ public class Helper {
     return token2index;
   }
 
-  public static <T> JsonValue encodeGeneric(final Object v) {
+  public static JsonValue encodeGeneric(final Object v) {
     return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).getEncodedValue();
   }
 
@@ -548,8 +545,7 @@ public class Helper {
    * @return encoded value
    */
   public static String encodeJersey(final String v) {
-    final String encoded = jerseyExtraEscape.escape(v);
-    return encoded;
+    return jerseyExtraEscape.escape(v);
   }
 
   /**
@@ -559,8 +555,7 @@ public class Helper {
    * @return encoded value
    */
   public static String encodePath(final String v) {
-    final String encoded = urlPathEscape.escape(v);
-    return encoded;
+    return urlPathEscape.escape(v);
   }
 
   /**
@@ -575,12 +570,7 @@ public class Helper {
   }
 
   public static String encodeBase64URL(final String val) {
-    try {
-      return Base64.encodeBase64URLSafeString(val.getBytes("UTF-8"));
-    } catch (final UnsupportedEncodingException ex) {
-      log.error("Java Virtual Maschine can't handle UTF-8: I'm utterly confused", ex);
-    }
-    return "";
+    return Base64.encodeBase64URLSafeString(val.getBytes(StandardCharsets.UTF_8));
   }
 
   public static String generateCorpusLink(final Set<String> corpora) {
@@ -855,7 +845,7 @@ public class Helper {
    */
   public static List<SNode> getSortedSegmentationNodes(final String segName,
       final SDocumentGraph graph) {
-    final List<SNode> token = new ArrayList<SNode>();
+    final List<SNode> token = new ArrayList<>();
 
     if (segName == null) {
       // if no segmentation is given just return the sorted token list
@@ -865,7 +855,7 @@ public class Helper {
       }
     } else {
       // get the very first node of the order relation chain
-      final Set<SNode> startNodes = new LinkedHashSet<SNode>();
+      final Set<SNode> startNodes = new LinkedHashSet<>();
       if (graph != null) {
         final List<SNode> orderRoots = graph.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
         if (orderRoots != null) {
@@ -884,7 +874,7 @@ public class Helper {
         }
       }
 
-      final Set<String> alreadyAdded = new HashSet<String>();
+      final Set<String> alreadyAdded = new HashSet<>();
 
       // add all nodes on the order relation chain beginning from the start node
       for (final SNode s : startNodes) {
@@ -931,16 +921,10 @@ public class Helper {
     if (str != null) {
       for (int i = 0; i < str.length(); i++) {
         final char cc = str.charAt(i);
-        // hebrew extended and basic, arabic basic and extendend
-        if (cc >= 1425 && cc <= 1785) {
-          return true;
-        }
-        // alphabetic presentations forms (hebrwew) to arabic presentation forms A
-        else if (cc >= 64286 && cc <= 65019) {
-          return true;
-        }
-        // arabic presentation forms B
-        else if (cc >= 65136 && cc <= 65276) {
+        // 1th condition: hebrew extended and basic, arabic basic and extendend
+        // 2nd condition: alphabetic presentations forms (hebrew) to arabic presentation forms A
+        // 3rd condition: arabic presentation forms B
+        if((cc >= 1425 && cc <= 1785) || (cc >= 64286 && cc <= 65019) || (cc >= 65136 && cc <= 65276)) {
           return true;
         }
       }
@@ -994,7 +978,7 @@ public class Helper {
   }
 
   public static Set<String> getTokenAnnotationLevelSet(final SaltProject p) {
-    final Set<String> result = new TreeSet<String>();
+    final Set<String> result = new TreeSet<>();
 
     for (final SCorpusGraph corpusGraphs : p.getCorpusGraphs()) {
       for (final SDocument doc : corpusGraphs.getDocuments()) {
@@ -1007,7 +991,7 @@ public class Helper {
   }
 
   public static Set<String> getTokenAnnotationLevelSet(final SDocumentGraph graph) {
-    final Set<String> result = new TreeSet<String>();
+    final Set<String> result = new TreeSet<>();
 
     if (graph != null) {
       for (final SToken n : graph.getTokens()) {
@@ -1082,7 +1066,7 @@ public class Helper {
    * @param fragment fragment to parse
    * @return a map with the keys and values of the fragment
    */
-  public static LinkedHashMap<String, String> parseFragment(String fragment) {
+  public static Map<String, String> parseFragment(String fragment) {
     final LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
 
     fragment = StringUtils.removeStart(fragment, "!");
