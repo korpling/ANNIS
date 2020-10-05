@@ -48,7 +48,7 @@ public class CitationRedirectionServlet extends HttpServlet {
           } catch (URISyntaxException | IOException ex) {
             log.error(null, ex);
             try {
-              resp.sendError(500, ex.getMessage());
+              resp.sendError(400, ex.getMessage());
             } catch (IOException sendEx) {
               log.error("Could not send error to client", sendEx);
             }

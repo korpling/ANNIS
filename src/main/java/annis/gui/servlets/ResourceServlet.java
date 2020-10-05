@@ -83,7 +83,7 @@ public class ResourceServlet extends HttpServlet {
       Optional<ResourcePlugin> vis =
           plugins.stream().filter(p -> Objects.equal(p.getShortName(), vistype)).findAny();
       if (!vis.isPresent()) {
-        response.sendError(500, "There is no resource with the short name " + vistype);
+        response.sendError(400, "There is no resource with the short name " + vistype);
       } else if (path.endsWith(".class")) {
         response.sendError(403, "illegal class path access");
       } else {
