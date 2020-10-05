@@ -932,7 +932,7 @@ public class Helper {
       for (int i = 0; i < str.length(); i++) {
         final char cc = str.charAt(i);
         // 1th condition: hebrew extended and basic, arabic basic and extendend
-        // 2nd condition: alphabetic presentations forms (hebrwew) to arabic presentation forms A
+        // 2nd condition: alphabetic presentations forms (hebrew) to arabic presentation forms A
         // 3rd condition: arabic presentation forms B
         if((cc >= 1425 && cc <= 1785) || (cc >= 64286 && cc <= 65019) || (cc >= 65136 && cc <= 65276)) {
           return true;
