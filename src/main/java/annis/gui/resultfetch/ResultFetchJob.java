@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.JSON;
@@ -99,10 +100,13 @@ public class ResultFetchJob implements Runnable {
       q.setLimit(query.getLimit());
       q.setQueryLanguage(query.getApiQueryLanguage());
       File findResult = search.find(q);
-      Files.lines(findResult.toPath(), StandardCharsets.UTF_8).forEachOrdered((line) -> {
-        Match m = Match.parseFromString(line);
-        result.getMatches().add(m);
-      });
+      try (Stream<String> findResultLines =
+          Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
+        findResultLines.forEachOrdered((line) -> {
+          Match m = Match.parseFromString(line);
+          result.getMatches().add(m);
+        });
+      }
       // get the subgraph for each match, when the result is not empty
       if (result.getMatches().isEmpty()) {
 
