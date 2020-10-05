@@ -28,12 +28,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,81 +48,91 @@ import org.springframework.stereotype.Component;
 public class ResourceServlet extends HttpServlet {
 
     private static final long serialVersionUID = -8182635617256833563L;
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResourceServlet.class);
 
     @Autowired
     private List<ResourcePlugin> plugins;
 
-    @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        OutputStream outStream = response.getOutputStream();
+    private void performGet(HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+      OutputStream outStream = response.getOutputStream();
 
-        String completePath = request.getPathInfo();
+      String completePath = request.getPathInfo();
 
-        if (completePath == null) {
-            response.sendError(404, "must provide a valid and existing path with a vistype");
-            return;
-        }
+      if (completePath == null) {
+        response.sendError(404, "must provide a valid and existing path with a vistype");
+        return;
+      }
 
-        // remove trailing /
-        completePath = completePath.substring(1);
+      // remove trailing /
+      completePath = completePath.substring(1);
 
-        String[] pathComponents = completePath.split("/");
+      String[] pathComponents = completePath.split("/");
 
-        String vistype = pathComponents[0];
+      String vistype = pathComponents[0];
 
-        if (pathComponents.length < 2) {
-            response.sendError(404, "must provide a valid and existing path");
-            return;
-        }
+      if (pathComponents.length < 2) {
+        response.sendError(404, "must provide a valid and existing path");
+        return;
+      }
 
-        String path = StringUtils.join(Arrays.copyOfRange(pathComponents, 1, pathComponents.length), "/");
+      String path =
+          StringUtils.join(Arrays.copyOfRange(pathComponents, 1, pathComponents.length), "/");
 
-        // get the visualizer for this vistype
-        Optional<ResourcePlugin> vis =
-            plugins.stream().filter(p -> Objects.equal(p.getShortName(), vistype)).findAny();
-        if (!vis.isPresent()) {
-            response.sendError(500, "There is no resource with the short name " + vistype);
-        } else if (path.endsWith(".class")) {
-            response.sendError(403, "illegal class path access");
+      // get the visualizer for this vistype
+      Optional<ResourcePlugin> vis =
+          plugins.stream().filter(p -> Objects.equal(p.getShortName(), vistype)).findAny();
+      if (!vis.isPresent()) {
+        response.sendError(500, "There is no resource with the short name " + vistype);
+      } else if (path.endsWith(".class")) {
+        response.sendError(403, "illegal class path access");
+      } else {
+        URL resource = vis.get().getClass().getResource(path);
+        if (resource == null) {
+          response.sendError(404, path + " not found");
         } else {
-          URL resource = vis.get().getClass().getResource(path);
-            if (resource == null) {
-                response.sendError(404, path + " not found");
+          // check if it is new
+          URLConnection resourceConnection = resource.openConnection();
+          long resourceLastModified = resourceConnection.getLastModified();
+          long requestLastModified = request.getDateHeader("If-Modified-Since");
+          if (requestLastModified != -1 && resourceLastModified <= requestLastModified) {
+            response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+          } else {
+            response.addDateHeader("Last-Modified", resourceLastModified);
+            if ("localhost".equals(request.getServerName())) {
+              // does always expire right now
+              response.addDateHeader("Expires", new Date().getTime());
             } else {
-                // check if it is new
-                URLConnection resourceConnection = resource.openConnection();
-                long resourceLastModified = resourceConnection.getLastModified();
-                long requestLastModified = request.getDateHeader("If-Modified-Since");
-                if (requestLastModified != -1 && resourceLastModified <= requestLastModified) {
-                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                } else {
-                    response.addDateHeader("Last-Modified", resourceLastModified);
-                    if ("localhost".equals(request.getServerName())) {
-                        // does always expire right now
-                        response.addDateHeader("Expires", new Date().getTime());
-                    } else {
-                        // expires in one minute per default
-                        response.addDateHeader("Expires", new Date().getTime() + 60000);
-                    }
-                    // not in cache, stream out
-                    String mimeType = getServletContext().getMimeType(path);
-                    response.setContentType(mimeType);
-                    if (mimeType.startsWith("text/")) {
-                        response.setCharacterEncoding("UTF-8");
-                    }
-                    OutputStream bufferedOut = new BufferedOutputStream(outStream);
-                    try (InputStream resourceInStream = new BufferedInputStream(resource.openStream())) {
-                        int v;
-                        while ((v = resourceInStream.read()) != -1) {
-                            bufferedOut.write(v);
-                        }
-                    } finally {
-                        bufferedOut.flush();
-                        outStream.flush();
-                    }
-                }
+              // expires in one minute per default
+              response.addDateHeader("Expires", new Date().getTime() + 60000);
             }
+            // not in cache, stream out
+            String mimeType = getServletContext().getMimeType(path);
+            response.setContentType(mimeType);
+            if (mimeType.startsWith("text/")) {
+              response.setCharacterEncoding("UTF-8");
+            }
+            OutputStream bufferedOut = new BufferedOutputStream(outStream);
+            try (InputStream resourceInStream = new BufferedInputStream(resource.openStream())) {
+              int v;
+              while ((v = resourceInStream.read()) != -1) {
+                bufferedOut.write(v);
+              }
+            } finally {
+              bufferedOut.flush();
+              outStream.flush();
+            }
+          }
         }
+      }
+    }
 
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) {
+      try {
+        performGet(request, response);
+      } catch (IOException ex) {
+        log.error("Input/output error when serving a resource", ex);
+      }
     }
 }

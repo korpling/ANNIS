@@ -18,7 +18,6 @@ package annis.gui.servlets;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,15 +40,18 @@ public class CitationRedirectionServlet extends HttpServlet {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(CitationRedirectionServlet.class);
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             URI uri = new URI(req.getRequestURI());
             req.getSession().setAttribute("citation", uri.getPath());
             resp.sendRedirect(req.getContextPath() + "/");
-        } catch (URISyntaxException ex) {
+          } catch (URISyntaxException | IOException ex) {
             log.error(null, ex);
-
-            resp.sendError(500, ex.getMessage());
+            try {
+              resp.sendError(500, ex.getMessage());
+            } catch (IOException sendEx) {
+              log.error("Could not send error to client", sendEx);
+            }
         }
     }
 
