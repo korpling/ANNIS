@@ -37,7 +37,7 @@ public class AutoHeightIFrame extends AbstractComponent {
   }
 
   @Override
-  protected AutoHeightIFrameState getState() {
+  public AutoHeightIFrameState getState() {
     return (AutoHeightIFrameState) super.getState();
   }
 
