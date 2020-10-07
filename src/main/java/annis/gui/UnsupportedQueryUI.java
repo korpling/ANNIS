@@ -1,17 +1,15 @@
 /*
  * Copyright 2019 Corpuslinguistic working group Humboldt University Berlin.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package annis.gui;
 
@@ -31,49 +29,64 @@ public class UnsupportedQueryUI extends CommonUI {
 
   public class UnsupportedQueryPanel extends Panel {
 
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 5891948595136418081L;
-        private Button btExecute;
-        private final String url;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 5891948595136418081L;
+    private Button btExecute;
 
-        public UnsupportedQueryPanel(String url) {
-            this.url = url;
+    private String url;
 
-            Page.getCurrent().setTitle("ANNIS: Unsupported query for citation link");
+    public UnsupportedQueryPanel() {
+      Page.getCurrent().setTitle("ANNIS: Unsupported query for citation link");
 
-            Design.read("UnsupportedQueryPanel.html", this);
+      Design.read("UnsupportedQueryPanel.html", this);
 
-            btExecute.addClickListener(event -> {
-                if (url != null) {
-                getUI().getPage().setLocation(servletContext.getContextPath() + url);
-                }
-            });
+      btExecute.addClickListener(event -> {
+        if (url != null) {
+          getPage().setLocation(servletContext.getContextPath() + url);
         }
-
+      });
     }
 
-    private static final long serialVersionUID = 3022711576267350004L;
-
-    public static final String URL_PREFIX = "/unsupported-query";
-
-    @Autowired
-    private transient ServletContext servletContext;
-
-    public UnsupportedQueryUI() {
-        super(URL_PREFIX);
-
+    public String getUrl() {
+      return url;
     }
 
-    @Override
-    protected void init(VaadinRequest request) {
-        UnsupportedQueryPanel panel = new UnsupportedQueryPanel(request.getParameter("url"));
-        setContent(panel);
+    public void setUrl(String url) {
+      this.url = url;
     }
+  }
 
-    @Override
-    public ServletContext getServletContext() {
-      return servletContext;
-    }
+  private static final long serialVersionUID = 3022711576267350004L;
+
+  public static final String URL_PREFIX = "/unsupported-query";
+
+
+  @Autowired
+  private transient ServletContext servletContext;
+
+  private UnsupportedQueryPanel panel;
+
+  public UnsupportedQueryUI() {
+    super(URL_PREFIX);
+
+  }
+
+  @Override
+  protected void init(VaadinRequest request) {
+    panel = new UnsupportedQueryPanel();
+    panel.setUrl(request.getParameter("url"));
+    setContent(panel);
+  }
+
+
+  @Override
+  public ServletContext getServletContext() {
+    return servletContext;
+  }
+
+  public UnsupportedQueryPanel getPanel() {
+    return panel;
+  }
 }
