@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.transaction.Transactional;
-import javax.ws.rs.core.UriBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class UrlShortener {
@@ -58,8 +58,8 @@ public class UrlShortener {
     } else {
       shortID = existingEntry.get(0).getId();
     }
-    return UriBuilder.fromUri(original).replacePath(appContext + "/").replaceQuery("").fragment("")
-        .queryParam("id", shortID.toString()).build().toASCIIString();
+    return UriComponentsBuilder.fromUri(original).replacePath(appContext + "/").replaceQuery("")
+        .queryParam("id", shortID.toString()).build().toUriString();
   }
 
   public Optional<URI> unshorten(UUID id) {

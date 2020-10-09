@@ -16,7 +16,6 @@ package annis.gui.query_references;
 import annis.gui.AnnisUI;
 import annis.gui.CommonUI;
 import annis.gui.EmbeddedVisUI;
-import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
@@ -42,10 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.ws.rs.core.UriBuilder;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  *
@@ -165,10 +164,11 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
   private URI generatorURLForVisualizer(VisualizerRule entry) {
     String appContext = ui.getServletContext().getContextPath();
     URI appURI = ui.getPage().getLocation();
-    UriBuilder result = UriBuilder.fromUri(appURI).replacePath(appContext).path("embeddedvis")
-        .path(Helper.encodeJersey(entry.getVisType())).fragment("");
+    UriComponentsBuilder result = UriComponentsBuilder.fromUri(appURI).replacePath(appContext)
+        .path("embeddedvis")
+        .path(entry.getVisType());
     if (entry.getLayer() != null) {
-      result = result.queryParam("embedded_ns", Helper.encodeJersey(entry.getLayer()));
+      result = result.queryParam("embedded_ns", entry.getLayer());
     }
     // test if the request was made from a sub-instance
     String nonContextPath = appURI.getPath().substring(appContext.length());
@@ -183,7 +183,7 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
         .filter(vis -> Objects.equal(vis.getShortName(), entry.getVisType())).findAny();
     
     // Add the matched node IDs
-    result = result.queryParam(EmbeddedVisUI.KEY_MATCH, Helper.encodeJersey(match.toString()));
+    result = result.queryParam(EmbeddedVisUI.KEY_MATCH, match.toString());
     if (visPlugin.isPresent() && visPlugin.get().isUsingText()) {
       // Tell the embedded visualizer to extract the fulltext for the whole match
       result = result.queryParam(EmbeddedVisUI.KEY_FULLTEXT, "true");
@@ -205,14 +205,13 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
     // add all mappings as parameter
     for (Map.Entry<String, String> e : entry.getMappings().entrySet()) {
       if (!e.getKey().startsWith(EmbeddedVisUI.KEY_PREFIX)) {
-        String value = Helper.encodeJersey(e.getValue());
-        result = result.queryParam(e.getKey(), value);
+        result = result.queryParam(e.getKey(), e.getValue());
       }
     }
   
 
 
-    return result.build();
+    return result.build().toUri();
   }
 
   @Override

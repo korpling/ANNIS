@@ -66,6 +66,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @Push(value = PushMode.AUTOMATIC)
 public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListener {
 
+  private static final Profiles DESKTOP_PROFILES = Profiles.of("desktop & !test");
   private static final long serialVersionUID = 3022711576267350005L;
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisUI.class);
 
@@ -276,7 +277,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   }
 
   public boolean isDesktopMode() {
-    return environment.acceptsProfiles(Profiles.of("desktop"));
+    return environment.acceptsProfiles(DESKTOP_PROFILES);
   }
 
   private void initTransients() {
