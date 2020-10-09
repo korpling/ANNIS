@@ -1,7 +1,17 @@
 package annis.gui.servlets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,6 +47,24 @@ class CitationRedirectionServletTest {
         .getForEntity("http://localhost:" + port + "/Cite/" + ORIGINAL_URL, String.class);
     assertEquals(HttpStatus.FOUND, response.getStatusCode());
     assertEquals("http://localhost:" + port + "/", response.getHeaders().get("Location").get(0));
+  }
+
+  @Test
+  void handleIOException() throws IOException {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpServletResponse response = mock(HttpServletResponse.class);
+    CitationRedirectionServlet servlet = new CitationRedirectionServlet();
+    HttpSession session = mock(HttpSession.class);
+
+    when(request.getSession()).thenReturn(session);
+
+    // Throw an exception when the servlet tries to perform the redirect
+    when(request.getRequestURI()).thenReturn("http://localhost:" + port + "/Cite/" + ORIGINAL_URL);
+
+    doThrow(new IOException("Connection aborted")).when(response).sendRedirect(anyString());
+    servlet.doGet(request, response);
+
+    verify(response).sendError(eq(400), anyString());
   }
 
 }
