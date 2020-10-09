@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.regex.Pattern;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -125,6 +126,8 @@ public class ReducingStringComparator {
         ClassResource cr = new ClassResource(ReducingStringComparator.class, MAPPING_FILE);
         try {
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document mappingD = db.parse(cr.getStream().getStream());
 
