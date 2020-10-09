@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.xml.XMLConstants;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -81,6 +82,8 @@ public abstract class AbstractGraphMLMapper {
 
   protected void execute(File inputFile) throws IOException, XMLStreamException {
     XMLInputFactory factory = XMLInputFactory.newInstance();
+    factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+    factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
     factory.setProperty(XMLInputFactory.IS_VALIDATING, false);
 
     // 1. pass, check which nodes have an outgoing edge of a certain types
