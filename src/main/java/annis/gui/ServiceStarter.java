@@ -13,6 +13,8 @@
  */
 package annis.gui;
 
+import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -24,10 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.moandjiezana.toml.Toml;
-import com.moandjiezana.toml.TomlWriter;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
