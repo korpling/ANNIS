@@ -12,6 +12,9 @@ cache:
   directories:
   - $HOME/.m2
 
+node_js:
+  - "10"
+
 branches:
     only:
     - master
