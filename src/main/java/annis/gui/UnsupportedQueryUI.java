@@ -68,6 +68,8 @@ public class UnsupportedQueryUI extends CommonUI {
 
   private UnsupportedQueryPanel panel;
 
+  protected Page overwrittenPage;
+
   public UnsupportedQueryUI() {
     super(URL_PREFIX);
 
@@ -88,5 +90,14 @@ public class UnsupportedQueryUI extends CommonUI {
 
   public UnsupportedQueryPanel getPanel() {
     return panel;
+  }
+
+  @Override
+  public Page getPage() {
+    if (overwrittenPage == null) {
+      return super.getPage();
+    } else {
+      return overwrittenPage;
+    }
   }
 }

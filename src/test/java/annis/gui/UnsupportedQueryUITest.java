@@ -25,7 +25,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @WebAppConfiguration
 class UnsupportedQueryUITest {
 
-  private static final String TARGET_URL = "http://localhost:8080/q=somequery";
+  private static final String TARGET_URL = "http://localhost:8080?q=somequery";
   @Autowired
   private BeanFactory beanFactory;
 
@@ -35,6 +35,10 @@ class UnsupportedQueryUITest {
   public void setup() {
     UIScopeImpl.setBeanStoreRetrievalStrategy(new SingletonBeanStoreRetrievalStrategy());
     ui = beanFactory.getBean(UnsupportedQueryUI.class);
+
+    // Make sure we can spy on the page object of the UI
+    Page page = spy(ui.getPage());
+    ui.overwrittenPage = page;
 
     MockVaadin.setup(() -> ui);
 
@@ -47,14 +51,13 @@ class UnsupportedQueryUITest {
 
   @Test
   void testExecuteQueryAnyway() {
-    Page page = spy(ui.getPage());
 
     ui.getPanel().setUrl(TARGET_URL);
 
     _click(_get(Button.class,
         spec -> spec.withPredicate(btn -> btn.getCaption().startsWith("I understand the risks"))));
     // This should redirect us to the target URL
-    verify(page).setLocation(eq(TARGET_URL));
+    verify(ui.getPage()).setLocation(eq(TARGET_URL));
   }
 
 }
