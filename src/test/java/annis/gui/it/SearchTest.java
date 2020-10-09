@@ -84,7 +84,7 @@ class SearchTest {
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
     _click(_get(Button.class, spec -> spec.withCaption("Search")));
 
-    awaitCondition(60, () -> !_find(SingleResultPanel.class).isEmpty());
+    awaitCondition(90, () -> !_find(SingleResultPanel.class).isEmpty());
   }
 
   @Test
