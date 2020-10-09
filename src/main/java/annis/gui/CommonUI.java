@@ -39,7 +39,7 @@ public abstract class CommonUI extends AnnisBaseUI {
 
     private InstanceConfig instanceConfig;
 
-    public CommonUI(String urlPrefix) {
+    protected CommonUI(String urlPrefix) {
         this.urlPrefix = urlPrefix;
     }
 
