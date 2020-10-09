@@ -14,6 +14,7 @@
 package annis.gui.docbrowser;
 
 import annis.gui.AnnisUI;
+import annis.gui.CommonUI;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.graphml.DocumentGraphMapper;
 import annis.libgui.Background;
@@ -185,7 +186,7 @@ public class DocBrowserController implements Serializable {
    * @return a {@link VisualizerInput} input, which is usable for rendering the whole document.
    */
   public static VisualizerInput createInput(String corpus, List<String> docPath,
-      VisualizerRule config, List<String> nodeAnnoFilter, boolean useRawText, UI ui) {
+      VisualizerRule config, List<String> nodeAnnoFilter, boolean useRawText, CommonUI ui) {
     VisualizerInput input = new VisualizerInput();
 
     // set mappings and namespaces. some visualizer do not survive without

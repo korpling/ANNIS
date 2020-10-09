@@ -13,9 +13,6 @@
  */
 package annis.libgui;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
 import com.google.common.base.Charsets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
@@ -30,11 +27,8 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -199,50 +193,9 @@ public class AnnisBaseUI extends UI implements Serializable {
 
   @Override
   protected void init(VaadinRequest request) {
-
-    initLogging();
-
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     alreadyAddedCSS.clear();
   }
-
-
-  protected final void initLogging() {
-    try {
-
-      List<File> logbackFiles = getAllConfigLocations("gui-logback.xml");
-
-      InputStream inStream = null;
-      if (!logbackFiles.isEmpty()) {
-        try {
-          inStream = new FileInputStream(logbackFiles.get(logbackFiles.size() - 1));
-        } catch (FileNotFoundException ex) {
-          // well no logging no error...
-        }
-      }
-      if (inStream == null) {
-        ClassResource res = new ClassResource(AnnisBaseUI.class, "logback.xml");
-        inStream = res.getStream().getStream();
-      }
-
-      if (inStream != null) {
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-        JoranConfigurator jc = new JoranConfigurator();
-        jc.setContext(context);
-        context.reset();
-
-        context.putProperty("webappHome",
-            VaadinService.getCurrent().getBaseDirectory().getAbsolutePath());
-
-        // load config file
-        jc.doConfigure(inStream);
-      }
-    } catch (JoranException ex) {
-      log.error("init logging failed", ex);
-    }
-
-  }
-
 
   /**
    * Inject CSS into the UI. This function will not add multiple style-elements if the exact CSS

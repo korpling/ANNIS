@@ -14,13 +14,13 @@
 package annis.gui;
 
 import annis.gui.components.SettingsStorage;
-import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.requesthandler.ResourceRequestHandler;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import com.vaadin.server.VaadinRequest;
 import java.util.Map;
+import javax.servlet.ServletContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CommonUI extends AnnisBaseUI {
+public abstract class CommonUI extends AnnisBaseUI {
     private static final long serialVersionUID = -1304604048896817844L;
 
     private static final Logger log = LoggerFactory.getLogger(CommonUI.class);
@@ -39,7 +39,7 @@ public class CommonUI extends AnnisBaseUI {
 
     private InstanceConfig instanceConfig;
 
-    public CommonUI(String urlPrefix) {
+    protected CommonUI(String urlPrefix) {
         this.urlPrefix = urlPrefix;
     }
 
@@ -153,5 +153,7 @@ public class CommonUI extends AnnisBaseUI {
     public String getUrlPrefix() {
         return urlPrefix;
     }
+
+    public abstract ServletContext getServletContext();
 
 }

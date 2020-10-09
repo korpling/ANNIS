@@ -26,12 +26,15 @@ import org.mockito.internal.util.collections.Sets;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 @SpringBootTest
-@ActiveProfiles("desktop")
+@ActiveProfiles({"desktop", "test"})
 @WebAppConfiguration
+@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class FlatQueryBuilderTest {
 
 

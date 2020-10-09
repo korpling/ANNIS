@@ -14,21 +14,17 @@
 package annis.gui.query_references;
 
 import annis.gui.AnnisUI;
+import annis.gui.CommonUI;
 import annis.gui.EmbeddedVisUI;
-import annis.libgui.Helper;
-import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.model.PagedResultQuery;
 import annis.service.objects.Match;
-import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.base.Splitter;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
@@ -40,18 +36,15 @@ import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.v7.ui.Grid;
 import com.vaadin.v7.ui.Label;
 import com.vaadin.v7.ui.TextArea;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLDecoder;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.ws.rs.core.UriBuilder;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  *
@@ -84,8 +77,11 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
 
   private final List<VisualizerPlugin> visualizerPlugins;
 
-  public ShareSingleMatchGenerator(List<VisualizerRule> visualizers, Match match,
+  private final CommonUI ui;
+
+  public ShareSingleMatchGenerator(CommonUI ui, List<VisualizerRule> visualizers, Match match,
       PagedResultQuery query, String baseText, List<VisualizerPlugin> visualizerPlugins) {
+    this.ui = ui;
     this.match = match;
     this.query = query;
     this.baseText = baseText;
@@ -166,12 +162,13 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
   }
 
   private URI generatorURLForVisualizer(VisualizerRule entry) {
-    String appContext = Helper.getContext(UI.getCurrent());
-    URI appURI = UI.getCurrent().getPage().getLocation();
-    UriBuilder result = UriBuilder.fromUri(appURI).replacePath(appContext).path("embeddedvis")
-        .path(Helper.encodeJersey(entry.getVisType())).fragment("");
+    String appContext = ui.getServletContext().getContextPath();
+    URI appURI = ui.getPage().getLocation();
+    UriComponentsBuilder result = UriComponentsBuilder.fromUri(appURI).replacePath(appContext)
+        .path("embeddedvis")
+        .path(entry.getVisType());
     if (entry.getLayer() != null) {
-      result = result.queryParam("embedded_ns", Helper.encodeJersey(entry.getLayer()));
+      result = result.queryParam("embedded_ns", entry.getLayer());
     }
     // test if the request was made from a sub-instance
     String nonContextPath = appURI.getPath().substring(appContext.length());
@@ -186,7 +183,7 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
         .filter(vis -> Objects.equal(vis.getShortName(), entry.getVisType())).findAny();
     
     // Add the matched node IDs
-    result = result.queryParam(EmbeddedVisUI.KEY_MATCH, Helper.encodeJersey(match.toString()));
+    result = result.queryParam(EmbeddedVisUI.KEY_MATCH, match.toString());
     if (visPlugin.isPresent() && visPlugin.get().isUsingText()) {
       // Tell the embedded visualizer to extract the fulltext for the whole match
       result = result.queryParam(EmbeddedVisUI.KEY_FULLTEXT, "true");
@@ -208,20 +205,18 @@ public class ShareSingleMatchGenerator extends Window implements SelectionEvent.
     // add all mappings as parameter
     for (Map.Entry<String, String> e : entry.getMappings().entrySet()) {
       if (!e.getKey().startsWith(EmbeddedVisUI.KEY_PREFIX)) {
-        String value = Helper.encodeJersey(e.getValue());
-        result = result.queryParam(e.getKey(), value);
+        result = result.queryParam(e.getKey(), e.getValue());
       }
     }
   
 
 
-    return result.build();
+    return result.build().toUri();
   }
 
   @Override
   public void select(SelectionEvent event) {
     Set<Object> selected = event.getSelected();
-    UI ui = UI.getCurrent();
     if (ui instanceof AnnisUI && !selected.isEmpty()) {
       AnnisUI annisUI = (AnnisUI) ui;
       generatedLinks.setVisible(true);

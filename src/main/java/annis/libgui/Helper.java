@@ -30,7 +30,6 @@ import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
 import com.vaadin.server.JsonCodec;
 import com.vaadin.server.Page;
-import com.vaadin.server.VaadinService;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import elemental.json.JsonValue;
@@ -586,15 +585,6 @@ public class Helper {
       log.error(null, ex);
     }
     return "ERROR";
-  }
-
-  public static String getContext(final UI ui) {
-    if (VaadinService.getCurrentRequest() != null) {
-      return VaadinService.getCurrentRequest().getContextPath();
-    } else {
-      return (String) ui.getSession().getAttribute(AnnisBaseUI.CONTEXT_PATH);
-    }
-
   }
 
   /**
