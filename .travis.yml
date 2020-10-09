@@ -1,8 +1,4 @@
-env:
-  global:
-    - MOZ_HEADLESS=1
 addons:
-  firefox: latest
   sonarcloud:
     organization: "korpling"
     token:
@@ -22,6 +18,10 @@ branches:
     - /release/.*/
     - /^v\d+.\d+(.\d+)?(-\S*)?$/
 
+before_install:
+  - nvm install 10
+  
+  
 before_script:
   - export SHORT_VERSION=`echo ${TRAVIS_TAG:-develop} | sed -E 's/(\.[0-9]+)$//'`
   - mkdir -p $HOME/.cargo/bin
