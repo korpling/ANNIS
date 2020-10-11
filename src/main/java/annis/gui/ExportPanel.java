@@ -47,7 +47,6 @@ import com.vaadin.v7.ui.Label;
 import com.vaadin.v7.ui.TextField;
 import java.io.File;
 import java.util.Optional;
-import net.sf.ehcache.CacheException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -396,7 +395,7 @@ public class ExportPanel extends GridLayout {
     // when not longer needed
     tmpOutputFile = currentTmpFile;
     //
-    if (exportError instanceof CacheException || exportError instanceof IllegalStateException
+    if (exportError instanceof IllegalStateException
         || exportError instanceof ClassCastException) {
       Notification.show(exportError.getMessage(), Notification.Type.ERROR_MESSAGE);
     } else if (tmpOutputFile == null) {
