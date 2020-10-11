@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -154,7 +155,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
       // 1. Get all the matches as Salt ID
       FindQuery query = new FindQuery();
-      query.setCorpora(new LinkedList<String>(corpora));
+      query.setCorpora(new LinkedList<>(corpora));
       query.setQueryLanguage(queryLanguage);
       query.setQuery(queryAnnisQL);
       File matches = searchApi.find(query);
@@ -166,11 +167,11 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
       final AtomicInteger offset = new AtomicInteger();
       final AtomicInteger pCounter = new AtomicInteger();
-      Map<Integer, Integer> offsets = new HashMap<Integer, Integer>();
+      Map<Integer, Integer> offsets = new HashMap<>();
 
       Optional<Exception> ex = Optional.empty();
       try (Stream<String> lines = Files.lines(matches.toPath(), StandardCharsets.UTF_8)) {
-        ex = lines.map((currentLine) -> {
+        ex = lines.map(currentLine -> {
           // 2. iterate over all matches and get the sub-graph for a group of matches
           Match match = Match.parseFromString(currentLine);
 
@@ -219,7 +220,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
             }
           }
           return null;
-        }).filter((result) -> result != null).findAny();
+        }).filter(Objects::nonNull).findAny();
       }
 
 
@@ -232,7 +233,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
       @SuppressWarnings("unchecked")
       List<Integer> cacheKeys = cache.getKeys();
-      List<Integer> listOfKeys = new ArrayList<Integer>();
+      List<Integer> listOfKeys = new ArrayList<>();
 
       for (Integer key : cacheKeys) {
         listOfKeys.add(key);
