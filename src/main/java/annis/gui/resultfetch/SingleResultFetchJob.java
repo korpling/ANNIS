@@ -81,7 +81,7 @@ public class SingleResultFetchJob implements Callable<SaltProject>
       SDocument doc = cg.createDocument(docURI);
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
       doc.setDocumentGraph(docGraph);
-      Helper.addMatchToDocumentGraph(match, doc);
+      Helper.addMatchToDocumentGraph(match, doc.getDocumentGraph());
     }
 
     return p;

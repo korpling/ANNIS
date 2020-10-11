@@ -16,11 +16,8 @@ package annis.gui.exporter;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
-import annis.gui.graphml.DocumentGraphMapper;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
-import annis.service.objects.Match;
-import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.eventbus.EventBus;
 import com.vaadin.ui.UI;
@@ -40,12 +37,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
-import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.QueryLanguage;
-import org.corpus_tools.annis.api.model.SubgraphWithContext;
-import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -53,7 +47,6 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SMetaAnnotation;
-import org.eclipse.emf.common.util.URI;
 
 public abstract class GeneralTextExporter implements ExporterPlugin, Serializable {
 
@@ -143,22 +136,9 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
       Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
     try {
 
+      CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
       if (keys == null || keys.isEmpty()) {
-        // auto set
-        keys = new LinkedList<>();
-        keys.add("tok");
-        List<Annotation> attributes = new LinkedList<>();
-
-        CorporaApi api = new CorporaApi(Helper.getClient(ui));
-        for (String corpus : corpora) {
-          attributes.addAll(api.nodeAnnotations(corpus, false, false));
-        }
-
-        for (Annotation a : attributes) {
-          if (a.getKey().getName() != null) {
-            keys.add(a.getKey().getName());
-          }
-        }
+        keys = ExportHelper.getAllAnnotationsAsExporterKey(corpora, corporaApi);
       }
 
       final List<String> finalKeys = keys;
@@ -177,7 +157,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
       // 1. Get all the matches as Salt ID
       SearchApi searchApi = new SearchApi(Helper.getClient(ui));
-      CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
+
       FindQuery query = new FindQuery();
       query.setCorpora(new LinkedList<String>(corpora));
       query.setQueryLanguage(queryLanguage);
@@ -185,49 +165,26 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
       final AtomicInteger offset = new AtomicInteger();
       File matches = searchApi.find(query);
+      // 2. iterate over all matches and get the sub-graph for them
       Optional<Exception> ex =
           Files.lines(matches.toPath(), StandardCharsets.UTF_8).map((currentLine) -> {
-            // 2. iterate over all matches and get the sub-graph for a group of matches
-            Match match = Match.parseFromString(currentLine);
-
-            if (!match.getSaltIDs().isEmpty()) {
-              List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
-
-              SubgraphWithContext subgraphQuery = new SubgraphWithContext();
-              subgraphQuery.setLeft(contextLeft);
-              subgraphQuery.setRight(contextRight);
-              subgraphQuery.setNodeIds(match.getSaltIDs());
-
-              if (args.containsKey("segmentation")) {
-                subgraphQuery.setSegmentation(args.get("segmentation"));
-              }
-
-              final SaltProject p = SaltFactory.createSaltProject();
-              SCorpusGraph cg = p.createCorpusGraph();
-              URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
-              SDocument doc = cg.createDocument(docURI);
-
-              try {
-                File graphML = corporaApi.subgraphForNodes(corpusPath.get(0), subgraphQuery);
-
-                SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-                doc.setDocumentGraph(docGraph);
-                Helper.addMatchToDocumentGraph(match, doc);
-
+            try {
+              Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
+                  contextLeft, contextRight, args);
+              if (p.isPresent()) {
                 int currentOffset = offset.getAndIncrement();
-                convertText(p, finalKeys, args, out, currentOffset, ui);
+                convertText(p.get(), finalKeys, args, out, currentOffset, ui);
 
                 if (eventBus != null) {
                   eventBus.post(currentOffset + 1);
                 }
-
-                if (Thread.interrupted()) {
-                  Exception result = new InterruptedException("Exporter job was interrupted");
-                  return result;
-                }
-              } catch (Exception e) {
-                return e;
               }
+
+              if (Thread.interrupted()) {
+                return new InterruptedException("Exporter job was interrupted");
+              }
+            } catch (Exception e) {
+              return e;
             }
             return null;
           }).filter((result) -> result != null).findAny();

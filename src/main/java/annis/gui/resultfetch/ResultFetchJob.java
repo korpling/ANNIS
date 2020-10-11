@@ -212,7 +212,7 @@ public class ResultFetchJob implements Runnable {
         SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
         queue.put(p);
         doc.setDocumentGraph(docGraph);
-        Helper.addMatchToDocumentGraph(m, doc);
+        Helper.addMatchToDocumentGraph(m, doc.getDocumentGraph());
         log.debug("added match {} to queue", currentMatchNumber + 1);
       } catch (XMLStreamException | IOException ex) {
         log.error("Could not map GraphML to Salt", ex);

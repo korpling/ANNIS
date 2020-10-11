@@ -93,6 +93,7 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SAnnotation;
+import org.corpus_tools.salt.core.SAnnotationContainer;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SGraph;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
@@ -786,7 +787,8 @@ public class Helper {
     }
   }
 
-  public static void addMatchToDocumentGraph(final Match match, final SDocument document) {
+  public static void addMatchToDocumentGraph(final Match match,
+      final SDocumentGraph documentGraph) {
     final List<String> allUrisAsString = new LinkedList<>();
     long i = 1;
     for (String u : match.getSaltIDs()) {
@@ -794,7 +796,7 @@ public class Helper {
       if (!u.startsWith("salt:/")) {
         u = "salt:/" + u;
       }
-      final SNode matchedNode = document.getDocumentGraph().getNode(u);
+      final SNode matchedNode = documentGraph.getNode(u);
       // set the feature for this specific node
       if (matchedNode != null) {
         final SFeature existing =
@@ -810,24 +812,29 @@ public class Helper {
       }
       i++;
     }
+    // Attach metadata to a possible attached document, or as fallback to the document graph itself
+    SAnnotationContainer metaDataContainer = documentGraph;
+    if (documentGraph.getDocument() != null) {
+      metaDataContainer = documentGraph.getDocument();
+    }
     final SFeature existingFeatIDs =
-        document.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
+        metaDataContainer.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
     if (existingFeatIDs == null) {
       final SFeature featIDs = SaltFactory.createSFeature();
       featIDs.setNamespace(AnnisConstants.ANNIS_NS);
       featIDs.setName(AnnisConstants.FEAT_MATCHEDIDS);
       featIDs.setValue(Joiner.on(",").join(allUrisAsString));
-      document.addFeature(featIDs);
+      metaDataContainer.addFeature(featIDs);
     }
 
     final SFeature existingFeatAnnos =
-        document.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDANNOS);
+        metaDataContainer.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDANNOS);
     if (existingFeatAnnos == null) {
       final SFeature featAnnos = SaltFactory.createSFeature();
       featAnnos.setNamespace(AnnisConstants.ANNIS_NS);
       featAnnos.setName(AnnisConstants.FEAT_MATCHEDANNOS);
       featAnnos.setValue(Joiner.on(",").join(match.getAnnos()));
-      document.addFeature(featAnnos);
+      metaDataContainer.addFeature(featAnnos);
     }
   }
 
