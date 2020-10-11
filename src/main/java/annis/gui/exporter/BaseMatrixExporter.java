@@ -85,8 +85,8 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
    * @param out
    */
   private void convertSaltProject(SaltProject p, Map<String, String> args, boolean alignmc,
-      int offset, Writer out, Integer nodeCount,
-      UI ui) throws IOException, IllegalArgumentException {
+      int offset, Writer out, Integer nodeCount, UI ui)
+      throws IOException, IllegalArgumentException {
     int recordNumber = offset;
     if (p != null && p.getCorpusGraphs() != null) {
 
@@ -145,7 +145,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
         if (splitted.length > 1) {
           val = splitted[1];
         }
-        args.put(key, val);I
+        args.put(key, val);
       }
 
       SearchApi searchApi = new SearchApi(Helper.getClient(ui));
@@ -200,8 +200,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
               int currentOffset = offset.getAndIncrement();
               int currentPCounter = pCounter.getAndIncrement();
-              convertSaltProject(p, args, alignmc, currentOffset, out, nodeCount,
-                  ui);
+              convertSaltProject(p, args, alignmc, currentOffset, out, nodeCount, ui);
 
               offsets.put(currentPCounter, currentOffset);
               cache.put(new Element(currentPCounter, p));
@@ -243,7 +242,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
       for (Integer key : listOfKeys) {
         SaltProject p = (SaltProject) cache.get(key).getObjectValue();
-        convertSaltProject(p, keys, args, alignmc, offsets.get(key), corpusConfigs, out, null, ui);
+        convertSaltProject(p, args, alignmc, offsets.get(key), out, null, ui);
       }
 
       out.append(System.lineSeparator());
