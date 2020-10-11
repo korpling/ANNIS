@@ -86,7 +86,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
    */
   private void convertSaltProject(SaltProject p, Map<String, String> args, boolean alignmc,
       int offset, Writer out, Integer nodeCount, UI ui)
-      throws IOException, IllegalArgumentException {
+      throws IOException {
     int recordNumber = offset;
     if (p != null && p.getCorpusGraphs() != null) {
 
@@ -260,7 +260,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   }
 
   public abstract void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args,
-      int recordNumber, int nodeCount) throws IOException, IllegalArgumentException;
+      int recordNumber, int nodeCount) throws IOException;
 
   /**
    * Specifies the ending of export file.
@@ -288,5 +288,5 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   }
 
   public abstract void outputText(SDocumentGraph graph, boolean alignmc, int recordNumber,
-      Writer out, UI ui) throws IOException, IllegalArgumentException;
+      Writer out, UI ui) throws IOException;
 }
