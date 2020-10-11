@@ -79,14 +79,13 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
    * for the single document graph.
    * 
    * @param p
-   * @param annoKeys
    * @param args
    * @param alignmc
    * @param offset
    * @param out
    */
   private void convertSaltProject(SaltProject p, Map<String, String> args, boolean alignmc,
-      int offset, Map<String, CorpusConfiguration> corpusConfigs, Writer out, Integer nodeCount,
+      int offset, Writer out, Integer nodeCount,
       UI ui) throws IOException, IllegalArgumentException {
     int recordNumber = offset;
     if (p != null && p.getCorpusGraphs() != null) {
@@ -146,7 +145,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
         if (splitted.length > 1) {
           val = splitted[1];
         }
-        args.put(key, val);
+        args.put(key, val);I
       }
 
       SearchApi searchApi = new SearchApi(Helper.getClient(ui));
@@ -201,7 +200,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
               int currentOffset = offset.getAndIncrement();
               int currentPCounter = pCounter.getAndIncrement();
-              convertSaltProject(p, args, alignmc, currentOffset, corpusConfigs, out, nodeCount,
+              convertSaltProject(p, args, alignmc, currentOffset, out, nodeCount,
                   ui);
 
               offsets.put(currentPCounter, currentOffset);
