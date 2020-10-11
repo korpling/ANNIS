@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
@@ -179,59 +180,61 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
             final AtomicInteger pCounter = new AtomicInteger();
             Map<Integer, Integer> offsets = new HashMap<Integer, Integer>();
 
-            Optional<Exception> ex =
-                Files.lines(matches.toPath(), StandardCharsets.UTF_8).map((currentLine) -> {
-                  // 2. iterate over all matches and get the sub-graph for a group of matches
-                  Match match = Match.parseFromString(currentLine);
+            Optional<Exception> ex = Optional.empty();
+            try (Stream<String> lines = Files.lines(matches.toPath(), StandardCharsets.UTF_8)) {
+              ex = lines.map((currentLine) -> {
+                // 2. iterate over all matches and get the sub-graph for a group of matches
+                Match match = Match.parseFromString(currentLine);
 
-                  if (!match.getSaltIDs().isEmpty()) {
-                    List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
+                if (!match.getSaltIDs().isEmpty()) {
+                  List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
 
-                    SubgraphWithContext subgraphQuery = new SubgraphWithContext();
-                    subgraphQuery.setLeft(contextLeft);
-                    subgraphQuery.setRight(contextRight);
-                    subgraphQuery.setNodeIds(match.getSaltIDs());
+                  SubgraphWithContext subgraphQuery = new SubgraphWithContext();
+                  subgraphQuery.setLeft(contextLeft);
+                  subgraphQuery.setRight(contextRight);
+                  subgraphQuery.setNodeIds(match.getSaltIDs());
 
-                    if (args.containsKey("segmentation")) {
-                      subgraphQuery.setSegmentation(args.get("segmentation"));
-                    }
-
-                    final SaltProject p = SaltFactory.createSaltProject();
-                    SCorpusGraph cg = p.createCorpusGraph();
-                    URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
-                    SDocument doc = cg.createDocument(docURI);
-
-                    try {
-                      File graphML = corporaApi.subgraphForNodes(corpusPath.get(0), subgraphQuery);
-
-                      SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-                      doc.setDocumentGraph(docGraph);
-                      Helper.addMatchToDocumentGraph(match, doc);
-
-                      int currentOffset = offset.getAndIncrement();
-                      int currentPCounter = pCounter.getAndIncrement();
-                      convertSaltProject(p, finalKeys, args, alignmc,
-                          currentOffset, corpusConfigs, out,
-                          nodeCount, ui);
-
-                      offsets.put(currentPCounter, currentOffset);
-                      cache.put(new Element(currentPCounter, p));
-
-
-                      if (eventBus != null && (currentOffset + 1) % 100 == 0) {
-                        eventBus.post(currentOffset + 1);
-                      }
-
-                      if (Thread.interrupted()) {
-                        Exception result = new InterruptedException("Exporter job was interrupted");
-                        return result;
-                      }
-                    } catch (Exception e) {
-                      return e;
-                    }
+                  if (args.containsKey("segmentation")) {
+                    subgraphQuery.setSegmentation(args.get("segmentation"));
                   }
-                  return null;
-                }).filter((result) -> result != null).findAny();
+
+                  final SaltProject p = SaltFactory.createSaltProject();
+                  SCorpusGraph cg = p.createCorpusGraph();
+                  URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
+                  SDocument doc = cg.createDocument(docURI);
+
+                  try {
+                    File graphML = corporaApi.subgraphForNodes(corpusPath.get(0), subgraphQuery);
+
+                    SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+                    doc.setDocumentGraph(docGraph);
+                    Helper.addMatchToDocumentGraph(match, doc);
+
+                    int currentOffset = offset.getAndIncrement();
+                    int currentPCounter = pCounter.getAndIncrement();
+                    convertSaltProject(p, finalKeys, args, alignmc, currentOffset, corpusConfigs,
+                        out, nodeCount, ui);
+
+                    offsets.put(currentPCounter, currentOffset);
+                    cache.put(new Element(currentPCounter, p));
+
+
+                    if (eventBus != null && (currentOffset + 1) % 100 == 0) {
+                      eventBus.post(currentOffset + 1);
+                    }
+
+                    if (Thread.interrupted()) {
+                      Exception result = new InterruptedException("Exporter job was interrupted");
+                      return result;
+                    }
+                  } catch (Exception e) {
+                    return e;
+                      }
+                    }
+                return null;
+              }).filter((result) -> result != null).findAny();
+            }
+
 
             if (ex.isPresent()) {
               return ex.get();
