@@ -28,9 +28,9 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.util.filter.SimpleStringFilter;
-import com.vaadin.v7.ui.TextField;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
 import java.io.File;
 import java.io.FileInputStream;
@@ -71,13 +71,11 @@ public class DocBrowserPanel extends Panel {
 
           TextField txtFilter = new TextField();
           txtFilter.setWidth("100%");
-          txtFilter.setInputPrompt("Filter documents by name");
-          txtFilter.setImmediate(true);
-          txtFilter.setTextChangeTimeout(500);
-          txtFilter.addTextChangeListener(event -> {
+          txtFilter.setPlaceholder("Filter documents by name");
+          txtFilter.addValueChangeListener(event -> {
             if (table != null) {
               table.setContainerFilter(new SimpleStringFilter(DocBrowserTable.PROP_DOC_NAME,
-                  event.getText(), true, false));
+                  event.getValue(), true, false));
             }
           });
 
