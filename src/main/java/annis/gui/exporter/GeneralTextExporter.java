@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,6 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.QueryLanguage;
@@ -138,7 +140,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
       CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
       if (keys == null || keys.isEmpty()) {
-        keys = ExportHelper.getAllAnnotationsAsExporterKey(corpora, corporaApi);
+        keys = getAllAnnotationsAsExporterKey(corpora, corporaApi);
       }
 
       final List<String> finalKeys = keys;
@@ -217,5 +219,31 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   @Override
   public boolean needsContext() {
     return true;
+  }
+
+  /**
+   * Queries all annotations for the given corpora.
+   * 
+   * @param corpora The corpora to query
+   * @param api An API object used to perform the lookup
+   * @return A list of annotation names.
+   * @throws ApiException
+   */
+  protected List<String> getAllAnnotationsAsExporterKey(Collection<String> corpora,
+      CorporaApi api) throws ApiException {
+    LinkedList<String> keys = new LinkedList<>();
+    keys.add("tok");
+    List<Annotation> attributes = new LinkedList<>();
+  
+    for (String corpus : corpora) {
+      attributes.addAll(api.nodeAnnotations(corpus, false, false));
+    }
+  
+    for (Annotation a : attributes) {
+      if (a.getKey().getName() != null) {
+        keys.add(a.getKey().getName());
+      }
+    }
+    return keys;
   }
 }
