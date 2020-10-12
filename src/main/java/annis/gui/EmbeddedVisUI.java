@@ -23,6 +23,7 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.Match;
+import annis.service.objects.RawTextWrapper;
 import annis.visualizers.htmlvis.HTMLVis;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
@@ -214,6 +215,7 @@ public class EmbeddedVisUI extends CommonUI {
     Match match = Match.parseFromString(args.get(KEY_MATCH)[0]);
     List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
     if (args.containsKey(KEY_FULLTEXT)) {
+      
       StringBuilder aql = new StringBuilder();
       aql.append("node @* annis:node_name=/");
       aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(corpusPath)));
@@ -221,6 +223,8 @@ public class EmbeddedVisUI extends CommonUI {
       Background.runWithCallback(
           () -> api.subgraphForQuery(corpusPath.get(0), aql.toString(), QueryLanguage.AQL, null),
           new GraphMLLoaderCallback(corpusPath, visPlugin.get(), args));
+
+
     } else {
       SubgraphWithContext subgraphQuery = new SubgraphWithContext();
       subgraphQuery.setLeft(Integer.parseInt(args.get(KEY_LEFT)[0]));
@@ -252,6 +256,9 @@ public class EmbeddedVisUI extends CommonUI {
     // generate the visualizer
     VisualizerInput visInput = new VisualizerInput();
     visInput.setDocument(doc);
+    if (visPlugin.isUsingRawText()) {
+      visInput.setRawText(new RawTextWrapper(doc.getDocumentGraph()));
+    }
     if (getInstanceConfig() != null && getInstanceConfig().getFont() != null) {
       visInput.setFont(getInstanceFont());
     }
