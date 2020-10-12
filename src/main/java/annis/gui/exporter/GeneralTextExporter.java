@@ -195,10 +195,6 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
         return ex.get();
       }
 
-      out.append("\n");
-      out.append("\n");
-      out.append("finished");
-
       return null;
 
     } catch (ApiException | IOException ex) {
