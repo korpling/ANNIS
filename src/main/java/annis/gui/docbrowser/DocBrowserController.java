@@ -196,17 +196,19 @@ public class DocBrowserController implements Serializable {
 
       // Build a query that includes all (possible filtered by name) node of the document
       boolean fallbackToAll = false;
-      if (nodeAnnoFilter == null) {
-        fallbackToAll = true;
-      } else {
-        nodeAnnoFilter = nodeAnnoFilter.stream()
-            .map((anno_name) -> anno_name.replaceFirst("::", ":")).collect(Collectors.toList());
-        for (String nodeAnno : nodeAnnoFilter) {
-          if (!validQNamePattern.matcher(nodeAnno).matches()) {
-            // If we can't produce a valid query for this annotation name fallback
-            // to retrieve all annotations.
-            fallbackToAll = true;
-            break;
+      if (!useRawText) {
+        if (nodeAnnoFilter == null) {
+          fallbackToAll = true;
+        } else {
+          nodeAnnoFilter = nodeAnnoFilter.stream()
+              .map((anno_name) -> anno_name.replaceFirst("::", ":")).collect(Collectors.toList());
+          for (String nodeAnno : nodeAnnoFilter) {
+            if (!validQNamePattern.matcher(nodeAnno).matches()) {
+              // If we can't produce a valid query for this annotation name fallback
+              // to retrieve all annotations.
+              fallbackToAll = true;
+              break;
+            }
           }
         }
       }
@@ -216,50 +218,38 @@ public class DocBrowserController implements Serializable {
       URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(docPath));
       SDocument doc = cg.createDocument(docURI);
 
-      try {
-      if (useRawText) {
-        SDocumentGraph docGraph = Helper.getRawTextDocumentGraph(docPath.get(0), docPath, ui);
-        doc.setDocumentGraph(docGraph);
-
-        input.setRawText(new RawTextWrapper(docGraph));
+      StringBuilder aql = new StringBuilder();
+      if (fallbackToAll) {
+        aql.append("(n#node");
+        aql.append(") & doc#annis:node_name=/");
+        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
+        aql.append("/ & #n @* #doc");
       } else {
-        StringBuilder aql = new StringBuilder();
-        if (fallbackToAll) {
-          aql.append("(n#node");
-          aql.append(") & doc#annis:node_name=/");
-          aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
-          aql.append("/ & #n @* #doc");
-        } else {
-          aql.append("(a#tok");
+        aql.append("(a#tok");
+        if (nodeAnnoFilter != null) {
           for (String nodeAnno : nodeAnnoFilter) {
             aql.append(" | a#");
             aql.append(nodeAnno);
           }
-
-          aql.append(") & doc#annis:node_name=/");
-          aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
-          aql.append("/ & #a @* #doc");
-
-          File graphML = api.subgraphForQuery(docPath.get(0), aql.toString(), QueryLanguage.AQL,
-              null);
-
-
-            SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-            doc.setDocumentGraph(docGraph);
-
-            SDocument sDoc = p.getCorpusGraphs().get(0).getDocuments().get(0);
-            input.setResult(sDoc);
-
         }
+
+        aql.append(") & doc#annis:node_name=/");
+        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
+        aql.append("/ & #a @* #doc");
       }
+      File graphML = api.subgraphForQuery(docPath.get(0), aql.toString(), QueryLanguage.AQL, null);
+
+      SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+      doc.setDocumentGraph(docGraph);
+      input.setResult(doc);
+      if (useRawText) {
+        input.setRawText(new RawTextWrapper(docGraph));
+      }
+    } catch (ApiException e) {
+      log.error("General remote service exception", e);
     } catch (XMLStreamException | IOException ex) {
       log.error("Could not map GraphML to Salt", ex);
       ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
-    }
-
-
-    } catch (ApiException e) {
-      log.error("General remote service exception", e);
     }
 
     return input;
