@@ -14,6 +14,7 @@ import annis.gui.AnnisUI;
 import annis.gui.EmbeddedVisUI;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.resultview.SingleResultPanel;
+import annis.gui.widgets.AutoHeightIFrame;
 import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.Row;
 import annis.visualizers.component.kwic.KWICComponent;
@@ -105,6 +106,13 @@ class SearchTest {
     assertEquals("in", tokens.get(0).getEvents().get(3).getValue());
     assertEquals("Zossen", tokens.get(0).getEvents().get(4).getValue());
     assertEquals("wollen", tokens.get(0).getEvents().get(5).getValue());
+
+    // Open the coreference visualizer and check that IFrame component is loaded
+    Button btOpenVisualizer =
+        _get(resultPanel, Button.class, spec -> spec.withCaption("coreference (discourse)"));
+    _click(btOpenVisualizer);
+    awaitCondition(120, () -> !_find(resultPanel, AutoHeightIFrame.class).isEmpty());
+    AutoHeightIFrame iframe = _get(resultPanel, AutoHeightIFrame.class, spec -> spec.withCount(1));
   }
 
   @Test
